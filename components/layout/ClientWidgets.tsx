@@ -13,12 +13,6 @@ const FloatingChatWidget = dynamic(
   { ssr: false, loading: () => null }
 );
 
-// Lazy load funding toast - shows WIOA/free tuition info
-const FundingToast = dynamic(
-  () => import('@/components/ui/FundingToast'),
-  { ssr: false, loading: () => null }
-);
-
 // Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
   () => import('@/components/programs/StickyMobileCTA').then(mod => ({ default: mod.StickyMobileCTA })),
@@ -67,21 +61,9 @@ const SentryInit = dynamic(
   { ssr: false, loading: () => null }
 );
 
-// Voice assistant - global voice interaction
-const VoiceAssistant = dynamic(
-  () => import('@/components/VoiceAssistant').then(mod => ({ default: mod.VoiceAssistant })),
-  { ssr: false, loading: () => null }
-);
-
 // Global avatar guide
 const GlobalAvatar = dynamic(
   () => import('@/components/GlobalAvatar'),
-  { ssr: false, loading: () => null }
-);
-
-// Mobile voiceover for accessibility
-const MobileVoiceOver = dynamic(
-  () => import('@/components/MobileVoiceOver').then(mod => ({ default: mod.MobileVoiceOver })),
   { ssr: false, loading: () => null }
 );
 
@@ -90,7 +72,6 @@ const MobileVoiceOver = dynamic(
 
 export default function ClientWidgets() {
   const [showChat, setShowChat] = useState(false);
-  const [showFundingToast, setShowFundingToast] = useState(false);
   const [showDeferredWidgets, setShowDeferredWidgets] = useState(false);
   const pathname = usePathname();
 
@@ -123,8 +104,8 @@ export default function ClientWidgets() {
       }
     };
 
-    // Load after 6 seconds
-    const timer = setTimeout(loadChat, 6000);
+    // Load after 8 seconds idle
+    const timer = setTimeout(loadChat, 8000);
 
     // Load on scroll
     const handleScroll = () => loadChat();
@@ -134,11 +115,8 @@ export default function ClientWidgets() {
     const handleClick = () => loadChat();
     window.addEventListener('click', handleClick, { once: true });
 
-    // Show funding toast after short delay (handled internally by component)
-    setShowFundingToast(true);
-
-    // Load deferred widgets after 2 seconds
-    const deferredTimer = setTimeout(() => setShowDeferredWidgets(true), 2000);
+    // Load deferred widgets after 4 seconds — keeps initial paint fast
+    const deferredTimer = setTimeout(() => setShowDeferredWidgets(true), 4000);
 
     return () => {
       clearTimeout(timer);

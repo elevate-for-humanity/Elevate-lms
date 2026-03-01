@@ -91,7 +91,7 @@ export function InView({
   // Before JS hydrates, render fully visible (no opacity-0).
   // After hydration, apply the animation classes.
   const animClass = mounted
-    ? `transition-all ease-out will-change-[transform,opacity] ${visible ? anim.visible : anim.hidden}`
+    ? `transition-all ease-out ${visible ? anim.visible : anim.hidden}`
     : '';
 
   return (

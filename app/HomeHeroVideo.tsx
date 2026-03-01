@@ -91,7 +91,7 @@ export default function HomeHeroVideo() {
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
 
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
+      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
 
       {isPlaying && (
         <>

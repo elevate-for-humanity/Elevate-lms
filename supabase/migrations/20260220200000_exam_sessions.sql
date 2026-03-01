@@ -40,9 +40,16 @@ CREATE TABLE exam_sessions (
   proctor_name  TEXT NOT NULL,
   proctor_notes TEXT,
 
+  -- Delivery
+  delivery_method TEXT NOT NULL DEFAULT 'in_person',    -- in_person, online_proctored, hybrid
+  is_retest     BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- Program linkage (optional)
   program_slug  TEXT,                                   -- e.g. "hvac-technician"
   cohort_id     UUID,
+
+  -- Evidence
+  evidence_url  TEXT,                                   -- Link to uploaded cert, score report, or photo
 
   -- Audit
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),

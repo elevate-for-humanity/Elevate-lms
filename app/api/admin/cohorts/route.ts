@@ -75,15 +75,32 @@ async function _POST(request: Request) {
       .from('cohorts')
       .insert({
         program_id: body.program_id,
+        program_slug: body.program_slug || null,
         code: body.code,
         name: body.name,
+        cohort_name: body.cohort_name || body.name,
         start_date: body.start_date,
         end_date: body.end_date,
+        cohort_start_date: body.cohort_start_date || body.start_date,
+        cohort_end_date: body.cohort_end_date || body.end_date,
+        planned_end_date: body.planned_end_date || null,
         max_capacity: body.max_capacity || 20,
+        max_enrollment: body.max_enrollment || body.max_capacity || null,
         status: body.status || 'planned',
         location: body.location,
         instructor_id: body.instructor_id,
         notes: body.notes,
+        // Workforce scheduling metadata
+        partner_name: body.partner_name || null,
+        partner_id: body.partner_id || null,
+        duration_weeks_min: body.duration_weeks_min || null,
+        duration_weeks_max: body.duration_weeks_max || null,
+        delivery_window_text: body.delivery_window_text || null,
+        session_length_minutes_default: body.session_length_minutes_default || 180,
+        sessions_per_week_min: body.sessions_per_week_min || null,
+        sessions_per_week_max: body.sessions_per_week_max || null,
+        funding_streams: body.funding_streams || [],
+        reporting_notes: body.reporting_notes || null,
       })
       .select()
       .single();

@@ -28,6 +28,25 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
   const supabase = createClient();
   const isEdit = !!session;
 
+  // Current user's tenant + profile
+  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('tenant_id')
+          .eq('id', user.id)
+          .single();
+        if (profile) setTenantId(profile.tenant_id);
+      }
+    })();
+  }, [supabase]);
+
   // Student lookup
   const [studentSearch, setStudentSearch] = useState('');
   const [studentMatches, setStudentMatches] = useState<StudentMatch[]>([]);
@@ -93,6 +112,7 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
     setSaving(true);
 
     const payload = {
+      tenant_id: tenantId,
       student_id: studentId || null,
       student_name: studentName.trim(),
       student_email: studentEmail.trim() || null,
@@ -111,7 +131,7 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
       duration_min: parseInt(durationMin) || 180,
       started_at: startedAt ? new Date(startedAt).toISOString() : null,
       completed_at: completedAt ? new Date(completedAt).toISOString() : null,
-      proctor_id: null, // Set by RLS/trigger based on auth.uid()
+      proctor_id: currentUserId,
       proctor_name: proctorName,
       proctor_notes: proctorNotes || null,
       is_retest: isRetest,

@@ -25,10 +25,12 @@ export const BARBER_PRICING = {
   billingHour: 10, // 10:00 AM local
 } as const;
 
-// Stripe price IDs (to be set after creating in Stripe dashboard)
+// Stripe price IDs — resolved via centralized config (lib/stripe/prices.ts)
+import { PRICES } from '@/lib/stripe/prices';
+
 export const STRIPE_PRICES = {
-  barberSetupFee: process.env.STRIPE_PRICE_BARBER_SETUP_FEE || '',
-  barberWeeklyPayment: process.env.STRIPE_PRICE_BARBER_WEEKLY || '',
+  barberSetupFee: PRICES.BARBER_SETUP_FEE,
+  barberWeeklyPayment: PRICES.BARBER_WEEKLY,
 } as const;
 
 export interface WeeklyPaymentCalculation {

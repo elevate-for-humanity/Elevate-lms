@@ -5,6 +5,8 @@
  * Ensures all required Stripe env vars are present before processing payments.
  */
 
+import { PRICES } from '@/lib/stripe/prices';
+
 export interface StripeEnvConfig {
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
@@ -42,8 +44,8 @@ export function validateStripeEnv(): StripeEnvConfig {
   return {
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
-    STRIPE_PRICE_MONTHLY: process.env.STRIPE_PRICE_MONTHLY,
-    STRIPE_PRICE_ANNUAL: process.env.STRIPE_PRICE_ANNUAL,
+    STRIPE_PRICE_MONTHLY: PRICES.MONTHLY,
+    STRIPE_PRICE_ANNUAL: PRICES.ANNUAL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   };
 }
@@ -52,16 +54,16 @@ export function validateStripeEnv(): StripeEnvConfig {
  * Validate that price IDs are configured for subscription creation
  */
 export function validateStripePriceIds(): void {
-  const priceIds = [
-    'STRIPE_PRICE_MONTHLY',
-    'STRIPE_PRICE_ANNUAL',
-  ];
+  const priceIds = {
+    MONTHLY: PRICES.MONTHLY,
+    ANNUAL: PRICES.ANNUAL,
+  };
 
-  const missing = priceIds.filter((key) => !process.env[key]);
+  const missing = Object.entries(priceIds).filter(([, v]) => !v).map(([k]) => k);
 
-  if (missing.length === priceIds.length) {
+  if (missing.length === Object.keys(priceIds).length) {
     throw new StripeConfigError(
-      'No Stripe price IDs configured. At least one of STRIPE_PRICE_MONTHLY or STRIPE_PRICE_ANNUAL must be set.',
+      'No Stripe price IDs configured. Set STRIPE_PRICES_JSON or individual STRIPE_PRICE_MONTHLY / STRIPE_PRICE_ANNUAL.',
       missing
     );
   }

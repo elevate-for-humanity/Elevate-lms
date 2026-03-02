@@ -16,11 +16,12 @@ import { logger } from '@/lib/logger';
 import { auditMutation } from '@/lib/api/withAudit';
 import { setAuditContext } from '@/lib/audit-context';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { PRICES } from '@/lib/stripe/prices';
 
 function tierFromPrice(priceId?: string | null): 'free' | 'student' | 'career' {
   if (!priceId) return 'free';
-  if (priceId === process.env.STRIPE_PRICE_STUDENT) return 'student';
-  if (priceId === process.env.STRIPE_PRICE_CAREER) return 'career';
+  if (priceId === PRICES.STUDENT) return 'student';
+  if (priceId === PRICES.CAREER) return 'career';
   return 'free';
 }
 

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { PRICES } from '@/lib/stripe/prices';
 
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
@@ -31,7 +32,8 @@ async function _POST(request: Request) {
     );
   }
 
-  if (!process.env.STRIPE_PRICE_CAREER) {
+  const careerPrice = PRICES.CAREER;
+  if (!careerPrice) {
     return NextResponse.json(
       { error: 'Career pricing not configured' },
       { status: 500 }
@@ -41,7 +43,7 @@ async function _POST(request: Request) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      line_items: [{ price: process.env.STRIPE_PRICE_CAREER, quantity: 1 }],
+      line_items: [{ price: careerPrice, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/lms/(app)/dashboard?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/pricing`,
       subscription_data: {

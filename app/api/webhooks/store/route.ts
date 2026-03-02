@@ -264,12 +264,11 @@ async function _POST(req: NextRequest) {
         logger.error('Error updating purchase on refund', { error: purchaseError });
       }
 
-      // Revoke LMS enrollment if applicable
+      // POLICY: Refund reverses funding, not training.
+      // Training status is untouched; admin must explicitly terminate if needed.
       const { error: enrollmentError } = await db
         .from('program_enrollments')
         .update({
-          status: 'refunded',
-          refunded_at: new Date().toISOString(),
           funding_status: 'refunded',
           funding_status_changed_at: new Date().toISOString(),
           funding_status_reason: `Store refund on charge ${charge.id}`,
@@ -277,7 +276,7 @@ async function _POST(req: NextRequest) {
         .eq('payment_id', paymentIntentId);
 
       if (enrollmentError) {
-        logger.error('Error revoking enrollment on refund', { error: enrollmentError });
+        logger.error('Error updating enrollment funding_status on refund', { error: enrollmentError });
       }
 
       // Flag certificates as funding-invalid (credential was earned, but payment reversed)

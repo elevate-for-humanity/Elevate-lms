@@ -234,7 +234,13 @@ async function _POST(request: NextRequest) {
     ]);
     const isDestructive = DESTRUCTIVE_EVENT_TYPES.has(event.type);
 
-    // Idempotency check - prevent duplicate processing
+    // Idempotency & ordering guarantee:
+    // We claim exactly-once side effects per (provider, event_id) because
+    // the idempotency record (stripe_webhook_events) is created BEFORE
+    // any side effects. Retries short-circuit before mutations. Destructive
+    // events (refund, subscription changes) are fail-closed: if we cannot
+    // record the event, we skip all mutations and return 200 so Stripe
+    // retries on the next attempt.
     let existingEvent = null;
     let idempotencyAvailable = true;
     try {
@@ -1986,16 +1992,18 @@ async function _POST(request: NextRequest) {
           logger.info(`[webhook] Revoked entitlements for user ${userId} due to refund on charge ${charge.id}`);
         }
 
-        // If there's an enrollment, mark funding as refunded.
-        // Training status and funding status are independent:
-        //   status = 'refunded' (training terminated)
-        //   funding_status = 'refunded' (payment reversed, training may continue)
+        // POLICY: Refund reverses funding, not training.
+        // A payment reversal is a fiscal event, not an instructional event.
+        // The student earned competency; access continues unless an admin
+        // explicitly terminates enrollment via a separate action.
+        //
+        // We update ONLY funding_status. Training status (status column)
+        // is untouched. If an admin later decides to terminate, they set
+        // status='cancelled' through the admin UI, which requires reason+actor.
         if (enrollmentId) {
           const { error: enrollError } = await supabase
             .from('program_enrollments')
             .update({ 
-              status: 'refunded',
-              refunded_at: new Date().toISOString(),
               funding_status: 'refunded',
               funding_status_changed_at: new Date().toISOString(),
               funding_status_reason: `Stripe charge.refunded: ${charge.id}`,
@@ -2003,9 +2011,9 @@ async function _POST(request: NextRequest) {
             .eq('id', enrollmentId);
 
           if (enrollError) {
-            logger.error('[webhook] Error updating enrollment status:', enrollError);
+            logger.error('[webhook] Error updating enrollment funding_status:', enrollError);
           } else {
-            logger.info(`[webhook] Marked enrollment ${enrollmentId} as refunded (training + funding)`);
+            logger.info(`[webhook] Marked enrollment ${enrollmentId} funding_status=refunded (training status unchanged)`);
           }
         }
 
@@ -2039,7 +2047,9 @@ async function _POST(request: NextRequest) {
           }
         }
 
-        // Record in multi-provider webhook log
+        // Cross-provider reconciliation record (post-mutation).
+        // Idempotency for Stripe is handled by stripe_webhook_events (pre-mutation).
+        // This table is for multi-provider reconciliation reporting only.
         try {
           await supabase.from('webhook_events_processed').insert({
             provider: 'stripe',

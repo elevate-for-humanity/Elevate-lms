@@ -9,6 +9,9 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
+import { createHash } from 'crypto';
+
+const BUILD_SHA = process.env.COMMIT_REF?.slice(0, 12) || 'dev';
 
 async function _POST(request: Request) {
   try {
@@ -249,27 +252,36 @@ async function _POST(request: Request) {
           min_rti_hours: eligibilityEvidence?.minRtiHours || 0,
         } : null,
         // Immutable point-in-time snapshot at issuance. Never updated after insert.
-        // Auditors can compare this against current funding_status to see what changed.
-        issuance_snapshot: {
-          snapshot_version: 1,
-          issued_at: new Date().toISOString(),
-          funding_source: enrollment?.funding_source || null,
-          funding_status_at_issuance: enrollment?.funding_status || 'funded',
-          amount_paid_cents: enrollment?.amount_paid_cents || null,
-          payment_reference: enrollment?.stripe_payment_intent_id || null,
-          enrollment_id: enrollment?.id || null,
-          enrollment_status_at_issuance: enrollment?.status || null,
-          issuance_policy: isApprenticeship ? 'apprenticeship_certificate' : 'course_certificate',
-          competency_evidence: isApprenticeship ? {
-            ojl_hours: eligibilityEvidence?.approvedHours?.ojl || 0,
-            rti_hours: eligibilityEvidence?.approvedHours?.rti || 0,
-            min_ojl_required: eligibilityEvidence?.minOjlHours || 0,
-            min_rti_required: eligibilityEvidence?.minRtiHours || 0,
-          } : {
-            duration_hours: course?.duration_hours || 0,
-          },
-          issued_by: user.id,
-        },
+        // DB trigger (trg_protect_issuance_snapshot) blocks mutation.
+        // Auditors compare this against current funding_status to see what changed.
+        issuance_snapshot: (() => {
+          const snapshot = {
+            snapshot_version: 1,
+            build_sha: BUILD_SHA,
+            issued_at: new Date().toISOString(),
+            funding_source: enrollment?.funding_source || null,
+            funding_status_at_issuance: enrollment?.funding_status || 'funded',
+            amount_paid_cents: enrollment?.amount_paid_cents || null,
+            payment_reference: enrollment?.stripe_payment_intent_id || null,
+            enrollment_id: enrollment?.id || null,
+            enrollment_status_at_issuance: enrollment?.status || null,
+            issuance_policy: isApprenticeship ? 'apprenticeship_certificate' : 'course_certificate',
+            competency_evidence: isApprenticeship ? {
+              ojl_hours: eligibilityEvidence?.approvedHours?.ojl || 0,
+              rti_hours: eligibilityEvidence?.approvedHours?.rti || 0,
+              min_ojl_required: eligibilityEvidence?.minOjlHours || 0,
+              min_rti_required: eligibilityEvidence?.minRtiHours || 0,
+            } : {
+              seat_time_hours: course?.duration_hours || 0,
+            },
+            issued_by: user.id,
+          };
+          const canonical = JSON.stringify(snapshot, Object.keys(snapshot).sort());
+          return {
+            ...snapshot,
+            snapshot_hash: createHash('sha256').update(canonical).digest('hex'),
+          };
+        })(),
       })
       .select('*')
       .single();

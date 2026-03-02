@@ -25,7 +25,12 @@ async function _POST(
 
     const { lessonId } = await params;
     const body = await request.json().catch(() => ({}));
-    const { timeSpentSeconds } = body;
+    // Clamp seat time: minimum 1s, maximum 4 hours per lesson
+    const MAX_LESSON_SECONDS = 4 * 60 * 60;
+    const timeSpentSeconds = Math.min(
+      Math.max(1, Number(body.timeSpentSeconds) || 1),
+      MAX_LESSON_SECONDS
+    );
 
     const userClient = await createClient();
     const admin = createAdminClient();
@@ -54,6 +59,57 @@ async function _POST(
     if (!enrollment) {
       return NextResponse.json(
         { error: 'Not enrolled in this course' },
+        { status: 403 }
+      );
+    }
+
+    // Fetch lesson details for type-specific enforcement
+    const { data: lessonDetail } = await db
+      .from('training_lessons')
+      .select('content_type, duration_minutes')
+      .eq('id', lessonId)
+      .single();
+
+    const contentType = lessonDetail?.content_type || 'video';
+
+    // Quiz lessons require a passing attempt before they can be marked complete
+    if (contentType === 'quiz') {
+      const { data: passingAttempt } = await db
+        .from('quiz_attempts')
+        .select('id')
+        .eq('user_uuid', user.id)
+        .eq('quiz_id', lessonId)
+        .eq('passed', true)
+        .limit(1)
+        .maybeSingle();
+
+      if (!passingAttempt) {
+        return NextResponse.json(
+          { error: 'Quiz must be passed before marking complete' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Per-lesson-type minimum seat time (seconds)
+    // Prevents instant click-through completion
+    const MINIMUM_SEAT_TIME: Record<string, number> = {
+      reading: 90,    // 1.5 min minimum for reading lessons
+      video: 120,     // 2 min minimum for video lessons (real enforcement is 90% watched client-side)
+      quiz: 30,       // 30s minimum for quiz lessons (real enforcement is pass score)
+      lab: 60,        // 1 min minimum for lab/assignment lessons
+      assignment: 60,
+    };
+
+    const minTime = MINIMUM_SEAT_TIME[contentType] || 30;
+    if (timeSpentSeconds < minTime) {
+      return NextResponse.json(
+        {
+          error: 'Minimum time requirement not met',
+          required: minTime,
+          actual: timeSpentSeconds,
+          message: `This lesson requires at least ${Math.ceil(minTime / 60)} minute(s) of engagement before it can be marked complete.`,
+        },
         { status: 403 }
       );
     }
@@ -131,41 +187,9 @@ async function _POST(
     // Check if course is now complete
     const courseCompleted = progressPercent === 100;
 
-    // Auto-create certificate if course completed
-    let certificate = null;
-    if (courseCompleted) {
-      // Fetch actual course name
-      const { data: course } = await db
-        .from('training_courses')
-        .select('course_name')
-        .eq('id', lesson.course_id)
-        .single();
-
-      const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
-      const certResult = await issueCertificate({
-        supabase,
-        studentId: user.id,
-        courseId: lesson.course_id,
-        enrollmentId: enrollment.id,
-        studentName: user.user_metadata?.full_name || user.email || 'Student',
-        courseTitle: course?.course_name || lesson.title,
-      });
-      if (certResult.success && certResult.certificate) {
-        certificate = certResult.certificate;
-        logger.info('Certificate issued', {
-          userId: user.id,
-          courseId: lesson.course_id,
-          certificateNumber: certResult.certificate.certificate_number,
-          alreadyIssued: certResult.alreadyIssued,
-        });
-      }
-
-      logger.info('Course completed', {
-        userId: user.id,
-        courseId: lesson.course_id,
-        progressPercent,
-      });
-    }
+    // NOTE: Certificate issuance is handled by /api/lms/progress/complete
+    // which enforces quiz pass verification and competency evidence.
+    // This endpoint only tracks lesson-level progress.
 
     return NextResponse.json({
       success: true,
@@ -179,7 +203,6 @@ async function _POST(
         progressPercent,
         courseCompleted,
       },
-      certificate,
     });
   } catch (error) {
     logger.error('Lesson complete API error:', error);

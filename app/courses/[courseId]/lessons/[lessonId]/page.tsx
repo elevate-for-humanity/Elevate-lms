@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
@@ -26,33 +26,7 @@ import LessonPlayer from '@/components/lms/LessonPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
-
-// Lesson-to-module mapping (same as course page)
-const LESSON_MODULE_MAP: Record<number, number[]> = {
-  1: [1, 2, 3, 4],
-  2: [5, 6, 7, 8, 9],
-  3: [10, 11, 12, 13, 14],
-  4: [15, 16, 17, 18, 19, 20],
-  5: [21, 22, 23, 24, 25, 26],
-  6: [27, 28, 29, 30, 31, 32, 33, 34],
-  7: [35, 36, 37, 38, 39],
-  8: [40, 41, 42, 43, 44, 45, 46],
-  9: [47, 48, 49, 50, 51, 52],
-  10: [53, 54, 55, 56, 57, 58, 59],
-  11: [60, 61, 62, 63, 64],
-  12: [65, 66, 67, 68, 69, 70],
-  13: [71, 72, 73, 74, 75, 76],
-  14: [77, 78, 79, 80, 81, 82, 83, 84],
-  15: [85, 86, 87, 88, 89],
-  16: [90, 91, 92, 93, 94, 95],
-};
-
-function getModuleForLesson(lessonNumber: number): number {
-  for (const [moduleIdx, lessons] of Object.entries(LESSON_MODULE_MAP)) {
-    if (lessons.includes(lessonNumber)) return parseInt(moduleIdx);
-  }
-  return 0;
-}
+import { LESSON_MODULE_MAP, getModuleForLesson } from '@/lib/courses/lesson-module-map';
 
 interface ModuleGroup {
   id: string;
@@ -79,6 +53,12 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [videoWatchPercent, setVideoWatchPercent] = useState(0);
+  const lessonStartTime = useRef(Date.now());
+
+  // Reset start time when lesson changes
+  useEffect(() => {
+    lessonStartTime.current = Date.now();
+  }, [lessonId]);
 
   useEffect(() => {
     fetchLessonData();
@@ -94,10 +74,30 @@ export default function LessonPage() {
     const lessonData = lessonsData.find((l: any) => l.id === lessonId) || null;
 
     if (lessonData) {
-      setLesson({ ...lessonData, resources: lessonData.resources || [] });
+      // Normalize quiz_questions: DB may store as JSON string or parsed array
+      let qq = lessonData.quiz_questions;
+      if (typeof qq === 'string') {
+        try { qq = JSON.parse(qq); } catch { qq = []; }
+      }
+      // Normalize answer key: some questions use "correct" instead of "correctAnswer"
+      if (Array.isArray(qq)) {
+        qq = qq.map((q: any) => {
+          if (q.correctAnswer === undefined && q.correct !== undefined) {
+            return { ...q, correctAnswer: q.correct };
+          }
+          return q;
+        });
+      }
+      setLesson({ ...lessonData, quiz_questions: qq || [], resources: lessonData.resources || [] });
     }
     if (lessonsData) setLessons(lessonsData);
     if (modulesData) setModules(modulesData);
+
+    // Redirect unenrolled users to the course page to enroll
+    if (apiData.enrolled === false) {
+      router.push(`/courses/${courseId}`);
+      return;
+    }
 
     if (courseData) {
       setCourse({
@@ -144,6 +144,8 @@ export default function LessonPage() {
     return true; // reading lessons
   };
 
+  const getElapsedSeconds = () => Math.max(1, Math.floor((Date.now() - lessonStartTime.current) / 1000));
+
   const markComplete = async () => {
     if (isCompleted) return; // no un-completing
     if (!canMarkComplete()) return;
@@ -153,7 +155,7 @@ export default function LessonPage() {
       const response = await fetch(`/api/lessons/${lessonId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeSpentSeconds: 0 }),
+        body: JSON.stringify({ timeSpentSeconds: getElapsedSeconds() }),
       });
       if (!response.ok) { setIsCompleted(false); return; }
       const result = await response.json();
@@ -499,7 +501,7 @@ export default function LessonPage() {
                       const response = await fetch(`/api/lessons/${lessonId}/complete`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ timeSpentSeconds: 0 }),
+                        body: JSON.stringify({ timeSpentSeconds: getElapsedSeconds() }),
                       });
                       if (response.ok) {
                         setCompletedLessonIds((prev) => new Set([...prev, lessonId]));

@@ -61,33 +61,7 @@ export async function generateMetadata({
 }
 import { Clock, Users, Award, BookOpen, Play, ChevronDown, Shield, Wrench } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-// Map lesson_number ranges to module order_index
-const LESSON_MODULE_MAP: Record<number, number[]> = {
-  1: [1, 2, 3, 4],
-  2: [5, 6, 7, 8, 9],
-  3: [10, 11, 12, 13, 14],
-  4: [15, 16, 17, 18, 19, 20],
-  5: [21, 22, 23, 24, 25, 26],
-  6: [27, 28, 29, 30, 31, 32, 33, 34],
-  7: [35, 36, 37, 38, 39],
-  8: [40, 41, 42, 43, 44, 45, 46],
-  9: [47, 48, 49, 50, 51, 52],
-  10: [53, 54, 55, 56, 57, 58, 59],
-  11: [60, 61, 62, 63, 64],
-  12: [65, 66, 67, 68, 69, 70],
-  13: [71, 72, 73, 74, 75, 76],
-  14: [77, 78, 79, 80, 81, 82, 83, 84],
-  15: [85, 86, 87, 88, 89],
-  16: [90, 91, 92, 93, 94, 95],
-};
-
-function getModuleForLesson(lessonNumber: number): number {
-  for (const [moduleIdx, lessons] of Object.entries(LESSON_MODULE_MAP)) {
-    if (lessons.includes(lessonNumber)) return parseInt(moduleIdx);
-  }
-  return 0;
-}
+import { LESSON_MODULE_MAP, getModuleForLesson } from '@/lib/courses/lesson-module-map';
 
 export default async function CourseDetailPage({
   params,

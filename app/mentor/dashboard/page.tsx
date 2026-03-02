@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, Calendar, MessageSquare, Award, ChevronRight } from 'lucide-react';
 
@@ -13,13 +13,11 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function MentorDashboardPage() {
+  // Require mentor role (admins can view for support)
+  const { user } = await requireRole(['mentor', 'admin', 'super_admin']);
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  
-  if (!supabase) redirect('/login');
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/mentor/dashboard');
 
   let menteeCount = 0;
   let sessionCount = 0;

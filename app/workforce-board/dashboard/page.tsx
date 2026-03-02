@@ -17,8 +17,6 @@ import {
   Target,
   Building2,
   GraduationCap,
-  ArrowUpRight,
-  ArrowDownRight,
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -111,7 +109,24 @@ export default async function WorkforceBoardDashboard() {
     .eq('status', 'active')
     .limit(5);
 
-  const performanceMetrics = { employmentRate: 78, medianWageGain: 12500, credentialAttainment: 85, measurableSkillGains: 72 };
+  // Derive WIOA indicators from real data
+  const { data: certificatesIssued } = await db
+    .from('certificates')
+    .select('id', { count: 'exact', head: true });
+  const credentialCount = certificatesIssued?.length ?? 0;
+  // Credential attainment: completers who earned at least one certificate
+  const credentialAttainment = completedEnrollments > 0
+    ? Math.min(100, Math.round((credentialCount / completedEnrollments) * 100))
+    : 0;
+  // Measurable skill gains: active enrollments with progress > 0
+  const { count: skillGainCount } = await db
+    .from('program_enrollments')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'active')
+    .gt('progress_percent', 0);
+  const measurableSkillGains = activeEnrollments > 0
+    ? Math.round(((skillGainCount || 0) / activeEnrollments) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,7 +161,6 @@ export default async function WorkforceBoardDashboard() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-2">
               <Users className="w-8 h-8 text-brand-blue-600" />
-              <span className="text-xs font-medium text-brand-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1" />12%</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-gray-900">{totalEnrollments}</p>
             <p className="text-sm text-gray-600">Total Enrollments</p>
@@ -154,7 +168,6 @@ export default async function WorkforceBoardDashboard() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-2">
               <GraduationCap className="w-8 h-8 text-brand-green-600" />
-              <span className="text-xs font-medium text-brand-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1" />8%</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-gray-900">{completedEnrollments}</p>
             <p className="text-sm text-gray-600">Completions</p>
@@ -166,60 +179,53 @@ export default async function WorkforceBoardDashboard() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Briefcase className="w-8 h-8 text-brand-orange-600" />
-              <span className="text-xs font-medium text-brand-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1" />5%</span>
+              <Award className="w-8 h-8 text-brand-orange-600" />
             </div>
-            <p className="text-2xl md:text-3xl font-bold text-gray-900">{performanceMetrics.employmentRate}%</p>
-            <p className="text-sm text-gray-600">Employment Rate</p>
+            <p className="text-2xl md:text-3xl font-bold text-gray-900">{credentialAttainment}%</p>
+            <p className="text-sm text-gray-600">Credential Attainment</p>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <BarChart3 className="w-5 h-5 mr-2 text-brand-blue-600" />WIOA Performance Indicators
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2 text-brand-blue-600" />WIOA Performance Indicators
+            </h2>
+            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">Derived from enrollment data</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Employment Rate Q2</span>
-                <span className="text-sm font-medium text-brand-green-600">{performanceMetrics.employmentRate}%</span>
+                <span className="text-sm text-gray-600">Completion Rate</span>
+                <span className={`text-sm font-medium ${completionRate >= 75 ? 'text-brand-green-600' : completionRate >= 50 ? 'text-yellow-600' : 'text-brand-red-600'}`}>{completionRate}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-brand-green-600 h-2 rounded-full" style={{ width: `${performanceMetrics.employmentRate}%` }} />
+                <div className={`h-2 rounded-full ${completionRate >= 75 ? 'bg-brand-green-600' : completionRate >= 50 ? 'bg-yellow-500' : 'bg-brand-red-500'}`} style={{ width: `${Math.min(completionRate, 100)}%` }} />
               </div>
               <p className="text-xs text-gray-500 mt-1">Target: 75%</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Median Wage Gain</span>
-                <span className="text-sm font-medium text-brand-green-600">${performanceMetrics.medianWageGain.toLocaleString()}</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-brand-green-600 h-2 rounded-full" style={{ width: '85%' }} />
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Target: $10,000</p>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">Credential Attainment</span>
-                <span className="text-sm font-medium text-brand-green-600">{performanceMetrics.credentialAttainment}%</span>
+                <span className={`text-sm font-medium ${credentialAttainment >= 70 ? 'text-brand-green-600' : credentialAttainment >= 50 ? 'text-yellow-600' : 'text-brand-red-600'}`}>{credentialAttainment}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-brand-green-600 h-2 rounded-full" style={{ width: `${performanceMetrics.credentialAttainment}%` }} />
+                <div className={`h-2 rounded-full ${credentialAttainment >= 70 ? 'bg-brand-green-600' : credentialAttainment >= 50 ? 'bg-yellow-500' : 'bg-brand-red-500'}`} style={{ width: `${Math.min(credentialAttainment, 100)}%` }} />
               </div>
               <p className="text-xs text-gray-500 mt-1">Target: 70%</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">Measurable Skill Gains</span>
-                <span className="text-sm font-medium text-yellow-600">{performanceMetrics.measurableSkillGains}%</span>
+                <span className={`text-sm font-medium ${measurableSkillGains >= 75 ? 'text-brand-green-600' : measurableSkillGains >= 50 ? 'text-yellow-600' : 'text-brand-red-600'}`}>{measurableSkillGains}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${performanceMetrics.measurableSkillGains}%` }} />
+                <div className={`h-2 rounded-full ${measurableSkillGains >= 75 ? 'bg-brand-green-600' : measurableSkillGains >= 50 ? 'bg-yellow-500' : 'bg-brand-red-500'}`} style={{ width: `${Math.min(measurableSkillGains, 100)}%` }} />
               </div>
               <p className="text-xs text-gray-500 mt-1">Target: 75%</p>
             </div>
           </div>
+          <p className="text-xs text-gray-400 mt-4">Employment rate and median wage gain require post-exit follow-up data. Connect employment outcomes to enable these indicators.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -298,8 +304,8 @@ export default async function WorkforceBoardDashboard() {
               <p className="text-sm text-gray-600">Active Participants</p>
             </div>
             <div className="text-center p-4 bg-brand-orange-50 rounded-lg">
-              <p className="text-2xl font-bold text-brand-orange-600">5</p>
-              <p className="text-sm text-gray-600">Industry Sectors</p>
+              <p className="text-2xl font-bold text-brand-orange-600">{completionRate}%</p>
+              <p className="text-sm text-gray-600">Completion Rate</p>
             </div>
           </div>
         </div>

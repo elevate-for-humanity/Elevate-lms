@@ -298,20 +298,16 @@ async function generateCourseCertificate(
     .eq('course_id', courseId)
     .eq('is_required', true);
 
-  // Create certificate record
-  await supabase.from('certificates').insert({
-    user_id: userId,
-    course_id: courseId,
-    certificate_number: generateCertificateNumber(),
-    issued_at: new Date().toISOString(),
-    credential_stack: {
-      primary: course.title,
-      external_credentials:
-        externalModules?.map((m) => ({
-          title: m.title,
-          partner: m.partner_name,
-        })) || [],
-    },
+  // Issue certificate through the canonical gated service
+  const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+  await issueCertificate({
+    supabase,
+    studentId: userId,
+    courseId,
+    studentName: student.full_name || student.email || 'Student',
+    courseTitle: course.title,
+    // No competencyEvidence passed — this path is for non-exam courses.
+    // Courses requiring proctored exams must use /api/lms/progress/complete.
   });
 }
 

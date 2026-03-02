@@ -249,6 +249,29 @@ export default function HomePage() {
       </section>
       </InView>
 
+      {/* ===== EMPLOYMENT SUPPORT ===== */}
+      <InView animation="fade-up">
+      <section aria-label="Employment support services" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-slate-900">One-on-one employment support</h2>
+            <p className="mt-3 text-slate-700">
+              In addition to training, we provide individualized, one-on-one support to help participants prepare for and pursue
+              competitive community employment, including job readiness, applications, interview prep, and employer connections.
+            </p>
+            <div className="mt-4">
+              <Link
+                href="/employment-support"
+                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Learn about support services
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      </InView>
+
       {/* ===== WHY ELEVATE ===== */}
       <InView animation="fade-up">
       <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">

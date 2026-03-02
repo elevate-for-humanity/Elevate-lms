@@ -116,6 +116,7 @@ export const NAV_ITEMS = [
     name: 'Support', 
     href: '/support',
     subItems: [
+      { name: 'Employment Support', href: '/employment-support' },
       { name: 'Help Center', href: '/support/help' },
       { name: 'Contact Us', href: '/contact' },
       { name: 'FAQ', href: '/faq' },

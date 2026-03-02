@@ -1406,7 +1406,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1415,7 +1414,7 @@ export const programs: Program[] = [
       '480 training hours',
       'Earn: Certified Administrative Professional',
       'Salary range: $32,000-$50,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Microsoft Office Suite (Word, Excel, PowerPoint, Outlook)',
@@ -1458,7 +1457,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1467,7 +1465,7 @@ export const programs: Program[] = [
       '1280 training hours',
       'Earn: ASE Certified Technician',
       'Salary range: $35,000-$70,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Engine repair and maintenance',
@@ -1764,7 +1762,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1773,7 +1770,7 @@ export const programs: Program[] = [
       '960 training hours',
       'Earn: Certiport IT Specialist — Cybersecurity',
       'Salary range: $60,000-$110,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Network security fundamentals',
@@ -1816,7 +1813,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1825,7 +1821,7 @@ export const programs: Program[] = [
       '800 training hours',
       'Earn: Data Analyst',
       'Salary range: $55,000-$90,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'SQL and database querying',
@@ -1868,7 +1864,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1877,7 +1872,7 @@ export const programs: Program[] = [
       '480 training hours',
       'Earn: Certified Dental Assistant (CDA)',
       'Salary range: $32,000-$46,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Chairside assisting techniques',
@@ -1920,7 +1915,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -1929,7 +1923,7 @@ export const programs: Program[] = [
       '1280 training hours',
       'Earn: ASE Diesel Certification',
       'Salary range: $40,000-$75,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Diesel engine theory and repair',
@@ -2255,7 +2249,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -2264,7 +2257,7 @@ export const programs: Program[] = [
       '320 training hours',
       'Earn: Certiport IT Specialist',
       'Salary range: $38,000-$60,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Computer hardware and software troubleshooting',
@@ -2355,7 +2348,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -2364,7 +2356,7 @@ export const programs: Program[] = [
       '480 training hours',
       'Earn: Manufacturing Technician Level 1',
       'Salary range: $35,000-$60,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Machine operation and setup',
@@ -2538,7 +2530,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -2547,7 +2538,7 @@ export const programs: Program[] = [
       '640 training hours',
       'Earn: Certified Pharmacy Technician (CPhT)',
       'Salary range: $30,000-$45,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'Medication preparation and compounding',
@@ -2815,7 +2806,6 @@ export const programs: Program[] = [
     approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
-      'Pell Grant',
       'Workforce Ready Grant',
       'Payment Plans'
     ],
@@ -2824,7 +2814,7 @@ export const programs: Program[] = [
       '960 training hours',
       'Earn: Full-Stack Web Developer',
       'Salary range: $50,000-$95,000/year',
-      'Funding: WIOA, Pell Grant'
+      'Funding: WIOA, WRG'
     ],
     whatYouLearn: [
       'HTML, CSS, and JavaScript fundamentals',

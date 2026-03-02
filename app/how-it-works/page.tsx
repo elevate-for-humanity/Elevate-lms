@@ -7,10 +7,10 @@ import { ArrowRight } from 'lucide-react';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/how-it-works' },
   title: 'How It Works | Elevate For Humanity',
-  description: 'From registration to employment in 5 steps. See exactly how Elevate career training works.',
+  description: 'From assessment to employment and follow-up support. See exactly how Elevate workforce and employment services work.',
   openGraph: {
     title: 'How It Works | Elevate for Humanity',
-    description: 'From registration to employment in 5 steps. See exactly how Elevate career training works.',
+    description: 'From assessment to employment and follow-up support. See exactly how Elevate workforce and employment services work.',
     url: 'https://www.elevateforhumanity.org/how-it-works',
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/heroes-hq/how-it-works-hero.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'How It Works | Elevate for Humanity',
-    description: 'From registration to employment in 5 steps.',
+    description: 'From assessment to employment and follow-up support.',
     images: ['/images/heroes-hq/how-it-works-hero.jpg'],
   },
 };
@@ -40,7 +40,7 @@ export default function HowItWorksPage() {
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">How It Works</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              From signup to your new career in 5 clear steps. No confusion, no runaround.
+              From assessment to employment and ongoing support. Training, one-on-one coaching, employer placement, and follow-up — all in one program.
             </p>
           </div>
         </div>
@@ -51,11 +51,11 @@ export default function HowItWorksPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="space-y-5">
             {[
-              { step: '1', title: 'Register at Indiana Career Connect', desc: 'Create a free account at indianacareerconnect.com. This is the state workforce portal — it takes about 10 minutes. You will need your ID and Social Security number.', image: '/images/homepage/funding-navigation.png', cta: 'Register Now', href: 'https://www.indianacareerconnect.com', external: true },
-              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Call or visit your local WorkOne center to schedule an eligibility meeting. A case manager will review your situation and determine which funding programs you qualify for (WIOA, WRG, JRI).', image: '/images/heroes-hq/how-it-works-hero.jpg', cta: 'Find WorkOne Locations', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true },
-              { step: '3', title: 'Choose Your Program', desc: 'Browse our training programs and pick the career path that fits your goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Your WorkOne case manager can help you decide.', image: '/images/homepage/training-program-collage.png', cta: 'View Programs', href: '/programs', external: false },
-              { step: '4', title: 'Complete Training & Get Certified', desc: 'Attend classes, complete hands-on training, and earn your industry certification. Most programs take 4-16 weeks. Some programs let you earn while you learn through apprenticeships.', image: '/images/homepage/certificate-of-completion.png', cta: 'Learn About Earn While You Learn', href: '/ojt-and-funding', external: false },
-              { step: '5', title: 'Get Hired', desc: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. Employment outcomes vary by program and market conditions.', image: '/images/industries/technology.jpg', cta: 'Career Services', href: '/career-services', external: false },
+              { step: '1', title: 'Assessment & Intake', desc: 'We start with an individualized assessment to understand your goals, skills, experience, and any barriers to employment. If you qualify for funded training (WIOA, WRG, JRI, or VR), we help you navigate the enrollment process including Indiana Career Connect registration and WorkOne referral.', image: '/images/homepage/funding-navigation.png', cta: 'Check Eligibility', href: '/check-eligibility', external: false },
+              { step: '2', title: 'Training & Certification', desc: 'Enroll in an industry-recognized credential program matched to your career goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Programs run 4-16 weeks with instructor oversight. Some programs offer earn-while-you-learn apprenticeship pathways.', image: '/images/homepage/training-program-collage.png', cta: 'View Programs', href: '/programs', external: false },
+              { step: '3', title: 'One-on-One Employment Support', desc: 'Every participant receives individualized career coaching throughout the program. This includes resume development, job readiness skills, application assistance, mock interviews, and personalized career planning. Support is adapted to your strengths and needs.', image: '/images/heroes-hq/career-services-hero.jpg', cta: 'Employment Support Services', href: '/employment-support', external: false },
+              { step: '4', title: 'Employer Matching & Placement', desc: 'We connect you directly with employers in our hiring network. Staff coordinate introductions, schedule interviews, and support you through the hiring process. We provide employment assistance and employer connection support across healthcare, trades, IT, business, and more.', image: '/images/heroes-hq/employer-hero.jpg', cta: 'Employer Network', href: '/for-employers', external: false },
+              { step: '5', title: 'Follow-Up & Retention Support', desc: 'Support does not end at placement. We provide ongoing retention check-ins at 30, 60, 90, and 180 days. If workplace challenges arise, we help you navigate them. Our goal is long-term employment stability and career advancement.', image: '/images/heroes-hq/success-hero.jpg', cta: 'Learn More', href: '/employment-support', external: false },
             ].map((item) => (
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">
@@ -79,6 +79,33 @@ export default function HowItWorksPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Inclusive Services Note */}
+      <section className="py-10 sm:py-14 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+              Support for Individuals with Barriers to Employment
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+              We support individuals with barriers to employment, including individuals
+              with disabilities, through individualized workforce and employment support.
+              Services are person-centered and adapted to each participant&apos;s strengths,
+              goals, and circumstances. We coordinate with vocational rehabilitation
+              counselors, workforce agencies, and community organizations to ensure
+              participants receive the support they need.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/employment-support" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
+                View Employment Support Services <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/contact" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
+                Contact Us for Referrals <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

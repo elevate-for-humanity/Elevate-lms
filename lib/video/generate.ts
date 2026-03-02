@@ -2,10 +2,11 @@
  * Video & Audio Generation System
  *
  * Priority chain:
- *   1. HeyGen — talking-head avatar video (requires API credits)
- *   2. OpenAI Sora — AI-generated scene video (sora-2, 4-12s clips)
- *   3. OpenAI gpt-4o-mini-tts — natural, instructor-voiced audio with personality
- *   4. OpenAI tts-1-hd — standard high-quality TTS fallback
+ *   1. Synthesia — full avatar video (training/L&D, premium)
+ *   2. D-ID — talking-head from instructor photo + audio
+ *   3. OpenAI Sora — AI-generated scene video (sora-2, 4-12s clips)
+ *   4. OpenAI gpt-4o-mini-tts — natural, instructor-voiced audio with personality
+ *   5. OpenAI tts-1-hd — standard high-quality TTS fallback
  */
 
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
@@ -32,7 +33,7 @@ export interface VideoGenerationResult {
   videoUrl?: string;
   duration?: number;
   transcript?: string;
-  method?: 'heygen' | 'sora' | 'gpt4o-mini-tts' | 'tts-1-hd';
+  method?: 'synthesia' | 'd-id' | 'sora' | 'gpt4o-mini-tts' | 'tts-1-hd';
   error?: string;
 }
 
@@ -176,58 +177,18 @@ export async function generateSoraVideo(
   throw new Error(`Sora timed out after ${maxWaitMs / 1000}s`);
 }
 
-// ── HeyGen (talking-head avatar video) ──────────────────────────────────
+// ── D-ID (talking-head from instructor photo + audio) ───────────────────
 
-export async function generateHeyGenVideo(
+export async function generateDIDVideo(
   script: string,
-  avatarId: string,
-  voiceId?: string
+  photoUrl: string,
+  audioUrl: string
 ): Promise<{ videoUrl: string; duration: number }> {
-  const apiKey = process.env.HEYGEN_API_KEY;
-  if (!apiKey) throw new Error('HeyGen API key not configured');
-
-  const createResponse = await fetch('https://api.heygen.com/v2/video/generate', {
-    method: 'POST',
-    headers: { 'X-Api-Key': apiKey, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      video_inputs: [{
-        character: { type: 'avatar', avatar_id: avatarId, avatar_style: 'normal' },
-        voice: { type: 'text', input_text: script, ...(voiceId && { voice_id: voiceId }) },
-        background: { type: 'color', value: '#0f172a' },
-      }],
-      dimension: { width: 1280, height: 720 },
-    }),
-  });
-
-  if (!createResponse.ok) {
-    const error = await createResponse.text();
-    throw new Error(`HeyGen API error: ${error}`);
-  }
-
-  const { data } = await createResponse.json();
-  const videoId = data.video_id;
-
-  // Poll for completion
-  let attempts = 0;
-  while (attempts < 60) {
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const statusResponse = await fetch(`https://api.heygen.com/v1/video_status.get?video_id=${videoId}`, {
-      headers: { 'X-Api-Key': apiKey },
-    });
-    const statusData = await statusResponse.json();
-
-    if (statusData.data.status === 'completed') {
-      const wordCount = script.split(/\s+/).length;
-      return { videoUrl: statusData.data.video_url, duration: Math.ceil((wordCount / 150) * 60) };
-    }
-    if (statusData.data.status === 'failed') {
-      const errDetail = statusData.data.error?.detail || statusData.data.error?.message || 'unknown';
-      throw new Error(`HeyGen failed: ${errDetail}`);
-    }
-    attempts++;
-  }
-
-  throw new Error('HeyGen video generation timed out');
+  const { createTalk, pollTalkResult } = await import('@/lib/d-id/generate-talk');
+  const { id } = await createTalk({ photoUrl, audioUrl });
+  const result = await pollTalkResult(id);
+  const wordCount = script.split(/\s+/).length;
+  return { videoUrl: result.result_url, duration: Math.ceil((wordCount / 150) * 60) };
 }
 
 // ── Synthesia ───────────────────────────────────────────────────────────
@@ -277,7 +238,7 @@ export async function generateSynthesiaVideo(
 
 /**
  * Generate lesson media using the best available method.
- * Chain: HeyGen → Sora → gpt-4o-mini-tts → tts-1-hd
+ * Chain: Synthesia → D-ID → Sora → gpt-4o-mini-tts → tts-1-hd
  */
 export async function generateCourseVideo(
   request: VideoGenerationRequest
@@ -294,17 +255,31 @@ export async function generateCourseVideo(
     const script = generateLessonScript(instructor, courseName, lessonNumber, lessonTitle, lessonContent, topics);
     const voice = INSTRUCTOR_VOICE_MAP[instructor.id] || 'nova';
 
-    // 1. Try HeyGen
-    if (process.env.HEYGEN_API_KEY) {
+    // 1. Try Synthesia (full avatar video — premium)
+    if (process.env.SYNTHESIA_API_KEY) {
       try {
-        const result = await generateHeyGenVideo(script, 'default');
-        return { success: true, videoUrl: result.videoUrl, duration: result.duration, transcript: script, method: 'heygen' };
+        const result = await generateSynthesiaVideo(script, 'anna_costume1_cameraA');
+        return { success: true, videoUrl: result.videoUrl, duration: result.duration, transcript: script, method: 'synthesia' };
       } catch (error) {
-        logger.warn('[VideoGen] HeyGen failed, trying Sora', { error });
+        logger.warn('[VideoGen] Synthesia failed, trying D-ID', { error });
       }
     }
 
-    // 2. Try Sora
+    // 2. Try D-ID (talking-head from instructor photo + generated audio)
+    if (process.env.DID_API_KEY && isOpenAIConfigured()) {
+      try {
+        // Generate voiceover audio first, then lip-sync to instructor photo
+        const { audioBuffer } = await generateNaturalVoiceover(script, voice, instructor.id);
+        const audioBase64 = audioBuffer.toString('base64');
+        const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`;
+        const result = await generateDIDVideo(script, instructor.avatar, audioDataUrl);
+        return { success: true, videoUrl: result.videoUrl, duration: result.duration, transcript: script, method: 'd-id' };
+      } catch (error) {
+        logger.warn('[VideoGen] D-ID failed, trying Sora', { error });
+      }
+    }
+
+    // 3. Try Sora (AI-generated b-roll video)
     if (isOpenAIConfigured()) {
       try {
         const soraPrompt = `Professional educational video for a ${courseName} course. Lesson: ${lessonTitle}. Show a clean, modern classroom or training environment with relevant visual elements. Professional lighting, 16:9 aspect ratio.`;
@@ -315,7 +290,7 @@ export async function generateCourseVideo(
       }
     }
 
-    // 3. Try gpt-4o-mini-tts (natural voice with personality)
+    // 4. Try gpt-4o-mini-tts (natural voice with personality)
     if (isOpenAIConfigured()) {
       try {
         const { audioBuffer, duration } = await generateNaturalVoiceover(script, voice, instructor.id);
@@ -332,7 +307,7 @@ export async function generateCourseVideo(
       }
     }
 
-    // 4. Fallback: tts-1-hd
+    // 5. Fallback: tts-1-hd
     if (isOpenAIConfigured()) {
       const { audioBuffer, duration } = await generateVoiceover(script, voice as any);
       const audioBase64 = audioBuffer.toString('base64');
@@ -381,16 +356,18 @@ export async function generateCourseVideos(
  */
 export function getAvailableServices(): {
   openai: boolean;
-  heygen: boolean;
   synthesia: boolean;
+  did: boolean;
   sora: boolean;
   gpt4oMiniTts: boolean;
+  elevenlabs: boolean;
 } {
   return {
     openai: isOpenAIConfigured(),
-    heygen: !!process.env.HEYGEN_API_KEY,
     synthesia: !!process.env.SYNTHESIA_API_KEY,
-    sora: isOpenAIConfigured(), // Sora uses the same OpenAI key
+    did: !!process.env.DID_API_KEY,
+    sora: isOpenAIConfigured(),
     gpt4oMiniTts: isOpenAIConfigured(),
+    elevenlabs: !!process.env.ELEVENLABS_API_KEY,
   };
 }

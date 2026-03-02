@@ -254,7 +254,7 @@ export default function HVACActivationPage() {
                 </div>
                 <p className="text-gray-600 text-sm mb-4">
                   Generates AI voiceovers for all 94 lessons using the trades instructor voice.
-                  Priority: HeyGen &rarr; Sora &rarr; gpt-4o-mini-tts &rarr; tts-1-hd.
+                  Priority: Synthesia &rarr; D-ID &rarr; Sora &rarr; gpt-4o-mini-tts &rarr; tts-1-hd.
                   This may take 10-15 minutes.
                 </p>
                 <button

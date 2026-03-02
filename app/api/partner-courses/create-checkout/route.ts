@@ -70,6 +70,7 @@ async function _POST(request: NextRequest) {
       // Enable multiple payment methods including BNPL and ACH
       payment_method_types: [
         'card',
+        'affirm',
         'afterpay_clearpay',
         'klarna',
         'us_bank_account',
@@ -98,11 +99,14 @@ async function _POST(request: NextRequest) {
 
       // Enable Buy Now Pay Later options
       payment_method_options: {
+        affirm: {
+          // Affirm: pay over 3-36 months
+        },
         afterpay_clearpay: {
-          enabled: true,
+          // Afterpay: 4 interest-free payments
         },
         klarna: {
-          enabled: true,
+          // Klarna: pay in 4 or financing
         },
       },
 

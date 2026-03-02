@@ -5,12 +5,12 @@
  * Reads page context and delivers the right script immediately.
  * No rebuild required—just master prompt + route-to-script map.
  * 
- * Designed for: HeyGen LiveAvatar / Streaming Avatar
+ * Designed for: Synthesia / D-ID avatar video generation
  * Response limit: 3 sentences max (spoken avatar constraint)
  */
 
 // =============================================================================
-// MASTER AVATAR PROMPT (HeyGen Knowledge Base format)
+// MASTER AVATAR PROMPT (avatar knowledge base format)
 // =============================================================================
 
 export const AVATAR_PERSONA = `Name: Elevate Guide

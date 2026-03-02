@@ -21,7 +21,7 @@ const PARTNER_COURSES = {
   certiport: {
     name: 'Certiport',
     description: 'Microsoft, Adobe, and IT certifications',
-    markup: 1.4,
+    markup: 1.5,
     courses: [
       {
         id: 'mos-word',
@@ -91,7 +91,7 @@ const PARTNER_COURSES = {
   hsi: {
     name: 'HSI',
     description: 'CPR, First Aid, and Safety Training',
-    markup: 1.59,
+    markup: 1.5,
     courses: [
       {
         id: 'cpr-adult',
@@ -189,7 +189,7 @@ const PARTNER_COURSES = {
   careersafe: {
     name: 'CareerSafe',
     description: 'OSHA Safety Training',
-    markup: 1.4,
+    markup: 1.5,
     courses: [
       {
         id: 'osha-10-general',
@@ -231,7 +231,7 @@ const PARTNER_COURSES = {
   milady: {
     name: 'Milady',
     description: 'Beauty & Cosmetology',
-    markup: 1.6,
+    markup: 1.5,
     courses: [
       {
         id: 'rise-cosmetology',
@@ -273,7 +273,7 @@ const PARTNER_COURSES = {
   nrf: {
     name: 'NRF RISE Up',
     description: 'Retail & Customer Service',
-    markup: 1.3,
+    markup: 1.5,
     courses: [
       {
         id: 'customer-service',

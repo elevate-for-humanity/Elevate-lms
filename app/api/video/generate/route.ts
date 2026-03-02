@@ -83,7 +83,7 @@ async function handleCourseVideoGeneration(request: NextRequest, body: any) {
     lessonContent,
     topics = [],
     instructorId,
-    outputFormat = 'audio', // Default to audio since video requires HeyGen/Synthesia
+    outputFormat = 'audio', // Default to audio since video requires Synthesia/D-ID
   } = body;
 
   if (!courseName || !lessonTitle || !lessonContent) {
@@ -95,11 +95,11 @@ async function handleCourseVideoGeneration(request: NextRequest, body: any) {
 
   // Check available services
   const services = getAvailableServices();
-  if (!services.openai && !services.heygen && !services.synthesia) {
+  if (!services.openai && !services.synthesia && !services.did) {
     return NextResponse.json(
       { 
         error: 'No video generation service configured',
-        hint: 'Add OPENAI_API_KEY for voiceovers, or HEYGEN_API_KEY/SYNTHESIA_API_KEY for avatar videos'
+        hint: 'Add OPENAI_API_KEY for voiceovers, or SYNTHESIA_API_KEY/DID_API_KEY for avatar videos'
       },
       { status: 503 }
     );
@@ -139,7 +139,7 @@ async function handleCourseVideoGeneration(request: NextRequest, body: any) {
     status: 'completed',
     services: {
       voiceover: services.openai ? 'OpenAI TTS' : null,
-      avatar: services.heygen ? 'HeyGen' : services.synthesia ? 'Synthesia' : null,
+      avatar: services.synthesia ? 'Synthesia' : services.did ? 'D-ID' : null,
     },
   });
 }

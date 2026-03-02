@@ -55,8 +55,8 @@ export default function AboutPage() {
             <p>
               Elevate for Humanity is a nonprofit workforce development institute based in
               Indianapolis, Indiana. We provide funded career training to people who need it most —
-              justice-involved individuals, low-income families, veterans, dislocated workers, and
-              anyone facing barriers to employment.
+              justice-involved individuals, low-income families, veterans, dislocated workers,
+              individuals with disabilities, and anyone facing barriers to employment.
             </p>
             <p>
               We are operated by 2Exclusive LLC-S in partnership with Rise Forward Foundation.
@@ -89,8 +89,9 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Our Mission</h2>
           <p className="text-lg text-brand-red-100 leading-relaxed max-w-3xl mx-auto">
             To create pathways out of poverty and into prosperity by connecting justice-involved
-            individuals, low-income families, veterans, and anyone facing barriers to employment
-            with high-quality, funded career training and direct employer placement.
+            individuals, low-income families, veterans, individuals with disabilities, and anyone
+            facing barriers to employment with high-quality, funded career training, individualized
+            employment support, and direct employer placement.
           </p>
         </div>
       </section>

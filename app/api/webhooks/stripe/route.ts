@@ -1236,7 +1236,7 @@ async function _POST(request: NextRequest) {
             ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
           // Create partner enrollment record
-          const { error: enrollmentError } = await supabase
+          const { data: partnerEnrollment, error: enrollmentError } = await supabase
             .from('partner_lms_enrollments')
             .insert({
               provider_id: session.metadata.provider_id,
@@ -1255,7 +1255,9 @@ async function _POST(request: NextRequest) {
                 profit_margin: session.metadata.profit_margin,
                 course_url: session.metadata.course_url,
               },
-            });
+            })
+            .select('id')
+            .single();
 
           if (enrollmentError) {
             logger.error('Error creating partner enrollment:', enrollmentError);
@@ -1277,6 +1279,56 @@ async function _POST(request: NextRequest) {
           });
 
           logger.info('✅ Partner course payment logged');
+
+          // --- Vendor Payout: pay vendor wholesale cost, keep margin ---
+          const wholesaleCostCents = Math.round(parseFloat(session.metadata.wholesale_cost || '0') * 100);
+          const retailPriceCents = Math.round(parseFloat(session.metadata.retail_price || '0') * 100);
+
+          if (wholesaleCostCents > 0 && partnerEnrollment?.id) {
+            try {
+              const { processVendorPayout } = await import('@/lib/vendors/payout');
+              const payoutResult = await processVendorPayout({
+                enrollmentId: partnerEnrollment.id,
+                courseId: session.metadata.course_id,
+                providerId: session.metadata.provider_id,
+                providerName: session.metadata.provider_name || 'Unknown',
+                wholesaleCostCents,
+                retailPriceCents,
+                stripePaymentIntentId: session.payment_intent as string,
+                studentId: session.metadata.student_id,
+                studentEmail: session.metadata.student_email || '',
+                courseName: session.metadata.course_code || 'Partner Course',
+              });
+              logger.info(`✅ Vendor payout ${payoutResult.method}: $${(wholesaleCostCents / 100).toFixed(2)} to ${session.metadata.provider_name}`);
+            } catch (payoutErr) {
+              // Non-fatal: enrollment succeeds even if payout recording fails
+              logger.error('[webhook] Vendor payout error (non-fatal):', payoutErr instanceof Error ? payoutErr : new Error(String(payoutErr)));
+            }
+          }
+
+          // --- Credential Delivery: send student login/access info ---
+          if (partnerEnrollment?.id) {
+            try {
+              const { deliverCredentials } = await import('@/lib/vendors/credential-delivery');
+              const deliveryResult = await deliverCredentials({
+                enrollmentId: partnerEnrollment.id,
+                courseId: session.metadata.course_id,
+                courseName: session.metadata.course_code || 'Partner Course',
+                courseCode: session.metadata.course_code,
+                providerId: session.metadata.provider_id,
+                providerName: session.metadata.provider_name || 'Unknown',
+                providerType: session.metadata.provider_type || 'generic',
+                studentId: session.metadata.student_id,
+                studentEmail: session.metadata.student_email || session.customer_email || '',
+                studentName: session.metadata.student_name || 'Student',
+                courseUrl: session.metadata.course_url,
+              });
+              logger.info(`✅ Credential delivery ${deliveryResult.method} for ${session.metadata.student_email}`);
+            } catch (deliveryErr) {
+              // Non-fatal: enrollment succeeds even if credential delivery fails
+              logger.error('[webhook] Credential delivery error (non-fatal):', deliveryErr instanceof Error ? deliveryErr : new Error(String(deliveryErr)));
+            }
+          }
         } catch (err: any) {
           Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(

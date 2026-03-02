@@ -136,12 +136,12 @@ async function getCategories() {
 }
 
 const roadmap = [
-  { step: '01', title: 'Check Eligibility', desc: 'Complete a quick assessment to see if you qualify for funded training through WIOA or other programs.' },
-  { step: '02', title: 'Choose Your Path', desc: 'Select from healthcare, trades, technology, or other career programs based on your interests.' },
-  { step: '03', title: 'Get Approved', desc: 'Our team helps you complete enrollment paperwork and get approved for funding.' },
-  { step: '04', title: 'Start Training', desc: 'Begin your program. Materials, books, and supplies may be included depending on your funding source.' },
-  { step: '05', title: 'Earn Credentials', desc: 'Complete industry-recognized certifications that employers are looking for.' },
-  { step: '06', title: 'Launch Career', desc: 'Get job placement support including resume help, interview prep, and employer connections.' },
+  { step: '01', title: 'Assessment & Eligibility', desc: 'Individualized intake and skills assessment. We help determine eligibility for funded training through WIOA, WRG, JRI, or vocational rehabilitation.' },
+  { step: '02', title: 'Choose Your Path', desc: 'Select from healthcare, trades, technology, or other career programs based on your goals, strengths, and interests.' },
+  { step: '03', title: 'Get Approved & Enroll', desc: 'Our team helps you complete enrollment paperwork and get approved for funding. We coordinate with WorkOne and referral partners.' },
+  { step: '04', title: 'Training & Certification', desc: 'Begin your program with instructor oversight. Earn industry-recognized credentials that employers are looking for.' },
+  { step: '05', title: 'One-on-One Employment Support', desc: 'Individualized career coaching, resume development, interview preparation, and job readiness assistance throughout your program.' },
+  { step: '06', title: 'Placement & Follow-Up', desc: 'Direct employer matching, interview coordination, and ongoing retention support at 30, 60, 90, and 180 days post-placement.' },
 ];
 
 export default async function ProgramsPage() {

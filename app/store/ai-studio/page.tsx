@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: 'AI Studio | Elevate Store',
   description:
-    'Generate AI videos, voiceovers, images, and virtual instructors for your courses. Powered by OpenAI, HeyGen, and more.',
+    'Generate AI videos, voiceovers, images, and virtual instructors for your courses. Powered by OpenAI, Synthesia, D-ID, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/ai-studio',
   },

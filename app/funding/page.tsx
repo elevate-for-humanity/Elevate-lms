@@ -128,6 +128,31 @@ export default function FundingPage() {
               </div>
             </div>
 
+            {/* VR — Vocational Rehabilitation */}
+            <div className="rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-[180px]">
+                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Vocational rehabilitation services" fill sizes="100vw" className="object-cover" />
+                <div className="absolute top-3 left-3 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-slate-900 text-lg mb-2">VR — Vocational Rehabilitation</h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                  Indiana FSSA Vocational Rehabilitation supports individuals with disabilities in achieving employment goals. We coordinate with VR counselors to provide individualized training and employment support services.
+                </p>
+                <div className="space-y-2 mb-4">
+                  {['Individualized employment support', 'Training and credential programs', 'Workplace accommodation assistance', 'Coordination with VR counselors'].map((item) => (
+                    <div key={item} className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-purple-600 rounded-full flex-shrink-0" />
+                      <span className="text-slate-700 text-sm">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/employment-support" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
+                  Employment Support Services <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">

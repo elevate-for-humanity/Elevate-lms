@@ -97,6 +97,11 @@ export const headerNavigation: NavGroup[] = [
         description: 'Job placement assistance',
       },
       {
+        label: 'Employment Support',
+        href: '/employment-support',
+        description: 'Individualized employment & barrier reduction services',
+      },
+      {
         label: 'Success Stories',
         href: '/success',
         description: 'Student testimonials',
@@ -336,6 +341,7 @@ export const footerNavigation = {
       { label: 'Apply Now', href: '/apply' },
       { label: 'Funding & Support', href: '/funding' },
       { label: 'Career Services', href: '/career-services' },
+      { label: 'Employment Support', href: '/employment-support' },
       { label: 'Success Stories', href: '/success' },
       { label: 'Student Login', href: '/lms/dashboard' },
     ],
@@ -405,6 +411,7 @@ export const footerNavigation = {
     title: 'Services',
     links: [
       { label: 'Career Services', href: '/career-services' },
+      { label: 'Employment Support', href: '/employment-support' },
       { label: 'Career Center', href: '/career-center' },
       { label: 'Career Counseling', href: '/career-counseling' },
       { label: 'Mentorship', href: '/mentorship/career-guidance' },

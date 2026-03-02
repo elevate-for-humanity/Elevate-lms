@@ -7,7 +7,8 @@ import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-lo
 import {
   generateNaturalVoiceover,
   generateVoiceover,
-  generateHeyGenVideo,
+  generateDIDVideo,
+  generateSynthesiaVideo,
   generateSoraVideo,
   getAvailableServices,
 } from '@/lib/video/generate';
@@ -19,46 +20,17 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
-// ── Avatar mapping (HeyGen-specific) ────────────────────────────────────
+// ── Synthesia avatar mapping ─────────────────────────────────────────────
 
-function getHeyGenAvatarForCourse(courseName: string): { avatarId: string; voiceId: string } {
+function getSynthesiaAvatarForCourse(courseName: string): string {
   const name = courseName.toLowerCase();
-
-  if (name.includes('cna') || name.includes('medical') || name.includes('phlebotomy') ||
-      name.includes('pharmacy') || name.includes('dental') || name.includes('emt') ||
-      name.includes('health') || name.includes('cpr') || name.includes('direct support') ||
-      name.includes('ekg') || name.includes('patient care'))
-    return { avatarId: 'Carlotta_BizTalk_Front_public', voiceId: '42d00d4aac5441279d8536cd6b52c53c' };
-
-  if (name.includes('hvac') || name.includes('solar') || name.includes('building') ||
-      name.includes('forklift') || name.includes('manufacturing') || name.includes('diesel') ||
-      name.includes('automotive') || name.includes('maintenance') || name.includes('welding') ||
-      name.includes('electrical') || name.includes('plumbing') || name.includes('construction'))
-    return { avatarId: 'Armando_Casual_Front_public', voiceId: '2eca0d3dd5ec4a1ea6efa6194b19eb78' };
-
-  if (name.includes('cdl') || name.includes('trucking') || name.includes('driving') ||
-      name.includes('warehouse') || name.includes('logistics'))
-    return { avatarId: 'Armando_Casual_Side_public', voiceId: '88bb9ee1c81b466eb2a08fdde86d3619' };
-
-  if (name.includes('barber') || name.includes('hair') || name.includes('nail') ||
-      name.includes('esthetician') || name.includes('cosmetology') || name.includes('beauty'))
-    return { avatarId: 'Brandon_expressive_public', voiceId: '2eca0d3dd5ec4a1ea6efa6194b19eb78' };
-
-  if (name.includes('cyber') || name.includes('web') || name.includes('data') ||
-      name.includes('it support') || name.includes('technology') || name.includes('security officer'))
-    return { avatarId: 'Annie_expressive10_public', voiceId: '1704ea0565c04c5188d9b67062b31a1a' };
-
-  if (name.includes('tax') || name.includes('bookkeeping') || name.includes('business') ||
-      name.includes('entrepreneur') || name.includes('insurance') || name.includes('real estate') ||
-      name.includes('administrative') || name.includes('customer service') || name.includes('nrf'))
-    return { avatarId: 'Adriana_BizTalk_Front_public', voiceId: '4754e1ec667544b0bd18cdf4bec7d6a7' };
-
-  if (name.includes('recovery') || name.includes('reentry') || name.includes('peer') ||
-      name.includes('life coach') || name.includes('community') || name.includes('culinary') ||
-      name.includes('hospitality') || name.includes('early childhood'))
-    return { avatarId: 'Annie_expressive11_public', voiceId: 'cef3bc4e0a84424cafcde6f2cf466c97' };
-
-  return { avatarId: 'Annie_expressive11_public', voiceId: '42d00d4aac5441279d8536cd6b52c53c' };
+  if (name.includes('health') || name.includes('cna') || name.includes('medical') || name.includes('cpr'))
+    return 'anna_costume1_cameraA';
+  if (name.includes('trade') || name.includes('hvac') || name.includes('welding') || name.includes('cdl'))
+    return 'jack_costume1_cameraA';
+  if (name.includes('tech') || name.includes('cyber') || name.includes('it '))
+    return 'bridget_costume1_cameraA';
+  return 'anna_costume1_cameraA';
 }
 
 // ── Script generation ───────────────────────────────────────────────────
@@ -85,9 +57,10 @@ const VOICE_MAP: Record<string, string> = {
   'angela-thompson': 'alloy',
 };
 
-// ── Per-lesson generation: HeyGen → Sora → gpt-4o-mini-tts → tts-1-hd ─
+// ── Per-lesson generation: Synthesia → D-ID → Sora → gpt-4o-mini-tts → tts-1-hd
 
-let heygenSkip = false;
+let synthesiaSkip = false;
+let didSkip = false;
 let soraSkip = false;
 
 async function generateForLesson(
@@ -99,30 +72,55 @@ async function generateForLesson(
   const instructor = getInstructorForCourse(courseName);
   const voice = VOICE_MAP[instructor.id] || 'nova';
 
-  // 1. HeyGen avatar video
-  if (process.env.HEYGEN_API_KEY && !heygenSkip) {
+  // 1. Synthesia avatar video (premium)
+  if (process.env.SYNTHESIA_API_KEY && !synthesiaSkip) {
     try {
-      const { avatarId, voiceId } = getHeyGenAvatarForCourse(courseName);
-      logger.info(`[VideoGen] HeyGen: "${lesson.title}" (${avatarId})`);
-      const result = await generateHeyGenVideo(script, avatarId, voiceId);
+      const avatarId = getSynthesiaAvatarForCourse(courseName);
+      logger.info(`[VideoGen] Synthesia: "${lesson.title}" (${avatarId})`);
+      const result = await generateSynthesiaVideo(script, avatarId);
 
       await db.from('training_lessons')
         .update({ video_url: result.videoUrl, updated_at: new Date().toISOString() })
         .eq('id', lesson.id);
 
-      return { success: true, videoUrl: result.videoUrl, method: 'heygen' };
+      return { success: true, videoUrl: result.videoUrl, method: 'synthesia' };
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';
-      if (msg.includes('INSUFFICIENT_CREDIT') || msg.includes('Insufficient credit')) {
-        heygenSkip = true;
-        logger.warn('[VideoGen] HeyGen credits depleted — skipping for batch');
+      if (msg.includes('credit') || msg.includes('quota') || msg.includes('limit')) {
+        synthesiaSkip = true;
+        logger.warn('[VideoGen] Synthesia credits depleted — skipping for batch');
       } else {
-        logger.warn(`[VideoGen] HeyGen failed: ${msg}`);
+        logger.warn(`[VideoGen] Synthesia failed: ${msg}`);
       }
     }
   }
 
-  // 2. OpenAI Sora video
+  // 2. D-ID talking-head (instructor photo + generated audio)
+  if (process.env.DID_API_KEY && !didSkip) {
+    try {
+      logger.info(`[VideoGen] D-ID: "${lesson.title}" (voice: ${voice})`);
+      const { audioBuffer } = await generateNaturalVoiceover(script, voice, instructor.id);
+      const audioBase64 = audioBuffer.toString('base64');
+      const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`;
+      const result = await generateDIDVideo(script, instructor.avatar, audioDataUrl);
+
+      await db.from('training_lessons')
+        .update({ video_url: result.videoUrl, updated_at: new Date().toISOString() })
+        .eq('id', lesson.id);
+
+      return { success: true, videoUrl: result.videoUrl, method: 'd-id' };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('credit') || msg.includes('quota') || msg.includes('limit')) {
+        didSkip = true;
+        logger.warn('[VideoGen] D-ID credits depleted — skipping for batch');
+      } else {
+        logger.warn(`[VideoGen] D-ID failed: ${msg}`);
+      }
+    }
+  }
+
+  // 3. OpenAI Sora video
   if (!soraSkip) {
     try {
       const prompt = buildSoraPrompt(courseName, lesson.title);
@@ -203,7 +201,8 @@ async function _POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Reset per-request flags
-    heygenSkip = false;
+    synthesiaSkip = false;
+    didSkip = false;
     soraSkip = false;
 
     const { courseId, lessonId, batchSize = 5 } = await request.json();

@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Netlify Environment Variable Cleanup
+# =============================================================================
+# Removes env vars that are either:
+# - Consolidated (STRIPE_PRICE_* → STRIPE_PRICES_JSON)
+# - Unused features (SSO, LDAP, AI, social media)
+# - Empty/placeholder values wasting payload space
+#
+# Run: netlify login && bash scripts/netlify-env-cleanup.sh
+#
+# After running, redeploy: netlify deploy --prod
+# =============================================================================
+
+set -euo pipefail
+
+echo "=== Netlify Env Var Cleanup ==="
+echo "This will remove unused env vars to fix the AWS Lambda 4KB limit."
+echo ""
+
+# --- STRIPE_PRICE_* (replaced by STRIPE_PRICES_JSON in lib/stripe/prices.ts) ---
+STRIPE_VARS=(
+  STRIPE_PRICE_ANNUAL
+  STRIPE_PRICE_BARBER
+  STRIPE_PRICE_BARBER_SETUP_FEE
+  STRIPE_PRICE_BARBER_WEEKLY
+  STRIPE_PRICE_CAREER
+  STRIPE_PRICE_CDL
+  STRIPE_PRICE_CNA
+  STRIPE_PRICE_CORE
+  STRIPE_PRICE_CORE_12MONTH
+  STRIPE_PRICE_CORE_3MONTH
+  STRIPE_PRICE_CORE_6MONTH
+  STRIPE_PRICE_CORE_ONETIME
+  STRIPE_PRICE_COSMETOLOGY
+  STRIPE_PRICE_CR_ENTERPRISE
+  STRIPE_PRICE_CR_GUIDE
+  STRIPE_PRICE_CYBERSECURITY
+  STRIPE_PRICE_DRUG_COLLECTOR
+  STRIPE_PRICE_DSP
+  STRIPE_PRICE_ELECTRICAL
+  STRIPE_PRICE_ENTERPRISE
+  STRIPE_PRICE_HVAC
+  STRIPE_PRICE_INSTITUTIONAL
+  STRIPE_PRICE_IT_SUPPORT
+  STRIPE_PRICE_MEDICAL_ASSISTANT
+  STRIPE_PRICE_MONTHLY
+  STRIPE_PRICE_PHLEBOTOMY
+  STRIPE_PRICE_PLUMBING
+  STRIPE_PRICE_PROFESSIONAL_ANNUAL
+  STRIPE_PRICE_PROFESSIONAL_MONTHLY
+  STRIPE_PRICE_SCHOOL
+  STRIPE_PRICE_STARTER_ANNUAL
+  STRIPE_PRICE_STARTER_MONTHLY
+  STRIPE_PRICE_STUDENT
+  STRIPE_PRICE_TAX_PREP
+  STRIPE_PRICE_WELDING
+  STRIPE_PRICE_MANAGED_ANNUAL
+  STRIPE_PRICE_MANAGED_MONTHLY
+  STRIPE_PRICE_SCHOOL_ANNUAL
+  STRIPE_PRICE_SCHOOL_MONTHLY
+  STRIPE_PMC_BARBER_TEST
+)
+
+# --- SSO/LDAP (not enabled) ---
+SSO_VARS=(
+  SAML_CERT SAML_ENTRY_POINT SAML_ISSUER SAML_CALLBACK_URL SAML_ENABLED
+  LDAP_URL LDAP_BIND_DN LDAP_BIND_PASSWORD LDAP_SEARCH_BASE LDAP_SEARCH_FILTER LDAP_ENABLED
+  AZURE_AD_ENABLED AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_TENANT_ID
+  AZURE_OPENAI_API_KEY AZURE_OPENAI_API_VERSION AZURE_OPENAI_DEPLOYMENT AZURE_OPENAI_ENDPOINT AZURE_DALLE_DEPLOYMENT
+)
+
+# --- AI/Media (not configured) ---
+AI_VARS=(
+  OPENAI_API_KEY GEMINI_API_KEY ELEVENLABS_API_KEY DID_API_KEY HEYGEN_API_KEY
+  RUNWAY_API_KEY SUNO_API_KEY STABILITY_API_KEY STABILITY_API_HOST SYNTHESIA_API_KEY
+  PEXELS_API_KEY PIXABAY_API_KEY UNSPLASH_ACCESS_KEY AI_PROVIDER AI_IMAGE_PROVIDER
+)
+
+# --- Social Media (scheduler disabled) ---
+SOCIAL_VARS=(
+  FACEBOOK_ACCESS_TOKEN FACEBOOK_CLIENT_ID FACEBOOK_CLIENT_SECRET FACEBOOK_PAGE_ID
+  INSTAGRAM_ACCESS_TOKEN INSTAGRAM_BUSINESS_ACCOUNT_ID
+  TWITTER_API_KEY TWITTER_API_SECRET TWITTER_ACCESS_TOKEN TWITTER_ACCESS_SECRET TWITTER_BEARER_TOKEN
+  LINKEDIN_ACCESS_TOKEN LINKEDIN_CLIENT_ID LINKEDIN_CLIENT_SECRET LINKEDIN_COMPANY_ID LINKEDIN_ORGANIZATION_ID
+  YOUTUBE_API_KEY YOUTUBE_CHANNEL_ID SOCIAL_MEDIA_TIMEZONE
+)
+
+# --- CRM (not configured) ---
+CRM_VARS=(
+  HUBSPOT_API_KEY HUBSPOT_FORM_GUID HUBSPOT_PORTAL_ID HUBSPOT_PRIVATE_APP_TOKEN
+  SALESFORCE_API_KEY SALESFORCE_CLIENT_ID SALESFORCE_INSTANCE_URL SALESFORCE_LOGIN_URL
+)
+
+# --- Monitoring (not configured) ---
+MONITOR_VARS=(
+  SIEM_API_KEY SIEM_ENDPOINT LOG_ENDPOINT LOG_SALT
+  SLACK_ALERT_WEBHOOK SLACK_SECURITY_WEBHOOK SLACK_WEBHOOK_URL
+  TEAMS_WEBHOOK_URL
+)
+
+# --- SMTP (redundant if using SendGrid/Resend) ---
+SMTP_VARS=(
+  SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS SMTP_PASSWORD SMTP_FROM
+)
+
+ALL_VARS=("${STRIPE_VARS[@]}" "${SSO_VARS[@]}" "${AI_VARS[@]}" "${SOCIAL_VARS[@]}" "${CRM_VARS[@]}" "${MONITOR_VARS[@]}" "${SMTP_VARS[@]}")
+
+echo "Will attempt to unset ${#ALL_VARS[@]} env vars."
+echo ""
+read -p "Continue? (y/N) " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+  echo "Aborted."
+  exit 0
+fi
+
+removed=0
+skipped=0
+for var in "${ALL_VARS[@]}"; do
+  if netlify env:unset "$var" 2>/dev/null; then
+    echo "  Removed: $var"
+    ((removed++))
+  else
+    ((skipped++))
+  fi
+done
+
+echo ""
+echo "Done. Removed: $removed, Skipped (not set): $skipped"
+echo ""
+echo "Next steps:"
+echo "  1. If you had STRIPE_PRICE_* vars, add one STRIPE_PRICES_JSON var instead:"
+echo '     netlify env:set STRIPE_PRICES_JSON '"'"'{"MONTHLY":"price_xxx","ANNUAL":"price_yyy"}'"'"
+echo "  2. Redeploy: netlify deploy --prod"

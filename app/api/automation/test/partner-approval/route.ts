@@ -82,7 +82,7 @@ async function _POST() {
           address_line1: '123 Test St',
           city: 'Indianapolis',
           state: 'IN',
-          zip: '46201',
+          zip: '46240',
           license_number: `TEST-${Date.now()}`,
           license_state: 'IN',
           license_expiry: testCase.licenseExpired 

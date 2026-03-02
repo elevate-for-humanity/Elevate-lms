@@ -82,7 +82,7 @@ function VITAFooter() {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>8888 Keystone Xing, Suite 1300<br />Indianapolis, IN 46240</span>
+                <span>8888 Keystone Crossing, Suite 1300<br />Indianapolis, IN 46240</span>
               </li>
             </ul>
           </div>

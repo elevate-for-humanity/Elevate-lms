@@ -90,7 +90,7 @@ export default function EmploymentSupportPage() {
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, 33vw" className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, (max-width: 1024px) 50vw, 33vw" className="object-cover" loading="lazy" />
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">{item.title}</h3>
@@ -135,13 +135,14 @@ export default function EmploymentSupportPage() {
       <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto">
+            <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto min-h-[300px]">
               <Image
                 src="/images/employment-support/who-we-serve.jpg"
                 alt="Participants in a training session"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
+                loading="lazy"
               />
             </div>
             <div className="flex flex-col justify-center">
@@ -187,6 +188,7 @@ export default function EmploymentSupportPage() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
+                  loading="lazy"
                 />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Industry Training</h3>
@@ -209,6 +211,7 @@ export default function EmploymentSupportPage() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
+                  loading="lazy"
                 />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">One-on-One Support</h3>

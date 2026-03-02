@@ -101,7 +101,7 @@ async function _POST() {
           address_line1: '123 Test St',
           city: 'Indianapolis',
           state: 'IN',
-          zip: '46201',
+          zip: '46240',
           lat: shop.lat,
           lng: shop.lng,
           apprentice_capacity: shop.capacity,

@@ -207,8 +207,8 @@ export default function CopyrightPage() {
               <ul className="list-none text-black space-y-2">
                 <li><strong>Email:</strong> <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
                 <li><strong>Mail:</strong> DMCA Agent, Elevate for Humanity</li>
-                <li className="ml-6">3737 N Meridian St, Suite 200</li>
-                <li className="ml-6">Indianapolis, IN 46208</li>
+                <li className="ml-6">8888 Keystone Crossing, Suite 1300</li>
+                <li className="ml-6">Indianapolis, IN 46240</li>
                 <li><strong>Phone:</strong> (317) 314-3757</li>
               </ul>
             </div>

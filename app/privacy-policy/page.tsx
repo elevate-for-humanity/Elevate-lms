@@ -10,7 +10,7 @@ const ORG_FULL = `${ORG_NAME}, operated by ${LEGAL_ENTITY}`;
 const PARTNER_ENTITY = 'Selfish Inc. (d/b/a Rise Forward Foundation)';
 const ORG_EMAIL = 'privacy@elevateforhumanity.org';
 const ORG_PHONE = '(317) 314-3757';
-const ORG_ADDRESS = 'Indianapolis, IN 46201';
+const ORG_ADDRESS = 'Indianapolis, IN 46240';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Elevate for Humanity',

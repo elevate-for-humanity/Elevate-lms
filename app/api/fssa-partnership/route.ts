@@ -98,7 +98,7 @@ async function _POST(request: NextRequest) {
           <p><strong>Contact Information:</strong><br>
           Phone: 317-314-3757<br>
           Email: partnerships@elevateforhumanity.org<br>
-          Address: 8888 Keystone Xing, Suite 1300, Indianapolis, IN 46240</p>
+          Address: 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
 
           <p>We look forward to discussing how we can partner to serve SNAP recipients in Indiana.</p>
 

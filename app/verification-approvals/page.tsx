@@ -29,7 +29,7 @@ const verifications = [
       { label: 'SAM UEI', value: '[Pending — provide your UEI to update]' },
       { label: 'Sponsor Type', value: 'Single Employer' },
       { label: 'NAICS', value: '[Pending — provide NAICS code to update]' },
-      { label: 'Location', value: '7009 E 56th St, Indianapolis, IN 46226 (Marion County)' },
+      { label: 'Location', value: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240 (Marion County)' },
     ],
   },
   {

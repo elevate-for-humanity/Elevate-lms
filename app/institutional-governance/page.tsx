@@ -106,7 +106,7 @@ export default function InstitutionalGovernancePage() {
                 </div>
                 <div>
                   <dt className="text-slate-500 text-xs uppercase tracking-wider">Location</dt>
-                  <dd className="font-semibold text-slate-900 mt-0.5">7009 E 56th St, Indianapolis, IN 46226 (Marion County)</dd>
+                  <dd className="font-semibold text-slate-900 mt-0.5">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240 (Marion County)</dd>
                 </div>
               </dl>
             </div>

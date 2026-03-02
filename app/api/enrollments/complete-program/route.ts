@@ -107,6 +107,8 @@ async function _POST(req: NextRequest) {
     const programHours = programs?.duration_hours || null;
 
     // Use authoritative certificate issuance service
+    // Program-level completions (non-course) don't require proctored exams
+    // but still record the completion method for audit trail
     const result = await issueCertificate({
       supabase,
       enrollmentId: enrollment_id,
@@ -116,6 +118,10 @@ async function _POST(req: NextRequest) {
       studentEmail: studentProfile.email,
       programName,
       programHours,
+      competencyEvidence: {
+        completionVerifiedAt: new Date().toISOString(),
+        completionMethod: 'program_enrollment_complete',
+      },
     });
 
     if (!result.success) {

@@ -81,7 +81,58 @@ async function _POST(
       );
     }
 
-    // Mark course as completed
+    // Delegate to the canonical completion endpoint which enforces
+    // quiz pass, proctored exam, and seat time gates.
+    // This route only validates enrollment + lesson count as a pre-check.
+    const { checkCourseCompletion } = await import('@/lib/course-completion');
+    const { getCourseRequirements } = await import('@/lib/courses/completion-requirements');
+
+    const completionStatus = await checkCourseCompletion(user.id, courseId);
+    if (!completionStatus.isComplete) {
+      return NextResponse.json({
+        error: 'Course requirements not met',
+        missingRequirements: completionStatus.missingRequirements,
+      }, { status: 403 });
+    }
+
+    // Quiz pass verification
+    if (!completionStatus.quizzesPassed && completionStatus.totalQuizzes > 0) {
+      return NextResponse.json({
+        error: 'Not all required quizzes have been passed',
+        failedQuizzes: completionStatus.failedQuizTitles,
+      }, { status: 403 });
+    }
+
+    // Proctored exam gate (course-specific)
+    const { data: courseDetail } = await db
+      .from('training_courses')
+      .select('slug')
+      .eq('id', courseId)
+      .single();
+
+    const requirements = getCourseRequirements(courseDetail?.slug || '');
+    let examSession: any = null;
+
+    if (requirements.examRequirement) {
+      const { data: session } = await db
+        .from('exam_sessions')
+        .select('id, provider, result, score, proctor_id, completed_at')
+        .eq('student_id', user.id)
+        .eq('program_slug', courseDetail?.slug)
+        .eq('result', requirements.examRequirement.requiredResult)
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!session) {
+        return NextResponse.json({
+          error: `Proctored ${requirements.examRequirement.examName} exam must be passed before certificate issuance.`,
+        }, { status: 403 });
+      }
+      examSession = session;
+    }
+
+    // Mark enrollment as completed
     const { error: updateError } = await db
       .from('program_enrollments')
       .update({
@@ -100,7 +151,29 @@ async function _POST(
       );
     }
 
-    // Issue certificate via canonical service
+    // Gather seat time
+    const { data: seatTimeData } = await db
+      .from('lesson_progress')
+      .select('time_spent_seconds')
+      .eq('user_id', user.id)
+      .eq('course_id', courseId);
+    const totalSeconds = (seatTimeData || []).reduce((s: number, r: any) => s + (r.time_spent_seconds || 0), 0);
+    const totalHours = Math.round((totalSeconds / 3600) * 10) / 10;
+
+    // Seat time gate
+    if (requirements.minimumSeatTimeHours && totalHours < requirements.minimumSeatTimeHours) {
+      return NextResponse.json({
+        error: 'Minimum seat time requirement not met',
+        seatTimeRequirement: {
+          required: requirements.minimumSeatTimeHours,
+          recorded: totalHours,
+          deficit: Math.round((requirements.minimumSeatTimeHours - totalHours) * 10) / 10,
+        },
+        message: `This course requires at least ${requirements.minimumSeatTimeHours} hours of instructional time. You have ${totalHours} hours recorded.`,
+      }, { status: 403 });
+    }
+
+    // Issue certificate with full competency evidence
     let certificate = null;
     try {
       const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
@@ -111,6 +184,18 @@ async function _POST(
         enrollmentId: enrollment.id,
         studentName: user.user_metadata?.full_name || user.email || 'Student',
         courseTitle: course.title,
+        competencyEvidence: {
+          seatTimeHours: totalHours,
+          seatTimeSeconds: totalSeconds,
+          examSessionId: examSession?.id || null,
+          examProvider: examSession?.provider || null,
+          examResult: examSession?.result || null,
+          examScore: examSession?.score || null,
+          examProctorId: examSession?.proctor_id || null,
+          examDate: examSession?.completed_at || null,
+          completionVerifiedAt: new Date().toISOString(),
+          completionMethod: 'competency_verified',
+        },
       });
       if (certResult.success && certResult.certificate) {
         certificate = certResult.certificate;

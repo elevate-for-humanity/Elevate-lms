@@ -23,8 +23,8 @@ import {
   Shield,
   Building2,
   TrendingUp,
+  BarChart3,
 } from 'lucide-react';
-import EmployerWorkforceAnalytics from '@/components/EmployerWorkforceAnalytics';
 
 /**
  * EMPLOYER PORTAL - PROGRESSION LOGIC
@@ -438,9 +438,25 @@ export default async function EmployerDashboardOrchestrated() {
             </div>
           </div>
 
-          {/* Workforce Analytics */}
-          <div className="mt-8">
-            <EmployerWorkforceAnalytics />
+          {/* Workforce Summary */}
+          <div className="mt-8 bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-5 h-5 text-brand-blue-600" />
+              <h3 className="text-lg font-bold text-black">Hiring Summary</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-50 rounded-lg">
+                <p className="text-2xl font-bold text-black">{postings?.length || 0}</p>
+                <p className="text-sm text-black">Active Postings</p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-lg">
+                <p className="text-2xl font-bold text-black">{applications?.length || 0}</p>
+                <p className="text-sm text-black">Pending Applications</p>
+              </div>
+            </div>
+            {!profile.verified && (
+              <p className="text-xs text-gray-500 mt-4">Complete verification to access full workforce analytics.</p>
+            )}
           </div>
         </div>
       </div>

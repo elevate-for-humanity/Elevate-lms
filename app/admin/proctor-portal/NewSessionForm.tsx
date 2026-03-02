@@ -93,12 +93,76 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
     return () => clearTimeout(timer);
   }, [studentSearch, supabase]);
 
+  // Exam eligibility: training + quizzes must be complete before exam
+  const [eligibility, setEligibility] = useState<{
+    checked: boolean;
+    eligible: boolean;
+    lessonsComplete: string;
+    quizzesPassed: string;
+    message: string;
+  } | null>(null);
+
+  const checkEligibility = async (userId: string) => {
+    setEligibility(null);
+    if (!userId) return;
+
+    // Check lesson completion
+    const { count: totalLessons } = await supabase
+      .from('training_lessons')
+      .select('*', { count: 'exact', head: true })
+      .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0');
+
+    const { count: completedLessons } = await supabase
+      .from('lesson_progress')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('completed', true);
+
+    // Check quiz pass status
+    const { data: quizLessons } = await supabase
+      .from('training_lessons')
+      .select('id')
+      .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0')
+      .eq('content_type', 'quiz');
+
+    let quizzesPassed = 0;
+    const totalQuizzes = quizLessons?.length || 0;
+    if (quizLessons) {
+      for (const q of quizLessons) {
+        const { data: attempt } = await supabase
+          .from('quiz_attempts')
+          .select('id')
+          .eq('user_uuid', userId)
+          .eq('quiz_id', q.id)
+          .eq('passed', true)
+          .limit(1)
+          .maybeSingle();
+        if (attempt) quizzesPassed++;
+      }
+    }
+
+    const allLessonsDone = (completedLessons || 0) >= (totalLessons || 0);
+    const allQuizzesPassed = quizzesPassed >= totalQuizzes;
+    const eligible = allLessonsDone && allQuizzesPassed;
+
+    setEligibility({
+      checked: true,
+      eligible,
+      lessonsComplete: `${completedLessons || 0}/${totalLessons || 0}`,
+      quizzesPassed: `${quizzesPassed}/${totalQuizzes}`,
+      message: eligible
+        ? 'Student has completed all training requirements and is eligible for the proctored exam.'
+        : `Training incomplete: ${!allLessonsDone ? `${(totalLessons || 0) - (completedLessons || 0)} lessons remaining` : ''}${!allLessonsDone && !allQuizzesPassed ? ', ' : ''}${!allQuizzesPassed ? `${totalQuizzes - quizzesPassed} quizzes not passed` : ''}`,
+    });
+  };
+
   const selectStudent = (s: StudentMatch) => {
     setStudentId(s.id);
     setStudentName(s.full_name);
     setStudentEmail(s.email);
     setStudentSearch('');
     setShowStudentDropdown(false);
+    checkEligibility(s.id);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,6 +305,27 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
             </div>
           </div>
         </fieldset>
+
+        {/* Exam Eligibility Check */}
+        {eligibility?.checked && (
+          <div className={`rounded-lg border p-4 ${eligibility.eligible ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+            <div className="flex items-start gap-3">
+              <span className="text-lg">{eligibility.eligible ? '✅' : '⚠️'}</span>
+              <div>
+                <p className={`text-sm font-semibold ${eligibility.eligible ? 'text-green-800' : 'text-amber-800'}`}>
+                  {eligibility.eligible ? 'Eligible for Proctored Exam' : 'Training Incomplete'}
+                </p>
+                <p className={`text-sm mt-1 ${eligibility.eligible ? 'text-green-700' : 'text-amber-700'}`}>
+                  {eligibility.message}
+                </p>
+                <div className="flex gap-4 mt-2 text-xs text-slate-600">
+                  <span>Lessons: {eligibility.lessonsComplete}</span>
+                  <span>Quizzes passed: {eligibility.quizzesPassed}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Section 2: Exam Details */}
         <fieldset className="space-y-4">

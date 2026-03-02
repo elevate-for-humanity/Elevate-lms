@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireApiRole } from '@/lib/auth/require-api-role';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -17,19 +16,11 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
+  const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+  if (auth instanceof NextResponse) return auth;
+
+  const { user, db } = auth;
   const { quizId } = await params;
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   let body: SubmitRequest;
   try {

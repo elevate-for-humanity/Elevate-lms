@@ -84,9 +84,11 @@ function buildLocalFallback(courseId: string, slug: string) {
 }
 
 /**
- * Public lesson list for a course. Returns lesson metadata (no quiz answers).
- * Used by the public lesson player page which can't read training_lessons
- * directly due to RLS (authenticated + tenant-scoped).
+ * Course lesson list with tiered access:
+ *
+ * - Unauthenticated: course overview + lesson titles/types only (syllabus view)
+ * - Authenticated but not enrolled: same as above
+ * - Authenticated + enrolled: full content (video URLs, HTML, quiz questions)
  *
  * Falls back to local course definitions when the course hasn't been seeded
  * into Supabase yet.
@@ -100,13 +102,39 @@ async function _GET(
   const admin = createAdminClient();
   const supabase = admin || (await createClient());
   if (!supabase) {
-    // No DB — try local fallback
     const slug = COURSE_ID_TO_SLUG[courseId];
     if (slug) {
       const fallback = buildLocalFallback(courseId, slug);
-      if (fallback) return NextResponse.json(fallback);
+      if (fallback) return NextResponse.json(stripSensitiveFields(fallback));
     }
     return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
+  }
+
+  // Check auth + enrollment status
+  const userClient = await createClient();
+  const { data: { user } } = userClient ? await userClient.auth.getUser() : { data: { user: null } };
+
+  let isEnrolled = false;
+  if (user) {
+    const { data: enrollment } = await supabase
+      .from('training_enrollments')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('course_id', courseId)
+      .limit(1)
+      .maybeSingle();
+    isEnrolled = !!enrollment;
+
+    // Also check program_enrollments as a fallback
+    if (!isEnrolled) {
+      const { data: progEnrollment } = await supabase
+        .from('program_enrollments')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle();
+      isEnrolled = !!progEnrollment;
+    }
   }
 
   // Fetch course
@@ -117,11 +145,12 @@ async function _GET(
     .single();
 
   if (courseErr || !course) {
-    // Fallback to local definitions for known courses not yet in Supabase
     const slug = COURSE_ID_TO_SLUG[courseId];
     if (slug) {
       const fallback = buildLocalFallback(courseId, slug);
-      if (fallback) return NextResponse.json(fallback);
+      if (fallback) {
+        return NextResponse.json(isEnrolled ? fallback : stripSensitiveFields(fallback));
+      }
     }
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
@@ -145,12 +174,39 @@ async function _GET(
     .eq('course_id', courseId)
     .order('order_index');
 
-  // Normalize course_name → title for frontend compatibility
   const normalizedCourse = { ...course, title: course.course_name };
-  return NextResponse.json({
+  const payload = {
     course: normalizedCourse,
     lessons: lessons || [],
     modules: modules || [],
-  });
+    enrolled: isEnrolled,
+  };
+
+  // Enrolled users get full content; everyone else gets syllabus only
+  return NextResponse.json(isEnrolled ? payload : stripSensitiveFields(payload));
+}
+
+/**
+ * Strip video URLs, full content, and quiz answers from lesson data.
+ * Returns only what's needed for the course syllabus/overview page.
+ */
+function stripSensitiveFields(data: any) {
+  return {
+    ...data,
+    enrolled: false,
+    lessons: (data.lessons || []).map((l: any) => ({
+      id: l.id,
+      course_id: l.course_id,
+      title: l.title,
+      lesson_number: l.lesson_number,
+      order_index: l.order_index,
+      duration_minutes: l.duration_minutes,
+      is_required: l.is_required,
+      is_published: l.is_published,
+      content_type: l.content_type,
+      description: l.description,
+      // Stripped: video_url, content, quiz_questions, quiz_id, passing_score, topics
+    })),
+  };
 }
 export const GET = withApiAudit('/api/courses/[courseId]/lessons/public', _GET);

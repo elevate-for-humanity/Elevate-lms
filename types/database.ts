@@ -6,8 +6,17 @@
 export type UserRole =
   | 'student'
   | 'admin'
+  | 'super_admin'
+  | 'staff'
+  | 'employer'
+  | 'workforce_board'
+  | 'partner'
+  | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
   | 'program_holder'
   | 'delegate'
+  | 'creator'
   | 'instructor';
 export type EnrollmentStatus =
   | 'pending'

@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireApiRole } from '@/lib/auth/require-api-role';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -18,22 +17,32 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+    if (auth instanceof NextResponse) return auth;
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { user, db } = auth;
 
     const body = await req.json();
     const { courseId } = body;
 
     if (!courseId) {
       return NextResponse.json({ error: 'Missing courseId' }, { status: 400 });
+    }
+
+    // Verify enrollment before allowing progress tracking
+    const { data: enrollment } = await db
+      .from('training_enrollments')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('course_id', courseId)
+      .in('status', ['active', 'in_progress'])
+      .single();
+
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: 'Not enrolled in this course' },
+        { status: 403 },
+      );
     }
 
     // Get course details

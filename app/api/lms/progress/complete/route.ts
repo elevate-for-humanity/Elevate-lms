@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireApiRole } from '@/lib/auth/require-api-role';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { checkCourseCompletion } from '@/lib/course-completion';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getCourseRequirements } from '@/lib/courses/completion-requirements';
 
 /**
  * Mark course as completed
@@ -25,23 +25,14 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
  * and seat time in the credential metadata.
  */
 async function _POST(req: NextRequest) {
-    const rateLimited = await applyRateLimit(req, 'contact');
-    if (rateLimited) return rateLimited;
-
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+    if (auth instanceof NextResponse) return auth;
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { user, db } = auth;
 
     // Handle both JSON and FormData
     let courseId: string;
@@ -60,6 +51,23 @@ async function _POST(req: NextRequest) {
 
     if (!courseId) {
       return NextResponse.json({ error: 'Missing courseId' }, { status: 400 });
+    }
+
+    // ── ENROLLMENT OWNERSHIP ─────────────────────────────────────────
+    // Verify the user is enrolled in this course before allowing completion.
+    const { data: enrollment } = await db
+      .from('training_enrollments')
+      .select('id, status')
+      .eq('user_id', user.id)
+      .eq('course_id', courseId)
+      .in('status', ['active', 'in_progress'])
+      .single();
+
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: 'Not enrolled in this course' },
+        { status: 403 },
+      );
     }
 
     // ── COMPLETION GATE ──────────────────────────────────────────────
@@ -107,6 +115,47 @@ async function _POST(req: NextRequest) {
       .select('slug, title, metadata')
       .eq('id', courseId)
       .single();
+
+    // ── PROCTORED EXAM GATE ──────────────────────────────────────────
+    // Courses with industry certification exams (e.g., EPA 608) require
+    // a logged and passing proctored exam session before certificate
+    // issuance. This enforces the credentialing chain of custody:
+    //   Training → Quizzes → Proctored Exam → Certificate
+    const requirements = getCourseRequirements(course?.slug || '');
+
+    if (requirements.examRequirement) {
+      const { provider, examName, requiredResult } = requirements.examRequirement;
+
+      if (!examSession || examSession.result !== requiredResult) {
+        return NextResponse.json({
+          error: 'Proctored exam requirement not met',
+          examRequirement: {
+            examName,
+            provider,
+            requiredResult,
+            currentStatus: examSession
+              ? `Exam logged but result is "${examSession.result}" (requires "${requiredResult}")`
+              : 'No proctored exam session found for this student',
+          },
+          message: `This course requires a passing ${examName} proctored exam before a certificate can be issued. Contact your proctor to schedule the exam.`,
+        }, { status: 403 });
+      }
+    }
+
+    // ── SEAT TIME GATE ───────────────────────────────────────────────
+    // Enforce minimum LMS theory hours. This covers the online portion;
+    // in-person lab/shop hours are tracked separately via hour_entries.
+    if (requirements.minimumSeatTimeHours && seatTime.totalHours < requirements.minimumSeatTimeHours) {
+      return NextResponse.json({
+        error: 'Minimum seat time requirement not met',
+        seatTimeRequirement: {
+          required: requirements.minimumSeatTimeHours,
+          recorded: seatTime.totalHours,
+          deficit: Math.round((requirements.minimumSeatTimeHours - seatTime.totalHours) * 10) / 10,
+        },
+        message: `This course requires at least ${requirements.minimumSeatTimeHours} hours of instructional time. You have ${seatTime.totalHours} hours recorded. Continue engaging with lesson content to meet this requirement.`,
+      }, { status: 403 });
+    }
 
     // Update progress to completed
     const { error } = await db.from('lms_progress').upsert(

@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { requireRole } from '@/lib/auth/require-role';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import {
   Clock,
@@ -28,35 +28,11 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function LearnerDashboardPage() {
+  // Require student role (admins can view for support)
+  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Get current user
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    redirect('/login?redirect=/learner/dashboard');
-  }
-
-  // Fetch profile
-  const { data: profile } = await db
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
 
   // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
   const { data: legacyEnrollments } = await db

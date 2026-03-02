@@ -1,11 +1,18 @@
-export type UserRole = 
+export type UserRole =
   | 'student'
-  | 'instructor'
-  | 'program_holder'
-  | 'employer'
-  | 'staff'
   | 'admin'
-  | 'super_admin';
+  | 'super_admin'
+  | 'staff'
+  | 'employer'
+  | 'workforce_board'
+  | 'partner'
+  | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
+  | 'instructor';
 
 export interface User {
   id: string;

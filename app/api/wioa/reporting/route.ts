@@ -1,10 +1,9 @@
 export const runtime = 'nodejs';
-import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { requireApiRole } from '@/lib/auth/require-api-role';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,7 +13,9 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+const _authCheck = await requireApiRole(['workforce_board', 'staff', 'admin', 'super_admin']);
+    if (_authCheck instanceof NextResponse) return _authCheck;
+    const supabase = _authCheck.adminDb;
   try {
     const { searchParams } = new URL(request.url);
     const reportType = searchParams.get('type');

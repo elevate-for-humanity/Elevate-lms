@@ -140,6 +140,10 @@ async function flagCertificatesForRefund(
   }
 }
 
+// System actor UUID for webhook-initiated changes (not a real user).
+// Auditors can identify this as an automated system action.
+const SYSTEM_WEBHOOK_ACTOR = '00000000-0000-0000-0000-000000000001';
+
 async function flagCertRows(
   db: ReturnType<typeof createClient>,
   certs: Array<{ id: string; certificate_number?: string }>,
@@ -152,6 +156,7 @@ async function flagCertRows(
     .update({
       funding_status: 'refunded',
       funding_status_changed_at: new Date().toISOString(),
+      funding_status_changed_by: SYSTEM_WEBHOOK_ACTOR,
       funding_status_reason: `Stripe refund on charge ${chargeId} (pi: ${paymentIntentId})`,
     })
     .in('id', certIds)
@@ -247,6 +252,14 @@ async function _POST(request: NextRequest) {
         Sentry.captureException(idempotencyErr, {
           tags: { subsystem: 'stripe_webhook', failure: 'idempotency_fail_closed', event_type: event.type },
         });
+        // Log the failed retry attempt
+        try {
+          await supabase.from('webhook_retry_log').insert({
+            provider: 'stripe', event_id: event.id, event_type: event.type,
+            outcome: 'idempotency_failed',
+            metadata: { error: String(idempotencyErr) },
+          });
+        } catch (_) { /* best-effort */ }
         return NextResponse.json({ received: true, skipped: true, reason: 'idempotency_unavailable' });
       }
       // Non-destructive: continue (fail-open)
@@ -255,6 +268,14 @@ async function _POST(request: NextRequest) {
 
     if (existingEvent) {
       logger.info(`[webhook] Already processed: ${event.id}, status: ${existingEvent.status}`);
+      // Log the duplicate attempt for audit trail
+      try {
+        await supabase.from('webhook_retry_log').insert({
+          provider: 'stripe', event_id: event.id, event_type: event.type,
+          outcome: 'duplicate_skipped',
+          metadata: { original_status: existingEvent.status },
+        });
+      } catch (_) { /* best-effort */ }
       return NextResponse.json({ received: true, duplicate: true });
     }
 
@@ -275,6 +296,13 @@ async function _POST(request: NextRequest) {
         // If insert fails due to unique constraint, another process is handling it
         if (insertError.code === '23505') {
           logger.info(`[webhook] Being processed by another instance: ${event.id}`);
+          try {
+            await supabase.from('webhook_retry_log').insert({
+              provider: 'stripe', event_id: event.id, event_type: event.type,
+              outcome: 'duplicate_skipped',
+              metadata: { reason: 'unique_constraint_race' },
+            });
+          } catch (_) { /* best-effort */ }
           return NextResponse.json({ received: true, duplicate: true });
         }
         logger.warn('[webhook] Failed to record event:', insertError);
@@ -291,6 +319,13 @@ async function _POST(request: NextRequest) {
       Sentry.captureException(new Error(`Fail-closed: could not record destructive webhook ${event.type}`), {
         tags: { subsystem: 'stripe_webhook', failure: 'record_fail_closed', event_type: event.type },
       });
+      try {
+        await supabase.from('webhook_retry_log').insert({
+          provider: 'stripe', event_id: event.id, event_type: event.type,
+          outcome: 'record_failed',
+          metadata: { reason: 'could_not_record_before_mutation' },
+        });
+      } catch (_) { /* best-effort */ }
       return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
     }
 
@@ -1951,20 +1986,26 @@ async function _POST(request: NextRequest) {
           logger.info(`[webhook] Revoked entitlements for user ${userId} due to refund on charge ${charge.id}`);
         }
 
-        // If there's an enrollment, mark it as refunded
+        // If there's an enrollment, mark funding as refunded.
+        // Training status and funding status are independent:
+        //   status = 'refunded' (training terminated)
+        //   funding_status = 'refunded' (payment reversed, training may continue)
         if (enrollmentId) {
           const { error: enrollError } = await supabase
             .from('program_enrollments')
             .update({ 
               status: 'refunded',
-              refunded_at: new Date().toISOString()
+              refunded_at: new Date().toISOString(),
+              funding_status: 'refunded',
+              funding_status_changed_at: new Date().toISOString(),
+              funding_status_reason: `Stripe charge.refunded: ${charge.id}`,
             })
             .eq('id', enrollmentId);
 
           if (enrollError) {
             logger.error('[webhook] Error updating enrollment status:', enrollError);
           } else {
-            logger.info(`[webhook] Marked enrollment ${enrollmentId} as refunded`);
+            logger.info(`[webhook] Marked enrollment ${enrollmentId} as refunded (training + funding)`);
           }
         }
 

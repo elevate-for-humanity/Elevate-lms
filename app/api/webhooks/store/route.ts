@@ -219,14 +219,17 @@ async function _POST(req: NextRequest) {
       if (idemErr) {
         if (idemErr.code === '23505') {
           logger.info('Store refund already processed, skipping', { eventId: event.id });
+          try { await dbIdem.from('webhook_retry_log').insert({ provider: 'stripe', event_id: event.id, event_type: event.type, outcome: 'duplicate_skipped', metadata: { source: 'store_webhook' } }); } catch (_) {}
           return NextResponse.json({ received: true, duplicate: true });
         }
-        // Cannot record → fail-closed, skip mutation
         logger.error('FAIL-CLOSED: Cannot record store refund event, skipping mutations', { error: idemErr });
+        try { await dbIdem.from('webhook_retry_log').insert({ provider: 'stripe', event_id: event.id, event_type: event.type, outcome: 'record_failed', metadata: { source: 'store_webhook' } }); } catch (_) {}
         return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
       }
     } catch (idemCatchErr) {
       logger.error('FAIL-CLOSED: Idempotency insert threw, skipping store refund', idemCatchErr);
+      // Best-effort retry log — dbIdem may not be available if this threw
+      try { const fallbackDb = createAdminClient(); if (fallbackDb) await fallbackDb.from('webhook_retry_log').insert({ provider: 'stripe', event_id: event.id, event_type: event.type, outcome: 'idempotency_failed', metadata: { source: 'store_webhook' } }); } catch (_) {}
       return NextResponse.json({ received: true, skipped: true, reason: 'idempotency_unavailable' });
     }
 
@@ -267,6 +270,9 @@ async function _POST(req: NextRequest) {
         .update({
           status: 'refunded',
           refunded_at: new Date().toISOString(),
+          funding_status: 'refunded',
+          funding_status_changed_at: new Date().toISOString(),
+          funding_status_reason: `Store refund on charge ${charge.id}`,
         })
         .eq('payment_id', paymentIntentId);
 
@@ -280,11 +286,13 @@ async function _POST(req: NextRequest) {
         const userId = paymentIntent.metadata?.user_id;
         if (userId) {
           const programId = paymentIntent.metadata?.program_id;
+          const SYSTEM_WEBHOOK_ACTOR = '00000000-0000-0000-0000-000000000001';
           let certQuery = db
             .from('certificates')
             .update({
               funding_status: 'refunded',
               funding_status_changed_at: new Date().toISOString(),
+              funding_status_changed_by: SYSTEM_WEBHOOK_ACTOR,
               funding_status_reason: `Store refund on charge ${charge.id} (pi: ${paymentIntentId})`,
             })
             .eq('funding_status', 'valid');
@@ -301,6 +309,7 @@ async function _POST(req: NextRequest) {
               .update({
                 funding_status: 'refunded',
                 funding_status_changed_at: new Date().toISOString(),
+                funding_status_changed_by: SYSTEM_WEBHOOK_ACTOR,
                 funding_status_reason: `Store refund on charge ${charge.id} (pi: ${paymentIntentId})`,
               })
               .eq('funding_status', 'valid')

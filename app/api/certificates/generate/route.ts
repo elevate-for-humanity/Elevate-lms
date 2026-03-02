@@ -71,7 +71,7 @@ async function _POST(request: Request) {
       // Check for an enrollment or application for this user + program
       const { data: enroll } = await db
         .from('program_enrollments')
-        .select('id, user_id, course_id, completed_at, status')
+        .select('id, user_id, course_id, completed_at, status, funding_source, funding_status, amount_paid_cents, stripe_payment_intent_id')
         .eq('user_id', user.id)
         .eq('program_id', prog.id)
         .maybeSingle();
@@ -89,6 +89,10 @@ async function _POST(request: Request) {
           course_id,
           completed_at,
           status,
+          funding_source,
+          funding_status,
+          amount_paid_cents,
+          stripe_payment_intent_id,
           courses (
             id,
             title,
@@ -244,6 +248,28 @@ async function _POST(request: Request) {
           min_ojl_hours: eligibilityEvidence?.minOjlHours || 0,
           min_rti_hours: eligibilityEvidence?.minRtiHours || 0,
         } : null,
+        // Immutable point-in-time snapshot at issuance. Never updated after insert.
+        // Auditors can compare this against current funding_status to see what changed.
+        issuance_snapshot: {
+          snapshot_version: 1,
+          issued_at: new Date().toISOString(),
+          funding_source: enrollment?.funding_source || null,
+          funding_status_at_issuance: enrollment?.funding_status || 'funded',
+          amount_paid_cents: enrollment?.amount_paid_cents || null,
+          payment_reference: enrollment?.stripe_payment_intent_id || null,
+          enrollment_id: enrollment?.id || null,
+          enrollment_status_at_issuance: enrollment?.status || null,
+          issuance_policy: isApprenticeship ? 'apprenticeship_certificate' : 'course_certificate',
+          competency_evidence: isApprenticeship ? {
+            ojl_hours: eligibilityEvidence?.approvedHours?.ojl || 0,
+            rti_hours: eligibilityEvidence?.approvedHours?.rti || 0,
+            min_ojl_required: eligibilityEvidence?.minOjlHours || 0,
+            min_rti_required: eligibilityEvidence?.minRtiHours || 0,
+          } : {
+            duration_hours: course?.duration_hours || 0,
+          },
+          issued_by: user.id,
+        },
       })
       .select('*')
       .single();

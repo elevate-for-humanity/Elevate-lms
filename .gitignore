@@ -67,6 +67,10 @@ temp/
 
 # Security - Never commit these
 *secret*
+!lib/secrets.ts
+!netlify/lib/secrets-standalone.ts
+!scripts/seed-app-secrets.sh
+!supabase/migrations/*app_secrets*
 *private*
 *.pem
 *.key

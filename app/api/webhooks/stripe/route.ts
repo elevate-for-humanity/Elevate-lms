@@ -61,6 +61,110 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase =
   supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
+/**
+ * Flag certificates as funding-invalid when a refund occurs.
+ * Does NOT delete or revoke the credential — the student earned it.
+ * Sets funding_status='refunded' so downstream systems (ETPL, WIOA reports)
+ * know the payment backing this credential was reversed.
+ */
+async function flagCertificatesForRefund(
+  db: ReturnType<typeof createClient>,
+  userId: string,
+  paymentIntentId: string,
+  chargeId: string,
+  enrollmentId?: string | null,
+  programId?: string | null,
+) {
+  try {
+    // Strategy: find certificates by enrollment → program, or by user + program
+    // Certificates don't store payment_intent_id directly, so we trace through enrollments
+    let certQuery = db
+      .from('certificates')
+      .select('id, certificate_number, funding_status')
+      .eq('funding_status', 'valid'); // only flag currently-valid certs
+
+    if (enrollmentId) {
+      // Look up the enrollment to get course_id / program_id
+      const { data: enrollment } = await db
+        .from('program_enrollments')
+        .select('course_id, program_id, user_id')
+        .eq('id', enrollmentId)
+        .single();
+
+      if (enrollment) {
+        certQuery = certQuery.eq('student_id', enrollment.user_id || userId);
+        if (enrollment.program_id) {
+          certQuery = certQuery.eq('program_id', enrollment.program_id);
+        } else if (enrollment.course_id) {
+          certQuery = certQuery.eq('course_id', enrollment.course_id);
+        }
+      } else {
+        // Enrollment not found — fall back to user_id + program_id if available
+        certQuery = certQuery.eq('student_id', userId);
+        if (programId) certQuery = certQuery.eq('program_id', programId);
+      }
+    } else {
+      // No enrollment_id — match by user + program if we have it
+      certQuery = certQuery.eq('student_id', userId);
+      if (programId) certQuery = certQuery.eq('program_id', programId);
+    }
+
+    const { data: certs, error: fetchErr } = await certQuery;
+
+    if (fetchErr) {
+      // certificates table may use user_id instead of student_id in some rows
+      logger.warn('[webhook] Certificate lookup by student_id failed, trying user_id:', fetchErr.message);
+      let fallbackQuery = db
+        .from('certificates')
+        .select('id, certificate_number, funding_status')
+        .eq('funding_status', 'valid')
+        .eq('user_id', userId);
+      if (programId) fallbackQuery = fallbackQuery.eq('program_id', programId);
+      const { data: fallbackCerts, error: fallbackErr } = await fallbackQuery;
+      if (fallbackErr || !fallbackCerts?.length) {
+        logger.info('[webhook] No valid certificates found to flag for refund');
+        return;
+      }
+      await flagCertRows(db, fallbackCerts, chargeId, paymentIntentId);
+      return;
+    }
+
+    if (!certs?.length) {
+      logger.info('[webhook] No valid certificates found to flag for refund');
+      return;
+    }
+
+    await flagCertRows(db, certs, chargeId, paymentIntentId);
+  } catch (err) {
+    logger.error('[webhook] Error flagging certificates for refund:', err);
+  }
+}
+
+async function flagCertRows(
+  db: ReturnType<typeof createClient>,
+  certs: Array<{ id: string; certificate_number?: string }>,
+  chargeId: string,
+  paymentIntentId: string,
+) {
+  const certIds = certs.map((c) => c.id);
+  const { error: updateErr, count } = await db
+    .from('certificates')
+    .update({
+      funding_status: 'refunded',
+      funding_status_changed_at: new Date().toISOString(),
+      funding_status_reason: `Stripe refund on charge ${chargeId} (pi: ${paymentIntentId})`,
+    })
+    .in('id', certIds)
+    .eq('funding_status', 'valid'); // guard against race conditions
+
+  if (updateErr) {
+    logger.error('[webhook] Error updating certificate funding_status:', updateErr);
+  } else {
+    const certNumbers = certs.map((c) => c.certificate_number).filter(Boolean);
+    logger.info(`[webhook] Flagged ${certIds.length} certificate(s) as funding-refunded: ${certNumbers.join(', ')}`);
+  }
+}
+
 async function _POST(request: NextRequest) {
   // Stage 0: Log env var presence for debugging
   logger.info('[webhook] Env check:', {
@@ -113,8 +217,21 @@ async function _POST(request: NextRequest) {
 
   // Wrap ALL post-verify logic in try/catch to prevent 500s
   try {
+    // Destructive events: state mutations that must not be replayed.
+    // These are fail-closed — if idempotency check fails, skip the mutation.
+    // Activation events (checkout.session.completed) are fail-open because
+    // upserts make them safely repeatable.
+    const DESTRUCTIVE_EVENT_TYPES = new Set([
+      'charge.refunded',
+      'customer.subscription.deleted',
+      'customer.subscription.updated',
+      'invoice.payment_failed',
+    ]);
+    const isDestructive = DESTRUCTIVE_EVENT_TYPES.has(event.type);
+
     // Idempotency check - prevent duplicate processing
     let existingEvent = null;
+    let idempotencyAvailable = true;
     try {
       const { data } = await supabase
         .from('stripe_webhook_events')
@@ -123,16 +240,26 @@ async function _POST(request: NextRequest) {
         .single();
       existingEvent = data;
     } catch (idempotencyErr) {
-      logger.error('[webhook] Idempotency check failed (continuing):', idempotencyErr);
+      idempotencyAvailable = false;
+      logger.error('[webhook] Idempotency check failed:', idempotencyErr);
+      if (isDestructive) {
+        logger.error(`[webhook] FAIL-CLOSED: Skipping destructive event ${event.type} (${event.id}) — cannot verify idempotency`);
+        Sentry.captureException(idempotencyErr, {
+          tags: { subsystem: 'stripe_webhook', failure: 'idempotency_fail_closed', event_type: event.type },
+        });
+        return NextResponse.json({ received: true, skipped: true, reason: 'idempotency_unavailable' });
+      }
+      // Non-destructive: continue (fail-open)
+      logger.warn('[webhook] Continuing without idempotency for non-destructive event');
     }
 
     if (existingEvent) {
       logger.info(`[webhook] Already processed: ${event.id}, status: ${existingEvent.status}`);
-      logger.info(`Webhook already processed: ${event.id}, status: ${existingEvent.status}`);
       return NextResponse.json({ received: true, duplicate: true });
     }
 
     // Record webhook event before processing
+    let eventRecorded = false;
     try {
       const { error: insertError } = await supabase
         .from('stripe_webhook_events')
@@ -148,15 +275,23 @@ async function _POST(request: NextRequest) {
         // If insert fails due to unique constraint, another process is handling it
         if (insertError.code === '23505') {
           logger.info(`[webhook] Being processed by another instance: ${event.id}`);
-          logger.info(`Webhook being processed by another instance: ${event.id}`);
           return NextResponse.json({ received: true, duplicate: true });
         }
-        // Log but continue - idempotency table might not exist yet
-        logger.warn('[webhook] Failed to record event (continuing):', insertError);
-        logger.warn('Failed to record webhook event (continuing):', insertError);
+        logger.warn('[webhook] Failed to record event:', insertError);
+      } else {
+        eventRecorded = true;
       }
     } catch (recordErr) {
-      logger.error('[webhook] Record event failed (continuing):', recordErr);
+      logger.error('[webhook] Record event failed:', recordErr);
+    }
+
+    // Fail-closed gate for destructive events: must have recorded the event
+    if (isDestructive && !eventRecorded) {
+      logger.error(`[webhook] FAIL-CLOSED: Cannot record destructive event ${event.type} (${event.id}) — skipping to prevent duplicate mutations`);
+      Sentry.captureException(new Error(`Fail-closed: could not record destructive webhook ${event.type}`), {
+        tags: { subsystem: 'stripe_webhook', failure: 'record_fail_closed', event_type: event.type },
+      });
+      return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
     }
 
     // Handle the event - each case wrapped in its own try/catch
@@ -1763,6 +1898,7 @@ async function _POST(request: NextRequest) {
         const userId = paymentIntent.metadata?.user_id;
         const productId = paymentIntent.metadata?.product_id;
         const enrollmentId = paymentIntent.metadata?.enrollment_id;
+        const programId = paymentIntent.metadata?.program_id;
 
         if (!userId) {
           logger.info('[webhook] No user_id in payment intent metadata, checking customer');
@@ -1791,6 +1927,9 @@ async function _POST(request: NextRequest) {
               } else {
                 logger.info('[webhook] Revoked entitlements for refunded charge');
               }
+
+              // Flag certificates for this user as funding-invalid
+              await flagCertificatesForRefund(supabase, profile.id, paymentIntentId, charge.id);
             }
           }
           break;
@@ -1808,10 +1947,8 @@ async function _POST(request: NextRequest) {
 
         if (revokeError) {
           logger.error('[webhook] Error revoking entitlements:', revokeError);
-          logger.error('Error revoking entitlements on refund:', revokeError);
         } else {
-          logger.info(`[webhook] ✅ Revoked entitlements for user ${userId} due to refund`);
-          logger.info(`Revoked entitlements for user ${userId} due to refund on charge ${charge.id}`);
+          logger.info(`[webhook] Revoked entitlements for user ${userId} due to refund on charge ${charge.id}`);
         }
 
         // If there's an enrollment, mark it as refunded
@@ -1827,9 +1964,12 @@ async function _POST(request: NextRequest) {
           if (enrollError) {
             logger.error('[webhook] Error updating enrollment status:', enrollError);
           } else {
-            logger.info(`[webhook] ✅ Marked enrollment ${enrollmentId} as refunded`);
+            logger.info(`[webhook] Marked enrollment ${enrollmentId} as refunded`);
           }
         }
+
+        // Flag certificates as funding-invalid (not revoked — credential was earned)
+        await flagCertificatesForRefund(supabase, userId, paymentIntentId, charge.id, enrollmentId, programId);
 
         // Revoke LMS access if product grants course access
         if (productId) {
@@ -1853,9 +1993,28 @@ async function _POST(request: NextRequest) {
             if (lmsError) {
               logger.error('[webhook] Error revoking LMS access:', lmsError);
             } else {
-              logger.info(`[webhook] ✅ Revoked LMS access for course ${product.course_id}`);
+              logger.info(`[webhook] Revoked LMS access for course ${product.course_id}`);
             }
           }
+        }
+
+        // Record in multi-provider webhook log
+        try {
+          await supabase.from('webhook_events_processed').insert({
+            provider: 'stripe',
+            event_id: event.id,
+            event_type: event.type,
+            payment_reference: paymentIntentId,
+            enrollment_id: enrollmentId || null,
+            status: 'processed',
+            metadata: {
+              charge_id: charge.id,
+              refund_amount: charge.amount_refunded,
+              user_id: userId,
+            },
+          });
+        } catch (logErr) {
+          logger.warn('[webhook] Failed to record in webhook_events_processed:', logErr);
         }
 
         // Audit log the refund
@@ -1873,7 +2032,6 @@ async function _POST(request: NextRequest) {
 
       } catch (err) {
         logger.error('[webhook] Error processing refund:', err);
-        logger.error('Error processing refund:', err);
       }
       break;
     }

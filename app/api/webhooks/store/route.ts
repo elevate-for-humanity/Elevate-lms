@@ -197,12 +197,38 @@ async function _POST(req: NextRequest) {
     }
   }
 
-  // Handle charge.refunded - revoke access
+  // Handle charge.refunded - revoke access (fail-closed: must record before mutating)
   if (event.type === 'charge.refunded') {
     const charge = event.data.object as Stripe.Charge;
     const paymentIntentId = charge.payment_intent as string;
 
-    logger.info('Processing refund', { chargeId: charge.id, paymentIntentId });
+    logger.info('Processing store refund', { chargeId: charge.id, paymentIntentId });
+
+    // Fail-closed idempotency: record in webhook_events_processed before mutating state
+    const supabaseForIdem = await createClient();
+    const dbIdem = createAdminClient() || supabaseForIdem;
+    try {
+      const { error: idemErr } = await dbIdem.from('webhook_events_processed').insert({
+        provider: 'stripe',
+        event_id: event.id,
+        event_type: event.type,
+        payment_reference: paymentIntentId,
+        status: 'processed',
+        metadata: { charge_id: charge.id, refund_amount: charge.amount_refunded },
+      });
+      if (idemErr) {
+        if (idemErr.code === '23505') {
+          logger.info('Store refund already processed, skipping', { eventId: event.id });
+          return NextResponse.json({ received: true, duplicate: true });
+        }
+        // Cannot record → fail-closed, skip mutation
+        logger.error('FAIL-CLOSED: Cannot record store refund event, skipping mutations', { error: idemErr });
+        return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
+      }
+    } catch (idemCatchErr) {
+      logger.error('FAIL-CLOSED: Idempotency insert threw, skipping store refund', idemCatchErr);
+      return NextResponse.json({ received: true, skipped: true, reason: 'idempotency_unavailable' });
+    }
 
     if (paymentIntentId) {
       const supabase = await createClient();
@@ -246,6 +272,46 @@ async function _POST(req: NextRequest) {
 
       if (enrollmentError) {
         logger.error('Error revoking enrollment on refund', { error: enrollmentError });
+      }
+
+      // Flag certificates as funding-invalid (credential was earned, but payment reversed)
+      try {
+        const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
+        const userId = paymentIntent.metadata?.user_id;
+        if (userId) {
+          const programId = paymentIntent.metadata?.program_id;
+          let certQuery = db
+            .from('certificates')
+            .update({
+              funding_status: 'refunded',
+              funding_status_changed_at: new Date().toISOString(),
+              funding_status_reason: `Store refund on charge ${charge.id} (pi: ${paymentIntentId})`,
+            })
+            .eq('funding_status', 'valid');
+
+          // Try student_id first (certificate generate route uses this)
+          certQuery = certQuery.eq('student_id', userId);
+          if (programId) certQuery = certQuery.eq('program_id', programId);
+
+          const { error: certErr } = await certQuery;
+          if (certErr) {
+            // Fallback: some certs use user_id column
+            const fallback = db
+              .from('certificates')
+              .update({
+                funding_status: 'refunded',
+                funding_status_changed_at: new Date().toISOString(),
+                funding_status_reason: `Store refund on charge ${charge.id} (pi: ${paymentIntentId})`,
+              })
+              .eq('funding_status', 'valid')
+              .eq('user_id', userId);
+            if (programId) fallback.eq('program_id', programId);
+            await fallback;
+          }
+          logger.info('Flagged certificates as funding-refunded for user', { userId });
+        }
+      } catch (certFlagErr) {
+        logger.error('Error flagging certificates on store refund:', certFlagErr);
       }
 
       logger.info('Refund processed - access revoked', { chargeId: charge.id });

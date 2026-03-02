@@ -49,7 +49,7 @@ export default function OrientationAvatar() {
           autoPlay
           preload="auto"
         >
-          <source src="/videos/avatars/orientation-guide.mp4" type="video/mp4" />
+          <source src="/videos/orientation-full.mp4" type="video/mp4" />
         </video>
         {/* Elevate logo */}
         <div className="absolute bottom-2 right-2 bg-white/90 rounded-lg px-2 py-1 flex items-center gap-1.5 shadow-sm pointer-events-none">

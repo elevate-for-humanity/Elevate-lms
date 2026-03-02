@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BookOpen, CheckCircle2, ArrowLeft, Shield, Clock, Users, AlertTriangle } from 'lucide-react';
+import OrientationAvatar from './OrientationAvatar';
 
 export const metadata: Metadata = {
   title: 'Orientation | Elevate for Humanity',
@@ -76,6 +77,8 @@ export default async function OrientationPage() {
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Student Orientation</h1>
         <p className="text-sm text-gray-500 mb-6">Review the following information before starting your program. You must acknowledge each section to complete orientation.</p>
+
+        <OrientationAvatar />
 
         <div className="space-y-4 mb-8">
           {sections.map((s, i) => (

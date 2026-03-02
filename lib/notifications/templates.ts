@@ -20,7 +20,10 @@ export type TemplateKey =
   | 'hostshop_decision'
   | 'apprentice_decision'
   | 'transfer_evaluated'
-  | 'match_assigned';
+  | 'match_assigned'
+  | 'employer_application_received'
+  | 'employer_decision'
+  | 'employer_activated';
 
 const BRAND_COLOR = '#7c3aed';
 const SUPPORT_EMAIL = 'support@elevateforhumanity.org';
@@ -361,6 +364,195 @@ Apprentice: ${data.apprentice_name}
 Start Date: ${data.start_date}
 
 Please reach out to the apprentice to coordinate their first day. Questions? Reply to this email or call ${SUPPORT_PHONE}`,
+        };
+      }
+
+    case 'employer_application_received':
+      return {
+        subject: 'Application Received — Elevate for Humanity Employer Partnership',
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Application Received</h2>
+          <p>Dear ${data.contact_name},</p>
+          <p>Thank you for applying to become an employer partner with Elevate for Humanity. We received your application for <strong>${data.business_name}</strong>.</p>
+
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">What happens next</h3>
+            <ol style="padding-left: 20px;">
+              <li>Our team reviews your application (typically 2–3 business days)</li>
+              <li>If approved, you'll receive an onboarding email with required documents</li>
+              <li>Complete onboarding to activate your employer portal</li>
+            </ol>
+          </div>
+
+          <h3>Documents you'll need ready</h3>
+          <ul>
+            <li>Signed Employer Partnership Agreement (MOU)</li>
+            <li>Certificate of Insurance — General Liability</li>
+            <li>Workers' Compensation proof (if hosting apprentices)</li>
+            <li>Business license or registration</li>
+            <li>Tax ID (EIN)</li>
+            <li>Supervisor/mentor designation</li>
+          </ul>
+
+          <h3>Employer partner benefits</h3>
+          <ul>
+            <li>Access pre-screened, trained candidates at no recruitment cost</li>
+            <li>OJT wage reimbursement pathways (WIOA, apprenticeship)</li>
+            <li>Work Opportunity Tax Credits (WOTC) — $2,400 to $9,600 per qualified hire</li>
+            <li>Dedicated employer portal for hours tracking, compliance, and reporting</li>
+            <li>Apprenticeship program support and DOL alignment</li>
+          </ul>
+
+          <p>Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Application Received
+
+Dear ${data.contact_name},
+
+Thank you for applying to become an employer partner with Elevate for Humanity. We received your application for ${data.business_name}.
+
+What happens next:
+1. Our team reviews your application (typically 2-3 business days)
+2. If approved, you'll receive an onboarding email with required documents
+3. Complete onboarding to activate your employer portal
+
+Documents you'll need ready:
+- Signed Employer Partnership Agreement (MOU)
+- Certificate of Insurance — General Liability
+- Workers' Compensation proof (if hosting apprentices)
+- Business license or registration
+- Tax ID (EIN)
+- Supervisor/mentor designation
+
+Employer partner benefits:
+- Access pre-screened, trained candidates at no recruitment cost
+- OJT wage reimbursement pathways (WIOA, apprenticeship)
+- Work Opportunity Tax Credits (WOTC) — $2,400 to $9,600 per qualified hire
+- Dedicated employer portal for hours tracking, compliance, and reporting
+- Apprenticeship program support and DOL alignment
+
+Questions? Reply to this email or call ${SUPPORT_PHONE}`,
+      };
+
+    case 'employer_activated':
+      return {
+        subject: 'Welcome to Elevate for Humanity — Your Employer Portal Is Live',
+        html: baseTemplate(`
+          <h2 style="color: #16a34a;">Welcome to Elevate for Humanity</h2>
+          <p>Dear ${data.contact_name},</p>
+          <p>Congratulations! <strong>${data.business_name}</strong> has completed all onboarding requirements. Your employer portal is now fully activated.</p>
+
+          <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+            <h3 style="margin-top: 0;">What you can do now</h3>
+            <ul style="padding-left: 20px;">
+              <li><strong>Employer Dashboard</strong> — View hiring activity, apprentice placements, and compliance status</li>
+              <li><strong>Hours Tracking</strong> — Review and approve apprentice OJL hours</li>
+              <li><strong>Post Jobs</strong> — List open positions for pre-screened candidates</li>
+              <li><strong>Documents</strong> — Manage insurance, agreements, and compliance files</li>
+              <li><strong>Reports</strong> — Access workforce outcome and retention data</li>
+            </ul>
+          </div>
+
+          ${button('Go to Your Dashboard →', 'https://www.elevateforhumanity.org/employer/dashboard')}
+
+          <h3>Employer Partner Benefits</h3>
+          <ul>
+            <li>Pre-screened, trained candidates at no recruitment cost</li>
+            <li>OJT wage reimbursement pathways (WIOA, apprenticeship)</li>
+            <li>Work Opportunity Tax Credits (WOTC) — $2,400 to $9,600 per qualified hire</li>
+            <li>Dedicated support from the Elevate team</li>
+          </ul>
+
+          <p>Thank you for partnering with Elevate for Humanity. Together, we are building real career pathways.</p>
+          <p style="font-size: 13px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Welcome to Elevate for Humanity
+
+Dear ${data.contact_name},
+
+Congratulations! ${data.business_name} has completed all onboarding requirements. Your employer portal is now fully activated.
+
+What you can do now:
+- Employer Dashboard — View hiring activity, apprentice placements, and compliance status
+- Hours Tracking — Review and approve apprentice OJL hours
+- Post Jobs — List open positions for pre-screened candidates
+- Documents — Manage insurance, agreements, and compliance files
+- Reports — Access workforce outcome and retention data
+
+Go to your dashboard: https://www.elevateforhumanity.org/employer/dashboard
+
+Employer Partner Benefits:
+- Pre-screened, trained candidates at no recruitment cost
+- OJT wage reimbursement pathways (WIOA, apprenticeship)
+- Work Opportunity Tax Credits (WOTC) — $2,400 to $9,600 per qualified hire
+- Dedicated support from the Elevate team
+
+Thank you for partnering with Elevate for Humanity.
+
+Questions? Reply to this email or call ${SUPPORT_PHONE}`,
+      };
+
+    case 'employer_decision':
+      if (data.approved) {
+        return {
+          subject: 'Approved — Complete Your Employer Onboarding',
+          html: baseTemplate(`
+            <h2 style="color: #16a34a;">Application Approved</h2>
+            <p>Dear ${data.contact_name},</p>
+            <p>Your employer partnership application for <strong>${data.business_name}</strong> has been approved.</p>
+
+            <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+              <h3 style="margin-top: 0;">Complete these steps to activate your portal</h3>
+              <ol style="padding-left: 20px;">
+                <li><strong>Sign the Employer Partnership Agreement</strong> — Review and e-sign your MOU</li>
+                <li><strong>Upload Insurance Documents</strong> — General Liability COI and Workers' Comp (if applicable)</li>
+                <li><strong>Verify Business Information</strong> — EIN, business license, worksite address</li>
+                <li><strong>Designate a Supervisor</strong> — Name the person who will oversee apprentices/trainees</li>
+              </ol>
+            </div>
+
+            ${button('Start Onboarding →', data.onboarding_url)}
+
+            <p style="font-size: 13px; color: #666;">Your portal will be fully activated once all required documents are submitted and verified. This typically takes 1–2 business days after submission.</p>
+          `),
+          text: `Application Approved
+
+Dear ${data.contact_name},
+
+Your employer partnership application for ${data.business_name} has been approved.
+
+Complete these steps to activate your portal:
+1. Sign the Employer Partnership Agreement (MOU)
+2. Upload Insurance Documents — General Liability COI and Workers' Comp
+3. Verify Business Information — EIN, business license, worksite address
+4. Designate a Supervisor for apprentices/trainees
+
+Start onboarding: ${data.onboarding_url}
+
+Your portal will be fully activated once all required documents are submitted and verified.
+
+Questions? Reply to this email or call ${SUPPORT_PHONE}`,
+        };
+      } else {
+        return {
+          subject: 'Application Update — Elevate for Humanity',
+          html: baseTemplate(`
+            <h2 style="color: #dc2626;">Application Not Approved</h2>
+            <p>Dear ${data.contact_name},</p>
+            <p>After review, we are unable to approve the employer partnership application for <strong>${data.business_name}</strong> at this time.</p>
+            ${data.reason ? `<p><strong>Reason:</strong> ${data.reason}</p>` : ''}
+            <p>If you believe this was in error or your circumstances have changed, please contact us to discuss next steps.</p>
+          `),
+          text: `Application Not Approved
+
+Dear ${data.contact_name},
+
+After review, we are unable to approve the employer partnership application for ${data.business_name} at this time.
+${data.reason ? `Reason: ${data.reason}` : ''}
+
+If you believe this was in error or your circumstances have changed, please contact us.
+
+Questions? Reply to this email or call ${SUPPORT_PHONE}`,
         };
       }
 

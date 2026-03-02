@@ -109,6 +109,10 @@ ALTER TABLE instructor_attestations ENABLE ROW LEVEL SECURITY;
 
 -- Service role can insert (API routes run as service role)
 -- Authenticated users can read their own attestations
+DROP POLICY IF EXISTS "Service role full access on attestations" ON instructor_attestations;
+DROP POLICY IF EXISTS "Students can view own attestations" ON instructor_attestations;
+DROP POLICY IF EXISTS "Instructors can view attestations they created" ON instructor_attestations;
+
 CREATE POLICY "Service role full access on attestations"
   ON instructor_attestations FOR ALL
   TO service_role

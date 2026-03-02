@@ -73,12 +73,40 @@ export default function HiringNeedsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Redirect to next step
-    router.push('/onboarding/employer?step=portal-access');
+
+    try {
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login?redirect=/onboarding/employer/hiring-needs');
+        return;
+      }
+
+      // Save hiring needs to employer_onboarding
+      await supabase
+        .from('employer_onboarding')
+        .update({
+          hiring_needs: formData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('employer_id', user.id);
+
+      // Also update onboarding step status
+      await supabase
+        .from('user_onboarding_status')
+        .upsert({
+          user_id: user.id,
+          profile_complete: true,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      router.push('/onboarding/employer?step=portal-access');
+    } catch {
+      setIsSubmitting(false);
+    }
   };
 
   return (

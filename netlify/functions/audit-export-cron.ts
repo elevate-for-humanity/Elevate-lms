@@ -1,4 +1,5 @@
 import type { Config, Context } from '@netlify/functions';
+import { hydrateProcessEnv } from '../lib/secrets-standalone.js';
 
 /**
  * Scheduled function: daily audit log export to Supabase Storage.
@@ -10,6 +11,7 @@ import type { Config, Context } from '@netlify/functions';
  * 3. Records export metadata with checksum
  */
 export default async function handler(req: Request, context: Context) {
+  await hydrateProcessEnv();
   const siteUrl = process.env.URL || process.env.DEPLOY_URL || 'https://www.elevateforhumanity.org';
   const internalSecret = process.env.INTERNAL_CRON_SECRET;
 

@@ -6,6 +6,8 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getTemplate } from '@/lib/notifications/templates';
+import { logger } from '@/lib/logger';
 
 async function _POST(req: Request) {
   try {
@@ -41,7 +43,7 @@ async function _POST(req: Request) {
           contact_email,
           contact_phone,
           documents,
-          status: 'submitted',
+          status: 'pending_review',
         },
       ])
       .select()
@@ -51,26 +53,49 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+    // Send welcome email to employer
+    try {
+      const template = getTemplate('employer_application_received', {
+        contact_name,
+        business_name,
+      });
+      await fetch(`${siteUrl}/api/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: contact_email,
+          subject: template.subject,
+          html: template.html,
+        }),
+      });
+    } catch (err) {
+      logger.error('Failed to send employer welcome email', err instanceof Error ? err : undefined);
+    }
+
     // Send notification email to admin
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+      await fetch(`${siteUrl}/api/email/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: 'elevate4humanityedu@gmail.com',
-          subject: `New Employer Onboarding: ${business_name}`,
+          subject: `New Employer Application: ${business_name}`,
           html: `
-            <h2>New Employer Onboarding Submission</h2>
+            <h2>New Employer Application</h2>
             <p><strong>Business Name:</strong> ${business_name}</p>
             <p><strong>Contact:</strong> ${contact_name}</p>
             <p><strong>Email:</strong> ${contact_email}</p>
             <p><strong>Phone:</strong> ${contact_phone}</p>
-            <p><strong>Status:</strong> Submitted for review</p>
-            <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/employers/onboarding">Review Submission</a></p>
+            <p><strong>Status:</strong> Pending Review</p>
+            <p><a href="${siteUrl}/admin/employers/onboarding">Review Application</a></p>
           `,
         }),
       });
-    } catch { /* non-fatal */ }
+    } catch (err) {
+      logger.error('Failed to send admin notification', err instanceof Error ? err : undefined);
+    }
 
     return NextResponse.json({ success: true, onboarding: data });
   } catch (error) { 

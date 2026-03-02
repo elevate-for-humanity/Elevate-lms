@@ -115,7 +115,26 @@ async function _POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, document });
+    // Check if this approval completes employer onboarding
+    let employerActivated = false;
+    if (action === 'approve' && studentUserId) {
+      try {
+        const { data: ownerProfile } = await db
+          .from('profiles')
+          .select('role')
+          .eq('id', studentUserId)
+          .single();
+
+        if (ownerProfile?.role === 'employer') {
+          const { tryAutoActivate } = await import('@/lib/employer/check-onboarding-complete');
+          employerActivated = await tryAutoActivate(db, studentUserId);
+        }
+      } catch {
+        // Non-fatal
+      }
+    }
+
+    return NextResponse.json({ success: true, document, employerActivated });
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -54,6 +54,14 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     ce_certificate: 'ce_certificate',
     employment_verification: 'employment_verification',
     ipla_packet: 'ipla_packet',
+    // Employer onboarding document types
+    coi_general_liability: 'other',
+    coi_workers_comp: 'other',
+    employer_mou: 'other',
+    business_license: 'other',
+    ein_verification: 'other',
+    supervisor_designation: 'other',
+    worksite_verification: 'other',
   };
   const documentType = docTypeMap[rawDocumentType] || 'other';
 
@@ -155,6 +163,22 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   // Document processing moved to Netlify function
   // Call /.netlify/functions/ocr-extract for OCR if needed
+
+  // Check if this upload completes employer onboarding
+  try {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role === 'employer') {
+      const { tryAutoActivate } = await import('@/lib/employer/check-onboarding-complete');
+      await tryAutoActivate(db, user.id);
+    }
+  } catch {
+    // Non-fatal — don't block document upload if activation check fails
+  }
 
   return NextResponse.json({
     success: true,

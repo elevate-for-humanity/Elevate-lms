@@ -15,6 +15,7 @@ const footerLinks = {
     { name: 'Our Mission', href: '/mission' },
     { name: 'Our Team', href: '/team' },
     { name: 'How It Works', href: '/how-it-works' },
+    { name: 'Support Services', href: '/employment-support' },
     { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
     { name: 'Impact', href: '/impact' },
     { name: 'Press', href: '/press' },

@@ -65,6 +65,7 @@ export const NAV_ITEMS = [
       { name: 'Our Team', href: '/about/team' },
       { name: 'Our Mission', href: '/mission' },
       { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Support Services', href: '/employment-support' },
       { name: 'Success Stories', href: '/testimonials' },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'Partnerships', href: '/partnerships' },

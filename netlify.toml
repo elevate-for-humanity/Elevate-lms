@@ -20,6 +20,31 @@
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
   PUPPETEER_SKIP_DOWNLOAD = "1"
 
+# ---------------------------------------------------------------------------
+# ENV VAR STRATEGY (Lambda 4 KB limit)
+#
+# AWS Lambda limits environment variables to 4 KB per function. Netlify
+# injects ALL site env vars into every function, including the Next.js
+# SSR handler. With 160+ vars this exceeds the limit and deploys fail.
+#
+# Solution: only 3 bootstrap vars stay in Netlify site settings:
+#   NEXT_PUBLIC_SUPABASE_URL
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY
+#   SUPABASE_SERVICE_ROLE_KEY
+#
+# All other secrets live in the Supabase `app_secrets` table and are
+# loaded at runtime via lib/secrets.ts → hydrateProcessEnv().
+# The Next.js instrumentation hook (instrumentation.ts) calls this on
+# server startup. Standalone Netlify functions use
+# netlify/lib/secrets-standalone.ts.
+#
+# NEXT_PUBLIC_* vars needed at build time should be set with scope
+# "Builds" in Netlify dashboard (not "Functions").
+#
+# To seed app_secrets: bash scripts/seed-app-secrets.sh > /tmp/seed.sql
+# Then run in Supabase SQL Editor.
+# ---------------------------------------------------------------------------
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
@@ -164,8 +189,8 @@
 [functions."refund-tracking"]
   external_node_modules = ["@supabase/supabase-js"]
 
-# Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit
-# TODO: Re-enable with reduced env vars or use background functions
+# Social Media Scheduler - can be re-enabled now that env vars are in
+# Supabase app_secrets (no longer hits Lambda 4KB limit).
 # [functions."social-media-scheduler"]
 #   schedule = "0 14,18,22 * * *"
 

@@ -165,9 +165,29 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     }
   }
 
+  // Check if this approval completes employer onboarding
+  let employerActivated = false;
+  if (action === 'approve' && document.user_id) {
+    try {
+      const { data: profile } = await db
+        .from('profiles')
+        .select('role')
+        .eq('id', document.user_id)
+        .single();
+
+      if (profile?.role === 'employer') {
+        const { tryAutoActivate } = await import('@/lib/employer/check-onboarding-complete');
+        employerActivated = await tryAutoActivate(db, document.user_id);
+      }
+    } catch {
+      // Non-fatal
+    }
+  }
+
   return NextResponse.json({
     success: true,
     enrollmentReady,
+    employerActivated,
     document: {
       id: documentId,
       status: action === 'approve' ? 'verified' : 'rejected',

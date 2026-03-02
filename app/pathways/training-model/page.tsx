@@ -121,10 +121,11 @@ export default function TrainingModelPage() {
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Online with Live Instructors</h3>
                   <p className="text-xs text-gray-400 mb-3">Programs: IT Support, Cybersecurity</p>
                   <p className="text-sm text-gray-700 mb-3">
-                    You work through lessons on our online learning platform at your own pace — video
-                    lessons, reading materials, hands-on labs, and practice quizzes. But you are not
-                    alone. You also attend scheduled live sessions with an instructor and your cohort
-                    where you can ask questions, work through problems together, and get real-time help.
+                    You work through lessons on our online learning platform with instructor oversight — video
+                    lessons, reading materials, hands-on labs, and practice quizzes. Your instructor
+                    reviews your progress and signs off on module completion. You also attend scheduled
+                    live sessions with your instructor and cohort where you ask questions, work through
+                    problems together, and get real-time help.
                   </p>
                   <p className="text-sm text-gray-700">
                     This format works well if you are working part-time, have family obligations, or

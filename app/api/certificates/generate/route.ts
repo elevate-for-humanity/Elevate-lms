@@ -62,7 +62,7 @@ async function _POST(request: Request) {
       // Workforce path: load program directly by slug (no course required)
       const { data: prog } = await db
         .from('programs')
-        .select('id, title, slug, issuance_policy, min_rti_hours, min_ojl_hours, credential_type, credential_name')
+        .select('id, title, slug, issuance_policy, min_rti_hours, min_ojl_hours, credential_type, credential_name, requires_instructor_attestation, min_engagement_hours')
         .eq('slug', programSlug)
         .single();
 
@@ -107,7 +107,9 @@ async function _POST(request: Request) {
               slug,
               issuance_policy,
               min_rti_hours,
-              min_ojl_hours
+              min_ojl_hours,
+              requires_instructor_attestation,
+              min_engagement_hours
             )
           )
         `
@@ -192,6 +194,90 @@ async function _POST(request: Request) {
           { status: 400 }
         );
       }
+
+      // Engagement-hours gate: if program specifies min_engagement_hours,
+      // verify accumulated seat time meets the threshold.
+      // This proves "instructional engagement, not just logins."
+      if (program?.min_engagement_hours && program.min_engagement_hours > 0 && course_id) {
+        const { data: progressRows } = await db
+          .from('lesson_progress')
+          .select('time_spent_seconds')
+          .eq('user_id', enrollment.user_id)
+          .eq('course_id', course_id);
+
+        const totalSeconds = (progressRows || []).reduce(
+          (sum: number, row: any) => sum + (row.time_spent_seconds || 0), 0
+        );
+        const totalEngagementHours = Math.round((totalSeconds / 3600) * 10) / 10;
+
+        if (totalEngagementHours < program.min_engagement_hours) {
+          return NextResponse.json(
+            {
+              error: 'Insufficient instructional engagement hours',
+              message: `This program requires ${program.min_engagement_hours} hours of instructional engagement. Current: ${totalEngagementHours} hours.`,
+              engagement_hours: totalEngagementHours,
+              required_hours: program.min_engagement_hours,
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    // 2b) Instructor attestation gate (distance RTI requirement)
+    // Programs with requires_instructor_attestation=true must have
+    // documented instructional oversight before credential issuance.
+    if (program?.requires_instructor_attestation) {
+      const { data: attestations, error: attestErr } = await db
+        .from('instructor_attestations')
+        .select('id, attestation_type, hours_attested, attested_at')
+        .eq('student_id', enrollment.user_id)
+        .eq('program_id', program.id);
+
+      if (attestErr) {
+        logger.error('Error checking instructor attestations:', attestErr);
+      }
+
+      const attestationCount = attestations?.length || 0;
+
+      if (attestationCount === 0) {
+        return NextResponse.json(
+          {
+            error: 'Instructor attestation required',
+            message: 'This program requires instructor sign-off before certificate issuance. No attestations found for this student.',
+          },
+          { status: 400 }
+        );
+      }
+
+      // If program has min_engagement_hours, verify attested hours meet threshold
+      if (program.min_engagement_hours && program.min_engagement_hours > 0) {
+        const totalAttestedHours = (attestations || []).reduce(
+          (sum: number, a: any) => sum + (a.hours_attested || 0), 0
+        );
+
+        if (totalAttestedHours < program.min_engagement_hours) {
+          return NextResponse.json(
+            {
+              error: 'Insufficient attested engagement hours',
+              message: `This program requires ${program.min_engagement_hours} instructor-attested engagement hours. Current: ${totalAttestedHours}.`,
+              attested_hours: totalAttestedHours,
+              required_hours: program.min_engagement_hours,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Store attestation evidence for the issuance snapshot
+      eligibilityEvidence = {
+        ...eligibilityEvidence,
+        attestation_count: attestationCount,
+        attested_hours: (attestations || []).reduce(
+          (sum: number, a: any) => sum + (a.hours_attested || 0), 0
+        ),
+        attestation_types: [...new Set((attestations || []).map((a: any) => a.attestation_type))],
+      };
     }
 
     // 3) Check if certificate already exists
@@ -274,6 +360,12 @@ async function _POST(request: Request) {
             } : {
               seat_time_hours: course?.duration_hours || 0,
             },
+            instructor_attestation: program?.requires_instructor_attestation ? {
+              attestation_count: eligibilityEvidence?.attestation_count || 0,
+              attested_hours: eligibilityEvidence?.attested_hours || 0,
+              attestation_types: eligibilityEvidence?.attestation_types || [],
+              min_engagement_hours: program?.min_engagement_hours || null,
+            } : null,
             issued_by: user.id,
           };
           const canonical = JSON.stringify(snapshot, Object.keys(snapshot).sort());

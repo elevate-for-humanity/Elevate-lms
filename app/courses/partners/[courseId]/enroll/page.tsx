@@ -260,7 +260,7 @@ export default function EnrollPage({
                   <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     3
                   </span>
-                  <span>Complete the training at your own pace</span>
+                  <span>Complete the training with flexible scheduling</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">

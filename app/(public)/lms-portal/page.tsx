@@ -54,7 +54,7 @@ export default function LMSPortalPublicPage() {
             <div className="bg-slate-50 rounded-xl p-6">
               <Play className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Video Courses</h3>
-              <p className="text-slate-600">Learn at your own pace with professional video lessons and interactive content.</p>
+              <p className="text-slate-600">Professional video lessons and interactive content with instructor oversight and progress checkpoints.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
               <BarChart3 className="w-10 h-10 text-brand-green-600 mb-4" />

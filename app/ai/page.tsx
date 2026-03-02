@@ -236,8 +236,8 @@ export default function AIHubPage() {
                 Learn Faster
               </h3>
               <p className="text-black">
-                Understand concepts quickly and move through your training at
-                your own pace.
+                Understand concepts quickly and move through your training
+                with AI-assisted support between instructor sessions.
               </p>
             </div>
           </div>

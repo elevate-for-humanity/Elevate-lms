@@ -482,7 +482,7 @@ export default async function CoursePage({ params }: { params: Params }) {
               avatarRole="Course Assistant"
               steps={[
                 { title: 'Welcome', message: `Welcome to ${course?.title || 'this course'}! Let me guide you through the content.`, videoUrl: '' },
-                { title: 'Getting Started', message: 'Start with the first lesson and work through each module at your own pace.', videoUrl: '' },
+                { title: 'Getting Started', message: 'Start with the first lesson and work through each module. Your instructor will review your progress at key checkpoints.', videoUrl: '' },
               ]}
             />
           </div>

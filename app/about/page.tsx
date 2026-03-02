@@ -209,7 +209,7 @@ export default function AboutPage() {
               <strong>Training sites by program:</strong> Barber and cosmetology apprentices train at
               licensed partner barbershops. Healthcare students complete clinicals at partner medical
               facilities. CDL students train at partner driving schools. Skilled trades apprentices
-              work at employer worksites. IT and business programs are delivered fully online.
+              work at employer worksites. IT and business programs are delivered online with instructor oversight and scheduled progress reviews.
             </p>
             <p>
               All credentials are issued by recognized third-party authorities (Indiana PLA, ISDH,

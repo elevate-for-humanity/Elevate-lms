@@ -67,7 +67,7 @@ export default async function CareerCoursesPage() {
               Career Success Courses
             </h1>
             <p className="text-xl text-brand-blue-100 mb-8">
-              Professional video training to help you land your dream job. Learn at your own pace with lifetime access.
+              Professional video training to help you land your dream job. Flexible scheduling with instructor support and lifetime access.
             </p>
             <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex items-center gap-2">

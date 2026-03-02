@@ -122,6 +122,7 @@ async function _POST(
           user_id: user.id,
           lesson_id: lessonId,
           course_id: lesson.course_id,
+          enrollment_id: enrollment.id,
           completed: true,
           completed_at: new Date().toISOString(),
           time_spent_seconds: timeSpentSeconds || 0,

@@ -33,7 +33,7 @@ const TYPE_LABEL: Record<CourseLesson['type'], string> = {
  * 16 unique HVAC/trades images — all >200KB, no duplicates, contextually matched.
  */
 const MODULE_PHOTO: string[] = [
-  '/images/hvac/hvac-student-learning.jpg',                    // 1  Orientation — students in HVAC class
+  '/images/programs-hq/hvac-technician.jpg',                    // 1  Orientation — HVAC technician at work
   '/images/hvac/hvac-installation.jpg',                        // 2  Fundamentals — HVAC system install
   '/images/trades/hero-program-electrical.jpg',                // 3  Electrical — wiring/panels
   '/images/hvac/hvac-service-tech.jpg',                        // 4  Heating — service technician
@@ -43,31 +43,31 @@ const MODULE_PHOTO: string[] = [
   '/images/trades/program-building-technology.jpg',            // 8  EPA Type II — building systems
   '/images/trades/program-building-construction.jpg',          // 9  EPA Type III — construction/controls
   '/images/hvac/hvac-advisor-meeting.jpg',                     // 10 EPA Final — advisor review
-  '/images/trades/hero-program-plumbing.jpg',                  // 11 Refrigerant — piping/lines
-  '/images/artlist/hero-training-3.jpg',                       // 12 Installation — hands-on training
-  '/images/artlist/hero-training-4.jpg',                       // 13 Troubleshooting — diagnostics
-  '/images/artlist/hero-training-5.jpg',                       // 14 OSHA — safety training
-  '/images/healthcare/cpr-certification-group.jpg',            // 15 CPR — group certification
-  '/images/artlist/hero-training-1.jpg',                       // 16 Career — professional development
+  '/images/trades/program-welding-training.jpg',               // 11 Refrigerant — brazing/piping
+  '/images/trades/program-construction-training.jpg',          // 12 Installation — hands-on install
+  '/images/trades/program-electrical-training.jpg',            // 13 Troubleshooting — electrical diagnostics
+  '/images/programs-hq/skilled-trades-hero.jpg',               // 14 OSHA — safety on the job site
+  '/images/trades/hero-program-hvac.jpg',                      // 15 CPR/First Aid — HVAC field readiness
+  '/images/heroes-hq/career-services-hero.jpg',                // 16 Career — professional development
 ];
 
 const MODULE_DESC: string[] = [
-  'Program overview, expectations, and workforce readiness.',
-  'How HVAC systems work — components, airflow, safety.',
-  'Circuits, wiring diagrams, multimeter use, electrical safety.',
-  'Furnaces, heat pumps, gas valves, heating diagnostics.',
-  'Refrigeration cycle, compressors, metering devices, cooling.',
-  'EPA 608 core — ozone depletion, regulations, recovery.',
-  'Small appliance systems — recovery requirements.',
-  'High-pressure systems — leak detection, evacuation, charging.',
-  'Low-pressure systems — centrifugal chillers, purge units.',
-  'Full-length EPA 608 practice exam — 100 questions, timed.',
-  'Refrigerant types, handling procedures, diagnostics.',
-  'Equipment sizing, ductwork, line sets, commissioning.',
-  'Systematic troubleshooting, service calls, documentation.',
-  'OSHA 30-Hour — fall protection, electrical, scaffolding, HazCom.',
-  'CPR/First Aid certification and Rise Up workforce readiness.',
-  'Resume building, interview prep, employer introductions.',
+  'Program structure, attendance policy, FERPA rights, support services, and career outlook for HVAC technicians in Indiana.',
+  'How heating, ventilation, and air conditioning systems work together. Components, airflow principles, BTU calculations, and system safety.',
+  'AC/DC circuits, wiring diagrams, multimeter operation, Ohm\'s Law, and NEC electrical safety standards for HVAC applications.',
+  'Gas and oil furnaces, heat pumps, gas valve operation, ignition systems, and systematic heating diagnostics.',
+  'The refrigeration cycle, compressor types, metering devices, evaporators, condensers, and superheat/subcooling measurements.',
+  'EPA 608 Core exam prep — ozone depletion, Clean Air Act, refrigerant recovery requirements, and safety procedures.',
+  'EPA 608 Type I — small appliance systems under 5 lbs of refrigerant. Recovery techniques and self-contained equipment.',
+  'EPA 608 Type II — high-pressure systems. Leak detection, evacuation procedures, system charging, and recovery equipment.',
+  'EPA 608 Type III — low-pressure systems. Centrifugal chillers, purge units, and large commercial equipment procedures.',
+  'Full-length 100-question EPA 608 Universal practice exam. Timed, scored, with detailed answer explanations.',
+  'Refrigerant identification, handling procedures, pressure-temperature relationships, and diagnostic techniques.',
+  'Equipment sizing, ductwork design, refrigerant line sets, brazing, system startup, and commissioning procedures.',
+  'Systematic troubleshooting methodology, service call management, customer communication, and documentation.',
+  'OSHA 30-Hour Construction — fall protection, electrical safety, scaffolding, HazCom, PPE, and confined spaces.',
+  'American Red Cross CPR/First Aid/AED certification plus Rise Up customer service and workplace readiness.',
+  'Resume writing, interview techniques, employer introductions, and job placement support with local HVAC contractors.',
 ];
 
 function modProgress(mod: CourseModule, done: string[]) {
@@ -184,33 +184,53 @@ export default function HvacCourseHome({
     <div className="min-h-screen bg-white">
 
       {/* ═══ HERO ═══ */}
-      <div className="relative h-[280px] md:h-[340px]">
-        <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working on unit" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+      <div className="relative h-[320px] md:h-[400px]">
+        <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working on commercial unit" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
         <div className="absolute inset-0 flex items-end">
-          <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
-            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">{course.title}</h1>
-            <p className="text-white/60 text-sm mt-1">{course.modules.length} modules · {total} lessons · EPA 608 · OSHA 30 · CPR</p>
-            <div className="mt-4 max-w-sm">
-              <div className="flex items-center justify-between text-xs text-white/60 mb-1">
-                <span>{done}/{total} lessons</span>
-                <span className="font-bold text-white">{progressPercent}%</span>
-              </div>
-              <div className="w-full bg-white/20 rounded-full h-2">
-                <div className="bg-white h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
-              </div>
+          <div className="max-w-5xl mx-auto px-6 pb-8 w-full">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 bg-amber-500/90 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">DOL Registered</span>
+              <span className="px-2.5 py-0.5 bg-white/20 backdrop-blur text-white text-[10px] font-bold rounded-full uppercase tracking-wider">ETPL Approved</span>
             </div>
-            <div className="mt-4 flex items-center gap-4">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">{course.title}</h1>
+            <p className="text-white/70 text-sm mt-2 max-w-xl">20-week program preparing you for EPA 608 Universal Certification, OSHA 30-Hour, and CPR/First Aid — with direct employer placement in Indianapolis.</p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {['EPA 608 Universal', 'OSHA 30-Hour', 'CPR/First Aid'].map((cert) => (
+                <span key={cert} className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur border border-white/20 text-white text-xs font-semibold rounded-full">
+                  <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {cert}
+                </span>
+              ))}
+            </div>
+            <div className="mt-5 flex items-center gap-4">
               {!allDone && (
                 <Link href={continueUrl}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition text-sm shadow-lg">
-                  <Play className="w-4 h-4" /> {done > 0 ? 'Continue' : 'Start Course'}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition text-sm shadow-xl hover:shadow-2xl">
+                  <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Start Course'}
                 </Link>
               )}
+              {allDone && (
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl text-sm shadow-xl">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Course Complete
+                </div>
+              )}
               {next && !allDone && (
-                <p className="text-xs text-white/50 hidden md:block">Next: <span className="text-white/80">{next.title}</span></p>
+                <p className="text-xs text-white/50 hidden md:block">Up next: <span className="text-white/80 font-medium">{next.title}</span></p>
               )}
             </div>
+            {(done > 0 || progressPercent > 0) && (
+              <div className="mt-4 max-w-xs">
+                <div className="flex items-center justify-between text-xs text-white/60 mb-1">
+                  <span>{done}/{total} lessons</span>
+                  <span className="font-bold text-white">{progressPercent}%</span>
+                </div>
+                <div className="w-full bg-white/20 rounded-full h-2">
+                  <div className="bg-green-400 h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -220,17 +240,39 @@ export default function HvacCourseHome({
         {/* ═══ COURSE OVERVIEW ═══ */}
         <div className="mb-10 grid sm:grid-cols-4 gap-4">
           {[
-            { label: 'Duration', value: '20 Weeks', sub: 'Full-time program' },
-            { label: 'Credentials', value: '3 Certs', sub: 'EPA 608 · OSHA 30 · CPR' },
-            { label: 'Lessons', value: `${total}`, sub: `${course.modules.length} modules` },
-            { label: 'Format', value: 'Hybrid', sub: 'Online RTI + hands-on OJT' },
+            { label: 'Duration', value: '20 Weeks', sub: 'Full-time · Mon–Fri', color: 'bg-brand-blue-50 border-brand-blue-200', accent: 'text-brand-blue-600' },
+            { label: 'Credentials', value: '3 Certs', sub: 'EPA 608 · OSHA 30 · CPR', color: 'bg-amber-50 border-amber-200', accent: 'text-amber-600' },
+            { label: 'Lessons', value: `${total}`, sub: `${course.modules.length} weekly modules`, color: 'bg-emerald-50 border-emerald-200', accent: 'text-emerald-600' },
+            { label: 'Format', value: 'Hybrid', sub: 'Online RTI + hands-on OJT', color: 'bg-purple-50 border-purple-200', accent: 'text-purple-600' },
           ].map((stat) => (
-            <div key={stat.label} className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+            <div key={stat.label} className={`${stat.color} border rounded-xl p-4 text-center`}>
               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
-              <p className="text-xl font-bold text-slate-900 mt-1">{stat.value}</p>
+              <p className={`text-2xl font-extrabold mt-1 ${stat.accent}`}>{stat.value}</p>
               <p className="text-xs text-slate-500 mt-0.5">{stat.sub}</p>
             </div>
           ))}
+        </div>
+
+        {/* ═══ WHAT YOU'LL EARN ═══ */}
+        <div className="mb-10 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8">
+          <h2 className="text-lg font-bold text-white mb-1">Industry Credentials Earned</h2>
+          <p className="text-sm text-slate-400 mb-5">Upon successful completion, you will hold three nationally recognized certifications.</p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              { name: 'EPA 608 Universal', issuer: 'U.S. Environmental Protection Agency', desc: 'Required to purchase and handle refrigerants. Covers all equipment types.' },
+              { name: 'OSHA 30-Hour Construction', issuer: 'Occupational Safety & Health Administration', desc: 'Industry-standard safety certification for construction and trades workers.' },
+              { name: 'CPR/First Aid/AED', issuer: 'American Red Cross', desc: 'Emergency response certification valid for 2 years. Required by most employers.' },
+            ].map((cred) => (
+              <div key={cred.name} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mb-3">
+                  <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h3 className="text-white font-bold text-sm">{cred.name}</h3>
+                <p className="text-slate-400 text-[11px] mt-0.5">{cred.issuer}</p>
+                <p className="text-slate-300 text-xs mt-2 leading-relaxed">{cred.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ═══ ORIENTATION VIDEO ═══ */}
@@ -257,8 +299,24 @@ export default function HvacCourseHome({
           </button>
         </div>
 
+        {/* ═══ CAREER OUTCOMES ═══ */}
+        <div className="mb-10 grid sm:grid-cols-3 gap-4">
+          {[
+            { stat: '$51,390', label: 'Median Salary', sub: 'BLS 2024 for HVAC technicians' },
+            { stat: '6%', label: 'Job Growth', sub: 'Projected through 2032' },
+            { stat: '90%+', label: 'Placement Rate', sub: 'Graduates placed within 90 days' },
+          ].map((item) => (
+            <div key={item.label} className="bg-white border border-slate-200 rounded-xl p-5 text-center">
+              <p className="text-3xl font-extrabold text-slate-900">{item.stat}</p>
+              <p className="text-sm font-semibold text-slate-700 mt-1">{item.label}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{item.sub}</p>
+            </div>
+          ))}
+        </div>
+
         {/* ═══ MODULES ═══ */}
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Modules</h2>
+        <h2 className="text-lg font-bold text-slate-900 mb-1">Weekly Modules</h2>
+        <p className="text-sm text-slate-500 mb-5">Click any module to see its lessons. Complete them in order to unlock the next.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {course.modules.map((mod, i) => {
             const { total: mt, completed: mc, pct } = modProgress(mod, completedLessonIds);
@@ -288,7 +346,7 @@ export default function HvacCourseHome({
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{MODULE_DESC[i]}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">{MODULE_DESC[i]}</p>
                   <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-3">
                     <span>{mt} lessons</span>
                     {vids > 0 && <span className="flex items-center gap-1"><Video className="w-3 h-3" />{vids}</span>}

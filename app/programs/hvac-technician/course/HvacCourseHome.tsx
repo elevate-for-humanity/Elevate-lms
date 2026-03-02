@@ -33,22 +33,22 @@ const TYPE_LABEL: Record<CourseLesson['type'], string> = {
  * 16 unique HVAC/trades images — all >200KB, no duplicates, contextually matched.
  */
 const MODULE_PHOTO: string[] = [
-  '/images/programs-hq/students-learning.jpg',                 // 1  Orientation — students in class
-  '/images/trades/hero-program-hvac.jpg',                      // 2  Fundamentals — HVAC hero shot
-  '/images/trades/electrical-hero.jpg',                        // 3  Electrical — wiring/panels
-  '/images/programs-hq/hvac-technician.jpg',                   // 4  Heating — HVAC tech at work
-  '/images/trades/program-hvac-technician.jpg',                // 5  Cooling — technician on unit
+  '/images/hvac/hvac-student-learning.jpg',                    // 1  Orientation — students in HVAC class
+  '/images/hvac/hvac-installation.jpg',                        // 2  Fundamentals — HVAC system install
+  '/images/trades/hero-program-electrical.jpg',                // 3  Electrical — wiring/panels
+  '/images/hvac/hvac-service-tech.jpg',                        // 4  Heating — service technician
+  '/images/hvac/hvac-commercial.jpg',                          // 5  Cooling — commercial system
   '/images/trades/program-hvac-overview.jpg',                  // 6  EPA Core — HVAC overview
-  '/images/hvac/hvac-service-tech.jpg',                        // 7  EPA Type I — service tech
-  '/images/hvac/hvac-commercial.jpg',                          // 8  EPA Type II — commercial system
-  '/images/programs-hq/electrical.jpg',                        // 9  EPA Type III — electrical/controls
-  '/images/hvac/hvac-tools-equipment.jpg',                     // 10 EPA Final — tools & testing
-  '/images/trades/program-plumbing-training.jpg',              // 11 Refrigerant — piping/lines
-  '/images/trades/program-construction-training.jpg',          // 12 Installation — construction site
-  '/images/trades/program-electrical-training.jpg',            // 13 Troubleshooting — diagnostics
-  '/images/programs-hq/skilled-trades-hero.jpg',               // 14 OSHA — safety/trades
+  '/images/hvac/hvac-tools-equipment.jpg',                     // 7  EPA Type I — tools & testing
+  '/images/trades/program-building-technology.jpg',            // 8  EPA Type II — building systems
+  '/images/trades/program-building-construction.jpg',          // 9  EPA Type III — construction/controls
+  '/images/hvac/hvac-advisor-meeting.jpg',                     // 10 EPA Final — advisor review
+  '/images/trades/hero-program-plumbing.jpg',                  // 11 Refrigerant — piping/lines
+  '/images/artlist/hero-training-3.jpg',                       // 12 Installation — hands-on training
+  '/images/artlist/hero-training-4.jpg',                       // 13 Troubleshooting — diagnostics
+  '/images/artlist/hero-training-5.jpg',                       // 14 OSHA — safety training
   '/images/healthcare/cpr-certification-group.jpg',            // 15 CPR — group certification
-  '/images/career-coaching-new.jpg',                           // 16 Career — coaching session
+  '/images/artlist/hero-training-1.jpg',                       // 16 Career — professional development
 ];
 
 const MODULE_DESC: string[] = [
@@ -185,7 +185,7 @@ export default function HvacCourseHome({
 
       {/* ═══ HERO ═══ */}
       <div className="relative h-[280px] md:h-[340px]">
-        <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician" fill className="object-cover" priority />
+        <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working on unit" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
@@ -240,7 +240,7 @@ export default function HvacCourseHome({
           <button onClick={() => setShowVideo(true)}
             className="relative w-full max-w-2xl rounded-2xl overflow-hidden group cursor-pointer border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all">
             <div className="relative aspect-video bg-slate-900">
-              <Image src="/images/heroes-hq/success-hero.jpg" alt="Student orientation" fill className="object-cover opacity-70 group-hover:opacity-90 transition-opacity" />
+              <Image src="/images/programs-hq/training-classroom.jpg" alt="Student orientation session" fill className="object-cover opacity-70 group-hover:opacity-90 transition-opacity" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                   <Play className="w-7 h-7 text-slate-900 ml-1" />

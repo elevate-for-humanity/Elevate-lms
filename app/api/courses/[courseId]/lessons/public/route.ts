@@ -59,12 +59,18 @@ function buildLocalFallback(courseId: string, slug: string) {
     mod.lessons.map((lesson, li) => {
       lessonNumber++;
       const quiz = quizMap[lesson.id];
+      const lessonUuid = lessonUuids[lesson.id] || lesson.id;
+      // Auto-resolve audio URL for video/lab lessons when no explicit contentUrl
+      const resolvedVideoUrl = lesson.contentUrl
+        || (lesson.type === 'video' || lesson.type === 'lab'
+          ? `/generated/lessons/lesson-${lessonUuid}.mp3`
+          : null);
       return {
-        id: lessonUuids[lesson.id] || lesson.id,
+        id: lessonUuid,
         course_id: courseId,
         title: lesson.title,
         content: lesson.description || '',
-        video_url: lesson.contentUrl || null,
+        video_url: resolvedVideoUrl,
         lesson_number: lessonNumber,
         order_index: li + 1,
         duration_minutes: lesson.durationMinutes || (lesson.type === 'reading' ? 15 : lesson.type === 'assignment' ? 30 : 20),
@@ -84,14 +90,23 @@ function buildLocalFallback(courseId: string, slug: string) {
 }
 
 /**
- * Course lesson list with tiered access:
+ * GET /api/courses/[courseId]/lessons/public
  *
- * - Unauthenticated: course overview + lesson titles/types only (syllabus view)
- * - Authenticated but not enrolled: same as above
- * - Authenticated + enrolled: full content (video URLs, HTML, quiz questions)
+ * Combined public metadata + conditional enrichment endpoint.
+ * Returns the same lesson list for all callers, but content fields
+ * (video_url, quiz_questions, full HTML) are stripped unless the
+ * caller is authenticated AND enrolled in the course.
  *
- * Falls back to local course definitions when the course hasn't been seeded
- * into Supabase yet.
+ * Access tiers:
+ *   Unauthenticated / not enrolled → syllabus only (titles, types, durations)
+ *   Authenticated + enrolled       → full content (video URLs, quiz data, HTML)
+ *
+ * Auth is read from Supabase session cookies via createClient().
+ * Enrollment is checked via the admin client (bypasses RLS) against
+ * training_enrollments, with program_enrollments as a fallback.
+ *
+ * Falls back to local course definitions (lib/courses/definitions.ts)
+ * when the course hasn't been seeded into Supabase.
  */
 async function _GET(
   _request: NextRequest,

@@ -66,7 +66,7 @@ let soraSkip = false;
 async function generateForLesson(
   lesson: any,
   courseName: string,
-  supabase: any
+  db: any
 ): Promise<{ success: boolean; videoUrl?: string; method?: string; error?: string }> {
   const script = buildScript(lesson, courseName);
   const instructor = getInstructorForCourse(courseName);
@@ -240,7 +240,7 @@ async function _POST(request: NextRequest) {
     const results: any[] = [];
     for (const lesson of lessons) {
       const courseName = lesson.training_courses?.course_name || 'Course';
-      const result = await generateForLesson(lesson, courseName, supabase);
+      const result = await generateForLesson(lesson, courseName, db);
       results.push({ lessonId: lesson.id, title: lesson.title, course: courseName, ...result });
       await new Promise(resolve => setTimeout(resolve, 1500));
     }

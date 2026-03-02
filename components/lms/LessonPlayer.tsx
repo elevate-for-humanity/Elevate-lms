@@ -56,6 +56,7 @@ export default function LessonPlayer({
 
   // Use direct Supabase URL — CSP media-src allows it, CORS is open
   const mediaSrc = videoUrl;
+  const isAudioOnly = /\.(mp3|wav|ogg|aac|m4a)(\?|$)/i.test(videoUrl);
 
   // Detect mobile for adaptive preload strategy
   const isMobile = React.useMemo(() => {
@@ -261,13 +262,13 @@ export default function LessonPlayer({
           {/* Actual video element — metadata-only preload for fast initial render */}
           <video
             ref={videoRef}
-            preload="metadata"
+            preload={isAudioOnly ? "auto" : "metadata"}
             playsInline
             crossOrigin="anonymous"
             className="absolute inset-0 h-full w-full object-contain bg-black"
             onClick={togglePlay}
           >
-            <source src={mediaSrc} type="video/mp4" />
+            <source src={mediaSrc} type={isAudioOnly ? "audio/mpeg" : "video/mp4"} />
             {captionUrl && (
               <track
                 kind="captions"
@@ -278,6 +279,18 @@ export default function LessonPlayer({
               />
             )}
           </video>
+
+          {/* Audio-only visual: show lesson info instead of black screen */}
+          {isAudioOnly && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 pointer-events-none">
+              <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                <Volume2 className="w-10 h-10 text-white/70" />
+              </div>
+              <p className="text-white/90 font-semibold text-lg text-center px-4">{lessonTitle}</p>
+              {moduleTitle && <p className="text-white/50 text-sm mt-1">{moduleTitle}</p>}
+              <p className="text-white/40 text-xs mt-3">Audio Lesson</p>
+            </div>
+          )}
 
           {/* Loading / buffering indicator */}
           {isLoading && hasStarted && !ended && (

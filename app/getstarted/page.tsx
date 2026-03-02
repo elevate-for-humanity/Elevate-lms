@@ -6,7 +6,7 @@ import Image from 'next/image';
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
   description:
-    'Start your free career training today. Apply for WIOA, WRG, or apprenticeship programs.',
+    'Start your career training today. Check eligibility for WIOA, WRG, or apprenticeship funding.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/getstarted',
   },
@@ -250,9 +250,9 @@ export default function Page() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold mb-3">100% Funded</h3>
+                <h3 className="text-lg font-semibold mb-3">Funding Available</h3>
                 <p className="text-black">
-                  All programs completely free through government funding
+                  Most participants qualify for full funding through WIOA, WRG, or JRI
                 </p>
               </div>
 

@@ -397,13 +397,125 @@ export default function AccreditationPage() {
               <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* Compliance Documentation */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-4">
+            Compliance Documentation
+          </h2>
+          <p className="text-center text-gray-600 mb-8 text-sm">
+            The following documents are available for workforce partners, funding agencies,
+            and regulatory reviewers. Contact us for additional documentation.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                title: 'DOL Apprenticeship Standards',
+                desc: 'Registered program standards filed with USDOL Office of Apprenticeship.',
+                status: 'Available on request',
+              },
+              {
+                title: 'ETPL Provider Documentation',
+                desc: 'Indiana ETPL listing confirmation and approved program details.',
+                status: 'Available on request',
+              },
+              {
+                title: 'Apprenticeship Agreement Template',
+                desc: 'Tri-party agreement between sponsor, employer, and apprentice.',
+                href: '/compliance/competency-verification/barber/apprenticeship-agreement',
+                status: 'View online',
+              },
+              {
+                title: 'Partner Compliance Requirements',
+                desc: 'Insurance, licensing, and worksite standards for host employers.',
+                href: '/partners/barbershop-apprenticeship/handbook',
+                status: 'View online',
+              },
+              {
+                title: 'Instructional Framework',
+                desc: 'RTI curriculum structure, competency standards, and assessment criteria.',
+                href: '/instructional-framework',
+                status: 'View online',
+              },
+              {
+                title: 'Institutional Governance',
+                desc: 'Organizational structure, oversight roles, and decision authority.',
+                href: '/institutional-governance',
+                status: 'View online',
+              },
+            ].map((doc) => (
+              <div key={doc.title} className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">{doc.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{doc.desc}</p>
+                  </div>
+                  <FileCheck className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                </div>
+                {doc.href ? (
+                  <Link href={doc.href} className="text-xs text-brand-blue-600 hover:underline mt-2 inline-block">
+                    {doc.status} →
+                  </Link>
+                ) : (
+                  <span className="text-xs text-gray-400 mt-2 inline-block">{doc.status}</span>
+                )}
+              </div>
+            ))}
+          </div>
           <p className="text-center text-gray-500 text-xs mt-6">
-            For documentation requests (EIN verification, insurance certificates,
-            or compliance records), contact{' '}
+            For document requests not listed above (EIN verification, insurance certificates,
+            W-9, or audit records), contact{' '}
             <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               elevate4humanityedu@gmail.com
             </a>
           </p>
+        </div>
+      </section>
+
+      {/* Outcomes Methodology */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-4">
+            Outcomes Reporting Methodology
+          </h2>
+          <p className="text-center text-gray-600 mb-8 text-sm">
+            Elevate reports training outcomes using the following standards.
+            All outcome data is derived from internal LMS records and verified
+            through employer confirmation.
+          </p>
+          <div className="space-y-6">
+            <div className="border border-gray-200 rounded-lg p-5">
+              <h3 className="font-semibold text-gray-900 mb-2">Data Sources</h3>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                <li>LMS completion records (lesson progress, quiz scores, seat time)</li>
+                <li>Instructor attestations (module sign-off, competency checkpoints)</li>
+                <li>Employer-verified OJL hour logs (GPS-geofenced timeclock + supervisor approval)</li>
+                <li>Credential issuance records (immutable issuance snapshots with SHA-256 hash)</li>
+                <li>Employment verification (employer confirmation at 30/90/180 days post-completion)</li>
+              </ul>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-5">
+              <h3 className="font-semibold text-gray-900 mb-2">Reporting Standards</h3>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                <li><strong>Completion rate:</strong> Participants who met all competency gates (OJL + RTI hours for apprenticeship, lesson + quiz + engagement hours for course-based) divided by total enrolled participants in the reporting cohort.</li>
+                <li><strong>Employment rate:</strong> Completers who obtained employment in a training-related occupation within 180 days of completion, verified by employer confirmation or wage record match.</li>
+                <li><strong>Credential attainment:</strong> Completers who earned an industry-recognized credential from a third-party authority (not issued by Elevate).</li>
+                <li><strong>Reporting period:</strong> Outcomes are reported on a rolling 12-month basis aligned with the program year (July 1 – June 30).</li>
+              </ul>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-5">
+              <h3 className="font-semibold text-gray-900 mb-2">Limitations & Disclaimers</h3>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                <li>Outcome data reflects participants who completed training. Participants who withdrew or were terminated are excluded from completion and employment rates.</li>
+                <li>Employment verification depends on employer response and may undercount actual employment.</li>
+                <li>Elevate is a new program (RAPIDS registered 2025). Historical outcome data is limited. Early cohort data will be reported as it becomes available.</li>
+                <li>Sample sizes for individual programs may be small. Interpret program-level rates with appropriate caution.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -106,6 +106,41 @@ export default function EmployerPage() {
         </div>
       </section>
 
+      {/* Partner Compliance Requirements */}
+      <section className="py-8 sm:py-14 bg-white border-t">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-3">Worksite Compliance Standards</h2>
+          <p className="text-center text-slate-600 text-sm mb-8 max-w-2xl mx-auto">
+            Employers hosting apprentices or trainees must meet the following standards.
+            Elevate verifies compliance before registering worksites in the federal RAPIDS system.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="border border-slate-200 rounded-lg p-5">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Insurance Requirements</h3>
+              <ul className="text-sm text-slate-600 space-y-1.5">
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>General Liability insurance (required for all partner worksites)</span></li>
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Workers&apos; Compensation insurance or valid state exemption (required when apprentices are on payroll)</span></li>
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Current Certificate of Insurance (COI) on file with Elevate</span></li>
+              </ul>
+            </div>
+            <div className="border border-slate-200 rounded-lg p-5">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Worksite Standards</h3>
+              <ul className="text-sm text-slate-600 space-y-1.5">
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Valid state business and occupational licenses</span></li>
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Designated supervisor with required licensure and experience</span></li>
+                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Commitment to structured training plan and hour verification</span></li>
+              </ul>
+            </div>
+          </div>
+          <p className="text-center text-xs text-slate-400 mt-6">
+            For full partner requirements, see the{' '}
+            <Link href="/partners/barbershop-apprenticeship/handbook" className="text-brand-blue-600 hover:underline">Partner Handbook</Link>
+            {' '}or contact{' '}
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>.
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-8 sm:py-14 bg-slate-900">
         <div className="max-w-3xl mx-auto px-4 text-center">

@@ -54,6 +54,8 @@ const REQUIRED_FIELDS = [
 ] as const;
 
 const VALID_EMPLOYMENT_MODELS = ['hourly', 'commission', 'hybrid', 'not_sure'];
+const VALID_COMPENSATION_MODELS = ['hourly', 'commission', 'hybrid'];
+const VALID_WC_STATUSES = ['verified', 'exempt', 'none'];
 
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -109,9 +111,39 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
     }
 
-    // Validate employment model
-    if (!VALID_EMPLOYMENT_MODELS.includes(body.employmentModel)) {
-      return NextResponse.json({ error: 'Invalid employment model' }, { status: 400 });
+    // Validate payroll confirmation — apprentices must be on shop payroll
+    if (body.apprenticesOnPayroll !== 'yes') {
+      return NextResponse.json(
+        { error: 'Apprentices must be added to your payroll. Shops that cannot add apprentices to payroll are not eligible to host registered apprenticeship OJL.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate compensation model
+    if (!VALID_COMPENSATION_MODELS.includes(body.compensationModel)) {
+      return NextResponse.json({ error: 'Please select a compensation model' }, { status: 400 });
+    }
+
+    // Validate General Liability — mandatory for all partner shops
+    if (body.hasGeneralLiability !== 'yes') {
+      return NextResponse.json(
+        { error: 'General Liability insurance is required to host apprentices at your worksite.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate Workers' Comp status
+    const wcStatus = body.workersCompStatus || 'none';
+    if (!VALID_WC_STATUSES.includes(wcStatus)) {
+      return NextResponse.json({ error: 'Invalid workers compensation status' }, { status: 400 });
+    }
+
+    // WC hard gate: shops with employees on payroll must have WC or valid exemption
+    if (wcStatus === 'none') {
+      return NextResponse.json(
+        { error: 'Elevate cannot register apprentices in the federal RAPIDS system under a partner worksite that does not meet minimum insurance and compliance standards. Workers\' Compensation insurance (or a valid state exemption) is required.' },
+        { status: 400 }
+      );
     }
 
     // Validate acknowledgments
@@ -167,8 +199,14 @@ async function _POST(req: Request) {
         supervisor_name: body.supervisorName.trim(),
         supervisor_license_number: body.supervisorLicenseNumber.trim(),
         supervisor_years_licensed: body.supervisorYearsLicensed ? parseInt(body.supervisorYearsLicensed) : null,
-        employment_model: body.employmentModel,
-        has_workers_comp: body.hasWorkersComp === 'yes',
+        apprentices_on_payroll: body.apprenticesOnPayroll === 'yes',
+        compensation_model: body.compensationModel,
+        number_of_employees: body.numberOfEmployees ? parseInt(body.numberOfEmployees) : null,
+        has_general_liability: body.hasGeneralLiability === 'yes',
+        workers_comp_status: body.workersCompStatus || 'none',
+        // Legacy field preserved for backward compatibility
+        employment_model: body.compensationModel,
+        has_workers_comp: body.workersCompStatus === 'verified',
         can_supervise_and_verify: body.canSuperviseAndVerify === 'yes',
         mou_acknowledged: body.mouAcknowledged,
         consent_acknowledged: body.consentAcknowledged,

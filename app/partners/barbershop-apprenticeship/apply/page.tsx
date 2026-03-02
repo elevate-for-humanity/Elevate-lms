@@ -10,11 +10,16 @@ import {
   BookOpen, FileText, ClipboardCheck, ShieldCheck, ArrowRight,
 } from 'lucide-react';
 
-const employmentModels = [
+const compensationModels = [
   { value: 'hourly', label: 'Hourly Wage' },
   { value: 'commission', label: 'Commission' },
   { value: 'hybrid', label: 'Hybrid (Wage + Commission)' },
-  { value: 'not_sure', label: 'Not Sure Yet' },
+];
+
+const workersCompOptions = [
+  { value: 'verified', label: 'Yes — we carry Workers\' Compensation insurance' },
+  { value: 'exempt', label: 'Exempt — we have a valid state exemption (will provide documentation)' },
+  { value: 'none', label: 'No — we do not currently carry Workers\' Compensation' },
 ];
 
 const partnerSteps = [
@@ -64,8 +69,11 @@ export default function BarbershopPartnerApplyPage() {
     supervisorName: '',
     supervisorLicenseNumber: '',
     supervisorYearsLicensed: '',
-    employmentModel: '',
-    hasWorkersComp: '',
+    apprenticesOnPayroll: 'yes',
+    compensationModel: '',
+    numberOfEmployees: '',
+    workersCompStatus: '',
+    hasGeneralLiability: '',
     canSuperviseAndVerify: '',
     mouAcknowledged: false,
     consentAcknowledged: false,
@@ -265,30 +273,97 @@ export default function BarbershopPartnerApplyPage() {
             {/* Employment & Compliance */}
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Employment & Compliance</h2>
-              <div className="space-y-4">
+              <p className="text-sm text-gray-500 mb-6">
+                As a DOL Registered Apprenticeship, apprentices must be employed by the host shop.
+                Elevate (as the registered sponsor) will register approved apprentices and employer
+                worksites in the federal RAPIDS system after compliance verification.
+              </p>
+              <div className="space-y-6">
+                {/* Payroll confirmation */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Intended Compensation Model *</label>
-                  <div className="grid md:grid-cols-2 gap-2">
-                    {employmentModels.map(model => (
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Will apprentices be added to your payroll as employees? *
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    DOL Registered Apprenticeships require the apprentice to be an employee of the host shop,
+                    regardless of compensation model (hourly, commission, or hybrid).
+                  </p>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input type="radio" name="apprenticesOnPayroll" value="yes" checked={formData.apprenticesOnPayroll === 'yes'} onChange={e => updateField('apprenticesOnPayroll', e.target.value)} required className="text-brand-blue-600" />
+                      <span className="text-gray-700">Yes — apprentices will be on our payroll</span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-amber-700 mt-2">
+                    Shops that cannot add apprentices to payroll are not eligible to host registered apprenticeship OJL.
+                  </p>
+                </div>
+
+                {/* Compensation model */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Compensation Model *</label>
+                  <div className="grid md:grid-cols-3 gap-2">
+                    {compensationModels.map(model => (
                       <label key={model.value} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                        <input type="radio" name="employmentModel" value={model.value} checked={formData.employmentModel === model.value} onChange={e => updateField('employmentModel', e.target.value)} required className="text-brand-blue-600" />
+                        <input type="radio" name="compensationModel" value={model.value} checked={formData.compensationModel === model.value} onChange={e => updateField('compensationModel', e.target.value)} required className="text-brand-blue-600" />
                         <span className="text-gray-700">{model.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
+
+                {/* Number of employees */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Do you carry workers&apos; compensation insurance? *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Total Number of Employees (including owner) *</label>
+                  <input type="number" min="1" value={formData.numberOfEmployees} onChange={e => updateField('numberOfEmployees', e.target.value)} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="e.g. 3" />
+                </div>
+
+                {/* General Liability */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Do you carry General Liability insurance? *</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="hasWorkersComp" value="yes" checked={formData.hasWorkersComp === 'yes'} onChange={e => updateField('hasWorkersComp', e.target.value)} required />
+                      <input type="radio" name="hasGeneralLiability" value="yes" checked={formData.hasGeneralLiability === 'yes'} onChange={e => updateField('hasGeneralLiability', e.target.value)} required />
                       <span>Yes</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="hasWorkersComp" value="no" checked={formData.hasWorkersComp === 'no'} onChange={e => updateField('hasWorkersComp', e.target.value)} />
+                      <input type="radio" name="hasGeneralLiability" value="no" checked={formData.hasGeneralLiability === 'no'} onChange={e => updateField('hasGeneralLiability', e.target.value)} />
                       <span>No</span>
                     </label>
                   </div>
+                  {formData.hasGeneralLiability === 'no' && (
+                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      General Liability insurance is required to host apprentices at your worksite.
+                    </p>
+                  )}
+                </div>
+
+                {/* Workers' Compensation */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Workers&apos; Compensation Status *</label>
+                  <div className="space-y-2">
+                    {workersCompOptions.map(opt => (
+                      <label key={opt.value} className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="workersCompStatus" value={opt.value} checked={formData.workersCompStatus === opt.value} onChange={e => updateField('workersCompStatus', e.target.value)} required className="mt-0.5 text-brand-blue-600" />
+                        <span className="text-gray-700 text-sm">{opt.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {formData.workersCompStatus === 'none' && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-700 font-medium">Workers&apos; Compensation is required for shops with employees on payroll.</p>
+                      <p className="text-xs text-red-600 mt-1">
+                        Elevate cannot register apprentices in the federal RAPIDS system under a partner
+                        worksite that does not meet minimum insurance and compliance standards.
+                      </p>
+                    </div>
+                  )}
+                  {formData.workersCompStatus === 'exempt' && (
+                    <p className="text-sm text-amber-700 mt-2">
+                      You will need to provide documentation of your state exemption during the compliance review.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Can you commit to supervising apprentices and verifying hours/competencies? *</label>

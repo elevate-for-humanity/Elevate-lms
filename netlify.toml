@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "echo 'Node:' && node --version && echo 'pnpm:' && pnpm --version && corepack enable && pnpm install && npx tsx scripts/ci-token-gate.ts && pnpm run build 2>&1 && echo 'BUILD SUCCESS' && du -sh .next/server/ && du -sh node_modules/"
+  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 

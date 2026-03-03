@@ -88,7 +88,7 @@ export default async function SignaturesPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/lms-courses.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Signatures Management"
           fill
           className="object-cover"

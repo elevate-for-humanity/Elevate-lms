@@ -102,7 +102,7 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes/workforce-partner-1.jpg"
+                  src="/images/heroes-hq/employer-hero.jpg"
                   alt="Workforce Development Boards"
                   fill
                   className="object-cover"
@@ -138,7 +138,7 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes/workforce-partner-2.jpg"
+                  src="/images/heroes-hq/employer-hero.jpg"
                   alt="State Agencies"
                   fill
                   className="object-cover"
@@ -174,7 +174,7 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes/workforce-partner-3.jpg"
+                  src="/images/heroes-hq/employer-hero.jpg"
                   alt="Federal Programs"
                   fill
                   className="object-cover"
@@ -234,7 +234,7 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/heroes/training-provider-1.jpg"
+                      src="/images/heroes-hq/programs-hero.jpg"
                       alt="ETPL Training"
                       fill
                       className="object-cover"
@@ -253,7 +253,7 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/heroes/training-provider-2.jpg"
+                      src="/images/heroes-hq/programs-hero.jpg"
                       alt="Apprenticeships"
                       fill
                       className="object-cover"
@@ -291,7 +291,7 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/heroes/training-provider-4.jpg"
+                      src="/images/heroes-hq/programs-hero.jpg"
                       alt="Compliance"
                       fill
                       className="object-cover"

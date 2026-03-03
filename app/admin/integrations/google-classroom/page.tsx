@@ -70,7 +70,7 @@ export default async function GoogleClassroomPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/technology/hero-program-cybersecurity.jpg"
+          src="/images/programs-hq/cybersecurity.jpg"
           alt="Google Classroom"
           fill
           className="object-cover"

@@ -80,7 +80,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/heroes/programs.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="Our Institution"
                   fill
                   className="object-cover"

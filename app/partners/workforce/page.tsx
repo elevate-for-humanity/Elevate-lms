@@ -14,7 +14,7 @@ export default function WorkforcePage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Workforce' }],
       hero: {
-        image: '/images/heroes/workforce-partner-4.jpg',
+        image: '/images/heroes-hq/employer-hero.jpg',
         tag: 'Partnership',
         tagColor: 'text-brand-blue-300',
         title: 'Workforce Development Partnership',

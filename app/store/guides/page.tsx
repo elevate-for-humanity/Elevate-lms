@@ -87,7 +87,7 @@ export default function GuidesPage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/blog-post-1.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Guides & Resources"
           fill
           className="object-cover"

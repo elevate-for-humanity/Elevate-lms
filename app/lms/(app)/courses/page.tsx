@@ -60,15 +60,15 @@ export default async function InteractiveCoursesPage() {
   // Category images mapping
   const categoryImages: Record<string, string> = {
     healthcare: '/images/programs-hq/healthcare-hero.jpg',
-    trades: '/images/artlist/hero-training-2.jpg',
-    technology: '/images/technology/hero-program-cybersecurity.jpg',
+    trades: '/images/programs-hq/training-classroom.jpg',
+    technology: '/images/programs-hq/cybersecurity.jpg',
     business: '/hero-images/business-hero.jpg',
-    default: '/images/healthcare/hero-healthcare-professionals.jpg',
+    default: '/images/programs-hq/healthcare-hero.jpg',
   };
 
   const courseCategories = [
     {
-      image: '/images/healthcare/hero-healthcare-professionals.jpg',
+      image: '/images/programs-hq/healthcare-hero.jpg',
       title: 'Healthcare',
       count: courses?.filter(c => c.category === 'healthcare').length || 0,
       href: '/lms/courses?category=healthcare',
@@ -80,7 +80,7 @@ export default async function InteractiveCoursesPage() {
       href: '/lms/courses?category=trades',
     },
     {
-      image: '/images/technology/hero-program-cybersecurity.jpg',
+      image: '/images/programs-hq/cybersecurity.jpg',
       title: 'Technology',
       count: courses?.filter(c => c.category === 'technology').length || 0,
       href: '/lms/courses?category=technology',

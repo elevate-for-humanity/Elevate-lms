@@ -26,7 +26,7 @@ export default function AccessibilityPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/faq-section-3.jpg"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
           alt="Accessibility Commitment"
           fill
           className="object-cover"

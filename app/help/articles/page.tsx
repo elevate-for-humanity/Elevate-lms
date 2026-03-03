@@ -71,7 +71,7 @@ export default async function HelpArticlesPage() {
 
       <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/misc/help-hero.jpg"
+          src="/images/heroes-hq/contact-hero.jpg"
           alt="Help Center"
           fill
           className="object-cover"

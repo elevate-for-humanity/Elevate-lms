@@ -35,7 +35,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="/images/artlist/hero-training-1.jpg"
+                src="/images/programs-hq/training-classroom.jpg"
                 alt="Classroom and coaching"
                 fill
                 className="object-cover"

@@ -29,7 +29,7 @@ export default function SubofficeOnboardingPage() {
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/blog-post-6.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Suboffice Onboarding"
           fill
           className="object-cover"

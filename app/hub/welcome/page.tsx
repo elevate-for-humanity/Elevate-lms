@@ -92,7 +92,7 @@ export default async function HubWelcomePage() {
       name: 'Tech Graduate',
       program: 'IT Support',
       quote: 'Having everything in one place - courses, certifications, job prep - made all the difference.',
-      image: '/images/heroes/about-mission.jpg',
+      image: '/images/heroes-hq/about-hero.jpg',
     },
   ];
 

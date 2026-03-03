@@ -67,7 +67,7 @@ export default async function GradesPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/artlist/hero-training-8.jpg"
+          src="/images/programs-hq/training-classroom.jpg"
           alt="Grades"
           fill sizes="100vw"
           className="object-cover"

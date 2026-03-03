@@ -114,7 +114,7 @@ export default function PartnerPortalPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/artlist/office-meeting.jpg" alt="Partner collaboration" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner collaboration" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">What Partners Get</h2>

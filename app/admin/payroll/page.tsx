@@ -111,7 +111,7 @@ export default function AdminPayroll() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-3.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Payroll"
           fill
           className="object-cover"

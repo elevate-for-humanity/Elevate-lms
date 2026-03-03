@@ -77,7 +77,7 @@ const templateFileContents: Record<string, string> = {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/blog-post-2.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Hero"
           fill
           className="object-cover"

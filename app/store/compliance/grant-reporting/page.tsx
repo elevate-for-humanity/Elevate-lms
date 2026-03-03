@@ -17,7 +17,7 @@ const features = [
   {
     title: 'Automated Data Collection',
     description: 'Automatically capture participant data, outcomes, and metrics as they happen.',
-    image: '/images/technology/hero-programs-technology.jpg',
+    image: '/images/programs-hq/technology-hero.jpg',
     items: ['Real-time data capture', 'Automatic calculations', 'Data validation', 'Error prevention'],
   },
   {
@@ -35,7 +35,7 @@ const features = [
   {
     title: 'One-Click Exports',
     description: 'Export reports in any format required by your funders.',
-    image: '/images/technology/hero-program-it-support.jpg',
+    image: '/images/programs-hq/it-support.jpg',
     items: ['Excel exports', 'PDF reports', 'CSV data files', 'API integrations'],
   },
 ];

@@ -60,8 +60,8 @@ export default function CredentialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Industry certifications and training credentials" fill className="object-cover" priority sizes="100vw" />
+      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Industry certifications and training credentials" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Intro — 3-layer explanation */}

@@ -99,7 +99,7 @@ export default async function VerifyCertificatePage({
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/artlist/hero-training-1.jpg"
+          src="/images/programs-hq/training-classroom.jpg"
           alt="Certificate verification"
           fill
           className="object-cover"

@@ -9,6 +9,7 @@ import { DOT_CODES } from '@/lib/compliance/rapids-integration';
 import { RAPIDS_CONFIG, getRAPIDSEnrollmentData } from '@/lib/compliance/rapids-config';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 
 const barberApplicationSchema = z.object({
   firstName: z.string().min(1),
@@ -118,6 +119,15 @@ export async function POST(req: Request) {
         fundingSource: 'self-pay',
         rapidsProgram: rapidsPreRegistration.program_number,
       },
+    });
+
+    // Send barber onboarding email with Calendly link (BCC admin)
+    sendOnboardingEmail({
+      email: validated.email,
+      name: `${validated.firstName} ${validated.lastName}`.trim(),
+      program: 'Barber Apprenticeship',
+    }).catch((err) => {
+      logger.error('[barber-apply] Onboarding email failed (non-blocking):', err);
     });
 
     return NextResponse.json({

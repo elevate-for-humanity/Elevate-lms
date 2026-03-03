@@ -64,7 +64,7 @@ export default function OJTAndFundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[200px]">
-                <Image src="/images/heroes/workforce-partner-5.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">On-the-Job Training (OJT)</h3>

@@ -79,7 +79,7 @@ export default async function EtplAlignmentPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/hero-banner-latest.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Etpl Alignment"
           fill
           className="object-cover"

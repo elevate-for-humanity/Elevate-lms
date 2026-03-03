@@ -48,7 +48,7 @@ export default async function WrgPage() {
       {/* Hero Section - Image Only */}
       <section className="relative h-[400px] overflow-hidden">
         <Image
-          src="/images/heroes/lms-analytics.jpg"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
           alt="WRG Success Story"
           fill
           className="object-cover"

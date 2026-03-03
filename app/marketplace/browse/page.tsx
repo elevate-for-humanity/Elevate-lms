@@ -50,8 +50,8 @@ export default async function MarketplaceBrowsePage() {
 {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/technology/hero-programs-technology.jpg" alt="Marketplace" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/programs-hq/technology-hero.jpg" alt="Marketplace" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -123,7 +123,7 @@ export default async function MarketplaceBrowsePage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48">
-              <Image src="/images/heroes/resource-1.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Items Available</h2>

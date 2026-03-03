@@ -130,8 +130,8 @@ export default function NewWorkflowPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs/cpr-group-training-hd.jpg"
-          alt="New"
+          src="/images/heroes-hq/career-services-hero.jpg"
+          alt="Email marketing automation"
           fill
           className="object-cover"
           quality={100}
@@ -570,7 +570,7 @@ export default function NewWorkflowPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/blog-post-8.jpg"
+                    src="/images/heroes-hq/success-stories-hero.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

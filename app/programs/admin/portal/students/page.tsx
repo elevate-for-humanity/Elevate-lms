@@ -69,7 +69,7 @@ export default async function StudentsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/student-profile.jpg"
+          src="/images/heroes-hq/success-hero.jpg"
           alt="Students"
           fill sizes="100vw"
           className="object-cover"

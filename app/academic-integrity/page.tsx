@@ -57,7 +57,7 @@ export default async function AcademicIntegrityPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/faq-section-2.jpg"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
           alt="Academic Integrity"
           fill
           className="object-cover"

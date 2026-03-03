@@ -33,7 +33,7 @@ export default function IndustryInsightsPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/hero/portal-hero.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

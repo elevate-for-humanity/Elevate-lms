@@ -136,7 +136,7 @@ export default async function NrfPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-3.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="NRF RISE Up Training"
           fill
           className="object-cover"

@@ -38,7 +38,7 @@ export default function DonationsPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/hero/hero-community.jpg" alt="Donate" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Donate" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

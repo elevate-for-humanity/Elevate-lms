@@ -80,7 +80,7 @@ export default async function DataProcessorPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/community.jpg"
+          src="/images/heroes-hq/about-hero.jpg"
           alt="Data Processor"
           fill
           className="object-cover"

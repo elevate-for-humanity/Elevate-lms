@@ -120,7 +120,7 @@ export default function StoreBuilderPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/technology/hero-program-web-dev.jpg"
+          src="/images/programs-hq/technology-hero.jpg"
           alt="Clones"
           fill
           className="object-cover"
@@ -487,7 +487,7 @@ export default function StoreBuilderPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/technology/hero-program-it-support.jpg"
+                    src="/images/programs-hq/it-support.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

@@ -53,7 +53,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/heroes/training-provider-5.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Student Roster</h3>
@@ -80,7 +80,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/hero/portal-hero.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/success-hero.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Communication</h3>
@@ -89,7 +89,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/heroes/training-provider-5.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Certifications</h3>

@@ -166,7 +166,7 @@ export default function TakeQuizPage({
                   </div>
                   <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/artlist/hero-training-7.jpg"
+                      src="/images/programs-hq/training-classroom.jpg"
                       alt="Students taking assessment"
                       fill
                       className="object-cover"

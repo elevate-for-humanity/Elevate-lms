@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 
 export default function CertificationsPage() {
   const certifications = [
-    { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/healthcare/hero-program-medical-assistant.jpg' },
+    { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/programs-hq/medical-assistant.jpg' },
     { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/healthcare/phlebotomy-hero.jpg' },
-    { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/hero/hero-certifications.jpg' },
+    { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/heroes-hq/programs-hero.jpg' },
     { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/trades/program-electrical-training.jpg' },
     { name: 'Certiport IT Specialist', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/programs-hq/technology-hero.jpg' },
     { name: 'Barber License', industry: 'Beauty', duration: '2000 hours', demand: 'Required', image: '/images/barber/training.jpg' },
@@ -29,7 +29,7 @@ export default function CertificationsPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Certifications" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certifications" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

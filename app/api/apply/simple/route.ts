@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
+import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 
 async function _POST(req: Request) {
   try {
@@ -47,6 +48,13 @@ async function _POST(req: Request) {
         to: applicantEmail,
         firstName: applicantName.split(' ')[0] || applicantName,
         programSlug: program,
+      }).catch(() => {});
+
+      // Send onboarding email with Calendly link and next steps (BCC admin)
+      sendOnboardingEmail({
+        email: applicantEmail,
+        name: applicantName,
+        program,
       }).catch(() => {});
     }
 

@@ -48,7 +48,7 @@ export default function EmailMarketingPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/blog-post-9.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Email Marketing"
           fill
           className="object-cover"

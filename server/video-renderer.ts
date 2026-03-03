@@ -17,10 +17,11 @@ let _registerFont: any = null;
 
 async function ensureDeps() {
   if (_ffmpeg) return;
-  const ff = (await import('fluent-ffmpeg')).default;
-  const ffmpegInstaller = (await import('@ffmpeg-installer/ffmpeg')).default;
-  const ffprobeInstaller = (await import('@ffprobe-installer/ffprobe')).default;
-  const canvasMod = await import('canvas');
+  // String concatenation prevents Turbopack from statically resolving these optional native deps
+  const ff = (await import(/* webpackIgnore: true */ 'fluent-' + 'ffmpeg')).default;
+  const ffmpegInstaller = (await import(/* webpackIgnore: true */ '@ffmpeg-installer/' + 'ffmpeg')).default;
+  const ffprobeInstaller = (await import(/* webpackIgnore: true */ '@ffprobe-installer/' + 'ffprobe')).default;
+  const canvasMod = await import(/* webpackIgnore: true */ 'can' + 'vas');
   ff.setFfmpegPath(ffmpegInstaller.path);
   ff.setFfprobePath(ffprobeInstaller.path);
   _ffmpeg = ff;

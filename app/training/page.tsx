@@ -14,7 +14,7 @@ const PROGRAM_AREAS = [
   { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.jpg' },
   { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.jpg' },
   { title: 'Technology', desc: 'IT Support, Cybersecurity, Certiport Certifications', icon: Monitor, href: '/programs/technology', image: '/images/programs-hq/technology-hero.jpg' },
-  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/artlist/hero-training-6.jpg' },
+  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/programs-hq/training-classroom.jpg' },
   { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/programs-hq/barber-hero.jpg' },
   { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/programs-hq/business-training.jpg' },
 ];

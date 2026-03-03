@@ -53,7 +53,7 @@ export default function VideoHeroSection() {
     <section className="relative w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px] lg:min-h-[700px] flex items-end bg-slate-900 overflow-hidden">
       {/* Fallback Image - always present for mobile */}
       <Image
-        src="/images/artlist/hero-training-1.jpg"
+        src="/images/programs-hq/training-classroom.jpg"
         alt="Career Training"
         fill
         className="object-cover"

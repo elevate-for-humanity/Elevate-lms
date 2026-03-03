@@ -148,7 +148,7 @@ export default async function CourseDetailPage({
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src={course.image_url || '/images/heroes/hero-state-funding.jpg'}
+                  src={course.image_url || '/images/heroes-hq/funding-hero.jpg'}
                   alt={course.title}
                   width={600}
                   height={400}

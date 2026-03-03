@@ -12,7 +12,7 @@ export function HomepageProgramsTeaser() {
     {
       title: "Barber & Beauty",
       description: "DOL Registered Apprenticeships",
-      image: "/images/artlist/hero-training-1.jpg",
+      image: "/images/programs-hq/training-classroom.jpg",
       href: "/programs/barber-apprenticeship",
     },
     {

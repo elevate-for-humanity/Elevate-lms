@@ -63,7 +63,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'BBP Certificate',
     href: '/programs/bloodborne-pathogens',
-    image: '/images/healthcare/hero-programs-healthcare.jpg',
+    image: '/images/programs-hq/healthcare-hero.jpg',
   },
 ];
 

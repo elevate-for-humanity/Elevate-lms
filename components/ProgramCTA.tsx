@@ -40,7 +40,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/hero/hero-career-services.jpg"
+                      src="/images/heroes-hq/career-services-hero.jpg"
                       alt="Job placement"
                       fill
                       className="object-cover"
@@ -55,7 +55,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/hero/hero-hands-on-training.jpg"
+                      src="/images/programs-hq/training-classroom.jpg"
                       alt="Hands-on training"
                       fill
                       className="object-cover"
@@ -86,7 +86,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
 
             <div className="relative h-[400px] sm:h-[500px] rounded-lg overflow-hidden shadow-2xl">
               <Image
-                src="/images/hero/hero-hands-on-training.jpg"
+                src="/images/programs-hq/training-classroom.jpg"
                 alt="Students in training"
                 fill
                 className="object-cover"
@@ -102,7 +102,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-2xl order-2 md:order-1">
               <Image
-                src="/images/hero/hero-main-welcome.jpg"
+                src="/images/heroes-hq/programs-hero.jpg"
                 alt="Indiana Career Connect"
                 fill
                 className="object-cover"
@@ -166,7 +166,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/hero/hero-career-services.jpg"
+                  src="/images/heroes-hq/career-services-hero.jpg"
                   alt="Career counseling"
                   fill
                   className="object-cover"
@@ -187,7 +187,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/hero/hero-main-welcome.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="Job placement"
                   fill
                   className="object-cover"
@@ -208,7 +208,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/hero/hero-hands-on-training.jpg"
+                  src="/images/programs-hq/training-classroom.jpg"
                   alt="Supportive services"
                   fill
                   className="object-cover"

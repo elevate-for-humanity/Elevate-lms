@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/heroes/workforce-partner-2.jpg' },
+  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/heroes-hq/employer-hero.jpg' },
   { title: 'Attendance', desc: 'Track and record student attendance.', image: '/images/hero-new/hero-8.jpg' },
   { title: 'Reports', desc: 'Generate and view performance reports.', image: '/images/business/tax-prep.jpg' },
   { title: 'Scheduling', desc: 'Manage class schedules and appointments.', image: '/images/healthcare/medical-assistant.jpg' },
-  { title: 'Documents', desc: 'Access and manage important documents.', image: '/images/technology/hero-program-it-support.jpg' },
-  { title: 'Settings', desc: 'Configure portal preferences and settings.', image: '/images/healthcare/hero-programs-healthcare.jpg' },
+  { title: 'Documents', desc: 'Access and manage important documents.', image: '/images/programs-hq/it-support.jpg' },
+  { title: 'Settings', desc: 'Configure portal preferences and settings.', image: '/images/programs-hq/healthcare-hero.jpg' },
 ];
 
 export default function StaffPortalLanding() {

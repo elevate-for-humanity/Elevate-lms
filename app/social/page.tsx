@@ -127,7 +127,7 @@ const defaultVideos = [
   {
     id: 'video1',
     title: 'Welcome to Elevate for Humanity',
-    thumbnail: '/images/social/social-hero.jpg',
+    thumbnail: '/images/heroes-hq/career-services-hero.jpg',
     duration: '2:45',
     views: '1.2K',
     youtubeId: 'dQw4w9WgXcQ',
@@ -251,8 +251,8 @@ export default function SocialMediaPage() {
       {/* Hero Section with Animation */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/social/social-hero.jpg" alt="Connect with Elevate for Humanity" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Connect with Elevate for Humanity" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

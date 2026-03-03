@@ -24,7 +24,7 @@ const dotTests = [
       'Clearinghouse query (if needed)',
       'Same-day scheduling available',
     ],
-    image: '/images/heroes/training-provider-1.jpg',
+    image: '/images/heroes-hq/programs-hero.jpg',
   },
   {
     name: 'DOT Random Testing',
@@ -38,7 +38,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/heroes/training-provider-3.jpg',
+    image: '/images/heroes-hq/programs-hero.jpg',
   },
   {
     name: 'DOT Post-Accident',
@@ -118,8 +118,8 @@ export default function DotTestingPage() {
 {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes/blog-post-4.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

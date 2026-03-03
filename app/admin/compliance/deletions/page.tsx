@@ -70,7 +70,7 @@ export default async function DeletionsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/workforce-partner-3.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Deletions"
           fill
           className="object-cover"

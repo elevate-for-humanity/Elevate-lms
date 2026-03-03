@@ -67,7 +67,7 @@ export default async function PortalPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/employer-partner-1.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Portal"
           fill sizes="100vw"
           className="object-cover"

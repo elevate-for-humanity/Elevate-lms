@@ -37,7 +37,7 @@ export default function SkillDevelopmentPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/hero/hero-hands-on-training.jpg" alt="Skill Development" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/programs-hq/training-classroom.jpg" alt="Skill Development" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

@@ -17,17 +17,17 @@ const benefits = [
   {
     title: 'Student Referrals',
     description: 'Receive pre-screened, WIOA-eligible students ready to enroll in your programs.',
-    image: '/images/heroes/training-provider-2.jpg',
+    image: '/images/heroes-hq/programs-hero.jpg',
   },
   {
     title: 'ETPL Listing Support',
     description: 'We help you get listed on the Eligible Training Provider List for WIOA funding.',
-    image: '/images/artlist/hero-training-8.jpg',
+    image: '/images/programs-hq/training-classroom.jpg',
   },
   {
     title: 'Marketing Support',
     description: 'Your programs featured on our website and promoted to workforce partners.',
-    image: '/images/artlist/hero-training-7.jpg',
+    image: '/images/programs-hq/training-classroom.jpg',
   },
   {
     title: 'Compliance Assistance',
@@ -37,12 +37,12 @@ const benefits = [
   {
     title: 'Employer Connections',
     description: 'Connect your graduates with our network of hiring employers.',
-    image: '/images/artlist/hero-training-7.jpg',
+    image: '/images/programs-hq/training-classroom.jpg',
   },
   {
     title: 'Streamlined Enrollment',
     description: 'Our team handles eligibility verification and funding paperwork.',
-    image: '/images/artlist/hero-training-4.jpg',
+    image: '/images/programs-hq/training-classroom.jpg',
   },
 ];
 
@@ -58,17 +58,17 @@ const programTypes = [
   {
     name: 'Healthcare',
     examples: 'CNA, Medical Assistant, Phlebotomy, EMT',
-    image: '/images/healthcare/hero-programs-healthcare.jpg',
+    image: '/images/programs-hq/healthcare-hero.jpg',
   },
   {
     name: 'Skilled Trades',
     examples: 'HVAC, Electrical, Plumbing, Welding',
-    image: '/images/artlist/hero-training-4.jpg',
+    image: '/images/programs-hq/training-classroom.jpg',
   },
   {
     name: 'Technology',
     examples: 'IT Support, Cybersecurity, Web Development',
-    image: '/images/technology/hero-programs-technology.jpg',
+    image: '/images/programs-hq/technology-hero.jpg',
   },
   {
     name: 'Transportation',
@@ -193,7 +193,7 @@ export default function TrainingProvidersPage() {
             
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/heroes/workforce-partner-5.jpg"
+                src="/images/heroes-hq/employer-hero.jpg"
                 alt="Training classroom"
                 fill
                 className="object-cover"

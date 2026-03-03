@@ -150,7 +150,7 @@ export default function WorkforceBoardsPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/technology/hero-program-it-support.jpg" alt="Workforce board dashboard" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/programs-hq/it-support.jpg" alt="Workforce board dashboard" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

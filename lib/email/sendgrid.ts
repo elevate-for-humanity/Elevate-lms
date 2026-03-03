@@ -14,6 +14,7 @@ export interface EmailOptions {
   text?: string;
   from?: string;
   replyTo?: string;
+  bcc?: string | string[];
 }
 
 /**
@@ -31,15 +32,23 @@ export async function sendEmail(options: EmailOptions) {
   const from = options.from || FROM_EMAIL;
   const replyTo = options.replyTo ?? REPLY_TO_EMAIL;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
+  const bccArr = options.bcc ? (Array.isArray(options.bcc) ? options.bcc : [options.bcc]) : undefined;
 
-  return sendViaSendGrid(sendgridKey, { ...options, from, replyTo, to: toArr });
+  return sendViaSendGrid(sendgridKey, { ...options, from, replyTo, to: toArr, bcc: bccArr });
 }
 
 async function sendViaSendGrid(
   apiKey: string,
-  opts: { to: string[]; from: string; subject: string; html: string; text?: string; replyTo: string },
+  opts: { to: string[]; from: string; subject: string; html: string; text?: string; replyTo: string; bcc?: string[] },
 ) {
   try {
+    const personalization: Record<string, unknown> = {
+      to: opts.to.map((email) => ({ email })),
+    };
+    if (opts.bcc?.length) {
+      personalization.bcc = opts.bcc.map((email) => ({ email }));
+    }
+
     const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
@@ -47,7 +56,7 @@ async function sendViaSendGrid(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        personalizations: [{ to: opts.to.map((email) => ({ email })) }],
+        personalizations: [personalization],
         from: parseSendGridFrom(opts.from),
         reply_to: parseSendGridFrom(opts.replyTo),
         subject: opts.subject,

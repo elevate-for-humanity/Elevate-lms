@@ -67,7 +67,7 @@ export default async function SignMouPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/employer-partner-2.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Sign Mou"
           fill sizes="100vw"
           className="object-cover"

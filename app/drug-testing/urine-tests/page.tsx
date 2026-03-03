@@ -26,7 +26,7 @@ const urineTests = [
       'Clearinghouse reporting (if applicable)',
     ],
     turnaround: '24-48 hours',
-    image: '/images/programs/cpr-group-training-hd.jpg',
+    image: '/images/programs-hq/healthcare-hero.jpg',
   },
   {
     name: '5-Panel Drug Test',

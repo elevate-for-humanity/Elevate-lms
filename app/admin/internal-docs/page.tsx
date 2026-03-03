@@ -80,7 +80,7 @@ export default async function InternalDocsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/lms-profile.jpg"
+          src="/images/heroes-hq/success-hero.jpg"
           alt="Internal Docs"
           fill
           className="object-cover"

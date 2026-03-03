@@ -92,7 +92,7 @@ export default async function CalendarPage() {
         {!user && (
           <div className="bg-white rounded-xl overflow-hidden shadow-lg mb-8">
             <div className="relative h-32">
-              <Image src="/images/heroes/event-1.jpg" alt="Sign in" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Sign in" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-6 text-center">
               <h2 className="text-lg font-semibold text-brand-blue-900 mb-2">Sign in to see your schedule</h2>
@@ -136,7 +136,7 @@ export default async function CalendarPage() {
                     )) : (
                       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
                         <div className="relative h-32">
-                          <Image src="/images/heroes/event-1.jpg" alt="Browse programs" fill sizes="100vw" className="object-cover" />
+                          <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Browse programs" fill sizes="100vw" className="object-cover" />
                         </div>
                         <div className="p-6 text-center text-gray-500">
                           <p>No enrolled classes</p>
@@ -199,7 +199,7 @@ export default async function CalendarPage() {
             <div className="mt-6">
               <Link href="/events" className="block bg-white rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition">
                 <div className="relative h-24">
-                  <Image src="/images/healthcare/drug-testing-training.jpg" alt="Events" fill sizes="100vw" className="object-cover" />
+                  <Image src="/images/programs-hq/healthcare-hero.jpg" alt="Events" fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-4 text-center">
                   <span className="font-medium text-brand-blue-700">View Public Events</span>

@@ -2,126 +2,120 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-interface AcknowledgmentPayload {
-  shop_name: string;
-  signer_name: string;
-  policies_acknowledged: string[];
-  acknowledged_at: string;
-}
-
-// All policy IDs that must be acknowledged (must match the page)
-const REQUIRED_POLICIES = [
-  'handbook',
-  'eeo',
-  'safety',
-  'confidentiality',
-  'compensation-compliance',
-  'reporting',
-];
-
-async function _POST(req: Request) {
+async function _POST(req: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(req, 'strict');
+    const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const body: AcknowledgmentPayload = await req.json();
+    const body = await req.json();
+    const {
+      shop_name,
+      signer_name,
+      policies_acknowledged,
+      acknowledged_at,
+    } = body || {};
 
-    // Validate required fields
-    if (!body.shop_name?.trim()) {
+    if (!shop_name || !signer_name) {
       return NextResponse.json(
-        { error: 'Shop name is required' },
+        { error: 'Shop name and signer name are required.' },
         { status: 400 }
       );
     }
 
-    if (!body.signer_name?.trim()) {
+    if (!Array.isArray(policies_acknowledged) || policies_acknowledged.length === 0) {
       return NextResponse.json(
-        { error: 'Signer name is required' },
-        { status: 400 }
-      );
-    }
-
-    if (!Array.isArray(body.policies_acknowledged) || body.policies_acknowledged.length === 0) {
-      return NextResponse.json(
-        { error: 'At least one policy must be acknowledged' },
-        { status: 400 }
-      );
-    }
-
-    // Verify all required policies are acknowledged
-    const missing = REQUIRED_POLICIES.filter(p => !body.policies_acknowledged.includes(p));
-    if (missing.length > 0) {
-      return NextResponse.json(
-        { error: `Missing policy acknowledgments: ${missing.join(', ')}` },
+        { error: 'You must acknowledge at least one policy.' },
         { status: 400 }
       );
     }
 
     const supabase = createAdminClient();
     if (!supabase) {
-      logger.error('Supabase admin client not available');
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
 
-    // Insert into policy_acknowledgments table
-    // If the table doesn't exist yet, fall back to a generic audit record
-    const record = {
-      shop_name: body.shop_name.trim(),
-      signer_name: body.signer_name.trim(),
-      policies_acknowledged: body.policies_acknowledged,
-      acknowledged_at: body.acknowledged_at || new Date().toISOString(),
-      ip_address:
-        req.headers.get('x-forwarded-for') ||
-        req.headers.get('x-real-ip') ||
-        'unknown',
-      user_agent: req.headers.get('user-agent') || 'unknown',
-    };
+    const ipAddress =
+      req.headers.get('x-forwarded-for') ||
+      req.headers.get('x-real-ip') ||
+      'unknown';
 
-    // Try the dedicated table first
-    const { error } = await supabase
-      .from('partner_policy_acknowledgments')
-      .insert(record);
+    // Find matching application
+    const { data: application } = await supabase
+      .from('barbershop_partner_applications')
+      .select('id, status')
+      .ilike('shop_legal_name', shop_name.trim())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (error) {
-      // Table may not exist yet — log and try mou_signatures as fallback
-      logger.error('Failed to insert policy acknowledgment (primary table)', error);
+    // Store acknowledgment in compliance_records
+    const { error: insertError } = await supabase
+      .from('compliance_records')
+      .insert({
+        record_type: 'policy_acknowledgment',
+        entity_type: 'barbershop_partner',
+        entity_id: application?.id || null,
+        signer_name: signer_name.trim(),
+        metadata: {
+          shop_name: shop_name.trim(),
+          policies_acknowledged,
+          acknowledged_at: acknowledged_at || new Date().toISOString(),
+          ip_address: ipAddress,
+          user_agent: req.headers.get('user-agent') || 'unknown',
+        },
+        status: 'completed',
+      });
 
-      // Fallback: store in mou_signatures with a marker
+    if (insertError) {
+      // If compliance_records doesn't exist, try a generic insert
+      logger.warn('[policy-ack] compliance_records insert failed, trying partner_mous:', insertError);
+
       const { error: fallbackError } = await supabase
-        .from('mou_signatures')
+        .from('partner_mous')
         .insert({
-          organization_name: body.shop_name.trim(),
-          contact_name: body.signer_name.trim(),
-          contact_title: 'Policy Acknowledgment',
-          contact_email: '',
-          digital_signature: `POLICY_ACK:${body.policies_acknowledged.join(',')}`,
-          agreed: true,
-          ip_address: record.ip_address,
-          user_agent: record.user_agent,
-          signed_at: record.acknowledged_at,
+          mou_version: 'policy-ack-v1',
+          status: 'signed',
+          signed_at: acknowledged_at || new Date().toISOString(),
+          terms: {
+            type: 'policy_acknowledgment',
+            shop_name: shop_name.trim(),
+            signer_name: signer_name.trim(),
+            policies_acknowledged,
+            ip_address: ipAddress,
+          },
         });
 
       if (fallbackError) {
-        logger.error('Failed to insert policy acknowledgment (fallback)', fallbackError);
+        logger.error('[policy-ack] Fallback insert also failed:', fallbackError);
         return NextResponse.json(
-          { error: 'Unable to save acknowledgment. Please try again.' },
+          { error: 'Failed to save acknowledgment. Please try again.' },
           { status: 500 }
         );
       }
     }
 
+    // Update application status if found
+    if (application?.id) {
+      await supabase
+        .from('barbershop_partner_applications')
+        .update({
+          status: 'policies_acknowledged',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', application.id);
+    }
+
+    logger.info(`[policy-ack] Policies acknowledged by ${signer_name} for ${shop_name}`);
+
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error('Policy acknowledgment error', err instanceof Error ? err : new Error(String(err)));
+    logger.error('[policy-ack] Error:', err instanceof Error ? err : new Error(String(err)));
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }

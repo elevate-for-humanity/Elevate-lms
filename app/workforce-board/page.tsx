@@ -39,7 +39,7 @@ export default async function WorkforceBoardPage() {
 
   const features = [
     {
-      image: '/images/healthcare/hero-healthcare-professionals.jpg',
+      image: '/images/programs-hq/healthcare-hero.jpg',
       title: 'Performance Dashboards',
       description: 'Real-time metrics on enrollment, completion, and employment outcomes',
       href: '/workforce-board/reports',
@@ -51,7 +51,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/technology/hero-program-cybersecurity.jpg',
+      image: '/images/programs-hq/cybersecurity.jpg',
       title: 'Participant Tracking',
       description: 'Monitor participant progress, services, and outcomes across all programs',
       href: '/workforce-board/participants',
@@ -96,7 +96,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/employment',
     },
     {
-      image: '/images/heroes/testimonial-1.jpg',
+      image: '/images/heroes-hq/success-stories-hero.jpg',
       title: 'Supportive Services',
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',

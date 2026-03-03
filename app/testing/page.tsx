@@ -89,7 +89,7 @@ export default function TestingPage() {
       {/* Hero */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/artlist/cropped/hero-training-2-wide.jpg"
+          src="/images/programs-hq/training-classroom.jpg"
           alt="Workforce credential testing"
           fill sizes="100vw"
           className="object-cover"

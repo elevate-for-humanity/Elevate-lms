@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Mobile App | Elevate For Humanity',
     description:
       'Install our mobile app directly from your browser. Access programs, track progress, and stay connected on the go.',
-    images: ['/images/technology/hero-program-cybersecurity.jpg'],
+    images: ['/images/programs-hq/cybersecurity.jpg'],
   },
 };
 
@@ -57,7 +57,7 @@ export default async function MobileAppPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/technology/hero-program-cybersecurity.jpg"
+          src="/images/programs-hq/cybersecurity.jpg"
           alt="Mobile App"
           fill
           className="object-cover"

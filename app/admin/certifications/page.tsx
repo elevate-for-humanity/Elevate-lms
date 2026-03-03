@@ -77,7 +77,7 @@ export default async function CertificationsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/hero-banner-latest.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Certifications Management"
           fill
           className="object-cover"

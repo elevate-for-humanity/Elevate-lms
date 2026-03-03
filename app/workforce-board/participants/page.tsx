@@ -88,7 +88,7 @@ export default async function ParticipantsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes/hero-banner-elevate.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="Participants"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

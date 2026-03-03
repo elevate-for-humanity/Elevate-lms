@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: 'OJT wage reimbursement, WOTC tax credits, and pre-trained talent at no recruiting cost.',
     url: 'https://www.elevateforhumanity.org/employers',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes/workforce-partner-2.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
+    images: [{ url: '/images/heroes-hq/employer-hero.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
     type: 'website',
   },
 };
@@ -47,7 +47,7 @@ export default function EmployersPage() {
       {/* Hero */}
       <section className="relative min-h-[320px] md:min-h-[400px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/workforce-partner-2.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Employer workforce partnership"
           fill
           className="object-cover"

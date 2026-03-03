@@ -28,8 +28,8 @@ export default function ApprovalsPage() {
 {/* Hero Section with Background Image */}
       <section className="relative h-48 md:h-64 w-full overflow-hidden">
         <Image
-          src="/images/programs/cpr-group-training-hd.jpg"
-          alt="Official documents and certifications"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
+          alt="Elevate for Humanity institutional approvals and governance"
           fill
           className="object-cover"
           priority

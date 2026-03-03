@@ -14,7 +14,7 @@ export default function TechnologyPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Technology' }],
       hero: {
-        image: '/images/heroes/workforce-partner-3.jpg',
+        image: '/images/heroes-hq/employer-hero.jpg',
         tag: 'Technology',
         tagColor: 'text-emerald-300',
         title: 'Technology Partnership',

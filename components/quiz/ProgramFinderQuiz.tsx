@@ -43,7 +43,7 @@ const steps: QuizStep[] = [
       { id: 'cdl', label: 'CDL / Trucking', image: '/images/cdl-vibrant.jpg', description: 'Hit the road and earn $50K+' },
       { id: 'tech', label: 'Technology', image: '/images/programs-hq/it-support.jpg', description: 'IT support, cybersecurity, web dev' },
       { id: 'barber', label: 'Barbering', image: '/images/barber-hero-new.jpg', description: 'Earn while you learn a creative trade' },
-      { id: 'safety', label: 'CPR & First Aid', image: '/images/healthcare/healthcare-professional-portrait-1.jpg', description: 'Same-day HSI certification' },
+      { id: 'safety', label: 'CPR & First Aid', image: '/images/programs-hq/healthcare-hero.jpg', description: 'Same-day HSI certification' },
     ],
   },
   {

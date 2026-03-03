@@ -72,7 +72,7 @@ export default function FinancialAidPage() {
       {/* Hero with Image */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/hero-state-funding.jpg"
+          src="/images/heroes-hq/funding-hero.jpg"
           alt="Financial aid and funding options"
           fill
           className="object-cover"

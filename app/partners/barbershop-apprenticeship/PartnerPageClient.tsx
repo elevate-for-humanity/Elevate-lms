@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import VideoHero from '@/components/ui/VideoHero';
 
 const CALENDLY_URL = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu/30min';
 
@@ -14,18 +14,16 @@ export default function PartnerPageClient() {
         <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Barbershop Apprenticeship' }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative bg-slate-900 text-white py-20">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/programs-hq/barber-hero.jpg"
-            alt="Barber apprentice training in a barbershop"
-            fill
-            className="object-cover opacity-40"
-            priority
-          />
-        </div>
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+      {/* Video Hero — no text overlay */}
+      <VideoHero
+        videoSrc="/videos/barber-hero-final.mp4"
+        posterSrc="/images/programs-hq/barber-hero.jpg"
+        posterAlt="Barber apprentice training in a barbershop"
+      />
+
+      {/* CTA Section below hero */}
+      <section className="bg-slate-900 text-white py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Barbershop Partner Program</h1>
           <p className="text-xl text-slate-200 mb-8 max-w-2xl mx-auto">
             Host apprentices in your shop. Develop talent. Grow your team through Indiana&apos;s

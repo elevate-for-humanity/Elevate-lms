@@ -81,33 +81,16 @@ export default function AddOnsPage() {
         </div>
       </div>
 
-      {/* Video Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
-        <ProgramHeroBanner videoSrc="/videos/store-marketplace.mp4" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
-            <p className="text-sm uppercase tracking-wider text-white/70 mb-3">Elevate Platform</p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 max-w-3xl">
-              Platform Add-Ons
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mb-8">
-              Extend your workforce operating system with powerful features. One-time purchase, lifetime access, no recurring fees.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="#add-ons"
-                className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700 transition"
-              >
-                Browse Add-Ons
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
-              >
-                Talk to Sales
-              </Link>
-            </div>
+      {/* Hero Section */}
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Platform Add-Ons</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Extend your workforce operating system with powerful features. One-time purchase, lifetime access, no recurring fees.</p>
           </div>
         </div>
       </section>

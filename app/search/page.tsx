@@ -176,7 +176,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/heroes/testimonial-2.jpg"
+                src="/images/heroes-hq/success-stories-hero.jpg"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
@@ -237,7 +237,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/heroes/programs.jpg"
+                src="/images/heroes-hq/programs-hero.jpg"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

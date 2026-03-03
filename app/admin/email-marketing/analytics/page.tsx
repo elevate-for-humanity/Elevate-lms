@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="/images/heroes/resource-1.jpg"
+            src="/images/heroes-hq/how-it-works-hero.jpg"
             alt="Analytics"
             fill
             className="object-cover"

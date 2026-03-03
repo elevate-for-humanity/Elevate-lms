@@ -419,7 +419,7 @@ export default function SocialMediaPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/training-provider-1.jpg"
+                    src="/images/heroes-hq/programs-hero.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

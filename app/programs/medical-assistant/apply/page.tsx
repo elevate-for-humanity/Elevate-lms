@@ -16,7 +16,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
-        <Image src="/images/heroes/programs/healthcare/hero-program-medical-assistant.jpg" alt="Medical Assistant" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/programs-hq/medical-assistant.jpg" alt="Medical Assistant" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-4">
@@ -49,7 +49,7 @@ export default function ApplyPage() {
             </div>
           </Link>
           <Link href="/apply/student?program=medical-assistant" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/heroes/programs/healthcare/hero-program-medical-assistant.jpg" alt="Apply for Medical Assistant" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/programs-hq/medical-assistant.jpg" alt="Apply for Medical Assistant" width={600} height={300} className="w-full h-52 object-cover" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
               <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>

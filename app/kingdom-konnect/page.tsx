@@ -23,7 +23,7 @@ export default function KingdomKonnectPage() {
         ]}
       />
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/hero/hero-community.jpg" alt="Kingdom Konnect" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Kingdom Konnect" fill className="object-cover" priority sizes="100vw" />
         
       </section>
       <section className="py-16 bg-white">

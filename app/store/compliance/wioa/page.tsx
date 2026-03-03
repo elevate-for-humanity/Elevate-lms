@@ -24,7 +24,7 @@ const features = [
   {
     title: 'Performance Metrics Tracking',
     description: 'Real-time tracking of all WIOA primary indicators of performance.',
-    image: '/images/technology/hero-programs-technology.jpg',
+    image: '/images/programs-hq/technology-hero.jpg',
     items: ['Employment rate tracking', 'Median earnings calculation', 'Credential attainment', 'Measurable skill gains'],
   },
   {
@@ -36,7 +36,7 @@ const features = [
   {
     title: 'Quarterly & Annual Reports',
     description: 'Pre-built report templates for all required WIOA submissions.',
-    image: '/images/technology/hero-program-it-support.jpg',
+    image: '/images/programs-hq/it-support.jpg',
     items: ['ETA-9169 reports', 'ETA-9170 reports', 'Custom report builder', 'Scheduled generation'],
   },
 ];
@@ -140,8 +140,8 @@ export default function WIOACompliancePage() {
 
       {/* Hero Section */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes/hero-federal-funding.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -221,10 +221,10 @@ export default function WIOACompliancePage() {
           <h2 className="text-3xl font-black text-black mb-8 text-center">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/technology/hero-programs-technology.jpg' },
+              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/programs-hq/technology-hero.jpg' },
               { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/heroes-hq/funding-hero.jpg' },
               { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/team-hq/team-meeting.jpg' },
-              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/technology/hero-program-it-support.jpg' },
+              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/programs-hq/it-support.jpg' },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-brand-green-600">

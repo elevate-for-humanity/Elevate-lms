@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const certPrograms = [
   { name: 'CNA — Certified Nursing Assistant', duration: '4-6 weeks', cost: 'Free with WIOA/WRG', image: '/images/programs-hq/healthcare-hero.jpg', href: '/programs/healthcare' },
-  { name: 'CDL — Commercial Driver License', duration: '4-8 weeks', cost: 'Free with WRG', image: '/images/artlist/hero-training-7.jpg', href: '/programs/cdl' },
+  { name: 'CDL — Commercial Driver License', duration: '4-8 weeks', cost: 'Free with WRG', image: '/images/programs-hq/training-classroom.jpg', href: '/programs/cdl' },
   { name: 'HVAC Technician + EPA 608', duration: '8-12 weeks', cost: 'Free with WIOA', image: '/images/programs-hq/skilled-trades-hero.jpg', href: '/programs/skilled-trades' },
   { name: 'Barber Apprenticeship', duration: '18-24 months', cost: 'Paid apprenticeship', image: '/images/programs-hq/barber-hero.jpg', href: '/programs/barber-apprenticeship' },
   { name: 'Phlebotomy Technician', duration: '6-8 weeks', cost: 'Free with WIOA/WRG', image: '/images/programs-hq/healthcare-hero.jpg', href: '/programs/healthcare' },
@@ -31,8 +31,8 @@ export default function CertificationsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Certification training" fill className="object-cover" priority sizes="100vw" />
+      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certification training" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

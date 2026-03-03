@@ -154,7 +154,7 @@ export default function CourseDiscussionsPage() {
                   </div>
                   <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/artlist/hero-training-6.jpg"
+                      src="/images/programs-hq/training-classroom.jpg"
                       alt="Students in discussion"
                       fill
                       className="object-cover"

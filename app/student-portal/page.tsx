@@ -53,7 +53,7 @@ export default function StudentPortalPage() {
       description: 'Access course materials, lectures, and assignments',
       href: '/lms/courses',
       color: 'blue',
-      image: '/images/heroes/student-community.jpg',
+      image: '/images/heroes-hq/success-hero.jpg',
     },
     {
       icon: Calendar,
@@ -61,7 +61,7 @@ export default function StudentPortalPage() {
       description: 'View class schedule, deadlines, and upcoming events',
       href: '/student-portal/schedule',
       color: 'green',
-      image: '/images/heroes/student-courses.jpg',
+      image: '/images/heroes-hq/success-hero.jpg',
     },
     {
       icon: BarChart3,
@@ -69,7 +69,7 @@ export default function StudentPortalPage() {
       description: 'Track your academic performance and completion status',
       href: '/student-portal/grades',
       color: 'blue',
-      image: '/images/heroes/resource-5.jpg',
+      image: '/images/heroes-hq/how-it-works-hero.jpg',
     },
     {
       icon: Users,
@@ -77,7 +77,7 @@ export default function StudentPortalPage() {
       description: 'Connect with instructors and get support',
       href: '/lms/support',
       color: 'orange',
-      image: '/images/heroes/student-career.jpg',
+      image: '/images/heroes-hq/career-services-hero.jpg',
     },
     {
       icon: Briefcase,
@@ -85,7 +85,7 @@ export default function StudentPortalPage() {
       description: 'Resume help, job placement, and interview prep',
       href: '/career-services',
       color: 'teal',
-      image: '/images/heroes/student-progress.jpg',
+      image: '/images/heroes-hq/success-hero.jpg',
     },
     {
       icon: FileText,
@@ -93,7 +93,7 @@ export default function StudentPortalPage() {
       description: 'Transcripts, certificates, and important forms',
       href: '/lms/files',
       color: 'indigo',
-      image: '/images/heroes/testimonial-1.jpg',
+      image: '/images/heroes-hq/success-stories-hero.jpg',
     },
   ];
 
@@ -222,7 +222,7 @@ export default function StudentPortalPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/artlist/hero-training-1.jpg"
+          src="/images/programs-hq/training-classroom.jpg"
           alt="Student Portal"
           fill
           className="object-cover"

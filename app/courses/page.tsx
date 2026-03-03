@@ -78,8 +78,8 @@ export default async function CoursesPage() {
       {/* Hero Section */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes/training-provider-3.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -174,7 +174,7 @@ export default async function CoursesPage() {
                 >
                   <div className="relative h-40">
                     <Image
-                      src={course.image_url || '/images/heroes/training-provider-3.jpg'}
+                      src={course.image_url || '/images/heroes-hq/programs-hero.jpg'}
                       alt={course.title}
                       fill
                       className="object-cover"

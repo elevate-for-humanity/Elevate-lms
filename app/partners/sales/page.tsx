@@ -14,7 +14,7 @@ export default function SalesPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'LMS Licensing' }],
       hero: {
-        image: '/images/artlist/office-meeting.jpg',
+        image: '/images/heroes-hq/employer-hero.jpg',
         tag: 'Technology',
         tagColor: 'text-purple-300',
         title: 'LMS Licensing',

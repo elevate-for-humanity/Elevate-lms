@@ -79,7 +79,7 @@ export default async function QuizBuilderPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/hero-employer-partnerships.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Quiz Builder"
           fill
           className="object-cover"

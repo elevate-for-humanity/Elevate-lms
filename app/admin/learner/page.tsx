@@ -65,7 +65,7 @@ export default async function LearnerPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/student-career.jpg"
+          src="/images/heroes-hq/career-services-hero.jpg"
           alt="Learner Management"
           fill
           className="object-cover"

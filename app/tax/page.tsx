@@ -94,7 +94,7 @@ export default function TaxServicesPage() {
             <div className="bg-white rounded-2xl border-2 border-brand-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes/training-provider-2.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="VITA Free Tax Preparation"
                   fill
                   className="object-cover"

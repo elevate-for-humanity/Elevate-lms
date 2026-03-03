@@ -61,8 +61,8 @@ export default async function SuccessStoriesPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative w-full h-64">
                 <Image
-                  src="/images/programs/cpr-group-training-hd.jpg"
-                  alt="Healthcare Training"
+                  src="/images/heroes-hq/success-hero.jpg"
+                  alt="Student success at Elevate for Humanity"
                   fill
                   className="object-cover"
                 />

@@ -80,7 +80,7 @@ export default async function DocumentCenterPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/about.jpg"
+          src="/images/heroes-hq/about-hero.jpg"
           alt="Document Center"
           fill
           className="object-cover"

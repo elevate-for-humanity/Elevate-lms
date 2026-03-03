@@ -10,6 +10,7 @@ import { contactRateLimit } from '@/lib/rate-limit';
 import { applicationSchema } from '@/lib/api/validation-schemas';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
+import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 
@@ -123,6 +124,15 @@ export const POST = withRateLimit(
         programSlug: program,
       }).catch((err) => {
         logger.error('[apply] Welcome email failed (non-blocking):', err);
+      });
+
+      // Send onboarding email with Calendly scheduling link and next steps (BCC admin)
+      sendOnboardingEmail({
+        email,
+        name: `${firstName} ${lastName}`.trim(),
+        program,
+      }).catch((err) => {
+        logger.error('[apply] Onboarding email failed (non-blocking):', err);
       });
 
       // Send notification email to admin

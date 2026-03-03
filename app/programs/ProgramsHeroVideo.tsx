@@ -30,7 +30,7 @@ export default function ProgramsHeroVideo() {
 
   return (
     <>
-      <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover brightness-110" loop muted playsInline autoPlay preload="metadata" poster="/images/artlist/hero-training-3.jpg">
+      <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover brightness-110" loop muted playsInline autoPlay preload="metadata" poster="/images/programs-hq/training-classroom.jpg">
         <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
       </video>
       <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />

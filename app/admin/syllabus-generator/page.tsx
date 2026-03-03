@@ -79,7 +79,7 @@ export default async function SyllabusGeneratorPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/hero/admin-hero.jpg"
+          src="/images/heroes-hq/about-hero.jpg"
           alt="Syllabus Generator"
           fill
           className="object-cover"

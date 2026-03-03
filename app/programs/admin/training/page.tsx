@@ -68,7 +68,7 @@ export default async function TrainingPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-3.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Training"
           fill sizes="100vw"
           className="object-cover"

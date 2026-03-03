@@ -102,7 +102,7 @@ export default async function AgenciesPage() {
       {/* HERO */}
       <section className="relative h-[500px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes/workforce-partner-1.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Workforce agencies and partners"
           fill
           className="object-cover"

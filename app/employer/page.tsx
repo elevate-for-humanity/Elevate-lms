@@ -22,7 +22,7 @@ export default function EmployerPage() {
       </div>
 
       {/* Hero — clean image, no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnership with Elevate for Humanity" fill sizes="100vw" className="object-cover" priority />
       </section>
 

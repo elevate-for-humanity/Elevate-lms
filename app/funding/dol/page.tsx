@@ -40,7 +40,7 @@ const programs = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image src="/images/trades/program-welding-training.jpg" alt="DOL Registered Apprenticeship" fill className="object-cover" priority sizes="100vw" />
         
       </section>

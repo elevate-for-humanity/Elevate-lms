@@ -31,7 +31,7 @@ export function VideoHero({
   overlayColor = 'from-black/60 via-black/50 to-black/70',
 }: VideoHeroProps) {
   return (
-    <section className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
+    <section className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
       <video
         autoPlay
         loop

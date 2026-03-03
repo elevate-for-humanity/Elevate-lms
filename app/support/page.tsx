@@ -45,7 +45,7 @@ export default async function SupportPage() {
     { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team', href: '/support/chat', available: 'Mon-Fri 9am-5pm EST' },
     { icon: Mail, title: 'Email Support', desc: 'Send us a message', href: '/contact', available: 'Response within 24 hours' },
     { icon: Phone, title: 'Submit a Ticket', desc: 'Get a response within 24 hours', href: '/support/ticket', available: '24/7 Online' },
-    { icon: FileText, title: 'Help Center', desc: 'Browse help articles', href: '/help', available: 'Available 24/7' },
+    { icon: FileText, title: 'Help Center', desc: 'Browse help articles', href: '/support/help', available: 'Available 24/7' },
   ];
 
   return (

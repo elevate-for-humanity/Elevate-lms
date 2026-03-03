@@ -33,7 +33,7 @@ export default function AboutPage() {
       </div>
 
       {/* Visual hero */}
-      <section className="relative h-[300px] sm:h-[400px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image
           src="/images/heroes-hq/team-hero.jpg"
           alt="Elevate for Humanity team and workforce training"

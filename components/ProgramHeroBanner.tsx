@@ -62,7 +62,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black"
+      className="relative w-full h-full bg-black"
     >
       {!videoFailed ? (
         <video

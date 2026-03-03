@@ -94,7 +94,7 @@ export default function AccreditationPage() {
 
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
           <Image
             src="/images/heroes-hq/success-stories-hero.jpg"
             alt="Workforce training classroom"

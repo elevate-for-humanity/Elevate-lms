@@ -44,7 +44,7 @@ export function PortalPageLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Video Hero */}
-      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] flex items-center justify-center text-white overflow-hidden">
         <video
           autoPlay
           muted

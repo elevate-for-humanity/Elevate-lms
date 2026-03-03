@@ -37,7 +37,7 @@ export default function FundingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image src="/images/trades/program-building-technology.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">

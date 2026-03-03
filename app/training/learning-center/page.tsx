@@ -29,7 +29,7 @@ export default function LearningCenterPage() {
       {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
           <Image src="/images/artlist/hero-training-2.jpg" alt="Learning center resources" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">

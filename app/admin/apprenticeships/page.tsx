@@ -351,7 +351,7 @@ export default function AdminApprenticeships() {
                     </li>
                   </ul>
                 </div>
-                <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
                     src="/images/efh/sections/coaching.jpg"
                     alt="Students learning"

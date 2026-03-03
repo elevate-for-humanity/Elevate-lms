@@ -72,7 +72,7 @@ export default function ProgramCoursesPage() {
       />
       {/* Hero Banner */}
       <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
           <Image src="/images/artlist/hero-training-6.jpg" alt="Professional training courses and certification programs" fill sizes="100vw" className="object-cover" />
         </div>
         <div className="bg-slate-900 py-10">

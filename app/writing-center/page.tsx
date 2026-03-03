@@ -85,7 +85,7 @@ export default function WritingCenterPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image src="/images/programs-hq/training-classroom.jpg" alt="Student receiving writing assistance at the Elevate Writing Center" fill sizes="100vw" className="object-cover" priority />
       </section>
 

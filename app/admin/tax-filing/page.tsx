@@ -369,7 +369,7 @@ export default async function TaxFilingAdminPage() {
                     </li>
                   </ul>
                 </div>
-                <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image alt="Tax filing document" priority
                     src="/images/programs-hq/tax-preparation.jpg"
                     alt="Tax filing preparation"

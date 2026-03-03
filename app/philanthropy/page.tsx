@@ -27,7 +27,7 @@ export default function PhilanthropyPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image src="/images/hero-new/hero-3.jpg" alt="Support workforce training" fill className="object-cover" priority sizes="100vw" />
         
       </section>

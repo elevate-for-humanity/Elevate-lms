@@ -22,16 +22,16 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'The Rise Foundation | Selfish Inc. 501(c)(3) | Indianapolis',
+  title: 'Selfish Inc. 501(c)(3) | Rise Foundation | CurvatureBody Sculpting | Indianapolis',
   description:
-    'The Rise Foundation is a DBA of Selfish Inc. 501(c)(3). We provide mental wellness counseling, CurvatureBody Sculpting, Meri-Go-Round wellness products, free VITA tax preparation, trauma recovery, addiction rehabilitation, divorce support, and community services in Indianapolis, Indiana.',
+    'Selfish Inc. is a 501(c)(3) nonprofit operating The Rise Foundation, CurvatureBody Sculpting, Meri-Go-Round wellness products, free VITA tax preparation, mental wellness counseling, trauma recovery, addiction rehabilitation, and community services in Indianapolis, Indiana.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/rise-foundation',
   },
   openGraph: {
-    title: 'The Rise Foundation | Selfish Inc. 501(c)(3)',
+    title: 'Selfish Inc. 501(c)(3) | Rise Foundation | Indianapolis',
     description:
-      'Mental wellness, CurvatureBody Sculpting, holistic healing, free VITA tax prep, and community services in Indianapolis.',
+      'Mental wellness, CurvatureBody Sculpting, Meri-Go-Round products, holistic healing, free VITA tax prep, and community services in Indianapolis.',
     url: 'https://www.elevateforhumanity.org/rise-foundation',
     siteName: 'Elevate for Humanity',
     type: 'website',
@@ -74,44 +74,46 @@ export default async function RiseFoundationPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[350px] md:h-[450px] w-full overflow-hidden">
-          <Image
-            src="/images/heroes-hq/success-hero.jpg"
-            alt="Rise Foundation community event in Indianapolis"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center px-4 max-w-4xl">
-              <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
-                A DBA of Selfish Inc. 501(c)(3)
-              </p>
-              <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-                The Rise Foundation
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-8">
-                Mental wellness. Body sculpting. Holistic healing. Free tax preparation.
-                Serving Indianapolis families with compassion and dignity.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/rise-foundation/get-involved"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition text-lg"
-                >
-                  Get Help Now
-                </Link>
-                <Link
-                  href="/rise-foundation/donate"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition text-lg"
-                >
-                  <Gift className="w-5 h-5" />
-                  Donate
-                </Link>
-              </div>
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
+        <Image
+          src="/images/heroes-hq/success-hero.jpg"
+          alt="Selfish Inc. community programs in Indianapolis"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+          quality={90}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
+              501(c)(3) Nonprofit Organization
+            </p>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-2">
+              Selfish Inc.
+            </h1>
+            <p className="text-xl md:text-2xl text-white/80 mb-4">
+              Operating The Rise Foundation &middot; CurvatureBody Sculpting &middot; Meri-Go-Round Products
+            </p>
+            <p className="text-lg text-white/70 max-w-2xl mb-8">
+              Mental wellness counseling, body sculpting, holistic healing, free VITA tax preparation, 
+              and community services. Serving Indianapolis families with compassion and dignity.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/rise-foundation/get-involved"
+                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition text-lg"
+              >
+                Get Help Now
+              </Link>
+              <Link
+                href="/rise-foundation/donate"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition text-lg"
+              >
+                <Gift className="w-5 h-5" />
+                Donate
+              </Link>
             </div>
           </div>
         </div>
@@ -145,9 +147,9 @@ export default async function RiseFoundationPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Programs</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Selfish Inc. Programs</h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              Three interconnected programs under one nonprofit, serving the whole person — mind, body, and community.
+              Three interconnected programs under one 501(c)(3) nonprofit, serving the whole person — mind, body, and community.
             </p>
           </div>
 
@@ -211,7 +213,7 @@ export default async function RiseFoundationPage() {
               <div className="h-52 relative">
                 <Image
                   src="/images/programs-hq/healthcare-hero.jpg"
-                  alt="CurvatureBody Sculpting treatment"
+                  alt="CurvatureBody Sculpting non-invasive body contouring"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -226,16 +228,26 @@ export default async function RiseFoundationPage() {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4">
-                  Non-invasive body contouring and wellness products. CurvatureBody Sculpting is a program of Rise Forward Foundation, not a separate entity.
+                  Non-invasive body contouring, skin tightening, and wellness services operated by Selfish Inc. 501(c)(3). 
+                  Professional treatments using ultrasonic cavitation, radio frequency, and vacuum therapy. 
+                  All proceeds fund Rise Foundation community programs.
                 </p>
                 <ul className="space-y-2 mb-6 text-sm">
                   <li className="flex items-start gap-2">
                     <Sparkles className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
-                    <Link href="/rise-foundation#curvature" className="text-gray-700 hover:text-brand-blue-600">Body Contouring &amp; Skin Tightening</Link>
+                    <span className="text-gray-700">Ultrasonic Cavitation — Fat reduction &amp; body contouring</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Radio Frequency — Skin tightening &amp; collagen stimulation</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Heart className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
-                    <Link href="/rise-foundation#curvature" className="text-gray-700 hover:text-brand-blue-600">Cellulite Reduction &amp; Lymphatic Drainage</Link>
+                    <span className="text-gray-700">Vacuum Therapy — Cellulite reduction &amp; lymphatic drainage</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Leaf className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">Wood Therapy — Manual body sculpting &amp; contouring</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Gift className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
@@ -243,15 +255,11 @@ export default async function RiseFoundationPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Calendar className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
-                    <Link href="/rise-foundation#curvature" className="text-gray-700 hover:text-brand-blue-600">Book a Consultation</Link>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Users className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
-                    <Link href="/rise-foundation/get-involved" className="text-gray-700 hover:text-brand-blue-600">Careers — Now Hiring</Link>
+                    <Link href="/contact?subject=curvature" className="text-gray-700 hover:text-brand-blue-600">Book a Free Consultation</Link>
                   </li>
                 </ul>
-                <Link href="/rise-foundation#curvature" className="inline-flex items-center gap-1 text-pink-600 font-semibold hover:underline">
-                  View Services &amp; Shop <ArrowRight className="w-4 h-4" />
+                <Link href="/contact?subject=curvature" className="inline-flex items-center gap-1 bg-pink-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-pink-700 transition text-sm">
+                  Book Consultation <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -315,41 +323,53 @@ export default async function RiseFoundationPage() {
 
       {/* Meri-Go-Round Products */}
       <section id="products" className="py-16 bg-pink-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-100 rounded-full text-pink-700 text-sm font-medium mb-4">
-                <Heart className="w-4 h-4" />
-                Meri-Go-Round Products
-              </div>
-              <h2 className="text-3xl font-bold mb-4">Handcrafted Wellness Products</h2>
-              <p className="text-gray-600 mb-6">
-                Teas, body butters, essential oils, and soaps handcrafted to support your wellness journey. All proceeds fund Rise Foundation community programs and mental wellness services.
-              </p>
-              <div className="space-y-3 mb-8">
-                {['Calm Blend Herbal Tea — $18.99', 'Shea Body Butter with Lavender — $24.99', 'Essential Oil Collection (6 oils) — $44.99', 'Handmade Soaps'].map((product) => (
-                  <div key={product} className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-pink-500 flex-shrink-0" />
-                    <span className="text-gray-700">{product}</span>
-                  </div>
-                ))}
-              </div>
-              <Link
-                href="/rise-foundation#products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 text-white font-bold rounded-lg hover:bg-pink-700 transition"
-              >
-                Shop Products <ArrowRight className="w-4 h-4" />
-              </Link>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-100 rounded-full text-pink-700 text-sm font-medium mb-4">
+              <Heart className="w-4 h-4" />
+              Meri-Go-Round Wellness Products
             </div>
-            <div className="relative h-[350px] rounded-2xl overflow-hidden">
-              <Image
-                src="/images/programs-hq/healthcare-hero.jpg"
-                alt="Meri-Go-Round wellness products — teas, butters, oils"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
+            <h2 className="text-3xl font-bold mb-4">Handcrafted Wellness Products</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Handcrafted teas, body butters, essential oils, and soaps to support your wellness journey. 
+              All proceeds fund Rise Foundation community programs and mental wellness services.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              { name: 'Calm Blend Herbal Tea', price: '$18.99', desc: 'Chamomile, lavender, and lemon balm loose-leaf blend. Caffeine-free. Promotes relaxation and restful sleep.', image: '/images/heroes-hq/how-it-works-hero.jpg' },
+              { name: 'Shea Body Butter — Lavender', price: '$24.99', desc: 'Whipped shea butter with lavender essential oil and vitamin E. Deep moisture for dry skin. 8 oz jar.', image: '/images/heroes-hq/career-services-hero.jpg' },
+              { name: 'Essential Oil Collection', price: '$44.99', desc: '6-oil starter set: lavender, peppermint, eucalyptus, tea tree, lemon, and frankincense. 10ml bottles.', image: '/images/programs-hq/healthcare-hero.jpg' },
+              { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/heroes-hq/success-hero.jpg' },
+            ].map((product) => (
+              <div key={product.name} className="bg-white rounded-xl overflow-hidden border shadow-sm hover:shadow-lg transition">
+                <div className="relative h-40">
+                  <Image src={product.image} alt={product.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, 25vw" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-gray-900 mb-1">{product.name}</h3>
+                  <p className="text-pink-600 font-bold mb-2">{product.price}</p>
+                  <p className="text-gray-600 text-sm mb-4">{product.desc}</p>
+                  <Link
+                    href="/contact?subject=products"
+                    className="inline-flex items-center gap-1 bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-pink-700 transition"
+                  >
+                    Order Now
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <p className="text-gray-500 text-sm mb-4">Custom orders and wholesale pricing available. Contact us for bulk orders or gift sets.</p>
+            <Link
+              href="/contact?subject=products"
+              className="inline-flex items-center gap-2 border-2 border-pink-600 text-pink-600 px-6 py-3 rounded-lg font-semibold hover:bg-pink-50 transition"
+            >
+              Contact for Custom Orders <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

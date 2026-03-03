@@ -49,7 +49,7 @@ export default async function ApplyPage({
       </div>
 
       {/* Hero banner — full width video, top of page */}
-      <section className="relative w-full h-[180px] sm:h-[280px] md:h-[380px] overflow-hidden">
+      <section className="relative w-full h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <ApplyHeroVideo />
       </section>
 

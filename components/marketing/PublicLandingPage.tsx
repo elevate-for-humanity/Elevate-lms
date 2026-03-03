@@ -49,7 +49,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
 
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[300px] sm:h-[380px] overflow-hidden">
+        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
           <Image src={config.hero.image} alt={config.hero.title} fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">

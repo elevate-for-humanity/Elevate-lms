@@ -72,11 +72,12 @@ export default function FAQPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-3.jpg"
-          alt="Get answers to your questions"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
+          alt="Students in a workforce training classroom"
           fill
+          quality={90}
           className="object-cover"
           priority
         />

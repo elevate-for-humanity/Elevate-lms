@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { HeartHandshake, BookOpen, DollarSign, Briefcase, Users, Phone, MessageSquare, Calendar } from 'lucide-react';
+import { ArrowRight, Phone, MessageSquare, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -36,12 +37,12 @@ export const metadata: Metadata = {
 };
 
 const services = [
-  { icon: BookOpen, title: 'Academic Support', description: 'Tutoring, study groups, and academic advising', link: '/student-support/academic' },
-  { icon: DollarSign, title: 'Financial Aid', description: 'Scholarships, grants, and payment plans', link: '/student-support/financial-aid' },
-  { icon: Briefcase, title: 'Career Services', description: 'Job placement, resume help, and interview prep', link: '/student-support/career' },
-  { icon: Users, title: 'Counseling', description: 'Personal counseling and wellness resources', link: '/student-support/counseling' },
-  { icon: HeartHandshake, title: 'Accessibility', description: 'Accommodations and disability services', link: '/student-support/accessibility' },
-  { icon: Calendar, title: 'Scheduling', description: 'Class scheduling and calendar management', link: '/student-support/scheduling' },
+  { title: 'Academic Support', description: 'One-on-one tutoring, study groups, and academic advising. Get help with coursework, exam prep, and staying on track in your program.', link: '/student-support/academic', image: '/images/programs-hq/students-learning.jpg' },
+  { title: 'Financial Aid', description: 'WIOA funding, scholarships, grants, and flexible payment plans. Our team helps you find and apply for every dollar available.', link: '/student-support/financial-aid', image: '/images/heroes-hq/funding-hero.jpg' },
+  { title: 'Career Services', description: 'Job placement assistance, resume writing, interview coaching, and employer connections. We stay with you through your first 90 days on the job.', link: '/student-support/career', image: '/images/heroes-hq/career-services-hero.jpg' },
+  { title: 'Counseling & Wellness', description: 'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.', link: '/student-support/counseling', image: '/images/heroes-hq/success-hero.jpg' },
+  { title: 'Accessibility Services', description: 'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.', link: '/student-support/accessibility', image: '/images/heroes-hq/about-hero.jpg' },
+  { title: 'Scheduling & Advising', description: 'Class scheduling, program advising, and calendar management. Flexible scheduling for working adults and parents.', link: '/student-support/scheduling', image: '/images/heroes-hq/how-it-works-hero.jpg' },
 ];
 
 export default function StudentSupportPage() {
@@ -54,81 +55,150 @@ export default function StudentSupportPage() {
         </div>
       </div>
 
-      <div className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/heroes/learners.jpg"
-          alt="Student Support"
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {services.map((service, index) => (
-            <Link key={index} href={service.link} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                <service.icon className="w-6 h-6 text-brand-green-600" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">{service.title}</h2>
-              <p className="text-gray-600">{service.description}</p>
-            </Link>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Support</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <Phone className="w-8 h-8 text-brand-green-600" />
-              <div>
-                <p className="font-medium text-gray-900">Phone Support</p>
-                <p className="text-gray-600">1-800-ELEVATE</p>
-                <p className="text-sm text-gray-500">Mon-Fri 8am-6pm</p>
-              </div>
+      {/* Video Hero */}
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+        <ProgramHeroBanner videoSrc="/videos/student-portal-hero.mp4" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <p className="text-sm uppercase tracking-wider text-white/70 mb-3">Elevate for Humanity</p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 max-w-3xl">
+              Student Support Services
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mb-8">
+              Academic help, financial aid, career services, and counseling — everything you need to succeed from enrollment through employment.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/apply"
+                className="inline-flex items-center justify-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
+              >
+                Apply Now
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/student-support/schedule"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
+              >
+                Schedule Appointment
+              </Link>
             </div>
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <MessageSquare className="w-8 h-8 text-brand-green-600" />
-              <div>
-                <p className="font-medium text-gray-900">Live Chat</p>
-                <p className="text-gray-600">Available 24/7</p>
-                <Link href="/support/chat" className="text-sm text-brand-green-600 hover:underline">Start Chat</Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <Calendar className="w-8 h-8 text-brand-green-600" />
-              <div>
-                <p className="font-medium text-gray-900">Schedule Meeting</p>
-                <p className="text-gray-600">Book an appointment</p>
-                <Link href="/student-support/schedule" className="text-sm text-brand-green-600 hover:underline">Book Now</Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
-            >
-              Apply Now
-            </Link>
-            <a
-              href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
-            >
-              <Phone className="w-4 h-4" />
-              Get Help Online
-            </a>
           </div>
         </div>
       </section>
-      </div>
+
+      {/* Services — Image Cards */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">How We Support You</h2>
+            <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+              From your first day in class to your first day on the job — and beyond.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((service) => (
+              <div key={service.title} className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition">
+                <div className="relative h-44">
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-4">
+                    <h3 className="text-lg font-bold text-white">{service.title}</h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-gray-600 text-sm mb-4">{service.description}</p>
+                  <Link
+                    href={service.link}
+                    className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
+                  >
+                    Learn More <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Support */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">Contact Support</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-gray-50 rounded-xl p-6 text-center">
+              <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-gray-900 mb-1">Phone Support</h3>
+              <a href="tel:+13173143757" className="text-brand-green-600 font-semibold hover:underline">(317) 314-3757</a>
+              <p className="text-sm text-gray-500 mt-1">Mon–Fri 8am–6pm EST</p>
+              <Link
+                href="tel:+13173143757"
+                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
+              >
+                Call Now
+              </Link>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6 text-center">
+              <MessageSquare className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-gray-900 mb-1">Live Chat</h3>
+              <p className="text-gray-600">Available 24/7</p>
+              <p className="text-sm text-gray-500 mt-1">Average response: under 2 minutes</p>
+              <Link
+                href="/support/chat"
+                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
+              >
+                Start Chat
+              </Link>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6 text-center">
+              <Calendar className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
+              <h3 className="font-bold text-gray-900 mb-1">Schedule Meeting</h3>
+              <p className="text-gray-600">Book a one-on-one</p>
+              <p className="text-sm text-gray-500 mt-1">In-person or virtual available</p>
+              <Link
+                href="/student-support/schedule"
+                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
+              >
+                Book Now
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative py-20 overflow-hidden">
+        <Image
+          src="/images/heroes-hq/success-hero.jpg"
+          alt="Students succeeding in workforce training"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-brand-green-700/90" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Start Your Career?</h2>
+          <p className="text-brand-green-100 text-lg mb-8">Check your eligibility for funded career training programs. Most students pay $0 out of pocket.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+            >
+              Apply Now <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/programs"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
+            >
+              Browse Programs
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

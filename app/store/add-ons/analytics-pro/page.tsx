@@ -161,25 +161,51 @@ export default function AnalyticsProPage() {
 
       {/* Pricing */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-slate-100 rounded-2xl p-8 md:p-12 text-slate-900 text-center">
-            <h2 className="text-3xl font-bold mb-4">Enterprise Pricing</h2>
-            <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-              Analytics Pro is available as an add-on to Enterprise licenses. 
-              Pricing is based on organization size and data volume.
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Pricing</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              One-time purchase. Lifetime access. No recurring fees.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+          </div>
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="bg-white rounded-2xl border-2 border-indigo-600 p-8 relative">
+              <div className="absolute -top-3 left-6 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">BEST VALUE</div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">One-Time Payment</h3>
+              <div className="text-4xl font-black text-indigo-600 mb-1">$1,497</div>
+              <p className="text-sm text-slate-500 mb-6">Pay once, own it forever</p>
+              <ul className="space-y-3 mb-8">
+                {['Lifetime access — no recurring fees', 'Real-time dashboards', 'Predictive analytics', 'Custom report builder', 'Cohort analysis', 'Free updates for 12 months'].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-indigo-500 font-bold mt-0.5">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
               <Link
-                href="/contact?product=analytics-pro"
-                className="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
+                href="/store/add-ons/analytics-pro/checkout"
+                className="block w-full text-center bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition"
               >
-                Request Pricing
+                Purchase Now — $1,497
               </Link>
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200 p-8">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">4 Monthly Payments</h3>
+              <div className="text-4xl font-black text-slate-900 mb-1">$424<span className="text-lg font-medium text-slate-500">/mo</span></div>
+              <p className="text-sm text-slate-500 mb-6">4 payments of $424 ($1,696 total)</p>
+              <ul className="space-y-3 mb-8">
+                {['Same lifetime access', 'Real-time dashboards', 'Predictive analytics', 'Custom report builder', 'Cohort analysis', 'Free updates for 12 months'].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-slate-400 font-bold mt-0.5">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
               <Link
-                href="/store/add-ons"
-                className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                href="/store/add-ons/analytics-pro/checkout?plan=monthly"
+                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition"
               >
-                View All Add-Ons
+                Start Monthly Plan — $424/mo
               </Link>
             </div>
           </div>
@@ -187,19 +213,27 @@ export default function AnalyticsProPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-indigo-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Improve Your Data?</h2>
-          <p className="text-xl text-slate-700 mb-8">
-            Schedule a demo to see Analytics Pro in action with your own data.
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Unlock Your Data?</h2>
+          <p className="text-xl text-indigo-100 mb-8">
+            Purchase Analytics Pro today or schedule a demo to see it in action.
           </p>
-          <Link
-            href="/contact?product=analytics-pro&demo=true"
-            className="inline-flex items-center gap-2 bg-indigo-600 text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
-          >
-            Schedule Demo
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/store/add-ons/analytics-pro/checkout"
+              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+            >
+              Purchase Now — $1,497
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/contact?product=analytics-pro"
+              className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition"
+            >
+              Talk to Sales
+            </Link>
+          </div>
         </div>
       </section>
     </div>

@@ -20,7 +20,7 @@ export default function OJTAndFundingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image src="/images/homepage/earn-while-you-learn.png" alt="Earn while you learn" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">

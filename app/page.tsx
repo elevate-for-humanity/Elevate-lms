@@ -25,7 +25,7 @@ export default function HomePage() {
       </div>
 
       {/* ===== HERO VIDEO ===== */}
-      <section className="relative h-[50vh] min-h-[320px] max-h-[500px]">
+      <section className="relative h-[65vh] min-h-[400px] max-h-[720px]">
         <HomeHeroVideo />
       </section>
 
@@ -292,9 +292,7 @@ export default function HomePage() {
                   { title: 'Self-service enrollment', desc: 'Apply online in 5 minutes. No appointments, no waiting rooms, no paperwork mailed in.' },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center mt-0.5">
-                      <span className="text-brand-green-600 text-xs font-bold">✓</span>
-                    </span>
+                    <span className="flex-shrink-0 w-1.5 h-1.5 bg-slate-900 rounded-full mt-2.5" />
                     <div>
                       <p className="font-bold text-slate-900">{item.title}</p>
                       <p className="text-slate-500 text-sm">{item.desc}</p>

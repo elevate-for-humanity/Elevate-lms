@@ -27,7 +27,7 @@ const config: ProgramPageConfig = {
   duration: '12–18 months', cost: '$4,890 (payment plans available)', format: 'In-shop OJT + classroom, Indianapolis', credential: 'Indiana Barber License',
   overview: 'This DOL-registered apprenticeship combines 2,000 hours of on-the-job training in licensed barbershops with structured classroom instruction. You will learn haircutting, fading, beard grooming, razor work, sanitation, and business skills. The program aligns with Indiana Professional Licensing Agency requirements for the Registered Barber License exam.',
   highlights: ['2,000 hours of paid on-the-job training', 'Training in licensed barbershops with real clients', 'Haircutting, fading, beard grooming, razor work', 'Sanitation and infection control certification', 'Indiana Barber License exam preparation', 'Business skills for independent barbering'],
-  overviewImage: '/images/programs-fresh/barber.jpg', overviewImageAlt: 'Barber apprentice cutting hair in a barbershop',
+  overviewImage: '/images/programs-hq/barber-training.jpg', overviewImageAlt: 'Barber apprentice cutting hair in a barbershop',
   salaryNumber: 45000, salaryLabel: 'Average annual salary for barbers in Indiana (BLS)', salaryPrefix: '$',
   curriculum: [
     { title: 'Haircutting', topics: ['Clipper techniques and fading', 'Scissor cutting and texturizing', 'Taper and blend techniques', 'Line-ups and edge work', 'Style consultation'] },
@@ -61,5 +61,5 @@ const config: ProgramPageConfig = {
 import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'barber-apprenticeship', name: config.title, slug: 'barber-apprenticeship', description: config.subtitle, duration_weeks: 65, price: 4890, image_url: `${SITE_URL}/images/programs-fresh/barber.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
+  return (<><ProgramStructuredData program={{ id: 'barber-apprenticeship', name: config.title, slug: 'barber-apprenticeship', description: config.subtitle, duration_weeks: 65, price: 4890, image_url: `${SITE_URL}/images/programs-hq/barber-training.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
 }

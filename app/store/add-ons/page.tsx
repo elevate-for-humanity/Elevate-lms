@@ -5,18 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Users, 
-  Puzzle, 
   ArrowRight, 
   Zap, 
-  MessageSquare, 
   Trophy, 
-  Calendar, 
-  Star,
-  Shield,
-  BarChart3,
   Play,
-CheckCircle, } from 'lucide-react';
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 import { createBrowserClient } from '@supabase/ssr';
 const addOns = [
@@ -45,20 +40,22 @@ const addOns = [
   },
 ];
 
-const comingSoon = [
+const moreAddOns = [
   {
     id: 'analytics-pro',
     title: 'Analytics Pro',
-    description: 'Advanced reporting and predictive analytics for student outcomes. Includes custom dashboards and data exports.',
+    description: 'Advanced reporting and predictive analytics for student outcomes. Real-time dashboards, custom reports, and cohort analysis.',
     href: '/store/add-ons/analytics-pro',
-    icon: BarChart3,
+    price: '$1,497',
+    image: '/images/programs-hq/technology-hero.jpg',
   },
   {
     id: 'compliance-automation',
     title: 'Compliance Automation',
-    description: 'Automated compliance tracking and reporting for WIOA, grants, and accreditation requirements.',
+    description: 'Automated compliance tracking and reporting for WIOA, grants, FERPA, and accreditation requirements.',
     href: '/store/add-ons/compliance-automation',
-    icon: Shield,
+    price: '$1,297',
+    image: '/images/heroes-hq/funding-hero.jpg',
   },
 ];
 
@@ -84,16 +81,33 @@ export default function AddOnsPage() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes/resource-5.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Platform Add-Ons</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Extend your workforce operating system with powerful features. One-time purchase, lifetime access, no recurring fees.</p>
+      {/* Video Hero */}
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+        <ProgramHeroBanner videoSrc="/videos/store-marketplace.mp4" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <p className="text-sm uppercase tracking-wider text-white/70 mb-3">Elevate Platform</p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 max-w-3xl">
+              Platform Add-Ons
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mb-8">
+              Extend your workforce operating system with powerful features. One-time purchase, lifetime access, no recurring fees.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="#add-ons"
+                className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700 transition"
+              >
+                Browse Add-Ons
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
+              >
+                Talk to Sales
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -184,17 +198,17 @@ export default function AddOnsPage() {
 
                   <div className="flex flex-wrap gap-4">
                     <Link
-                      href={addon.href}
+                      href={`${addon.href}/checkout`}
                       className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
                     >
-                      View Details
+                      Purchase Now
                       <ArrowRight className="w-5 h-5" />
                     </Link>
                     <Link
-                      href={`${addon.href}/checkout`}
+                      href={addon.href}
                       className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
                     >
-                      Purchase Now
+                      View Details
                     </Link>
                   </div>
                 </div>
@@ -213,43 +227,67 @@ export default function AddOnsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {comingSoon.map((item) => (
-              <Link 
+            {moreAddOns.map((item) => (
+              <div 
                 key={item.id} 
-                href={item.href}
-                className="group bg-white rounded-xl p-8 border border-slate-200 shadow-sm hover:shadow-lg transition-all"
+                className="group bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-blue-200 transition-colors">
-                  <item.icon className="w-6 h-6 text-brand-blue-600" />
+                <div className="relative h-44">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-4">
+                    <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">{item.title}</h3>
-                <p className="text-slate-600 mb-4">{item.description}</p>
-                <span className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold">
-                  Learn More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
+                <div className="p-6">
+                  <p className="text-slate-600 mb-4">{item.description}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-black text-slate-900">{item.price}</div>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`${item.href}/checkout`}
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition"
+                      >
+                        Purchase Now <ArrowRight className="w-4 h-4" />
+                      </Link>
+                      <Link
+                        href={item.href}
+                        className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-50 transition"
+                      >
+                        Details
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Need a Custom Add-On?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Need a Custom Add-On?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
             We build custom features for enterprise clients. Tell us what you need.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Contact Sales
             </Link>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
               Back to Store
             </Link>

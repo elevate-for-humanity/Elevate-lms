@@ -11,7 +11,7 @@ export function BarberHero() {
       <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" voiceoverSrc="/audio/heroes/barber.mp3" />
 
       {/* Hero Image — no text overlay */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image
           src="/images/barber-hero-new.webp"
           alt="Barber apprentice cutting hair in a licensed barbershop"

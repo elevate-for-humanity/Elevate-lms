@@ -30,7 +30,7 @@ export default function PageHero({ title, description, forceHero }: PageHeroProp
   const priority = shouldPrioritizeHero(pathname);
 
   return (
-    <section className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
+    <section className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
       {isVideo ? (
         <video
           autoPlay

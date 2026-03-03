@@ -406,7 +406,7 @@ export default async function CashAdvancesAdminPage() {
                   </li>
                 </ul>
               </div>
-              <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   priority
                   src="/images/programs-hq/business-office.jpg"

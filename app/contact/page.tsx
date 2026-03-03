@@ -74,7 +74,7 @@ export default function ContactPage() {
       </div>
 
       {/* Hero */}
-      <div className="relative h-[35vh] sm:h-[40vh] min-h-[250px] sm:min-h-[300px] flex items-center justify-center">
+      <div className="relative h-[60vh] min-h-[400px] max-h-[720px] flex items-center justify-center">
         <Image
           src="/images/heroes-hq/contact-hero.jpg"
           alt="Contact Us"

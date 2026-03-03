@@ -131,7 +131,7 @@ export default async function ServicesPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Services" }]} />
       </div>
 {/* Hero */}
-      <section className="relative h-[400px] md:h-[500px] w-full overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
         <Image alt="Tax preparation services" 
           src="/images/homepage/wraparound-support.jpg" 
           alt="Professional Tax Services" 

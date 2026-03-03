@@ -70,7 +70,7 @@ export default function HeroBanner({
 
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden rounded-3xl">
-      <div className="relative h-[300px] md:h-[400px] w-full">
+      <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full">
         {type === 'video' ? (
           <>
             <video

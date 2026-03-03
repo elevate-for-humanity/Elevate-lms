@@ -116,7 +116,7 @@ export function QualityHero({
           </div>
 
           {/* Image */}
-          <div className="relative h-[400px] md:h-[500px] rounded-lg overflow-hidden shadow-xl">
+          <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-lg overflow-hidden shadow-xl">
             <Image
               src={imageSrc}
               alt={imageAlt}

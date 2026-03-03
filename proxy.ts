@@ -2,7 +2,13 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// LMS domain - routes to /student-portal paths
+// Education domain - landing page at /education, sub-routes pass through
+const EDUCATION_DOMAIN = 'elevateforhumanityeducation.com';
+
+// Connects domain - landing page at /connects, sub-routes pass through
+const CONNECTS_DOMAIN = 'elevateconnects.org';
+
+// LMS domain (legacy alias — now uses EDUCATION_DOMAIN)
 const LMS_DOMAIN = 'elevateforhumanityeducation.com';
 
 // Supersonic Fast Cash domain - routes to /supersonic-fast-cash paths
@@ -257,40 +263,22 @@ export async function proxy(request: NextRequest) {
   // DOMAIN-BASED ROUTING
   // ============================================
 
-  // LMS domain routing (elevateforhumanityeducation.com -> /student-portal)
-  if (host.includes(LMS_DOMAIN)) {
-    // Skip for static files and API routes
-    if (
-      pathname.startsWith('/_next') ||
-      pathname.startsWith('/api') ||
-      pathname.includes('.')
-    ) {
-      return NextResponse.next();
+  // Education domain routing (elevateforhumanityeducation.com)
+  // Root -> /education landing page; all other routes pass through to the full site
+  if (host.includes(EDUCATION_DOMAIN)) {
+    if (pathname === '/' || pathname === '') {
+      return NextResponse.rewrite(new URL('/education', request.url));
     }
+    return NextResponse.next();
+  }
 
-    // Root of LMS domain -> student portal
-    if (pathname === '/') {
-      return NextResponse.rewrite(new URL('/student-portal', request.url));
+  // Connects domain routing (elevateconnects.org)
+  // Root -> /connects landing page; all other routes pass through to the full site
+  if (host.includes(CONNECTS_DOMAIN)) {
+    if (pathname === '/' || pathname === '') {
+      return NextResponse.rewrite(new URL('/connects', request.url));
     }
-
-    // Already on /student-portal path, allow through
-    if (pathname.startsWith('/student-portal')) {
-      return NextResponse.next();
-    }
-
-    // Login/auth pages - allow through
-    if (pathname === '/login' || pathname === '/signup' || pathname === '/unauthorized') {
-      return NextResponse.next();
-    }
-
-    // Common student routes - rewrite to /student-portal/*
-    const studentRoutes = ['/my-courses', '/my-progress', '/courses', '/programs', '/certificates', '/settings'];
-    if (studentRoutes.some(route => pathname.startsWith(route))) {
-      return NextResponse.rewrite(new URL(`/student-portal${pathname}`, request.url));
-    }
-
-    // Default: rewrite to /student-portal/*
-    return NextResponse.rewrite(new URL(`/student-portal${pathname}`, request.url));
+    return NextResponse.next();
   }
 
   // Supersonic Fast Cash domain routing (supersonicfastermoney.com -> /supersonic-fast-cash)

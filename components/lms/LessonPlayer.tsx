@@ -263,6 +263,7 @@ export default function LessonPlayer({
             ref={videoRef}
             preload="metadata"
             playsInline
+            crossOrigin="anonymous"
             className="absolute inset-0 h-full w-full object-contain bg-black"
             onClick={togglePlay}
           >

@@ -69,7 +69,7 @@ export default async function OrientationPage() {
             <ProgramOrientationVideo
               title="Welcome to Elevate for Humanity"
               description="Learn about our programs, what to expect, and how to succeed in your training journey."
-              videoUrl="/videos/programs-overview-video-with-narration.mp4"
+              videoUrl="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-60sec.mp4"
               onComplete={async () => {
                 'use server';
                 const supabase = await createClient();

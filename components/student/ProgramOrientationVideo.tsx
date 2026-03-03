@@ -17,7 +17,7 @@ interface ProgramOrientationVideoProps {
 
 export default function ProgramOrientationVideo({
   onComplete,
-  videoUrl = '/videos/programs-overview-video-with-narration.mp4',
+  videoUrl = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-60sec.mp4',
   title = 'Program Orientation',
   description = 'Watch this orientation video to learn about our programs, what to expect, and how to succeed.',
   programId,
@@ -136,6 +136,8 @@ export default function ProgramOrientationVideo({
                 controls
                 autoPlay
                 playsInline
+                crossOrigin="anonymous"
+                preload="auto"
                 onEnded={handleVideoEnd}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}

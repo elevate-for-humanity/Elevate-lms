@@ -8,11 +8,11 @@ const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Training | EPA 608 Certified | Indianapolis',
-  description: '15-week HVAC program. EPA 608, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA.',
+  description: '12-week HVAC program. EPA 608 Universal, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA and Next Level Jobs.',
   alternates: { canonical: `${SITE_URL}/programs/hvac-technician` },
   openGraph: {
     title: 'HVAC Technician Training | EPA 608 Certified | Indianapolis',
-    description: '15-week HVAC program. EPA 608, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA.',
+    description: '12-week HVAC program. EPA 608 Universal, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA and Next Level Jobs.',
     url: `${SITE_URL}/programs/hvac-technician`,
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'HVAC Technician Training | EPA 608 Certified | Indianapolis' }],
@@ -21,63 +21,250 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/hvac-technician.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-  title: 'HVAC Technician', subtitle: 'Install, maintain, and repair heating and cooling systems. Prepare for EPA 608 Universal and OSHA 30 certification in 15 weeks.',
-  badge: 'Funding Available', badgeColor: 'orange',
-  duration: '15 weeks', cost: '$0 with WIOA funding', format: 'Hybrid — In-person + LMS', credential: 'EPA 608 Universal + OSHA 30',
+  videoSrc: '/videos/hvac-technician.mp4',
+  voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
+  title: 'HVAC Technician',
+  subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal, OSHA 30, and CPR/AED certifications in 12 weeks.',
+  badge: 'Funding Available',
+  badgeColor: 'orange',
+  duration: '12 weeks',
+  cost: '$0 with WIOA funding',
+  format: 'Hybrid — Online RTI + Employer OJT',
+  credential: 'EPA 608 Universal + OSHA 30 + CPR/AED',
 
-  // Program details
-  totalHours: 300,
+  totalHours: 240,
   schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults. Contact us for schedule options.',
   cohortSize: '10–15 participants per cohort',
-  admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior HVAC experience required'],
-  modality: 'Hybrid — In-person hands-on labs, LMS-supported theory, live instructor sessions',
+  admissionRequirements: [
+    '18 years or older',
+    'High school diploma or GED (or actively pursuing)',
+    'Able to lift 50 lbs',
+    'No prior HVAC experience required',
+  ],
+  modality: 'Hybrid — Online Related Technical Instruction via LMS, hands-on labs at training facility, On-the-Job Training at employer sites',
   facilityInfo: 'Elevate training center, Indianapolis',
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available. LMS supports Spanish language accessibility.',
   nextLevelJobsEligible: true,
-  employerPartners: ['2 HVAC employer partners (onboarding)', 'Jesse J. Wilkerson & Associates — Construction'],
+  employerPartners: [
+    '2 HVAC employer partners (onboarding)',
+    'Jesse J. Wilkerson & Associates — Construction',
+  ],
   selfPayCost: '$5,000',
   cohortPricing: 'Contact us for organizational/cohort pricing',
-  pricingIncludes: ['300 instructional hours', 'EPA 608 Universal exam fee (ESCO or Mainstream Engineering)', 'OSHA 30-Hour certification', 'CPR/First Aid certification', 'All PPE, tools, and materials', 'LMS access', 'Career placement support'],
-  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
-  overview: 'This 15-week program covers residential and light commercial HVAC systems. You will learn refrigeration theory, electrical fundamentals, system installation, troubleshooting, and preventive maintenance. Training includes hands-on work with real HVAC equipment. The program includes EPA 608 Universal exam preparation and on-site proctored exam administration through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Graduates also complete OSHA 30 and additional industry credentials.',
-  highlights: ['Refrigeration theory and the refrigeration cycle', 'Electrical fundamentals for HVAC', 'System installation and startup', 'Troubleshooting and diagnostics', 'EPA 608 Universal exam prep + on-site proctored exam', 'OSHA 30-Hour Construction Safety'],
-  overviewImage: '/images/programs-fresh/hvac.jpg', overviewImageAlt: 'HVAC technician servicing an air conditioning unit',
-  salaryNumber: 52000, salaryLabel: 'Average annual salary for HVAC technicians in Indiana (BLS)', salaryPrefix: '$',
-  curriculum: [
-    { title: 'Refrigeration Theory', topics: ['Refrigeration cycle', 'Pressure-temperature relationships', 'Refrigerant types and handling', 'Superheat and subcooling', 'System charging'] },
-    { title: 'Electrical Fundamentals', topics: ['Ohm\'s Law for HVAC', 'Wiring diagrams', 'Contactors and relays', 'Capacitors and motors', 'Thermostat wiring'] },
-    { title: 'Heating Systems', topics: ['Gas furnace operation', 'Ignition systems', 'Heat exchangers', 'Combustion analysis', 'Heat pump operation'] },
-    { title: 'Cooling Systems', topics: ['Split system components', 'Compressor types', 'Evaporator and condenser coils', 'Metering devices', 'Ductwork basics'] },
-    { title: 'Troubleshooting', topics: ['Systematic diagnosis', 'Electrical testing', 'Refrigerant leak detection', 'Airflow measurement', 'Customer communication'] },
-    { title: 'Certifications', topics: ['EPA 608 Universal exam', 'OSHA 30-Hour certification', 'CPR/First Aid', 'Rise Up certification', 'Career placement support'] },
+  pricingIncludes: [
+    '240 instructional hours (12 weeks)',
+    'EPA 608 Universal exam fee (ESCO or Mainstream Engineering)',
+    'OSHA 30-Hour Construction Safety certification',
+    'CPR/First Aid/AED certification',
+    'All PPE, tools, and materials',
+    'LMS access for full program duration',
+    'Career placement support and resume assistance',
   ],
-  credentials: ['EPA 608 Universal (administered on-site via ESCO Institute or Mainstream Engineering)', 'OSHA 30-Hour Construction Safety (DOL card)', 'Residential HVAC Certification 1 & 2', 'CPR/First Aid (AHA/HSI issued)', 'Rise Up (NRF Foundation)'],
+  paymentTerms: 'WIOA, Next Level Jobs, and Workforce Ready Grant funding accepted. Payment plans available for self-pay students.',
+
+  overview: 'This 12-week program covers residential and light commercial HVAC systems through a structured workforce pathway. Weeks 1–5 build foundational knowledge: HVAC fundamentals, electrical basics, heating systems, and cooling/refrigeration. Weeks 6–8 focus on EPA 608 certification prep across all four sections (Core, Type I, Type II, Type III) with timed practice exams. Weeks 9–11 cover advanced diagnostics, installation, troubleshooting, and OSHA 30. Week 12 includes the proctored EPA 608 Universal exam, CPR/AED certification, and career placement. Every module has measurable competency standards — superheat within ±2°F, evacuation to 500 microns, fault diagnosis within 30 minutes.',
+  highlights: [
+    'Week 1–2: HVAC fundamentals, tools, safety, and the refrigeration cycle',
+    'Week 3–4: Electrical basics, heating systems, and heat pump operation',
+    'Week 5: Cooling systems — superheat, subcooling, and PT chart mastery',
+    'Week 6: EPA 608 Core — ozone, Clean Air Act, recovery/recycling/reclamation',
+    'Week 7: EPA 608 Type I (small appliances) + Type II (high-pressure systems)',
+    'Week 8: EPA 608 Type III (low-pressure) + Universal exam prep (100 questions)',
+    'Week 9–10: Refrigerant charging, diagnostics, ductwork, and installation',
+    'Week 11: Systematic troubleshooting + OSHA 30-Hour Construction Safety',
+    'Week 12: Proctored EPA 608 exam, CPR/AED, resume, and mock interviews',
+  ],
+  overviewImage: '/images/programs-fresh/hvac.jpg',
+  overviewImageAlt: 'HVAC technician servicing an air conditioning unit',
+  salaryNumber: 52000,
+  salaryLabel: 'Average annual salary for HVAC technicians in Indiana (BLS)',
+  salaryPrefix: '$',
+
+  curriculum: [
+    {
+      title: 'Week 1–2: Foundations',
+      topics: [
+        'Program orientation and workforce readiness',
+        'How HVAC systems work — heating, cooling, ventilation',
+        'HVAC tools and equipment identification (10/10 practical)',
+        'PPE and shop safety — LOTO per OSHA 1910.147',
+        'System components identification lab',
+      ],
+    },
+    {
+      title: 'Week 3: Electrical Basics',
+      topics: [
+        'Voltage, current, resistance, and Ohm\'s Law',
+        'Reading wiring diagrams and schematics',
+        'Multimeter operation and electrical testing (±5% accuracy)',
+        'Capacitors, contactors, and relays',
+      ],
+    },
+    {
+      title: 'Week 4: Heating Systems',
+      topics: [
+        'Gas furnace operation and ignition systems',
+        'Electric heat and heat strips',
+        'Heat pump heating mode and reversing valve',
+        'Combustion analysis — CO below 100 ppm',
+        'Temperature rise measurement (±5°F of nameplate)',
+      ],
+    },
+    {
+      title: 'Week 5: Cooling & Refrigeration',
+      topics: [
+        'The refrigeration cycle — 4 stages',
+        'Pressure-temperature relationship and PT charts (5-second lookup)',
+        'Superheat and subcooling measurement (±2°F)',
+        'Compressor types and metering devices',
+      ],
+    },
+    {
+      title: 'Week 6: EPA 608 Core',
+      topics: [
+        'Ozone layer and environmental impact',
+        'Clean Air Act Section 608 regulations and fines',
+        'Refrigerant safety and cylinder handling',
+        'Refrigerant types: CFC, HCFC, HFC, HFO — classify 10 by ODP',
+        'Recovery, recycling, and reclamation definitions',
+        '25-question Core practice exam (85% to pass)',
+      ],
+    },
+    {
+      title: 'Week 7: EPA 608 Type I & II',
+      topics: [
+        'Small appliance systems (Type I) — <5 lbs refrigerant',
+        'Recovery requirements: 90%/80%/0% by date and type',
+        'High-pressure systems (Type II) — R-410A, R-22, R-134a',
+        'Evacuation to 500 microns',
+        'Leak detection methods — electronic, UV dye, soap bubbles',
+        'Leak repair timelines (10%/20% triggers)',
+      ],
+    },
+    {
+      title: 'Week 8: EPA 608 Type III & Universal Prep',
+      topics: [
+        'Low-pressure systems and centrifugal chillers',
+        'Purge units and vacuum operation',
+        'Type III recovery: 0 psig <200 lbs, 25 mm Hg absolute ≥200 lbs',
+        '100-question Universal practice exam (70% per section)',
+        'Section comparison charts and weak-area review',
+      ],
+    },
+    {
+      title: 'Week 9–10: Advanced Skills',
+      topics: [
+        'Refrigerant charging: subcooling and superheat methods (±2°F)',
+        'System diagnostics with manifold gauges — 4/4 fault diagnoses',
+        'Ductwork design and static pressure (±0.02 in. w.c.)',
+        'Equipment sizing (Manual J basics)',
+        'Brazing and line set installation — passes 150 psi nitrogen test',
+      ],
+    },
+    {
+      title: 'Week 11: Troubleshooting & OSHA',
+      topics: [
+        'Systematic troubleshooting method (6 steps)',
+        'Common AC failures: bad capacitor, frozen coil, low charge',
+        'Common heating failures: ignition, heat exchanger, gas valve',
+        '3 faults diagnosed in 30 minutes each',
+        'OSHA 30-Hour Construction Safety certification',
+        'Fall protection, electrical safety, HazCom, confined spaces',
+      ],
+    },
+    {
+      title: 'Week 12: Certification & Placement',
+      topics: [
+        'Proctored EPA 608 Universal exam (ESCO/Mainstream Engineering)',
+        'CPR/First Aid/AED certification',
+        'Resume building and portfolio preparation',
+        'Mock interviews for HVAC positions',
+        'Employer introductions and placement support',
+      ],
+    },
+  ],
+
+  credentials: [
+    'EPA 608 Universal — proctored on-site via ESCO Institute or Mainstream Engineering',
+    'OSHA 30-Hour Construction Safety (DOL card)',
+    'CPR/First Aid/AED (nationally accredited provider)',
+    'Residential HVAC Certification 1 & 2',
+    'Rise Up Retail Industry Fundamentals (NRF Foundation)',
+  ],
+
   careers: [
     { title: 'HVAC Technician', salary: '$42,000–$62,000' },
     { title: 'HVAC Installer', salary: '$38,000–$55,000' },
     { title: 'Maintenance Technician', salary: '$40,000–$58,000' },
+    { title: 'Refrigeration Technician', salary: '$45,000–$65,000' },
     { title: 'HVAC Service Manager', salary: '$55,000–$80,000' },
   ],
+
   steps: [
     { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },
-    { title: 'Check Funding', desc: 'Register at Indiana Career Connect for WIOA eligibility.' },
-    { title: 'Attend Orientation', desc: 'Tour the HVAC shop and meet your instructor.' },
-    { title: 'Start Training', desc: 'Begin 15 weeks of hands-on HVAC training.' },
+    { title: 'Check Funding', desc: 'Register at Indiana Career Connect for WIOA/Next Level Jobs eligibility.' },
+    { title: 'Attend Orientation', desc: 'Tour the training facility and meet your instructor.' },
+    { title: 'Start Training', desc: 'Begin 12 weeks of structured HVAC training with certification exams included.' },
   ],
+
   faqs: [
-    { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
-    { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, tools, and certification fees. If you do not qualify, payment plans are available.' },
-    { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who handles refrigerants. The Universal level covers all equipment types. Elevate administers the proctored exam on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Certification is issued by the certifying organization, not by Elevate. Retest policies vary by provider.' },
+    {
+      question: 'Do I need HVAC experience?',
+      answer: 'No. This program starts from the basics. Week 1 covers orientation, tools, and safety. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.',
+    },
+    {
+      question: 'Is this program free?',
+      answer: 'Yes, for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant funding covers tuition, tools, certification exam fees, and materials. If you do not qualify for funding, self-pay is $5,000 with payment plans available.',
+    },
+    {
+      question: 'What is EPA 608?',
+      answer: 'EPA Section 608 is a federal certification required by law for anyone who purchases or handles refrigerants. The Universal level covers all equipment types (small appliances, high-pressure, and low-pressure). Elevate administers the proctored exam on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). The exam has 80 questions across 4 sections — you need 70% on each section to pass.',
+    },
+    {
+      question: 'What certifications will I earn?',
+      answer: 'EPA 608 Universal, OSHA 30-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included in the program.',
+    },
+    {
+      question: 'How is the program structured?',
+      answer: 'The 12-week program uses a hybrid model: Related Technical Instruction is delivered online through our LMS with video lessons, reading materials, and practice quizzes. Hands-on labs are completed at the training facility with instructor supervision. On-the-Job Training occurs at employer partner sites.',
+    },
+    {
+      question: 'What happens after I graduate?',
+      answer: 'Our career services team helps with resume building, mock interviews, and direct introductions to HVAC employer partners. The median salary for HVAC technicians in Indiana is $52,000/year, with experienced technicians earning $65,000+.',
+    },
   ],
+
   applyHref: '/apply?program=hvac-technician',
-  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'HVAC Technician' }],
+  breadcrumbs: [
+    { label: 'Programs', href: '/programs' },
+    { label: 'Skilled Trades', href: '/programs/skilled-trades' },
+    { label: 'HVAC Technician' },
+  ],
 };
 
 import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'hvac-technician', name: config.title, slug: 'hvac-technician', description: config.subtitle, duration_weeks: 15, price: 0, image_url: `${SITE_URL}/images/programs-fresh/hvac.jpg`, category: 'Skilled Trades', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
+  return (
+    <>
+      <ProgramStructuredData
+        program={{
+          id: 'hvac-technician',
+          name: config.title,
+          slug: 'hvac-technician',
+          description: config.subtitle,
+          duration_weeks: 12,
+          price: 0,
+          image_url: `${SITE_URL}/images/programs-fresh/hvac.jpg`,
+          category: 'Skilled Trades',
+          outcomes: config.credentials || [],
+        }}
+      />
+      <ProgramPageLayout config={config}>
+        <SponsorDisclosure />
+      </ProgramPageLayout>
+    </>
+  );
 }

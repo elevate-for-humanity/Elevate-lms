@@ -272,7 +272,7 @@ export default async function CourseDetailPage({
               Course Curriculum
             </h2>
             <p className="text-slate-500 mb-8">
-              15-week program &middot; {lessons?.length || 0} lessons &middot; EPA 608 Universal + OSHA 30 + CPR
+              12-week program &middot; {lessons?.length || 0} lessons &middot; EPA 608 Universal + OSHA 30 + CPR
             </p>
 
             <div className="space-y-3">

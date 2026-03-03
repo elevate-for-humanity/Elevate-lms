@@ -253,8 +253,8 @@ export default async function ProgramsPage() {
                 slug: 'hvac-technician',
                 href: '/programs/hvac-technician',
                 programId: '#10004322',
-                duration: '15 weeks',
-                cost: '$5,000',
+                duration: '12 weeks',
+                cost: '$0 with WIOA funding',
                 credentials: [
                   { name: 'Residential HVAC Certification 1', partner: 'Industry Certification Body' },
                   { name: 'Residential HVAC Certification 2 — Refrigeration Diagnostics', partner: 'Industry Certification Body' },

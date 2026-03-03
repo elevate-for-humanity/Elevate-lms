@@ -78,7 +78,7 @@ ${lesson.durationMinutes ? `This lesson is approximately ${lesson.durationMinute
 
 The full AI-generated lecture for this lesson is being prepared and will be available shortly. In the meantime, review the lesson materials and feel free to ask the AI tutor any questions you have.
 
-Remember, this is part of your 15-week HVAC Technician program at Elevate for Humanity. Stay focused, take notes, and don't hesitate to reach out if you need help.
+Remember, this is part of your 12-week HVAC Technician program at Elevate for Humanity. Stay focused, take notes, and don't hesitate to reach out if you need help.
 
 Let's get to work.`.trim();
 }

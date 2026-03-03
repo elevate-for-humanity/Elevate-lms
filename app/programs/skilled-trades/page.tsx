@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: 'HVAC Technician', duration: '15 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/programs-fresh/hvac.jpg' },
+  { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/programs-fresh/hvac.jpg' },
   { title: 'Electrical Technician', duration: '12 weeks', salary: '$60,240', href: '/programs/electrical', image: '/images/programs-fresh/electrical.jpg' },
   { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/programs-fresh/welding.jpg' },
   { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/programs-fresh/plumbing.jpg' },
@@ -36,7 +36,7 @@ const config: ProgramPageConfig = {
   videoSrc: '/videos/electrician-trades.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
   title: 'Skilled Trades', subtitle: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel. Hands-on training with real job placement.',
   badge: 'Funding Available', badgeColor: 'orange',
-  duration: '3–15 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'OSHA + Industry Certifications',
+  duration: '3–12 weeks', cost: '$0 with WIOA funding', format: 'Hybrid — Online + In-person, Indianapolis', credential: 'OSHA + Industry Certifications',
   overview: 'Our skilled trades programs prepare you for high-demand careers in construction, manufacturing, and transportation. Every program includes hands-on training with real tools and equipment, industry-recognized certifications, and job placement assistance. Most programs are free for eligible participants through WIOA funding.',
   highlights: ['Hands-on training from day one', 'OSHA safety certifications included', 'Industry-recognized credentials', 'Job placement with employer partners', 'Free for eligible participants through WIOA', 'Apprenticeship pathways available'],
   overviewImage: '/images/programs-hq/skilled-trades-hero.jpg', overviewImageAlt: 'Skilled trades students in a workshop',

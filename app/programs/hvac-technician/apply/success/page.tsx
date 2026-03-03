@@ -33,7 +33,7 @@ export default function HvacApplicationSuccessPage() {
               {[
                 'We review your application and funding eligibility within 2 business days',
                 'You\'ll receive an email with your enrollment status and next steps',
-                'If approved, you\'ll complete orientation and start your 15-week program',
+                'If approved, you\'ll complete orientation and start your 12-week program',
                 'Our team is available to answer questions at any time',
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">

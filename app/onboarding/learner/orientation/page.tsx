@@ -39,7 +39,7 @@ export default async function OrientationPage() {
 
   const sections = [
     { title: 'Program Overview', icon: BookOpen, items: [
-      'Your program is 15 weeks (375 hours) combining online coursework and hands-on training.',
+      'Your program is 12 weeks (240 hours) combining online coursework and hands-on training.',
       'Related Technical Instruction (RTI) is delivered through the Elevate LMS.',
       'On-the-Job Training (OJT) is completed at employer partner sites.',
       'You will prepare for and sit for industry-recognized credential exams including EPA 608 and OSHA certifications, administered through their respective certifying organizations.',

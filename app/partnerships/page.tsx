@@ -120,7 +120,7 @@ export default function PartnershipsPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs Available for Referral</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'Building Technician with HVAC Fundamentals', duration: '15 weeks', funding: 'WIOA, WRG' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', funding: 'WIOA, WRG' },
               { name: 'Barber Apprenticeship', duration: '15 months', funding: 'WIOA' },
               { name: 'CNA Certification', duration: '6 weeks', funding: 'WIOA, WRG' },
               { name: 'CDL Training (Class A)', duration: '4 weeks', funding: 'WIOA, WRG' },

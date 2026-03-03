@@ -222,7 +222,7 @@ export default function HvacCourseHome({
       <div className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center gap-6 md:gap-10 text-sm">
           {[
-            { icon: Clock, text: <>20 weeks &middot; Full-time</> },
+            { icon: Clock, text: <>12 weeks &middot; Hybrid</> },
             { icon: BookOpen, text: <>{total} lessons &middot; {course.modules.length} modules</> },
             { icon: Award, text: <>3 certifications included</> },
             { icon: Users, text: <>Hybrid: Online + Hands-on</> },
@@ -391,7 +391,7 @@ export default function HvacCourseHome({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
                     <div className="absolute top-3 left-3 px-2.5 py-1 bg-white text-brand-blue-800 text-[11px] font-bold rounded-lg shadow">
-                      Week {i + 1}
+                      {mod.weekAssignment ? `Week ${mod.weekAssignment.week}` : `Module ${i + 1}`}
                     </div>
 
                     {isComplete && (
@@ -507,7 +507,7 @@ export default function HvacCourseHome({
             ═══════════════════════════════════════════════════════════ */}
         <section className="text-center py-10 border-t border-slate-200">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Ready to start your HVAC career?</h2>
-          <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">Structured 20-week pathway with proctored certification and employer placement.</p>
+          <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">12-week structured pathway with proctored EPA 608 certification and employer placement.</p>
           <Link href={continueUrl}
             className="inline-flex items-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition text-sm shadow-lg shadow-brand-red-600/25">
             <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Enroll Now'}

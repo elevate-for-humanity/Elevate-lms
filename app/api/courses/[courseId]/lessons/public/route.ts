@@ -5,6 +5,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import { HVAC_LESSON_UUID, HVAC_MODULE_UUID } from '@/lib/courses/hvac-uuids';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
+import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,11 +66,13 @@ function buildLocalFallback(courseId: string, slug: string) {
         || (lesson.type === 'video' || lesson.type === 'lab'
           ? `/generated/lessons/lesson-${lessonUuid}.mp3`
           : null);
+      // Use rich generated content instead of one-line description
+      const richContent = slug === 'hvac-technician' ? buildLessonContent(lesson.id) : (lesson.description || '');
       return {
         id: lessonUuid,
         course_id: courseId,
         title: lesson.title,
-        content: lesson.description || '',
+        content: richContent,
         video_url: resolvedVideoUrl,
         lesson_number: lessonNumber,
         order_index: li + 1,
@@ -191,10 +194,25 @@ async function _GET(
     .eq('course_id', courseId)
     .order('order_index');
 
+  // Enrich DB lessons that have placeholder content with generated rich HTML
+  const slug = COURSE_ID_TO_SLUG[courseId];
+  const enrichedLessons = (lessons || []).map((lesson: any) => {
+    if (slug === 'hvac-technician' && isPlaceholderContent(lesson.content)) {
+      // Reverse-lookup: UUID → definition ID
+      const lessonUuids = LESSON_ID_TO_UUID[slug] || {};
+      const defId = Object.entries(lessonUuids).find(([, uuid]) => uuid === lesson.id)?.[0];
+      if (defId) {
+        const richContent = buildLessonContent(defId);
+        return { ...lesson, content: richContent };
+      }
+    }
+    return lesson;
+  });
+
   const normalizedCourse = { ...course, title: course.course_name };
   const payload = {
     course: normalizedCourse,
-    lessons: lessons || [],
+    lessons: enrichedLessons,
     modules: modules || [],
     enrolled: isEnrolled,
     authenticated: isAuthenticated,

@@ -25,6 +25,7 @@ import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
 import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
+import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
 
 export default function LessonPage() {
   const params = useParams();
@@ -99,8 +100,18 @@ export default function LessonPage() {
           quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
         }
       }
+      // Enrich placeholder content with generated rich HTML
+      let enrichedContent = lessonData.content;
+      if (isPlaceholderContent(lessonData.content)) {
+        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        if (defId) {
+          enrichedContent = buildLessonContent(defId);
+        }
+      }
+
       setLesson({
         ...lessonData,
+        content: enrichedContent || lessonData.content,
         quiz_questions: quizQuestions || lessonData.quiz_questions,
         passing_score: quizPassingScore || lessonData.passing_score,
         quiz_id: lessonData.quiz_id || (quizQuestions?.length ? lessonData.id : null),
@@ -451,9 +462,9 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
-        ) : lesson.video_url ? (
+        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {/* Video/audio lesson — InteractiveVideoPlayer handles both MP4 and MP3 */}
+            {/* Video/audio lesson with real media file */}
             <InteractiveVideoPlayer
               videoUrl={lesson.video_url}
               title={lesson.title}
@@ -464,23 +475,34 @@ export default function LessonPage() {
                 }
               }}
             />
+            {/* Show lesson content below video */}
+            {lesson.content && (
+              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
+                <div
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            )}
           </div>
         ) : (
-          /* Reading / text lesson — no video, show content directly */
-          <div className="bg-slate-100 py-8">
+          /* Reading / text / video-without-file lesson — show rich content */
+          <div className="bg-slate-50 py-8">
             <div className="max-w-4xl mx-auto px-4">
               <div className="bg-white rounded-xl p-8 shadow-sm">
-                <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                  <BookOpen className="w-4 h-4" />
-                  <span>Reading &middot; Lesson {currentIndex + 1} of {lessons.length}</span>
-                </div>
                 {lesson.content ? (
                   <div
                     className="prose max-w-none"
                     dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
                   />
                 ) : (
-                  <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+                      <BookOpen className="w-4 h-4" />
+                      <span>Lesson {currentIndex + 1} of {lessons.length}</span>
+                    </div>
+                    <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>
+                  </div>
                 )}
               </div>
             </div>

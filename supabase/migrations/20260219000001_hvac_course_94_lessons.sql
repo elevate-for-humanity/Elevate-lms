@@ -1,7 +1,7 @@
 -- ============================================================
 -- HVAC Technician Course — Sync Migration
 -- 16 modules, 94 lessons with deterministic UUIDs
--- ETPL Program #10004322 | 20 weeks | Hybrid
+-- ETPL Program #10004322 | 12 weeks | Hybrid
 --
 -- Deterministic UUIDs generated via UUID v5 with namespace
 -- a1b2c3d4-e5f6-7890-abcd-200000000001
@@ -17,7 +17,7 @@ INSERT INTO training_courses (
   'f0593164-55be-5867-98e7-8a86770a8dd0',
   'HVAC Technician',
   'HVAC Technician',
-  'Complete HVAC training: heating, cooling, refrigeration, EPA 608 Universal certification, OSHA 30, and residential HVAC certifications. ETPL Program #10004322. 20-week hybrid program.',
+  'Complete HVAC training: heating, cooling, refrigeration, EPA 608 Universal certification, OSHA 30, and residential HVAC certifications. ETPL Program #10004322. 12-week hybrid program.',
   true,
   'Skilled Trades',
   NOW()

@@ -206,6 +206,21 @@ export default async function CoursePage({ params }: { params: Params }) {
                   <span>Certificate</span>
                 </div>
               </div>
+
+              {/* Credential alignment banner */}
+              {course.certification_name && (
+                <div className="mt-6 flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
+                  <Award className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                  <p className="text-sm text-white/90">
+                    <span className="text-amber-400 font-semibold">Credential Alignment:</span>{' '}
+                    This course prepares you for{' '}
+                    <span className="font-medium">{course.certification_name}</span>
+                    {course.certification_body && (
+                      <span className="text-white/50"> issued by {course.certification_body}</span>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Course Card */}

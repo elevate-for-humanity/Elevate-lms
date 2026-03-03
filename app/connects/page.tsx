@@ -1,0 +1,312 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, Menu, X, Phone, Mail, Volume2, VolumeX } from 'lucide-react';
+
+/* ── Nav ── */
+const NAV = [
+  { label: 'Portals', href: '#portals' },
+  { label: 'Student', href: '/student-portal' },
+  { label: 'Employer', href: '/employer-portal' },
+  { label: 'Staff', href: '/staff-portal' },
+  { label: 'Admin', href: '/admin-login' },
+];
+
+/* ── Portal cards — image icons from real photos ── */
+const PORTALS = [
+  {
+    title: 'Student Portal',
+    desc: 'Access courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
+    href: '/student-portal',
+    loginHref: '/login?redirect=/lms/dashboard',
+    image: '/images/programs-hq/students-learning.jpg',
+    icon: '/images/icons/book.png',
+    features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule'],
+    accent: 'bg-brand-blue-600 hover:bg-brand-blue-700',
+    tagBg: 'bg-brand-blue-50 text-brand-blue-700',
+  },
+  {
+    title: 'Employer Portal',
+    desc: 'Manage apprentices, track training progress, access compliance documents, and connect with program coordinators.',
+    href: '/employer-portal',
+    loginHref: '/login?redirect=/employer/dashboard',
+    image: '/images/heroes-hq/employer-hero.jpg',
+    icon: '/images/icons/users.png',
+    features: ['Apprentice Mgmt', 'Training Progress', 'Compliance', 'Hiring Tools'],
+    accent: 'bg-green-600 hover:bg-green-700',
+    tagBg: 'bg-green-50 text-green-700',
+  },
+  {
+    title: 'Partner Portal',
+    desc: 'Collaborate on programs, access partnership resources, track referrals, and manage your organization\'s involvement.',
+    href: '/partner-portal',
+    loginHref: '/login?redirect=/partner',
+    image: '/images/heroes-hq/career-services-hero.jpg',
+    icon: '/images/icons/trending-up.png',
+    features: ['Collaboration', 'Referral Tracking', 'Resources', 'Reports'],
+    accent: 'bg-purple-600 hover:bg-purple-700',
+    tagBg: 'bg-purple-50 text-purple-700',
+  },
+  {
+    title: 'Staff Portal',
+    desc: 'Manage students, track enrollments, record attendance, generate reports, and access administrative tools.',
+    href: '/staff-portal',
+    loginHref: '/login?redirect=/staff-portal/dashboard',
+    image: '/images/heroes-hq/team-hero.jpg',
+    icon: '/images/icons/clock.png',
+    features: ['Student Mgmt', 'Attendance', 'Reports', 'Scheduling'],
+    accent: 'bg-amber-600 hover:bg-amber-700',
+    tagBg: 'bg-amber-50 text-amber-700',
+  },
+  {
+    title: 'Workforce Board',
+    desc: 'Access workforce development data, program outcomes, compliance reports, and funding utilization dashboards.',
+    href: '/workforce-board',
+    loginHref: '/login?redirect=/workforce-board',
+    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    icon: '/images/icons/dollar.png',
+    features: ['Outcomes Data', 'Compliance', 'Funding Reports', 'Analytics'],
+    accent: 'bg-teal-600 hover:bg-teal-700',
+    tagBg: 'bg-teal-50 text-teal-700',
+  },
+  {
+    title: 'Admin Dashboard',
+    desc: 'Full platform administration. Manage users, programs, enrollments, content, analytics, and system configuration.',
+    href: '/admin-login',
+    loginHref: '/login?redirect=/admin/dashboard',
+    image: '/images/heroes-hq/about-hero.jpg',
+    icon: '/images/icons/shield.png',
+    features: ['User Mgmt', 'Program Admin', 'Analytics', 'System Config'],
+    accent: 'bg-brand-red-600 hover:bg-brand-red-700',
+    tagBg: 'bg-brand-red-50 text-brand-red-700',
+  },
+];
+
+/* ── Features ── */
+const FEATURES = [
+  { icon: '/images/icons/trending-up.png', title: 'Personalized Dashboards', desc: 'Role-based views tailored to your needs' },
+  { icon: '/images/icons/check-circle.png', title: 'Real-Time Analytics', desc: 'Track progress, outcomes, and performance' },
+  { icon: '/images/icons/book.png', title: 'Document Management', desc: 'Access forms, reports, and compliance docs' },
+  { icon: '/images/icons/shield.png', title: 'Secure Access', desc: 'Role-based permissions and data protection' },
+];
+
+export default function ConnectsLandingPage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const voiceoverRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const play = async () => { try { await v.play(); setIsPlaying(true); } catch { /* poster */ } };
+    if (v.readyState >= 2) play();
+    else v.addEventListener('loadeddata', play, { once: true });
+    return () => v.removeEventListener('loadeddata', play);
+  }, []);
+
+  const toggleVoice = () => {
+    const vo = voiceoverRef.current;
+    if (!vo) return;
+    if (!voiceActive) { vo.currentTime = 0; vo.play().catch(() => {}); setVoiceActive(true); }
+    else { vo.pause(); setVoiceActive(false); }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* ═══ NAV ═══ */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/connects" className="flex items-center gap-2.5">
+              <Image src="/logo.png" alt="Elevate Connects" width={140} height={40} className="h-9 w-auto brightness-0 invert" priority />
+              <span className="hidden sm:inline text-xs font-bold text-cyan-400 bg-cyan-950 px-2.5 py-1 rounded-full border border-cyan-800">
+                Connects
+              </span>
+            </Link>
+
+            <nav className="hidden lg:flex items-center gap-1">
+              {NAV.map((n) => (
+                <Link key={n.label} href={n.href} className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                  {n.label}
+                </Link>
+              ))}
+              <Link href="/login" className="ml-1 px-5 py-2.5 text-sm font-bold bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors">
+                Sign In
+              </Link>
+            </nav>
+
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 rounded-lg text-gray-300 hover:bg-slate-800" aria-label="Menu">
+              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+
+          {mobileOpen && (
+            <div className="lg:hidden border-t border-slate-700 py-3 space-y-1">
+              {NAV.map((n) => (
+                <Link key={n.label} href={n.href} onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-slate-800 rounded-lg">
+                  {n.label}
+                </Link>
+              ))}
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-bold text-cyan-400">Sign In</Link>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* ═══ VIDEO HERO ═══ */}
+      <section className="relative h-[65vh] min-h-[460px] overflow-hidden pt-16">
+        <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/heroes-hq/about-hero.jpg">
+          <source src="/videos/dashboard-admin-narrated.mp4" type="video/mp4" />
+        </video>
+        <audio ref={voiceoverRef} src="/videos/elevate-overview-with-narration.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30" />
+
+        <div className="relative z-10 h-full flex flex-col justify-end pb-14 px-6 max-w-6xl mx-auto">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-cyan-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+              <Image src="/images/icons/trending-up.png" alt="" width={16} height={16} className="w-4 h-4" /> Elevate Connects
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              Your Dashboard. Your Portal.
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
+              One platform, every role. Access your personalized dashboard — whether you&apos;re a student, employer, partner, staff member, or administrator.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/login" className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-7 py-3.5 rounded-lg font-bold text-base transition-colors shadow-lg">
+                Sign In to Your Portal <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link href="#portals" className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white px-7 py-3.5 rounded-lg font-semibold text-base transition-colors border border-white/30">
+                Browse Portals
+              </Link>
+            </div>
+          </div>
+
+          {isPlaying && (
+            <button onClick={toggleVoice} className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-cyan-600 hover:bg-cyan-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
+              {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
+            </button>
+          )}
+        </div>
+      </section>
+
+      {/* ═══ FEATURES BAR ═══ */}
+      <section className="bg-slate-800 py-8">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="flex items-start gap-3">
+              <Image src={f.icon} alt="" width={28} height={28} className="w-7 h-7 mt-0.5 rounded" />
+              <div>
+                <div className="text-sm font-semibold text-white">{f.title}</div>
+                <div className="text-xs text-gray-400">{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ PORTAL CARDS ═══ */}
+      <section id="portals" className="py-16 px-6 scroll-mt-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Choose Your Portal</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Each portal is tailored to your role. Sign in to access your personalized dashboard, tools, and resources.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {PORTALS.map((p) => (
+              <div key={p.title} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="relative h-44 overflow-hidden">
+                  <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2.5">
+                    <Image src={p.icon} alt="" width={40} height={40} className="w-10 h-10 rounded-lg border-2 border-white/50 bg-white/90 p-1 shadow" />
+                    <h3 className="text-xl font-bold text-white drop-shadow">{p.title}</h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-gray-600 text-sm mb-3">{p.desc}</p>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {p.features.map((f) => (
+                      <span key={f} className={`text-xs px-2 py-1 rounded-full ${p.tagBg}`}>{f}</span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Link href={p.loginHref} className={`flex-1 inline-flex items-center justify-center gap-1.5 ${p.accent} text-white px-4 py-2.5 rounded-lg text-sm font-bold transition-colors`}>
+                      Sign In <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link href={p.href} className="inline-flex items-center justify-center gap-1 border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+                      Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ QUICK SIGN IN ═══ */}
+      <section className="py-16 px-6 bg-slate-50">
+        <div className="max-w-2xl mx-auto text-center">
+          <Image src="/images/icons/users.png" alt="" width={48} height={48} className="w-12 h-12 mx-auto mb-4 rounded" />
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Already have an account?</h2>
+          <p className="text-gray-600 mb-6">Sign in and you&apos;ll be automatically directed to your dashboard based on your role.</p>
+          <Link href="/login" className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-3.5 rounded-lg font-bold text-lg transition-colors shadow-lg">
+            Sign In <ArrowRight className="w-5 h-5" />
+          </Link>
+          <div className="mt-4 text-sm text-gray-500">
+            Don&apos;t have an account?{' '}
+            <Link href="/apply" className="text-cyan-600 hover:underline font-semibold">Apply for a program</Link>
+            {' '}or{' '}
+            <Link href="/contact" className="text-cyan-600 hover:underline font-semibold">contact us</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="bg-slate-900 text-gray-400 py-10 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <Image src="/logo.png" alt="Elevate for Humanity" width={120} height={36} className="h-8 w-auto brightness-0 invert mb-3" />
+              <div className="text-sm">8888 Keystone Crossing, Suite 1300</div>
+              <div className="text-sm">Indianapolis, IN 46240</div>
+              <div className="flex items-center gap-2 mt-3 text-sm"><Phone className="w-4 h-4" /><a href="tel:+13173550500" className="hover:text-white">(317) 355-0500</a></div>
+              <div className="flex items-center gap-2 mt-1 text-sm"><Mail className="w-4 h-4" /><a href="mailto:info@elevateforhumanity.org" className="hover:text-white">info@elevateforhumanity.org</a></div>
+            </div>
+            <div>
+              <div className="text-white font-semibold mb-3">Portals</div>
+              <div className="space-y-2 text-sm">
+                {PORTALS.map((p) => <Link key={p.title} href={p.href} className="block hover:text-white">{p.title}</Link>)}
+              </div>
+            </div>
+            <div>
+              <div className="text-white font-semibold mb-3">Quick Links</div>
+              <div className="space-y-2 text-sm">
+                <Link href="/login" className="block hover:text-white">Sign In</Link>
+                <Link href="/apply" className="block hover:text-white">Apply for a Program</Link>
+                <Link href="/support" className="block hover:text-white">Support</Link>
+                <Link href="/contact" className="block hover:text-white">Contact</Link>
+                <Link href="/privacy-policy" className="block hover:text-white">Privacy Policy</Link>
+                <Link href="https://www.elevateforhumanity.org" className="block hover:text-white">Main Site</Link>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-sm">
+            <div>&copy; {new Date().getFullYear()} Elevate for Humanity. All rights reserved.</div>
+            <div className="flex gap-4">
+              <Link href="https://www.elevateforhumanity.org" className="hover:text-white">elevateforhumanity.org</Link>
+              <Link href="https://www.elevateforhumanityeducation.com" className="hover:text-white">Education</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

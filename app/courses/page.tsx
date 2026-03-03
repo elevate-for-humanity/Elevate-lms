@@ -25,6 +25,24 @@ export const metadata: Metadata = {
 
 const categories = ['All', 'Healthcare', 'Trades', 'Beauty', 'Transportation', 'Technology'];
 
+const featuredCategories = [
+  { slug: 'healthcare', name: 'Healthcare', image: '/images/programs-hq/healthcare-hero.jpg', courses: 5, description: 'CNA, Medical Assistant, Phlebotomy, CPR & First Aid, and Pharmacy Technician training.' },
+  { slug: 'skilled-trades', name: 'Skilled Trades', image: '/images/programs-hq/skilled-trades-hero.jpg', courses: 6, description: 'HVAC, Electrical, Welding, Plumbing, and Construction certifications.' },
+  { slug: 'technology', name: 'Technology', image: '/images/programs-hq/technology-hero.jpg', courses: 4, description: 'Cybersecurity, IT Help Desk, Software Development, and Networking.' },
+  { slug: 'cdl', name: 'CDL & Transportation', image: '/images/programs-hq/cdl-trucking.jpg', courses: 3, description: 'Class A and Class B CDL training with job placement assistance.' },
+  { slug: 'barber-apprenticeship', name: 'Beauty & Barbering', image: '/images/programs-hq/barber-hero.jpg', courses: 3, description: 'Barber apprenticeships, cosmetology, and nail technician programs.' },
+  { slug: 'business', name: 'Business & Finance', image: '/images/programs-hq/business-training.jpg', courses: 4, description: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship.' },
+];
+
+const microClasses = [
+  { id: 'cpr', category: 'Healthcare', title: 'CPR & First Aid (HSI)', description: 'Get CPR and First Aid certified in one day. Required for healthcare, education, and many licensed professions.', duration: '1 day', price: 'Free*' },
+  { id: 'osha10', category: 'Safety', title: 'OSHA 10-Hour', description: 'Workplace safety certification covering hazard recognition, fall protection, and PPE requirements.', duration: '2 days', price: 'Free*' },
+  { id: 'forklift', category: 'Trades', title: 'Forklift Certification', description: 'OSHA-compliant forklift operator training and certification for warehouse and logistics roles.', duration: '1 day', price: 'Free*' },
+  { id: 'riseup', category: 'Professional', title: 'Rise Up Certification', description: 'NRF Rise Up retail industry fundamentals credential for customer service and sales roles.', duration: '2 weeks', price: 'Free*' },
+  { id: 'epa608', category: 'Trades', title: 'EPA 608 Certification', description: 'EPA Section 608 refrigerant handling certification required for HVAC technicians.', duration: '1 day', price: 'Free*' },
+  { id: 'servsafe', category: 'Hospitality', title: 'ServSafe Food Handler', description: 'Food safety certification for restaurant, catering, and food service professionals.', duration: '1 day', price: 'Free*' },
+];
+
 export default async function CoursesPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;

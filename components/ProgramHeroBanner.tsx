@@ -6,35 +6,38 @@ import { Mic, Volume2 } from 'lucide-react';
 interface ProgramHeroBannerProps {
   videoSrc: string;
   voiceoverSrc?: string;
+  posterImage?: string;
 }
 
 /**
- * Video hero banner. Video autoplays muted.
- * Voiceover requires user click (browser autoplay policy blocks
- * audio without a user gesture — scroll events don't count).
+ * Video hero banner. Autoplays muted on page load.
+ * Same layout on laptop, desktop, and Chromebook — no cutoff.
  */
-export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHeroBannerProps) {
+export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage }: ProgramHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [voiceActive, setVoiceActive] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
 
-  // Video: autoplay muted, pause when off-screen
   useEffect(() => {
+    const video = videoRef.current;
     const container = containerRef.current;
-    if (!container) return;
+    if (!video || !container) return;
 
+    // Play immediately on mount
+    video.play().catch(() => {});
+
+    // Pause when scrolled off-screen, resume when visible
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const video = videoRef.current;
-        if (!video) return;
         if (entry.isIntersecting) {
           video.play().catch(() => {});
         } else {
           video.pause();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     observer.observe(container);
@@ -57,16 +60,35 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[50vh] min-h-[320px] max-h-[500px] overflow-hidden bg-black">
-      <video
-        ref={videoRef}
-        className="w-full h-full object-cover"
-        src={videoSrc}
-        muted
-        loop
-        playsInline
-        preload="metadata"
-      />
+    <div
+      ref={containerRef}
+      className="relative w-full aspect-video bg-black"
+    >
+      {!videoFailed ? (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          src={videoSrc}
+          poster={posterImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onError={() => setVideoFailed(true)}
+        />
+      ) : posterImage ? (
+        <img
+          src={posterImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+      )}
+
+      {/* Bottom gradient */}
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
       {voiceoverSrc && (
         <>

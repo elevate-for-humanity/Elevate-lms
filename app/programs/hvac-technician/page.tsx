@@ -237,6 +237,7 @@ const config: ProgramPageConfig = {
   ],
 
   applyHref: '/apply?program=hvac-technician',
+  courseHref: '/programs/hvac-technician/course',
   breadcrumbs: [
     { label: 'Programs', href: '/programs' },
     { label: 'Skilled Trades', href: '/programs/skilled-trades' },

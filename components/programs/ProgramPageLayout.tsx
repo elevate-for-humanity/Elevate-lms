@@ -81,6 +81,7 @@ export interface ProgramPageConfig {
   // CTA
   applyHref?: string;
   inquiryHref?: string;
+  courseHref?: string;
 
   // Program status notice — shown as amber banner when program is not yet enrolling
   statusNotice?: string;
@@ -137,7 +138,7 @@ export default function ProgramPageLayout({
     <div className="min-h-screen bg-white">
 
       {/* ===== VIDEO HERO — clean, no text ===== */}
-      <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} />
+      <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} posterImage={c.overviewImage} />
 
       {/* ===== BREADCRUMBS ===== */}
       <div className="bg-white border-b border-slate-100">
@@ -201,6 +202,15 @@ export default function ProgramPageLayout({
                   Apply Now
                   <ArrowRight className="w-4 h-4" />
                 </Link>
+                {c.courseHref && (
+                  <Link
+                    href={c.courseHref}
+                    className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all text-base"
+                  >
+                    Access Course
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
                 <Link
                   href="/wioa-eligibility"
                   className="text-center text-sm text-slate-500 hover:text-brand-red-600 transition-colors"

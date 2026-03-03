@@ -4,16 +4,30 @@
  * Uses FFmpeg to render videos from scenes
  */
 
-import ffmpeg from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-import ffprobeInstaller from '@ffprobe-installer/ffprobe';
-import { createCanvas, loadImage, registerFont } from 'canvas';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Set FFmpeg paths
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-ffmpeg.setFfprobePath(ffprobeInstaller.path);
+// Heavy native deps loaded at runtime only — keeps them out of the
+// Netlify server handler's file-trace graph.
+// Typed as `any` intentionally so the tracer cannot follow the import path.
+let _ffmpeg: any = null;
+let _createCanvas: any = null;
+let _loadImage: any = null;
+let _registerFont: any = null;
+
+async function ensureDeps() {
+  if (_ffmpeg) return;
+  const ff = (await import('fluent-ffmpeg')).default;
+  const ffmpegInstaller = (await import('@ffmpeg-installer/ffmpeg')).default;
+  const ffprobeInstaller = (await import('@ffprobe-installer/ffprobe')).default;
+  const canvasMod = await import('canvas');
+  ff.setFfmpegPath(ffmpegInstaller.path);
+  ff.setFfprobePath(ffprobeInstaller.path);
+  _ffmpeg = ff;
+  _createCanvas = canvasMod.createCanvas;
+  _loadImage = canvasMod.loadImage;
+  _registerFont = canvasMod.registerFont;
+}
 
 export interface RenderScene {
   id: string;
@@ -104,7 +118,8 @@ export async function createTextOverlay(
     backgroundColor?: string;
   }
 ): Promise<Buffer> {
-  const canvas = createCanvas(width, height);
+  await ensureDeps();
+  const canvas = _createCanvas!(width, height);
   const ctx = canvas.getContext('2d');
 
   // Background
@@ -180,7 +195,8 @@ export async function createColorBackground(
   width: number,
   height: number
 ): Promise<Buffer> {
-  const canvas = createCanvas(width, height);
+  await ensureDeps();
+  const canvas = _createCanvas!(width, height);
   const ctx = canvas.getContext('2d');
 
   ctx.fillStyle = color;
@@ -244,7 +260,8 @@ export async function renderScene(
       await fs.writeFile(textOverlayPath, textOverlay);
 
       // Build FFmpeg command
-      const command = ffmpeg();
+      await ensureDeps();
+      const command = _ffmpeg!();
 
       // Add background input
       if (scene.videoPath) {
@@ -331,7 +348,7 @@ export async function concatenateVideos(
       const concatContent = videoPaths.map((p) => `file '${p}'`).join('\n');
       await fs.writeFile(concatFilePath, concatContent);
 
-      ffmpeg()
+      _ffmpeg!()
         .input(concatFilePath)
         .inputOptions(['-f', 'concat', '-safe', '0'])
         .outputOptions(['-c', 'copy'])
@@ -365,7 +382,7 @@ export async function addBackgroundMusic(
   musicVolume: number = 0.3
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    ffmpeg()
+    _ffmpeg!()
       .input(videoPath)
       .input(musicPath)
       .complexFilter([
@@ -402,7 +419,7 @@ export async function addBackgroundMusic(
  */
 export async function getVideoMetadata(videoPath: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(videoPath, (err, metadata) => {
+    _ffmpeg!.ffprobe(videoPath, (err, metadata) => {
       if (err) {
         reject(err);
       } else {

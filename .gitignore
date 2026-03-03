@@ -158,3 +158,11 @@ deno.lock
 eng.traineddata
 scripts/live-schema-snapshot.json
 audit_artifacts/
+
+# Build artifacts / audit reports
+audit/
+audits/
+lighthouse-*.json
+marketing-audit-report.json
+broken-links-report.json
+r2-url-mapping.json

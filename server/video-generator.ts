@@ -4,11 +4,26 @@
  * This runs as a background worker or separate service
  */
 
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
+
+// Heavy native deps loaded at runtime only — typed as `any` so the
+// file tracer cannot follow the import path into native binaries.
+let _ffmpeg: any = null;
+let _createCanvas: any = null;
+let _loadImage: any = null;
+let _registerFont: any = null;
+
+async function ensureDeps() {
+  if (_ffmpeg) return;
+  const ff = (await import('fluent-ffmpeg')).default;
+  const canvasMod = await import('canvas');
+  _ffmpeg = ff;
+  _createCanvas = canvasMod.createCanvas;
+  _loadImage = canvasMod.loadImage;
+  _registerFont = canvasMod.registerFont;
+}
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -107,7 +122,7 @@ export class VideoGenerator {
     index: number
   ): Promise<string> {
     // Create canvas for this scene
-    const canvas = createCanvas(dimensions.width, dimensions.height);
+    const canvas = _createCanvas!(dimensions.width, dimensions.height);
     const ctx = canvas.getContext('2d');
 
     // Fill background
@@ -117,7 +132,7 @@ export class VideoGenerator {
     // Add background image if provided
     if (scene.image) {
       try {
-        const img = await loadImage(scene.image);
+        const img = await _loadImage!(scene.image);
         ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
       } catch (error) {
         // Image load failed, continue without background
@@ -138,7 +153,7 @@ export class VideoGenerator {
     const sceneVideoPath = path.join(this.tempDir, `scene-${index}.mp4`);
 
     await new Promise<void>((resolve, reject) => {
-      let command = ffmpeg()
+      let command = _ffmpeg!()
         .input(framePath)
         .inputOptions(['-loop 1', `-t ${scene.duration}`])
         .outputOptions(['-c:v libx264', '-pix_fmt yuv420p', '-r 30']);
@@ -231,7 +246,7 @@ export class VideoGenerator {
     await writeFile(fileListPath, fileList);
 
     return new Promise((resolve, reject) => {
-      ffmpeg()
+      _ffmpeg!()
         .input(fileListPath)
         .inputOptions(['-f concat', '-safe 0'])
         .outputOptions(['-c copy'])
@@ -262,6 +277,7 @@ export class VideoGenerator {
 export async function generateVideoFromConfig(
   config: VideoConfig
 ): Promise<string> {
+  await ensureDeps();
   const generator = new VideoGenerator();
   const videoPath = await generator.generateVideo(config);
   return videoPath;

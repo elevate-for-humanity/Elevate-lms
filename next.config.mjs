@@ -236,7 +236,17 @@ const nextConfig = {
       '**/node_modules/**/chromium/**',
       '**/node_modules/@sparticuz/**',
       '**/node_modules/chrome-aws-lambda/**',
-      // Heaviest packages (never imported server-side)
+      // FFmpeg + FFprobe binaries (66MB + 76MB) — only used in video generator
+      '**/node_modules/@ffmpeg-installer/**',
+      '**/node_modules/.pnpm/@ffmpeg-installer*/**',
+      '**/node_modules/@ffprobe-installer/**',
+      '**/node_modules/.pnpm/@ffprobe-installer*/**',
+      '**/node_modules/fluent-ffmpeg/**',
+      '**/node_modules/.pnpm/fluent-ffmpeg*/**',
+      // Canvas native binary (24MB) — only used in video generator
+      '**/node_modules/canvas/**',
+      '**/node_modules/.pnpm/canvas*/**',
+      // Other heavy packages
       '**/node_modules/googleapis/**',
       '**/node_modules/.pnpm/googleapis*/**',
       '**/node_modules/monaco-editor/**',

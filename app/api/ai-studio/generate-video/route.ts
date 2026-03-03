@@ -21,6 +21,15 @@ import { createClient } from '@/lib/supabase/server';
  */
 
 async function _POST(request: NextRequest) {
+  // Video rendering requires native binaries (ffmpeg, canvas) that are
+  // excluded from the Netlify SSR handler to stay under the 250MB limit.
+  if (process.env.NETLIFY === 'true') {
+    return NextResponse.json(
+      { error: 'Video rendering is not available in this deployment. Use a dedicated worker.' },
+      { status: 501 }
+    );
+  }
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

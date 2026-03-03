@@ -39,7 +39,7 @@ export async function ProgramsGrid() {
             <div className="relative h-40 w-full bg-slate-100">
               {program.hero_image_url || program.image_url ? (
                 <Image
-                  src={program.hero_image_url || program.image_url || '/Content.svg'}
+                  src={program.hero_image_url || program.image_url || '/images/programs-hq/training-classroom.jpg'}
                   alt={program.title || program.name}
                   fill
           sizes="100vw"

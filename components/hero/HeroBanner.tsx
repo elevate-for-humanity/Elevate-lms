@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
@@ -11,12 +9,10 @@ type HeroBannerProps = {
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   trustIndicators?: string[];
-  // Video mode
   type?: 'image' | 'video';
   videoSrc?: string;
   voiceoverSrc?: string;
   posterSrc?: string;
-  // Image mode
   heroImageSrc?: string;
   heroImageAlt?: string;
   overlay?: boolean;
@@ -31,129 +27,76 @@ export default function HeroBanner({
   type = 'image',
   videoSrc = '/video/hero-home-dec12.mp4',
   voiceoverSrc,
-  posterSrc = '/images/hero/hero-dec12-poster.svg',
-  heroImageSrc = '/images/hero/hero-main.svg',
+  posterSrc = '/images/artlist/hero-training-3.jpg',
+  heroImageSrc = '/images/heroes-hq/programs-hero.jpg',
   heroImageAlt = 'Elevate for Humanity hero banner',
-  overlay = true,
 }: HeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioBlocked, setAudioBlocked] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const hasPlayedVoiceover = useRef(false);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
-  // Always autoplay the muted video on load
+  // Wait for page load
+  useEffect(() => {
+    if (document.readyState === 'complete') {
+      setPageLoaded(true);
+    } else {
+      const onLoad = () => setPageLoaded(true);
+      window.addEventListener('load', onLoad);
+      return () => window.removeEventListener('load', onLoad);
+    }
+  }, []);
+
+  // Video: autoplay muted, pause when scrolled away
   useEffect(() => {
     if (type !== 'video') return;
+    const section = sectionRef.current;
+    if (!section) return;
 
-    const v = videoRef.current;
-    if (!v) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const v = videoRef.current;
+        if (!v) return;
+        if (entry.isIntersecting) {
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { threshold: 0.2 }
+    );
 
-    v.muted = true;
-    v.loop = voiceoverSrc ? false : true; // no loop if voiceover present
-    v.playsInline = true;
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [type]);
 
-    v.play().catch(() => {
-      // If even muted autoplay fails (rare), user gesture will be needed
-    });
-  }, [type, voiceoverSrc]);
-
-  // Attempt to autoplay voiceover on load (may be blocked by browser)
+  // Voiceover: play once on scroll-in after page load
   useEffect(() => {
-    if (type !== 'video' || !voiceoverSrc) return;
-
-    const v = videoRef.current;
+    if (type !== 'video' || !voiceoverSrc || !pageLoaded) return;
+    const section = sectionRef.current;
     const a = audioRef.current;
-    if (!v || !a) return;
+    if (!section || !a) return;
 
-    const attempt = async () => {
-      try {
-        v.muted = true;
-        a.currentTime = v.currentTime || 0;
-        await a.play();
-        setAudioBlocked(false);
-      } catch (error) {
-        setAudioBlocked(true);
-      }
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayedVoiceover.current) {
+          hasPlayedVoiceover.current = true;
+          a.play().catch(() => {});
+        }
+        if (!entry.isIntersecting && !a.paused) {
+          a.pause();
+        }
+      },
+      { threshold: 0.3 }
+    );
 
-    attempt();
-  }, [type, voiceoverSrc]);
-
-  // Keep voiceover synced to video
-  useEffect(() => {
-    if (type !== 'video' || !voiceoverSrc) return undefined;
-
-    const v = videoRef.current;
-    const a = audioRef.current;
-    if (!v || !a) return undefined;
-
-    const onPlay = async (): Promise<void> => {
-      if (audioBlocked) return;
-      try {
-        a.currentTime = v.currentTime || 0;
-        await a.play();
-      } catch (error) {
-        setAudioBlocked(true);
-      }
-    };
-
-    const onPause = (): void => {
-      a.pause();
-    };
-
-    const onSeeked = (): void => {
-      a.currentTime = v.currentTime || 0;
-      if (!v.paused && !audioBlocked) {
-        a.play().catch(() => setAudioBlocked(true));
-      }
-    };
-
-    const onTimeUpdate = (): void => {
-      // Light drift correction
-      const drift = Math.abs((a.currentTime || 0) - (v.currentTime || 0));
-      if (drift > 0.35) a.currentTime = v.currentTime || 0;
-    };
-
-    const onEnded = (): void => {
-      a.pause();
-      a.currentTime = 0;
-    };
-
-    v.addEventListener('play', onPlay);
-    v.addEventListener('pause', onPause);
-    v.addEventListener('seeked', onSeeked);
-    v.addEventListener('timeupdate', onTimeUpdate);
-    v.addEventListener('ended', onEnded);
-
-    return () => {
-      v.removeEventListener('play', onPlay);
-      v.removeEventListener('pause', onPause);
-      v.removeEventListener('seeked', onSeeked);
-      v.removeEventListener('timeupdate', onTimeUpdate);
-      v.removeEventListener('ended', onEnded);
-    };
-  }, [type, voiceoverSrc, audioBlocked]);
-
-  // User gesture fallback: enable sound
-  const enableSound = async () => {
-    const v = videoRef.current;
-    const a = audioRef.current;
-    if (!v || !a) return;
-
-    try {
-      v.muted = true;
-      await v.play().catch(() => {
-        // Video play blocked
-      });
-      a.currentTime = v.currentTime || 0;
-      await a.play();
-      setAudioBlocked(false);
-    } catch (error) {
-      setAudioBlocked(true);
-    }
-  };
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [type, voiceoverSrc, pageLoaded]);
 
   return (
-    <section className="relative w-full overflow-hidden rounded-3xl">
+    <section ref={sectionRef} className="relative w-full overflow-hidden rounded-3xl">
       <div className="relative h-[300px] md:h-[400px] w-full">
         {type === 'video' ? (
           <>
@@ -161,13 +104,14 @@ export default function HeroBanner({
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               src={videoSrc}
-              autoPlay
               muted
+              loop
               playsInline
-              preload="none"
+              preload="metadata"
+              poster={posterSrc}
             />
             {voiceoverSrc && (
-              <audio ref={audioRef} src={voiceoverSrc} preload="none" />
+              <audio ref={audioRef} src={voiceoverSrc} preload="auto" />
             )}
           </>
         ) : (
@@ -176,7 +120,6 @@ export default function HeroBanner({
             alt={heroImageAlt}
             fill
             priority
-            unoptimized
             sizes="100vw"
             className="object-cover"
           />

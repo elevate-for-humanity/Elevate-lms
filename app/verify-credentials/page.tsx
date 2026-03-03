@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
   Shield, 
@@ -33,6 +34,7 @@ interface VerifiableCredential {
   verificationUrl: string | null;
   verificationInstructions: string;
   icon: React.ElementType;
+  image: string;
   category: 'federal' | 'state' | 'accreditation' | 'funding';
 }
 
@@ -46,6 +48,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.apprenticeship.gov/partner-finder',
     verificationInstructions: 'Search for "Elevate for Humanity" in the DOL Apprenticeship Partner Finder',
     icon: Shield,
+    image: '/images/credentials/dol-apprenticeship.jpg',
     category: 'federal',
   },
   {
@@ -57,6 +60,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://intraining.dwd.in.gov/',
     verificationInstructions: 'Search INTraining for Location ID 10004621 or "Elevate for Humanity"',
     icon: Building2,
+    image: '/images/credentials/etpl-listing.jpg',
     category: 'state',
   },
   {
@@ -68,6 +72,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.in.gov/doe/students/private-schools/',
     verificationInstructions: 'Contact Indiana DOE to verify approval status',
     icon: Award,
+    image: '/images/credentials/doe-approval.jpg',
     category: 'state',
   },
   {
@@ -79,6 +84,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://intraining.dwd.in.gov/',
     verificationInstructions: 'WIOA eligibility verified through ETPL listing on INTraining',
     icon: FileCheck,
+    image: '/images/credentials/wioa-eligible.jpg',
     category: 'funding',
   },
   {
@@ -90,6 +96,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.in.gov/che/state-financial-aid/state-financial-aid-by-program/workforce-ready-grant/',
     verificationInstructions: 'WRG eligibility tied to ETPL-approved programs',
     icon: BadgeCheck,
+    image: '/images/credentials/workforce-ready-grant.jpg',
     category: 'funding',
   },
   {
@@ -101,6 +108,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: null,
     verificationInstructions: 'Contact Indiana DOC or local WorkOne office to verify JRI partnership',
     icon: Shield,
+    image: '/images/credentials/jri-funding.jpg',
     category: 'funding',
   },
 ];
@@ -129,14 +137,12 @@ function StatusBadge({ status }: { status: 'active' | 'pending' | 'renewal' }) {
 }
 
 function CredentialCard({ credential }: { credential: VerifiableCredential }) {
-  const Icon = credential.icon;
-  
   return (
     <div className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-brand-blue-300 transition">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-            <Icon className="w-6 h-6 text-brand-blue-600" />
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+            <Image src={credential.image} alt={credential.name} fill sizes="48px" className="object-cover" />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">{credential.name}</h3>
@@ -193,20 +199,27 @@ export default function VerifyCredentialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-700 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            <span className="text-brand-blue-400 font-medium">Credential Verification</span>
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image
+          src="/images/credentials/verify-hero.jpg"
+          alt="Elevate for Humanity credential verification"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-sm font-semibold tracking-wide text-brand-blue-300 mb-1">Credential Verification</p>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
+              Verify Our Credentials
+            </h1>
+            <p className="text-base md:text-lg text-white/90 max-w-3xl">
+              All credentials are independently verifiable through official 
+              government databases and issuing authorities.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Verify Our Credentials
-          </h1>
-          <p className="text-xl text-slate-300 max-w-3xl">
-            All Elevate for Humanity credentials are independently verifiable through official 
-            government databases and issuing authorities. Use this page to confirm our 
-            authorization to provide workforce training services.
-          </p>
         </div>
       </section>
 

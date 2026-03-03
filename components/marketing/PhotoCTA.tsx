@@ -27,7 +27,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="/programs/hvac-hero.svg"
+                src="/images/programs-hq/hvac-technician.jpg"
                 alt="HVAC technician training"
                 fill
                 className="object-cover"

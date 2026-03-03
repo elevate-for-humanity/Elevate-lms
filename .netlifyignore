@@ -1,0 +1,48 @@
+# Exclude non-essential files from the Netlify server handler bundle.
+# The @netlify/plugin-nextjs copies the project root into the function;
+# these patterns keep the zipped artifact under the 250 MB limit.
+
+# Audit / report artifacts
+audit/
+audits/
+*.report.json
+broken-links-report.json
+lighthouse-*.json
+marketing-audit-report.json
+r2-url-mapping.json
+
+# Development tooling
+tools/
+scripts/
+outreach/
+branding/
+lms-content/
+lms-data/
+cloudflare-workers/
+fly-containers/
+
+# Config / docs not needed at runtime
+*.md
+LICENSE
+CHANGELOG*
+.github/
+.devcontainer/
+.vscode/
+
+# Test artifacts
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage/
+playwright-report/
+test-results/
+
+# Supabase local dev
+supabase/.temp/
+supabase/.branches/
+
+# Large media (served from CDN/public, not from the function)
+public/videos/
+public/audio/

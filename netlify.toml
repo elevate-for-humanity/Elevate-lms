@@ -120,45 +120,74 @@
     "pg"
   ]
 
-# Externalize heavy deps from the Next.js SSR handler to stay under 50MB zip limit
+# Externalize heavy deps from the Next.js SSR handler to stay under 250MB zip limit
 [functions."___netlify-server-handler"]
   external_node_modules = [
+    # Google APIs (194MB alone)
+    "googleapis",
+    "google-auth-library",
+    # Editor / terminal (75MB + 63MB — browser-only)
+    "monaco-editor",
+    "node-pty",
+    # OCR / image processing
     "tesseract.js",
     "tesseract.js-core",
     "sharp",
+    "@img/sharp-libvips-linux-x64",
+    "@napi-rs/canvas",
+    "@napi-rs/canvas-linux-x64-gnu",
+    # PDF libraries
     "pdf-parse",
     "pdfkit",
     "pdf-lib",
+    "pdfjs-dist",
     "jspdf",
     "jspdf-autotable",
     "@react-pdf/renderer",
+    # Video (browser-only)
+    "video.js",
+    # AWS SDK
     "@aws-sdk/client-s3",
     "@aws-sdk/s3-request-presigner",
+    # Database / cache
     "pg",
-    "openai",
-    "stripe",
     "ioredis",
     "redis",
     "@upstash/redis",
-    "socket.io",
-    "socket.io-client",
+    "@redis/client",
+    # AI / payments
+    "openai",
+    "stripe",
+    # Email
     "@sendgrid/mail",
     "nodemailer",
+    # Observability
     "@sentry/nextjs",
     "@sentry/node",
     "@sentry/core",
+    "@sentry/cli-linux-x64",
     "@opentelemetry/api",
     "@opentelemetry/sdk-node",
     "@opentelemetry/exporter-trace-otlp-http",
     "@opentelemetry/resources",
     "@opentelemetry/semantic-conventions",
+    # Browser automation (not needed in SSR)
     "puppeteer",
     "puppeteer-core",
     "playwright",
+    "playwright-core",
     "chromium-bidi",
+    # DOM / test (not needed in SSR)
     "jsdom",
+    "happy-dom",
+    # Build tools (not needed at runtime)
     "typescript",
     "core-js",
+    "prettier",
+    "es-toolkit",
+    # Sockets (not used in serverless)
+    "socket.io",
+    "socket.io-client",
   ]
 
 # PDF export function - isolated bundle with PDF libraries

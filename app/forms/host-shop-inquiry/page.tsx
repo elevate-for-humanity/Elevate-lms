@@ -25,8 +25,8 @@ export default function HostShopInquiryPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          inquiry_type: 'host_shop',
-          data: formData,
+          ...formData,
+          program: 'barber-apprenticeship-host-shop',
         }),
       });
 

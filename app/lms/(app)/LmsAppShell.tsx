@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { LMSSidebar } from '@/components/lms/LMSSidebar';
 import { AIInstructorWidget } from '@/components/AIInstructorWidget';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
+import { VoiceAssistant } from '@/components/VoiceAssistant';
 
 interface LmsAppShellProps {
   user: { id: string; email?: string; user_metadata?: Record<string, any> };
@@ -28,6 +29,7 @@ export function LmsAppShell({ user, profile, children }: LmsAppShellProps) {
       </main>
 
       <AIInstructorWidget context="lesson" />
+      <VoiceAssistant />
     </div>
   );
 }

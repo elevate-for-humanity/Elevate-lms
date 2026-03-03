@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { apiPost, apiPatch } from '@/lib/api';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), { ssr: false });
 
 interface Course {
   id: string;
@@ -140,6 +143,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
 
   const publishedCount = courses.filter(c => c.is_published).length;
   const draftCount = courses.filter(c => !c.is_published).length;
+  const [activeTab, setActiveTab] = useState<'manual' | 'ai'>('manual');
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -155,6 +159,27 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
         </button>
       </div>
 
+      {/* Tab Switcher */}
+      <div className="flex gap-1 mb-8 bg-gray-100 rounded-lg p-1 w-fit">
+        <button
+          onClick={() => setActiveTab('manual')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'manual' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+        >
+          Manual Builder
+        </button>
+        <button
+          onClick={() => setActiveTab('ai')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'ai' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+        >
+          AI Course Generator
+        </button>
+      </div>
+
+      {activeTab === 'ai' && (
+        <AutomaticCourseBuilder />
+      )}
+
+      {activeTab === 'manual' && (<>
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
@@ -343,6 +368,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 }

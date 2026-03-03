@@ -5,6 +5,10 @@ const nextConfig = {
   // Server external packages - exclude heavy dependencies from the server bundle
   // These are loaded at runtime instead of being bundled, reducing Lambda size
   serverExternalPackages: [
+    'fluent-ffmpeg',
+    '@ffmpeg-installer/ffmpeg',
+    '@ffprobe-installer/ffprobe',
+    'canvas',
     'tesseract.js',
     'tesseract.js-core',
     'sharp',

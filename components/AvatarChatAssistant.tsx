@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Volume2, VolumeX, Minimize2, Maximize2 } from 'lucide-react';
+import { getAvatar, AVATARS } from '@/lib/ai-avatars';
 
 interface Message {
   role: 'user' | 'assistant';

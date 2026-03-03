@@ -95,8 +95,6 @@ export async function generateVideo(
 
     for (let i = 0; i < request.scenes.length; i++) {
       const scene = request.scenes[i];
-        `Processing scene ${i + 1}/${request.scenes.length}: ${scene.id}`
-      );
 
       // Generate TTS audio if voice-over is enabled
       let audioPath: string | undefined;

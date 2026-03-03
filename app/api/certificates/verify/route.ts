@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { verifyCertificate, getVerificationUrl, getQRCodeUrl } from '@/lib/certificates/verification';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

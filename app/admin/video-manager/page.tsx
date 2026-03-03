@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import VideoUploader from '@/components/admin/VideoUploader';
+import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
 import { Check, Copy, FileText, Sparkles, Video, Trash2, RefreshCw, Search, ExternalLink } from 'lucide-react';
 
 interface VideoRecord {

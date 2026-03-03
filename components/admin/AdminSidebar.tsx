@@ -23,6 +23,9 @@ import {
   Briefcase,
   X,
   Menu,
+  Sparkles,
+  Workflow,
+  ClipboardList,
 } from 'lucide-react';
 
 interface NavItem {
@@ -44,6 +47,25 @@ const NAV: NavSection[] = [
     icon: LayoutDashboard,
     href: '/admin',
   },
+
+  // ── AI STUDIO ─────────────────────────────────────────────────────
+  {
+    name: 'AI Studio',
+    icon: Sparkles,
+    items: [
+      { name: 'AI Console', href: '/admin/ai-console', badge: 'AI' },
+      { name: 'Course Generator', href: '/admin/course-generator', badge: 'AI' },
+      { name: 'Program Generator', href: '/admin/program-generator', badge: 'AI' },
+      { name: 'Syllabus Generator', href: '/admin/syllabus-generator', badge: 'AI' },
+      { name: 'Video Generator', href: '/admin/video-generator', badge: 'AI' },
+      { name: 'Video Manager', href: '/admin/video-manager' },
+      { name: 'AI Tutor Logs', href: '/admin/ai-tutor-logs' },
+      { name: 'Copilot', href: '/admin/copilot', badge: 'AI' },
+      { name: 'Autopilot', href: '/admin/autopilot', badge: 'AI' },
+    ],
+  },
+
+  // ── USERS ─────────────────────────────────────────────────────────
   {
     name: 'Users & Access',
     icon: Users,
@@ -52,12 +74,19 @@ const NAV: NavSection[] = [
       { name: 'Students', href: '/admin/students' },
       { name: 'Instructors', href: '/admin/instructors' },
       { name: 'Applicants', href: '/admin/applicants' },
+      { name: 'Applicants Live', href: '/admin/applicants-live' },
+      { name: 'Applications', href: '/admin/applications' },
       { name: 'Leads', href: '/admin/leads' },
+      { name: 'Waitlist', href: '/admin/waitlist' },
       { name: 'Delegates', href: '/admin/delegates' },
       { name: 'HR', href: '/admin/hr' },
       { name: 'At-Risk Students', href: '/admin/at-risk' },
+      { name: 'Intake', href: '/admin/intake' },
+      { name: 'Verifications', href: '/admin/verifications' },
     ],
   },
+
+  // ── PROGRAMS & COURSES ────────────────────────────────────────────
   {
     name: 'Programs & Courses',
     icon: GraduationCap,
@@ -65,26 +94,58 @@ const NAV: NavSection[] = [
       { name: 'Programs', href: '/admin/programs' },
       { name: 'Courses', href: '/admin/courses' },
       { name: 'Course Builder', href: '/admin/course-builder' },
+      { name: 'Course Templates', href: '/admin/course-templates' },
+      { name: 'Course Import', href: '/admin/course-import' },
+      { name: 'Career Courses', href: '/admin/career-courses' },
       { name: 'Curriculum', href: '/admin/curriculum' },
       { name: 'Modules', href: '/admin/modules' },
+      { name: 'Lessons', href: '/admin/lessons' },
+      { name: 'External Modules', href: '/admin/external-modules' },
       { name: 'Quiz Builder', href: '/admin/quiz-builder' },
-      { name: 'Enrollments', href: '/admin/enrollments' },
+      { name: 'Quizzes', href: '/admin/quizzes' },
+      { name: 'Gradebook', href: '/admin/gradebook' },
       { name: 'HVAC Activation', href: '/admin/hvac-activation', badge: 'NEW' },
     ],
   },
+
+  // ── ENROLLMENT & OPERATIONS ───────────────────────────────────────
+  {
+    name: 'Enrollment & Ops',
+    icon: ClipboardList,
+    items: [
+      { name: 'Enrollments', href: '/admin/enrollments' },
+      { name: 'Enrollment Jobs', href: '/admin/enrollment-jobs' },
+      { name: 'HSI Enrollments', href: '/admin/hsi-enrollments' },
+      { name: 'Partner Enrollments', href: '/admin/partner-enrollments' },
+      { name: 'Cohorts', href: '/admin/cohorts' },
+      { name: 'Operations', href: '/admin/operations' },
+      { name: 'Next Steps', href: '/admin/next-steps' },
+    ],
+  },
+
+  // ── PARTNERS & EMPLOYERS ──────────────────────────────────────────
   {
     name: 'Partners & Employers',
     icon: Building2,
     items: [
       { name: 'Partners', href: '/admin/partners' },
+      { name: 'Partner Inquiries', href: '/admin/partner-inquiries' },
       { name: 'Employers', href: '/admin/employers' },
+      { name: 'Employers Playbook', href: '/admin/employers-playbook' },
       { name: 'Program Holders', href: '/admin/program-holders' },
+      { name: 'PH Documents', href: '/admin/program-holder-documents' },
+      { name: 'PH Acknowledgements', href: '/admin/program-holder-acknowledgements' },
       { name: 'Apprenticeships', href: '/admin/apprenticeships' },
+      { name: 'RAPIDS', href: '/admin/rapids' },
       { name: 'JRI', href: '/admin/jri' },
       { name: 'MOU', href: '/admin/mou' },
       { name: 'Shops', href: '/admin/shops' },
+      { name: 'Affiliates', href: '/admin/affiliates' },
+      { name: 'Jobs Board', href: '/admin/jobs' },
     ],
   },
+
+  // ── CREDENTIALS ───────────────────────────────────────────────────
   {
     name: 'Credentials',
     icon: Award,
@@ -94,92 +155,152 @@ const NAV: NavSection[] = [
       { name: 'Completions', href: '/admin/completions' },
       { name: 'Signatures', href: '/admin/signatures' },
       { name: 'License', href: '/admin/license' },
-      { name: 'Proctor Portal', href: '/proctor' },
+      { name: 'Licenses', href: '/admin/licenses' },
+      { name: 'License Requests', href: '/admin/license-requests' },
+      { name: 'Licensing', href: '/admin/licensing' },
+      { name: 'Proctor Portal', href: '/admin/proctor-portal' },
     ],
   },
+
+  // ── STUDENT SUPPORT ───────────────────────────────────────────────
   {
     name: 'Student Support',
     icon: Briefcase,
     items: [
       { name: 'Progress', href: '/admin/progress' },
+      { name: 'External Progress', href: '/admin/external-progress' },
+      { name: 'Learner View', href: '/admin/learner' },
       { name: 'Barriers', href: '/admin/barriers' },
       { name: 'Retention', href: '/admin/retention' },
+      { name: 'Success', href: '/admin/success' },
+      { name: 'Support', href: '/admin/support' },
       { name: 'Transfer Hours', href: '/admin/transfer-hours' },
       { name: 'Hours Export', href: '/admin/hours-export' },
     ],
   },
+
+  // ── CONTENT & MEDIA ───────────────────────────────────────────────
   {
     name: 'Content & Media',
     icon: Video,
     items: [
+      { name: 'Media Studio', href: '/admin/media-studio' },
+      { name: 'Videos', href: '/admin/videos' },
       { name: 'Documents', href: '/admin/documents' },
       { name: 'Document Center', href: '/admin/document-center' },
-      { name: 'Videos', href: '/admin/videos' },
-      { name: 'Media Studio', href: '/admin/media-studio' },
       { name: 'Blog', href: '/admin/blog' },
       { name: 'Files', href: '/admin/files' },
+      { name: 'Social Media', href: '/admin/social-media' },
+      { name: 'Moderation', href: '/admin/moderation' },
+      { name: 'Review Queue', href: '/admin/review-queue' },
     ],
   },
+
+  // ── COMMUNICATION ─────────────────────────────────────────────────
   {
     name: 'Communication',
     icon: Mail,
     items: [
-      { name: 'Email Marketing', href: '/admin/email-marketing' },
       { name: 'CRM', href: '/admin/crm' },
       { name: 'Inbox', href: '/admin/inbox' },
+      { name: 'Live Chat', href: '/admin/live-chat' },
+      { name: 'Email Marketing', href: '/admin/email-marketing' },
+      { name: 'Campaigns', href: '/admin/campaigns' },
       { name: 'Notifications', href: '/admin/notifications' },
       { name: 'Contacts', href: '/admin/contacts' },
-      { name: 'Campaigns', href: '/admin/campaigns' },
+      { name: 'Marketing', href: '/admin/marketing' },
     ],
   },
+
+  // ── FUNDING & FINANCE ─────────────────────────────────────────────
   {
     name: 'Funding & Finance',
     icon: DollarSign,
     items: [
       { name: 'Funding', href: '/admin/funding' },
+      { name: 'Funding Playbook', href: '/admin/funding-playbook' },
       { name: 'Grants', href: '/admin/grants' },
+      { name: 'WIOA', href: '/admin/wioa' },
+      { name: 'WOTC', href: '/admin/wotc' },
+      { name: 'SAP', href: '/admin/sap' },
       { name: 'Payroll', href: '/admin/payroll' },
+      { name: 'Payroll Cards', href: '/admin/payroll-cards' },
+      { name: 'Cash Advances', href: '/admin/cash-advances' },
       { name: 'Incentives', href: '/admin/incentives' },
+      { name: 'Promo Codes', href: '/admin/promo-codes' },
       { name: 'Tax Filing', href: '/admin/tax-filing' },
       { name: 'Marketplace', href: '/admin/marketplace' },
       { name: 'Store', href: '/admin/store' },
     ],
   },
+
+  // ── COMPLIANCE & REPORTS ──────────────────────────────────────────
   {
     name: 'Compliance & Reports',
     icon: Shield,
     items: [
       { name: 'Analytics', href: '/admin/analytics' },
+      { name: 'Performance', href: '/admin/performance-dashboard' },
       { name: 'Reports', href: '/admin/reporting' },
+      { name: 'Impact', href: '/admin/impact' },
+      { name: 'Outcomes', href: '/admin/outcomes' },
       { name: 'Compliance', href: '/admin/compliance' },
+      { name: 'Compliance Audit', href: '/admin/compliance-audit' },
       { name: 'Accreditation', href: '/admin/accreditation' },
       { name: 'FERPA', href: '/admin/ferpa' },
       { name: 'ETPL Alignment', href: '/admin/etpl-alignment' },
+      { name: 'Governance', href: '/admin/governance' },
       { name: 'Audit Logs', href: '/admin/audit-logs' },
-      { name: 'Outcomes', href: '/admin/outcomes' },
+      { name: 'Activity', href: '/admin/activity' },
     ],
   },
+
+  // ── WORKFLOWS & AUTOMATION ────────────────────────────────────────
+  {
+    name: 'Workflows',
+    icon: Workflow,
+    items: [
+      { name: 'Workflows', href: '/admin/workflows' },
+      { name: 'Automation', href: '/admin/automation' },
+      { name: 'Automation QA', href: '/admin/automation-qa' },
+      { name: 'Import', href: '/admin/import' },
+      { name: 'Portal Map', href: '/admin/portal-map' },
+    ],
+  },
+
+  // ── SYSTEM ────────────────────────────────────────────────────────
   {
     name: 'System',
     icon: Settings,
     items: [
       { name: 'Settings', href: '/admin/settings' },
       { name: 'Integrations', href: '/admin/integrations' },
+      { name: 'API Keys', href: '/admin/api-keys' },
       { name: 'System Health', href: '/admin/system-health' },
+      { name: 'System Status', href: '/admin/system-status' },
+      { name: 'System Monitor', href: '/admin/system-monitor' },
+      { name: 'Site Health', href: '/admin/site-health' },
+      { name: 'Monitoring', href: '/admin/monitoring' },
       { name: 'Security', href: '/admin/security' },
       { name: 'Tenants', href: '/admin/tenants' },
+      { name: 'Mobile Sync', href: '/admin/mobile-sync' },
     ],
   },
+
+  // ── DEV TOOLS ─────────────────────────────────────────────────────
   {
     name: 'Dev Tools',
     icon: Wrench,
     items: [
       { name: 'Dev Studio', href: '/admin/dev-studio' },
-      { name: 'Autopilot', href: '/admin/autopilot' },
-      { name: 'Copilot', href: '/admin/copilot' },
+      { name: 'Advanced Tools', href: '/admin/advanced-tools' },
       { name: 'Editor', href: '/admin/editor' },
-      { name: 'Migrations', href: '/admin/migrations' },
       { name: 'Data Processor', href: '/admin/data-processor' },
+      { name: 'Migrations', href: '/admin/migrations' },
+      { name: 'Test Emails', href: '/admin/test-emails' },
+      { name: 'Test Payments', href: '/admin/test-payments' },
+      { name: 'Docs', href: '/admin/docs' },
+      { name: 'Internal Docs', href: '/admin/internal-docs' },
     ],
   },
 ];

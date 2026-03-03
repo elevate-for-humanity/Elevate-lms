@@ -828,7 +828,7 @@ export const ORIENTATION_QUIZ: QuizQuestion[] = [
   { id: "q-01-02", question: "What is the program delivery model?", options: ["Fully online", "Fully in-person", "Hybrid (online RTI + employer OJT)", "Self-paced only"], correctAnswer: 2, explanation: "The program uses a hybrid model: Related Technical Instruction online via LMS, On-the-Job Training at employer sites." },
   { id: "q-01-03", question: "What funding source covers tuition for eligible students?", options: ["Student loans", "WIOA / Next Level Jobs", "Private scholarships only", "Employer reimbursement only"], correctAnswer: 1, explanation: "WIOA and Next Level Jobs funding covers tuition for eligible participants." },
   { id: "q-01-04", question: "What is the minimum attendance requirement?", options: ["50%", "70%", "80%", "100%"], correctAnswer: 2, explanation: "Students must maintain at least 80% attendance to remain in good standing." },
-  { id: "q-01-05", question: "How long is the HVAC program?", options: ["8 weeks", "12 weeks", "16 weeks", "20 weeks"], correctAnswer: 3, explanation: "The HVAC Technician program is 20 weeks." },
+  { id: "q-01-05", question: "How long is the HVAC program?", options: ["8 weeks", "12 weeks", "16 weeks", "20 weeks"], correctAnswer: 1, explanation: "The HVAC Technician program is 12 weeks of Related Technical Instruction." },
 ];
 
 export const HVAC_FUNDAMENTALS_QUIZ: QuizQuestion[] = [

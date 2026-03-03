@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import CopilotAssistant from '@/components/admin/CopilotAssistant';
 
 export const metadata: Metadata = {
   alternates: {
@@ -209,6 +210,12 @@ export default async function CopilotPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Live Copilot Assistant */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Copilot Assistant</h2>
+          <CopilotAssistant />
         </div>
       </div>
     </div>

@@ -19,9 +19,12 @@ import {
 CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import LessonPlayer from '@/components/lms/LessonPlayer';
+import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
+import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
+import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
 
 export default function LessonPage() {
   const params = useParams();
@@ -85,8 +88,22 @@ export default function LessonPage() {
 
     // 2. Set state
     if (lessonData) {
+      // If quiz lesson has no quiz_questions, fall back to local quiz bank
+      let quizQuestions = lessonData.quiz_questions;
+      let quizPassingScore = lessonData.passing_score;
+      if (lessonData.content_type === 'quiz' && (!quizQuestions || quizQuestions.length === 0)) {
+        // Reverse-lookup: UUID → definition ID → quiz config
+        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        if (defId && HVAC_QUIZ_MAP[defId]) {
+          quizQuestions = HVAC_QUIZ_MAP[defId].questions;
+          quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
+        }
+      }
       setLesson({
         ...lessonData,
+        quiz_questions: quizQuestions || lessonData.quiz_questions,
+        passing_score: quizPassingScore || lessonData.passing_score,
+        quiz_id: lessonData.quiz_id || (quizQuestions?.length ? lessonData.id : null),
         resources: lessonData.resources || [],
       });
     }
@@ -422,37 +439,24 @@ export default function LessonPage() {
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
             />
           </div>
-        ) : lesson.content_type === 'quiz' && lesson.quiz_id ? (
+        ) : lesson.content_type === 'quiz' && (lesson.quiz_questions?.length > 0 || lesson.quiz_id) ? (
           <div className="max-w-4xl mx-auto p-8">
             <QuizSystem
               questions={lesson.quiz_questions || []}
               onComplete={async (score) => {
-                // Save quiz attempt
-                try {
-                  await fetch(`/api/lms/quizzes/${lesson.quiz_id}/submit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ score, answers: [] }),
-                  });
-                  if (score >= (lesson.passing_score || 70)) {
-                    markComplete();
-                  }
-                } catch { /* non-fatal */ }
+                if (score >= (lesson.passing_score || 70)) {
+                  markComplete();
+                }
               }}
               passingScore={lesson.passing_score || 70}
             />
           </div>
         ) : lesson.video_url ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <LessonPlayer
+            {/* Video/audio lesson — InteractiveVideoPlayer handles both MP4 and MP3 */}
+            <InteractiveVideoPlayer
               videoUrl={lesson.video_url}
-              lessonTitle={lesson.title}
-              moduleTitle={course?.title}
-              transcript={lesson.transcript ?? null}
-              lessonContent={lesson.content ?? null}
-              lessonNumber={currentIndex + 1}
-              totalLessons={lessons.length}
-              durationMinutes={lesson.duration_minutes ?? undefined}
+              title={lesson.title}
               onComplete={() => {
                 if (!isCompleted) {
                   setIsCompleted(true);

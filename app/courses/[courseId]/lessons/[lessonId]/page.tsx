@@ -53,6 +53,7 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [videoWatchPercent, setVideoWatchPercent] = useState(0);
+
   const lessonStartTime = useRef(Date.now());
 
   // Reset start time when lesson changes
@@ -60,12 +61,15 @@ export default function LessonPage() {
     lessonStartTime.current = Date.now();
   }, [lessonId]);
 
+  const fetchIdRef = useRef(0);
   useEffect(() => {
-    fetchLessonData();
+    const id = ++fetchIdRef.current;
+    fetchLessonData(id);
   }, [lessonId]);
 
-  const fetchLessonData = async () => {
+  const fetchLessonData = async (fetchId: number) => {
     const apiRes = await fetch(`/api/courses/${courseId}/lessons/public`);
+    if (fetchId !== fetchIdRef.current) return; // stale from strict mode remount
     const apiData = apiRes.ok ? await apiRes.json() : { course: null, lessons: [], modules: [] };
 
     const courseData = apiData.course;
@@ -93,11 +97,8 @@ export default function LessonPage() {
     if (lessonsData) setLessons(lessonsData);
     if (modulesData) setModules(modulesData);
 
-    // Redirect unenrolled users to the course page to enroll
-    if (apiData.enrolled === false) {
-      router.push(`/courses/${courseId}`);
-      return;
-    }
+    // Note: enrollment gating removed — lessons are publicly viewable.
+    // Progress tracking and completion still require authentication.
 
     if (courseData) {
       setCourse({

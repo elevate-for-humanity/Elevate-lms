@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import LearningBarrierAnalyzer from '@/components/admin/LearningBarrierAnalyzer';
 
 export const metadata: Metadata = {
   alternates: {
@@ -193,6 +194,12 @@ export default async function BarriersPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* AI Barrier Analyzer */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h2 className="text-xl font-semibold mb-4">AI Barrier Analysis</h2>
+        <LearningBarrierAnalyzer />
       </div>
     </div>
   );

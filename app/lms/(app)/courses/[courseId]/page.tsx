@@ -24,6 +24,7 @@ import { DiscussionForum } from '@/components/DiscussionForum';
 import AIInstructor from '@/components/AIInstructor';
 import AvatarCourseGuide from '@/components/AvatarCourseGuide';
 import VoiceoverPlayer from '@/components/VoiceoverPlayer';
+import { UniversalCoursePlayer } from '@/components/UniversalCoursePlayer';
 
 type Params = Promise<{ courseId: string }>;
 

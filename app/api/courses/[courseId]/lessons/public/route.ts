@@ -130,6 +130,7 @@ async function _GET(
   const { data: { user } } = userClient ? await userClient.auth.getUser() : { data: { user: null } };
 
   let isEnrolled = false;
+  const isAuthenticated = !!user;
   if (user) {
     const { data: enrollment } = await supabase
       .from('training_enrollments')
@@ -164,7 +165,8 @@ async function _GET(
     if (slug) {
       const fallback = buildLocalFallback(courseId, slug);
       if (fallback) {
-        return NextResponse.json(isEnrolled ? fallback : stripSensitiveFields(fallback));
+        // Known courses serve full content publicly
+        return NextResponse.json({ ...fallback, enrolled: isEnrolled, authenticated: isAuthenticated });
       }
     }
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
@@ -195,10 +197,16 @@ async function _GET(
     lessons: lessons || [],
     modules: modules || [],
     enrolled: isEnrolled,
+    authenticated: isAuthenticated,
   };
 
-  // Enrolled users get full content; everyone else gets syllabus only
-  return NextResponse.json(isEnrolled ? payload : stripSensitiveFields(payload));
+  // Known courses (HVAC etc.) serve full content publicly so lessons are
+  // viewable without sign-in. Other courses still require enrollment.
+  const isKnownCourse = !!COURSE_ID_TO_SLUG[courseId];
+  if (isEnrolled || isKnownCourse) {
+    return NextResponse.json(payload);
+  }
+  return NextResponse.json(stripSensitiveFields(payload));
 }
 
 /**
@@ -209,6 +217,7 @@ function stripSensitiveFields(data: any) {
   return {
     ...data,
     enrolled: false,
+    authenticated: data.authenticated ?? false,
     lessons: (data.lessons || []).map((l: any) => ({
       id: l.id,
       course_id: l.course_id,

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/files' },
@@ -43,6 +44,12 @@ export default async function FilesPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Storage Used</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">0 MB</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Recent Files</h2><p className="text-gray-500 text-center py-4">No files uploaded yet</p></div>
+
+        {/* Advanced Video Uploader */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Video Upload</h2>
+          <AdvancedVideoUploader />
+        </div>
       </div>
     </div>
   );

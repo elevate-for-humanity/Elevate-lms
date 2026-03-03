@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import SocialMediaAutomation from '@/lib/new-ecosystem-services/SocialMediaAutomation';
 
 import {
   Plus,

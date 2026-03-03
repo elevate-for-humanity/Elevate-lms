@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Video Final Test</title></head>
+<body style="margin:0;padding:20px;background:#000;color:#fff;font-family:sans-serif">
+<h2>Test 1: 60-second orientation clip from Supabase (2.9MB)</h2>
+<video controls playsinline preload="auto" crossorigin="anonymous" style="width:100%;max-width:800px;display:block">
+  <source src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-60sec.mp4" type="video/mp4">
+</video>
+
+<h2 style="margin-top:40px">Test 1b: Same URL, direct src attribute</h2>
+<video controls playsinline preload="auto" crossorigin="anonymous" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-60sec.mp4" style="width:100%;max-width:800px;display:block"></video>
+
+<h2 style="margin-top:40px">Test 1c: iframe to raw video URL</h2>
+<iframe src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-60sec.mp4" style="width:100%;max-width:800px;height:450px;border:1px solid #333"></iframe>
+
+<h2 style="margin-top:40px">Test 2: Lesson 5 from Supabase (8MB, control)</h2>
+<video controls playsinline preload="auto" style="width:100%;max-width:800px;display:block">
+  <source src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/lessons/hvac-lesson-005.mp4" type="video/mp4">
+</video>
+</body>
+</html>

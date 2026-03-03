@@ -259,10 +259,10 @@ export default function LessonPlayer({
       {/* Video container with 16:9 aspect ratio */}
       <div className="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
         <div className="relative aspect-video">
-          {/* Actual video element — metadata-only preload for fast initial render */}
+          {/* Actual video element */}
           <video
             ref={videoRef}
-            preload={isAudioOnly ? "auto" : "metadata"}
+            preload="auto"
             playsInline
             crossOrigin="anonymous"
             className="absolute inset-0 h-full w-full object-contain bg-black"
@@ -319,51 +319,51 @@ export default function LessonPlayer({
             </div>
           )}
 
-          {/* Pre-start overlay */}
+          {/* Pre-start overlay — translucent so video thumbnail shows through */}
           {!hasStarted && !hasError && (
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 cursor-pointer"
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 cursor-pointer"
               onClick={play}
             >
               {/* Top bar */}
               <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 backdrop-blur-sm sm:h-8 sm:w-8">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-black/30 backdrop-blur-sm sm:h-8 sm:w-8">
                     <BookOpen className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" />
                   </div>
                   <div>
                     {moduleTitle && (
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-white/50 sm:text-xs">
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
                         {moduleTitle}
                       </p>
                     )}
-                    <p className="text-xs font-medium text-white/70 sm:text-sm">
+                    <p className="text-xs font-medium text-white/90 sm:text-sm">
                       {lessonNumber && totalLessons ? `Lesson ${lessonNumber} of ${totalLessons}` : "Lesson"}
                     </p>
                   </div>
                 </div>
                 {durationMinutes && (
-                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-medium text-white/60 backdrop-blur-sm sm:text-xs">
+                  <span className="rounded-full bg-black/30 px-2.5 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm sm:text-xs">
                     {durationMinutes} min
                   </span>
                 )}
               </div>
 
-              <h2 className="mb-3 max-w-lg text-center text-xl font-bold text-white sm:text-3xl md:text-4xl px-4">
+              <h2 className="mb-3 max-w-lg text-center text-xl font-bold text-white drop-shadow-lg sm:text-3xl md:text-4xl px-4">
                 {lessonTitle}
               </h2>
               {moduleTitle && (
-                <p className="mb-8 text-sm text-white/50 sm:text-base">{moduleTitle}</p>
+                <p className="mb-8 text-sm text-white/70 drop-shadow sm:text-base">{moduleTitle}</p>
               )}
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); play(); }}
-                className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600 text-white shadow-lg shadow-brand-blue-600/30 transition hover:scale-105 hover:bg-brand-blue-500 hover:shadow-xl sm:h-20 sm:w-20"
+                className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-2xl transition hover:scale-105 hover:bg-white sm:h-20 sm:w-20"
                 aria-label="Play video"
               >
                 <Play className="ml-1 h-7 w-7 sm:h-8 sm:w-8" />
               </button>
-              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-white/40 sm:text-sm">
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-white/60 drop-shadow sm:text-sm">
                 <Volume2 className="h-3.5 w-3.5" />
                 Make sure your volume is on
               </p>

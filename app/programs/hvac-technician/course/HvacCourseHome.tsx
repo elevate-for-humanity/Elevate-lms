@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
   BookOpen, Video, FileText, ClipboardCheck, Wrench, FlaskConical,
-  ChevronRight, Play, X, Maximize2,
+  ChevronRight, Play, X, Award, CheckCircle, Clock, Users,
 } from 'lucide-react';
 import type { CourseDefinition, CourseLesson, CourseModule } from '@/lib/courses/definitions';
 import {
@@ -14,6 +14,8 @@ import {
   HVAC_LESSON_UUID as LESSON_UUID,
   HVAC_MODULE_FIRST_LESSON as MODULE_FIRST_LESSON,
 } from '@/lib/courses/hvac-uuids';
+
+/* ── Helpers ── */
 
 function lessonUrl(id: string) { return `/courses/${HVAC_COURSE_ID}/lessons/${id}`; }
 function lessonUrlById(defId: string) {
@@ -29,45 +31,24 @@ const TYPE_LABEL: Record<CourseLesson['type'], string> = {
   video: 'Video', reading: 'Reading', quiz: 'Quiz', assignment: 'Assignment', lab: 'Lab',
 };
 
-/*
- * 16 unique HVAC/trades images — all >200KB, no duplicates, contextually matched.
- */
+// One image per module — all real workforce/HVAC photos
 const MODULE_PHOTO: string[] = [
-  '/images/programs-hq/hvac-technician.jpg',                    // 1  Orientation — HVAC technician at work
-  '/images/hvac/hvac-installation.jpg',                        // 2  Fundamentals — HVAC system install
-  '/images/trades/hero-program-electrical.jpg',                // 3  Electrical — wiring/panels
-  '/images/hvac/hvac-service-tech.jpg',                        // 4  Heating — service technician
-  '/images/hvac/hvac-commercial.jpg',                          // 5  Cooling — commercial system
-  '/images/trades/program-hvac-overview.jpg',                  // 6  EPA Core — HVAC overview
-  '/images/hvac/hvac-tools-equipment.jpg',                     // 7  EPA Type I — tools & testing
-  '/images/trades/program-building-technology.jpg',            // 8  EPA Type II — building systems
-  '/images/trades/program-building-construction.jpg',          // 9  EPA Type III — construction/controls
-  '/images/hvac/hvac-advisor-meeting.jpg',                     // 10 EPA Final — advisor review
-  '/images/trades/program-welding-training.jpg',               // 11 Refrigerant — brazing/piping
-  '/images/trades/program-construction-training.jpg',          // 12 Installation — hands-on install
-  '/images/trades/program-electrical-training.jpg',            // 13 Troubleshooting — electrical diagnostics
-  '/images/programs-hq/skilled-trades-hero.jpg',               // 14 OSHA — safety on the job site
-  '/images/trades/hero-program-hvac.jpg',                      // 15 CPR/First Aid — HVAC field readiness
-  '/images/heroes-hq/career-services-hero.jpg',                // 16 Career — professional development
-];
-
-const MODULE_DESC: string[] = [
-  'Program structure, attendance policy, FERPA rights, support services, and career outlook for HVAC technicians in Indiana.',
-  'How heating, ventilation, and air conditioning systems work together. Components, airflow principles, BTU calculations, and system safety.',
-  'AC/DC circuits, wiring diagrams, multimeter operation, Ohm\'s Law, and NEC electrical safety standards for HVAC applications.',
-  'Gas and oil furnaces, heat pumps, gas valve operation, ignition systems, and systematic heating diagnostics.',
-  'The refrigeration cycle, compressor types, metering devices, evaporators, condensers, and superheat/subcooling measurements.',
-  'EPA 608 Core exam prep — ozone depletion, Clean Air Act, refrigerant recovery requirements, and safety procedures.',
-  'EPA 608 Type I — small appliance systems under 5 lbs of refrigerant. Recovery techniques and self-contained equipment.',
-  'EPA 608 Type II — high-pressure systems. Leak detection, evacuation procedures, system charging, and recovery equipment.',
-  'EPA 608 Type III — low-pressure systems. Centrifugal chillers, purge units, and large commercial equipment procedures.',
-  'Full-length 100-question EPA 608 Universal practice exam. Timed, scored, with detailed answer explanations.',
-  'Refrigerant identification, handling procedures, pressure-temperature relationships, and diagnostic techniques.',
-  'Equipment sizing, ductwork design, refrigerant line sets, brazing, system startup, and commissioning procedures.',
-  'Systematic troubleshooting methodology, service call management, customer communication, and documentation.',
-  'OSHA 30-Hour Construction — fall protection, electrical safety, scaffolding, HazCom, PPE, and confined spaces.',
-  'American Red Cross CPR/First Aid/AED certification plus Rise Up customer service and workplace readiness.',
-  'Resume writing, interview techniques, employer introductions, and job placement support with local HVAC contractors.',
+  '/images/programs-hq/hvac-technician.jpg',
+  '/images/trades/program-hvac-overview.jpg',
+  '/images/trades/hero-program-electrical.jpg',
+  '/images/trades/program-hvac-technician.jpg',
+  '/images/trades/program-building-technology.jpg',
+  '/images/trades/hero-program-hvac.jpg',
+  '/images/programs-hq/training-classroom.jpg',
+  '/images/trades/program-building-construction.jpg',
+  '/images/trades/program-construction-training.jpg',
+  '/images/trades/program-electrical-training.jpg',
+  '/images/trades/program-welding-training.jpg',
+  '/images/programs-hq/skilled-trades-hero.jpg',
+  '/images/programs-hq/students-learning.jpg',
+  '/images/heroes-hq/programs-hero.jpg',
+  '/images/heroes-hq/success-hero.jpg',
+  '/images/heroes-hq/career-services-hero.jpg',
 ];
 
 function modProgress(mod: CourseModule, done: string[]) {
@@ -86,80 +67,90 @@ function findNext(modules: CourseModule[], done: string[]) {
   return null;
 }
 
-function countType(lessons: CourseLesson[], t: CourseLesson['type']) {
-  return lessons.filter((l) => l.type === t).length;
-}
+/* ══════════════════════════════════════════════════════════════════
+   Lesson Drawer — slides in from right when a module card is clicked
+   ══════════════════════════════════════════════════════════════════ */
 
-/* ── Full-Screen Video Player ── */
-function VideoPlayer({ src, onClose }: { src: string; onClose: () => void }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const handleFullscreen = () => { videoRef.current?.requestFullscreen?.(); };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
-      <button onClick={onClose} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition">
-        <X className="w-5 h-5" />
-      </button>
-      <button onClick={handleFullscreen} className="absolute top-4 right-16 z-10 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition">
-        <Maximize2 className="w-4 h-4" />
-      </button>
-      <video ref={videoRef} src={src} autoPlay controls className="w-full h-full max-h-screen object-contain" onEnded={onClose} />
-    </div>
-  );
-}
-
-/* ── Lesson Drawer ── */
 function LessonDrawer({ module, index, done, onClose }: {
   module: CourseModule; index: number; done: string[]; onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-white shadow-2xl overflow-y-auto">
-        <div className="relative h-44">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-white shadow-2xl overflow-y-auto animate-in slide-in-from-right">
+
+        {/* Header image */}
+        <div className="relative h-52">
           <Image src={MODULE_PHOTO[index] || MODULE_PHOTO[0]} alt={module.title} fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur text-white flex items-center justify-center hover:bg-white/40 transition">
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/90 via-brand-blue-900/40 to-transparent" />
+          <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition shadow-lg">
             <X className="w-4 h-4" />
           </button>
-          <div className="absolute bottom-4 left-5 right-5 text-white">
-            <p className="text-[11px] font-semibold text-white/60 uppercase tracking-wider">Module {index + 1}</p>
-            <h2 className="text-xl font-bold leading-tight mt-0.5">{module.title}</h2>
-            <p className="text-xs text-white/70 mt-1">{module.lessons.length} lessons</p>
+          <div className="absolute bottom-5 left-5 right-5 text-white">
+            <p className="text-[11px] font-bold text-white/60 uppercase tracking-widest">Week {index + 1}</p>
+            <h2 className="text-xl font-extrabold leading-tight mt-1">{module.title}</h2>
           </div>
         </div>
-        <div className="px-5 py-3">
-          <p className="text-xs text-slate-500 mb-4">{MODULE_DESC[index]}</p>
-          {module.lessons.map((lesson, li) => {
-            const Ic = TYPE_ICON[lesson.type] || BookOpen;
-            const uuid = LESSON_UUID[lesson.id] || lesson.id;
-            const isDone = done.includes(uuid);
-            return (
-              <Link key={lesson.id} href={lessonUrlById(lesson.id)}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold ${
-                  isDone ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
-                }`}>
-                  {isDone ? <Play className="w-3.5 h-3.5" /> : li + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium leading-tight ${isDone ? 'text-slate-400' : 'text-slate-900'}`}>{lesson.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Ic className="w-3 h-3 text-slate-400" />
-                    <span className="text-[11px] text-slate-400">{TYPE_LABEL[lesson.type]}{lesson.durationMinutes ? ` · ${lesson.durationMinutes} min` : ''}</span>
+
+        <div className="p-6">
+          {/* Objectives */}
+          {module.objectives && module.objectives.length > 0 && (
+            <div className="mb-6 bg-brand-blue-50 rounded-2xl p-5">
+              <p className="text-[11px] font-bold text-brand-blue-800 uppercase tracking-widest mb-3">Learning Objectives</p>
+              <ul className="space-y-2.5">
+                {module.objectives.map((obj, oi) => (
+                  <li key={oi} className="flex items-start gap-2.5 text-sm text-brand-blue-900">
+                    <CheckCircle className="w-4 h-4 text-brand-blue-500 mt-0.5 flex-shrink-0" />
+                    {obj}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Milestone */}
+          {module.milestone && (
+            <div className="mb-6 flex items-center gap-3 px-4 py-3 bg-brand-red-50 border border-brand-red-200 rounded-xl">
+              <Award className="w-5 h-5 text-brand-red-600" />
+              <span className="text-sm font-bold text-brand-red-800">{module.milestone}</span>
+            </div>
+          )}
+
+          {/* Lesson list */}
+          <div className="space-y-1">
+            {module.lessons.map((lesson, li) => {
+              const Ic = TYPE_ICON[lesson.type] || BookOpen;
+              const uuid = LESSON_UUID[lesson.id] || lesson.id;
+              const isDone = done.includes(uuid);
+              return (
+                <Link key={lesson.id} href={lessonUrlById(lesson.id)}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold ${
+                    isDone ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-brand-blue-100 group-hover:text-brand-blue-700'
+                  }`}>
+                    {isDone ? <CheckCircle className="w-4 h-4" /> : li + 1}
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
-              </Link>
-            );
-          })}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium leading-tight ${isDone ? 'text-slate-400 line-through' : 'text-slate-900'}`}>{lesson.title}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Ic className="w-3 h-3 text-slate-400" />
+                      <span className="text-[11px] text-slate-400">{TYPE_LABEL[lesson.type]}{lesson.durationMinutes ? ` \u00b7 ${lesson.durationMinutes} min` : ''}</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 flex-shrink-0" />
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════
+   Main Course Page
+   ══════════════════════════════════════════════════════════════════ */
 
 export default function HvacCourseHome({
   course, completedLessonIds = [], progressPercent = 0,
@@ -173,211 +164,365 @@ export default function HvacCourseHome({
   totalTimeSeconds?: number;
 }) {
   const [openModule, setOpenModule] = useState<number | null>(null);
-  const [showVideo, setShowVideo] = useState(false);
+
   const total = course.modules.reduce((s, m) => s + m.lessons.length, 0);
   const done = completedLessonIds.length;
   const next = useMemo(() => findNext(course.modules, completedLessonIds), [course.modules, completedLessonIds]);
   const continueUrl = lastLessonId ? lessonUrl(lastLessonId) : next ? lessonUrl(next.lessonId) : lessonUrl(FIRST_LESSON_ID);
-  const allDone = done >= total && total > 0;
 
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ═══ HERO ═══ */}
-      <div className="relative h-[320px] md:h-[400px]">
-        <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working on commercial unit" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-5xl mx-auto px-6 pb-8 w-full">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 bg-amber-500/90 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">DOL Registered</span>
-              <span className="px-2.5 py-0.5 bg-white/20 backdrop-blur text-white text-[10px] font-bold rounded-full uppercase tracking-wider">ETPL Approved</span>
+      {/* ═══════════════════════════════════════════════════════════
+          HERO — Dark with HVAC image, Elevate red/blue branding
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-brand-blue-900">
+          <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working" fill className="object-cover opacity-20" priority />
+        </div>
+        {/* Red accent stripe */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-brand-red-600" />
+
+        <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-20">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="px-3 py-1 bg-brand-red-600 text-white text-xs font-bold rounded-full tracking-wide">ETPL APPROVED</span>
+              <span className="px-3 py-1 bg-white/15 text-white text-xs font-bold rounded-full tracking-wide">WIOA ELIGIBLE</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">{course.title}</h1>
-            <p className="text-white/70 text-sm mt-2 max-w-xl">20-week program preparing you for EPA 608 Universal Certification, OSHA 30-Hour, and CPR/First Aid — with direct employer placement in Indianapolis.</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              {['EPA 608 Universal', 'OSHA 30-Hour', 'CPR/First Aid'].map((cert) => (
-                <span key={cert} className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur border border-white/20 text-white text-xs font-semibold rounded-full">
-                  <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  {cert}
-                </span>
-              ))}
-            </div>
-            <div className="mt-5 flex items-center gap-4">
-              {!allDone && (
-                <Link href={continueUrl}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition text-sm shadow-xl hover:shadow-2xl">
-                  <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Start Course'}
-                </Link>
-              )}
-              {allDone && (
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl text-sm shadow-xl">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Course Complete
+            <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-[1.1]">
+              HVAC Technician<br />Certification Pathway
+            </h1>
+            <p className="text-white/60 text-base md:text-lg mt-4 max-w-lg leading-relaxed">
+              12-week structured workforce pathway. EPA 608 Universal, OSHA 30, CPR/AED, and employer placement.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 mt-8">
+              <Link href={continueUrl}
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition text-sm shadow-lg shadow-brand-red-600/30">
+                <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Start Course'}
+              </Link>
+              {done > 0 && (
+                <div className="flex items-center gap-3 px-5 py-3 bg-white/10 rounded-xl backdrop-blur">
+                  <div>
+                    <p className="text-white text-sm font-bold">{done}/{total} lessons</p>
+                    <p className="text-white/40 text-xs">{progressPercent}% complete</p>
+                  </div>
+                  <div className="w-24 bg-white/20 rounded-full h-2">
+                    <div className="bg-green-400 h-2 rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
+                  </div>
                 </div>
               )}
-              {next && !allDone && (
-                <p className="text-xs text-white/50 hidden md:block">Up next: <span className="text-white/80 font-medium">{next.title}</span></p>
-              )}
             </div>
-            {(done > 0 || progressPercent > 0) && (
-              <div className="mt-4 max-w-xs">
-                <div className="flex items-center justify-between text-xs text-white/60 mb-1">
-                  <span>{done}/{total} lessons</span>
-                  <span className="font-bold text-white">{progressPercent}%</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-2">
-                  <div className="bg-green-400 h-2 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
-
-        {/* ═══ COURSE OVERVIEW ═══ */}
-        <div className="mb-10 grid sm:grid-cols-4 gap-4">
+      {/* ═══════════════════════════════════════════════════════════
+          STATS BAR — Clean, minimal
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center gap-6 md:gap-10 text-sm">
           {[
-            { label: 'Duration', value: '20 Weeks', sub: 'Full-time · Mon–Fri', color: 'bg-brand-blue-50 border-brand-blue-200', accent: 'text-brand-blue-600' },
-            { label: 'Credentials', value: '3 Certs', sub: 'EPA 608 · OSHA 30 · CPR', color: 'bg-amber-50 border-amber-200', accent: 'text-amber-600' },
-            { label: 'Lessons', value: `${total}`, sub: `${course.modules.length} weekly modules`, color: 'bg-emerald-50 border-emerald-200', accent: 'text-emerald-600' },
-            { label: 'Format', value: 'Hybrid', sub: 'Online RTI + hands-on OJT', color: 'bg-purple-50 border-purple-200', accent: 'text-purple-600' },
-          ].map((stat) => (
-            <div key={stat.label} className={`${stat.color} border rounded-xl p-4 text-center`}>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${stat.accent}`}>{stat.value}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{stat.sub}</p>
+            { icon: Clock, text: <>20 weeks &middot; Full-time</> },
+            { icon: BookOpen, text: <>{total} lessons &middot; {course.modules.length} modules</> },
+            { icon: Award, text: <>3 certifications included</> },
+            { icon: Users, text: <>Hybrid: Online + Hands-on</> },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2 text-slate-600">
+              <item.icon className="w-4 h-4 text-brand-blue-500" />
+              <span>{item.text}</span>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* ═══ WHAT YOU'LL EARN ═══ */}
-        <div className="mb-10 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8">
-          <h2 className="text-lg font-bold text-white mb-1">Industry Credentials Earned</h2>
-          <p className="text-sm text-slate-400 mb-5">Upon successful completion, you will hold three nationally recognized certifications.</p>
-          <div className="grid sm:grid-cols-3 gap-4">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+
+        {/* ═══════════════════════════════════════════════════════════
+            CREDENTIALS — Three clean cards, Elevate colors
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="mb-14">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-6">Credentials Earned</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { name: 'EPA 608 Universal', issuer: 'U.S. Environmental Protection Agency', desc: 'Required to purchase and handle refrigerants. Covers all equipment types.' },
-              { name: 'OSHA 30-Hour Construction', issuer: 'Occupational Safety & Health Administration', desc: 'Industry-standard safety certification for construction and trades workers.' },
-              { name: 'CPR/First Aid/AED', issuer: 'American Red Cross', desc: 'Emergency response certification valid for 2 years. Required by most employers.' },
+              {
+                name: 'EPA 608 Universal',
+                issuer: 'Environmental Protection Agency',
+                desc: 'Required to purchase and handle refrigerants. Covers small appliances, high-pressure, and low-pressure systems.',
+                bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', accent: 'text-brand-blue-700', check: 'text-brand-blue-500',
+              },
+              {
+                name: 'OSHA 30-Hour Construction',
+                issuer: 'Occupational Safety & Health Administration',
+                desc: 'Industry-standard safety certification covering fall protection, electrical safety, HazCom, and PPE.',
+                bg: 'bg-brand-red-50', border: 'border-brand-red-200', accent: 'text-brand-red-700', check: 'text-brand-red-500',
+              },
+              {
+                name: 'CPR / First Aid / AED',
+                issuer: 'Nationally Accredited Provider',
+                desc: 'Emergency response certification valid for 2 years. Required by most HVAC employers for field positions.',
+                bg: 'bg-slate-50', border: 'border-slate-200', accent: 'text-slate-700', check: 'text-slate-500',
+              },
             ].map((cred) => (
-              <div key={cred.name} className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mb-3">
-                  <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div key={cred.name} className={`${cred.bg} ${cred.border} border rounded-2xl p-6`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className={`w-5 h-5 ${cred.check}`} />
+                  <h3 className={`font-bold ${cred.accent}`}>{cred.name}</h3>
                 </div>
-                <h3 className="text-white font-bold text-sm">{cred.name}</h3>
-                <p className="text-slate-400 text-[11px] mt-0.5">{cred.issuer}</p>
-                <p className="text-slate-300 text-xs mt-2 leading-relaxed">{cred.desc}</p>
+                <p className="text-xs text-slate-500 mb-3">{cred.issuer}</p>
+                <p className="text-sm text-slate-600 leading-relaxed">{cred.desc}</p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* ═══ ORIENTATION VIDEO ═══ */}
-        <div className="mb-10">
-          <h2 className="text-lg font-bold text-slate-900 mb-1">Student Orientation</h2>
-          <p className="text-sm text-slate-500 mb-3">Required before starting Module 1. Covers program structure, policies, rights, and support services.</p>
-          <button onClick={() => setShowVideo(true)}
-            className="relative w-full max-w-2xl rounded-2xl overflow-hidden group cursor-pointer border border-slate-200 hover:border-slate-300 hover:shadow-xl transition-all">
-            <div className="relative aspect-video bg-slate-900">
-              <Image src="/images/programs-hq/training-classroom.jpg" alt="Student orientation session" fill className="object-cover opacity-70 group-hover:opacity-90 transition-opacity" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <Play className="w-7 h-7 text-slate-900 ml-1" />
-                </div>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                <div>
-                  <p className="text-white font-semibold text-sm drop-shadow-lg">Student Orientation Video</p>
-                  <p className="text-white/60 text-xs">Program overview, policies, FERPA rights, and next steps</p>
-                </div>
-                <span className="text-white/50 text-xs bg-black/40 px-2 py-1 rounded">10:32</span>
-              </div>
+        {/* ═══════════════════════════════════════════════════════════
+            PROGRAM OUTCOMES — What graduates can do
+            ═══════════════════════════════════════════════════════════ */}
+        {course.programOutcomes && course.programOutcomes.length > 0 && (
+          <section className="mb-14">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Program Outcomes</h2>
+            <p className="text-sm text-slate-500 mb-6">By completion, graduates will be able to:</p>
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <ol className="space-y-3">
+                {course.programOutcomes.map((outcome, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="flex-shrink-0 w-7 h-7 bg-brand-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center mt-0.5">{i + 1}</span>
+                    <span className="text-sm text-slate-700 leading-relaxed">{outcome}</span>
+                  </li>
+                ))}
+              </ol>
             </div>
-          </button>
-        </div>
+          </section>
+        )}
 
-        {/* ═══ CAREER OUTCOMES ═══ */}
-        <div className="mb-10 grid sm:grid-cols-3 gap-4">
-          {[
-            { stat: '$51,390', label: 'Median Salary', sub: 'BLS 2024 for HVAC technicians' },
-            { stat: '6%', label: 'Job Growth', sub: 'Projected through 2032' },
-            { stat: '90%+', label: 'Placement Rate', sub: 'Graduates placed within 90 days' },
-          ].map((item) => (
-            <div key={item.label} className="bg-white border border-slate-200 rounded-xl p-5 text-center">
-              <p className="text-3xl font-extrabold text-slate-900">{item.stat}</p>
-              <p className="text-sm font-semibold text-slate-700 mt-1">{item.label}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">{item.sub}</p>
+        {/* ═══════════════════════════════════════════════════════════
+            CREDENTIAL PATHWAY — Apprentice → Master → Contractor
+            ═══════════════════════════════════════════════════════════ */}
+        {course.credentialPathway && course.credentialPathway.length > 0 && (
+          <section className="mb-14">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Career Pathway</h2>
+            <p className="text-sm text-slate-500 mb-6">Industry progression from entry to mastery.</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {course.credentialPathway.map((level, i) => (
+                <div key={i} className={`relative border rounded-2xl p-5 ${i === 0 ? 'bg-brand-red-50 border-brand-red-200' : 'bg-white border-slate-200'}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-brand-red-600 text-white' : 'bg-slate-200 text-slate-600'}`}>{level.level}</span>
+                    <h3 className="font-bold text-slate-900 text-sm">{level.title}</h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">{level.typicalTimeline}</p>
+                  <ul className="space-y-1">
+                    {level.requirements.map((req, j) => (
+                      <li key={j} className="text-xs text-slate-600 flex items-start gap-1.5">
+                        <CheckCircle className={`w-3 h-3 mt-0.5 flex-shrink-0 ${i === 0 ? 'text-brand-red-500' : 'text-slate-400'}`} />
+                        {req}
+                      </li>
+                    ))}
+                  </ul>
+                  {i === 0 && <span className="absolute top-2 right-2 px-2 py-0.5 bg-brand-red-600 text-white text-[10px] font-bold rounded-full">THIS PROGRAM</span>}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </section>
+        )}
 
-        {/* ═══ MODULES ═══ */}
-        <h2 className="text-lg font-bold text-slate-900 mb-1">Weekly Modules</h2>
-        <p className="text-sm text-slate-500 mb-5">Click any module to see its lessons. Complete them in order to unlock the next.</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {course.modules.map((mod, i) => {
-            const { total: mt, completed: mc, pct } = modProgress(mod, completedLessonIds);
-            const isComplete = mc === mt && mt > 0;
-            const vids = countType(mod.lessons, 'video');
-            const quizzes = countType(mod.lessons, 'quiz');
-            const labs = countType(mod.lessons, 'lab');
-
-            return (
-              <button key={mod.id} onClick={() => setOpenModule(i)}
-                className="text-left bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-slate-300 transition-all duration-200 group">
-                <div className="relative h-40 overflow-hidden">
-                  <Image src={MODULE_PHOTO[i]} alt={mod.title} fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-sm font-bold text-slate-800 shadow">
-                    {i + 1}
+        {/* ═══════════════════════════════════════════════════════════
+            12-WEEK SCHEDULE — Weekly competency statements
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="mb-14">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">12-Week Schedule</h2>
+          <p className="text-sm text-slate-500 mb-6">Weekly competency milestones.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {course.modules
+              .filter(m => m.weekAssignment)
+              .reduce((acc, mod) => {
+                const week = mod.weekAssignment!.week;
+                const existing = acc.find(w => w.week === week);
+                if (existing) {
+                  existing.modules.push(mod.title);
+                } else {
+                  acc.push({ week, statement: mod.weekAssignment!.weeklyCompetencyStatement, modules: [mod.title] });
+                }
+                return acc;
+              }, [] as { week: number; statement: string; modules: string[] }[])
+              .sort((a, b) => a.week - b.week)
+              .map(w => (
+                <div key={w.week} className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand-blue-300 transition">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-6 h-6 bg-brand-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">{w.week}</span>
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Week {w.week}</span>
                   </div>
-                  {isComplete && (
-                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-green-500 text-white text-[10px] font-bold rounded-full shadow uppercase tracking-wide">Done</div>
-                  )}
-                  {!isComplete && pct > 0 && (
-                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-white/90 backdrop-blur text-slate-800 text-[10px] font-bold rounded-full shadow">{pct}%</div>
-                  )}
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-white font-bold text-sm leading-tight drop-shadow-lg">{mod.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed mb-2">{w.statement}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {w.modules.map((m, i) => (
+                      <span key={i} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{m}</span>
+                    ))}
                   </div>
                 </div>
-                <div className="p-4">
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">{MODULE_DESC[i]}</p>
-                  <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-3">
-                    <span>{mt} lessons</span>
-                    {vids > 0 && <span className="flex items-center gap-1"><Video className="w-3 h-3" />{vids}</span>}
-                    {quizzes > 0 && <span className="flex items-center gap-1"><ClipboardCheck className="w-3 h-3" />{quizzes}</span>}
-                    {labs > 0 && <span className="flex items-center gap-1"><FlaskConical className="w-3 h-3" />{labs}</span>}
+              ))}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            MODULES — Clean card grid, large images, minimal text
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="mb-14">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Course Modules</h2>
+          <p className="text-sm text-slate-500 mb-8">Click any module to view lessons and learning objectives.</p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {course.modules.map((mod, i) => {
+              const { total: mt, completed: mc, pct } = modProgress(mod, completedLessonIds);
+              const isComplete = pct === 100;
+
+              return (
+                <button
+                  key={mod.id}
+                  onClick={() => setOpenModule(i)}
+                  className="group text-left bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-brand-blue-300 transition-all duration-200"
+                >
+                  {/* Image */}
+                  <div className="relative h-44">
+                    <Image
+                      src={MODULE_PHOTO[i] || MODULE_PHOTO[0]}
+                      alt={mod.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-white text-brand-blue-800 text-[11px] font-bold rounded-lg shadow">
+                      Week {i + 1}
+                    </div>
+
+                    {isComplete && (
+                      <div className="absolute top-3 right-3 px-2.5 py-1 bg-green-500 text-white text-[10px] font-bold rounded-lg shadow">
+                        Complete
+                      </div>
+                    )}
+
+                    {mod.milestone && (
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-red-600/90 backdrop-blur text-white text-[10px] font-bold rounded-lg">
+                          <Award className="w-3 h-3" />
+                          {mod.milestone}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="mt-3 w-full bg-slate-100 rounded-full h-1.5">
-                    <div className={`h-1.5 rounded-full transition-all duration-300 ${isComplete ? 'bg-green-500' : pct > 0 ? 'bg-slate-800' : 'bg-slate-200'}`}
-                      style={{ width: `${Math.max(pct, 2)}%` }} />
+
+                  {/* Body */}
+                  <div className="p-5">
+                    <h3 className="font-bold text-slate-900 leading-tight group-hover:text-brand-blue-600 transition-colors">
+                      {mod.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">{mod.description}</p>
+
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                      <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                        <span>{mt} lessons</span>
+                        {mod.lessons.some(l => l.type === 'quiz') && (
+                          <span className="flex items-center gap-1"><ClipboardCheck className="w-3 h-3" /> Quiz</span>
+                        )}
+                        {mod.lessons.some(l => l.type === 'lab') && (
+                          <span className="flex items-center gap-1"><FlaskConical className="w-3 h-3" /> Lab</span>
+                        )}
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 transition-colors" />
+                    </div>
+
+                    {mc > 0 && (
+                      <div className="mt-3">
+                        <div className="w-full bg-slate-100 rounded-full h-1.5">
+                          <div className="bg-green-500 h-1.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-[11px] text-slate-400">{mc}/{mt}</span>
-                    <span className="text-[11px] font-semibold text-slate-800 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      Open <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            ALIGNMENT — Two columns, clean lists
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="mb-14 grid sm:grid-cols-2 gap-6">
+          <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-2xl p-6">
+            <h3 className="font-bold text-brand-blue-900 text-lg mb-4">Regulatory Alignment</h3>
+            <ul className="space-y-3">
+              {[
+                'EPA Section 608 Universal — all equipment types',
+                'OSHA 30-Hour Construction Safety Standard',
+                'Nationally accredited CPR/First Aid/AED',
+                'NRF Rise Up Retail Industry Fundamentals',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-brand-blue-800">
+                  <CheckCircle className="w-4 h-4 text-brand-blue-500 mt-0.5 flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-brand-red-50 border border-brand-red-100 rounded-2xl p-6">
+            <h3 className="font-bold text-brand-red-900 text-lg mb-4">Workforce Standards</h3>
+            <ul className="space-y-3">
+              {[
+                'U.S. Department of Labor competency framework',
+                'WIOA Title I eligible training provider (ETPL)',
+                'Documented assessment checkpoints per module',
+                'Participant progress tracking and completion reporting',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-brand-red-800">
+                  <CheckCircle className="w-4 h-4 text-brand-red-500 mt-0.5 flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            CAREER OUTCOMES — Bold stats
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="mb-14">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-6">Career Outcomes</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {[
+              { stat: '$51,390', label: 'Median Salary', sub: 'BLS 2024 for HVAC technicians' },
+              { stat: '6%', label: 'Job Growth', sub: 'Projected through 2032' },
+              { stat: '90%+', label: 'Placement Rate', sub: 'Graduates placed within 90 days' },
+            ].map((item) => (
+              <div key={item.label} className="bg-white border border-slate-200 rounded-2xl p-6 text-center">
+                <p className="text-4xl font-extrabold text-brand-blue-700">{item.stat}</p>
+                <p className="text-sm font-bold text-slate-800 mt-2">{item.label}</p>
+                <p className="text-xs text-slate-400 mt-1">{item.sub}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            CTA
+            ═══════════════════════════════════════════════════════════ */}
+        <section className="text-center py-10 border-t border-slate-200">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Ready to start your HVAC career?</h2>
+          <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">Structured 20-week pathway with proctored certification and employer placement.</p>
+          <Link href={continueUrl}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition text-sm shadow-lg shadow-brand-red-600/25">
+            <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Enroll Now'}
+          </Link>
+        </section>
       </div>
 
-      {/* Orientation video player */}
-      {showVideo && (
-        <VideoPlayer src="/videos/orientation-full.mp4" onClose={() => setShowVideo(false)} />
-      )}
-
-      {/* Lesson Drawer */}
+      {/* ═══ Lesson Drawer ═══ */}
       {openModule !== null && (
-        <LessonDrawer module={course.modules[openModule]} index={openModule} done={completedLessonIds} onClose={() => setOpenModule(null)} />
+        <LessonDrawer
+          module={course.modules[openModule]}
+          index={openModule}
+          done={completedLessonIds}
+          onClose={() => setOpenModule(null)}
+        />
       )}
     </div>
   );

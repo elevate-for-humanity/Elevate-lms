@@ -33,7 +33,7 @@ async function requireAdmin() {
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
-  return { user, supabase };
+  return { user, supabase, db };
 }
 
 function buildLessonHtml(
@@ -79,7 +79,7 @@ async function _POST(request: NextRequest) {
   if ('error' in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
-  const { supabase } = auth;
+  const { db } = auth;
 
   try {
     const body = await request.json().catch(() => ({}));

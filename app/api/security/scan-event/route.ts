@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { detectAIBot, isRateLimited, logRequest } from '@/lib/security/ai-protection';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

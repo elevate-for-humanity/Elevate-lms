@@ -299,9 +299,7 @@ export async function renderScene(
         .output(outputPath)
         .on('start', (commandLine) => {
         })
-        .on('progress', (progress) => {
-            `Rendering scene ${scene.id}: ${progress.percent?.toFixed(2)}%`
-          );
+        .on('progress', () => {
         })
         .on('end', () => {
           resolve(outputPath);
@@ -340,9 +338,7 @@ export async function concatenateVideos(
         .output(outputPath)
         .on('start', (commandLine) => {
         })
-        .on('progress', (progress) => {
-            `Concatenation progress: ${progress.percent?.toFixed(2)}%`
-          );
+        .on('progress', () => {
         })
         .on('end', async () => {
           // Clean up concat file

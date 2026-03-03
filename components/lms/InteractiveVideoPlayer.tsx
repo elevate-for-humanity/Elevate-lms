@@ -78,6 +78,10 @@ export default function InteractiveVideoPlayer({
   const [showCaptions, setShowCaptions] = useState(false);
   const [currentCaption, setCurrentCaption] = useState('');
   const [lessonId, setLessonId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+
+  // Detect media type from URL
+  const isAudioOnly = /\.(mp3|wav|ogg|aac|m4a)(\?|$)/i.test(videoUrl);
 
   // Load saved notes from database
   useEffect(() => {
@@ -307,19 +311,55 @@ export default function InteractiveVideoPlayer({
   return (
     <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
       <div className="relative">
-        {/* Video Element */}
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          className="w-full aspect-video"
-          playsInline
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={() => {
-            setIsPlaying(false);
-            if (onComplete) onComplete();
-          }}
-        />
+        {/* Media Element — video or audio with graceful fallback */}
+        {loadError ? (
+          <div className="w-full aspect-video flex items-center justify-center bg-gray-900 text-white">
+            <div className="text-center p-8">
+              <p className="text-lg font-medium mb-2">Unable to load media</p>
+              <p className="text-sm text-gray-400 mb-4">The video may be temporarily unavailable.</p>
+              <button
+                onClick={() => { setLoadError(false); videoRef.current?.load(); }}
+                className="px-4 py-2 bg-brand-blue-600 rounded-lg text-sm hover:bg-brand-blue-700"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        ) : isAudioOnly ? (
+          <div className="w-full aspect-video flex flex-col items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900">
+            <div className="w-24 h-24 rounded-full bg-brand-blue-600 flex items-center justify-center mb-4">
+              <Volume2 className="w-12 h-12 text-white" />
+            </div>
+            <p className="text-white text-lg font-medium mb-2">{title}</p>
+            <p className="text-gray-400 text-sm">Audio Lesson</p>
+            {/* Hidden audio element using same ref */}
+            <audio
+              ref={videoRef as React.RefObject<HTMLAudioElement>}
+              src={videoUrl}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onError={() => setLoadError(true)}
+              onEnded={() => {
+                setIsPlaying(false);
+                if (onComplete) onComplete();
+              }}
+            />
+          </div>
+        ) : (
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full aspect-video"
+            playsInline
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onError={() => setLoadError(true)}
+            onEnded={() => {
+              setIsPlaying(false);
+              if (onComplete) onComplete();
+            }}
+          />
+        )}
 
         {/* Captions Overlay */}
         {showCaptions && currentCaption && (

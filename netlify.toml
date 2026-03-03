@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "corepack enable && pnpm install && npx tsx scripts/ci-token-gate.ts && pnpm run build && node scripts/slim-server-bundle.mjs"
+  command = "corepack enable && pnpm install && npx tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 

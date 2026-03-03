@@ -124,6 +124,8 @@ export default function CoursePreviewPage() {
                     src={activeLesson.video_url}
                     controls
                     playsInline
+                    crossOrigin="anonymous"
+                    preload="metadata"
                     controlsList="nodownload"
                     className="w-full h-full"
                   />

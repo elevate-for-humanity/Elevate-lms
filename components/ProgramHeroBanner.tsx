@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { Mic, Volume2 } from 'lucide-react';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -8,29 +9,17 @@ interface ProgramHeroBannerProps {
 }
 
 /**
- * Video hero banner. Video autoplays muted on load.
- * Voiceover plays automatically when the hero scrolls into view
- * after the page has finished loading. No mute/unmute button.
+ * Video hero banner. Video autoplays muted.
+ * Voiceover requires user click (browser autoplay policy blocks
+ * audio without a user gesture — scroll events don't count).
  */
 export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hasPlayedVoiceover = useRef(false);
-  const [pageLoaded, setPageLoaded] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
 
-  // Wait for page to finish loading before enabling voiceover
-  useEffect(() => {
-    if (document.readyState === 'complete') {
-      setPageLoaded(true);
-    } else {
-      const onLoad = () => setPageLoaded(true);
-      window.addEventListener('load', onLoad);
-      return () => window.removeEventListener('load', onLoad);
-    }
-  }, []);
-
-  // Video: autoplay muted, pause when scrolled away
+  // Video: autoplay muted, pause when off-screen
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -39,7 +28,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
       ([entry]) => {
         const video = videoRef.current;
         if (!video) return;
-
         if (entry.isIntersecting) {
           video.play().catch(() => {});
         } else {
@@ -53,34 +41,20 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     return () => observer.disconnect();
   }, []);
 
-  // Voiceover: play once when hero scrolls into view after page load
-  useEffect(() => {
-    if (!pageLoaded || !voiceoverSrc) return;
+  const toggleVoiceover = () => {
+    const audio = voiceoverRef.current;
+    if (!audio) return;
 
-    const container = containerRef.current;
-    const vo = voiceoverRef.current;
-    if (!container || !vo) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayedVoiceover.current) {
-          hasPlayedVoiceover.current = true;
-          vo.play().catch(() => {
-            // Browser blocked autoplay — no fallback button
-          });
-        }
-
-        // Pause voiceover if user scrolls away
-        if (!entry.isIntersecting && !vo.paused) {
-          vo.pause();
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [pageLoaded, voiceoverSrc]);
+    if (voiceActive) {
+      audio.pause();
+      setVoiceActive(false);
+    } else {
+      audio.currentTime = 0;
+      audio.play()
+        .then(() => setVoiceActive(true))
+        .catch(() => {});
+    }
+  };
 
   return (
     <div ref={containerRef} className="relative w-full h-[50vh] min-h-[320px] max-h-[500px] overflow-hidden bg-black">
@@ -95,7 +69,35 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
       />
 
       {voiceoverSrc && (
-        <audio ref={voiceoverRef} src={voiceoverSrc} preload="auto" />
+        <>
+          <audio
+            ref={voiceoverRef}
+            src={voiceoverSrc}
+            preload="auto"
+            onEnded={() => setVoiceActive(false)}
+          />
+          <button
+            onClick={toggleVoiceover}
+            className={`absolute z-20 bottom-5 right-5 flex items-center gap-2 rounded-full shadow-lg px-5 py-3 transition-all ${
+              voiceActive
+                ? 'bg-white text-slate-900 hover:bg-slate-100'
+                : 'bg-brand-red-600 text-white hover:bg-brand-red-700 animate-pulse'
+            }`}
+            aria-label={voiceActive ? 'Stop narration' : 'Listen'}
+          >
+            {voiceActive ? (
+              <>
+                <Volume2 className="w-5 h-5" />
+                <span className="text-sm font-semibold">Playing...</span>
+              </>
+            ) : (
+              <>
+                <Mic className="w-5 h-5" />
+                <span className="text-sm font-semibold">Listen</span>
+              </>
+            )}
+          </button>
+        </>
       )}
     </div>
   );

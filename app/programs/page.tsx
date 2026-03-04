@@ -245,8 +245,9 @@ export default async function ProgramsPage() {
           </div>
           <p className="text-center text-xs text-slate-500 mb-10">Provider: 2Exclusive LLC-S &nbsp;|&nbsp; Location: Elevate for Humanity Training Center, Indianapolis, IN (Marion County) &nbsp;|&nbsp; <span className="font-medium">W</span> = WIOA Eligible &nbsp; <span className="font-medium">WRG</span> = Workforce Ready Grant</p>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
+          {/* Sector-grouped catalog */}
+          {(() => {
+            const allPrograms = [
               {
                 name: 'Building Technician with HVAC Fundamentals',
                 image: '/images/programs-hq/hvac-technician.jpg',
@@ -456,7 +457,72 @@ export default async function ProgramsPage() {
                 funding: 'WIOA, NLJ',
                 category: 'Skilled Trades',
               },
-            ].map((program) => (
+            ];
+
+            // Group by sector
+            const sectorOrder = ['Skilled Trades', 'Healthcare', 'Apprenticeship', 'Beauty & Barbering', 'Business', 'Public Safety'];
+            const sectorLabels: Record<string, string> = {
+              'Skilled Trades': 'Construction & Skilled Trades',
+              'Healthcare': 'Healthcare & Allied Health',
+              'Apprenticeship': 'Licensed Apprenticeships',
+              'Beauty & Barbering': 'Personal Services & Licensed Trades',
+              'Business': 'Business & Professional Development',
+              'Public Safety': 'Public Safety & Community Services',
+            };
+            const grouped = sectorOrder
+              .map(sector => ({
+                sector,
+                label: sectorLabels[sector] || sector,
+                programs: allPrograms.filter(p => p.category === sector),
+              }))
+              .filter(g => g.programs.length > 0);
+
+            return (
+              <>
+                {/* Quick comparison table */}
+                <div className="mb-12 overflow-x-auto">
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr className="bg-slate-900 text-white">
+                        <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider">Program</th>
+                        <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider">Duration</th>
+                        <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider">Cost</th>
+                        <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider">Credentials</th>
+                        <th className="text-left px-4 py-3 font-bold text-xs uppercase tracking-wider">Funding</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allPrograms.map((p, i) => (
+                        <tr key={p.programId} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                          <td className="px-4 py-2.5 font-semibold text-slate-900">
+                            <Link href={p.href} className="hover:text-brand-red-600 transition-colors">{p.name}</Link>
+                          </td>
+                          <td className="px-4 py-2.5 text-slate-600">{p.duration}</td>
+                          <td className="px-4 py-2.5 text-slate-600">{p.cost}</td>
+                          <td className="px-4 py-2.5 text-slate-600">{p.credentials.length}</td>
+                          <td className="px-4 py-2.5">
+                            <div className="flex flex-wrap gap-1">
+                              {p.funding.split(',').map((f: string) => (
+                                <span key={f.trim()} className="inline-block bg-brand-green-100 text-brand-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded">{f.trim()}</span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Sector-grouped program cards */}
+                {grouped.map(({ sector, label, programs }) => (
+                  <div key={sector} className="mb-12">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-1 h-8 bg-brand-red-600 rounded-full" />
+                      <h3 className="text-xl font-extrabold text-slate-900">{label}</h3>
+                      <span className="text-xs text-slate-400 font-medium">{programs.length} program{programs.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {programs.map((program) => (
               <div key={program.programId} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
                 {program.image && (
                   <div className="relative h-40 overflow-hidden">
@@ -523,8 +589,13 @@ export default async function ProgramsPage() {
                   </Link>
                 </div>
               </div>
-            ))}
-          </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            );
+          })()}
 
           {/* Additional Programs — Category browsing */}
           <div className="mt-12">

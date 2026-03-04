@@ -199,7 +199,7 @@ export default function PartnerHandbookPage() {
                 <a key={s.id} href={`#${s.id}`} className="flex items-center gap-2 text-sm text-slate-700 hover:text-brand-blue-600 py-1 group">
                   {photo ? (
                     <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      <Image src={photo.src} alt="" fill className="object-cover group-hover:scale-110 transition-transform" sizes="32px" />
+                      <Image src={photo.src} alt={photo.alt} fill className="object-cover group-hover:scale-110 transition-transform" sizes="32px" />
                     </div>
                   ) : (
                     <s.icon className="w-4 h-4 text-slate-400" />

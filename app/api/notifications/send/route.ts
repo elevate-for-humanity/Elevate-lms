@@ -42,7 +42,7 @@ async function _POST(request: NextRequest) {
       const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
-      await db.from('push_notifications_log').insert({
+      await db.from('push_notification_send_log').insert({
         sender_id: user?.id,
         title: notification.title,
         body: notification.body,

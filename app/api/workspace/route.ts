@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
-      .from('workspaces')
+      .from('studio_workspaces')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
     const { data, error } = await supabase
-      .from('workspaces')
+      .from('studio_workspaces')
       .insert({
         name,
         description: description || null,

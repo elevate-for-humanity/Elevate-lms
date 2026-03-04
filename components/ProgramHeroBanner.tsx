@@ -80,7 +80,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
       ) : posterImage ? (
         <img
           src={posterImage}
-          alt=""
+          alt="Program hero banner"
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (

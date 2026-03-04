@@ -157,7 +157,7 @@ export default function ConnectsLandingPage() {
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-cyan-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
-              <Image src="/images/icons/trending-up.png" alt="" width={16} height={16} className="w-4 h-4" /> Elevate Connects
+              <Image src="/images/icons/trending-up.png" alt="Trending up icon" width={16} height={16} className="w-4 h-4" /> Elevate Connects
             </div>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Your Dashboard. Your Portal.</h1>
             <p className="text-base md:text-lg text-slate-300 mb-8 max-w-3xl mx-auto">One platform, every role. Access your personalized dashboard — whether you&apos;re a student, employer, partner, staff member, or administrator.</p>
@@ -174,7 +174,7 @@ export default function ConnectsLandingPage() {
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {FEATURES.map((f) => (
             <div key={f.title} className="flex items-start gap-3">
-              <Image src={f.icon} alt="" width={28} height={28} className="w-7 h-7 mt-0.5 rounded" />
+              <Image src={f.icon} alt={`${f.title} icon`} width={28} height={28} className="w-7 h-7 mt-0.5 rounded" />
               <div>
                 <div className="text-sm font-semibold text-gray-900">{f.title}</div>
                 <div className="text-xs text-gray-500">{f.desc}</div>
@@ -199,7 +199,7 @@ export default function ConnectsLandingPage() {
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2.5 mb-3">
-                    <Image src={p.icon} alt="" width={36} height={36} className="w-9 h-9 rounded-lg bg-gray-50 p-1 border border-gray-200" />
+                    <Image src={p.icon} alt={`${p.title} icon`} width={36} height={36} className="w-9 h-9 rounded-lg bg-gray-50 p-1 border border-gray-200" />
                     <h3 className="text-lg font-bold text-gray-900">{p.title}</h3>
                   </div>
                   <p className="text-gray-600 text-sm mb-3">{p.desc}</p>
@@ -224,7 +224,7 @@ export default function ConnectsLandingPage() {
       {/* QUICK SIGN IN */}
       <section className="py-16 px-6 bg-slate-50">
         <div className="max-w-2xl mx-auto text-center">
-          <Image src="/images/icons/users.png" alt="" width={48} height={48} className="w-12 h-12 mx-auto mb-4 rounded" />
+          <Image src="/images/icons/users.png" alt="User accounts icon" width={48} height={48} className="w-12 h-12 mx-auto mb-4 rounded" />
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Already have an account?</h2>
           <p className="text-gray-600 mb-6">Sign in and you&apos;ll be automatically directed to your dashboard based on your role.</p>
           <Link href="/login" className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-3.5 rounded-lg font-bold text-lg transition-colors">

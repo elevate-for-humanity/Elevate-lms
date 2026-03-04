@@ -46,27 +46,22 @@ export default function MOUPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      // Try signed_documents table first, fall back gracefully
-      await supabase.from('signed_documents').insert({
-        user_id: user.id,
-        document_type: 'partner_mou',
-        document_title: 'Indiana Barbershop Apprenticeship MOU',
+      await supabase.from('mou_signatures').insert({
         signer_name: partnerName,
-        signer_email: user.email,
-        metadata: {
+        signer_title: 'Partner',
+        supervisor_name: supervisorName,
+        supervisor_license: supervisorLicense,
+        compensation_model: compensationModel,
+        mou_version: 'barbershop-v1',
+        signature_data: {
           shop_name: shopName,
-          supervisor_name: supervisorName,
-          supervisor_license: supervisorLicense,
-          compensation_model: compensationModel,
           partner_signature_id: partnerSignatureId,
           supervisor_signature_id: supervisorSignatureId,
           effective_date: effectiveDate,
-          signed_at: new Date().toISOString(),
+          signer_email: user.email,
         },
-        status: 'signed',
         signed_at: new Date().toISOString(),
-      }).catch(() => {
-        // Table may not exist — signatures are already saved via SignatureInput
+        ip_address: null,
       });
 
       setSubmitted(true);

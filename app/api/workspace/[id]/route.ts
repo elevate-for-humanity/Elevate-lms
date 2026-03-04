@@ -16,7 +16,7 @@ export async function GET(
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
-      .from('workspaces')
+      .from('studio_workspaces')
       .select('*')
       .eq('id', id)
       .single();
@@ -39,7 +39,7 @@ export async function DELETE(
   try {
     const supabase = createAdminClient();
     const { error } = await supabase
-      .from('workspaces')
+      .from('studio_workspaces')
       .delete()
       .eq('id', id);
 

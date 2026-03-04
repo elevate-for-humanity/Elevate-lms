@@ -13,9 +13,9 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Params = { params: Promise<{ videoId: string }> };
 
-async function _GET(_req: NextRequest, { params }: Params) {
+async function _GET(req: NextRequest, { params }: Params) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
     const { videoId } = await params;
@@ -33,11 +33,11 @@ async function _GET(_req: NextRequest, { params }: Params) {
       logger.error("Error fetching chapters:", chaptersError);
     }
 
-    // Get video transcript
+    // Get video transcript (lesson_id stores the video reference)
     const { data: transcript, error: transcriptError } = await db
       .from("video_transcripts")
       .select("*")
-      .eq("video_id", videoId)
+      .eq("lesson_id", videoId)
       .single();
 
     if (transcriptError && transcriptError.code !== "PGRST116") {
@@ -76,12 +76,12 @@ async function _POST(req: NextRequest, { params }: Params) {
 
     // Check if user is admin
     const { data: profile } = await db
-      .from("user_profiles")
+      .from("profiles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("id", user.id)
       .single();
 
-    if (profile?.role !== "admin") {
+    if (profile?.role !== "admin" && profile?.role !== "super_admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -100,9 +100,9 @@ async function _POST(req: NextRequest, { params }: Params) {
           .insert(
             chapters.map((item: any) => ({
               video_id: videoId,
-              title: ch.title,
-              start_time: ch.start_time,
-              end_time: ch.end_time,
+              title: item.title,
+              start_time: item.start_time,
+              end_time: item.end_time,
             }))
           );
 
@@ -122,7 +122,7 @@ async function _POST(req: NextRequest, { params }: Params) {
       const { data: existing } = await db
         .from("video_transcripts")
         .select("id")
-        .eq("video_id", videoId)
+        .eq("lesson_id", videoId)
         .single();
 
       if (existing) {
@@ -130,10 +130,10 @@ async function _POST(req: NextRequest, { params }: Params) {
         const { error: transcriptError } = await db
           .from("video_transcripts")
           .update({
-            content: transcript.content,
+            transcript_text: transcript.content,
             language: transcript.language || "en",
           })
-          .eq("video_id", videoId);
+          .eq("lesson_id", videoId);
 
         if (transcriptError) {
           logger.error("Error updating transcript:", transcriptError);
@@ -147,8 +147,8 @@ async function _POST(req: NextRequest, { params }: Params) {
         const { error: transcriptError } = await db
           .from("video_transcripts")
           .insert({
-            video_id: videoId,
-            content: transcript.content,
+            lesson_id: videoId,
+            transcript_text: transcript.content,
             language: transcript.language || "en",
           });
 

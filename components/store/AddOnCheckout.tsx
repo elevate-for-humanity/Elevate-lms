@@ -139,7 +139,7 @@ function CheckoutForm({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@organization.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 outline-none"
               />
               <p className="text-xs text-gray-500 mt-2">
                 Your license and receipt will be sent to this email.
@@ -154,7 +154,7 @@ function CheckoutForm({
                 <label
                   className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition ${
                     paymentMethod === 'stripe'
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -172,9 +172,9 @@ function CheckoutForm({
                     <div className="text-xs text-gray-500">Visa, Mastercard, Amex via Stripe</div>
                   </div>
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    paymentMethod === 'stripe' ? 'border-blue-500' : 'border-gray-300'
+                    paymentMethod === 'stripe' ? 'border-brand-blue-500' : 'border-gray-300'
                   }`}>
-                    {paymentMethod === 'stripe' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                    {paymentMethod === 'stripe' && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue-500" />}
                   </div>
                 </label>
 
@@ -183,7 +183,7 @@ function CheckoutForm({
                   <label
                     className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition ${
                       paymentMethod === 'affirm'
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-brand-blue-500 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -195,15 +195,15 @@ function CheckoutForm({
                       onChange={() => setPaymentMethod('affirm')}
                       className="sr-only"
                     />
-                    <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center text-xs font-bold text-blue-700">A</div>
+                    <div className="w-6 h-6 bg-brand-blue-100 rounded flex items-center justify-center text-xs font-bold text-brand-blue-700">A</div>
                     <div className="flex-1">
                       <div className="font-semibold text-gray-900">Affirm</div>
                       <div className="text-xs text-gray-500">Pay over 3–36 months. As low as 0% APR.</div>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'affirm' ? 'border-blue-500' : 'border-gray-300'
+                      paymentMethod === 'affirm' ? 'border-brand-blue-500' : 'border-gray-300'
                     }`}>
-                      {paymentMethod === 'affirm' && <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />}
+                      {paymentMethod === 'affirm' && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue-500" />}
                     </div>
                   </label>
                 )}

@@ -54,50 +54,24 @@ async function _POST(req: NextRequest) {
       .limit(1)
       .maybeSingle();
 
-    // Store acknowledgment in compliance_records
+    // Store acknowledgment
     const { error: insertError } = await supabase
-      .from('compliance_records')
+      .from('partner_policy_acknowledgments')
       .insert({
-        record_type: 'policy_acknowledgment',
-        entity_type: 'barbershop_partner',
-        entity_id: application?.id || null,
+        shop_name: shop_name.trim(),
         signer_name: signer_name.trim(),
-        metadata: {
-          shop_name: shop_name.trim(),
-          policies_acknowledged,
-          acknowledged_at: acknowledged_at || new Date().toISOString(),
-          ip_address: ipAddress,
-          user_agent: req.headers.get('user-agent') || 'unknown',
-        },
-        status: 'completed',
+        policies_acknowledged,
+        acknowledged_at: acknowledged_at || new Date().toISOString(),
+        ip_address: ipAddress,
+        user_agent: req.headers.get('user-agent') || 'unknown',
       });
 
     if (insertError) {
-      // If compliance_records doesn't exist, try a generic insert
-      logger.warn('[policy-ack] compliance_records insert failed, trying partner_mous:', insertError);
-
-      const { error: fallbackError } = await supabase
-        .from('partner_mous')
-        .insert({
-          mou_version: 'policy-ack-v1',
-          status: 'signed',
-          signed_at: acknowledged_at || new Date().toISOString(),
-          terms: {
-            type: 'policy_acknowledgment',
-            shop_name: shop_name.trim(),
-            signer_name: signer_name.trim(),
-            policies_acknowledged,
-            ip_address: ipAddress,
-          },
-        });
-
-      if (fallbackError) {
-        logger.error('[policy-ack] Fallback insert also failed:', fallbackError);
-        return NextResponse.json(
-          { error: 'Failed to save acknowledgment. Please try again.' },
-          { status: 500 }
-        );
-      }
+      logger.error('[policy-ack] Insert failed:', insertError);
+      return NextResponse.json(
+        { error: 'Failed to save acknowledgment. Please try again.' },
+        { status: 500 }
+      );
     }
 
     // Update application status if found

@@ -3,6 +3,10 @@ import { HVAC_TECHNICIAN } from './hvac-technician';
 import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { BARBER_APPRENTICESHIP } from './barber-apprenticeship';
 import { CNA } from './cna';
+import { IT_HELP_DESK } from './it-help-desk';
+import { CYBERSECURITY_ANALYST } from './cybersecurity-analyst';
+import { BOOKKEEPING } from './bookkeeping';
+import { OFFICE_ADMINISTRATION } from './office-administration';
 
 /**
  * Program Catalog — All programs grouped by sector.
@@ -13,6 +17,10 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   PHARMACY_TECHNICIAN,
   BARBER_APPRENTICESHIP,
   CNA,
+  IT_HELP_DESK,
+  CYBERSECURITY_ANALYST,
+  BOOKKEEPING,
+  OFFICE_ADMINISTRATION,
 ];
 
 export const SECTORS = [

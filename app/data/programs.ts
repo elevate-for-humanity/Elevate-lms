@@ -1381,7 +1381,7 @@ export const programs: Program[] = [
       label: 'Request Information',
       href: '/inquiry?program=drug-alcohol-specimen-collector',
     },
-    price: 504,
+    price: 1500,
   },
 
   // ============================================
@@ -1438,6 +1438,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=administrative-assistant' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 4200,
   },
     {
     slug: 'automotive-technician',
@@ -1489,6 +1490,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=automotive-technician' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 9500,
   },
     {
     slug: 'bookkeeping',
@@ -1592,6 +1594,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=chw-cert' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 1200,
   },
     {
     slug: 'cosmetology-apprenticeship',
@@ -1643,6 +1646,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=cosmetology-apprenticeship' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 8500,
   },
     {
     slug: 'culinary-apprenticeship',
@@ -1691,6 +1695,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=culinary-apprenticeship' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 6500,
   },
     {
     slug: 'customer-service-representative',
@@ -1743,6 +1748,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=customer-service-representative' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 2800,
   },
     {
     slug: 'cybersecurity-analyst',
@@ -1794,6 +1800,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=cybersecurity-analyst' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 7500,
   },
     {
     slug: 'data-analytics',
@@ -1845,6 +1852,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=data-analytics' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 6500,
   },
     {
     slug: 'dental-assistant',
@@ -1896,6 +1904,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=dental-assistant' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 4500,
   },
     {
     slug: 'diesel-mechanic',
@@ -1947,6 +1956,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=diesel-mechanic' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 9500,
   },
     {
     slug: 'dsp-training',
@@ -1988,6 +1998,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=dsp-training' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 950,
   },
     {
     slug: 'electrical',
@@ -2028,6 +2039,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=electrical' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 5500,
   },
     {
     slug: 'emt-apprenticeship',
@@ -2075,6 +2087,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=emt-apprenticeship' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 1800,
   },
     {
     slug: 'entrepreneurship-small-business',
@@ -2126,6 +2139,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=entrepreneurship-small-business' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 5200,
   },
     {
     slug: 'forklift-operator',
@@ -2178,6 +2192,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=forklift-operator' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 450,
   },
     {
     slug: 'insurance-agent',
@@ -2230,6 +2245,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=insurance-agent' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 2800,
   },
     {
     slug: 'it-help-desk',
@@ -2281,6 +2297,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=it-support-specialist' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 2800,
   },
     {
     slug: 'life-coach-certification-wioa',
@@ -2329,6 +2346,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=life-coach-certification-wioa' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 750,
   },
     {
     slug: 'manufacturing-technician',
@@ -2380,6 +2398,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=manufacturing-technician' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 4200,
   },
     {
     slug: 'nail-technician',
@@ -2429,6 +2448,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=nail-technician' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 3800,
   },
     {
     slug: 'nrf-riseup',
@@ -2470,6 +2490,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=nrf-riseup' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 399,
   },
     {
     slug: 'peer-support',
@@ -2511,6 +2532,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=peer-support' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 750,
   },
     {
     slug: 'pharmacy-technician',
@@ -2562,6 +2584,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=pharmacy-technician' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 5200,
   },
     {
     slug: 'plumbing',
@@ -2602,6 +2625,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=plumbing' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 5500,
   },
     {
     slug: 'real-estate-agent',
@@ -2654,6 +2678,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=real-estate-agent' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 4200,
   },
     {
     slug: 'recovery-coach',
@@ -2695,6 +2720,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=recovery-coach' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 750,
   },
     {
     slug: 'sanitation-infection-control',
@@ -2735,6 +2761,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=sanitation-infection-control' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 575,
   },
     {
     slug: 'solar-panel-installation',
@@ -2787,6 +2814,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=solar-panel-installation' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 4200,
   },
     {
     slug: 'web-development',
@@ -2838,6 +2866,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=web-development' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 7500,
   },
     {
     slug: 'welding',
@@ -2878,6 +2907,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=welding' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 5500,
   },
     {
     slug: 'youth-culinary-apprenticeship',
@@ -2925,6 +2955,7 @@ export const programs: Program[] = [
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=youth-culinary-apprenticeship' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
+    price: 1800,
   }];
 
 /**

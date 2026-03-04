@@ -245,7 +245,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       // Also update program_enrollments and profile
       await supabase
         .from('program_enrollments')
-        .update({ status: 'active', enrollment_state: 'enrolled' })
+        .update({ status: 'active', enrollment_state: 'active' })
         .eq('user_id', enrollment.user_id);
 
       await supabase

@@ -260,7 +260,7 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
               full_name: `${before.first_name || ''} ${before.last_name || ''}`.trim(),
               phone: before.phone || null,
               status: 'active',
-              enrollment_state: 'enrolled',
+              enrollment_state: 'active',
               enrollment_confirmed_at: new Date().toISOString(),
               funding_source: 'pending',
               amount_paid_cents: 0,

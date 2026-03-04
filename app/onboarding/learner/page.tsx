@@ -113,9 +113,9 @@ export default async function LearnerOnboardingPage() {
     db.from('documents')
       .select('document_type', { count: 'exact' })
       .eq('user_id', user.id),
-    db.from('agreement_acceptances')
-      .select('agreement_key')
-      .eq('subject_id', user.id),
+    db.from('license_agreement_acceptances')
+      .select('agreement_key:agreement_type')
+      .eq('user_id', user.id),
     db.from('handbook_acknowledgments')
       .select('id')
       .eq('user_id', user.id)
@@ -193,145 +193,18 @@ export default async function LearnerOnboardingPage() {
   const progress = Math.round((completedSteps.length / ONBOARDING_STEPS.length) * 100);
   const allComplete = completedSteps.length === ONBOARDING_STEPS.length;
 
-  if (allComplete && profile && !profile.onboarding_completed) {
-    await db
-      .from('profiles')
-      .update({
-        onboarding_completed: true,
-        onboarding_completed_at: new Date().toISOString()
-      })
-      .eq('id', user.id);
-  }
-
+  // Onboarding completion is set only via POST /api/onboarding/complete
   const isOnboardingComplete = allComplete || profile?.onboarding_completed;
 
-  // Auto-enroll when all onboarding steps are complete
+  // Onboarding completion is handled by POST /api/onboarding/complete.
+  // Application approval and enrollment creation is handled by
+  // POST /api/admin/applications/[id]/approve. No auto-approve here.
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const studentName = profile?.first_name || 'Student';
   const programName = enrollmentProgramName || 'your selected program';
-  let justEnrolled = false;
+  const justEnrolled = false;
 
-  if (isOnboardingComplete && profile?.enrollment_status !== 'active') {
-    const { data: application } = await db
-      .from('applications')
-      .select('id, program_interest, program_id')
-      .eq('user_id', user.id)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (application) {
-      let programId = application.program_id;
-      const programSlug = application.program_interest?.toLowerCase().replace(/\s+/g, '-').trim() || '';
-
-      // Resolve program ID from slug if not set on the application
-      if (!programId && programSlug) {
-        const { data: programRow } = await db.from('programs').select('id').eq('slug', programSlug).eq('is_active', true).maybeSingle();
-        programId = programRow?.id || null;
-      }
-
-      await db.from('applications').update({ status: 'approved', updated_at: new Date().toISOString() }).eq('id', application.id);
-
-      if (programId) {
-        await db.from('program_enrollments').upsert({
-          user_id: user.id, program_id: programId, program_slug: programSlug, email: user.email,
-          full_name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim(),
-          amount_paid_cents: 0, funding_source: 'pending', status: 'pending_approval', enrollment_state: 'pending_approval',
-        }, { onConflict: 'user_id,program_id', ignoreDuplicates: true });
-
-        // Find courses for this program
-        let { data: courses } = await db.from('training_courses').select('id, program_id').eq('program_id', programId).eq('is_active', true);
-
-        // Fallback: program_id mismatch across programs/training_courses tables.
-        // Use controlled keyword from the program name (not user free text).
-        if ((!courses || courses.length === 0) && programSlug) {
-          const SLUG_TO_TOKEN: Record<string, string> = {
-            'hvac-technician': 'HVAC', 'hvac': 'HVAC', 'hvac-2024': 'HVAC',
-            'cna-training': 'CNA', 'cna': 'CNA', 'cna-certification': 'CNA',
-            'cdl': 'CDL', 'cdl-commercial-driving': 'CDL',
-            'welding': 'Welding', 'welding-certification': 'Welding',
-            'phlebotomy': 'Phlebotomy', 'phlebotomy-technician': 'Phlebotomy',
-            'barber': 'Barber', 'barber-apprenticeship': 'Barber',
-            'medical-assistant': 'Medical Assistant',
-            'cybersecurity': 'Cybersecurity',
-            'it-support': 'IT Support', 'it-support-specialist': 'IT Support',
-            'electrical': 'Electrical', 'electrical-apprenticeship': 'Electrical',
-            'plumbing': 'Plumbing', 'plumbing-apprenticeship': 'Plumbing',
-            'tax-preparation': 'Tax Preparation',
-          };
-          const token = SLUG_TO_TOKEN[programSlug];
-          if (token) {
-            const { data: fallback } = await db.from('training_courses').select('id, program_id').ilike('course_name', `%${token}%`).eq('is_active', true);
-            // Only use fallback if all results belong to a single program (no ambiguity)
-            if (fallback && fallback.length > 0) {
-              const programIds = new Set(fallback.map((c: any) => c.program_id).filter(Boolean));
-              if (programIds.size <= 1) {
-                courses = fallback;
-              } else {
-                logger.error('Ambiguous course fallback — multiple program_ids', { programSlug, token, programIds: [...programIds] });
-              }
-            }
-          }
-        }
-
-        if (courses && courses.length > 0) {
-          await db.from('training_enrollments').upsert(
-            courses.map((c: any) => ({ user_id: user.id, course_id: c.id, status: 'pending_approval', progress: 0, enrolled_at: new Date().toISOString() })),
-            { onConflict: 'user_id,course_id', ignoreDuplicates: true }
-          );
-        } else {
-          logger.error('No active courses found for auto-enrollment', { programId, programSlug, userId: user.id });
-        }
-      }
-
-      await db.from('profiles').update({ enrollment_status: 'pending_approval' }).eq('id', user.id);
-      justEnrolled = true;
-
-      // Email 1: Student — onboarding complete, pending admin review
-      try {
-        await sendEmail({
-          to: user.email!,
-          subject: `Onboarding Complete — ${programName} | Elevate for Humanity`,
-          html: [
-            `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${studentName},</h2>`,
-            `<p style="font-size:15px;line-height:1.6;color:#334155">Your onboarding for <strong>${programName}</strong> is complete. All your documents and information have been submitted.</p>`,
-            `<div style="background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;padding:16px;margin:16px 0">`,
-            `<p style="margin:0 0 8px;font-weight:bold;color:#92400e">What happens next?</p>`,
-            `<p style="margin:0;color:#78350f;font-size:14px">An administrator will review your enrollment. Once approved, you will receive a separate email confirming your start date and course access.</p>`,
-            `</div>`,
-            `<p style="font-size:14px;color:#475569">You do not need to take any further action at this time. We will contact you directly once your enrollment has been reviewed.</p>`,
-            `<p style="font-size:14px;color:#475569">Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>`,
-            `<p style="font-size:14px;color:#64748b;margin-top:24px">— Elevate for Humanity</p>`,
-          ].join(''),
-        });
-      } catch (emailErr) {
-        logger.warn('Failed to send student onboarding-complete email', emailErr as Error);
-      }
-
-      // Email 2: Admin — new student needs enrollment approval
-      try {
-        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
-        await sendEmail({
-          to: adminEmail,
-          subject: `Action Required: ${studentName} completed onboarding for ${programName}`,
-          html: [
-            `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">New Student Enrollment Pending Approval</h2>`,
-            `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:12px 0">`,
-            `<p style="margin:0 0 8px"><strong>Student:</strong> ${studentName} (${user.email})</p>`,
-            `<p style="margin:0 0 8px"><strong>Program:</strong> ${programName}</p>`,
-            `<p style="margin:0"><strong>Submitted:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`,
-            `</div>`,
-            `<p style="font-size:15px;color:#334155">This student has completed all onboarding steps and is waiting for admin approval to begin coursework.</p>`,
-            `<p style="text-align:center;margin:24px 0"><a href="${siteUrl}/admin/enrollments" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Review Enrollments</a></p>`,
-            `<p style="font-size:13px;color:#64748b">— Elevate LMS Notifications</p>`,
-          ].join(''),
-        });
-      } catch (emailErr) {
-        logger.warn('Failed to send admin enrollment notification', emailErr as Error);
-      }
-    }
-  }
+  // (auto-enroll block removed — approval handled by admin endpoint only)
 
   // Find next incomplete step
   const nextStep = ONBOARDING_STEPS.find(s => !completedSteps.includes(s.id));

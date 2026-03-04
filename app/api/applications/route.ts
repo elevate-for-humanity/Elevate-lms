@@ -16,6 +16,7 @@ import { sendEmail } from '@/lib/email/sendgrid';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { approveApplication } from '@/lib/enrollment/approve';
 
 // CORS preflight for cross-origin form submissions
 export async function OPTIONS() {
@@ -148,101 +149,31 @@ async function _POST(req: Request) {
       );
     }
 
-    // Auto-approve: create auth user, profile, and enrollment record
+    // Auto-approve through single pipeline
     let userId: string | null = null;
-    let isNewUser = false;
-    let passwordSetupLink: string | null = null;
+    const passwordSetupLink: string | null = null;
     try {
-      // Check if user already exists by looking up profiles table first (fast, indexed)
-      const { data: existingProfile } = await supabase
-        .from('profiles')
+      const programSlug = body.programSlug || body.program || 'barber-apprenticeship';
+      const { data: programRow } = await supabase
+        .from('programs')
         .select('id')
-        .eq('email', body.email.toLowerCase())
+        .eq('slug', programSlug)
         .maybeSingle();
 
-      if (existingProfile) {
-        userId = existingProfile.id;
+      const result = await approveApplication(supabase, {
+        applicationId: data.id,
+        programId: programRow?.id || null,
+        fundingType: body.fundingType || null,
+      });
+
+      if (result.success) {
+        userId = result.userId || null;
+        logger.info('[Applications] Auto-approved', { applicationId: data.id, userId });
       } else {
-        // Create auth user with random password (student sets it via reset flow)
-        const tempPassword = `Elv-${crypto.randomUUID().slice(0, 16)}!`;
-        const { data: newUser, error: createErr } = await supabase.auth.admin.createUser({
-          email: body.email,
-          password: tempPassword,
-          email_confirm: true,
-          user_metadata: {
-            full_name: `${body.firstName} ${body.lastName}`,
-            role: 'student',
-          },
-        });
-        if (!createErr && newUser?.user) {
-          userId = newUser.user.id;
-          isNewUser = true;
-        } else {
-          logger.warn('Auto-approve: could not create user', { email: body.email, error: createErr });
-        }
+        logger.warn('[Applications] Auto-approve failed (non-fatal)', { error: result.error });
       }
-
-      if (userId) {
-        // Run profile upsert, program lookup, and password link generation in parallel
-        const [, programResult, linkResult] = await Promise.all([
-          // Upsert profile
-          supabase.from('profiles').upsert({
-            id: userId,
-            email: body.email,
-            full_name: `${body.firstName} ${body.lastName}`,
-            phone: body.phone,
-            role: 'student',
-            enrollment_status: 'active',
-          }, { onConflict: 'id' }),
-
-          // Resolve program ID
-          supabase
-            .from('programs')
-            .select('id')
-            .eq('slug', body.programSlug || 'barber-apprenticeship')
-            .maybeSingle(),
-
-          // Generate password setup link for new users (runs in parallel)
-          isNewUser
-            ? supabase.auth.admin.generateLink({
-                type: 'recovery',
-                email: body.email,
-                options: { redirectTo: `${(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org')}/update-password` },
-              }).catch((err: any) => { logger.warn('[Applications] Password link generation threw', err); return null; })
-            : Promise.resolve(null),
-        ]);
-
-        const programRow = programResult?.data;
-
-        if (linkResult && 'data' in linkResult && linkResult.data?.properties?.action_link) {
-          passwordSetupLink = linkResult.data.properties.action_link;
-          logger.info('[Applications] Password setup link generated', { email: body.email });
-        }
-
-        // Create enrollment record + update application status in parallel
-        await Promise.all([
-          supabase.from('program_enrollments').insert({
-            user_id: userId,
-            program_id: programRow?.id || null,
-            email: body.email,
-            full_name: `${body.firstName} ${body.lastName}`,
-            amount_paid_cents: 0,
-            funding_source: body.fundingType || 'self-pay',
-            status: 'pending',
-            enrollment_state: 'approved',
-            next_required_action: 'COMPLETE_PAYMENT',
-          }),
-          supabase
-            .from('applications')
-            .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
-            .eq('id', data.id),
-        ]);
-
-        logger.info('Application auto-approved', { userId, applicationId: data.id, program });
-      }
-    } catch (autoApproveErr) {
-      // Non-fatal — application is saved, payment can proceed
-      logger.warn('Auto-approve failed (non-fatal)', autoApproveErr);
+    } catch (approveErr) {
+      logger.warn('[Applications] Auto-approve threw (non-fatal)', approveErr);
     }
 
     // Send email notifications — direct call, no self-fetch
@@ -357,7 +288,7 @@ async function _POST(req: Request) {
           <p><strong>Program:</strong> ${body.program}</p>
           <p><strong>Location:</strong> ${body.city || 'N/A'}, ${body.zip || 'N/A'}</p>
           <p><strong>Preferred Contact:</strong> ${body.preferredContact || 'phone'}</p>
-          <p><strong>Auto-Approved:</strong> ${userId ? 'Yes' : 'No'} ${isNewUser ? '(new account created)' : '(existing user)'}</p>
+          <p><strong>Status:</strong> Pending admin approval</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}

@@ -69,7 +69,7 @@ async function _POST(req: NextRequest) {
     // Verify lead exists and is eligible
     const { data: lead, error: leadError } = await supabase
       .from('leads')
-      .select('id, stage, eligibility_data')
+      .select('id, stage, eligibility_data, first_name, last_name, email, phone')
       .eq('id', data.leadId)
       .single();
 
@@ -127,6 +127,20 @@ async function _POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Also insert into applications table so admin dashboard sees intake applicants
+    await supabase.from('applications').insert({
+      first_name: lead.first_name || '',
+      last_name: lead.last_name || '',
+      email: lead.email || '',
+      phone: lead.phone || '',
+      program_interest: program.title,
+      status: 'pending',
+      source: 'intake-funnel',
+      support_notes: `Lead ID: ${data.leadId} | ${data.additionalInfo || ''}`.trim(),
+    }).then(({ error: appErr }) => {
+      if (appErr) logger.error('Intake: failed to mirror to applications table', { error: appErr });
+    });
 
     // Log event
     await supabase.from('audit_logs').insert({

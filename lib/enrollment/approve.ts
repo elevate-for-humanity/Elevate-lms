@@ -1,0 +1,176 @@
+/**
+ * Single approval pipeline. Every approval in the system calls this function.
+ * No other code should create enrollments or change application status.
+ *
+ * Steps:
+ * 1. Find or create auth user + profile
+ * 2. Create program_enrollments (enrollment_state: 'active')
+ * 3. Create training_enrollments for all active courses in the program
+ * 4. Update application status to 'approved'
+ * 5. Update profile enrollment_status to 'active'
+ */
+
+import { logger } from '@/lib/logger';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+export interface ApproveApplicationInput {
+  applicationId: string;
+  programId?: string | null;
+  fundingType?: string | null;
+}
+
+export interface ApproveApplicationResult {
+  success: boolean;
+  userId?: string;
+  enrollmentId?: string | null;
+  error?: string;
+}
+
+export async function approveApplication(
+  db: SupabaseClient,
+  input: ApproveApplicationInput,
+): Promise<ApproveApplicationResult> {
+  const { applicationId, programId, fundingType } = input;
+
+  // Load application
+  const { data: app, error: appError } = await db
+    .from('applications')
+    .select('*')
+    .eq('id', applicationId)
+    .maybeSingle();
+
+  if (appError || !app) {
+    return { success: false, error: 'Application not found' };
+  }
+
+  if (app.status === 'approved') {
+    return { success: true, userId: app.user_id, error: 'Already approved' };
+  }
+
+  const email = (app.email || '').trim().toLowerCase();
+  if (!email) {
+    return { success: false, error: 'Application has no email' };
+  }
+
+  // Step 1: Find or create user
+  let userId: string | null = null;
+
+  // Check profiles first (fast, indexed)
+  const { data: existingProfile } = await db
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (existingProfile) {
+    userId = existingProfile.id;
+  } else {
+    // Check auth users
+    const { data: listUsers } = await db.auth.admin.listUsers({ page: 1, perPage: 100 });
+    const existingUser = listUsers?.users?.find(
+      (u) => u.email?.toLowerCase() === email,
+    );
+
+    if (existingUser) {
+      userId = existingUser.id;
+    } else {
+      // Create new auth user
+      const tempPassword = `EFH-${Math.random().toString(36).slice(2, 10)}-Temp!`;
+      const { data: newUser, error: createError } = await db.auth.admin.createUser({
+        email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: {
+          full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
+          role: 'student',
+        },
+      });
+
+      if (createError || !newUser?.user) {
+        logger.error('[approve] Failed to create user', { email, error: createError });
+        return { success: false, error: 'Failed to create user account' };
+      }
+      userId = newUser.user.id;
+    }
+
+    // Ensure profile exists
+    await db.from('profiles').upsert({
+      id: userId,
+      email,
+      first_name: app.first_name,
+      last_name: app.last_name,
+      full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
+      phone: app.phone,
+      role: 'student',
+    }, { onConflict: 'id' });
+  }
+
+  // Step 2: Create program_enrollments
+  const resolvedProgramId = programId || app.program_id || null;
+  let enrollmentId: string | null = null;
+
+  if (resolvedProgramId) {
+    const { data: pe } = await db
+      .from('program_enrollments')
+      .upsert({
+        user_id: userId,
+        program_id: resolvedProgramId,
+        email,
+        full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
+        amount_paid_cents: 0,
+        funding_source: fundingType || 'pending',
+        status: 'active',
+        enrollment_state: 'active',
+      }, { onConflict: 'user_id,program_id', ignoreDuplicates: false })
+      .select('id')
+      .maybeSingle();
+
+    enrollmentId = pe?.id || null;
+
+    // Step 3: Create training_enrollments for all active courses
+    const { data: courses } = await db
+      .from('training_courses')
+      .select('id')
+      .eq('program_id', resolvedProgramId)
+      .eq('is_active', true);
+
+    if (courses && courses.length > 0) {
+      await db.from('training_enrollments').upsert(
+        courses.map((c: { id: string }) => ({
+          user_id: userId,
+          course_id: c.id,
+          status: 'active',
+          progress: 0,
+          enrolled_at: new Date().toISOString(),
+        })),
+        { onConflict: 'user_id,course_id', ignoreDuplicates: true },
+      );
+    }
+  }
+
+  // Step 4: Update application status
+  await db
+    .from('applications')
+    .update({
+      status: 'approved',
+      user_id: userId,
+      program_id: resolvedProgramId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', applicationId);
+
+  // Step 5: Update profile enrollment_status
+  await db
+    .from('profiles')
+    .update({ enrollment_status: 'active' })
+    .eq('id', userId);
+
+  logger.info('[approve] Application approved', {
+    applicationId,
+    userId,
+    programId: resolvedProgramId,
+    enrollmentId,
+  });
+
+  return { success: true, userId: userId!, enrollmentId };
+}

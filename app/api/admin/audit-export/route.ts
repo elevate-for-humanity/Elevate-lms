@@ -30,7 +30,7 @@ async function _POST(request: Request) {
     // Step 1: Get export snapshot metadata
     const { data: snapshot, error: snapError } = await supabase.rpc('export_audit_snapshot');
     if (snapError) {
-      return NextResponse.json({ error: 'Snapshot failed', detail: snapError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Snapshot failed' }, { status: 500 });
     }
 
     if (snapshot.status === 'no_new_rows') {
@@ -46,7 +46,7 @@ async function _POST(request: Request) {
       .order('created_at', { ascending: true });
 
     if (fetchError || !rows) {
-      return NextResponse.json({ error: 'Fetch failed', detail: fetchError?.message }, { status: 500 });
+      return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
     }
 
     // Step 3: Convert to JSONL (one JSON object per line)
@@ -71,7 +71,7 @@ async function _POST(request: Request) {
       });
 
     if (uploadError) {
-      return NextResponse.json({ error: 'Upload failed', detail: uploadError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
     // Step 5: Mark export as completed

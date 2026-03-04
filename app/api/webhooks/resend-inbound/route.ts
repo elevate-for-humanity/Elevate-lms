@@ -70,7 +70,7 @@ async function _POST(request: NextRequest) {
 
     if (error) {
       logger.error('[Resend Inbound] Forward failed:', error);
-      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
     logger.info('[Resend Inbound] Forwarded successfully', { emailId, forwardedId: data?.id });

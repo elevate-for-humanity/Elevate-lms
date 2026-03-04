@@ -502,8 +502,7 @@ async function insertApplication(payload: {
               full_name: `${payload.firstName} ${payload.lastName}`.trim(),
               phone: payload.phone || null,
               status: 'active',
-              enrollment_state: 'onboarding',
-              next_required_action: 'Complete Onboarding',
+              enrollment_state: 'active',
               funding_source: 'pending',
               amount_paid_cents: 0,
             }, { onConflict: 'user_id,program_id', ignoreDuplicates: true })

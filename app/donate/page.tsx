@@ -13,8 +13,10 @@ import {
   Shield,
   Award,
   Phone,
-CheckCircle, } from 'lucide-react';
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
 
 export const metadata: Metadata = {
   title: 'Donate | Support Career Training | Elevate for Humanity',
@@ -94,10 +96,10 @@ export default async function DonatePage() {
         </div>
       </div>
 
-      {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Support workforce development" fill sizes="100vw" className="object-cover" priority />
-      </section>
+
+      {/* Video Hero */}
+      <VideoHeroBanner videoSrc="/videos/programs-overview-video-with-narration.mp4" posterSrc="/images/heroes-hq/funding-hero.jpg" posterAlt="Donate" />
+
 
       {/* Title */}
       <section className="bg-teal-600 text-white py-20">

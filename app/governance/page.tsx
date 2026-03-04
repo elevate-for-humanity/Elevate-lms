@@ -3,6 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
+
 export const metadata: Metadata = {
   title: 'Governance & Program Structure | Elevate for Humanity',
   description: 'Institutional governance structure, apprenticeship sponsor role, program delivery model, and partner training site framework for Elevate for Humanity Career & Technical Institute.',
@@ -12,16 +14,10 @@ export const metadata: Metadata = {
 export default function GovernancePage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative h-[200px] sm:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Governance and program structure" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/70" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Governance &amp; Program Structure</h1>
-          </div>
-        </div>
-      </section>
+
+      {/* Video Hero */}
+      <VideoHeroBanner videoSrc="/videos/training-providers-hero.mp4" posterSrc="/images/heroes-hq/about-hero.jpg" posterAlt="Governance" />
+
 
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Governance & Program Structure' }]} />

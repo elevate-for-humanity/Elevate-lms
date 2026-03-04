@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
+import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
 import {
   getActivePositions,
   formatSalaryRange,
@@ -111,6 +112,9 @@ export default async function CareersPage() {
           <Breadcrumbs items={[{ label: 'Careers' }]} />
         </div>
       </div>
+
+      {/* Video Hero */}
+      <VideoHeroBanner videoSrc="/videos/career-services-hero.mp4" posterSrc="/images/heroes-hq/career-services-hero.jpg" posterAlt="Careers" />
 
       {/* Hero Banner */}
       <ModernLandingHero

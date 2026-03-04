@@ -7,6 +7,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
 
+import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
+
 export const metadata: Metadata = {
   title: 'Impact & Outcomes | Elevate for Humanity',
   description:
@@ -45,18 +47,10 @@ export default async function ImpactPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="w-full py-20 bg-brand-blue-700 text-white">
-        <div className="mx-auto w-full max-w-6xl px-6">
-          <h1 className="text-5xl md:text-6xl font-black mb-6">
-            Measurable Impact, Sustainable Systems
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl">
-            Supporting workforce development with proven outcomes, transparent
-            reporting, and scalable infrastructure.
-          </p>
-        </div>
-      </section>
+
+      {/* Video Hero */}
+      <VideoHeroBanner videoSrc="/videos/graduation-success.mp4" posterSrc="/images/heroes-hq/success-hero.jpg" posterAlt="Impact" />
+
 
       {/* Why Funders Choose Elevate */}
       <section className="w-full py-20 bg-white">

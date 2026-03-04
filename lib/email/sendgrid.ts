@@ -1,11 +1,5 @@
 import { logger } from '@/lib/logger';
-
-const FROM_EMAIL =
-  process.env.EMAIL_FROM ||
-  process.env.MAIL_FROM ||
-  'Elevate for Humanity <info@elevateforhumanity.org>';
-const REPLY_TO_EMAIL =
-  process.env.REPLY_TO_EMAIL || 'info@elevateforhumanity.org';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export interface EmailOptions {
   to: string | string[];
@@ -20,14 +14,25 @@ export interface EmailOptions {
 /**
  * Send email via SendGrid HTTP API (no SDK — direct fetch).
  * All email in the app routes through this single function.
+ * Hydrates secrets from Supabase app_secrets on first call.
  */
 export async function sendEmail(options: EmailOptions) {
+  // Ensure runtime secrets (SENDGRID_API_KEY, EMAIL_FROM, etc.) are in process.env
+  await hydrateProcessEnv();
+
   const sendgridKey = process.env.SENDGRID_API_KEY;
 
   if (!sendgridKey) {
     logger.warn('[Email] SENDGRID_API_KEY not configured — email not sent');
     return { success: false, error: 'Email service not configured. Set SENDGRID_API_KEY.' };
   }
+
+  const FROM_EMAIL =
+    process.env.EMAIL_FROM ||
+    process.env.MAIL_FROM ||
+    'Elevate for Humanity <info@elevateforhumanity.org>';
+  const REPLY_TO_EMAIL =
+    process.env.REPLY_TO_EMAIL || 'info@elevateforhumanity.org';
 
   const from = options.from || FROM_EMAIL;
   const replyTo = options.replyTo ?? REPLY_TO_EMAIL;

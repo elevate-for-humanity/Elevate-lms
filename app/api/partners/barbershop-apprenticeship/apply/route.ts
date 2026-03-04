@@ -71,7 +71,7 @@ function hashIP(ip: string): string {
 
 async function _POST(req: Request) {
   try {
-    const rateLimited = await applyRateLimit(req, 'strict');
+    const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
     const identifier = getClientIdentifier(req.headers);

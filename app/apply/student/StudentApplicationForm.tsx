@@ -23,22 +23,23 @@ function SuccessPanel({ data }: { data: SuccessData }) {
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Application Submitted!</h2>
       <div className="flex items-center justify-center gap-2 mb-4">
         <Mail className="w-5 h-5 text-brand-blue-600" />
-        <p className="text-lg text-gray-700">Check your email to get started.</p>
+        <p className="text-lg text-gray-700">Check your email for next steps.</p>
       </div>
       <p className="text-gray-600 max-w-md mx-auto mb-6">
-        We sent a confirmation email to <strong>{data.email}</strong> with
-        instructions to begin onboarding. You can log in using the email and
-        password you provided on this form.
+        We sent a confirmation to <strong>{data.email}</strong> with your login
+        credentials and instructions. Our team will review your application and
+        follow up within 1–2 business days.
       </p>
       <a
-        href="/onboarding/learner"
+        href="/login"
         className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3 rounded-lg transition-colors mb-4"
       >
-        Start Onboarding
+        Log In to Your Account
       </a>
       <p className="text-sm text-gray-500 mb-6">
         Don&apos;t see the email? Check your spam folder or contact us at{' '}
-        <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
+        <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
+        {' '}or call <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
       </p>
       {data.referenceNumber && (
         <p className="text-sm text-gray-500">
@@ -61,6 +62,12 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
     setError('');
 
     const formData = new FormData(e.currentTarget);
+
+    // Honeypot — hidden field bots fill in
+    if (formData.get('website_url')) {
+      setSuccessData({ email: '', referenceNumber: '' }); // Silent success for bots
+      return;
+    }
 
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
@@ -125,6 +132,12 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Honeypot — invisible to real users, bots fill it in */}
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        <label htmlFor="website_url">Website</label>
+        <input type="text" id="website_url" name="website_url" tabIndex={-1} autoComplete="off" />
+      </div>
+
       {error && (
         <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm" role="alert">
           {error}

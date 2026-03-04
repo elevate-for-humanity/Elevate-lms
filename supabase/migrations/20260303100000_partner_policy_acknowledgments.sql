@@ -24,6 +24,7 @@ ALTER TABLE public.mou_signatures ADD COLUMN IF NOT EXISTS mou_version TEXT;
 -- RLS: allow inserts from service role (API routes use admin client)
 ALTER TABLE partner_policy_acknowledgments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on partner_policy_acknowledgments" ON partner_policy_acknowledgments;
 CREATE POLICY "Service role full access on partner_policy_acknowledgments"
   ON partner_policy_acknowledgments
   FOR ALL

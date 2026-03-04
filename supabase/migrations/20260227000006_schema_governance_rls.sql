@@ -11,7 +11,8 @@ ALTER TABLE public.admin_audit_events ENABLE ROW LEVEL SECURITY;
 -- Policy: admins_read_audit
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "admins_read_audit" ON public.admin_audit_events
+  DROP POLICY IF EXISTS "admins_read_audit" ON public.admin_audit_events;
+CREATE POLICY "admins_read_audit" ON public.admin_audit_events
   AS PERMISSIVE
   FOR SELECT
   TO public
@@ -24,7 +25,8 @@ END $$;
 -- Policy: service_insert_audit
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "service_insert_audit" ON public.admin_audit_events
+  DROP POLICY IF EXISTS "service_insert_audit" ON public.admin_audit_events;
+CREATE POLICY "service_insert_audit" ON public.admin_audit_events
   AS PERMISSIVE
   FOR INSERT
   TO public
@@ -40,7 +42,8 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 -- Policy: Admins can manage applications
 -- Command: ALL | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "Admins can manage applications" ON public.applications
+  DROP POLICY IF EXISTS "Admins can manage applications" ON public.applications;
+CREATE POLICY "Admins can manage applications" ON public.applications
   AS PERMISSIVE
   FOR ALL
   TO public
@@ -51,7 +54,8 @@ END $$;
 -- Policy: Users can create own applications
 -- Command: INSERT | Permissive: RESTRICTIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "Users can create own applications" ON public.applications
+  DROP POLICY IF EXISTS "Users can create own applications" ON public.applications;
+CREATE POLICY "Users can create own applications" ON public.applications
   AS RESTRICTIVE
   FOR INSERT
   TO public
@@ -62,7 +66,8 @@ END $$;
 -- Policy: Users can view own applications
 -- Command: SELECT | Permissive: RESTRICTIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "Users can view own applications" ON public.applications
+  DROP POLICY IF EXISTS "Users can view own applications" ON public.applications;
+CREATE POLICY "Users can view own applications" ON public.applications
   AS RESTRICTIVE
   FOR SELECT
   TO public
@@ -73,7 +78,8 @@ END $$;
 -- Policy: admins_all
 -- Command: ALL | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "admins_all" ON public.applications
+  DROP POLICY IF EXISTS "admins_all" ON public.applications;
+CREATE POLICY "admins_all" ON public.applications
   AS PERMISSIVE
   FOR ALL
   TO authenticated
@@ -85,7 +91,8 @@ END $$;
 -- Policy: anyone_insert
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "anyone_insert" ON public.applications
+  DROP POLICY IF EXISTS "anyone_insert" ON public.applications;
+CREATE POLICY "anyone_insert" ON public.applications
   AS PERMISSIVE
   FOR INSERT
   TO public
@@ -96,7 +103,8 @@ END $$;
 -- Policy: applications_admin_all
 -- Command: ALL | Permissive: RESTRICTIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "applications_admin_all" ON public.applications
+  DROP POLICY IF EXISTS "applications_admin_all" ON public.applications;
+CREATE POLICY "applications_admin_all" ON public.applications
   AS RESTRICTIVE
   FOR ALL
   TO authenticated
@@ -109,7 +117,8 @@ END $$;
 -- Policy: applications_own_read
 -- Command: SELECT | Permissive: RESTRICTIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "applications_own_read" ON public.applications
+  DROP POLICY IF EXISTS "applications_own_read" ON public.applications;
+CREATE POLICY "applications_own_read" ON public.applications
   AS RESTRICTIVE
   FOR SELECT
   TO authenticated
@@ -122,7 +131,8 @@ END $$;
 -- Policy: applications_service_only_insert
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "applications_service_only_insert" ON public.applications
+  DROP POLICY IF EXISTS "applications_service_only_insert" ON public.applications;
+CREATE POLICY "applications_service_only_insert" ON public.applications
   AS PERMISSIVE
   FOR INSERT
   TO public
@@ -133,7 +143,8 @@ END $$;
 -- Policy: auth_read_applications
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "auth_read_applications" ON public.applications
+  DROP POLICY IF EXISTS "auth_read_applications" ON public.applications;
+CREATE POLICY "auth_read_applications" ON public.applications
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -144,7 +155,8 @@ END $$;
 -- Policy: public_insert_applications
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: anon,authenticated
 DO $$ BEGIN
-  CREATE POLICY "public_insert_applications" ON public.applications
+  DROP POLICY IF EXISTS "public_insert_applications" ON public.applications;
+CREATE POLICY "public_insert_applications" ON public.applications
   AS PERMISSIVE
   FOR INSERT
   TO anon,authenticated
@@ -155,7 +167,8 @@ END $$;
 -- Policy: service_role_all_applications
 -- Command: ALL | Permissive: PERMISSIVE | Roles: service_role
 DO $$ BEGIN
-  CREATE POLICY "service_role_all_applications" ON public.applications
+  DROP POLICY IF EXISTS "service_role_all_applications" ON public.applications;
+CREATE POLICY "service_role_all_applications" ON public.applications
   AS PERMISSIVE
   FOR ALL
   TO service_role
@@ -167,7 +180,8 @@ END $$;
 -- Policy: users_own
 -- Command: SELECT | Permissive: RESTRICTIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "users_own" ON public.applications
+  DROP POLICY IF EXISTS "users_own" ON public.applications;
+CREATE POLICY "users_own" ON public.applications
   AS RESTRICTIVE
   FOR SELECT
   TO public
@@ -183,7 +197,8 @@ ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 -- Policy: auth_read_certificates
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "auth_read_certificates" ON public.certificates
+  DROP POLICY IF EXISTS "auth_read_certificates" ON public.certificates;
+CREATE POLICY "auth_read_certificates" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -194,7 +209,8 @@ END $$;
 -- Policy: certificates_admin_delete
 -- Command: DELETE | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_admin_delete" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_admin_delete" ON public.certificates;
+CREATE POLICY "certificates_admin_delete" ON public.certificates
   AS PERMISSIVE
   FOR DELETE
   TO authenticated
@@ -205,7 +221,8 @@ END $$;
 -- Policy: certificates_admin_insert
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_admin_insert" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_admin_insert" ON public.certificates;
+CREATE POLICY "certificates_admin_insert" ON public.certificates
   AS PERMISSIVE
   FOR INSERT
   TO authenticated
@@ -216,7 +233,8 @@ END $$;
 -- Policy: certificates_admin_read
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_admin_read" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_admin_read" ON public.certificates;
+CREATE POLICY "certificates_admin_read" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -227,7 +245,8 @@ END $$;
 -- Policy: certificates_admin_update
 -- Command: UPDATE | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_admin_update" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_admin_update" ON public.certificates;
+CREATE POLICY "certificates_admin_update" ON public.certificates
   AS PERMISSIVE
   FOR UPDATE
   TO authenticated
@@ -238,7 +257,8 @@ END $$;
 -- Policy: certificates_completion_insert
 -- Command: INSERT | Permissive: RESTRICTIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_completion_insert" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_completion_insert" ON public.certificates;
+CREATE POLICY "certificates_completion_insert" ON public.certificates
   AS RESTRICTIVE
   FOR INSERT
   TO authenticated
@@ -249,7 +269,8 @@ END $$;
 -- Policy: certificates_insert
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "certificates_insert" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_insert" ON public.certificates;
+CREATE POLICY "certificates_insert" ON public.certificates
   AS PERMISSIVE
   FOR INSERT
   TO public
@@ -260,7 +281,8 @@ END $$;
 -- Policy: certificates_partner_read
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_partner_read" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_partner_read" ON public.certificates;
+CREATE POLICY "certificates_partner_read" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -275,7 +297,8 @@ END $$;
 -- Policy: certificates_public_verify
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: anon,authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_public_verify" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_public_verify" ON public.certificates;
+CREATE POLICY "certificates_public_verify" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO anon,authenticated
@@ -286,7 +309,8 @@ END $$;
 -- Policy: certificates_select
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "certificates_select" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_select" ON public.certificates;
+CREATE POLICY "certificates_select" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO public
@@ -297,7 +321,8 @@ END $$;
 -- Policy: certificates_update
 -- Command: UPDATE | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "certificates_update" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_update" ON public.certificates;
+CREATE POLICY "certificates_update" ON public.certificates
   AS PERMISSIVE
   FOR UPDATE
   TO public
@@ -308,7 +333,8 @@ END $$;
 -- Policy: certificates_user_read
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "certificates_user_read" ON public.certificates
+  DROP POLICY IF EXISTS "certificates_user_read" ON public.certificates;
+CREATE POLICY "certificates_user_read" ON public.certificates
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -324,7 +350,8 @@ ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
 -- Policy: documents_admin_all
 -- Command: ALL | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "documents_admin_all" ON public.documents
+  DROP POLICY IF EXISTS "documents_admin_all" ON public.documents;
+CREATE POLICY "documents_admin_all" ON public.documents
   AS PERMISSIVE
   FOR ALL
   TO authenticated
@@ -336,7 +363,8 @@ END $$;
 -- Policy: documents_insert_own
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "documents_insert_own" ON public.documents
+  DROP POLICY IF EXISTS "documents_insert_own" ON public.documents;
+CREATE POLICY "documents_insert_own" ON public.documents
   AS PERMISSIVE
   FOR INSERT
   TO authenticated
@@ -347,7 +375,8 @@ END $$;
 -- Policy: documents_select_own
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "documents_select_own" ON public.documents
+  DROP POLICY IF EXISTS "documents_select_own" ON public.documents;
+CREATE POLICY "documents_select_own" ON public.documents
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -358,7 +387,8 @@ END $$;
 -- Policy: documents_service_role
 -- Command: ALL | Permissive: PERMISSIVE | Roles: service_role
 DO $$ BEGIN
-  CREATE POLICY "documents_service_role" ON public.documents
+  DROP POLICY IF EXISTS "documents_service_role" ON public.documents;
+CREATE POLICY "documents_service_role" ON public.documents
   AS PERMISSIVE
   FOR ALL
   TO service_role
@@ -370,7 +400,8 @@ END $$;
 -- Policy: documents_update_own
 -- Command: UPDATE | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "documents_update_own" ON public.documents
+  DROP POLICY IF EXISTS "documents_update_own" ON public.documents;
+CREATE POLICY "documents_update_own" ON public.documents
   AS PERMISSIVE
   FOR UPDATE
   TO authenticated
@@ -387,7 +418,8 @@ ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
 -- Policy: auth_read_organizations
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "auth_read_organizations" ON public.organizations
+  DROP POLICY IF EXISTS "auth_read_organizations" ON public.organizations;
+CREATE POLICY "auth_read_organizations" ON public.organizations
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -398,7 +430,8 @@ END $$;
 -- Policy: public_active
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "public_active" ON public.organizations
+  DROP POLICY IF EXISTS "public_active" ON public.organizations;
+CREATE POLICY "public_active" ON public.organizations
   AS PERMISSIVE
   FOR SELECT
   TO public
@@ -414,7 +447,8 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 -- Policy: profiles_admin_all
 -- Command: ALL | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "profiles_admin_all" ON public.profiles
+  DROP POLICY IF EXISTS "profiles_admin_all" ON public.profiles;
+CREATE POLICY "profiles_admin_all" ON public.profiles
   AS PERMISSIVE
   FOR ALL
   TO authenticated
@@ -426,7 +460,8 @@ END $$;
 -- Policy: profiles_insert_own
 -- Command: INSERT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "profiles_insert_own" ON public.profiles
+  DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
+CREATE POLICY "profiles_insert_own" ON public.profiles
   AS PERMISSIVE
   FOR INSERT
   TO authenticated
@@ -437,7 +472,8 @@ END $$;
 -- Policy: profiles_select_own
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "profiles_select_own" ON public.profiles
+  DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
+CREATE POLICY "profiles_select_own" ON public.profiles
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -448,7 +484,8 @@ END $$;
 -- Policy: profiles_service_role
 -- Command: ALL | Permissive: PERMISSIVE | Roles: service_role
 DO $$ BEGIN
-  CREATE POLICY "profiles_service_role" ON public.profiles
+  DROP POLICY IF EXISTS "profiles_service_role" ON public.profiles;
+CREATE POLICY "profiles_service_role" ON public.profiles
   AS PERMISSIVE
   FOR ALL
   TO service_role
@@ -460,7 +497,8 @@ END $$;
 -- Policy: profiles_update_own
 -- Command: UPDATE | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "profiles_update_own" ON public.profiles
+  DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
+CREATE POLICY "profiles_update_own" ON public.profiles
   AS PERMISSIVE
   FOR UPDATE
   TO authenticated
@@ -477,7 +515,8 @@ ALTER TABLE public.program_holders ENABLE ROW LEVEL SECURITY;
 -- Policy: admins_all
 -- Command: ALL | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "admins_all" ON public.program_holders
+  DROP POLICY IF EXISTS "admins_all" ON public.program_holders;
+CREATE POLICY "admins_all" ON public.program_holders
   AS PERMISSIVE
   FOR ALL
   TO authenticated
@@ -489,7 +528,8 @@ END $$;
 -- Policy: admins_manage_holders
 -- Command: ALL | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "admins_manage_holders" ON public.program_holders
+  DROP POLICY IF EXISTS "admins_manage_holders" ON public.program_holders;
+CREATE POLICY "admins_manage_holders" ON public.program_holders
   AS PERMISSIVE
   FOR ALL
   TO public
@@ -502,7 +542,8 @@ END $$;
 -- Policy: auth_read_program_holders
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "auth_read_program_holders" ON public.program_holders
+  DROP POLICY IF EXISTS "auth_read_program_holders" ON public.program_holders;
+CREATE POLICY "auth_read_program_holders" ON public.program_holders
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -513,7 +554,8 @@ END $$;
 -- Policy: holders_see_own
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "holders_see_own" ON public.program_holders
+  DROP POLICY IF EXISTS "holders_see_own" ON public.program_holders;
+CREATE POLICY "holders_see_own" ON public.program_holders
   AS PERMISSIVE
   FOR SELECT
   TO public
@@ -524,7 +566,8 @@ END $$;
 -- Policy: staff_read_holders
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "staff_read_holders" ON public.program_holders
+  DROP POLICY IF EXISTS "staff_read_holders" ON public.program_holders;
+CREATE POLICY "staff_read_holders" ON public.program_holders
   AS PERMISSIVE
   FOR SELECT
   TO public
@@ -537,7 +580,8 @@ END $$;
 -- Policy: users_own
 -- Command: SELECT | Permissive: RESTRICTIVE | Roles: public
 DO $$ BEGIN
-  CREATE POLICY "users_own" ON public.program_holders
+  DROP POLICY IF EXISTS "users_own" ON public.program_holders;
+CREATE POLICY "users_own" ON public.program_holders
   AS RESTRICTIVE
   FOR SELECT
   TO public
@@ -553,7 +597,8 @@ ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can view own tenant
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "Users can view own tenant" ON public.tenants
+  DROP POLICY IF EXISTS "Users can view own tenant" ON public.tenants;
+CREATE POLICY "Users can view own tenant" ON public.tenants
   AS PERMISSIVE
   FOR SELECT
   TO authenticated
@@ -564,7 +609,8 @@ END $$;
 -- Policy: auth_read_tenants
 -- Command: SELECT | Permissive: PERMISSIVE | Roles: authenticated
 DO $$ BEGIN
-  CREATE POLICY "auth_read_tenants" ON public.tenants
+  DROP POLICY IF EXISTS "auth_read_tenants" ON public.tenants;
+CREATE POLICY "auth_read_tenants" ON public.tenants
   AS PERMISSIVE
   FOR SELECT
   TO authenticated

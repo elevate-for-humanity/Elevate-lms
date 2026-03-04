@@ -101,40 +101,52 @@ CREATE TABLE IF NOT EXISTS public.course_progress (
 
 -- Quizzes: anyone can read published quizzes
 ALTER TABLE public.quizzes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quizzes_select" ON public.quizzes;
 CREATE POLICY "quizzes_select" ON public.quizzes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "quizzes_admin_all" ON public.quizzes;
 CREATE POLICY "quizzes_admin_all" ON public.quizzes FOR ALL
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 
 -- Quiz questions: anyone can read
 ALTER TABLE public.quiz_questions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quiz_questions_select" ON public.quiz_questions;
 CREATE POLICY "quiz_questions_select" ON public.quiz_questions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "quiz_questions_admin_all" ON public.quiz_questions;
 CREATE POLICY "quiz_questions_admin_all" ON public.quiz_questions FOR ALL
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 
 -- Quiz answers: anyone can read
 ALTER TABLE public.quiz_answers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quiz_answers_select" ON public.quiz_answers;
 CREATE POLICY "quiz_answers_select" ON public.quiz_answers FOR SELECT USING (true);
+DROP POLICY IF EXISTS "quiz_answers_admin_all" ON public.quiz_answers;
 CREATE POLICY "quiz_answers_admin_all" ON public.quiz_answers FOR ALL
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 
 -- Quiz attempts: users see own, admins see all
 ALTER TABLE public.quiz_attempts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quiz_attempts_own" ON public.quiz_attempts;
 CREATE POLICY "quiz_attempts_own" ON public.quiz_attempts FOR ALL
   USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "quiz_attempts_admin" ON public.quiz_attempts;
 CREATE POLICY "quiz_attempts_admin" ON public.quiz_attempts FOR SELECT
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 
 -- Quiz attempt answers: users see own via attempt
 ALTER TABLE public.quiz_attempt_answers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "quiz_attempt_answers_own" ON public.quiz_attempt_answers;
 CREATE POLICY "quiz_attempt_answers_own" ON public.quiz_attempt_answers FOR ALL
   USING (attempt_id IN (SELECT id FROM public.quiz_attempts WHERE user_id = auth.uid()));
+DROP POLICY IF EXISTS "quiz_attempt_answers_admin" ON public.quiz_attempt_answers;
 CREATE POLICY "quiz_attempt_answers_admin" ON public.quiz_attempt_answers FOR SELECT
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 
 -- Course progress: users see own, admins see all
 ALTER TABLE public.course_progress ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "course_progress_own" ON public.course_progress;
 CREATE POLICY "course_progress_own" ON public.course_progress FOR ALL
   USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "course_progress_admin" ON public.course_progress;
 CREATE POLICY "course_progress_admin" ON public.course_progress FOR SELECT
   USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' IN ('admin', 'instructor')));
 

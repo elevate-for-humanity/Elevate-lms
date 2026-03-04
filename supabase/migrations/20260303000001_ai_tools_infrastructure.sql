@@ -25,12 +25,13 @@ CREATE TABLE IF NOT EXISTS video_generation_jobs (
   completed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_video_gen_jobs_tenant ON video_generation_jobs(tenant_id);
-CREATE INDEX idx_video_gen_jobs_status ON video_generation_jobs(status);
-CREATE INDEX idx_video_gen_jobs_created ON video_generation_jobs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_video_gen_jobs_tenant ON video_generation_jobs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_video_gen_jobs_status ON video_generation_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_video_gen_jobs_created ON video_generation_jobs(created_at DESC);
 
 ALTER TABLE video_generation_jobs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage video generation jobs" ON video_generation_jobs;
 CREATE POLICY "Admins manage video generation jobs"
   ON video_generation_jobs FOR ALL
   USING (
@@ -62,11 +63,12 @@ CREATE TABLE IF NOT EXISTS generated_images (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_generated_images_tenant ON generated_images(tenant_id);
-CREATE INDEX idx_generated_images_created ON generated_images(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_generated_images_tenant ON generated_images(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_generated_images_created ON generated_images(created_at DESC);
 
 ALTER TABLE generated_images ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage generated images" ON generated_images;
 CREATE POLICY "Admins manage generated images"
   ON generated_images FOR ALL
   USING (
@@ -98,11 +100,12 @@ CREATE TABLE IF NOT EXISTS tts_audio_files (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_tts_audio_tenant ON tts_audio_files(tenant_id);
-CREATE INDEX idx_tts_audio_lesson ON tts_audio_files(lesson_id) WHERE lesson_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_tts_audio_tenant ON tts_audio_files(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_tts_audio_lesson ON tts_audio_files(lesson_id) WHERE lesson_id IS NOT NULL;
 
 ALTER TABLE tts_audio_files ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage TTS audio" ON tts_audio_files;
 CREATE POLICY "Admins manage TTS audio"
   ON tts_audio_files FOR ALL
   USING (
@@ -141,14 +144,15 @@ CREATE TABLE IF NOT EXISTS media_assets (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_media_assets_tenant ON media_assets(tenant_id);
-CREATE INDEX idx_media_assets_type ON media_assets(asset_type);
-CREATE INDEX idx_media_assets_course ON media_assets(course_id) WHERE course_id IS NOT NULL;
-CREATE INDEX idx_media_assets_lesson ON media_assets(lesson_id) WHERE lesson_id IS NOT NULL;
-CREATE INDEX idx_media_assets_tags ON media_assets USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_media_assets_tenant ON media_assets(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_media_assets_type ON media_assets(asset_type);
+CREATE INDEX IF NOT EXISTS idx_media_assets_course ON media_assets(course_id) WHERE course_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_media_assets_lesson ON media_assets(lesson_id) WHERE lesson_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_media_assets_tags ON media_assets USING GIN(tags);
 
 ALTER TABLE media_assets ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage media assets" ON media_assets;
 CREATE POLICY "Admins manage media assets"
   ON media_assets FOR ALL
   USING (
@@ -160,7 +164,8 @@ CREATE POLICY "Admins manage media assets"
     )
   );
 
--- Students can view media linked to their enrolled courses
+-- Students can view media linked to their enrolled programs
+DROP POLICY IF EXISTS "Students view course media" ON media_assets;
 CREATE POLICY "Students view course media"
   ON media_assets FOR SELECT
   USING (
@@ -168,7 +173,7 @@ CREATE POLICY "Students view course media"
     AND EXISTS (
       SELECT 1 FROM student_enrollments se
       WHERE se.student_id = auth.uid()
-        AND se.course_id = media_assets.course_id
+        AND se.program_id = media_assets.course_id
         AND se.status = 'active'
     )
   );
@@ -194,13 +199,14 @@ CREATE TABLE IF NOT EXISTS ai_generation_tasks (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_ai_tasks_tenant ON ai_generation_tasks(tenant_id);
-CREATE INDEX idx_ai_tasks_status ON ai_generation_tasks(status) WHERE status IN ('queued','running');
-CREATE INDEX idx_ai_tasks_type ON ai_generation_tasks(task_type);
-CREATE INDEX idx_ai_tasks_priority ON ai_generation_tasks(priority DESC, created_at ASC) WHERE status = 'queued';
+CREATE INDEX IF NOT EXISTS idx_ai_tasks_tenant ON ai_generation_tasks(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_ai_tasks_status ON ai_generation_tasks(status) WHERE status IN ('queued','running');
+CREATE INDEX IF NOT EXISTS idx_ai_tasks_type ON ai_generation_tasks(task_type);
+CREATE INDEX IF NOT EXISTS idx_ai_tasks_priority ON ai_generation_tasks(priority DESC, created_at ASC) WHERE status = 'queued';
 
 ALTER TABLE ai_generation_tasks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage AI tasks" ON ai_generation_tasks;
 CREATE POLICY "Admins manage AI tasks"
   ON ai_generation_tasks FOR ALL
   USING (
@@ -232,11 +238,12 @@ CREATE TABLE IF NOT EXISTS autopilot_runs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_autopilot_runs_tenant ON autopilot_runs(tenant_id);
-CREATE INDEX idx_autopilot_runs_status ON autopilot_runs(status);
+CREATE INDEX IF NOT EXISTS idx_autopilot_runs_tenant ON autopilot_runs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_autopilot_runs_status ON autopilot_runs(status);
 
 ALTER TABLE autopilot_runs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage autopilot runs" ON autopilot_runs;
 CREATE POLICY "Admins manage autopilot runs"
   ON autopilot_runs FOR ALL
   USING (
@@ -266,10 +273,11 @@ CREATE TABLE IF NOT EXISTS course_generation_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_course_gen_logs_tenant ON course_generation_logs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_course_gen_logs_tenant ON course_generation_logs(tenant_id);
 
 ALTER TABLE course_generation_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins manage course generation logs" ON course_generation_logs;
 CREATE POLICY "Admins manage course generation logs"
   ON course_generation_logs FOR ALL
   USING (
@@ -302,6 +310,7 @@ BEGIN
     'ai_generation_tasks'
   ])
   LOOP
+    EXECUTE format('DROP TRIGGER IF EXISTS set_updated_at ON %I', tbl);
     EXECUTE format(
       'CREATE TRIGGER set_updated_at BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()',
       tbl

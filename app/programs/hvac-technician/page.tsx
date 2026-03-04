@@ -21,8 +21,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/hvac-technician.mp4',
-  voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
+  heroImage: '/images/trades/hero-program-hvac.jpg',
+  heroImageAlt: 'HVAC technician working on a residential air conditioning system',
   title: 'HVAC Technician',
   subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal, OSHA 30, and CPR/AED certifications in 12 weeks.',
   badge: 'Funding Available',

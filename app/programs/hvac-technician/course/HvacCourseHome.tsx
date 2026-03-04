@@ -14,6 +14,9 @@ import {
   HVAC_LESSON_UUID as LESSON_UUID,
   HVAC_MODULE_FIRST_LESSON as MODULE_FIRST_LESSON,
 } from '@/lib/courses/hvac-uuids';
+import { QuizPanel } from './QuizPanel';
+import { EPA_608_CORE, EPA_608_TYPE_I, EPA_608_TYPE_II, EPA_608_TYPE_III, getUniversalExam } from '@/lib/courses/hvac-quizzes';
+import type { QuizQuestion } from '@/lib/courses/hvac-quizzes';
 
 /* ── Helpers ── */
 
@@ -151,6 +154,64 @@ function LessonDrawer({ module, index, done, onClose }: {
 /* ══════════════════════════════════════════════════════════════════
    Main Course Page
    ══════════════════════════════════════════════════════════════════ */
+
+/* ── Practice Quiz Section ── */
+const QUIZ_OPTIONS: { id: string; label: string; questions: QuizQuestion[]; desc: string }[] = [
+  { id: 'core', label: 'EPA 608 Core', questions: EPA_608_CORE, desc: '25 questions — ozone, Clean Air Act, refrigerant safety, recovery/recycling' },
+  { id: 'type1', label: 'EPA 608 Type I', questions: EPA_608_TYPE_I, desc: '25 questions — small appliances, self-contained recovery' },
+  { id: 'type2', label: 'EPA 608 Type II', questions: EPA_608_TYPE_II, desc: '25 questions — high-pressure systems, evacuation, leak detection' },
+  { id: 'type3', label: 'EPA 608 Type III', questions: EPA_608_TYPE_III, desc: '25 questions — low-pressure systems, chillers, purge units' },
+  { id: 'universal', label: 'Universal (Full Exam)', questions: getUniversalExam(), desc: '100 questions — all four sections combined, 70% per section to pass' },
+];
+
+function PracticeQuizSection() {
+  const [activeQuiz, setActiveQuiz] = useState<string | null>(null);
+  const active = QUIZ_OPTIONS.find(q => q.id === activeQuiz);
+
+  return (
+    <section className="mb-14">
+      <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Practice Quizzes</h2>
+      <p className="text-sm text-slate-500 mb-6">Test your knowledge with EPA 608 practice exams. These match the format and difficulty of the proctored certification exam.</p>
+
+      {!activeQuiz ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {QUIZ_OPTIONS.map(q => (
+            <button
+              key={q.id}
+              onClick={() => setActiveQuiz(q.id)}
+              className="bg-white border border-slate-200 rounded-xl p-5 text-left hover:border-brand-red-300 hover:shadow-md transition-all group"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-brand-red-50 rounded-lg flex items-center justify-center group-hover:bg-brand-red-100 transition-colors">
+                  <ClipboardCheck className="w-5 h-5 text-brand-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">{q.label}</h3>
+                  <span className="text-[11px] text-slate-400">{q.questions.length} questions</span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">{q.desc}</p>
+            </button>
+          ))}
+        </div>
+      ) : active ? (
+        <div>
+          <button
+            onClick={() => setActiveQuiz(null)}
+            className="mb-4 text-sm text-slate-500 hover:text-brand-red-600 transition-colors flex items-center gap-1"
+          >
+            ← Back to quiz selection
+          </button>
+          <QuizPanel
+            questions={active.questions}
+            lessonTitle={active.label}
+            onPass={() => {}}
+          />
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 export default function HvacCourseHome({
   course, completedLessonIds = [], progressPercent = 0,
@@ -511,6 +572,11 @@ export default function HvacCourseHome({
             </div>
           </div>
         </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            PRACTICE QUIZZES — EPA 608 exam prep
+            ═══════════════════════════════════════════════════════════ */}
+        <PracticeQuizSection />
 
         {/* ═══════════════════════════════════════════════════════════
             CAREER OUTCOMES — Bold stats

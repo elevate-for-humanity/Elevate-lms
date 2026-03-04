@@ -167,7 +167,7 @@ export default async function ProgramsPage() {
       </div>
 
       {/* HERO - Video banner with auto-play */}
-      <ProgramHeroBanner videoSrc="/videos/training-providers-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
+      <ProgramHeroBanner videoSrc="/videos/training-providers-hero.mp4" />
 
       {/* TEXT SECTION - Below hero, consistent sizing */}
       <section className="py-10 sm:py-12 lg:py-16 bg-white">

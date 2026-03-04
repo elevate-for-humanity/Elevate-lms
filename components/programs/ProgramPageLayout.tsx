@@ -35,9 +35,11 @@ interface Step {
 }
 
 export interface ProgramPageConfig {
-  // Hero — video only, no text overlay
-  videoSrc: string;
+  // Hero — video or static image
+  videoSrc?: string;
   voiceoverSrc?: string;
+  heroImage?: string;
+  heroImageAlt?: string;
 
   // Identity
   title: string;
@@ -163,8 +165,22 @@ export default function ProgramPageLayout({
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== VIDEO HERO — clean, no text ===== */}
-      <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} posterImage={c.overviewImage} />
+      {/* ===== HERO — video or static image ===== */}
+      {c.videoSrc ? (
+        <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} posterImage={c.heroImage || c.overviewImage} />
+      ) : c.heroImage ? (
+        <div className="relative w-full aspect-[21/9] bg-slate-900">
+          <Image
+            src={c.heroImage}
+            alt={c.heroImageAlt || c.title}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
+        </div>
+      ) : null}
 
       {/* ===== BREADCRUMBS ===== */}
       <div className="bg-white border-b border-slate-100">

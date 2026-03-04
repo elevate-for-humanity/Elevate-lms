@@ -179,6 +179,84 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for Individual Training Accounts through local workforce boards.' },
   ],
 
+  // ─── Training Phases (in-program pathway) ─────────────────────────
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Technical Foundations',
+      weeks: 'Weeks 1–3',
+      focus: 'HVAC principles, electrical basics, safety protocols, and tool proficiency.',
+      labCompetencies: [
+        'Identify 10 HVAC tools by name and purpose',
+        'Execute lockout/tagout per OSHA 1910.147',
+        'Measure voltage, amperage, and resistance with a multimeter (±5%)',
+        'Read and trace ladder diagrams',
+        'Test run and start capacitors — pass/fail diagnosis',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'System Diagnostics',
+      weeks: 'Weeks 4–7',
+      focus: 'Heating systems, cooling systems, refrigeration cycle, and diagnostic procedures.',
+      labCompetencies: [
+        'Measure temperature rise within ±5°F of nameplate range',
+        'Perform combustion analysis — CO below 100 ppm',
+        'Calculate superheat within ±2°F from live gauge readings',
+        'Calculate subcooling within ±2°F from live gauge readings',
+        'Connect manifold gauges with correct hose routing',
+        'Look up PT chart values within 5 seconds',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'EPA Certification Prep',
+      weeks: 'Weeks 8–10',
+      focus: 'EPA 608 Core, Type I, Type II, Type III exam preparation and refrigerant handling.',
+      labCompetencies: [
+        'Perform refrigerant recovery to required levels (90%/80%)',
+        'Evacuate a system to 500 microns and hold',
+        'Identify 10 refrigerants by type (CFC, HCFC, HFC, HFO)',
+        'Braze refrigerant lines — pass 150 psi nitrogen pressure test',
+        'Charge a system to manufacturer specifications',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Internship / Work-Based Learning',
+      weeks: 'Weeks 11–12',
+      focus: 'Employer site placement, real-world service calls, and career preparation.',
+      labCompetencies: [
+        'Diagnose 3 common AC faults within 30 minutes each',
+        'Complete a full furnace safety inspection (15-point checklist)',
+        'Perform a residential system startup and commissioning',
+        'Document service calls using industry-standard formats',
+      ],
+    },
+  ],
+
+  // ─── Credential Pipeline (training → cert → job) ─────────────────
+  credentialPipeline: [
+    {
+      training: 'EPA 608 exam prep (Weeks 6–10)',
+      certification: 'EPA 608 Universal Certification',
+      certBody: 'EPA / ESCO Institute',
+      jobRole: 'Entry-level HVAC Technician',
+    },
+    {
+      training: 'OSHA 30-Hour Construction (Weeks 1–4)',
+      certification: 'OSHA 30 DOL Card',
+      certBody: 'U.S. Department of Labor',
+      jobRole: 'Construction / Trades Worker',
+    },
+    {
+      training: 'Residential HVAC modules (Weeks 4–11)',
+      certification: 'Residential HVAC Certification 1 & 2',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Residential HVAC Installer / Service Tech',
+    },
+  ],
+
   // ─── H. Labor Market Info ────────────────────────────────────────
   laborMarket: {
     medianSalary: 52000,

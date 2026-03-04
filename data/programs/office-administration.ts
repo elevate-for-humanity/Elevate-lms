@@ -73,6 +73,77 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
     { standard: 'Indiana DWD Next Level Jobs', description: 'Approved for Workforce Ready Grant funding.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Computer Literacy & Digital Skills',
+      weeks: 'Week 1',
+      focus: 'Windows navigation, file management, cloud storage, typing speed, and digital literacy.',
+      labCompetencies: [
+        'Navigate Windows file system and organize folders',
+        'Upload and share files using OneDrive and Google Drive',
+        'Type at 35+ WPM with 95% accuracy',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Microsoft Office Mastery',
+      weeks: 'Weeks 2–4',
+      focus: 'Word, Excel, and Outlook — document creation, data analysis, and communication.',
+      labCompetencies: [
+        'Create a formatted business report with table of contents in Word',
+        'Execute a mail merge for 50+ recipients',
+        'Build a budget spreadsheet with SUM, IF, and VLOOKUP formulas',
+        'Create a pivot table and chart from raw data in Excel',
+        'Manage inbox with rules, categories, and calendar sharing in Outlook',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Business Communication & Office Procedures',
+      weeks: 'Week 5',
+      focus: 'Professional writing, phone etiquette, records management, and office workflows.',
+      labCompetencies: [
+        'Draft a professional business memo and email',
+        'Take and format meeting minutes',
+        'Set up a digital filing system with consistent naming conventions',
+        'Process incoming and outgoing correspondence',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'MOS Certification & Career Placement',
+      weeks: 'Week 6',
+      focus: 'Microsoft Office Specialist exam preparation and career readiness.',
+      labCompetencies: [
+        'Score 80%+ on MOS Word practice exam',
+        'Score 80%+ on MOS Excel practice exam',
+        'Complete a mock administrative assistant interview',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'Microsoft Word mastery (Weeks 2–6)',
+      certification: 'Microsoft Office Specialist: Word',
+      certBody: 'Microsoft / Certiport',
+      jobRole: 'Administrative Assistant',
+    },
+    {
+      training: 'Microsoft Excel mastery (Weeks 3–6)',
+      certification: 'Microsoft Office Specialist: Excel',
+      certBody: 'Microsoft / Certiport',
+      jobRole: 'Data Entry Specialist / Office Coordinator',
+    },
+    {
+      training: 'Microsoft Outlook mastery (Week 4)',
+      certification: 'Microsoft Office Specialist: Outlook',
+      certBody: 'Microsoft / Certiport',
+      jobRole: 'Receptionist / Front Desk Coordinator',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 42000,
     salaryRange: '$30,000–$55,000',

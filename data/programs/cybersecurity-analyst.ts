@@ -83,6 +83,79 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
     { standard: 'WIOA Title I', description: 'Program meets WIOA eligibility for Individual Training Accounts (ITA).' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Networking Foundations',
+      weeks: 'Weeks 1–3',
+      focus: 'OSI model, TCP/IP, routing, switching, and network infrastructure.',
+      labCompetencies: [
+        'Configure routers and switches in a virtual lab',
+        'Capture and analyze packets using Wireshark',
+        'Set up VLANs and verify inter-VLAN routing',
+        'Troubleshoot connectivity using CLI tools',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Threats, Attacks & Defense',
+      weeks: 'Weeks 4–7',
+      focus: 'Attack vectors, cryptography, firewalls, IDS/IPS, and identity management.',
+      labCompetencies: [
+        'Configure firewall rules to block specific traffic patterns',
+        'Set up and tune an IDS/IPS (Snort or Suricata)',
+        'Implement MFA and role-based access controls',
+        'Perform a vulnerability scan using Nessus or OpenVAS',
+        'Identify phishing emails in a simulated inbox (95% accuracy)',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Security+ Certification Prep',
+      weeks: 'Weeks 8–10',
+      focus: 'CompTIA Security+ SY0-701 exam domains, practice tests, and incident response.',
+      labCompetencies: [
+        'Score 85%+ on Security+ practice exams',
+        'Execute a tabletop incident response exercise',
+        'Map security controls to NIST CSF functions',
+        'Analyze SIEM alerts and triage by severity',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Capstone & Career Placement',
+      weeks: 'Weeks 11–12',
+      focus: 'Security assessment capstone project, certification exam, and employer placement.',
+      labCompetencies: [
+        'Complete a network security assessment report',
+        'Present findings and remediation recommendations',
+        'Sit for CompTIA Security+ certification exam',
+        'Complete a mock SOC analyst interview',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'Security+ prep (Weeks 4–11)',
+      certification: 'CompTIA Security+ Certification',
+      certBody: 'CompTIA',
+      jobRole: 'Security Operations Analyst',
+    },
+    {
+      training: 'Network+ prep (Weeks 1–3)',
+      certification: 'CompTIA Network+ Certification',
+      certBody: 'CompTIA',
+      jobRole: 'Network Security Technician',
+    },
+    {
+      training: 'Security+ (DoD 8570 baseline)',
+      certification: 'DoD IAT Level II Compliance',
+      certBody: 'U.S. Department of Defense',
+      jobRole: 'Government / Defense IT Security',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 112000,
     salaryRange: '$55,000–$150,000',

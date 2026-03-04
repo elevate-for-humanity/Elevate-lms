@@ -89,6 +89,24 @@ export interface HoursBreakdown {
   careerPlacement: number;
 }
 
+// ─── Training Phase ──────────────────────────────────────────────────
+export interface TrainingPhase {
+  phase: number;
+  title: string;
+  weeks: string;
+  focus: string;
+  /** Hands-on lab competencies verified in this phase */
+  labCompetencies: string[];
+}
+
+// ─── Credential Pipeline ─────────────────────────────────────────────
+export interface CredentialPipeline {
+  training: string;
+  certification: string;
+  certBody: string;
+  jobRole: string;
+}
+
 // ─── CTA Links ───────────────────────────────────────────────────────
 export interface CTALinks {
   applyHref: string;
@@ -145,6 +163,12 @@ export interface ProgramSchema {
 
   // ─── G. Standards & Compliance ──────────────────────────────────
   complianceAlignment: ComplianceAlignment[];
+
+  // ─── Training Phases (in-program pathway) ─────────────────────
+  trainingPhases?: TrainingPhase[];
+
+  // ─── Credential Pipeline (training → cert → job) ──────────────
+  credentialPipeline?: CredentialPipeline[];
 
   // ─── H. Labor Market Info ───────────────────────────────────────
   laborMarket: LaborMarketStats;

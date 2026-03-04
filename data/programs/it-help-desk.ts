@@ -77,6 +77,77 @@ export const IT_HELP_DESK: ProgramSchema = {
     { standard: 'Indiana DWD Next Level Jobs', description: 'Approved for Workforce Ready Grant and Employer Training Grant funding.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'IT Foundations',
+      weeks: 'Weeks 1–2',
+      focus: 'PC hardware, operating systems, and basic troubleshooting methodology.',
+      labCompetencies: [
+        'Assemble a PC from components and boot to OS',
+        'Install Windows, macOS, and Linux on bare hardware',
+        'Navigate command line (CMD, PowerShell, Terminal)',
+        'Identify and replace failed RAM, HDD/SSD, and PSU',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Networking & Security',
+      weeks: 'Weeks 3–5',
+      focus: 'TCP/IP, network services, endpoint security, and Active Directory.',
+      labCompetencies: [
+        'Configure a static IP address and verify connectivity',
+        'Set up DNS and DHCP on a lab network',
+        'Configure Windows Firewall rules and antivirus policies',
+        'Create user accounts and group policies in Active Directory',
+        'Troubleshoot network connectivity using ping, tracert, and nslookup',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'CompTIA A+ Exam Prep',
+      weeks: 'Weeks 6–7',
+      focus: 'CompTIA A+ Core 1 and Core 2 exam domains, practice tests, and performance-based questions.',
+      labCompetencies: [
+        'Score 85%+ on CompTIA A+ Core 1 practice exam',
+        'Score 85%+ on CompTIA A+ Core 2 practice exam',
+        'Complete 3 performance-based question simulations',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Help Desk Operations & Career Placement',
+      weeks: 'Week 8',
+      focus: 'Ticketing systems, SLA management, customer communication, and job placement.',
+      labCompetencies: [
+        'Log, categorize, and resolve 10 simulated tickets in a ticketing system',
+        'Demonstrate professional phone and email communication',
+        'Complete a mock technical interview',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'CompTIA A+ prep (Weeks 1–7)',
+      certification: 'CompTIA A+ Certification',
+      certBody: 'CompTIA',
+      jobRole: 'Help Desk Technician / Desktop Support',
+    },
+    {
+      training: 'IT Fundamentals module (Week 1)',
+      certification: 'CompTIA ITF+ Certification',
+      certBody: 'CompTIA',
+      jobRole: 'Entry-level IT Support',
+    },
+    {
+      training: 'OSHA 10 General Industry (Week 1)',
+      certification: 'OSHA 10 DOL Card',
+      certBody: 'U.S. Department of Labor',
+      jobRole: 'IT Field Technician',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 55510,
     salaryRange: '$38,000–$72,000',

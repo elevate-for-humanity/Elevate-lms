@@ -148,6 +148,78 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for Individual Training Accounts through local workforce boards.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Pharmacy Foundations',
+      weeks: 'Weeks 1–3',
+      focus: 'Pharmacology basics, drug classifications, medical terminology, and pharmacy law.',
+      labCompetencies: [
+        'Identify top 200 drugs by brand and generic name (80% accuracy)',
+        'Classify drugs by therapeutic category',
+        'Interpret prescription abbreviations (sig codes)',
+        'Apply HIPAA privacy rules to patient interactions',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Dispensing Operations',
+      weeks: 'Weeks 4–6',
+      focus: 'Prescription processing, compounding, inventory management, and sterile technique.',
+      labCompetencies: [
+        'Process a prescription from intake to verification',
+        'Perform pharmaceutical calculations (dosage, concentration, dilution)',
+        'Compound a non-sterile preparation using proper technique',
+        'Operate pharmacy management software for order entry',
+        'Count and pour medications using a counting tray',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'PTCB Certification Prep',
+      weeks: 'Weeks 7–8',
+      focus: 'PTCB exam domains, practice tests, and test-taking strategies.',
+      labCompetencies: [
+        'Score 80%+ on PTCB practice exams across all 4 domains',
+        'Calculate IV flow rates and drip rates',
+        'Identify controlled substance schedules (I–V)',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Externship & Career Placement',
+      weeks: 'Weeks 9–10',
+      focus: 'Supervised pharmacy externship at a retail or hospital pharmacy.',
+      labCompetencies: [
+        'Complete 80 hours of supervised pharmacy practice',
+        'Process 50+ prescriptions under pharmacist supervision',
+        'Perform medication reconciliation',
+        'Demonstrate proper medication storage and handling',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'PTCB exam prep (Weeks 7–8)',
+      certification: 'PTCB Certified Pharmacy Technician (CPhT)',
+      certBody: 'Pharmacy Technician Certification Board',
+      jobRole: 'Certified Pharmacy Technician',
+    },
+    {
+      training: 'Indiana pharmacy tech registration (Week 10)',
+      certification: 'Indiana Pharmacy Technician Registration',
+      certBody: 'Indiana Board of Pharmacy',
+      jobRole: 'Registered Pharmacy Technician (IN)',
+    },
+    {
+      training: 'Sterile compounding module (Week 5)',
+      certification: 'Sterile Compounding Certificate',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Hospital / IV Pharmacy Technician',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 37790,
     salaryRange: '$30,000–$50,000',

@@ -148,6 +148,79 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for workforce board funding.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Foundations & Sanitation',
+      weeks: 'Weeks 1–8',
+      focus: 'Indiana barber law, sanitation/infection control, scalp and hair analysis, and tool proficiency.',
+      labCompetencies: [
+        'Sanitize and disinfect all tools per Indiana Board of Health standards',
+        'Identify scalp conditions that require medical referral',
+        'Demonstrate proper draping and client preparation',
+        'Maintain a clean and organized workstation',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Cutting & Styling Techniques',
+      weeks: 'Weeks 9–26',
+      focus: 'Clipper cuts, scissor cuts, fades, tapers, beard shaping, and styling.',
+      labCompetencies: [
+        'Perform a skin fade with seamless blending',
+        'Execute scissor-over-comb technique on varied hair textures',
+        'Shape and line a beard using straight razor and trimmers',
+        'Complete a full men\'s haircut in under 30 minutes',
+        'Perform a hot towel straight razor shave',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Chemical Services & Advanced Skills',
+      weeks: 'Weeks 27–40',
+      focus: 'Chemical treatments, color services, hair replacement, and business fundamentals.',
+      labCompetencies: [
+        'Apply chemical relaxer with proper strand test and timing',
+        'Perform a single-process color application',
+        'Demonstrate hair replacement attachment techniques',
+        'Calculate service pricing and product costs',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Apprenticeship Hours & Exam Prep',
+      weeks: 'Weeks 41–52',
+      focus: 'Supervised shop floor hours, client management, and Indiana state board exam preparation.',
+      labCompetencies: [
+        'Complete 1,500 supervised apprenticeship hours',
+        'Manage a personal client book of 20+ regular clients',
+        'Pass practical exam simulation (4 required skills)',
+        'Pass written exam practice test with 75%+ score',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'Barber apprenticeship (52 weeks)',
+      certification: 'Indiana Barber License',
+      certBody: 'Indiana Professional Licensing Agency (SPLA)',
+      jobRole: 'Licensed Barber',
+    },
+    {
+      training: 'Sanitation/infection control (Weeks 1–8)',
+      certification: 'Sanitation & Infection Control Certificate',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Barber / Personal Care Professional',
+    },
+    {
+      training: 'Business fundamentals (Weeks 27–40)',
+      certification: 'Barbershop Business Certificate',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Barbershop Manager / Owner',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 35760,
     salaryRange: '$24,000–$65,000+',

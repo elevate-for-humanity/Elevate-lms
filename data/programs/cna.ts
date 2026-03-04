@@ -145,6 +145,77 @@ export const CNA: ProgramSchema = {
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for Individual Training Accounts through local workforce boards.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Foundations of Patient Care',
+      weeks: 'Weeks 1–2',
+      focus: 'Medical terminology, infection control, vital signs, and patient rights.',
+      labCompetencies: [
+        'Measure blood pressure within ±4 mmHg of instructor reading',
+        'Measure oral temperature within ±0.2°F',
+        'Perform hand hygiene per CDC guidelines (20-second protocol)',
+        'Don and doff PPE in correct sequence',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Clinical Skills',
+      weeks: 'Weeks 3–4',
+      focus: 'Activities of daily living, patient transfers, range of motion, and nutrition.',
+      labCompetencies: [
+        'Perform a two-person transfer from bed to wheelchair',
+        'Assist with ambulation using a gait belt',
+        'Perform passive range of motion exercises on upper and lower extremities',
+        'Make an occupied bed with proper body mechanics',
+        'Measure and record intake and output',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Specialty Care & Documentation',
+      weeks: 'Week 5',
+      focus: 'Dementia care, end-of-life care, mental health, and clinical documentation.',
+      labCompetencies: [
+        'Document vital signs and observations using facility charting system',
+        'Demonstrate redirection techniques for patients with dementia',
+        'Perform post-mortem care procedures',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Clinical Practicum & Exam Prep',
+      weeks: 'Week 6',
+      focus: '30-hour supervised clinical rotation at a long-term care facility plus state exam preparation.',
+      labCompetencies: [
+        'Complete 30 hours of supervised patient care at a clinical site',
+        'Perform 5 randomly selected CNA skills for state competency evaluation',
+        'Pass written practice exam with 75%+ score',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'CNA classroom + clinical (6 weeks)',
+      certification: 'Indiana CNA Certification',
+      certBody: 'Indiana State Department of Health',
+      jobRole: 'Certified Nursing Assistant',
+    },
+    {
+      training: 'CPR/AED/First Aid (Week 1)',
+      certification: 'CPR/AED/First Aid Certification',
+      certBody: 'American Heart Association',
+      jobRole: 'Healthcare Worker (all settings)',
+    },
+    {
+      training: 'Dementia care module (Week 5)',
+      certification: 'Dementia Care Certificate',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Memory Care Aide / Dementia Unit CNA',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 35760,
     salaryRange: '$28,000–$45,000',

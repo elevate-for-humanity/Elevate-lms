@@ -112,6 +112,80 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
         </div>
       </section>
 
+      {/* ═══ TRAINING PHASES (in-program pathway) ═══════════════════ */}
+      {p.trainingPhases && p.trainingPhases.length > 0 && (
+        <section className="bg-slate-900 py-10">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-brand-blue-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white">Training Pathway</h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {p.trainingPhases.map((phase) => (
+                <div key={phase.phase} className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">{phase.phase}</span>
+                    <span className="text-xs text-slate-400 font-medium uppercase">{phase.weeks}</span>
+                  </div>
+                  <h3 className="font-semibold text-white text-sm">{phase.title}</h3>
+                  <p className="text-xs text-slate-400 mt-1">{phase.focus}</p>
+                  {phase.labCompetencies.length > 0 && (
+                    <div className="mt-3 border-t border-white/10 pt-3">
+                      <p className="text-[10px] text-brand-blue-400 font-bold uppercase tracking-wider mb-1.5">Lab Competencies</p>
+                      <ul className="space-y-1">
+                        {phase.labCompetencies.map((lc, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-slate-300">
+                            <Wrench className="w-3 h-3 text-brand-blue-400 mt-0.5 flex-shrink-0" />
+                            {lc}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ CREDENTIAL PIPELINE (training → cert → job) ═══════════ */}
+      {p.credentialPipeline && p.credentialPipeline.length > 0 && (
+        <section className="bg-brand-blue-50 py-8">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-blue-700" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900">Credential Pipeline</h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {p.credentialPipeline.map((cp, i) => (
+                <div key={i} className="bg-white rounded-lg border border-brand-blue-200 p-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm text-slate-700">{cp.training}</span>
+                    </div>
+                    <div className="flex items-center gap-2 pl-2">
+                      <ChevronRight className="w-3 h-3 text-brand-blue-400" />
+                      <span className="text-sm font-semibold text-brand-blue-700">{cp.certification}</span>
+                      <span className="text-[10px] text-slate-400">({cp.certBody})</span>
+                    </div>
+                    <div className="flex items-center gap-2 pl-2">
+                      <ChevronRight className="w-3 h-3 text-brand-green-500" />
+                      <span className="text-sm font-medium text-brand-green-700">{cp.jobRole}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ═══ B. CREDENTIALS EARNED ══════════════════════════════════ */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <SectionHeader icon={Award} title="Credentials Earned" />

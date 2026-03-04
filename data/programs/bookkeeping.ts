@@ -70,6 +70,69 @@ export const BOOKKEEPING: ProgramSchema = {
     { standard: 'GAAP Fundamentals', description: 'Program teaches Generally Accepted Accounting Principles at the bookkeeping level.' },
   ],
 
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Accounting Fundamentals',
+      weeks: 'Week 1',
+      focus: 'Double-entry bookkeeping, chart of accounts, journal entries, and accrual vs cash basis.',
+      labCompetencies: [
+        'Record 20 transactions using T-accounts with zero errors',
+        'Classify accounts as asset, liability, equity, revenue, or expense',
+        'Prepare a trial balance from journal entries',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'QuickBooks Online Mastery',
+      weeks: 'Weeks 2–3',
+      focus: 'Company setup, invoicing, expense tracking, bank reconciliation, and reporting.',
+      labCompetencies: [
+        'Set up a company file with chart of accounts and opening balances',
+        'Create and send invoices, record payments, and track receivables',
+        'Reconcile a bank account to $0.00 difference',
+        'Generate profit & loss and balance sheet reports',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Payroll & Tax Compliance',
+      weeks: 'Week 4',
+      focus: 'Payroll processing, tax withholding, W-2/1099 preparation, and quarterly filings.',
+      labCompetencies: [
+        'Process a complete payroll cycle for 5 employees',
+        'Calculate federal and state tax withholding',
+        'Prepare W-2 and 1099 forms from payroll data',
+      ],
+    },
+    {
+      phase: 4,
+      title: 'Certification Exam & Career Prep',
+      weeks: 'Week 5',
+      focus: 'QuickBooks Certified User exam preparation, Excel skills, and career placement.',
+      labCompetencies: [
+        'Score 80%+ on QuickBooks Certified User practice exam',
+        'Build a budget spreadsheet with formulas and pivot tables in Excel',
+        'Complete a mock bookkeeping interview',
+      ],
+    },
+  ],
+
+  credentialPipeline: [
+    {
+      training: 'QuickBooks Online mastery (Weeks 2–5)',
+      certification: 'QuickBooks Certified User',
+      certBody: 'Intuit / Certiport',
+      jobRole: 'Bookkeeper / Accounts Clerk',
+    },
+    {
+      training: 'Excel for accounting (Weeks 4–5)',
+      certification: 'Microsoft Office Specialist: Excel',
+      certBody: 'Microsoft / Certiport',
+      jobRole: 'Financial Analyst / Data Entry',
+    },
+  ],
+
   laborMarket: {
     medianSalary: 45860,
     salaryRange: '$35,000–$55,000',

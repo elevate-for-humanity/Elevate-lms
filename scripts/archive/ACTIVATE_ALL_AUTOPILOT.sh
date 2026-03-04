@@ -8,11 +8,11 @@ echo "🤖 ACTIVATING ALL AUTOPILOT SYSTEMS"
 echo "===================================="
 echo ""
 
-# Secrets from documentation
-export NETLIFY_AUTH_TOKEN="nfp_ZQh1EUwZgJt939dcD3kb9sEYGk7DDgwPbaae"
-export NETLIFY_SITE_ID="12f120ab-3f63-419b-bc49-430f043415c1"
-export SUPABASE_URL="https://cuxzzpsyufcewtmicszk.supabase.co"
-export SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA3MzI0NzUsImV4cCI6MjA0NjMwODQ3NX0.9y3VZ_pqLbHqEqGJYqxQxqxQxqxQxqxQxqxQxqxQxqxQ"
+# Load secrets from environment — never hardcode tokens
+export NETLIFY_AUTH_TOKEN="${NETLIFY_AUTH_TOKEN:?Set NETLIFY_AUTH_TOKEN env var}"
+export NETLIFY_SITE_ID="${NETLIFY_SITE_ID:?Set NETLIFY_SITE_ID env var}"
+export SUPABASE_URL="${SUPABASE_URL:?Set SUPABASE_URL env var}"
+export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY env var}"
 
 echo "✅ Secrets loaded"
 echo ""

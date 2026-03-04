@@ -10,57 +10,52 @@ import Image from 'next/image';
 // Principle: If a first-time visitor or government reviewer wouldn't expect to see it, remove it
 
 const footerLinks = {
-  about: [
-    { name: 'About Elevate', href: '/about' },
-    { name: 'Our Mission', href: '/mission' },
-    { name: 'Our Team', href: '/team' },
-    { name: 'How It Works', href: '/how-it-works' },
-    { name: 'Support Services', href: '/employment-support' },
-    { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
-    { name: 'Impact', href: '/impact' },
-    { name: 'Press', href: '/press' },
-    { name: 'Contact', href: '/contact' },
-  ],
-  programs: [
-    { name: 'Training Programs', href: '/programs' },
-    { name: 'Certifications', href: '/training/certifications' },
-    { name: 'Career Pathways', href: '/how-it-works' },
+  training: [
+    { name: 'All Programs', href: '/programs' },
+    { name: 'Skilled Trades', href: '/programs/hvac-technician' },
+    { name: 'Healthcare', href: '/programs/cna' },
+    { name: 'Technology', href: '/programs/it-help-desk' },
+    { name: 'Business & Office', href: '/programs/bookkeeping' },
     { name: 'Apprenticeships', href: '/programs/barber-apprenticeship' },
+    { name: 'Certifications', href: '/training/certifications' },
     { name: 'Career Services', href: '/career-counseling' },
-    { name: 'Employer Partnerships', href: '/employer' },
+  ],
+  funding: [
+    { name: 'How Enrollment Works', href: '/how-it-works' },
+    { name: 'WIOA Funding', href: '/funding/federal-programs' },
+    { name: 'Workforce Ready Grant', href: '/funding/state-programs' },
+    { name: 'Next Level Jobs', href: '/funding/state-programs' },
+    { name: 'Tuition & Costs', href: '/tuition' },
+    { name: 'Support Services', href: '/employment-support' },
+  ],
+  partners: [
+    { name: 'Employer Partners', href: '/employer' },
+    { name: 'Workforce Boards', href: '/workforce-board' },
     { name: 'Partner Directory', href: '/directory' },
+    { name: 'Become a Partner', href: '/partnerships' },
+    { name: 'Platform Licensing', href: '/store/licenses' },
   ],
-  platform: [
-    { name: 'Platform Overview', href: '/store' },
-    { name: 'Licensing', href: '/store/licenses' },
-    { name: 'Managed Platform', href: '/store/licenses/managed-platform' },
-    { name: 'Enterprise Access', href: '/store/licenses/enterprise-license' },
-    { name: 'Demos', href: '/store/demo' },
-    { name: 'Add-Ons', href: '/store/add-ons' },
-  ],
-  compliance: [
-    { name: 'Institutional Governance', href: '/institutional-governance' },
-    { name: 'Verification & Approvals', href: '/verification-approvals' },
-    { name: 'Compliance & Security', href: '/compliance' },
-    { name: 'Data Privacy', href: '/governance/data' },
-    { name: 'Accessibility', href: '/accessibility' },
-    { name: 'Transparency', href: '/transparency' },
-    { name: 'Verify Credentials', href: '/verify' },
-  ],
-  access: [
+  portals: [
     { name: 'Student Portal', href: '/login' },
-    { name: 'Program Holder Portal', href: '/program-holder' },
+    { name: 'Employer Portal', href: '/employer' },
     { name: 'Partner Portal', href: '/partner-portal' },
-    { name: 'Partner Barbershop', href: '/partners/barber-shop' },
-    { name: 'Partnerships', href: '/partnerships' },
     { name: 'Support', href: '/support' },
     { name: 'FAQ', href: '/faq' },
+  ],
+  organization: [
+    { name: 'About Elevate', href: '/about' },
+    { name: 'Our Team', href: '/team' },
+    { name: 'Our Mission', href: '/mission' },
+    { name: 'Governance', href: '/institutional-governance' },
+    { name: 'Compliance', href: '/compliance' },
+    { name: 'Transparency', href: '/transparency' },
+    { name: 'Contact', href: '/contact' },
   ],
   legal: [
     { name: 'Terms of Service', href: '/terms-of-service' },
     { name: 'Privacy Policy', href: '/privacy-policy' },
+    { name: 'Accessibility', href: '/accessibility' },
     { name: 'Security', href: '/governance/security' },
-    { name: 'Licensing', href: '/store/licenses' },
   ],
 };
 
@@ -68,13 +63,33 @@ export default function ServerFooter() {
   return (
     <footer className="bg-slate-900 text-white" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Institutional Identity */}
+        <div className="mb-10 pb-8 border-b border-slate-800">
+          <div className="flex items-center gap-3 mb-3">
+            <Image src="/logo.png" alt="Elevate for Humanity" width={32} height={32} className="w-8 h-8" />
+            <span className="text-lg font-bold text-white">Elevate for Humanity</span>
+          </div>
+          <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+            National workforce training platform connecting online technical instruction, industry credentials, and employer pathways. Programs aligned with EPA, CompTIA, PTCB, Microsoft, and OSHA certifications.
+          </p>
+          <div className="flex flex-wrap gap-4 mt-4 text-xs text-slate-500">
+            <span>DOL Registered Apprenticeship Sponsor</span>
+            <span className="text-slate-700">·</span>
+            <span>ETPL Listed Training Provider</span>
+            <span className="text-slate-700">·</span>
+            <span>WIOA Title I Approved</span>
+            <span className="text-slate-700">·</span>
+            <span>WorkOne Workforce Partner</span>
+          </div>
+        </div>
+
         {/* 5-Column Footer */}
         <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
-          {/* Column 1: About */}
+          {/* Column 1: Training Programs */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">About</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Training Programs</h3>
             <ul className="space-y-3">
-              {footerLinks.about.map((link) => (
+              {footerLinks.training.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-400 hover:text-white text-sm">
                     {link.name}
@@ -84,11 +99,11 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 2: Programs */}
+          {/* Column 2: Funding & Enrollment */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Programs</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Funding & Enrollment</h3>
             <ul className="space-y-3">
-              {footerLinks.programs.map((link) => (
+              {footerLinks.funding.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-400 hover:text-white text-sm">
                     {link.name}
@@ -98,11 +113,11 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 3: Platform */}
+          {/* Column 3: Employers & Partners */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Platform</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Employers & Partners</h3>
             <ul className="space-y-3">
-              {footerLinks.platform.map((link) => (
+              {footerLinks.partners.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-400 hover:text-white text-sm">
                     {link.name}
@@ -112,11 +127,11 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 4: Compliance & Trust */}
+          {/* Column 4: Portals & Access */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Compliance & Trust</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Portals & Access</h3>
             <ul className="space-y-3">
-              {footerLinks.compliance.map((link) => (
+              {footerLinks.portals.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-400 hover:text-white text-sm">
                     {link.name}
@@ -126,11 +141,11 @@ export default function ServerFooter() {
             </ul>
           </div>
 
-          {/* Column 5: Access */}
+          {/* Column 5: Organization */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Access</h3>
+            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Organization</h3>
             <ul className="space-y-3">
-              {footerLinks.access.map((link) => (
+              {footerLinks.organization.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-slate-400 hover:text-white text-sm">
                     {link.name}
@@ -140,6 +155,26 @@ export default function ServerFooter() {
             </ul>
           </div>
         </nav>
+
+        {/* Footer CTA */}
+        <div className="border-t border-slate-800 pt-8 pb-8 mb-8 text-center">
+          <p className="text-sm text-slate-400 mb-4">Ready to start your career? Explore funded training programs.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors">
+              Apply for Training
+            </Link>
+            <Link href="/partnerships" className="border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors">
+              Partner With Us
+            </Link>
+          </div>
+        </div>
+
+        {/* Credential Alignment */}
+        <div className="border-t border-slate-800 pt-6 pb-6 mb-6 text-center">
+          <p className="text-[10px] text-slate-500 max-w-3xl mx-auto leading-relaxed">
+            Programs aligned with industry-recognized certifications including EPA Section 608, CompTIA A+, CompTIA Security+, PTCB CPhT, Microsoft Office Specialist, OSHA 30, and Indiana state licensing requirements. Credential outcomes are issued by the respective certifying organizations.
+          </p>
+        </div>
 
         {/* Bottom Bar: Legal Links + Copyright */}
         <div className="border-t border-slate-800 pt-8">
@@ -155,9 +190,6 @@ export default function ServerFooter() {
               />
               <p className="text-slate-400 text-sm">
                 © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute.
-              </p>
-              <p className="text-slate-500 text-xs mt-1">
-                Registered Apprenticeship Sponsor | Workforce Training Provider | Career &amp; Technical Instructional Institution
               </p>
             </div>
             

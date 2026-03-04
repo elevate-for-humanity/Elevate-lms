@@ -162,11 +162,23 @@ export default async function VerifyCertificatePage({
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
-                Valid Certificate
+                {certificate?.status === 'revoked' ? 'Revoked Certificate' : 'Valid Certificate'}
               </h2>
               <p className="text-center text-gray-600 mb-6">
-                This certificate has been verified and is authentic
+                {certificate?.status === 'revoked'
+                  ? 'This certificate has been revoked'
+                  : 'This certificate has been verified and is authentic'}
               </p>
+              {certificate?.funding_status && certificate.funding_status !== 'funded' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-amber-800 text-center">
+                    Funding status: <span className="font-semibold capitalize">{certificate.funding_status}</span>
+                  </p>
+                  <p className="text-xs text-amber-600 text-center mt-1">
+                    This credential remains valid. Training was completed and competency was demonstrated.
+                  </p>
+                </div>
+              )}
 
               {/* Certificate Information */}
               <div className="border-t border-b border-gray-200 py-6 space-y-4">

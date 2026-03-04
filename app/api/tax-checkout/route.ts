@@ -54,7 +54,7 @@ async function _POST(req: Request) {
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       client_reference_id: intake_id,
       metadata: {
         intake_id,

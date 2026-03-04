@@ -150,7 +150,7 @@ async function _POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       // Force card collection upfront
       payment_method_collection: 'always',
       line_items: [

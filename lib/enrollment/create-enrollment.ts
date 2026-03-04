@@ -1,6 +1,7 @@
 /**
  * Shared enrollment creation logic
- * Used by both Stripe and Sezzle webhooks to create enrollments
+ * Used by Stripe, Sezzle, and Affirm webhooks to create enrollments.
+ * Authoritative enrollment activator for all payment rails.
  */
 
 import { logger } from '@/lib/logger';
@@ -17,7 +18,7 @@ interface EnrollmentParams {
   phone?: string;
   fundingSource?: string;
   applicationId?: string;
-  paymentProvider: 'stripe' | 'sezzle' | 'sezzle_virtual_card';
+  paymentProvider: 'stripe' | 'sezzle' | 'sezzle_virtual_card' | 'affirm';
   paymentReference?: string;
   paymentAmountCents?: number;
 }

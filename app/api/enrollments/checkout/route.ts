@@ -143,7 +143,7 @@ async function _POST(request: NextRequest) {
     // 5. Create Stripe Checkout Session
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       customer_email: userEmail,
       client_reference_id: enrollmentId,
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/enrollment/success?session_id={CHECKOUT_SESSION_ID}`,

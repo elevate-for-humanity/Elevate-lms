@@ -23,7 +23,8 @@ export type TemplateKey =
   | 'match_assigned'
   | 'employer_application_received'
   | 'employer_decision'
-  | 'employer_activated';
+  | 'employer_activated'
+  | 'partner_approved';
 
 const BRAND_COLOR = '#7c3aed';
 const SUPPORT_EMAIL = 'support@elevateforhumanity.org';
@@ -555,6 +556,44 @@ If you believe this was in error or your circumstances have changed, please cont
 Questions? Reply to this email or call ${SUPPORT_PHONE}`,
         };
       }
+
+    case 'partner_approved':
+      return {
+        subject: 'Partner Onboarding \u2014 You\'re Approved',
+        html: baseTemplate(`
+          <h2 style="color: #16a34a;">Welcome to the Elevate Apprenticeship Network</h2>
+          <p>Hi ${data.owner_name || 'there'},</p>
+          <p>Your partner application has been <strong>approved</strong>. Your shop is now an authorized training site in the Elevate for Humanity Barber Apprenticeship Program.</p>
+
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: ${BRAND_COLOR}; margin-top: 0;">Onboarding Checklist</h3>
+            <p style="margin-bottom: 12px;">Complete these steps to begin receiving apprentices:</p>
+            <ol style="margin: 0; padding-left: 20px; line-height: 2;">
+              <li><strong>Sign in to your Partner Portal</strong> using the link below</li>
+              <li><strong>Upload your Certificate of Insurance (COI)</strong> &mdash; must show Commercial General Liability ($1M/$2M) with &quot;Elevate for Humanity&quot; as Certificate Holder</li>
+              <li><strong>Sign the Memorandum of Understanding (MOU)</strong> &mdash; available in your portal</li>
+              <li><strong>Confirm your supervising barber</strong> &mdash; name, license number, and availability</li>
+              <li><strong>Set your apprentice capacity</strong> &mdash; how many apprentices your shop can host at once</li>
+            </ol>
+          </div>
+
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px;"><strong>Insurance requirement:</strong> Your COI must be on file and approved before apprentices can be placed at your shop. Ask your insurance agent for an ACORD 25 certificate naming &quot;Elevate for Humanity&quot; as Certificate Holder.</p>
+          </div>
+
+          ${button('Sign In to Partner Portal \u2192', data.login_link || 'https://www.elevateforhumanity.org/login')}
+
+          <p><strong>What happens next:</strong></p>
+          <ul style="padding-left: 20px; line-height: 1.8;">
+            <li>Once onboarding is complete, your shop will be listed as an active training site</li>
+            <li>We will match apprentices to your shop based on location and capacity</li>
+            <li>You will receive a notification when an apprentice is assigned</li>
+          </ul>
+
+          <p style="font-size: 14px; color: #666;">If you have questions about onboarding, insurance requirements, or the program, reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Partner Onboarding \u2014 You're Approved\n\nHi ${data.owner_name || 'there'},\n\nYour partner application has been approved. Your shop is now an authorized training site in the Elevate for Humanity Barber Apprenticeship Program.\n\nONBOARDING CHECKLIST\n1. Sign in to your Partner Portal: ${data.login_link || 'https://www.elevateforhumanity.org/login'}\n2. Upload your Certificate of Insurance (COI) \u2014 Commercial General Liability ($1M/$2M) with "Elevate for Humanity" as Certificate Holder\n3. Sign the Memorandum of Understanding (MOU)\n4. Confirm your supervising barber\n5. Set your apprentice capacity\n\nINSURANCE REQUIREMENT: Your COI must be on file and approved before apprentices can be placed. Ask your insurance agent for an ACORD 25 certificate naming "Elevate for Humanity" as Certificate Holder.\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n\nElevate for Humanity | Indianapolis, IN`,
+      };
 
     default:
       return {

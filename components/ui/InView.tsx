@@ -24,7 +24,7 @@ function getSharedObserver(): IntersectionObserver {
           }
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.05, rootMargin: '50px 0px -60px 0px' }
     );
   }
   return sharedObserver;

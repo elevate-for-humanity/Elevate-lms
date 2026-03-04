@@ -148,7 +148,7 @@ async function _POST(request: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/enroll/payment?application_id=${application_id}&canceled=true`,
       // Enable installments/BNPL for installment option
       ...(payment_option === 'installment' && {
-        payment_method_types: ['card', 'affirm', 'klarna'],
+        payment_method_types: ['card', 'klarna'],
       }),
     };
 

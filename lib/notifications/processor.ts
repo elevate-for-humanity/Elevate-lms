@@ -73,7 +73,7 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
       const template = getTemplate(notification.template_key, notification.template_data);
 
       // Send email
-      const sendResult = await sendEmail({
+      const sendResult = await sendEmailViaProvider({
         to: notification.to_email,
         subject: template.subject,
         html: template.html,
@@ -122,55 +122,27 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
 }
 
 /**
- * Send email using configured provider (Resend)
+ * Send email using SendGrid (primary provider).
+ * Wraps lib/email/sendgrid.ts for the notification queue.
  */
-async function sendEmail(params: {
+async function sendEmailViaProvider(params: {
   to: string;
   subject: string;
   html: string;
   text: string;
-}): Promise<{ success: boolean; error?: string; messageId?: string }> {
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+}): Promise<{ success: boolean; error?: string }> {
+  // Dynamic import to avoid circular dependency
+  const { sendEmail: sgSend } = await import('@/lib/email/sendgrid');
 
-  if (!RESEND_API_KEY) {
-    logger.warn('RESEND_API_KEY not configured, skipping email send');
-    // In development, log and return success
-    if (process.env.NODE_ENV === 'development') {
-      logger.info('DEV EMAIL:', params.to, params.subject);
-      return { success: true, messageId: 'dev-' + Date.now() };
-    }
-    return { success: false, error: 'Email provider not configured' };
-  }
+  const result = await sgSend({
+    to: params.to,
+    subject: params.subject,
+    html: params.html,
+    text: params.text,
+    from: DEFAULT_FROM,
+  });
 
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: DEFAULT_FROM,
-        to: params.to,
-        subject: params.subject,
-        html: params.html,
-        text: params.text,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return {
-        success: false,
-        error: errorData.message || `HTTP ${response.status}`,
-      };
-    }
-
-    const data = await response.json();
-    return { success: true, messageId: data.id };
-  } catch (error: any) {
-    return { success: false, error: 'Network error' };
-  }
+  return result;
 }
 
 /**

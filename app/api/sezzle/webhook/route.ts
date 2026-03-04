@@ -17,6 +17,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
+import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
+import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -130,14 +132,33 @@ async function _POST(request: NextRequest) {
       referenceId: event.data.reference_id,
     });
 
+    // Event-level deduplication via webhook_events_processed
+    const sezzleEventId = event.event_id || `${event.event_type}:${event.data.order_uuid}`;
+    const { shouldProcess, confident } = await claimWebhookEvent(
+      'sezzle',
+      sezzleEventId,
+      event.event_type,
+      { orderUuid: event.data.order_uuid, referenceId: event.data.reference_id },
+    );
+
+    if (!shouldProcess) {
+      return NextResponse.json({ received: true, idempotent: true });
+    }
+
+    // Fail-closed: if deduplication check is not authoritative, reject for retry
+    if (!confident) {
+      logger.error('[Sezzle Webhook] Cannot verify idempotency — rejecting for retry', { eventId: sezzleEventId });
+      return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
+    }
+
     // Use admin client — webhooks have no user session, RLS would block writes
     const supabase = createAdminClient();
     if (!supabase) {
       logger.error('[Sezzle Webhook] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY likely missing. DB writes will be skipped.');
+      await finalizeWebhookEvent('sezzle', sezzleEventId, 'errored', 'DB unavailable');
     }
 
-    // Deduplicate by order_uuid + event_type: if we already have a
-    // captured payment for this order, skip re-processing
+    // Legacy deduplication (kept as secondary check)
     if (supabase && event.data.order_uuid && event.event_type === 'order.captured') {
       const { data: existing } = await supabase
         .from('payments')
@@ -152,6 +173,7 @@ async function _POST(request: NextRequest) {
           orderUuid: event.data.order_uuid,
           existingPaymentId: existing.id,
         });
+        await finalizeWebhookEvent('sezzle', sezzleEventId, 'skipped');
         return NextResponse.json({ received: true, duplicate: true });
       }
     }
@@ -180,9 +202,11 @@ async function _POST(request: NextRequest) {
       default:
         logger.info('[Sezzle Webhook] Unhandled event type', { eventType: event.event_type });
     }
+    await finalizeWebhookEvent('sezzle', sezzleEventId, 'processed');
   } catch (error) {
     // Log but still return 200 — don't let processing errors cause retries
     logger.error('[Sezzle Webhook] Processing error:', error);
+    try { await finalizeWebhookEvent('sezzle', sezzleEventId, 'errored', String(error)); } catch { /* */ }
   }
 
   return NextResponse.json({ received: true });
@@ -423,6 +447,15 @@ async function handleOrderRefunded(event: SezzleWebhookEvent, supabase: any) {
         deactivated_at: new Date().toISOString(),
       })
       .eq('id', payment.enrollment_id);
+
+    // Flag certificates issued under this enrollment
+    await flagCertificatesOnRefund({
+      supabase,
+      enrollmentId: payment.enrollment_id,
+      reason: 'refunded',
+      paymentProvider: 'sezzle',
+      paymentReference: order_uuid,
+    });
   }
 }
 

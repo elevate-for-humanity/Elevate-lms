@@ -6,8 +6,8 @@ import { PRICES } from './prices';
 
 export const STRIPE_PRICE_IDS: Record<string, string> = {
   // Capital Readiness Guide Products
-  "capital-readiness-guide": PRICES.CR_GUIDE || "price_PLACEHOLDER_CR_GUIDE",
-  "capital-readiness-enterprise": PRICES.CR_ENTERPRISE || "price_PLACEHOLDER_CR_ENTERPRISE",
+  "capital-readiness-guide": PRICES.CR_GUIDE || "price_1T1yGkIRNf5vPH3ALVeVuavY",
+  "capital-readiness-enterprise": PRICES.CR_ENTERPRISE || "price_1T1yGlIRNf5vPH3AdNlMlLAx",
   
   // Platform Licenses
   "efh-core": PRICES.CORE_ONETIME,

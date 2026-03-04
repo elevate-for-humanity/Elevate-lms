@@ -30,6 +30,19 @@ const execAsync = promisify(exec);
  */
 
 async function _POST(request: NextRequest) {
+  // Kill switch: disabled by default in production.
+  // Set AVATAR_GENERATION_ENABLED=true to temporarily enable.
+  if (process.env.AVATAR_GENERATION_ENABLED !== 'true') {
+    logger.info('Avatar generation endpoint called while disabled', {
+      ip: request.headers.get('x-forwarded-for'),
+      userAgent: request.headers.get('user-agent')?.substring(0, 100),
+    });
+    return NextResponse.json(
+      { error: 'Avatar generation is not available.' },
+      { status: 410 }
+    );
+  }
+
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

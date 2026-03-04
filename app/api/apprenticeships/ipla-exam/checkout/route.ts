@@ -25,7 +25,7 @@ async function _POST(request: NextRequest) {
     const { studentInfo, examDate, examTime } = await request.json();
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       line_items: [
         {
           price_data: {

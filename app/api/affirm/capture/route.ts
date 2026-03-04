@@ -14,7 +14,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
-import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -46,7 +45,9 @@ async function _GET(request: NextRequest) {
     allParams: Object.fromEntries(searchParams.entries()),
   });
 
-  // DIAGNOSTIC: Mark context with error if params missing (proves capture was hit)
+  // Fallback redirect path when we don't have context yet
+  const fallbackPath = '/programs';
+
   if (orderId && !checkoutToken) {
     await supabase
       .from('checkout_contexts')
@@ -58,23 +59,17 @@ async function _GET(request: NextRequest) {
       .eq('provider', 'affirm');
     
     logger.error('Affirm capture missing checkout_token', { orderId });
-    return NextResponse.redirect(
-      `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=affirm`
-    );
+    return NextResponse.redirect(`${siteUrl}${fallbackPath}?canceled=true&provider=affirm`);
   }
 
   if (!orderId) {
     logger.error('Affirm capture missing order_id');
-    return NextResponse.redirect(
-      `${siteUrl}/programs/barber-apprenticeship/apply?error=missing_order`
-    );
+    return NextResponse.redirect(`${siteUrl}${fallbackPath}?error=missing_order`);
   }
 
   if (!checkoutToken) {
     logger.info('Affirm checkout canceled or no token', { orderId });
-    return NextResponse.redirect(
-      `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=affirm`
-    );
+    return NextResponse.redirect(`${siteUrl}${fallbackPath}?canceled=true&provider=affirm`);
   }
 
   // Load checkout context from DB (server-side, tamper-proof)
@@ -88,10 +83,12 @@ async function _GET(request: NextRequest) {
 
   if (contextError || !context) {
     logger.error('Checkout context not found or already used', { orderId, error: contextError });
-    return NextResponse.redirect(
-      `${siteUrl}/programs/barber-apprenticeship/apply?error=invalid_session`
-    );
+    return NextResponse.redirect(`${siteUrl}${fallbackPath}?error=invalid_session`);
   }
+
+  // Use context's program slug for redirects from here on
+  const programSlug = context.program_slug || 'barber-apprenticeship';
+  const programPath = `/programs/${programSlug}/apply`;
 
   // Check expiration
   if (new Date(context.expires_at) < new Date()) {
@@ -100,9 +97,7 @@ async function _GET(request: NextRequest) {
       .from('checkout_contexts')
       .update({ status: 'expired' })
       .eq('id', context.id);
-    return NextResponse.redirect(
-      `${siteUrl}/programs/barber-apprenticeship/apply?error=session_expired`
-    );
+    return NextResponse.redirect(`${siteUrl}${programPath}?error=session_expired`);
   }
 
   try {
@@ -117,67 +112,19 @@ async function _GET(request: NextRequest) {
       program: context.program_slug,
     });
 
-    // Mark context as completed and store provider response
+    // Mark context as authorized — enrollment happens on webhook charge.captured
     await supabase
       .from('checkout_contexts')
       .update({
-        status: 'completed',
+        status: 'authorized',
         completed_at: new Date().toISOString(),
         provider_charge_id: result.id,
         provider_response: result,
       })
       .eq('id', context.id);
 
-    // Create barber_subscriptions record using DB context (not URL params)
-    if (context.program_slug === 'barber-apprenticeship' && context.customer_email) {
-      try {
-        const amountPaidCents = result.amount || 0;
-        const totalHoursRequired = BARBER_PRICING.totalHoursRequired || 2000;
-        const hoursRemaining = Math.max(0, totalHoursRequired - (context.transfer_hours || 0));
-        const weeksRemaining = Math.ceil(hoursRemaining / (context.hours_per_week || 40));
-        
-        const { data: subscription, error: subError } = await supabase
-          .from('barber_subscriptions')
-          .insert({
-            customer_email: context.customer_email,
-            customer_name: context.customer_name || '',
-            status: 'active',
-            full_tuition_amount: BARBER_PRICING.fullPrice,
-            amount_paid_at_checkout: amountPaidCents / 100,
-            remaining_balance: Math.max(0, (BARBER_PRICING.fullPrice * 100 - amountPaidCents) / 100),
-            payment_method: 'affirm',
-            bnpl_provider: 'affirm',
-            fully_paid: amountPaidCents >= BARBER_PRICING.fullPrice * 100,
-            weekly_payment_cents: 0,
-            weeks_remaining: weeksRemaining,
-            hours_per_week: context.hours_per_week || 40,
-            transferred_hours_verified: context.transfer_hours || 0,
-            payment_model: 'bnpl_affirm',
-            created_at: new Date().toISOString(),
-          })
-          .select('id')
-          .single();
-
-        if (subError) {
-          logger.error('Failed to create barber_subscriptions:', subError);
-        } else {
-          logger.info('Barber subscription created for Affirm payment', {
-            subscriptionId: subscription?.id,
-            contextId: context.id,
-            chargeId: result.id,
-            customerEmail: context.customer_email,
-            amountPaidCents,
-            transferHours: context.transfer_hours,
-            hoursPerWeek: context.hours_per_week,
-          });
-        }
-      } catch (dbError) {
-        logger.error('Failed to create barber_subscriptions record:', dbError);
-      }
-    }
-
-    // Redirect to success page (minimal params - no sensitive data)
-    const successUrl = new URL(`${siteUrl}/programs/barber-apprenticeship/apply/success`);
+    // Redirect to success page — enrollment will be activated by webhook
+    const successUrl = new URL(`${siteUrl}${programPath}/success`);
     successUrl.searchParams.set('provider', 'affirm');
     successUrl.searchParams.set('ref', context.id);
 
@@ -191,7 +138,7 @@ async function _GET(request: NextRequest) {
       .update({ status: 'failed' })
       .eq('id', context.id);
     
-    const errorUrl = new URL(`${siteUrl}/programs/barber-apprenticeship/apply`);
+    const errorUrl = new URL(`${siteUrl}${programPath}`);
     errorUrl.searchParams.set('error', 'affirm_failed');
     errorUrl.searchParams.set('message', 'Authorization failed');
     

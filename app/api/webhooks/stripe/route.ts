@@ -49,6 +49,8 @@ import {
   assertSubscriptionData,
 } from '@/lib/licensing/billing-authority';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
+import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import * as Sentry from '@sentry/nextjs';
 
 
@@ -220,6 +222,9 @@ async function _POST(request: NextRequest) {
     livemode: event.livemode,
   });
 
+  // Unified event tracking (secondary to stripe_webhook_events)
+  claimWebhookEvent('stripe', event.id, event.type, { livemode: event.livemode }).catch(() => {});
+
   // Wrap ALL post-verify logic in try/catch to prevent 500s
   try {
     // Destructive events: state mutations that must not be replayed.
@@ -340,6 +345,20 @@ async function _POST(request: NextRequest) {
       switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      // Guard: Only activate enrollment when funds are confirmed.
+      // 'paid' = card/instant capture. 'no_payment_required' = WIOA/free/trial.
+      // 'unpaid' = async methods (Klarna, Afterpay) — deferred to async_payment_succeeded.
+      // Any unknown status is also deferred as a safety measure.
+      const allowedPaymentStatuses = ['paid', 'no_payment_required'];
+      if (!allowedPaymentStatuses.includes(session.payment_status)) {
+        logger.info('[webhook] Payment not yet confirmed — deferring enrollment', {
+          sessionId: session.id,
+          paymentStatus: session.payment_status,
+          paymentMethodTypes: session.payment_method_types,
+        });
+        break;
+      }
 
       // ========== CANONICAL PROGRAM ENROLLMENT ==========
       // This is the standard path for ALL program enrollments
@@ -1737,6 +1756,79 @@ async function _POST(request: NextRequest) {
       break;
     }
 
+    // Async payment methods (Klarna, Afterpay) confirm funds here, not on session.completed
+    case 'checkout.session.async_payment_succeeded': {
+      const asyncSession = event.data.object as Stripe.Checkout.Session;
+      logger.info('[webhook] Async payment succeeded — processing enrollment', {
+        sessionId: asyncSession.id,
+        paymentStatus: asyncSession.payment_status,
+      });
+
+      // Re-dispatch to the same enrollment logic as checkout.session.completed
+      // by constructing a synthetic completed event and recursing through the switch
+      // Instead, directly handle the two enrollment paths:
+
+      if (asyncSession.metadata?.kind === 'program_enrollment') {
+        const studentId = asyncSession.metadata.student_id;
+        const programId = asyncSession.metadata.program_id;
+        const programSlug = asyncSession.metadata.program_slug;
+        const fundingSource = asyncSession.metadata.funding_source || 'self_pay';
+        const amountPaid = (asyncSession.amount_total || 0) / 100;
+
+        if (studentId && programId) {
+          const { data: enrollment, error: enrollError } = await supabase
+            .from('student_enrollments')
+            .upsert({
+              student_id: studentId,
+              program_id: programId,
+              program_slug: programSlug,
+              stripe_checkout_session_id: asyncSession.id,
+              status: 'active',
+              funding_source: fundingSource,
+              amount_paid: amountPaid,
+              started_at: new Date().toISOString(),
+            }, {
+              onConflict: 'student_id,program_slug',
+            })
+            .select('id')
+            .single();
+
+          if (enrollError) {
+            logger.error('[webhook] Async payment: failed to upsert enrollment', enrollError);
+          } else {
+            await auditLog({
+              action: AuditAction.ENROLLMENT_CREATED,
+              entity: AuditEntity.ENROLLMENT,
+              entityId: enrollment?.id,
+              userId: studentId,
+              metadata: {
+                program_id: programId,
+                program_slug: programSlug,
+                funding_source: fundingSource,
+                amount_paid: amountPaid,
+                checkout_session_id: asyncSession.id,
+                payment_method: 'async_bnpl',
+                activated_by: 'webhook:async_payment_succeeded',
+              },
+            });
+            logger.info(`✅ Async payment enrollment provisioned: ${programSlug} for ${studentId}`);
+          }
+        }
+      }
+      break;
+    }
+
+    case 'checkout.session.async_payment_failed': {
+      const failedSession = event.data.object as Stripe.Checkout.Session;
+      logger.warn('[webhook] Async payment failed', {
+        sessionId: failedSession.id,
+        customerEmail: failedSession.customer_email,
+        metadata: failedSession.metadata,
+      });
+      // No enrollment to deactivate since we deferred on session.completed
+      break;
+    }
+
     case 'payment_intent.succeeded': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       logger.info('PaymentIntent succeeded:', paymentIntent.id);
@@ -2120,6 +2212,16 @@ async function _POST(request: NextRequest) {
           logger.warn('[webhook] Failed to record in webhook_events_processed:', logErr);
         }
 
+        // Flag certificates issued to this student
+        await flagCertificatesOnRefund({
+          supabase,
+          studentId: userId,
+          enrollmentId: enrollmentId || undefined,
+          reason: 'refunded',
+          paymentProvider: 'stripe',
+          paymentReference: charge.id,
+        });
+
         // Audit log the refund
         await auditLog({
           action: AuditAction.DELETE,
@@ -2158,6 +2260,7 @@ async function _POST(request: NextRequest) {
         .from('stripe_webhook_events')
         .update({ status: 'processed', processed_at: new Date().toISOString() })
         .eq('stripe_event_id', event.id);
+      finalizeWebhookEvent('stripe', event.id, 'processed').catch(() => {});
     } catch (updateErr) {
       logger.warn('[webhook] Failed to update status:', updateErr);
       logger.warn('Failed to update webhook status:', updateErr);
@@ -2180,6 +2283,7 @@ async function _POST(request: NextRequest) {
           processed_at: new Date().toISOString() 
         })
         .eq('stripe_event_id', event.id);
+      finalizeWebhookEvent('stripe', event.id, 'errored', errMsg).catch(() => {});
     } catch (updateErr) {
       logger.warn('[webhook] Failed to update failure status:', updateErr);
     }

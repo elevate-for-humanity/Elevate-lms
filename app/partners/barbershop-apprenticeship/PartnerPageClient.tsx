@@ -186,6 +186,12 @@ export default function PartnerPageClient() {
               <Phone className="w-5 h-5 mr-2" /> (317) 314-3757
             </a>
           </div>
+          <Link
+            href="/partners/requirements"
+            className="inline-block mt-4 text-sm text-orange-100 underline hover:text-white transition-colors"
+          >
+            View full partner site requirements including insurance
+          </Link>
         </div>
       </section>
     </div>

@@ -26,7 +26,7 @@ export default function HomePage() {
       </div>
 
       {/* ===== HERO VIDEO ===== */}
-      <section className="relative h-[65vh] min-h-[400px] max-h-[720px]">
+      <section className="relative w-full h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] min-h-[320px] max-h-[800px] overflow-hidden">
         <HomeHeroVideo />
       </section>
 

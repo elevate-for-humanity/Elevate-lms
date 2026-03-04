@@ -207,7 +207,7 @@ export const hvacVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "hvac-hero-main",
-      imageSrc: "/images/efh-building-tech-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-training.jpg",
       imageAlt: "HVAC learner working on an outdoor unit.",
       eyebrow: "Skilled Trades",
       title: "HVAC & Building Technician Pathway",

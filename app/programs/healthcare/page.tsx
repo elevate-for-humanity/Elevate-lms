@@ -99,28 +99,28 @@ const healthcarePrograms = [
     duration: '4–6 weeks',
     desc: 'Become a Certified Nursing Assistant. State exam prep and clinical hours included.',
     href: '/programs/cna',
-    image: '/images/pages/comp-program-template.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
   },
   {
     title: 'Medical Assistant',
     duration: '12–16 weeks',
     desc: 'Clinical and administrative medical assisting. CCMA certification included.',
     href: '/programs/medical-assistant',
-    image: '/images/pages/comp-program-template.jpg',
+    image: '/images/pages/admin-health-hero.jpg',
   },
   {
     title: 'Phlebotomy Technician',
     duration: '8–10 weeks',
     desc: 'Venipuncture, specimen handling, and lab safety. CPT certification included.',
     href: '/programs/phlebotomy',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/comp-highlights-team.jpg',
   },
   {
     title: 'CPR & First Aid',
     duration: '1 day',
     desc: 'American Heart Association CPR, First Aid, and AED certification.',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/comp-program-template.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
 ];
 

@@ -168,7 +168,7 @@ export default function RootLayout({
         {/* Preload hero image for faster LCP */}
         <link
           rel="preload"
-          href="/images/hero-poster.webp"
+          href="/images/pages/home-hero-video.jpg"
           as="image"
           type="image/webp"
           fetchPriority="high"

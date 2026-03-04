@@ -114,7 +114,7 @@ export default async function CareersPage() {
       </div>
 
       {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/career-services-hero.mp4" posterSrc="/images/heroes-hq/career-services-hero.jpg" posterAlt="Careers" />
+      <VideoHeroBanner videoSrc="/videos/career-services-hero.mp4" posterSrc="/images/pages/careers-video-poster.jpg" posterAlt="Careers" />
 
       {/* Hero Banner */}
       <ModernLandingHero

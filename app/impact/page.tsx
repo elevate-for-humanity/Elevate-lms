@@ -49,7 +49,7 @@ export default async function ImpactPage() {
 
 
       {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/graduation-success.mp4" posterSrc="/images/heroes-hq/success-hero.jpg" posterAlt="Impact" />
+      <VideoHeroBanner videoSrc="/videos/graduation-success.mp4" posterSrc="/images/pages/impact-video-poster.jpg" posterAlt="Impact" />
 
 
       {/* Why Funders Choose Elevate */}

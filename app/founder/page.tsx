@@ -20,7 +20,7 @@ export default function FounderPage() {
       </div>
 
       {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/elevate-overview-with-narration.mp4" posterSrc="/images/heroes-hq/about-hero.jpg" posterAlt="Founder" />
+      <VideoHeroBanner videoSrc="/videos/elevate-overview-with-narration.mp4" posterSrc="/images/pages/founder-video-poster.jpg" posterAlt="Founder" />
 
       {/* Bio — full body photo left, bio right */}
       <section className="py-10 sm:py-16">

@@ -286,12 +286,12 @@ export default function WorkOnePartnerPacketPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { title: 'Barber Apprenticeship', duration: '18 months', credential: 'Indiana Barber License', funding: 'WIOA, WRG, Apprenticeship', image: '/images/barber-hero.jpg' },
-              { title: 'Healthcare Certifications', duration: '4-12 weeks', credential: 'Medical Assistant, Phlebotomy, Home Health Aide', funding: 'WIOA, WRG', image: '/images/healthcare-highlight.jpg' },
+              { title: 'Barber Apprenticeship', duration: '18 months', credential: 'Indiana Barber License', funding: 'WIOA, WRG, Apprenticeship', image: '/images/pages/barber-gallery-1.jpg' },
+              { title: 'Healthcare Certifications', duration: '4-12 weeks', credential: 'Medical Assistant, Phlebotomy, Home Health Aide', funding: 'WIOA, WRG', image: '/images/pages/comp-pathway-healthcare.jpg' },
               { title: 'IT & Cybersecurity', duration: '8-12 weeks', credential: 'Certiport IT Specialist, Cisco CCST', funding: 'WIOA, WRG', image: '/images/pages/comp-cta-training.jpg' },
               { title: 'CDL Training', duration: '4-6 weeks', credential: 'Class A CDL', funding: 'WIOA, WRG', image: '/images/pages/comp-cta-training.jpg' },
-              { title: 'Skilled Trades', duration: '8-24 weeks', credential: 'OSHA, NCCER, Industry Certs', funding: 'WIOA, WRG, Apprenticeship', image: '/images/hvac-technician-success.jpg' },
-              { title: 'Business & Office', duration: '4-8 weeks', credential: 'Microsoft Office, QuickBooks', funding: 'WIOA, WRG', image: '/images/business-highlight.jpg' },
+              { title: 'Skilled Trades', duration: '8-24 weeks', credential: 'OSHA, NCCER, Industry Certs', funding: 'WIOA, WRG, Apprenticeship', image: '/images/pages/comp-pathway-trades.jpg' },
+              { title: 'Business & Office', duration: '4-8 weeks', credential: 'Microsoft Office, QuickBooks', funding: 'WIOA, WRG', image: '/images/pages/comp-cta-training.jpg' },
             ].map((program, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
                 <div className="relative h-40">

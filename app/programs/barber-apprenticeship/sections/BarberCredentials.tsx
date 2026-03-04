@@ -7,8 +7,8 @@ const CURRICULUM_IMAGES = [
   '/images/pages/barber-gallery-1.jpg',
   '/images/pages/barber-gallery-1.jpg',
   '/images/pages/barber-gallery-1.jpg',
-  '/images/barber-highlight-1.jpg',
-  '/images/barber-highlight-2.jpg',
+  '/images/pages/barber-gallery-1.jpg',
+  '/images/pages/barber-gallery-2.jpg',
   '/images/pages/comp-cta-training.jpg',
 ];
 

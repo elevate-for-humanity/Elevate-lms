@@ -123,7 +123,7 @@ export function generateArticleSchema(article: {
     },
     datePublished: article.datePublished,
     dateModified: article.dateModified || article.datePublished,
-    image: article.image || `${baseUrl}/images/default-blog.jpg`,
+    image: article.image || `${baseUrl}/images/pages/social-media-1.jpg`,
     url: article.url,
     mainEntityOfPage: {
       '@type': 'WebPage',

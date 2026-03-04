@@ -24,15 +24,15 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: 'IT Help Desk', duration: '8 weeks', salary: '$55,510', href: '/programs/it-help-desk', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/web-development', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Software Development', duration: '12 weeks', salary: '$104,000', href: '/programs/software-development', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Network Administration', duration: '10 weeks', salary: '$80,600', href: '/programs/network-administration', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Office Administration', duration: '6 weeks', salary: '$42,000', href: '/programs/office-administration', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'IT Help Desk', duration: '8 weeks', salary: '$55,510', href: '/programs/it-help-desk', image: '/images/pages/comp-universal-hero.jpg' },
+  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/pages/admin-network-hero.jpg' },
+  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/web-development', image: '/images/pages/admin-code-hero.jpg' },
+  { title: 'Software Development', duration: '12 weeks', salary: '$104,000', href: '/programs/software-development', image: '/images/pages/admin-dev-hero.jpg' },
+  { title: 'Network Administration', duration: '10 weeks', salary: '$80,600', href: '/programs/network-administration', image: '/images/pages/comp-layout-hero.jpg' },
+  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/pages/admin-design-hero.jpg' },
+  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/pages/admin-media-hero.jpg' },
+  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/pages/admin-projects-hero.jpg' },
+  { title: 'Office Administration', duration: '6 weeks', salary: '$42,000', href: '/programs/office-administration', image: '/images/pages/comp-cta-training.jpg' },
 ];
 
 const config: ProgramPageConfig = {

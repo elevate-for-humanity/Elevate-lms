@@ -261,8 +261,8 @@ export const PROGRAMS: Program[] = [
     tagline: "IRS-approved training + supervised practicum.",
     shortDescription:
       "Tax prep, QuickBooks, Microsoft 365, and financial literacy certifications for building a service business.",
-    cardImage: "/images/tax-office-1.jpg",
-    heroImage: "/images/tax-office-1.jpg",
+    cardImage: "/images/pages/supersonic-tax-prep.jpg",
+    heroImage: "/images/pages/supersonic-tax-prep.jpg",
     duration: "10 weeks",
     cost: "Funding may cover full cost",
     format: "Hybrid / Online",

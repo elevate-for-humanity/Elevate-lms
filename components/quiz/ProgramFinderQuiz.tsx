@@ -40,9 +40,9 @@ const steps: QuizStep[] = [
     options: [
       { id: 'healthcare', label: 'Healthcare', image: '/images/pages/comp-home-hero.jpg', description: 'Help people heal and stay healthy' },
       { id: 'trades', label: 'Skilled Trades', image: '/images/pages/comp-pathway-trades.jpg', description: 'Build, fix, and create with your hands' },
-      { id: 'cdl', label: 'CDL / Trucking', image: '/images/cdl-vibrant.jpg', description: 'Hit the road and earn $50K+' },
+      { id: 'cdl', label: 'CDL / Trucking', image: '/images/pages/comp-pathway-trades.jpg', description: 'Hit the road and earn $50K+' },
       { id: 'tech', label: 'Technology', image: '/images/pages/comp-cta-training.jpg', description: 'IT support, cybersecurity, web dev' },
-      { id: 'barber', label: 'Barbering', image: '/images/barber-hero-new.jpg', description: 'Earn while you learn a creative trade' },
+      { id: 'barber', label: 'Barbering', image: '/images/pages/barber-gallery-1.jpg', description: 'Earn while you learn a creative trade' },
       { id: 'safety', label: 'CPR & First Aid', image: '/images/pages/comp-cta-training.jpg', description: 'Same-day HSI certification' },
     ],
   },

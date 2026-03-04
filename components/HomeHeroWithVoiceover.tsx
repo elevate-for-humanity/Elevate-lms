@@ -167,7 +167,7 @@ export function HomeHeroWithVoiceover({
         muted
         playsInline
         preload="metadata"
-        poster="/images/hero-poster.jpg"
+        poster="/images/pages/home-hero-video.jpg"
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       >
         <source src={config.video_src} type="video/mp4" />

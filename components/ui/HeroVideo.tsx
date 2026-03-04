@@ -60,7 +60,7 @@ export function HeroVideo({
  *
  * <HeroVideo
  *   videoSrc="/videos/hero-home.mp4"
- *   posterSrc="/images/video-poster.jpg"
+ *   posterSrc="/images/pages/home-hero-video.jpg"
  *   overlayOpacity={40}
  *   className="min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]"
  * >

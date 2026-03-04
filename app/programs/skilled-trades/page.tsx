@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Electrical Technician', duration: '12 weeks', salary: '$60,240', href: '/programs/electrical', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'CDL Class A Training', duration: '3–6 weeks', salary: '$62,000', href: '/programs/cdl-training', image: '/images/pages/comp-program-template.jpg' },
-  { title: 'Diesel Mechanic', duration: '12 weeks', salary: '$55,000', href: '/programs/diesel-mechanic', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
+  { title: 'Electrical Technician', duration: '12 weeks', salary: '$60,240', href: '/programs/electrical', image: '/images/pages/comp-highlights-electrical.jpg' },
+  { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/pages/comp-highlights-welding.jpg' },
+  { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'CDL Class A Training', duration: '3–6 weeks', salary: '$62,000', href: '/programs/cdl-training', image: '/images/pages/comp-layout-hero.jpg' },
+  { title: 'Diesel Mechanic', duration: '12 weeks', salary: '$55,000', href: '/programs/diesel-mechanic', image: '/images/pages/admin-fleet-hero.jpg' },
 ];
 
 const config: ProgramPageConfig = {

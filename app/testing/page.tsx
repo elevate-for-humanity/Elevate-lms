@@ -16,7 +16,7 @@ const examCategories = [
   {
     name: 'Certiport Authorized Testing',
     provider: 'Certiport (Pearson VUE)',
-    image: '/images/Content_PATHWAY_BUSINESS.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     description: 'Proctor-supervised exams administered on-site through our Certiport Authorized Testing Center designation.',
     exams: [
       'Microsoft Office Specialist (Word, Excel, PowerPoint, Outlook, Access)',
@@ -30,7 +30,7 @@ const examCategories = [
   {
     name: 'EPA Section 608 Certification',
     provider: 'ESCO Institute & Mainstream Engineering',
-    image: '/images/Content_PATHWAY_TRADES.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     description: 'Universal certification exam covering Core, Type I, II, and III refrigerant handling. Required by federal law for HVAC technicians. Exam fees and retesting policies vary by certifying organization.',
     exams: [
       'EPA 608 Universal Certification Exam',
@@ -40,7 +40,7 @@ const examCategories = [
   {
     name: 'OSHA Safety Certifications',
     provider: 'CareerSafe / OSHA',
-    image: '/images/apprenticeships-card.jpg',
+    image: '/images/pages/apprenticeships-hero.jpg',
     description: 'OSHA-authorized safety training and certification through our CareerSafe partnership.',
     exams: [
       'OSHA 10-Hour General Industry',
@@ -65,7 +65,7 @@ const examCategories = [
   {
     name: 'CareerSafe Safety Training',
     provider: 'CareerSafe',
-    image: '/images/Content_PATHWAY_CDL.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     description: 'Online safety training courses with certification upon completion. Accepted by employers in construction, manufacturing, and general industry.',
     exams: [
       'Bloodborne Pathogens',

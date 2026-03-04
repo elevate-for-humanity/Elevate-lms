@@ -113,7 +113,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
       title: 'Program Application',
       purpose:
         'Use this page to apply and submit the information required for review.',
-      image: '/images/application/hero.jpg',
+      image: '/images/pages/apply-employer-hero.jpg',
       imageAlt: 'Application form',
     },
     sections: {
@@ -145,7 +145,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
       title: 'Solicitud del programa',
       purpose:
         'Usa esta página para aplicar y enviar la información requerida.',
-      image: '/images/application/hero.jpg',
+      image: '/images/pages/apply-employer-hero.jpg',
       imageAlt: 'Formulario de solicitud',
     },
     sections: {
@@ -172,7 +172,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'My Dashboard',
       purpose: 'This page shows your current status and next required steps.',
-      image: '/images/dashboard/hero.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       imageAlt: 'Student dashboard',
     },
     sections: {
@@ -211,7 +211,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'Mi panel',
       purpose: 'Este panel muestra tu estado actual y los siguientes pasos.',
-      image: '/images/dashboard/hero.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       imageAlt: 'Panel del estudiante',
     },
     sections: {
@@ -244,7 +244,7 @@ export const directoryListingContent: LocalizedContent = {
       title: 'Available Programs',
       purpose:
         'Browse and filter programs that are currently open for enrollment.',
-      image: '/images/directory/hero.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
       imageAlt: 'Program directory',
     },
     sections: {
@@ -271,7 +271,7 @@ export const directoryListingContent: LocalizedContent = {
     hero: {
       title: 'Programas disponibles',
       purpose: 'Explora programas abiertos y filtra según tus necesidades.',
-      image: '/images/directory/hero.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
       imageAlt: 'Directorio de programas',
     },
     sections: {
@@ -299,7 +299,7 @@ export const policyComplianceContent: LocalizedContent = {
       title: 'Policy Information',
       purpose:
         'This page explains policies that apply to your use of this platform.',
-      image: '/images/policy/hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
       imageAlt: 'Policy documentation',
     },
     sections: {
@@ -328,7 +328,7 @@ export const policyComplianceContent: LocalizedContent = {
       title: 'Información de políticas',
       purpose:
         'Esta página explica las políticas que aplican al uso de la plataforma.',
-      image: '/images/policy/hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
       imageAlt: 'Documentación de políticas',
     },
     cta: {
@@ -400,7 +400,7 @@ export const authAccountContent: LocalizedContent = {
       title: 'Account Access',
       purpose:
         'Use this page to log in, create an account, or manage your profile.',
-      image: '/images/auth/hero.jpg',
+      image: '/images/pages/comp-highlights-success.jpg',
       imageAlt: 'Account login',
     },
     sections: {
@@ -429,7 +429,7 @@ export const authAccountContent: LocalizedContent = {
       title: 'Acceso a cuenta',
       purpose:
         'Usa esta página para iniciar sesión, crear una cuenta o administrar tu perfil.',
-      image: '/images/auth/hero.jpg',
+      image: '/images/pages/comp-highlights-success.jpg',
       imageAlt: 'Inicio de sesión',
     },
     cta: {
@@ -450,7 +450,7 @@ export const reportingAdminContent: LocalizedContent = {
       title: 'Administrative Dashboard',
       purpose:
         'This page provides tools for reporting, management, and operations.',
-      image: '/images/admin/hero.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       imageAlt: 'Administrative dashboard',
     },
     sections: {
@@ -479,7 +479,7 @@ export const reportingAdminContent: LocalizedContent = {
       title: 'Panel administrativo',
       purpose:
         'Esta página proporciona herramientas para informes, gestión y operaciones.',
-      image: '/images/admin/hero.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       imageAlt: 'Panel administrativo',
     },
     cta: {
@@ -499,7 +499,7 @@ export const marketingInformationalContent: LocalizedContent = {
     hero: {
       title: 'About This Platform',
       purpose: 'Learn about our mission, programs, and how to get involved.',
-      image: '/images/marketing/hero.jpg',
+      image: '/images/pages/comp-home-hero-programs.jpg',
       imageAlt: 'Platform overview',
     },
     sections: {
@@ -529,7 +529,7 @@ export const marketingInformationalContent: LocalizedContent = {
     hero: {
       title: 'Acerca de esta plataforma',
       purpose: 'Conoce nuestra misión, programas y cómo participar.',
-      image: '/images/marketing/hero.jpg',
+      image: '/images/pages/comp-home-hero-programs.jpg',
       imageAlt: 'Resumen de la plataforma',
     },
     cta: {
@@ -549,7 +549,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Page Not Found',
       purpose: "The page you're looking for doesn't exist or has been moved.",
-      image: '/images/system/404.jpg',
+      image: '/images/pages/comp-highlights-success.jpg',
       imageAlt: 'Page not found',
     },
     sections: {
@@ -575,7 +575,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Página no encontrada',
       purpose: 'La página que buscas no existe o ha sido movida.',
-      image: '/images/system/404.jpg',
+      image: '/images/pages/comp-highlights-success.jpg',
       imageAlt: 'Página no encontrada',
     },
     cta: {

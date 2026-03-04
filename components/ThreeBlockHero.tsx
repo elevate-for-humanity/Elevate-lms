@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 const heroBlocks = [
   {
-    image: "/images/jozanna-george.jpg",
+    image: "/images/pages/comp-cta-training.jpg",
     title: "Beauty & Wellness Programs",
     description: "Barber, Cosmetology, and Esthetics training with state licensure",
     cta: "Explore Beauty Programs",
@@ -13,7 +13,7 @@ const heroBlocks = [
     color: " ",
   },
   {
-    image: "/images/sharon-douglas.jpg",
+    image: "/images/pages/comp-cta-training.jpg",
     title: "Healthcare Training",
     description: "CNA, Medical Assistant, and Phlebotomy certifications in weeks",
     cta: "View Healthcare Programs",
@@ -22,7 +22,7 @@ const heroBlocks = [
     color: " ",
   },
   {
-    image: "/images/pages/apply-employer-hero.jpg",
+    image: "/images/pages/comp-cta-training.jpg",
     title: "Direct Job Placement",
     description: "Our staffing team connects you with employers before graduation",
     cta: "Learn About Job Support",

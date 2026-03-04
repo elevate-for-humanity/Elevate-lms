@@ -42,7 +42,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '5 Weeks • 32 Hours',
-    image: '/images/business-startup.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     etplApproved: true,
   },
   {
@@ -65,7 +65,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '4 Weeks • 80 Hours',
-    image: '/images/emergency-health-safety.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: true,
   },
   {
@@ -88,7 +88,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '50 Weeks • 125 Hours RTI',
-    image: '/images/hvac-technician.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     etplApproved: true,
   },
   {
@@ -109,7 +109,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: 'Rolling Enrollment',
-    image: '/images/dsp.jpg',
+    image: '/images/pages/admin-counseling-hero.jpg',
     etplApproved: true,
   },
   {
@@ -132,7 +132,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '5 Weeks • 60 Hours',
-    image: '/images/esthetician.jpg',
+    image: '/images/pages/barber-gallery-2.jpg',
     etplApproved: true,
   },
   {
@@ -155,7 +155,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Earn and Learn'],
     duration: '10 Weeks • 150 Hours',
-    image: '/images/tax-prep.jpg',
+    image: '/images/pages/supersonic-tax-prep.jpg',
     etplApproved: true,
   },
   {
@@ -177,7 +177,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '45 Days • 180 Hours',
-    image: '/images/public-safety-reentry.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     etplApproved: true,
   },
   {
@@ -200,7 +200,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '2,000 Hours • 12 Weeks + OJT',
-    image: '/images/barber-apprenticeship.jpg',
+    image: '/images/pages/barber-gallery-1.jpg',
     etplApproved: true,
   },
   {
@@ -223,7 +223,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '12 Weeks',
-    image: '/images/beauty-career-educator.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     etplApproved: true,
   },
   {
@@ -246,7 +246,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '6-8 Weeks',
-    image: '/images/peer-support.jpg',
+    image: '/images/pages/admin-counseling-hero.jpg',
     etplApproved: true,
   },
   {
@@ -269,7 +269,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '45 Days • 180 Hours',
-    image: '/images/peer-recovery-coach.jpg',
+    image: '/images/pages/comp-home-pathways-support.jpg',
     etplApproved: true,
   },
   {
@@ -292,7 +292,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['Self-Pay', 'Employer Sponsored'],
     duration: '1 Day • 4-8 Hours',
-    image: '/images/cpr-cert.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: false,
   },
   {
@@ -315,7 +315,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '8-12 Weeks',
-    image: '/images/community-healthcare-worker.jpg',
+    image: '/images/pages/admin-health-hero.jpg',
     etplApproved: true,
   },
   {
@@ -338,7 +338,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '4-6 Weeks',
-    image: '/images/rise-up.jpg',
+    image: '/images/pages/comp-highlights-success.jpg',
     etplApproved: true,
   },
   {
@@ -361,7 +361,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '10 Hours • 2 Days',
-    image: '/images/osha-10.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     etplApproved: true,
   },
   {
@@ -384,7 +384,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '4-6 Weeks • 120+ Hours',
-    image: '/images/cna-certification.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: true,
   },
   {
@@ -407,7 +407,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '6-8 Weeks • 160 Hours',
-    image: '/images/building-maintenance.jpg',
+    image: '/images/pages/comp-highlights-electrical.jpg',
     etplApproved: true,
   },
   {
@@ -430,7 +430,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Carrier Sponsorship'],
     duration: '4-6 Weeks • 160+ Hours',
-    image: '/images/cdl-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     etplApproved: true,
   },
   {
@@ -453,7 +453,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Free through partnership'],
     duration: '4-6 Weeks • 40-60 Hours',
-    image: '/images/nrf-rise-up.jpg',
+    image: '/images/pages/comp-highlights-success.jpg',
     etplApproved: true,
     partnerName: 'NRF Foundation',
     partnerUrl: 'https://riseup.nrf.com',
@@ -482,7 +482,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '6-8 Weeks • 80 Hours',
-    image: '/images/microsoft-office.jpg',
+    image: '/images/pages/admin-business-hero.jpg',
     etplApproved: true,
   },
   {
@@ -505,7 +505,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Employer Sponsored'],
     duration: '1 Day • 4-8 Hours',
-    image: '/images/cpr-first-aid.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: true,
     partnerName: 'Health & Safety Institute (HSI)',
     partnerUrl: 'https://hsi.com',
@@ -534,7 +534,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Employer Sponsored'],
     duration: '30 Hours • 1-2 Weeks',
-    image: '/images/osha-30.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     etplApproved: true,
     partnerName: 'CareerSafe',
     partnerUrl: 'https://careersafeonline.com',
@@ -562,7 +562,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 120 Hours',
-    image: '/images/cybersecurity.jpg',
+    image: '/images/pages/admin-network-hero.jpg',
     etplApproved: true,
   },
   {
@@ -585,7 +585,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 120 Hours',
-    image: '/images/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     etplApproved: true,
   },
   {
@@ -608,7 +608,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-10 Weeks • 120 Hours',
-    image: '/images/medical-admin.jpg',
+    image: '/images/pages/admin-health-hero.jpg',
     etplApproved: true,
   },
   {
@@ -631,7 +631,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 200+ Hours',
-    image: '/images/patient-care-tech.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: true,
   },
   {
@@ -654,7 +654,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 150 Hours',
-    image: '/images/dental-assistant.jpg',
+    image: '/images/pages/admin-health-hero.jpg',
     etplApproved: true,
   },
   {
@@ -677,7 +677,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '12-16 Weeks • 200 Hours',
-    image: '/images/pharmacy-tech.jpg',
+    image: '/images/pages/comp-pathway-healthcare.jpg',
     etplApproved: true,
   },
   {
@@ -700,7 +700,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '4-8 Weeks • 80-120 Hours',
-    image: '/images/phlebotomy.jpg',
+    image: '/images/pages/comp-highlights-team.jpg',
     etplApproved: true,
   },
   {
@@ -723,7 +723,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Small Business Grants'],
     duration: '8-12 Weeks • 100 Hours',
-    image: '/images/entrepreneurship.jpg',
+    image: '/images/pages/admin-startup-hero.jpg',
     etplApproved: true,
   },
   {
@@ -746,7 +746,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '12-16 Weeks • 200 Hours',
-    image: '/images/hospitality-culinary.jpg',
+    image: '/images/pages/admin-cafeteria-hero.jpg',
     etplApproved: true,
   },
 ];

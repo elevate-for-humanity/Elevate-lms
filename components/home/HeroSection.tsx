@@ -38,7 +38,7 @@ export default function HeroSection() {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-30"
-          poster="/images/hero-banner-new.jpg"
+          poster="/images/pages/home-hero-video.jpg"
         >
           <source src="/videos/hero-home.mp4" type="video/mp4" />
         </video>

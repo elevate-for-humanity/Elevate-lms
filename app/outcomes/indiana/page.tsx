@@ -16,80 +16,85 @@ export const metadata: Metadata = {
 
 const outcomeMetrics = [
   {
-    label: 'Program Completion Rate',
-    value: '87%',
-    description: 'Students who complete their enrolled training program',
+    label: '2026 Enrollment Target',
+    value: '27',
+    description: 'Individuals enrolled in trades-related career training',
+    icon: Users,
+  },
+  {
+    label: 'Completion Target',
+    value: '24',
+    description: 'Participants completing training and earning a credential (89% target)',
     icon: GraduationCap,
   },
   {
-    label: 'Employment Within 6 Months',
-    value: '78%',
-    description: 'Graduates employed in their field within 6 months',
+    label: 'Employment Target',
+    value: '20',
+    description: 'Graduates securing employment in the field at $14+/hr within 18 months',
     icon: Briefcase,
   },
   {
-    label: 'Average Wage Increase',
-    value: '42%',
-    description: 'Average wage increase for graduates vs. pre-enrollment',
-    icon: DollarSign,
-  },
-  {
     label: 'Credential Attainment',
-    value: '91%',
-    description: 'Students who earn an industry-recognized credential',
+    value: '89%',
+    description: 'Target credential attainment rate (24 of 27 enrolled)',
     icon: Award,
   },
 ];
 
 const programOutcomes = [
   {
-    program: 'Barber Apprenticeship',
-    enrolled: 124,
-    completed: 108,
-    employed: 96,
-    avgWage: '$38,500',
+    program: 'HVAC Technician',
+    enrolled: '—',
+    completed: '—',
+    employed: '—',
+    avgWage: '$52,000 (median)',
     region: 'Indianapolis Metro',
+    status: '2026 cohort — enrolling',
   },
   {
     program: 'CNA Certification',
-    enrolled: 89,
-    completed: 78,
-    employed: 71,
-    avgWage: '$34,200',
-    region: 'Statewide',
-  },
-  {
-    program: 'Building Technician with HVAC Fundamentals',
-    enrolled: 56,
-    completed: 48,
-    employed: 44,
-    avgWage: '$45,800',
-    region: 'Central Indiana',
-  },
-  {
-    program: 'CDL Training',
-    enrolled: 67,
-    completed: 61,
-    employed: 58,
-    avgWage: '$52,000',
-    region: 'Statewide',
-  },
-  {
-    program: 'IT Support',
-    enrolled: 43,
-    completed: 37,
-    employed: 32,
-    avgWage: '$41,500',
+    enrolled: '—',
+    completed: '—',
+    employed: '—',
+    avgWage: '$35,760 (median)',
     region: 'Indianapolis Metro',
+    status: '2026 cohort — enrolling',
+  },
+  {
+    program: 'Barber Apprenticeship',
+    enrolled: '—',
+    completed: '—',
+    employed: '—',
+    avgWage: '$35,760 (median)',
+    region: 'Indianapolis Metro',
+    status: '2026 cohort — enrolling',
+  },
+  {
+    program: 'Pharmacy Technician',
+    enrolled: '—',
+    completed: '—',
+    employed: '—',
+    avgWage: '$37,790 (median)',
+    region: 'Indianapolis Metro',
+    status: '2026 cohort — enrolling',
+  },
+  {
+    program: 'IT Help Desk',
+    enrolled: '—',
+    completed: '—',
+    employed: '—',
+    avgWage: '$55,510 (median)',
+    region: 'Indianapolis Metro',
+    status: '2026 cohort — enrolling',
   },
 ];
 
 const fundingSources = [
-  { name: 'WIOA Adult & Dislocated Worker', percentage: 38 },
-  { name: 'Workforce Ready Grant (WRG)', percentage: 28 },
-  { name: 'EmployIndy / WorkOne', percentage: 18 },
-  { name: 'Self-Pay / Employer Sponsored', percentage: 12 },
-  { name: 'Other (JRI, DOL Grants)', percentage: 4 },
+  { name: 'Lilly Endowment Workforce Grant', percentage: 40 },
+  { name: 'Cummins Foundation Workforce Grant', percentage: 30 },
+  { name: 'WIOA Adult & Dislocated Worker', percentage: 15 },
+  { name: 'Workforce Ready Grant (WRG) / Next Level Jobs', percentage: 10 },
+  { name: 'Self-Pay / Employer Sponsored', percentage: 5 },
 ];
 
 export default function IndianaOutcomesPage() {
@@ -112,11 +117,12 @@ export default function IndianaOutcomesPage() {
             <span className="text-brand-blue-400 font-medium">Indiana</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Indiana Workforce Outcomes
+            Indiana Workforce Outcomes — 2026 Program Targets
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
-            Measurable results from Elevate training programs operating across Indiana. 
-            Data reflects program completions, employment placement, and wage outcomes.
+            Grant-funded workforce training targets for 2026 cohorts in the Indianapolis region.
+            Programs funded through Lilly Endowment and Cummins Foundation workforce grants.
+            Outcome data will be updated as cohorts complete.
           </p>
         </div>
       </div>
@@ -141,7 +147,8 @@ export default function IndianaOutcomesPage() {
 
         {/* Program Breakdown */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">Outcomes by Program</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Outcomes by Program</h2>
+          <p className="text-sm text-slate-500 mb-8">2026 cohorts are currently enrolling. Outcome data will be reported as cohorts complete training and enter employment.</p>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -193,7 +200,7 @@ export default function IndianaOutcomesPage() {
 
         {/* Methodology */}
         <section className="mb-16 bg-slate-50 rounded-xl p-6 border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Data Methodology</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Outcome Tracking Methodology</h2>
           <ul className="space-y-2 text-slate-700 text-sm">
             <li className="flex items-start gap-2">
               <span className="text-slate-400 flex-shrink-0">•</span>

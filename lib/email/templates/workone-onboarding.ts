@@ -70,10 +70,13 @@ export function workoneOnboardingEmail(data: WorkOneOnboardingData) {
     <!-- Orientation Scheduling -->
     <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; margin: 24px 0;">
       <h3 style="margin-top: 0; color: #92400e; font-size: 15px;">Schedule Your Orientation</h3>
-      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>Format:</strong> 30-minute video call</p>
-      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>How:</strong> Pick a time that works for you using the link below</p>
-      <div style="margin-top: 16px;">
-        <a href="${calendlyLink}" style="${buttonStyle}">Schedule Orientation</a>
+      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>Format:</strong> 30-minute Zoom video call</p>
+      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>Step 1:</strong> Pick a time that works for you</p>
+      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>Step 2:</strong> Join the Zoom meeting at your scheduled time</p>
+      <p style="margin: 4px 0; font-size: 14px; color: #92400e;"><strong>Zoom Meeting ID:</strong> 167 4915 6017</p>
+      <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="${calendlyLink}" style="${buttonStyle}">Schedule a Time</a>
+        <a href="https://us06web.zoom.us/j/16749156017" style="${buttonStyle} background: #2563eb;">Join Zoom Meeting</a>
       </div>
     </div>
 

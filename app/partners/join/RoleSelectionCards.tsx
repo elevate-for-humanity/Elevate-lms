@@ -36,7 +36,7 @@ export default function RoleSelectionCards({
         throw new Error(data.error || 'Failed to select role');
       }
 
-      router.push('/partners/onboarding');
+      router.push('/partner/onboarding');
     } catch (err: any) {
       setError((err as Error).message);
       setIsSubmitting(false);

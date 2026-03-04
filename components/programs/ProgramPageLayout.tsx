@@ -103,6 +103,32 @@ export interface ProgramPageConfig {
   pricingIncludes?: string[];
   paymentTerms?: string;
 
+  // Instructional delivery — who teaches, where, how
+  instructionalDelivery?: {
+    description: string;
+    qualifications: string;
+    labProvider?: string;
+    ojtProvider?: string;
+  };
+
+  // Training hours breakdown
+  hoursBreakdown?: { label: string; hours: number }[];
+
+  // Assessment structure
+  assessmentStructure?: {
+    requirements: string[];
+    passingScore: number;
+    retakePolicy?: string;
+  };
+
+  // Employer pathway
+  employerPathway?: {
+    description?: string;
+    sectors: string[];
+    placementRate?: string;
+    placementWindow?: string;
+  };
+
   // Breadcrumbs
   breadcrumbs: { label: string; href?: string }[];
 }
@@ -296,6 +322,154 @@ export default function ProgramPageLayout({
                     </div>
                   </ScrollReveal>
                 ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== INSTRUCTIONAL DELIVERY ===== */}
+      {c.instructionalDelivery && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Instructional Delivery</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">How Training Is Delivered</h2>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                  <h3 className="font-bold text-slate-900 mb-2">Delivery Model</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{c.instructionalDelivery.description}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                  <h3 className="font-bold text-slate-900 mb-2">Instructor Qualifications</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{c.instructionalDelivery.qualifications}</p>
+                </div>
+                {c.instructionalDelivery.labProvider && (
+                  <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                    <h3 className="font-bold text-slate-900 mb-2">Lab Training</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">{c.instructionalDelivery.labProvider}</p>
+                  </div>
+                )}
+                {c.instructionalDelivery.ojtProvider && (
+                  <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                    <h3 className="font-bold text-slate-900 mb-2">On-the-Job Training</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">{c.instructionalDelivery.ojtProvider}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== TRAINING HOURS BREAKDOWN ===== */}
+      {c.hoursBreakdown && c.hoursBreakdown.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Training Hours</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Hours Breakdown</h2>
+              </div>
+              <div className="max-w-2xl mx-auto">
+                <div className="space-y-3">
+                  {c.hoursBreakdown.map((item) => {
+                    const total = c.hoursBreakdown!.reduce((sum, h) => sum + h.hours, 0);
+                    const pct = Math.round((item.hours / total) * 100);
+                    return (
+                      <div key={item.label} className="bg-white rounded-xl p-4 border border-slate-100">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-semibold text-slate-900 text-sm">{item.label}</span>
+                          <span className="font-bold text-brand-red-600">{item.hours} hours</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2.5">
+                          <div className="bg-brand-red-600 h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-6 text-center">
+                  <div className="inline-flex items-center gap-2 bg-brand-red-50 text-brand-red-700 font-bold px-6 py-3 rounded-full text-lg">
+                    Total: {c.hoursBreakdown.reduce((sum, h) => sum + h.hours, 0)} hours
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== ASSESSMENT STRUCTURE ===== */}
+      {c.assessmentStructure && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Assessment</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Program Assessment Structure</h2>
+              </div>
+              <div className="max-w-3xl mx-auto">
+                <div className="bg-slate-50 rounded-xl p-8 border border-slate-100">
+                  <h3 className="font-bold text-slate-900 mb-4">Students must complete:</h3>
+                  <ul className="space-y-3 mb-6">
+                    {c.assessmentStructure.requirements.map((req) => (
+                      <li key={req} className="flex items-start gap-3 text-sm text-slate-700">
+                        <CheckCircle2 className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        {req}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-200">
+                    <div className="bg-white rounded-lg px-5 py-3 border border-slate-200">
+                      <span className="text-xs text-slate-500 block">Minimum Passing Score</span>
+                      <span className="text-xl font-extrabold text-brand-red-600">{c.assessmentStructure.passingScore}%</span>
+                    </div>
+                    {c.assessmentStructure.retakePolicy && (
+                      <div className="bg-white rounded-lg px-5 py-3 border border-slate-200 flex-1 min-w-[200px]">
+                        <span className="text-xs text-slate-500 block">Retake Policy</span>
+                        <span className="text-sm font-semibold text-slate-900">{c.assessmentStructure.retakePolicy}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== EMPLOYER PATHWAY ===== */}
+      {c.employerPathway && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Career Placement</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Where Graduates Work</h2>
+              </div>
+              <div className="max-w-3xl mx-auto">
+                {c.employerPathway.description && (
+                  <p className="text-slate-600 text-center mb-8 leading-relaxed">{c.employerPathway.description}</p>
+                )}
+                <div className="grid sm:grid-cols-2 gap-4 mb-8">
+                  {c.employerPathway.sectors.map((sector) => (
+                    <div key={sector} className="flex items-center gap-3 bg-white rounded-xl p-4 border border-slate-100">
+                      <Briefcase className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
+                      <span className="font-medium text-slate-900 text-sm">{sector}</span>
+                    </div>
+                  ))}
+                </div>
+                {c.employerPathway.placementRate && (
+                  <div className="text-center bg-white rounded-xl p-6 border border-slate-200">
+                    <div className="text-3xl font-extrabold text-brand-green-600 mb-1">{c.employerPathway.placementRate}</div>
+                    <p className="text-sm text-slate-500">
+                      placement rate{c.employerPathway.placementWindow ? ` within ${c.employerPathway.placementWindow}` : ''}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </section>

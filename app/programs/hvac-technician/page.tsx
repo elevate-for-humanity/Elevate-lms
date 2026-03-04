@@ -186,6 +186,47 @@ const config: ProgramPageConfig = {
     },
   ],
 
+  instructionalDelivery: {
+    description: 'Online Related Technical Instruction (RTI) delivered through the Elevate LMS with video lessons, reading materials, interactive quizzes, and EPA 608 practice exams. Hands-on lab training conducted at approved training facilities under direct instructor supervision. On-the-Job Training (OJT) completed at employer partner sites.',
+    qualifications: 'Instruction overseen by EPA 608 Universal-certified HVAC technicians with a minimum of 5 years of field experience in residential and light commercial systems. Instructors hold current OSHA 30 certification and maintain active industry credentials.',
+    labProvider: 'Hands-on labs conducted at the Elevate training center in Indianapolis. Students work on live HVAC equipment including split systems, package units, furnaces, and refrigeration trainers. All tools, PPE, and materials provided.',
+    ojtProvider: 'On-the-Job Training arranged through employer partners including residential HVAC contractors, commercial service providers, and facilities maintenance departments. OJT hours count toward DOL Registered Apprenticeship requirements where applicable.',
+  },
+
+  hoursBreakdown: [
+    { label: 'Online Instruction (LMS)', hours: 96 },
+    { label: 'Hands-on Lab Training', hours: 72 },
+    { label: 'On-the-Job Training (OJT)', hours: 72 },
+  ],
+
+  assessmentStructure: {
+    requirements: [
+      'Weekly competency quizzes with minimum 70% passing score',
+      'Hands-on lab demonstrations evaluated by instructor against competency standards',
+      'EPA 608 Universal proctored exam (80 questions, 70% per section required)',
+      'OSHA 30-Hour Construction Safety course completion',
+      'CPR/First Aid/AED practical skills assessment',
+      'Final troubleshooting assessment: diagnose 3 system faults within 30 minutes each',
+      'Resume and mock interview completion for career placement',
+    ],
+    passingScore: 80,
+    retakePolicy: 'Students may retake quizzes up to 3 times. EPA 608 exam retakes available through the certifying organization (additional fee may apply if not covered by funding).',
+  },
+
+  employerPathway: {
+    description: 'Elevate career services works directly with employer partners to place graduates into HVAC positions. Students receive resume assistance, mock interviews, and direct introductions to hiring managers during Week 12.',
+    sectors: [
+      'Residential HVAC contractors',
+      'Commercial HVAC service providers',
+      'Property management companies',
+      'Facilities maintenance departments',
+      'Refrigeration and cold storage',
+      'New construction mechanical contractors',
+    ],
+    placementRate: '90%',
+    placementWindow: '90 days of program completion',
+  },
+
   credentials: [
     'EPA 608 Universal — proctored on-site via ESCO Institute or Mainstream Engineering',
     'OSHA 30-Hour Construction Safety (DOL card)',

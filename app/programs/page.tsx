@@ -60,7 +60,7 @@ export default function ProgramCatalogPage() {
             <div key={sector.key} className="mb-12">
               <SectorHeader label={sector.label} description={sector.description} count={0} />
               <div className="mt-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-8 text-center text-slate-500">
-                Programs coming soon.
+                New programs in this sector are in development. <a href="/contact" className="text-brand-blue-600 underline">Contact us</a> to express interest.
               </div>
             </div>
           );

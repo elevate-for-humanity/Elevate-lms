@@ -424,7 +424,7 @@ async function insertApplication(payload: {
         `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
 
         // Waiting list
-        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Programs Coming Soon</h3>`,
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Programs Pending ETPL Approval</h3>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">The following programs are in the process of being added to the ETPL. Once approved, they'll be eligible for federal funding. In the meantime, you can join the waiting list and we'll notify you as soon as funding opens up:</p>`,
         `<ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:#444;font-family:Arial,sans-serif;line-height:1.8">`,
         waitlistList,

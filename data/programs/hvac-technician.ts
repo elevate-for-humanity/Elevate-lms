@@ -5,13 +5,16 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
  * Program Detail Template v1
  *
  * This is the gold standard. All other programs must match this structure.
+ * Structure: 6–8 weeks classroom + 2–4 weeks hands-on/OJT = 10–12 weeks total
  * Hours math: 12 weeks × 20 hrs/week = 240 hours total
+ * Funding: Lilly Endowment and Cummins Foundation grants cover tuition.
+ * EPA 608 proctored on-site — Elevate is an approved EPA 608 proctor testing site.
  */
 export const HVAC_TECHNICIAN: ProgramSchema = {
   // ─── Identity ────────────────────────────────────────────────────
   slug: 'hvac-technician',
   title: 'HVAC Technician',
-  subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal, OSHA 30, and CPR/AED certifications in 12 weeks.',
+  subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal certification — proctored on-site at our approved testing facility. 6–8 weeks classroom plus 2–4 weeks hands-on training.',
   sector: 'skilled-trades',
   category: 'Skilled Trades',
 
@@ -32,20 +35,20 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     examPrep: 30,
     careerPlacement: 20,
   },
-  schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
+  schedule: '6–8 weeks classroom instruction + 2–4 weeks hands-on/OJT (flexible scheduling based on cohort)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA funding. Next Level Jobs and Workforce Ready Grant accepted.',
+  fundingStatement: '$0 tuition — funded through Lilly Endowment and Cummins Foundation workforce grants.',
   selfPayCost: '$5,000 (payment plans available)',
-  badge: 'Funding Available',
-  badgeColor: 'orange',
+  badge: 'Grant Funded',
+  badgeColor: 'green',
 
   // ─── B. Credentials Earned ───────────────────────────────────────
   credentials: [
     {
       name: 'EPA 608 Universal',
       issuer: 'EPA via ESCO Institute / Mainstream Engineering',
-      description: 'Federal certification required by law to purchase or handle refrigerants. Covers all equipment types.',
+      description: 'Federal certification required by law to purchase or handle refrigerants. Covers all equipment types. Proctored exam administered on-site — Elevate is an approved EPA 608 testing facility.',
       validity: 'Lifetime (no renewal required)',
     },
     {
@@ -183,9 +186,9 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   trainingPhases: [
     {
       phase: 1,
-      title: 'Technical Foundations',
+      title: 'Technical Foundations (Classroom)',
       weeks: 'Weeks 1–3',
-      focus: 'HVAC principles, electrical basics, safety protocols, and tool proficiency.',
+      focus: 'HVAC principles, electrical basics, safety protocols, and tool proficiency. Classroom instruction at Elevate training center, Indianapolis.',
       labCompetencies: [
         'Identify 10 HVAC tools by name and purpose',
         'Execute lockout/tagout per OSHA 1910.147',
@@ -196,9 +199,9 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     },
     {
       phase: 2,
-      title: 'System Diagnostics',
+      title: 'System Diagnostics (Classroom)',
       weeks: 'Weeks 4–7',
-      focus: 'Heating systems, cooling systems, refrigeration cycle, and diagnostic procedures.',
+      focus: 'Heating systems, cooling systems, refrigeration cycle, and diagnostic procedures. Includes lab simulations.',
       labCompetencies: [
         'Measure temperature rise within ±5°F of nameplate range',
         'Perform combustion analysis — CO below 100 ppm',
@@ -210,22 +213,23 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     },
     {
       phase: 3,
-      title: 'EPA Certification Prep',
-      weeks: 'Weeks 8–10',
-      focus: 'EPA 608 Core, Type I, Type II, Type III exam preparation and refrigerant handling.',
+      title: 'EPA 608 Certification (On-Site Proctored)',
+      weeks: 'Weeks 8–9',
+      focus: 'EPA 608 Core, Type I, Type II, Type III exam preparation and proctored testing. Elevate is an approved EPA 608 proctor testing site — participants complete certification during the program.',
       labCompetencies: [
         'Perform refrigerant recovery to required levels (90%/80%)',
         'Evacuate a system to 500 microns and hold',
         'Identify 10 refrigerants by type (CFC, HCFC, HFC, HFO)',
         'Braze refrigerant lines — pass 150 psi nitrogen pressure test',
         'Charge a system to manufacturer specifications',
+        'Pass EPA 608 Universal proctored exam',
       ],
     },
     {
       phase: 4,
-      title: 'Internship / Work-Based Learning',
-      weeks: 'Weeks 11–12',
-      focus: 'Employer site placement, real-world service calls, and career preparation.',
+      title: 'Hands-On / OJT (Employer Site)',
+      weeks: 'Weeks 10–12',
+      focus: 'Employer jobsite training and placement in the Indianapolis region. Real-world service calls under supervision.',
       labCompetencies: [
         'Diagnose 3 common AC faults within 30 minutes each',
         'Complete a full furnace safety inspection (15-point checklist)',
@@ -293,8 +297,10 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available. LMS supports Spanish language accessibility.',
   employerPartners: [
-    '2 HVAC employer partners (onboarding)',
     'Jesse J. Wilkerson & Associates — Construction',
+    'Indianapolis-area HVAC contractors (hiring pipeline)',
+    'Lilly Endowment — Workforce Grant Funder',
+    'Cummins Foundation — Workforce Grant Funder',
   ],
   pricingIncludes: [
     '240 instructional hours (12 weeks)',
@@ -305,16 +311,17 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement support and resume assistance',
   ],
-  paymentTerms: 'WIOA, Next Level Jobs, and Workforce Ready Grant funding accepted. Payment plans available for self-pay students.',
+  paymentTerms: 'Grant-funded through Lilly Endowment and Cummins Foundation workforce grants — $0 tuition for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant also accepted. Payment plans available for self-pay students.',
 
   // ─── FAQ ─────────────────────────────────────────────────────────
   faqs: [
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. Week 1 covers orientation, tools, and safety. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
-    { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant funding covers tuition, tools, certification exam fees, and materials. If you do not qualify for funding, self-pay is $5,000 with payment plans available.' },
-    { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who purchases or handles refrigerants. The Universal level covers all equipment types. The exam has 80 questions across 4 sections — you need 70% on each section to pass.' },
-    { question: 'What certifications will I earn?', answer: 'EPA 608 Universal, OSHA 30-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included.' },
-    { question: 'How is the program structured?', answer: 'The 12-week program uses a hybrid model: Related Technical Instruction is delivered online through our LMS. Hands-on labs are completed at the training facility. On-the-Job Training occurs at employer partner sites.' },
-    { question: 'What happens after I graduate?', answer: 'Our career services team helps with resume building, mock interviews, and direct introductions to HVAC employer partners. The median salary for HVAC technicians in Indiana is $52,000/year.' },
+    { question: 'Is this program free?', answer: 'Yes. Tuition is covered through workforce grants from Lilly Endowment and Cummins Foundation. WIOA, Next Level Jobs, and Workforce Ready Grant funding is also accepted. Self-pay is $5,000 with payment plans available.' },
+    { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who purchases or handles refrigerants. The Universal level covers all equipment types. The exam has 80 questions across 4 sections — you need 70% on each section to pass. Elevate is an approved EPA 608 proctor testing site, so you take the exam here during the program.' },
+    { question: 'What certifications will I earn?', answer: 'EPA 608 Universal (proctored on-site), OSHA 30-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included.' },
+    { question: 'How is the program structured?', answer: '6–8 weeks of classroom instruction at our Indianapolis training center, followed by 2–4 weeks of hands-on training and employer jobsite placement. EPA 608 certification is proctored on-site during the program. Total duration is approximately 12 weeks.' },
+    { question: 'What happens after I graduate?', answer: 'Our career services team helps with resume building, mock interviews, and direct introductions to HVAC employer partners in the Indianapolis region. The target is employment at $14+/hour within 18 months of enrollment. The median salary for HVAC technicians in Indiana is $52,000/year.' },
+    { question: 'Where is the training located?', answer: 'Classroom instruction and EPA 608 proctored testing take place at the Elevate training center in Indianapolis. Hands-on/OJT placement is with employer partners in the Indianapolis metropolitan area.' },
   ],
 
   // ─── Navigation ──────────────────────────────────────────────────
@@ -325,6 +332,6 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   ],
 
   // ─── SEO ─────────────────────────────────────────────────────────
-  metaTitle: 'HVAC Technician Training | EPA 608 Certified | Indianapolis',
-  metaDescription: '12-week HVAC program. EPA 608 Universal, OSHA 30, and 5 industry credentials. 180–240 hours. Funding available through WIOA and Next Level Jobs.',
+  metaTitle: 'HVAC Technician Training | EPA 608 Proctor Site | Indianapolis',
+  metaDescription: '12-week HVAC program: 6–8 weeks classroom + 2–4 weeks hands-on. EPA 608 Universal proctored on-site. Grant-funded through Lilly Endowment and Cummins Foundation. Indianapolis.',
 };

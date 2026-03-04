@@ -45,7 +45,7 @@ export default async function ManageCoursesPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-courses-manage-hero.jpg" alt="Manage courses" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">

@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       authors: [post.author_name],
       images: [
         {
-          url: post.image || '/images/blog/default.jpg',
+          url: post.image || '/images/pages/social-media-1.jpg',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/images/blog/default.jpg'],
+      images: [post.image || '/images/pages/social-media-1.jpg'],
     },
   };
 }
@@ -120,7 +120,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
         <Image
-          src={post.image || '/images/blog/default.jpg'}
+          src={post.image || '/images/pages/social-media-1.jpg'}
           alt={post.title}
           fill
           className="object-cover"
@@ -177,7 +177,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                 >
                   <div className="relative h-48">
                     <Image
-                      src={related.image || '/images/blog/default.jpg'}
+                      src={related.image || '/images/pages/social-media-1.jpg'}
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -13,7 +13,7 @@ export function BarberHero() {
       {/* Hero Image — no text overlay */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image
-          src="/images/barber-hero-new.webp"
+          src="/images/pages/programs-barber-hero-new.jpg"
           alt="Barber apprentice cutting hair in a licensed barbershop"
           fill sizes="100vw"
           className="object-cover"
@@ -68,7 +68,7 @@ export function BarberHero() {
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/programs-hq/barber-training.jpg"
+                src="/images/pages/programs-barber-training.jpg"
                 alt="Barber apprentice training in licensed shop"
                 fill sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"

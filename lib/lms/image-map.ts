@@ -5,31 +5,31 @@
 
 // -- Hero banners (one per page) --
 export const LMS_HEROES = {
-  dashboard:     '/images/heroes-hq/success-hero.jpg',
-  courses:       '/images/programs-hq/students-learning.jpg',
-  progress:      '/images/heroes-hq/how-it-works-hero.jpg',
-  quizzes:       '/images/programs-hq/technology-hero.jpg',
-  schedule:      '/images/heroes-hq/career-services-hero.jpg',
-  messages:      '/images/heroes-hq/contact-hero.jpg',
-  certificates:  '/images/heroes-hq/success-stories-hero.jpg',
-  assignments:   '/images/programs-hq/business-training.jpg',
-  grades:        '/images/programs-hq/business-office.jpg',
-  resources:     '/images/heroes-hq/programs-hero.jpg',
-  achievements:  '/images/heroes-hq/team-hero.jpg',
-  profile:       '/images/heroes-hq/about-hero.jpg',
-  support:       '/images/heroes-hq/employer-hero.jpg',
-  forums:        '/images/programs-hq/skilled-trades-hero.jpg',
+  dashboard:     '/images/pages/comp-cta-career.jpg',
+  courses:       '/images/pages/comp-cta-training.jpg',
+  progress:      '/images/pages/comp-cta-career.jpg',
+  quizzes:       '/images/pages/comp-cta-training.jpg',
+  schedule:      '/images/pages/comp-cta-career.jpg',
+  messages:      '/images/pages/comp-cta-career.jpg',
+  certificates:  '/images/pages/comp-cta-career.jpg',
+  assignments:   '/images/pages/comp-cta-training.jpg',
+  grades:        '/images/pages/comp-cta-training.jpg',
+  resources:     '/images/pages/comp-cta-career.jpg',
+  achievements:  '/images/pages/comp-cta-career.jpg',
+  profile:       '/images/pages/comp-cta-career.jpg',
+  support:       '/images/pages/comp-cta-career.jpg',
+  forums:        '/images/pages/comp-cta-training.jpg',
 } as const;
 
 // -- Dashboard section cards (state-aware sections) --
 export const LMS_SECTION_CARDS = {
-  orientation:   '/images/programs-hq/training-classroom.jpg',
+  orientation:   '/images/pages/comp-cta-training.jpg',
   eligibility:   '/hero-images/apply-hero.jpg',
   programs:      '/hero-images/programs-hero.jpg',
   programsView:  '/hero-images/pathways-hero.jpg',
   funding:       '/hero-images/federal-funded-hero.jpg',
-  courses:       '/images/programs-hq/healthcare-hero.jpg',
-  progress:      '/images/trades/program-building-technology.jpg',
+  courses:       '/images/pages/comp-cta-training.jpg',
+  progress:      '/images/pages/comp-pathway-trades.jpg',
   certificates:  '/hero-images/apprenticeships-hero.jpg',
   certification: '/hero-images/services-hero.jpg',
   placement:     '/hero-images/employer-new-hero.jpg',
@@ -39,34 +39,34 @@ export const LMS_SECTION_CARDS = {
 
 // -- Dashboard "My Learning Tools" sidebar cards --
 export const LMS_TOOLS = {
-  courses:       '/images/programs-hq/cna-training.jpg',
-  assignments:   '/images/programs-hq/barber-training.jpg',
-  grades:        '/images/programs-hq/electrical.jpg',
-  quizzes:       '/images/programs-hq/cybersecurity.jpg',
-  schedule:      '/images/programs-hq/cdl-trucking.jpg',
-  messages:      '/images/programs-hq/medical-assistant.jpg',
-  resources:     '/images/programs-hq/it-support.jpg',
-  certificates:  '/images/programs-hq/phlebotomy.jpg',
-  achievements:  '/images/programs-hq/welding.jpg',
-  profile:       '/images/programs-hq/hvac-technician.jpg',
-  support:       '/images/programs-hq/tax-preparation.jpg',
-  forums:        '/images/trades/program-construction-training.jpg',
+  courses:       '/images/pages/comp-cta-training.jpg',
+  assignments:   '/images/pages/comp-cta-training.jpg',
+  grades:        '/images/pages/comp-cta-training.jpg',
+  quizzes:       '/images/pages/comp-cta-training.jpg',
+  schedule:      '/images/pages/comp-cta-training.jpg',
+  messages:      '/images/pages/comp-cta-training.jpg',
+  resources:     '/images/pages/comp-cta-training.jpg',
+  certificates:  '/images/pages/comp-cta-training.jpg',
+  achievements:  '/images/pages/comp-cta-training.jpg',
+  profile:       '/images/pages/comp-cta-training.jpg',
+  support:       '/images/pages/comp-cta-training.jpg',
+  forums:        '/images/pages/comp-pathway-trades.jpg',
 } as const;
 
 // -- Course category images --
 export const LMS_CATEGORIES = {
-  healthcare:    '/images/programs-hq/healthcare-hero.jpg',
-  trades:        '/images/trades/hero-program-hvac.jpg',
-  technology:    '/images/programs-hq/cybersecurity.jpg',
-  business:      '/images/programs-hq/business-office.jpg',
-  default:       '/images/programs-hq/training-classroom.jpg',
+  healthcare:    '/images/pages/comp-cta-training.jpg',
+  trades:        '/images/pages/comp-pathway-trades.jpg',
+  technology:    '/images/pages/comp-cta-training.jpg',
+  business:      '/images/pages/comp-cta-training.jpg',
+  default:       '/images/pages/comp-cta-training.jpg',
 } as const;
 
 // -- Course detail fallback (when no thumbnail_url) --
 export const COURSE_CATEGORY_FALLBACKS: Record<string, string> = {
-  healthcare:    '/images/programs-hq/healthcare-hero.jpg',
-  trades:        '/images/trades/hero-program-welding.jpg',
-  technology:    '/images/programs-hq/technology-hero.jpg',
-  business:      '/images/programs-hq/business-training.jpg',
-  default:       '/images/programs-hq/training-classroom.jpg',
+  healthcare:    '/images/pages/comp-cta-training.jpg',
+  trades:        '/images/pages/comp-pathway-trades.jpg',
+  technology:    '/images/pages/comp-cta-training.jpg',
+  business:      '/images/pages/comp-cta-training.jpg',
+  default:       '/images/pages/comp-cta-training.jpg',
 };

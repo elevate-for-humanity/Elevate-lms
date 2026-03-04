@@ -17,55 +17,55 @@ const services = [
     title: 'Tax Services',
     description: 'Professional tax preparation and maximum refund guarantee',
     href: '/tax-services',
-    image: '/images/heroes-hq/tax-refund-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
   {
     title: 'Supersonic Fast Cash',
     description: 'Quick refund advances and fast cash services',
     href: '/supersonic-fast-cash',
-    image: '/images/business/program-tax-preparation.jpg',
+    image: '/images/pages/apply-employer-hero.jpg',
   },
   {
     title: 'Career Services',
     description: 'Resume building, interview prep, job search support',
     href: '/career-services',
-    image: '/images/homepage/wraparound-support.jpg',
+    image: '/images/pages/homepage-why-elevate.jpg',
   },
   {
     title: 'Career Center',
     description: 'Job boards, employer connections, placement assistance',
     href: '/career-center',
-    image: '/images/community/event-5.jpg',
+    image: '/images/pages/comp-home-pathways-support.jpg',
   },
   {
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
     href: '/career-fair',
-    image: '/images/homepage/overcoming-barriers-support.png',
+    image: '/images/pages/homepage-why-elevate.jpg',
   },
   {
     title: 'Academic Advising',
     description: 'One-on-one guidance to help you succeed',
     href: '/advising',
-    image: '/images/testimonials-hq/person-4.jpg',
+    image: '/images/pages/comp-highlights-success.jpg',
   },
   {
     title: 'Mentorship Program',
     description: 'Connect with industry professionals',
     href: '/mentorship',
-    image: '/images/team-hq/instructor-1.jpg',
+    image: '/images/pages/store-recommendations.jpg',
   },
   {
     title: 'Support Services',
     description: 'Transportation, childcare, barrier removal',
     href: '/support',
-    image: '/images/heroes-hq/about-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
   {
     title: 'Help Center',
     description: 'FAQs, guides, and support resources',
     href: '/help',
-    image: '/images/heroes-hq/contact-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
 ];
 
@@ -83,7 +83,7 @@ export default function ServicesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Support Services" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/services-page-1.jpg" alt="Support Services" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

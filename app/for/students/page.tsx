@@ -64,7 +64,7 @@ export default function StudentsPage() {
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/courses/medical-assistant-10002419-cover.jpg"
+          src="/images/pages/for-students-hero.jpg"
           alt="Students in training"
           fill
           sizes="100vw"

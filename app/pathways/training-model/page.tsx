@@ -21,7 +21,7 @@ export default function TrainingModelPage() {
 
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px]">
-        <Image src="/images/programs-hq/training-classroom.jpg" alt="Students in a hands-on training classroom" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/pathways-page-4.jpg" alt="Students in a hands-on training classroom" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Intro */}
@@ -63,7 +63,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
-                  <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="Hands-on trades training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-4.jpg" alt="Hands-on trades training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Classroom + Hands-On Lab</h3>
@@ -89,7 +89,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
-                  <Image src="/images/programs-hq/cdl-trucking.jpg" alt="CDL behind-the-wheel training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-4.jpg" alt="CDL behind-the-wheel training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Full-Time In-Person</h3>
@@ -115,7 +115,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
-                  <Image src="/images/programs-hq/cybersecurity.jpg" alt="Online cybersecurity training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-4.jpg" alt="Online cybersecurity training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Online with Live Instructors</h3>

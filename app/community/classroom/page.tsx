@@ -61,7 +61,7 @@ export default async function ClassroomPage() {
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/programs-hq/training-classroom.jpg" alt="Community Classroom" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/community-page-1.jpg" alt="Community Classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Stats */}

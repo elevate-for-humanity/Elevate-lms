@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/search',
     images: [
       {
-        url: '/images/heroes/resources.jpg',
+        url: '/images/pages/comp-highlights-success.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate for Humanity — Workforce Training Programs',
@@ -30,42 +30,42 @@ const programs = [
   {
     name: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/programs-hq/healthcare-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     certs: ['CNA', 'Medical Assistant', 'Phlebotomy'],
     funding: 'WIOA & WRG eligible',
   },
   {
     name: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/programs-hq/skilled-trades-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     certs: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
     funding: 'WIOA & JRI eligible',
   },
   {
     name: 'CDL Training',
     href: '/programs/cdl',
-    image: '/images/gallery/image11.jpg',
+    image: '/images/pages/features-hero.jpg',
     certs: ['Class A CDL', 'Class B CDL'],
     funding: 'WRG eligible',
   },
   {
     name: 'Barber Apprenticeship',
     href: '/programs/barber-apprenticeship',
-    image: '/images/programs-hq/barber-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     certs: ['Barber License'],
     funding: 'Earn while you learn — paid apprenticeship',
   },
   {
     name: 'Technology',
     href: '/programs/technology',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     certs: ['IT Support', 'Cybersecurity'],
     funding: 'WIOA eligible',
   },
   {
     name: 'CPR & First Aid',
     href: '/programs/cpr-first-aid',
-    image: '/images/programs-hq/cna-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     certs: ['HSI CPR/AED', 'First Aid'],
     funding: 'Same-day certification',
   },
@@ -92,7 +92,7 @@ export default function SearchPage() {
       {/* Hero */}
       <section className="relative h-[320px] sm:h-[400px] overflow-hidden">
         <Image
-          src="/images/compare-programs-hero.jpg"
+          src="/images/pages/search-page-1.jpg"
           alt="Workforce training programs"
           fill
           className="object-cover"
@@ -176,7 +176,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/heroes-hq/success-stories-hero.jpg"
+                src="/images/pages/search-page-1.jpg"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
@@ -237,7 +237,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/heroes-hq/programs-hero.jpg"
+                src="/images/pages/search-page-1.jpg"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

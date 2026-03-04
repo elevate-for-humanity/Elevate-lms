@@ -407,7 +407,7 @@ export default function CoursesCatalogPage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/pages/courses-page-5.jpg"
           alt="Partner Course Catalog"
           fill
           className="object-cover"

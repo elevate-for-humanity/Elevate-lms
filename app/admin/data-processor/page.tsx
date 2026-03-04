@@ -72,7 +72,7 @@ export default async function DataProcessorPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-data-processor-hero.jpg" alt="Data processor" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Data Processor" }]} />
@@ -80,7 +80,7 @@ export default async function DataProcessorPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
+          src="/images/pages/admin-data-processor-detail.jpg"
           alt="Data Processor"
           fill
           className="object-cover"

@@ -169,7 +169,7 @@ export default function PartnerOnboardingPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner onboarding" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-9.jpg" alt="Partner onboarding" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

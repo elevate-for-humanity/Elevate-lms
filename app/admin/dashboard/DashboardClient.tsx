@@ -92,7 +92,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
       <div className="relative h-48 md:h-56 overflow-hidden">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Elevate for Humanity workforce training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-dashboard-client-hero.jpg" alt="Elevate for Humanity workforce training" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 -mt-6 relative z-20">

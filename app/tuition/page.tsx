@@ -52,7 +52,7 @@ export default async function TuitionPage() {
       {/* Hero */}
       <section className="relative bg-slate-900 py-12 sm:py-16">
         <Image
-          src="/images/funding/funding-dol-program-v2.jpg"
+          src="/images/pages/tuition-hero.jpg"
           alt="Tuition and Payment Options"
           fill
           className="object-cover opacity-30"

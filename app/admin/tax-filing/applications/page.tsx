@@ -64,7 +64,7 @@ export default async function TaxFilingApplicationsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-tax-apps-hero.jpg" alt="Tax administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">

@@ -71,7 +71,7 @@ export default async function FundingPlaybookPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-funding-playbook-hero.jpg" alt="Funding playbook" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Funding Playbook" }]} />
@@ -79,7 +79,7 @@ export default async function FundingPlaybookPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/funding-hero.jpg"
+          src="/images/pages/admin-funding-playbook-detail.jpg"
           alt="Funding Playbook"
           fill
           className="object-cover"

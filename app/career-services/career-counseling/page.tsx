@@ -80,7 +80,7 @@ export default function CareerCounselingPage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/community/event-5.jpg"
+          src="/images/pages/career-services-page-1.jpg"
           alt="Career Counseling Services"
           fill
           className="object-cover object-center"

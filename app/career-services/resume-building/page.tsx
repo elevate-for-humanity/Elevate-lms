@@ -71,7 +71,7 @@ export default function ResumeBuildingPage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/business/startup.jpg"
+          src="/images/pages/resume-building-hero.jpg"
           alt="Resume Building Services"
           fill
           className="object-cover object-center"

@@ -27,10 +27,10 @@ const benefits = [
 
 
 const steps = [
-  { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/business/collaboration-1.jpg' },
-  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/heroes/resources.jpg' },
-  { num: 3, title: 'Train', desc: 'Learn on the job', image: '/images/business/team-1.jpg' },
-  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/hero-new/hero-8.jpg' },
+  { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/pages/apply-employer-hero.jpg' },
+  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/pages/comp-highlights-success.jpg' },
+  { num: 3, title: 'Train', desc: 'Learn on the job', image: '/images/pages/apply-employer-hero.jpg' },
+  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/pages/philanthropy-hero.jpg' },
 ];
 
 export default async function ApprenticeshipsPage() {
@@ -54,7 +54,7 @@ const apprenticeships = (dbRows as any[]) || [];
 
       {/* Hero */}
       <section className="relative h-[55vh] min-h-[400px]">
-        <Image src="/images/skilled-trades-vibrant.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/apprenticeships-hero.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -133,7 +133,7 @@ const apprenticeships = (dbRows as any[]) || [];
               </div>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/trades/hero-program-hvac.jpg" alt="Apprentice training" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/apprenticeships-page-2.jpg" alt="Apprentice training" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

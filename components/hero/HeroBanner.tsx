@@ -27,8 +27,8 @@ export default function HeroBanner({
   type = 'image',
   videoSrc = '/video/hero-home-dec12.mp4',
   voiceoverSrc,
-  posterSrc = '/images/artlist/hero-training-3.jpg',
-  heroImageSrc = '/images/heroes-hq/programs-hero.jpg',
+  posterSrc = '/images/pages/comp-home-hero-programs.jpg',
+  heroImageSrc = '/images/pages/comp-cta-career.jpg',
   heroImageAlt = 'Elevate for Humanity hero banner',
 }: HeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);

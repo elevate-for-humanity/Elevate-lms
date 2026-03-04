@@ -23,7 +23,7 @@ export default function FederalCompliancePage() {
 {/* Hero */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/policies-page-1.jpg"
           alt="Federal Compliance"
           fill
           className="object-cover"

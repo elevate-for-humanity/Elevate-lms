@@ -15,7 +15,7 @@ export default function ApprenticeshipSponsorPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[220px] sm:h-[320px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Apprenticeship sponsor" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/apprenticeship-sponsor-page-1.jpg" alt="Apprenticeship sponsor" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/70" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-4">

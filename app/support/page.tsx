@@ -59,7 +59,7 @@ export default async function SupportPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/contact-hero.jpg" alt="Student support services" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/support-page-2.jpg" alt="Student support services" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <div className="bg-brand-blue-600 text-white py-16">

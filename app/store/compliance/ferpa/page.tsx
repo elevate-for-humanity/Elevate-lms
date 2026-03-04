@@ -18,25 +18,25 @@ const features = [
   {
     title: 'Data Encryption',
     description: 'AES-256 encryption for all student data at rest and in transit.',
-    image: '/images/programs-hq/cybersecurity.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['AES-256 encryption', 'TLS 1.3 in transit', 'Encrypted backups', 'Key rotation'],
   },
   {
     title: 'Access Controls',
     description: 'Role-based access control ensures only authorized users see student data.',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['Role-based permissions', 'Multi-factor authentication', 'Session management', 'IP restrictions'],
   },
   {
     title: 'Audit Logging',
     description: 'Complete audit trail of all data access and modifications.',
-    image: '/images/homepage/licensable-platform.jpg',
+    image: '/images/pages/homepage-why-elevate.jpg',
     items: ['Access logging', 'Change tracking', 'Export history', 'Compliance reports'],
   },
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/homepage/licensable-platform.jpg',
+    image: '/images/pages/homepage-why-elevate.jpg',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];
@@ -68,7 +68,7 @@ export default function FERPACompliancePage() {
       </div>
 {/* Avatar Guide */}
       <AvatarGuide
-        avatarImage="/images/team-hq/instructor-3.jpg"
+        avatarImage="/images/pages/store-recommendations.jpg"
         avatarName="Sarah"
         welcomeMessage="Hi! I'm Sarah, and I'll explain how we protect student data under FERPA. Data privacy is serious business - let me show you our safeguards."
         steps={guideSteps}
@@ -97,7 +97,7 @@ export default function FERPACompliancePage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/programs-hq/cybersecurity.jpg" alt="FERPA" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/store-compliance-ferpa-hero.jpg" alt="FERPA" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

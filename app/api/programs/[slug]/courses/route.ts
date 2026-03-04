@@ -69,7 +69,7 @@ async function _GET(
       enrolled: course.enrolled_count || 0,
       certification: course.certification || false,
       funding: course.funding_source,
-      image: course.cover_image_url || '/images/courses/default-course.jpg',
+      image: course.cover_image_url || '/images/pages/course-create-hero.jpg',
     }));
 
     return NextResponse.json({ 

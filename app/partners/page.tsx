@@ -72,7 +72,7 @@ export default function PartnersIndexPage() {
 
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partners-pub-page-7.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <section className="bg-slate-900 py-12">

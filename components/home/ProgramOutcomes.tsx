@@ -8,7 +8,7 @@ import { ArrowRight, TrendingUp, Clock, DollarSign } from 'lucide-react';
 const PROGRAMS = [
   {
     title: 'CNA Certification',
-    image: '/images/programs-hq/cna-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '6 weeks',
     salary: '$35K–$42K',
     placement: '92%',
@@ -17,7 +17,7 @@ const PROGRAMS = [
   },
   {
     title: 'CDL Class A',
-    image: '/images/programs-hq/cdl-trucking.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '8 weeks',
     salary: '$55K–$72K',
     placement: '88%',
@@ -26,7 +26,7 @@ const PROGRAMS = [
   },
   {
     title: 'HVAC Technician',
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '12 weeks',
     salary: '$45K–$65K',
     placement: '85%',
@@ -35,7 +35,7 @@ const PROGRAMS = [
   },
   {
     title: 'Medical Assistant',
-    image: '/images/programs-hq/medical-assistant.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '10 weeks',
     salary: '$32K–$40K',
     placement: '87%',
@@ -44,7 +44,7 @@ const PROGRAMS = [
   },
   {
     title: 'Welding',
-    image: '/images/programs-hq/welding.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '14 weeks',
     salary: '$40K–$58K',
     placement: '83%',
@@ -53,7 +53,7 @@ const PROGRAMS = [
   },
   {
     title: 'IT Help Desk',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     duration: '8 weeks',
     salary: '$38K–$60K',
     placement: '80%',

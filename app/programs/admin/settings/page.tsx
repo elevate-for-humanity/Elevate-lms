@@ -67,7 +67,7 @@ export default async function SettingsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/homepage/student-portal-interface.png"
+          src="/images/pages/programs-page-3.jpg"
           alt="Settings"
           fill sizes="100vw"
           className="object-cover"

@@ -12,7 +12,7 @@ type Props = {
 export function CourseCard({ course }: Props) {
   const coverSrc =
     (manifest as Record<string, string>)[course.coverImageKey] ??
-    '/images/programs-hq/training-classroom.jpg';
+    '/images/pages/comp-cta-training.jpg';
 
   return (
     <Link

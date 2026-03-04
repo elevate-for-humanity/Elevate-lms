@@ -131,7 +131,7 @@ export default function PartnerDocumentsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner documents" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-5.jpg" alt="Partner documents" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

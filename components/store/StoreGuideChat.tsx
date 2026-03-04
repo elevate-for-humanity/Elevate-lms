@@ -13,11 +13,11 @@ interface StoreGuideChatProps {
 
 // Image mapping for choices
 const choiceImages: Record<string, string> = {
-  'shop': '/images/shop/shop-hero.jpg',
-  'courses': '/images/store/banners/courses-banner.jpg',
-  'workbooks': '/images/heroes/lms-courses.jpg',
-  'licensing': '/images/store/banners/apps-banner.jpg',
-  'not-sure': '/images/team-hq/instructor-1.jpg',
+  'shop': '/images/pages/shop-hero.jpg',
+  'courses': '/images/pages/shop-hero.jpg',
+  'workbooks': '/images/pages/comp-highlights-success.jpg',
+  'licensing': '/images/pages/shop-hero.jpg',
+  'not-sure': '/images/pages/store-recommendations.jpg',
 };
 
 // Simple speech hook
@@ -168,7 +168,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
         aria-label="Open store guide"
       >
         <Image
-          src="/images/team-hq/instructor-1.jpg"
+          src="/images/pages/store-guide-1.jpg"
           alt="Guide"
           width={24}
           height={24}
@@ -199,7 +199,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
               {/* Avatar Image */}
               <div className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-brand-red-500 animate-pulse' : 'border-slate-200'}`}>
                 <Image
-                  src="/images/team-hq/instructor-1.jpg"
+                  src="/images/pages/store-guide-1.jpg"
                   alt="Store Guide"
                   width={56}
                   height={56}
@@ -250,7 +250,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                       {/* Choice Image */}
                       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                         <Image
-                          src={choiceImages[choice.id] || '/images/team-hq/instructor-1.jpg'}
+                          src={choiceImages[choice.id] || '/images/pages/store-recommendations.jpg'}
                           alt={choice.label}
                           width={56}
                           height={56}
@@ -281,7 +281,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
               <div className="text-center">
                 <div className="w-20 h-20 rounded-xl overflow-hidden mx-auto mb-4">
                   <Image
-                    src={choiceImages[selectedChoice?.id || ''] || '/images/team-hq/instructor-1.jpg'}
+                    src={choiceImages[selectedChoice?.id || ''] || '/images/pages/store-recommendations.jpg'}
                     alt={selectedChoice?.label || ''}
                     width={80}
                     height={80}

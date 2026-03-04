@@ -47,7 +47,7 @@ export default async function CoursedetailPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/efh/sections/classroom.jpg"
+          src="/images/pages/courses-page-3.jpg"
           alt="Coursedetail"
           fill
           className="object-cover"
@@ -87,7 +87,7 @@ export default async function CoursedetailPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/programs-hq/training-classroom.jpg"
+                  src="/images/pages/courses-page-6.jpg"
                   alt="Course detail"
                   fill
                   className="object-cover"

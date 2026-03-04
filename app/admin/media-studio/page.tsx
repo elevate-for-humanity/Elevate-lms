@@ -158,7 +158,7 @@ export default function MediaStudioPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-media-studio-hero.jpg" alt="Media studio" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Media Studio" }]} />
@@ -166,7 +166,7 @@ export default function MediaStudioPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/business-office.jpg"
+          src="/images/pages/admin-media-studio-detail.jpg"
           alt="Media Studio"
           fill
           className="object-cover"

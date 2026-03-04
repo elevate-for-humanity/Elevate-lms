@@ -26,7 +26,7 @@ const config: ProgramPageConfig = {
   duration: '1 day – 2 weeks', cost: 'Included with funded programs', format: 'In-person, Indianapolis', credential: 'Multiple Certifications',
   overview: 'Micro programs are short-term certification courses that can be completed in as little as one day. They are included at no extra cost with most funded training programs, or can be taken as standalone courses. Stack multiple certifications to make your resume stand out to employers.',
   highlights: ['Same-day certification available for some courses', 'Included with most funded training programs at no extra cost', 'Nationally recognized certifications', 'Stack multiple credentials', 'Available as standalone courses', 'No prerequisites for most courses'],
-  overviewImage: '/images/programs-fresh/cpr-first-aid.jpg', overviewImageAlt: 'Students in a certification training session',
+  overviewImage: '/images/pages/comp-program-template.jpg', overviewImageAlt: 'Students in a certification training session',
   salaryNumber: 0, salaryLabel: 'Boost your resume with stackable credentials', salaryPrefix: '',
   curriculum: [
     { title: 'Safety Certifications', topics: ['CPR/First Aid/AED (AHA)', 'OSHA 10-Hour Construction', 'OSHA 30-Hour Construction', 'Bloodborne Pathogen Safety', 'Fire Safety Awareness'] },

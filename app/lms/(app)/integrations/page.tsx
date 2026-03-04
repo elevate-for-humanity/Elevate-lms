@@ -101,7 +101,7 @@ export default async function IntegrationsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/technology-hero.jpg"
+          src="/images/pages/lms-page-3.jpg"
           alt="Integrations"
           fill
           className="object-cover"
@@ -141,7 +141,7 @@ export default async function IntegrationsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/programs-hq/it-support.jpg"
+                  src="/images/pages/lms-page-3.jpg"
                   alt="Platform integrations"
                   fill
                   className="object-cover"

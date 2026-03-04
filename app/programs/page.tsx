@@ -19,7 +19,7 @@ export default function ProgramCatalogPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[300px]">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/programs-page-hero.jpg"
           alt="Students in a workforce training classroom"
           fill
           className="object-cover"

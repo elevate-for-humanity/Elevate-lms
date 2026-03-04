@@ -73,7 +73,7 @@ export default async function NewReportPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/how-it-works-hero.jpg"
+          src="/images/pages/program-holder-page-3.jpg"
           alt="New Report"
           fill
           className="object-cover"

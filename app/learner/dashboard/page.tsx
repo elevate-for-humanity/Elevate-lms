@@ -174,7 +174,7 @@ export default async function LearnerDashboardPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Learning dashboard" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/learner-page-1.jpg" alt="Learning dashboard" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <header className="bg-white border-b border-gray-200">

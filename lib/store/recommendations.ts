@@ -35,7 +35,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 4999,
     priceDisplay: '$4,999',
     href: '/store/licenses/core-license',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'license',
     tier: 'starter',
     valueProps: [
@@ -53,7 +53,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 15000,
     priceDisplay: '$15,000',
     href: '/store/licenses/school-license',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'license',
     tier: 'professional',
     valueProps: [
@@ -73,7 +73,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 50000,
     priceDisplay: '$50,000',
     href: '/store/licenses/enterprise-license',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/pages/store-recommendations.jpg',
     category: 'license',
     tier: 'enterprise',
     valueProps: [
@@ -94,7 +94,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 1999,
     priceDisplay: '$1,999',
     href: '/store/compliance/wioa',
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -112,7 +112,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/compliance/ferpa',
-    image: '/images/programs-hq/cybersecurity.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -130,7 +130,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/compliance/grant-reporting',
-    image: '/images/programs-hq/business-office.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -149,7 +149,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/ai-studio',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -168,7 +168,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 0,
     priceDisplay: 'WIOA Funded',
     href: '/programs/barber-apprenticeship',
-    image: '/images/programs-hq/barber-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'program',
     tier: 'standalone',
     valueProps: [
@@ -186,7 +186,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 0,
     priceDisplay: 'WIOA Funded',
     href: '/programs/cna',
-    image: '/images/programs-hq/cna-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     category: 'program',
     tier: 'standalone',
     valueProps: [

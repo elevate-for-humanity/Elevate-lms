@@ -68,7 +68,7 @@ export default async function AttendancePage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/pages/programs-admin-attendance-hero.jpg"
           alt="Attendance"
           fill sizes="100vw"
           className="object-cover"

@@ -24,7 +24,7 @@ const dotTests = [
       'Clearinghouse query (if needed)',
       'Same-day scheduling available',
     ],
-    image: '/images/heroes-hq/programs-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
   {
     name: 'DOT Random Testing',
@@ -38,7 +38,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/heroes-hq/programs-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
   {
     name: 'DOT Post-Accident',
@@ -52,7 +52,7 @@ const dotTests = [
       'Full documentation',
       'MRO review included',
     ],
-    image: '/images/efh/sections/classroom.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
   },
   {
     name: 'DOT Reasonable Suspicion',
@@ -66,7 +66,7 @@ const dotTests = [
       'MRO review included',
       'Confidential handling',
     ],
-    image: '/images/efh/sections/coaching.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
   },
   {
     name: 'Return to Duty (RTD)',
@@ -81,7 +81,7 @@ const dotTests = [
       'Follow-up testing schedule setup',
       'Full compliance documentation',
     ],
-    image: '/images/efh/sections/staffing.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
   },
   {
     name: 'Follow-Up Testing',
@@ -95,7 +95,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/learners/coaching-session.jpg',
+    image: '/images/pages/comp-pathway-classroom.jpg',
   },
 ];
 
@@ -119,7 +119,7 @@ export default function DotTestingPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/drug-testing-page-1.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -304,7 +304,7 @@ export default function DotTestingPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/heroes-hq/success-stories-hero.jpg"
+                src="/images/pages/drug-testing-page-1.jpg"
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"

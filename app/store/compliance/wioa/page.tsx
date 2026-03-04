@@ -18,25 +18,25 @@ const features = [
   {
     title: 'Participant Intake & Eligibility',
     description: 'Automated eligibility verification with document upload and digital signatures.',
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     items: ['Digital intake forms', 'Eligibility checklist automation', 'Document management', 'E-signature integration'],
   },
   {
     title: 'Performance Metrics Tracking',
     description: 'Real-time tracking of all WIOA primary indicators of performance.',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['Employment rate tracking', 'Median earnings calculation', 'Credential attainment', 'Measurable skill gains'],
   },
   {
     title: 'PIRL Data Export',
     description: 'One-click export to Participant Individual Record Layout format.',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/pages/store-recommendations.jpg',
     items: ['Automated field mapping', 'Data validation', 'Error checking', 'Batch export capability'],
   },
   {
     title: 'Quarterly & Annual Reports',
     description: 'Pre-built report templates for all required WIOA submissions.',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['ETA-9169 reports', 'ETA-9170 reports', 'Custom report builder', 'Scheduled generation'],
   },
 ];
@@ -113,7 +113,7 @@ export default function WIOACompliancePage() {
       </div>
 {/* Avatar Guide at Top */}
       <AvatarGuide
-        avatarImage="/images/team-hq/instructor-2.jpg"
+        avatarImage="/images/pages/store-recommendations.jpg"
         avatarName="James"
         welcomeMessage="Welcome to our WIOA Compliance tools! I'm James, and I'll explain how we make WIOA compliance simple. Let me show you around."
         steps={wioaGuideSteps}
@@ -141,7 +141,7 @@ export default function WIOACompliancePage() {
       {/* Hero Section */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/store-compliance-wioa-hero.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -221,10 +221,10 @@ export default function WIOACompliancePage() {
           <h2 className="text-3xl font-black text-black mb-8 text-center">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/programs-hq/technology-hero.jpg' },
-              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/heroes-hq/funding-hero.jpg' },
-              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/team-hq/team-meeting.jpg' },
-              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/programs-hq/it-support.jpg' },
+              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/pages/comp-cta-training.jpg' },
+              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/pages/comp-cta-career.jpg' },
+              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/pages/store-recommendations.jpg' },
+              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/pages/comp-cta-training.jpg' },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-brand-green-600">
@@ -310,7 +310,7 @@ export default function WIOACompliancePage() {
               </div>
               <div className="relative h-64 rounded-xl overflow-hidden">
                 <Image
-                  src="/images/heroes-hq/funding-hero.jpg"
+                  src="/images/pages/store-compliance-wioa-detail.jpg"
                   alt="WIOA Resources"
                   fill
                   className="object-cover"

@@ -203,7 +203,7 @@ export default function HandbookAcknowledgePage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/student-portal-page-4.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>

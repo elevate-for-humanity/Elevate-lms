@@ -57,7 +57,7 @@ export default async function CompleteFERPATrainingPage() {
     <>
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/ferpa-page-12.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
       <FERPATrainingForm
         user={profile}

@@ -118,7 +118,7 @@ export default function PartnerLoginPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner login" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-8.jpg" alt="Partner login" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">

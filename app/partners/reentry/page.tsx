@@ -14,7 +14,7 @@ export default function ReentryPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Reentry' }],
       hero: {
-        image: '/images/heroes-hq/jri-hero.jpg',
+        image: '/images/pages/comp-cta-career.jpg',
         tag: 'Reentry Programs',
         tagColor: 'text-brand-green-300',
         title: 'Reentry Workforce Partnership',
@@ -26,7 +26,7 @@ export default function ReentryPartnerPage() {
           'Elevate for Humanity partners with reentry organizations, community corrections, and probation departments to provide career training for justice-involved individuals. Our programs are funded through JRI and WIOA, removing financial barriers to participation.',
           'We provide hands-on training in high-demand fields where background checks are less restrictive, giving participants a realistic path to stable employment.',
         ],
-        image: '/images/trades/program-construction-training.jpg',
+        image: '/images/pages/comp-pathway-trades.jpg',
       },
       features: {
         heading: 'Program Features',

@@ -28,32 +28,32 @@ export default function TutoringPage() {
     {
       title: "Healthcare & CNA",
       description: "Anatomy review, medical terminology, patient care procedures, clinical skills practice, and state exam preparation for CNA certification.",
-      image: "/images/programs-hq/cna-training.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "Skilled Trades",
       description: "Electrical theory, NEC code review, welding technique coaching, HVAC system troubleshooting, plumbing calculations, and blueprint reading.",
-      image: "/images/trades/welding-hero.jpg"
+      image: "/images/pages/comp-pathway-trades.jpg"
     },
     {
       title: "Technology & IT",
       description: "CompTIA A+ and Network+ exam prep, cybersecurity concepts, help desk scenarios, coding fundamentals, and web development projects.",
-      image: "/images/programs-hq/cybersecurity.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "Business & Finance",
       description: "QuickBooks operations, bookkeeping fundamentals, tax preparation concepts, business plan development, and Microsoft Office proficiency.",
-      image: "/images/programs-hq/business-office.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "General Academic Support",
       description: "Math fundamentals, reading comprehension, study skills, test-taking strategies, and GED preparation for students who need foundational support.",
-      image: "/images/programs-hq/students-learning.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "Certification Exam Prep",
       description: "Focused review sessions for any certification exam — OSHA, AWS, QuickBooks, CompTIA, AFSP, or state licensing boards. Practice tests and targeted review.",
-      image: "/images/programs-hq/training-classroom.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     }
   ];
 
@@ -98,7 +98,7 @@ export default function TutoringPage() {
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/programs-hq/students-learning.jpg" alt="Students receiving one-on-one tutoring at Elevate training center" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/tutoring-page-1.jpg" alt="Students receiving one-on-one tutoring at Elevate training center" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Intro */}
@@ -117,10 +117,10 @@ export default function TutoringPage() {
           <h2 className="text-3xl font-bold text-center mb-12">How Tutoring Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: "1", title: "Log In to LMS", desc: "Access the tutoring portal through your student dashboard. Navigate to Help > Tutoring.", image: "/images/programs-hq/students-learning.jpg" },
-              { step: "2", title: "Choose Your Subject", desc: "Select from healthcare, trades, technology, business, academic support, or exam prep.", image: "/images/programs-hq/training-classroom.jpg" },
-              { step: "3", title: "Book a Session", desc: "Pick an available tutor and time slot. Choose 30 or 60 minutes, virtual or in-person.", image: "/images/heroes-hq/career-services-hero.jpg" },
-              { step: "4", title: "Meet & Learn", desc: "Join your session via Zoom or at the training center. Get focused help on exactly what you need.", image: "/images/heroes-hq/success-hero.jpg" },
+              { step: "1", title: "Log In to LMS", desc: "Access the tutoring portal through your student dashboard. Navigate to Help > Tutoring.", image: "/images/pages/comp-cta-training.jpg" },
+              { step: "2", title: "Choose Your Subject", desc: "Select from healthcare, trades, technology, business, academic support, or exam prep.", image: "/images/pages/comp-cta-training.jpg" },
+              { step: "3", title: "Book a Session", desc: "Pick an available tutor and time slot. Choose 30 or 60 minutes, virtual or in-person.", image: "/images/pages/comp-cta-career.jpg" },
+              { step: "4", title: "Meet & Learn", desc: "Join your session via Zoom or at the training center. Get focused help on exactly what you need.", image: "/images/pages/comp-cta-career.jpg" },
             ].map((item, index) => (
               <motion.div
                 key={index}

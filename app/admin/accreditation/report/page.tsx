@@ -65,7 +65,7 @@ export default async function AccreditationReportPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-accreditation-report-hero.jpg" alt="Accreditation reports" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto">
         <div className="mb-4">

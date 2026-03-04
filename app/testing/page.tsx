@@ -53,7 +53,7 @@ const examCategories = [
   {
     name: 'Rise Up — National Retail Federation',
     provider: 'NRF Foundation',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/pages/apply-employer-hero.jpg',
     description: 'Workforce credentials in customer service, retail, and business fundamentals. Stackable credentials recognized by national employers.',
     exams: [
       'Customer Service & Sales Credential',
@@ -89,7 +89,7 @@ export default function TestingPage() {
       {/* Hero */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/pages/testing-page-1.jpg"
           alt="Workforce credential testing"
           fill sizes="100vw"
           className="object-cover"

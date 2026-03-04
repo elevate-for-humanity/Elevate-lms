@@ -13,7 +13,7 @@ export default function Pathways() {
           <Link href="/programs" className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group">
             <div className="relative h-48">
               <Image
-                src="/images/programs-hq/training-classroom.jpg"
+                src="/images/pages/comp-home-pathways-train.jpg"
                 alt="Students learning"
                 fill
                 className="object-cover group-hover:scale-105 transition"
@@ -29,7 +29,7 @@ export default function Pathways() {
           <Link href="/wioa-eligibility" className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group">
             <div className="relative h-48">
               <Image
-                src="/images/efh/hero/hero-support.jpg"
+                src="/images/pages/comp-home-pathways-support.jpg"
                 alt="Career pathways"
                 fill
                 className="object-cover group-hover:scale-105 transition"

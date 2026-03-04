@@ -14,7 +14,7 @@ export default function WorkforcePage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Workforce' }],
       hero: {
-        image: '/images/heroes-hq/employer-hero.jpg',
+        image: '/images/pages/comp-cta-career.jpg',
         tag: 'Partnership',
         tagColor: 'text-brand-blue-300',
         title: 'Workforce Development Partnership',
@@ -26,7 +26,7 @@ export default function WorkforcePage() {
           'Elevate for Humanity partners with workforce development boards, WorkOne offices, and state agencies to deliver WIOA-funded training in high-demand fields. Our programs are ETPL-approved and produce industry-certified graduates ready for employment.',
           'We handle enrollment, training delivery, certification testing, and job placement — giving your agency a turnkey training partner with measurable outcomes.',
         ],
-        image: '/images/trades/program-welding-training.jpg',
+        image: '/images/pages/comp-pathway-trades.jpg',
       },
       features: {
         heading: 'Partnership Benefits',

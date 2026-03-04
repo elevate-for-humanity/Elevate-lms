@@ -4,8 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Scale, Phone, Mail, AlertTriangle } from 'lucide-react';
 
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
-
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/grievance' },
   title: 'Grievance Procedure | Elevate For Humanity',
@@ -26,10 +24,10 @@ export default function GrievancePage() {
         <Breadcrumbs items={[{ label: 'Grievance Procedure' }]} />
       </div>
 
-
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/getting-started-hero.mp4" posterSrc="/images/heroes-hq/contact-hero.jpg" posterAlt="Grievance" />
-
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/pages/grievance-page-1.jpg" alt="Grievance process" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       {/* Header */}
       <section className="bg-gray-900 text-white py-16">

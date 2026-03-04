@@ -33,7 +33,7 @@ export default function ContentAutomationPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Content Automation" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-content-automation-hero.jpg" alt="Content automation" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Content Automation' }]} />

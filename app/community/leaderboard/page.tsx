@@ -62,7 +62,7 @@ export default async function LeaderboardPage() {
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Community Leaderboard" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/community-page-3.jpg" alt="Community Leaderboard" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Top 3 Podium */}

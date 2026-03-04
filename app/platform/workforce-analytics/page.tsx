@@ -139,7 +139,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/it-support.jpg" alt="Analytics dashboard" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/platform-page-6.jpg" alt="Analytics dashboard" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Integrated With Your Workflow</h2>

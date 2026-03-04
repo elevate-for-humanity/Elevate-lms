@@ -71,7 +71,7 @@ export default function TrialPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/store-trial-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="bg-slate-50 border-b">
           <div className="max-w-6xl mx-auto px-4 py-3">
@@ -161,7 +161,7 @@ export default function TrialPage() {
             {/* Left: visual */}
             <div className="hidden lg:block">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-4">
-                <Image src="/images/demos/admin-dashboard-thumb.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover" />
+                <Image src="/images/pages/store-trial-detail.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover" />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your admin dashboard — ready in under 60 seconds</p>
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">

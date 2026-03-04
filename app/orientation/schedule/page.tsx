@@ -36,7 +36,7 @@ export default function OrientationSchedulePage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/getting-started-hero.jpg" alt="Students attending orientation session" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/orientation-page-2.jpg" alt="Students attending orientation session" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -97,7 +97,7 @@ export default function OrientationSchedulePage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src="/images/gallery/image7.jpg"
+                src="/images/pages/orientation-schedule-hero.jpg"
                 alt="Students in orientation session"
                 fill
                 className="object-cover"

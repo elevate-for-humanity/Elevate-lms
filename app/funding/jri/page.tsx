@@ -39,7 +39,7 @@ export default function JRIFundingPage() {
 
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
-        <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Job-Ready Incentive program" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/funding-page-2.jpg" alt="JRI Job-Ready Incentive program" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 
@@ -60,7 +60,7 @@ export default function JRIFundingPage() {
               </Link>
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/trades/program-construction-training.jpg" alt="JRI career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/pages/funding-page-4.jpg" alt="JRI career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>

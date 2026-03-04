@@ -54,7 +54,7 @@ export default async function DealsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-crm-deals-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <section className="bg-white border-b">

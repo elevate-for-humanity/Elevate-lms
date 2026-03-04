@@ -101,7 +101,7 @@ export default async function AtRiskStudentsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/homepage/students.jpg"
+          src="/images/pages/program-holder-page-2.jpg"
           alt="At-Risk Students"
           fill
           className="object-cover"

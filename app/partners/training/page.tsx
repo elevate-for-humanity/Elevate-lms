@@ -14,7 +14,7 @@ export default function TrainingPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Training' }],
       hero: {
-        image: '/images/homepage/employers.jpg',
+        image: '/images/pages/homepage-why-elevate.jpg',
         tag: 'Training Partners',
         title: 'Training Provider Partnership',
         subtitle: 'Co-deliver workforce training programs and expand your reach through our enrollment pipeline and funding network.',
@@ -25,7 +25,7 @@ export default function TrainingPartnerPage() {
           'Elevate for Humanity partners with training providers to co-deliver programs in healthcare, skilled trades, CDL, technology, and cosmetology. We bring the students, funding, and support services — you bring the expertise.',
           'Our partnerships are structured to maximize enrollment, improve completion rates, and ensure graduates are job-ready.',
         ],
-        image: '/images/trades/program-hvac-technician.jpg',
+        image: '/images/pages/comp-pathway-trades.jpg',
       },
       features: {
         heading: 'What We Bring to the Partnership',

@@ -14,7 +14,7 @@ export default function JoinPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Join' }],
       hero: {
-        image: '/images/heroes-hq/employer-hero.jpg',
+        image: '/images/pages/comp-cta-career.jpg',
         title: 'Become a Partner',
         subtitle: 'Join our network of workforce agencies, employers, and community organizations building career pathways.',
       },

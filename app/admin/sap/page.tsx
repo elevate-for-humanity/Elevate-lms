@@ -214,7 +214,7 @@ export default async function SAPMonitoringPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-sap-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">

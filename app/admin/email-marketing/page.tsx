@@ -40,7 +40,7 @@ export default function EmailMarketingPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-email-marketing-hero.jpg" alt="Email marketing" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Email Marketing" }]} />
@@ -48,7 +48,7 @@ export default function EmailMarketingPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-stories-hero.jpg"
+          src="/images/pages/admin-email-marketing-d1.jpg"
           alt="Email Marketing"
           fill
           className="object-cover"
@@ -421,7 +421,7 @@ export default function EmailMarketingPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/programs-hq/business-training.jpg"
+                    src="/images/pages/admin-email-marketing-d2.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

@@ -70,7 +70,7 @@ export default function InstructorsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-instructors-hero.jpg" alt="Instructors management" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
@@ -82,7 +82,7 @@ export default function InstructorsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/pages/admin-instructors-detail.jpg"
           alt="Instructors Management"
           fill
           className="object-cover"

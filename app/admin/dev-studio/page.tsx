@@ -261,7 +261,7 @@ export default function DevStudioPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-dev-studio-hero.jpg" alt="Dev studio" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-slate-800 px-4 py-2">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Dev Studio' }]} />
@@ -269,7 +269,7 @@ export default function DevStudioPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/efh/sections/staffing.jpg"
+          src="/images/pages/admin-dev-studio-detail.jpg"
           alt="Hero"
           fill
           className="object-cover"

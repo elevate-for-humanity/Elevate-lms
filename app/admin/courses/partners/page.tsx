@@ -34,7 +34,7 @@ export default async function CoursePartnersPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-courses-partners-hero.jpg" alt="Course partners" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto">
         <div className="mb-4">

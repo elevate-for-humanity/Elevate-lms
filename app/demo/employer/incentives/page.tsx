@@ -19,7 +19,7 @@ const incentives = (dbRows as any[]) || [];
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-14.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="bg-white rounded-xl border p-4">
           <div className="flex items-center gap-2 mb-1"><DollarSign className="w-4 h-4 text-brand-green-600" /><span className="text-xs text-gray-500">Total Earned</span></div>

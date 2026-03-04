@@ -33,17 +33,17 @@ export default async function EnrollmentPage() {
   ];
 
   const featured = [
-    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '20', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/trades/hero-program-hvac.jpg' },
-    { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/trades/hero-program-electrical.jpg' },
-    { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/trades/hero-program-plumbing.jpg' },
-    { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/programs-hq/skilled-trades-hero.jpg' },
+    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '20', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
+    { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/comp-pathway-trades.jpg' },
+    { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/comp-pathway-trades.jpg' },
+    { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/comp-cta-training.jpg' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <Image src="/images/getting-started-hero.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
+        <Image src="/images/pages/enrollment-page-1.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
       </div>
 
       <div className="py-4 border-b border-gray-100">

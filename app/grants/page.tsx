@@ -23,7 +23,7 @@ export default function GrantsPage() {
       {/* Hero */}
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/heroes-hq/funding-hero.jpg"
+          src="/images/pages/grants-page-1.jpg"
           alt="Students celebrating graduation"
           fill
           className="object-cover"

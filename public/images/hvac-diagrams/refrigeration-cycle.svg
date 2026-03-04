@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8fafc" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Basic Refrigeration Cycle</text>
+  <text x="400" y="55" text-anchor="middle" font-size="12" fill="#64748b">Four main components — High side (red) / Low side (blue)</text>
+
+  <!-- High pressure side background -->
+  <rect x="390" y="70" width="390" height="250" rx="8" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+  <text x="585" y="90" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626" text-transform="uppercase" letter-spacing="1">HIGH PRESSURE SIDE</text>
+
+  <!-- Low pressure side background -->
+  <rect x="20" y="70" width="370" height="250" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="205" y="90" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb" text-transform="uppercase" letter-spacing="1">LOW PRESSURE SIDE</text>
+
+  <!-- COMPRESSOR (bottom right) -->
+  <circle cx="400" cy="280" r="45" fill="#fff" stroke="#0f172a" stroke-width="2.5"/>
+  <text x="400" y="275" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">COMPRESSOR</text>
+  <text x="400" y="293" text-anchor="middle" font-size="10" fill="#64748b">Increases pressure</text>
+  <text x="400" y="305" text-anchor="middle" font-size="10" fill="#64748b">&amp; temperature</text>
+
+  <!-- CONDENSER (top right) -->
+  <rect x="530" y="110" width="140" height="70" rx="6" fill="#fff" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="600" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">CONDENSER</text>
+  <text x="600" y="158" text-anchor="middle" font-size="10" fill="#64748b">Rejects heat (outdoor)</text>
+  <!-- Heat arrows out -->
+  <text x="600" y="100" text-anchor="middle" font-size="11" fill="#dc2626">↑ HEAT OUT ↑</text>
+
+  <!-- METERING DEVICE (top left) -->
+  <rect x="130" y="110" width="140" height="70" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/>
+  <text x="200" y="133" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">METERING</text>
+  <text x="200" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">DEVICE</text>
+  <text x="200" y="166" text-anchor="middle" font-size="10" fill="#64748b">Reduces pressure</text>
+
+  <!-- EVAPORATOR (bottom left) -->
+  <rect x="100" y="230" width="140" height="70" rx="6" fill="#fff" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="170" y="260" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb">EVAPORATOR</text>
+  <text x="170" y="278" text-anchor="middle" font-size="10" fill="#64748b">Absorbs heat (indoor)</text>
+  <!-- Heat arrows in -->
+  <text x="170" y="318" text-anchor="middle" font-size="11" fill="#2563eb">↑ HEAT IN ↑</text>
+
+  <!-- FLOW LINES -->
+  <!-- Compressor to Condenser (high pressure gas — red) -->
+  <line x1="440" y1="260" x2="530" y2="145" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="510" y="195" font-size="9" fill="#dc2626" font-weight="600">Hot high-pressure gas</text>
+
+  <!-- Condenser to Metering Device (high pressure liquid — red/purple) -->
+  <line x1="530" y1="145" x2="270" y2="145" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow-red)"/>
+  <text x="400" y="138" text-anchor="middle" font-size="9" fill="#dc2626" font-weight="600">Warm high-pressure liquid</text>
+
+  <!-- Metering Device to Evaporator (low pressure mix — blue) -->
+  <line x1="200" y1="180" x2="170" y2="230" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="140" y="210" font-size="9" fill="#2563eb" font-weight="600">Cold low-pressure mix</text>
+
+  <!-- Evaporator to Compressor (low pressure gas — blue) -->
+  <line x1="240" y1="265" x2="355" y2="280" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text x="290" y="258" font-size="9" fill="#2563eb" font-weight="600">Cool low-pressure gas</text>
+
+  <!-- State labels -->
+  <rect x="30" y="370" width="740" height="220" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="400" y="395" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Refrigerant State Changes</text>
+
+  <!-- Four states -->
+  <rect x="50" y="410" width="160" height="80" rx="6" fill="#eff6ff"/>
+  <text x="130" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#2563eb">1. EVAPORATOR</text>
+  <text x="130" y="452" text-anchor="middle" font-size="10" fill="#334155">Liquid → Gas</text>
+  <text x="130" y="467" text-anchor="middle" font-size="9" fill="#64748b">Absorbs heat from air</text>
+  <text x="130" y="480" text-anchor="middle" font-size="9" fill="#64748b">Low pressure / Low temp</text>
+
+  <rect x="230" y="410" width="160" height="80" rx="6" fill="#f8fafc"/>
+  <text x="310" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">2. COMPRESSOR</text>
+  <text x="310" y="452" text-anchor="middle" font-size="10" fill="#334155">Gas → Hot Gas</text>
+  <text x="310" y="467" text-anchor="middle" font-size="9" fill="#64748b">Compresses refrigerant</text>
+  <text x="310" y="480" text-anchor="middle" font-size="9" fill="#64748b">High pressure / High temp</text>
+
+  <rect x="410" y="410" width="160" height="80" rx="6" fill="#fef2f2"/>
+  <text x="490" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">3. CONDENSER</text>
+  <text x="490" y="452" text-anchor="middle" font-size="10" fill="#334155">Gas → Liquid</text>
+  <text x="490" y="467" text-anchor="middle" font-size="9" fill="#64748b">Rejects heat to outside</text>
+  <text x="490" y="480" text-anchor="middle" font-size="9" fill="#64748b">High pressure / Med temp</text>
+
+  <rect x="590" y="410" width="160" height="80" rx="6" fill="#f5f3ff"/>
+  <text x="670" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">4. METERING</text>
+  <text x="670" y="452" text-anchor="middle" font-size="10" fill="#334155">Liquid → Mix</text>
+  <text x="670" y="467" text-anchor="middle" font-size="9" fill="#64748b">Drops pressure rapidly</text>
+  <text x="670" y="480" text-anchor="middle" font-size="9" fill="#64748b">Low pressure / Low temp</text>
+
+  <!-- Flow arrows between states -->
+  <text x="205" y="455" text-anchor="middle" font-size="16" fill="#94a3b8">→</text>
+  <text x="385" y="455" text-anchor="middle" font-size="16" fill="#94a3b8">→</text>
+  <text x="565" y="455" text-anchor="middle" font-size="16" fill="#94a3b8">→</text>
+
+  <!-- Key measurements -->
+  <text x="400" y="520" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a">Key Measurements</text>
+  <text x="200" y="540" text-anchor="middle" font-size="10" fill="#334155">Superheat = measured at evaporator outlet (suction line)</text>
+  <text x="200" y="555" text-anchor="middle" font-size="10" fill="#334155">Subcooling = measured at condenser outlet (liquid line)</text>
+  <text x="600" y="540" text-anchor="middle" font-size="10" fill="#334155">Normal superheat: 10–15°F</text>
+  <text x="600" y="555" text-anchor="middle" font-size="10" fill="#334155">Normal subcooling: 10–15°F</text>
+
+  <!-- Footer -->
+  <text x="400" y="590" text-anchor="middle" font-size="9" fill="#94a3b8">Elevate for Humanity — HVAC Technician Program — Module 5: Refrigeration Cycle</text>
+</svg>

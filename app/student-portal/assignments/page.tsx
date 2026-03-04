@@ -87,7 +87,7 @@ export default async function AssignmentsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/student-portal-page-2.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">

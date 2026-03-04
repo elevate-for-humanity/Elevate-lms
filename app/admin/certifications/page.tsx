@@ -69,7 +69,7 @@ export default async function CertificationsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Certification administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-certifications-hero.jpg" alt="Certifications management" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Certifications" }]} />
@@ -77,7 +77,7 @@ export default async function CertificationsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/admin-certifications-detail.jpg"
           alt="Certifications Management"
           fill
           className="object-cover"

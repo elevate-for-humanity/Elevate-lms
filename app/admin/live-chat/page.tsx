@@ -36,7 +36,7 @@ export default function LiveChatPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/contact-hero.jpg"
+          src="/images/pages/admin-live-chat-detail.jpg"
           alt="Live Chat"
           fill
           className="object-cover"
@@ -341,7 +341,7 @@ function ActionButton({ title, description, href }: ActionButtonProps) {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/contact-hero.jpg" alt="Communications" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-live-chat-hero.jpg" alt="Live chat" fill sizes="100vw" className="object-cover" priority />
       </section>{title}</div>
       <div className="text-sm text-black mb-2">{description}</div>
       <div className="flex items-center text-sm text-brand-blue-600">

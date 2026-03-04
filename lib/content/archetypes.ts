@@ -149,7 +149,7 @@ export function getProgramContent(programSlug: string): PageContent {
     title: 'Registered Apprenticeship Program',
     description:
       'Earn while you learn through our DOL-registered apprenticeship program. Receive hands-on training, industry credentials, and job placement support.',
-    imageSrc: '/images/programs/apprentice-training.jpg',
+    imageSrc: '/images/pages/comp-cta-programs.jpg',
     imageAlt:
       'Apprentice receiving hands-on training from experienced instructor',
     actions: [

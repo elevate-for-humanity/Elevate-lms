@@ -47,7 +47,7 @@ export default async function HireGraduatesPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/pages/hire-graduates-page-1.jpg"
           alt="Hire Graduates"
           fill
           className="object-cover"
@@ -89,7 +89,7 @@ export default async function HireGraduatesPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/programs-hq/training-classroom.jpg"
+                  src="/images/pages/hire-graduates-page-1.jpg"
                   alt="Hire Graduates"
                   fill
                   className="object-cover"

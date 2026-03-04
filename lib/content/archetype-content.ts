@@ -45,7 +45,7 @@ export const programTrainingContent: LocalizedContent = {
       title: 'Program Overview',
       purpose:
         'This page explains who this program is for, what you will learn, and how to apply.',
-      image: '/images/programs/hero.jpg',
+      image: '/images/pages/comp-cta-programs.jpg',
       imageAlt: 'Students in training program',
     },
     sections: {
@@ -82,7 +82,7 @@ export const programTrainingContent: LocalizedContent = {
       title: 'Resumen del programa',
       purpose:
         'Esta página explica para quién es el programa, qué aprenderás y cómo aplicar.',
-      image: '/images/programs/hero.jpg',
+      image: '/images/pages/comp-cta-programs.jpg',
       imageAlt: 'Estudiantes en programa de capacitación',
     },
     sections: {

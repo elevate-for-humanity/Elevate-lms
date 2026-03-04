@@ -89,7 +89,7 @@ export default async function CashAdvancesAdminPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-cash-advances-hero.jpg" alt="Cash advances" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-black mb-2">
@@ -409,7 +409,7 @@ export default async function CashAdvancesAdminPage() {
               <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   priority
-                  src="/images/programs-hq/business-office.jpg"
+                  src="/images/pages/admin-cash-advances-office.jpg"
                   alt="Students learning"
                   fill
                   className="object-cover"

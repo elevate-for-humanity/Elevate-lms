@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Website Builder for Training Providers',
     description: 'Build professional training provider websites with LMS integration.',
-    images: ['/images/programs-hq/technology-hero.jpg'],
+    images: ['/images/pages/comp-cta-training.jpg'],
     type: 'website',
   },
   alternates: {

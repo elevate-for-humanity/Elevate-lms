@@ -98,7 +98,7 @@ export default async function CommunityPage() {
       {/* Clean Hero - Image Only */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image
-          src="/images/community/community-hero.jpg"
+          src="/images/pages/community-page-5.jpg"
           alt="Community members collaborating"
           fill
           className="object-cover"
@@ -234,9 +234,9 @@ export default async function CommunityPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: "Career Development Workshop", frequency: "Weekly", image: "/images/community/event-1.jpg" },
-              { title: "Monthly Networking Mixer", frequency: "Monthly", image: "/images/community/event-2.jpg" },
-              { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "/images/community/event-3.jpg" }
+              { title: "Career Development Workshop", frequency: "Weekly", image: "/images/pages/comp-home-pathways-support.jpg" },
+              { title: "Monthly Networking Mixer", frequency: "Monthly", image: "/images/pages/comp-home-pathways-support.jpg" },
+              { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "/images/pages/comp-home-pathways-support.jpg" }
             ].map((event, index) => (
               <div key={index} className="bg-gray-50 rounded-xl overflow-hidden">
                 <div className="relative h-40">
@@ -283,7 +283,7 @@ export default async function CommunityPage() {
             </div>
             <div className="relative h-64 md:h-auto rounded-xl overflow-hidden">
               <Image
-                src="/images/community/event-4.jpg"
+                src="/images/pages/community-page-5.jpg"
                 alt="Community members"
                 fill
                 className="object-cover"

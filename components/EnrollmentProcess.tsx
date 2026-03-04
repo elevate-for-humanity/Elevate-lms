@@ -7,7 +7,7 @@ const steps = [
     title: 'Visit Indiana Career Connect',
     desc: 'Go to indianacareerconnect.com and create your free account. This is the official portal for all WIOA-funded training programs in Indiana.',
     cta: { label: 'Go to Indiana Career Connect \u2192', href: 'https://www.indianacareerconnect.com', external: true },
-    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     alt: 'Indiana Career Connect registration process',
   },
   {
@@ -15,7 +15,7 @@ const steps = [
     title: 'Complete Your Profile',
     desc: 'Fill out your profile with your work history, education, and career goals. This helps match you with the right training program and funding.',
     note: 'What you\u2019ll need: Social Security Number, proof of residency, income documentation (if applicable), and high school diploma or GED.',
-    image: '/images/heroes-hq/career-services-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     alt: 'Student completing enrollment profile',
   },
   {
@@ -26,7 +26,7 @@ const steps = [
       { icon: '\uD83D\uDCCD', label: 'In-Person', sub: 'Visit a WorkOne center near you' },
       { icon: '\uD83D\uDCBB', label: 'Virtual', sub: 'Schedule a video call appointment' },
     ],
-    image: '/images/heroes-hq/contact-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     alt: 'Career advisor meeting with student',
   },
   {
@@ -34,7 +34,7 @@ const steps = [
     title: 'Meet with Your Advisor',
     desc: 'Your career advisor will verify your eligibility, explain funding options, and help you select Elevate for Humanity as your training provider. They can also discuss supportive services like transportation and childcare assistance.',
     note: 'Mention you want to train with Elevate for Humanity. We\u2019re an approved WIOA provider in Marion County.',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     alt: 'Workforce advisor reviewing training options',
   },
   {
@@ -42,7 +42,7 @@ const steps = [
     title: 'Get Approved & Enroll',
     desc: 'Once approved for WIOA funding, your advisor will issue a training voucher. Bring this to Elevate for Humanity to complete your enrollment. We handle all the paperwork and get you started.',
     cta: { label: 'Contact Us for Help', href: '/contact', external: false },
-    image: '/images/heroes-hq/success-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     alt: 'Student celebrating enrollment approval',
   },
 ];

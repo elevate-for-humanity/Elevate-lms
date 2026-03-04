@@ -20,7 +20,7 @@ const testingCategories = [
     title: 'Urine Drug Tests',
     description: 'Most common and cost-effective. Lab-confirmed results in 24-48 hours.',
     href: '/drug-testing/urine-tests',
-    image: '/images/trades/program-electrical-training.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     startingPrice: 69,
     tests: ['5-Panel', '10-Panel', 'DOT 5-Panel', 'Expanded Opiates'],
   },
@@ -28,7 +28,7 @@ const testingCategories = [
     title: 'Instant Rapid Tests',
     description: 'On-site results in 5-10 minutes. Perfect for high-volume screening.',
     href: '/drug-testing/instant-tests',
-    image: '/images/trades/program-welding-training.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     startingPrice: 60,
     tests: ['Rapid 5-Panel', 'Rapid 10-Panel', 'Rapid + Alcohol'],
   },
@@ -36,7 +36,7 @@ const testingCategories = [
     title: 'Hair Follicle Tests',
     description: '90-day detection window. Difficult to cheat, ideal for pre-employment.',
     href: '/drug-testing/hair-tests',
-    image: '/images/courses/esthetician-client-services-10002415-cover.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     startingPrice: 125,
     tests: ['5-Panel Hair', '10-Panel Hair', 'Extended Opiates'],
   },
@@ -44,7 +44,7 @@ const testingCategories = [
     title: 'DOT Testing',
     description: 'FMCSA-compliant testing for commercial drivers and transportation workers.',
     href: '/drug-testing/dot-testing',
-    image: '/images/courses/business-startup-marketing-10002422-cover.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     startingPrice: 75,
     tests: ['Pre-Employment', 'Random', 'Post-Accident', 'Return to Duty'],
   },
@@ -52,7 +52,7 @@ const testingCategories = [
     title: 'Training & Certification',
     description: 'Online courses for supervisors, collectors, and employers. DOT-compliant certificates.',
     href: '/drug-testing/training',
-    image: '/images/courses/home-health-aide-10002413-cover.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     startingPrice: 22,
     tests: ['Supervisor Training', 'Collector Certification', 'DER Training'],
   },
@@ -106,7 +106,7 @@ export default async function DrugTestingLandingPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/programs-hq/healthcare-hero.jpg" alt="Professional Drug Testing Services" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/drug-testing-page-3.jpg" alt="Professional Drug Testing Services" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -206,7 +206,7 @@ export default async function DrugTestingLandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/courses/barber-apprenticeship-10002417-cover.jpg"
+                src="/images/pages/drug-testing-main-1.jpg"
                 alt="Employer Drug Testing Programs"
                 fill
                 className="object-cover"
@@ -291,7 +291,7 @@ export default async function DrugTestingLandingPage() {
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/courses/hvac-technician-10002289-cover.jpg"
+                src="/images/pages/drug-testing-main-2.jpg"
                 alt="DOT Drug Testing for Commercial Drivers"
                 fill
                 className="object-cover"

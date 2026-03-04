@@ -16,7 +16,7 @@ interface Slide {
 }
 const slides: Slide[] = [
   {
-    image: "/images/heroes-hq/programs-hero.jpg",
+    image: "/images/pages/comp-cta-career.jpg",
     title: "Elevate for Humanity",
     text: "State-approved, federally aligned workforce training that opens doors to high-wage careers.",
     cta: {
@@ -25,7 +25,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-barber.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "DOL Registered Barber Apprenticeship",
     text: "2,000-hour barber apprenticeship. Earn while you learn. WIOA, WRG, and JRI fundable. Indiana state licensure.",
     cta: {
@@ -34,7 +34,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-healthcare.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Healthcare Training Programs",
     text: "CNA certification through Choice Medical Institute. State-approved, workforce fundable, high-demand careers.",
     cta: {
@@ -43,7 +43,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-skilled-trades.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Skilled Trades & Building Technician",
     text: "HVAC, electrical, plumbing. Hands-on training for high-wage careers in construction and maintenance.",
     cta: {
@@ -52,7 +52,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-beauty-wellness.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Beauty & Esthetics Programs",
     text: "Nails, esthetics, and cosmetology training with experienced instructors.",
     cta: {
@@ -61,7 +61,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/heroes-hq/career-services-hero.jpg",
+    image: "/images/pages/comp-cta-career.jpg",
     title: "Career Services & Support",
     text: "Life coaching, mental health partnerships, and wraparound support to help you succeed.",
     cta: {
@@ -70,7 +70,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/programs-hq/training-classroom.jpg",
+    image: "/images/pages/comp-cta-training.jpg",
     title: "Hands-On Training",
     text: "Real-world skills training with experienced instructors in state-of-the-art facilities.",
     cta: {
@@ -79,7 +79,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-tech-careers.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Technology Career Pathways",
     text: "IT training and technology skills for the digital economy.",
     cta: {
@@ -88,7 +88,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-business.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Business & Professional Skills",
     text: "Office administration, customer service, and professional development training.",
     cta: {
@@ -97,7 +97,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/hero/hero-early-childhood.jpg",
+    image: "/images/pages/comp-home-hero.jpg",
     title: "Early Childhood Education",
     text: "Childcare and early education training for rewarding careers working with children.",
     cta: {

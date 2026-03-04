@@ -62,17 +62,17 @@ export default async function NetworkingEventsPage() {
     {
       title: 'Career Fairs',
       description: 'Meet multiple employers in one day. Bring your resume and dress professionally.',
-      image: '/images/career-services/job-fair.jpg',
+      image: '/images/pages/resume-building-hero.jpg',
     },
     {
       title: 'Industry Meetups',
       description: 'Connect with professionals in your field. Learn about industry trends and opportunities.',
-      image: '/images/career-services/industry-mixer.jpg',
+      image: '/images/pages/resume-building-hero.jpg',
     },
     {
       title: 'Employer Panels',
       description: 'Hear directly from hiring managers about what they look for in candidates.',
-      image: '/images/career-services/resume-workshop.jpg',
+      image: '/images/pages/resume-building-hero.jpg',
     },
   ];
 
@@ -89,7 +89,7 @@ export default async function NetworkingEventsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/career-services/interview-prep.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/career-services-page-4.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

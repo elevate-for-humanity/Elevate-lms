@@ -64,7 +64,7 @@ export default function AcademicCalendarPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Academic calendar and important dates" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/academic-calendar-hero.jpg" alt="Academic calendar and important dates" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Title */}

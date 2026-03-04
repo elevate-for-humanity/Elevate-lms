@@ -7,7 +7,7 @@ export function BarberPartnership() {
     <>
       {/* Career Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[360px]">
-        <Image src="/images/barber/barber-shop-interior.jpg" alt="Professional barbershop interior" fill sizes="100vw" className="object-cover" />
+        <Image src="/images/pages/barber-shop-interior.jpg" alt="Professional barbershop interior" fill sizes="100vw" className="object-cover" />
       </section>
 
       {/* Section 7 — Career Pathways */}

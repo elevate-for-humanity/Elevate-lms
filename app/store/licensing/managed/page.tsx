@@ -128,7 +128,7 @@ export default function ManagedPlatformPage() {
             <div className="mt-12 max-w-4xl mx-auto">
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
                 <Image
-                  src="/images/demos/admin-dashboard-thumb.jpg"
+                  src="/images/pages/store-licensing-managed-hero.jpg"
                   alt="Elevate managed platform dashboard"
                   fill
                   quality={85} className="object-cover"
@@ -147,10 +147,10 @@ export default function ManagedPlatformPage() {
           
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { icon: Users, title: 'Your Branding', desc: 'Your logo, colors, and domain. Students and employers see your organization — the platform is invisible.', img: '/images/demos/lms-overview-thumb.jpg' },
-              { icon: BarChart3, title: 'Your Data', desc: 'Your learners, your programs, your reports. Full data export anytime. You own everything.', img: '/images/demos/admin-dashboard-thumb.jpg' },
-              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance. 99.9% uptime SLA.', img: '/images/heroes-hq/how-it-works-hero.jpg' },
-              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/heroes-hq/career-services-hero.jpg' },
+              { icon: Users, title: 'Your Branding', desc: 'Your logo, colors, and domain. Students and employers see your organization — the platform is invisible.', img: '/images/pages/demos-hero.jpg' },
+              { icon: BarChart3, title: 'Your Data', desc: 'Your learners, your programs, your reports. Full data export anytime. You own everything.', img: '/images/pages/demos-hero.jpg' },
+              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance. 99.9% uptime SLA.', img: '/images/pages/comp-cta-career.jpg' },
+              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/pages/comp-cta-career.jpg' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div className="relative h-36">

@@ -32,7 +32,7 @@ export default function SalesAvatar({
   productId,
   pageName,
   messages,
-  avatarImage = '/images/team-hq/instructor-1.jpg',
+  avatarImage = '/images/pages/store-recommendations.jpg',
   avatarName = 'Maya',
   position = 'bottom-right',
   autoStart = true,

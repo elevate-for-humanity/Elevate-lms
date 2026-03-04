@@ -49,7 +49,7 @@ export default function EPA608CoursePage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/trades/program-hvac-overview.jpg"
+          src="/images/pages/courses-page-4.jpg"
           alt="HVAC technician working with refrigerant gauges"
           fill
           quality={90}

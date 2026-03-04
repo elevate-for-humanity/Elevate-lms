@@ -1,5 +1,5 @@
 export const homepageHeroImages = {
-  certificateOfCompletion: "/images/homepage/certificate-of-completion.png",
-  topHeroBanner: "/images/homepage/hero-top-homepage-gradient.png",
-  secondHeroBanner: "/images/homepage/hero-second-homepage-programs.png",
+  certificateOfCompletion: "/images/pages/homepage-why-elevate.jpg",
+  topHeroBanner: "/images/pages/homepage-why-elevate.jpg",
+  secondHeroBanner: "/images/pages/homepage-why-elevate.jpg",
 };

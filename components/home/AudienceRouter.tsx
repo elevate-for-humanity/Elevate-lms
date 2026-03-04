@@ -17,7 +17,7 @@ const AUDIENCES = [
     ctaHref: '/wioa-eligibility',
     secondaryCta: 'Browse Programs',
     secondaryHref: '/programs',
-    image: '/images/artlist/cropped/hero-training-3-square.jpg',
+    image: '/images/pages/comp-home-hero-programs.jpg',
     color: 'from-brand-blue-600 to-brand-blue-800',
     accent: 'bg-brand-blue-500',
     stats: [
@@ -42,7 +42,7 @@ const AUDIENCES = [
     ctaHref: '/employer',
     secondaryCta: 'View Hiring Programs',
     secondaryHref: '/ojt-and-funding',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     color: 'from-emerald-600 to-emerald-800',
     accent: 'bg-emerald-500',
     stats: [
@@ -67,7 +67,7 @@ const AUDIENCES = [
     ctaHref: '/compliance',
     secondaryCta: 'Partnership Inquiry',
     secondaryHref: '/contact',
-    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     color: 'from-slate-700 to-slate-900',
     accent: 'bg-slate-600',
     stats: [

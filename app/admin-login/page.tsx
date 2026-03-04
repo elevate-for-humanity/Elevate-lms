@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
       {/* Left side — branding */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
+          src="/images/pages/admin-login-hero.jpg"
           alt="Elevate administration"
           fill
           className="object-cover"

@@ -29,7 +29,7 @@ export default function CertificatesPage() {
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/certificates-hero.jpg"
+          src="/images/pages/certificates-page-1.jpg"
           alt="Certificates & Credentials"
           fill
           className="object-cover"

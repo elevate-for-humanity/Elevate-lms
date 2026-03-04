@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-// Image asset: /images/hero-new/hero-6.jpg
+// Image asset: /images/pages/philanthropy-hero.jpg
 
 export const metadata: Metadata = {
   title: "Sign Up - Create Your Account",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sign Up - Create Your Account | Elevate for Humanity",
     description: "Create your free account to access career training programs and track your progress.",
-    images: ["/images/efh/hero/hero-main-clean.jpg"],
+    images: ["/images/pages/comp-home-highlight-health.jpg"],
     type: "website",
   },
 };

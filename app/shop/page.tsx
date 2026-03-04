@@ -72,7 +72,7 @@ export default async function ShopPage() {
 
       <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/shop/shop-hero.jpg"
+          src="/images/pages/shop-hero.jpg"
           alt="Shop"
           fill
           className="object-cover"

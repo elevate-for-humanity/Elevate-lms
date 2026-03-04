@@ -133,13 +133,13 @@ export default async function GrantSubmissionsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-grants-submissions-hero.jpg" alt="Grant submissions" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="/images/homepage/funded-programs-optimized.jpg"
+            src="/images/pages/admin-grants-submissions-detail.jpg"
             alt="Grant Submissions"
             fill
             className="object-cover"

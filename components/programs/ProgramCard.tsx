@@ -7,7 +7,7 @@ export default function ProgramCard({ program }: { program: Program }) {
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:shadow-md transition">
       <div className="relative w-full h-[220px] rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50">
         <Image
-          src={program.cardImage || program.heroImage || "/images/programs/default.jpg"}
+          src={program.cardImage || program.heroImage || "/images/pages/comp-cta-programs.jpg"}
           alt={program.title}
           fill
           sizes="100vw"

@@ -98,7 +98,7 @@ export default function LicensingPartnershipsPage() {
       </div>
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Licensing Partnerships" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/licensing-partnerships-page-1.jpg" alt="Licensing Partnerships" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Section 1: For Students */}

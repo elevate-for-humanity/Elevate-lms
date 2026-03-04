@@ -39,7 +39,7 @@ export default async function CourseBuilderPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-courses-builder-hero.jpg" alt="Course builder" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">

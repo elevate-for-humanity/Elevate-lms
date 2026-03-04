@@ -31,7 +31,7 @@ export default function OngoingSupportPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/efh/sections/coaching.jpg" alt="Ongoing Support" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/mentorship-page-3.jpg" alt="Ongoing Support" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       <section className="py-16 bg-white">

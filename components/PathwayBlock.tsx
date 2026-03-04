@@ -23,7 +23,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
           <div className="text-center">
             <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden relative">
               <Image
-                src="/images/programs-hq/training-classroom.jpg"
+                src="/images/pages/comp-pathway-classroom.jpg"
                 alt="Eligibility screening"
                 fill
                 className="object-cover"
@@ -42,7 +42,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
           <div className="text-center">
             <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden relative">
               <Image
-                src="/images/programs-hq/healthcare-hero.jpg"
+                src="/images/pages/comp-pathway-healthcare.jpg"
                 alt="Training classroom"
                 fill
                 className="object-cover"
@@ -61,7 +61,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
           <div className="text-center">
             <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden relative">
               <Image
-                src="/images/programs-hq/skilled-trades-hero.jpg"
+                src="/images/pages/comp-pathway-trades.jpg"
                 alt="Job placement"
                 fill
                 className="object-cover"

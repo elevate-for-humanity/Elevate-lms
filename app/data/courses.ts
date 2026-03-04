@@ -49,7 +49,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/courses/microsoft-word.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Microsoft curriculum',
       'Hands-on practice exercises',
@@ -85,7 +85,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/courses/microsoft-excel.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Microsoft curriculum',
       'Real-world data exercises',
@@ -121,7 +121,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '3-4 weeks',
     hours: 30,
-    image: '/images/courses/microsoft-powerpoint.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Microsoft curriculum',
       'Design templates included',
@@ -158,7 +158,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '6-8 weeks',
     hours: 60,
-    image: '/images/courses/adobe-photoshop.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Adobe curriculum',
       'Project-based learning',
@@ -194,7 +194,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '6-8 weeks',
     hours: 60,
-    image: '/images/courses/adobe-illustrator.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Adobe curriculum',
       'Project-based learning',
@@ -231,7 +231,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/courses/cybersecurity.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Industry-aligned curriculum',
       'Hands-on security labs',
@@ -267,7 +267,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '6-8 weeks',
     hours: 50,
-    image: '/images/courses/python.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Beginner-friendly curriculum',
       'Coding exercises and projects',
@@ -304,7 +304,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 85,
     duration: '1 day',
     hours: 2,
-    image: '/images/courses/cpr-aed.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'OSHA-compliant training',
       'Hands-on skills practice',
@@ -339,7 +339,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 85,
     duration: '1 day',
     hours: 2,
-    image: '/images/courses/first-aid.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'OSHA-compliant training',
       'Hands-on skills practice',
@@ -373,7 +373,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 100,
     duration: '1 day',
     hours: 4,
-    image: '/images/courses/bls.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Healthcare-specific training',
       'Team CPR scenarios',
@@ -409,7 +409,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/courses/quickbooks.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official Intuit curriculum',
       'Real-world accounting scenarios',
@@ -446,7 +446,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 40,
     duration: 'Self-paced',
     hours: 2,
-    image: '/images/courses/food-handler.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'State-approved curriculum',
       'Online self-paced learning',
@@ -482,7 +482,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 65,
     duration: '2-3 days',
     hours: 10,
-    image: '/images/courses/osha-10.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official OSHA curriculum',
       'DOL wallet card included',
@@ -517,7 +517,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 135,
     duration: '1-2 weeks',
     hours: 30,
-    image: '/images/courses/osha-30.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Official OSHA curriculum',
       'DOL wallet card included',
@@ -553,7 +553,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '3-4 weeks',
     hours: 30,
-    image: '/images/courses/digital-literacy.jpg',
+    image: '/images/pages/course-create-hero.jpg',
     features: [
       'Beginner-friendly curriculum',
       'Covers all computer basics',
@@ -591,7 +591,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 27,
     duration: 'Same day',
     hours: 2,
-    image: '/images/trades/program-hvac-overview.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     features: [
       'All four exam sections included (Core + Type I + II + III)',
       'Online proctored exam — no travel required',
@@ -623,7 +623,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 45,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     features: [
       '12-week structured certification prep curriculum',
       'Study kit provided free to every student',
@@ -656,7 +656,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 55,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/trades/hero-program-hvac.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
     features: [
       'Complete 12-week EPA 608 prep curriculum',
       'Physical study kit shipped to your address',

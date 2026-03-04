@@ -55,7 +55,7 @@ export default function PostJobPage() {
           <div className="bg-white rounded-lg shadow-sm p-8">
             <div className="relative w-32 h-32 mx-auto mb-6">
               <Image
-                src="/images/programs/cpr-certification-group-hd.jpg"
+                src="/images/pages/employers-page-2.jpg"
                 alt="Success"
                 fill
                 className="object-cover rounded-full"

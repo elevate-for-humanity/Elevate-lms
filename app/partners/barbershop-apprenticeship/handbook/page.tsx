@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 };
 
 const sectionPhotos: Record<string, { src: string; alt: string }> = {
-  role: { src: '/images/barber/training.jpg', alt: 'Barber mentoring apprentice' },
-  compensation: { src: '/images/barber/barber-tools.jpg', alt: 'Barber tools and station' },
-  hours: { src: '/images/barber/barber-cutting.jpg', alt: 'Barber cutting hair' },
-  competencies: { src: '/images/barber/barber-fade.jpg', alt: 'Barber performing fade cut' },
-  safety: { src: '/images/barber/barber-shop-interior.jpg', alt: 'Clean barbershop interior' },
-  communication: { src: '/images/barber/gallery-1.jpg', alt: 'Barbershop team' },
-  prohibited: { src: '/images/barber/gallery-2.jpg', alt: 'Professional barbershop' },
-  termination: { src: '/images/barber/gallery-3.jpg', alt: 'Barbershop workspace' },
+  role: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber mentoring apprentice' },
+  compensation: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber tools and station' },
+  hours: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber cutting hair' },
+  competencies: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber performing fade cut' },
+  safety: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Clean barbershop interior' },
+  communication: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barbershop team' },
+  prohibited: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Professional barbershop' },
+  termination: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barbershop workspace' },
 };
 
 const sections = [
@@ -167,7 +167,7 @@ export default function PartnerHandbookPage() {
       {/* Hero */}
       <section className="relative py-16 overflow-hidden">
         <Image
-          src="/images/programs-hq/barber-training.jpg"
+          src="/images/pages/partners-pub-page-3.jpg"
           alt="Barber training session"
           fill
           className="object-cover"
@@ -215,16 +215,16 @@ export default function PartnerHandbookPage() {
       {/* Photo Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
         <div className="relative h-48">
-          <Image src="/images/barber/barber-cutting.jpg" alt="Barber cutting hair" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-cutting.jpg" alt="Barber cutting hair" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/barber/barber-fade.jpg" alt="Barber performing fade" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-fade.jpg" alt="Barber performing fade" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/barber/barber-shop-interior.jpg" alt="Barbershop interior" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-shop-interior.jpg" alt="Barbershop interior" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/barber/barber-tools.jpg" alt="Barber tools and equipment" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-tools.jpg" alt="Barber tools and equipment" fill className="object-cover" sizes="25vw" />
         </div>
       </div>
 

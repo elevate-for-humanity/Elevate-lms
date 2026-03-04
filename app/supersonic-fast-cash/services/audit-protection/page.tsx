@@ -81,7 +81,7 @@ export default function AuditProtectionPage() {
       </div>
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Audit Protection" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/supersonic-page-4.jpg" alt="Audit Protection" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Why You Need It */}

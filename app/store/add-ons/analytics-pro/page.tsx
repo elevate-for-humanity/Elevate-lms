@@ -56,17 +56,17 @@ const useCases = [
   {
     title: 'Workforce Boards',
     description: 'Track WIOA performance metrics, generate compliance reports, and monitor provider outcomes.',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Training Providers',
     description: 'Monitor student progress, identify at-risk learners, and optimize program delivery.',
-    image: '/images/programs-hq/students-learning.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Employers',
     description: 'Track apprentice performance, measure ROI on training investments, and forecast hiring needs.',
-    image: '/images/programs-hq/business-office.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
 ];
 
@@ -97,7 +97,7 @@ export default function AnalyticsProPage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/programs-hq/it-support.jpg"
+          src="/images/pages/store-addons-analytics-hero.jpg"
           alt="Analytics Pro"
           fill
           className="object-cover"

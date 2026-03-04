@@ -122,7 +122,7 @@ export default async function EventsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Upcoming events and workshops" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/events-page-1.jpg" alt="Upcoming events and workshops" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Title */}

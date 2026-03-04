@@ -118,7 +118,7 @@ export default function CreateCoursePage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Create course" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-4.jpg" alt="Create course" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

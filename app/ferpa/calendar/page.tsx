@@ -136,7 +136,7 @@ export default async function FerpaCalendarPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/ferpa-page-1.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

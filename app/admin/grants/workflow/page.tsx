@@ -84,12 +84,12 @@ export default async function GrantWorkflowPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-grants-workflow-hero.jpg" alt="Grant workflow" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/homepage/funders-philanthropy.jpg"
+          src="/images/pages/admin-grants-workflow-detail.jpg"
           alt="Grant Workflow"
           fill
           className="object-cover"

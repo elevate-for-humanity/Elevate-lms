@@ -105,7 +105,7 @@ export default function EmployerProgramsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/courses/medical-assistant-10002419-cover.jpg" alt="Employer Drug Testing Programs" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/drug-testing-employer.jpg" alt="Employer Drug Testing Programs" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -273,7 +273,7 @@ export default function EmployerProgramsPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/homepage/employers.jpg"
+                src="/images/pages/drug-testing-page-2.jpg"
                 alt="DOT Compliance"
                 fill
                 className="object-cover"

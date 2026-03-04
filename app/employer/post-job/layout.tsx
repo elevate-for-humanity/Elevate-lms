@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-// Image asset: /images/programs-new/program-26.jpg
+// Image asset: /images/pages/funding-impact-1.jpg
 
 export const metadata: Metadata = {
   title: "Post a Job - Hire Skilled Workers",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Post a Job - Hire Skilled Workers | Elevate for Humanity",
     description: "Post job openings and connect with qualified candidates trained in healthcare and skilled trades.",
-    images: ["/images/heroes-hq/programs-hero.jpg"],
+    images: ["/images/pages/comp-cta-career.jpg"],
     type: "website",
   },
 };

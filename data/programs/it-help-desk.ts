@@ -7,7 +7,7 @@ export const IT_HELP_DESK: ProgramSchema = {
   sector: 'technology',
   category: 'Information Technology',
 
-  heroImage: '/images/programs-hq/it-support.jpg',
+  heroImage: '/images/pages/comp-universal-hero.jpg',
   heroImageAlt: 'IT help desk technician troubleshooting a workstation',
 
   deliveryMode: 'hybrid',

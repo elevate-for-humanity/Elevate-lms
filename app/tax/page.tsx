@@ -45,7 +45,7 @@ export default function TaxServicesPage() {
 {/* Hero Section */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/business/customer-service.jpg"
+          src="/images/pages/tax-main-hero.jpg"
           alt="Tax Preparation Services"
           fill
           className="object-cover"
@@ -94,7 +94,7 @@ export default function TaxServicesPage() {
             <div className="bg-white rounded-2xl border-2 border-brand-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes-hq/programs-hero.jpg"
+                  src="/images/pages/tax-page-1.jpg"
                   alt="VITA Free Tax Preparation"
                   fill
                   className="object-cover"
@@ -154,7 +154,7 @@ export default function TaxServicesPage() {
             <div className="bg-white rounded-2xl border-2 border-brand-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes-hq/tax-refund-hero.jpg"
+                  src="/images/pages/tax-page-1.jpg"
                   alt="Supersonic Fast Cash Tax Services"
                   fill
                   className="object-cover"

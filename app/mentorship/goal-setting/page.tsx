@@ -31,7 +31,7 @@ export default function GoalSettingPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/business/professional-2.jpg" alt="Goal Setting" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/goal-setting-hero.jpg" alt="Goal Setting" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       <section className="py-16 bg-white">

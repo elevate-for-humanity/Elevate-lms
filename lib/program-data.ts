@@ -26,7 +26,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Launch your healthcare career as a Medical Assistant. Provide essential clinical and administrative support in hospitals, clinics, and medical offices. Get certified in just 12 weeks with 100% funded training.",
     duration: "12 Weeks",
     salaryRange: "$35K-$45K",
-    heroImage: "/images/healthcare/program-medical-assistant.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Clinical Skills", description: "Vital signs, injections, EKG, phlebotomy, and patient care procedures." },
       { title: "Administrative Skills", description: "Medical records, scheduling, billing, and insurance processing." },
@@ -54,7 +54,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Become a certified Phlebotomy Technician and specialize in blood collection and laboratory procedures. This fast-track 8-week program prepares you for immediate employment in hospitals, labs, and clinics.",
     duration: "8 Weeks",
     salaryRange: "$32K-$42K",
-    heroImage: "/images/healthcare/video-thumbnail-phlebotomy.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Venipuncture Techniques", description: "Master blood draw procedures using various methods and equipment." },
       { title: "Specimen Handling", description: "Proper collection, labeling, and processing of blood samples." },
@@ -82,7 +82,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Train to become an EKG Technician and perform vital cardiac monitoring tests. This specialized 6-week program prepares you for a focused career in cardiovascular diagnostics.",
     duration: "6 Weeks",
     salaryRange: "$33K-$43K",
-    heroImage: "/images/healthcare/program-healthcare-overview.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "EKG Procedures", description: "12-lead EKG, Holter monitoring, and stress test administration." },
       { title: "Cardiac Anatomy", description: "Understanding heart structure, function, and electrical conduction." },
@@ -110,7 +110,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Become a certified Pharmacy Technician and assist pharmacists in preparing and dispensing medications. This comprehensive 12-week program covers retail and hospital pharmacy settings.",
     duration: "12 Weeks",
     salaryRange: "$34K-$44K",
-    heroImage: "/images/healthcare/healthcare-professional-portrait-1.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Medication Preparation", description: "Counting, measuring, and compounding medications safely." },
       { title: "Pharmacy Calculations", description: "Dosage calculations, conversions, and measurements." },
@@ -138,7 +138,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Start your dental career as a Dental Assistant. Support dental professionals in patient care and office operations. This 10-week program prepares you for immediate employment in dental practices.",
     duration: "10 Weeks",
     salaryRange: "$36K-$46K",
-    heroImage: "/images/healthcare/video-thumbnail-dental-assistant.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Chairside Assisting", description: "Four-handed dentistry, instrument passing, and patient care." },
       { title: "Dental Radiography", description: "X-ray techniques, safety protocols, and image processing." },
@@ -166,7 +166,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Become a Patient Care Technician and provide direct patient care in hospitals and healthcare facilities. This comprehensive 14-week program combines CNA, EKG, and phlebotomy skills.",
     duration: "14 Weeks",
     salaryRange: "$35K-$45K",
-    heroImage: "/images/healthcare/program-cna-training.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Basic Nursing Skills", description: "Vital signs, patient hygiene, mobility assistance, and comfort care." },
       { title: "EKG Monitoring", description: "Cardiac monitoring, telemetry, and rhythm recognition." },
@@ -194,7 +194,7 @@ export const programsData: Record<string, ProgramData> = {
     description: "Train as a Sterile Processing Technician and ensure medical instruments are properly sterilized and maintained. This critical 12-week program prepares you for behind-the-scenes healthcare work.",
     duration: "12 Weeks",
     salaryRange: "$37K-$47K",
-    heroImage: "/images/healthcare/healthcare-professional-portrait-2.jpg",
+    heroImage: "/images/pages/comp-pathway-healthcare.jpg",
     skills: [
       { title: "Decontamination", description: "Cleaning, disinfecting, and preparing instruments for sterilization." },
       { title: "Sterilization Methods", description: "Autoclaving, gas sterilization, and low-temperature methods." },

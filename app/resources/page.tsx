@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, ExternalLink, GraduationCap, DollarSign, Briefcase, Shield } from 'lucide-react';
 
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
-
 export const metadata: Metadata = {
   title: 'Resources | Elevate for Humanity',
   description: 'Workforce training resources, funding guides, career tools, and external links for students, employers, and partners.',
@@ -78,10 +76,10 @@ export default function ResourcesPage() {
         </div>
       </div>
 
-
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/lms-learning.mp4" posterSrc="/images/heroes-hq/programs-hero.jpg" posterAlt="Resources" />
-
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/pages/resources-page-1.jpg" alt="Resource hub for students and partners" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       <section className="bg-slate-900 py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">

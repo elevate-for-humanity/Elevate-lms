@@ -16,32 +16,32 @@ export default function WritingCenterPage() {
     {
       title: "Course Essays & Written Assignments",
       description: "Get feedback on structure, clarity, grammar, and argument strength for any course assignment. Tutors review your draft and provide specific, actionable suggestions — not just corrections.",
-      image: "/images/programs-hq/students-learning.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "Resume & Cover Letter Writing",
       description: "Build a professional resume tailored to your target industry. Learn how to highlight certifications, skills, and training. Cover letter templates and customization for specific job postings.",
-      image: "/images/heroes-hq/career-services-hero.jpg"
+      image: "/images/pages/comp-cta-career.jpg"
     },
     {
       title: "Professional Communication",
       description: "Email etiquette, business letter formatting, workplace communication norms, and professional tone. Essential for office administration students and anyone entering a professional environment.",
-      image: "/images/programs-hq/business-office.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "Scholarship & Application Essays",
       description: "Craft compelling personal statements for scholarship applications, program admissions, and funding requests. Tutors help you tell your story effectively and meet word count requirements.",
-      image: "/images/heroes-hq/funding-hero.jpg"
+      image: "/images/pages/comp-cta-career.jpg"
     },
     {
       title: "Citation & Research Formatting",
       description: "APA and MLA formatting, in-text citations, reference pages, and avoiding plagiarism. Required for students completing research-based assignments or capstone projects.",
-      image: "/images/programs-hq/training-classroom.jpg"
+      image: "/images/pages/comp-cta-training.jpg"
     },
     {
       title: "GED Writing Preparation",
       description: "Extended response practice for the GED Reasoning Through Language Arts test. Learn the scoring rubric, practice timed essays, and build confidence in written argumentation.",
-      image: "/images/heroes-hq/success-hero.jpg"
+      image: "/images/pages/comp-cta-career.jpg"
     }
   ];
 
@@ -86,7 +86,7 @@ export default function WritingCenterPage() {
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/programs-hq/training-classroom.jpg" alt="Student receiving writing assistance at the Elevate Writing Center" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/writing-center-page-1.jpg" alt="Student receiving writing assistance at the Elevate Writing Center" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Intro */}
@@ -110,7 +110,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56">
-                <Image src="/images/programs-hq/students-learning.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
+                <Image src="/images/pages/writing-center-page-1.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Submit for Written Review</h3>
@@ -128,7 +128,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
+                <Image src="/images/pages/writing-center-page-1.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Book a Live Session</h3>

@@ -76,7 +76,7 @@ export default function ContactPage() {
       {/* Hero */}
       <div className="relative h-[60vh] min-h-[400px] max-h-[720px] flex items-center justify-center">
         <Image
-          src="/images/heroes-hq/contact-hero.jpg"
+          src="/images/pages/contact-page-1.jpg"
           alt="Contact Us"
           fill
           quality={90} className="object-cover"

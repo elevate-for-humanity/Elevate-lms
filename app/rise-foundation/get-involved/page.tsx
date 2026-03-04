@@ -46,7 +46,7 @@ export default async function GetInvolvedPage() {
       description: 'Share your time and skills to support individuals on their healing journey.',
       href: '/rise-foundation/volunteer',
       color: 'pink',
-      image: '/images/rise-foundation/volunteer.jpg',
+      image: '/images/pages/philanthropy-hero.jpg',
     },
     {
       icon: Heart,
@@ -54,7 +54,7 @@ export default async function GetInvolvedPage() {
       description: 'Your financial support enables us to provide free services to those in need.',
       href: '/donate',
       color: 'blue',
-      image: '/images/rise-foundation/donate.jpg',
+      image: '/images/pages/philanthropy-hero.jpg',
     },
     {
       icon: Briefcase,
@@ -62,7 +62,7 @@ export default async function GetInvolvedPage() {
       description: 'Organizations can partner with us to expand our reach and impact.',
       href: '/rise-foundation/partner',
       color: 'blue',
-      image: '/images/rise-foundation/partner.jpg',
+      image: '/images/pages/philanthropy-hero.jpg',
     },
     {
       icon: Users,
@@ -70,7 +70,7 @@ export default async function GetInvolvedPage() {
       description: 'Know someone who could benefit from our services? Help connect them.',
       href: '/rise-foundation/refer',
       color: 'green',
-      image: '/images/rise-foundation/advocate.jpg',
+      image: '/images/pages/philanthropy-hero.jpg',
     },
   ];
 
@@ -87,7 +87,7 @@ export default async function GetInvolvedPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/rise-foundation/get-involved-hero.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/rise-foundation-page-1.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

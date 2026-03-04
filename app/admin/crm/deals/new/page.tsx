@@ -57,7 +57,7 @@ export default function NewDealPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-crm-deals-new-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'CRM', href: '/admin/crm' }, { label: 'New Deal' }]} />

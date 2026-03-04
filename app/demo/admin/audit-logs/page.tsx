@@ -18,7 +18,7 @@ const logs = (dbRows as any[]) || [];
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-2.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         <table className="w-full text-sm">
           <thead>

@@ -166,7 +166,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                 </div>
                 <div className="relative hidden lg:block">
                   <Image
-                    src={bundle.image_url || '/images/heroes-hq/about-hero.jpg'}
+                    src={bundle.image_url || '/images/pages/comp-cta-career.jpg'}
                     alt={bundle.title}
                     fill
                     className="object-cover"
@@ -191,7 +191,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                 <div key={course.id} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col">
                   <div className="relative h-48">
                     <Image
-                      src={course.image_url || '/images/business/program-tax-preparation.jpg'}
+                      src={course.image_url || '/images/pages/apply-employer-hero.jpg'}
                       alt={course.title}
                       fill
                       className="object-cover"

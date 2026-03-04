@@ -49,7 +49,7 @@ const config: ProgramPageConfig = {
     'Job placement assistance with 50+ healthcare employers',
     'Scrubs, textbooks, and supplies provided with WIOA funding',
   ],
-  overviewImage: '/images/programs-fresh/healthcare.jpg',
+  overviewImage: '/images/pages/comp-program-template.jpg',
   overviewImageAlt: 'Healthcare students in clinical training',
 
   salaryNumber: 42000,
@@ -99,28 +99,28 @@ const healthcarePrograms = [
     duration: '4–6 weeks',
     desc: 'Become a Certified Nursing Assistant. State exam prep and clinical hours included.',
     href: '/programs/cna',
-    image: '/images/programs-fresh/cna-nursing.jpg',
+    image: '/images/pages/comp-program-template.jpg',
   },
   {
     title: 'Medical Assistant',
     duration: '12–16 weeks',
     desc: 'Clinical and administrative medical assisting. CCMA certification included.',
     href: '/programs/medical-assistant',
-    image: '/images/programs-fresh/medical-assistant.jpg',
+    image: '/images/pages/comp-program-template.jpg',
   },
   {
     title: 'Phlebotomy Technician',
     duration: '8–10 weeks',
     desc: 'Venipuncture, specimen handling, and lab safety. CPT certification included.',
     href: '/programs/phlebotomy',
-    image: '/images/programs-hq/phlebotomy.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'CPR & First Aid',
     duration: '1 day',
     desc: 'American Heart Association CPR, First Aid, and AED certification.',
     href: '/programs/cpr-first-aid',
-    image: '/images/programs-fresh/cpr-first-aid.jpg',
+    image: '/images/pages/comp-program-template.jpg',
   },
 ];
 
@@ -134,7 +134,7 @@ export default function Page() {
         description: config.subtitle,
         duration_weeks: 16,
         price: 0,
-        image_url: `${SITE_URL}/images/programs-fresh/healthcare.jpg`,
+        image_url: `${SITE_URL}/images/pages/comp-pathway-healthcare.jpg`,
         category: 'Healthcare',
         outcomes: config.credentials || [],
       }} />

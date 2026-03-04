@@ -49,7 +49,7 @@ export default async function ParticipantsPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/hub/cta.jpg"
+          src="/images/pages/workforce-board-page-2.jpg"
           alt="Participants"
           fill
           priority
@@ -88,7 +88,7 @@ export default async function ParticipantsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes-hq/programs-hero.jpg"
+                  src="/images/pages/workforce-board-page-3.jpg"
                   alt="Participants"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

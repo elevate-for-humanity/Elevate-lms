@@ -19,7 +19,7 @@ const reports = (dbRows as any[]) || [];
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-9.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         {reports.map((r, i) => (
           <div key={i} className="bg-white rounded-xl border p-4 flex items-center justify-between hover:shadow-sm transition">

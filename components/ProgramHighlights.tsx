@@ -14,32 +14,32 @@ const defaultHighlights: Highlight[] = [
   {
     title: "No-Cost Training Available",
     description: "No tuition for eligible participants. Funded through WIOA, WRG, and JRI programs.",
-    image: "/images/trades/program-construction-training.jpg"
+    image: "/images/pages/comp-pathway-trades.jpg"
   },
   {
     title: "Earn While You Learn",
     description: "Get paid during training through work-study programs and apprenticeships.",
-    image: "/images/trades/program-welding-training.jpg"
+    image: "/images/pages/comp-pathway-trades.jpg"
   },
   {
     title: "Industry Certification",
     description: "Earn recognized certifications that employers value and actively seek.",
-    image: "/images/hero/hero-certifications.jpg"
+    image: "/images/pages/comp-home-hero.jpg"
   },
   {
     title: "Job Placement Support",
     description: "We connect you with employers hiring in your field. Resume and interview prep included.",
-    image: "/images/heroes-hq/career-services-hero.jpg"
+    image: "/images/pages/comp-cta-career.jpg"
   },
   {
     title: "Hands-On Experience",
     description: "Real-world training with actual equipment and industry-standard tools.",
-    image: "/images/trades/program-hvac-technician.jpg"
+    image: "/images/pages/comp-pathway-trades.jpg"
   },
   {
     title: "Support Services",
     description: "Childcare, transportation, and career counseling to keep you on track.",
-    image: "/images/heroes-hq/programs-hero.jpg"
+    image: "/images/pages/comp-cta-career.jpg"
   }
 ];
 
@@ -85,7 +85,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/trades/program-electrical-training.jpg"
+                  src="/images/pages/comp-highlights-electrical.jpg"
                   alt="Small class sizes"
                   fill
                   className="object-cover"
@@ -97,7 +97,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/team-new/team-1.jpg"
+                  src="/images/pages/comp-highlights-team.jpg"
                   alt="Expert instructors"
                   fill
                   className="object-cover"
@@ -109,7 +109,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/trades/program-welding-training.jpg"
+                  src="/images/pages/comp-highlights-welding.jpg"
                   alt="Modern equipment"
                   fill
                   className="object-cover"
@@ -121,7 +121,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/heroes-hq/success-hero.jpg"
+                  src="/images/pages/comp-highlights-success.jpg"
                   alt="Job placement"
                   fill
                   className="object-cover"

@@ -704,7 +704,7 @@ export default function AdminPortalMapPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-portal-map-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
             <span className="text-slate-400 flex-shrink-0">•</span>
             Active

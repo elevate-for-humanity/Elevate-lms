@@ -36,7 +36,7 @@ export default function SystemMonitorPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-system-monitor-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
         <Activity className="h-11 w-11 animate-spin text-brand-blue-600" />
         <p>Loading...</p>

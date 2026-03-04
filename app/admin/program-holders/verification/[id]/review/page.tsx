@@ -87,7 +87,7 @@ export default async function ReviewVerificationPage({
     <>
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Verification review" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-ph-verify-review-hero.jpg" alt="Verification review" fill sizes="100vw" className="object-cover" priority />
       </section>
       <VerificationReviewForm
         holder={holder}

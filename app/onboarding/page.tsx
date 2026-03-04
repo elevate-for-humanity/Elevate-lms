@@ -59,7 +59,7 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden bg-white">
         <Image
-          src="/images/heroes-hq/success-hero.jpg"
+          src="/images/pages/onboarding-page-2.jpg"
           alt="Welcome to Elevate for Humanity"
           fill
           className="object-cover"
@@ -90,7 +90,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/success-hero.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/onboarding-page-2.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -126,7 +126,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/prog-hero-main.jpg" alt="Program Holder" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/prog-hero-main-2.jpg" alt="Program Holder" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -161,7 +161,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/onboarding-page-2.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">

@@ -37,7 +37,7 @@ export default function StoreCoursesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
+          <Image src="/images/pages/store-courses-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -58,7 +58,7 @@ export default function StoreCoursesPage() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={course.image || '/images/courses/default.jpg'}
+                    src={course.image || '/images/pages/course-create-hero.jpg'}
                     alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

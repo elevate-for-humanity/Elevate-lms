@@ -87,7 +87,7 @@ export default async function HsiPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/skilled-trades-hero.jpg"
+          src="/images/pages/courses-page-7.jpg"
           alt="HSI Safety Training"
           fill
           className="object-cover"

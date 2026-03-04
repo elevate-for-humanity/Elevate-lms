@@ -136,7 +136,7 @@ export default async function NdsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/efh/sections/classroom.jpg"
+          src="/images/pages/courses-page-5.jpg"
           alt="DOT Compliance Training"
           fill
           className="object-cover"

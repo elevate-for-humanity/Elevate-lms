@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 
 export default function TransparencyPage() {
   const outcomes = [
-    { label: 'Programs Available', value: '10+', image: '/images/community/community-hero.jpg' },
-    { label: 'Placement Goal', value: '85%', image: '/images/heroes-hq/success-hero.jpg' },
-    { label: 'Training Cost', value: '$0', image: '/images/heroes-hq/funding-hero.jpg' },
-    { label: 'Support', value: '24/7', image: '/images/heroes/blog-post-10.jpg' },
-    { label: 'Funding Sources', value: '5+', image: '/images/heroes-hq/how-it-works-hero.jpg' },
-    { label: 'Indiana Locations', value: '3+', image: '/images/heroes/blog-post-7.jpg' },
+    { label: 'Programs Available', value: '10+', image: '/images/pages/comp-home-pathways-support.jpg' },
+    { label: 'Placement Goal', value: '85%', image: '/images/pages/comp-cta-career.jpg' },
+    { label: 'Training Cost', value: '$0', image: '/images/pages/comp-cta-career.jpg' },
+    { label: 'Support', value: '24/7', image: '/images/pages/comp-highlights-success.jpg' },
+    { label: 'Funding Sources', value: '5+', image: '/images/pages/comp-cta-career.jpg' },
+    { label: 'Indiana Locations', value: '3+', image: '/images/pages/comp-highlights-success.jpg' },
   ];
 
   const financials = [
@@ -47,7 +47,7 @@ export default function TransparencyPage() {
       {/* Hero */}
       <section className="relative h-72 overflow-hidden">
         <Image
-          src="/images/heroes-hq/team-hero.jpg"
+          src="/images/pages/transparency-page-1.jpg"
           alt="Transparency"
           fill
           className="object-cover"

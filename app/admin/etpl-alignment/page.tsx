@@ -71,7 +71,7 @@ export default async function EtplAlignmentPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-etpl-alignment-hero.jpg" alt="ETPL alignment" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Etpl Alignment" }]} />
@@ -79,7 +79,7 @@ export default async function EtplAlignmentPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/admin-etpl-alignment-detail.jpg"
           alt="Etpl Alignment"
           fill
           className="object-cover"

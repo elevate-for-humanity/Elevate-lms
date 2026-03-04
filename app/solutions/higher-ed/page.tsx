@@ -30,7 +30,7 @@ export default function HigherEdPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/efh/sections/coaching.jpg" alt="Higher education training solutions" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/solutions-page-2.jpg" alt="Higher education training solutions" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -89,7 +89,7 @@ export default function HigherEdPage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src="/images/gallery/image6.jpg"
+                src="/images/pages/higher-ed-hero.jpg"
                 alt="Students in higher education program"
                 fill
                 className="object-cover"

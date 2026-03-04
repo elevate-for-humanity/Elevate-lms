@@ -61,7 +61,7 @@ export default async function EnrollmentSuccessPage({
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/efh/sections/coaching.jpg"
+          src="/images/pages/courses-page-6.jpg"
           alt="Success"
           fill
           className="object-cover"

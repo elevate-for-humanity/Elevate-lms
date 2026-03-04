@@ -19,7 +19,7 @@ const demos = [
     title: 'LMS Platform Overview',
     description: 'See how students navigate courses, track progress, earn certificates, and interact with AI tutors.',
     duration: '15 min',
-    thumbnail: '/images/heroes-hq/programs-hero.jpg',
+    thumbnail: '/images/pages/comp-cta-career.jpg',
     features: [
       'Student dashboard walkthrough',
       'Course enrollment and navigation',
@@ -36,7 +36,7 @@ const demos = [
     title: 'Employer Portal Demo',
     description: 'Learn how employers track sponsored employees, post jobs, and access workforce analytics.',
     duration: '10 min',
-    thumbnail: '/images/gallery/image6.jpg',
+    thumbnail: '/images/pages/features-hero.jpg',
     features: [
       'Candidate search and filtering',
       'Job posting workflow',
@@ -53,7 +53,7 @@ const demos = [
     title: 'Admin Dashboard Tour',
     description: 'Explore the administrative tools for managing programs, students, courses, and compliance.',
     duration: '20 min',
-    thumbnail: '/images/programs-hq/technology-hero.jpg',
+    thumbnail: '/images/pages/comp-cta-training.jpg',
     features: [
       'Student management',
       'Course builder and authoring',
@@ -70,7 +70,7 @@ const demos = [
     title: 'AI Course Builder',
     description: 'Watch how to create complete courses with AI-generated content, quizzes, and video lessons.',
     duration: '12 min',
-    thumbnail: '/images/hero-new/hero-10.jpg',
+    thumbnail: '/images/pages/philanthropy-hero.jpg',
     features: [
       'AI course generation',
       'Drag-and-drop lesson builder',
@@ -97,7 +97,7 @@ export default function DemosPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/business/team-1.jpg" alt="Product Demos" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/demos-hero.jpg" alt="Product Demos" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

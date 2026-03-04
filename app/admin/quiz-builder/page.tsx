@@ -71,7 +71,7 @@ export default async function QuizBuilderPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-quiz-builder-hero.jpg" alt="Quiz builder" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Quiz Builder" }]} />
@@ -79,7 +79,7 @@ export default async function QuizBuilderPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/pages/admin-quiz-builder-detail.jpg"
           alt="Quiz Builder"
           fill
           className="object-cover"

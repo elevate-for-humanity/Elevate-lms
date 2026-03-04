@@ -44,10 +44,10 @@ export default function CareerServicesPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What You Get</h2>
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
             {[
-              { title: 'Resume Building', desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.', image: '/images/career-services/resume-workshop.jpg' },
-              { title: 'Interview Preparation', desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.', image: '/images/career-services/interview-prep.jpg' },
-              { title: 'Job Fairs & Hiring Events', desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.', image: '/images/career-services/job-fair.jpg' },
-              { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/heroes-hq/success-stories-hero.jpg' },
+              { title: 'Resume Building', desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.', image: '/images/pages/resume-building-hero.jpg' },
+              { title: 'Interview Preparation', desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.', image: '/images/pages/resume-building-hero.jpg' },
+              { title: 'Job Fairs & Hiring Events', desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.', image: '/images/pages/resume-building-hero.jpg' },
+              { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/pages/comp-cta-career.jpg' },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink">

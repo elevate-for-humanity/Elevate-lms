@@ -18,7 +18,7 @@ const apprentices = (dbRows as any[]) || [];
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-11.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         {apprentices.map((a, i) => {
           const pct = Math.round((a.hoursLogged / a.hoursRequired) * 100);

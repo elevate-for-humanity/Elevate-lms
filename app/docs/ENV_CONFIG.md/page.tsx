@@ -25,7 +25,7 @@ export default function ENVCONFIGmdPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/technology-hero.jpg"
+          src="/images/pages/docs-page-1.jpg"
           alt="Environment Configuration"
           fill
           className="object-cover"
@@ -65,7 +65,7 @@ export default function ENVCONFIGmdPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/gallery/image7.jpg"
+                  src="/images/pages/env-config-hero.jpg"
                   alt="Configuration guide"
                   fill
                   className="object-cover"

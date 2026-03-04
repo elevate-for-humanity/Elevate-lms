@@ -31,7 +31,7 @@ export const homepageVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "hero-main",
-      imageSrc: "/images/facilities-new/facility-1.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Elevate For Humanity training facility with Keystone Crossing location",
       eyebrow: "Elevate For Humanity",
       title: "Real Training. Real Credentials. Real Jobs.",
@@ -42,7 +42,7 @@ export const homepageVisuals: PageVisualConfig = {
     },
     {
       id: "hero-earn",
-      imageSrc: "/images/heroes-hq/homepage-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Student working while studying on a laptop.",
       eyebrow: "Earn While You Learn",
       title: "Work experience, stipends, and employer connections while you train.",
@@ -61,7 +61,7 @@ export const homepageVisuals: PageVisualConfig = {
         "Every pathway is tied to credential partners like Milady, HSI, CareerSafe, Certiport, Rise, National Drug, and JRI.",
         "Short, focused training that leads into employer connections, WEX, and OJT opportunities."
       ],
-      imageSrc: "/images/artlist/hero-training-3.jpg",
+      imageSrc: "/images/pages/comp-home-hero-programs.jpg",
       imageAlt: "Students learning practical career skills in training programs.",
     },
     {
@@ -72,7 +72,7 @@ export const homepageVisuals: PageVisualConfig = {
         "Clear next steps for enrollment, paperwork, and getting ready for work.",
         "Coaching for resumes, interviews, soft skills, and showing up professionally."
       ],
-      imageSrc: "/images/facilities-new/facility-3.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Elevate For Humanity training facility and learning environment.",
     },
     {
@@ -83,7 +83,7 @@ export const homepageVisuals: PageVisualConfig = {
         "WEX placements and OJT wage reimbursement to make it easier for employers to hire you.",
         "Stories of students who moved from stress and instability into stable income and career paths."
       ],
-      imageSrc: "/images/artlist/hero-training-5.jpg",
+      imageSrc: "/images/pages/comp-home-hero-programs.jpg",
       imageAlt: "Students engaged in hands-on career training.",
     },
   ],
@@ -97,7 +97,7 @@ export const cnaVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "cna-hero-main",
-      imageSrc: "/images/programs-new/program-1.jpg",
+      imageSrc: "/images/pages/funding-impact-1.jpg",
       imageAlt: "CNA student practicing vital signs on a mannequin.",
       eyebrow: "Certified Nursing Assistant",
       title: "Step Into Healthcare With CNA Training That Leads to Real Work.",
@@ -108,7 +108,7 @@ export const cnaVisuals: PageVisualConfig = {
     },
     {
       id: "cna-hero-earn",
-      imageSrc: "/images/students-new/student-1.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Healthcare worker comforting an elderly patient.",
       eyebrow: "Earn While You Learn",
       title: "Start building experience while you finish your CNA training.",
@@ -127,7 +127,7 @@ export const cnaVisuals: PageVisualConfig = {
         "Healthcare safety and drug-free workplace modules to meet employer expectations.",
         "Soft skills, professionalism, and job readiness through Job Ready Indy and EFH modules."
       ],
-      imageSrc: "/images/programs-new/program-2.jpg",
+      imageSrc: "/images/pages/funding-impact-1.jpg",
       imageAlt: "Students practicing CNA skills in a lab environment.",
     },
     {
@@ -138,7 +138,7 @@ export const cnaVisuals: PageVisualConfig = {
         "A foundation for future nursing pathways, including LPN and RN.",
         "Experience that proves you can care, communicate, and follow through on a professional path."
       ],
-      imageSrc: "/images/students-new/student-2.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "CNA graduate standing confidently in a healthcare facility.",
     },
   ],
@@ -152,7 +152,7 @@ export const barberVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "barber-hero-main",
-      imageSrc: "/images/programs/efh-barber-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-programs.jpg",
       imageAlt: "Barber apprentice cutting hair in a modern barbershop.",
       eyebrow: "Barber Apprenticeship",
       title: "Train in the Shop, Build Your Skills, and Get Paid While You Learn.",
@@ -163,7 +163,7 @@ export const barberVisuals: PageVisualConfig = {
     },
     {
       id: "barber-hero-earn",
-      imageSrc: "/images/programs/efh-barber-card.jpg",
+      imageSrc: "/images/pages/comp-cta-programs.jpg",
       imageAlt: "Barber apprentice laughing with a client in the chair.",
       eyebrow: "Earn While You Learn",
       title: "Real clients, real hours, real income.",
@@ -182,7 +182,7 @@ export const barberVisuals: PageVisualConfig = {
         "In-shop apprenticeship experience with licensed barbers supervising your hours.",
         "Drug-free workplace and professionalism training tailored to barber/beauty environments."
       ],
-      imageSrc: "/images/heroes-hq/programs-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Instructor demonstrating a haircut technique to apprentices.",
     },
     {
@@ -193,7 +193,7 @@ export const barberVisuals: PageVisualConfig = {
         "Paths into chair rental, commission-based work, or eventually shop ownership.",
         "A portable licensed trade that lets you work, travel, and build your own brand."
       ],
-      imageSrc: "/images/heroes-hq/career-services-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Barber proudly standing by their station with tools organized.",
     },
   ],
@@ -218,7 +218,7 @@ export const hvacVisuals: PageVisualConfig = {
     },
     {
       id: "hvac-hero-earn",
-      imageSrc: "/images/trades/hero-program-hvac.jpg",
+      imageSrc: "/images/pages/comp-pathway-trades.jpg",
       imageAlt: "Technician using tools while working on a building system.",
       eyebrow: "Earn While You Learn",
       title: "Earn experience while you build trade skills.",
@@ -237,7 +237,7 @@ export const hvacVisuals: PageVisualConfig = {
         "Tools, safety, and basic troubleshooting.",
         "Customer interaction and professionalism in the field."
       ],
-      imageSrc: "/images/facilities-new/facility-2.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "HVAC student reviewing wiring on a unit.",
     },
     {
@@ -248,7 +248,7 @@ export const hvacVisuals: PageVisualConfig = {
         "On-the-job training or apprenticeships with partner companies.",
         "A starting point for advanced HVAC credentials."
       ],
-      imageSrc: "/images/facilities-new/facility-3.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "HVAC technician and apprentice working together.",
     },
   ],
@@ -262,7 +262,7 @@ export const cdlVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "cdl-hero-main",
-      imageSrc: "/images/programs-hq/cdl-trucking.jpg",
+      imageSrc: "/images/pages/comp-cta-training.jpg",
       imageAlt: "CDL student standing in front of a commercial truck.",
       eyebrow: "CDL & Transportation",
       title: "Prepare for Transportation Careers with Safety and DOT Readiness.",
@@ -273,7 +273,7 @@ export const cdlVisuals: PageVisualConfig = {
     },
     {
       id: "cdl-hero-earn",
-      imageSrc: "/images/heroes-hq/employer-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Truck driver stepping out of a semi truck cab.",
       eyebrow: "Earn While You Learn",
       title: "Work-based learning while you prepare for CDL opportunities.",
@@ -292,7 +292,7 @@ export const cdlVisuals: PageVisualConfig = {
         "Transportation and roadway safety concepts via partner content.",
         "Job readiness and professionalism modules focused on transportation work.",
       ],
-      imageSrc: "/images/heroes-hq/success-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Instructor explaining a transportation safety diagram.",
     },
     {
@@ -303,7 +303,7 @@ export const cdlVisuals: PageVisualConfig = {
         "Connections to employer partners seeking reliable transportation staff.",
         "A pathway into higher-paying CDL roles once licensure steps are complete.",
       ],
-      imageSrc: "/images/heroes-hq/about-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Truck fleet parked in a lot with a driver walking by.",
     },
   ],
@@ -317,7 +317,7 @@ export const customerServiceVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "cs-hero-main",
-      imageSrc: "/images/programs-hq/business-office.jpg",
+      imageSrc: "/images/pages/comp-cta-training.jpg",
       imageAlt: "Customer service representative speaking with a client over a headset.",
       eyebrow: "Customer Service Pro",
       title: "Turn Your People Skills Into Professional Office and Call Center Roles.",
@@ -328,7 +328,7 @@ export const customerServiceVisuals: PageVisualConfig = {
     },
     {
       id: "cs-hero-earn",
-      imageSrc: "/images/students-new/student-3.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Team of office workers collaborating in a bright workspace.",
       eyebrow: "Earn While You Learn",
       title: "Gain experience while building your communication skills.",
@@ -347,7 +347,7 @@ export const customerServiceVisuals: PageVisualConfig = {
         "Certiport customer service certification prep content.",
         "Elevate modules on workplace professionalism, email, chat, and phone etiquette.",
       ],
-      imageSrc: "/images/students-new/student-4.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Trainer leading a workshop on customer service skills.",
     },
     {
@@ -358,7 +358,7 @@ export const customerServiceVisuals: PageVisualConfig = {
         "Stepping stones into supervisory or account management roles.",
         "Transferable communication skills that apply in every career.",
       ],
-      imageSrc: "/images/students-new/student-5.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Professional smiling at a desk with a computer and headset.",
     },
   ],
@@ -372,7 +372,7 @@ export const itSupportVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "it-hero-main",
-      imageSrc: "/images/heroes-hq/contact-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "IT support technician helping a coworker at a computer.",
       eyebrow: "IT Support Helpdesk",
       title: "Step Into Tech with IT Support and Helpdesk Skills.",
@@ -383,7 +383,7 @@ export const itSupportVisuals: PageVisualConfig = {
     },
     {
       id: "it-hero-earn",
-      imageSrc: "/images/heroes-hq/team-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Person working in a modern IT operations center.",
       eyebrow: "Earn While You Learn",
       title: "Build your portfolio while gaining IT experience.",
@@ -402,7 +402,7 @@ export const itSupportVisuals: PageVisualConfig = {
         "Helpdesk-focused soft skills and communication modules.",
         "Guidance on tickets, troubleshooting workflow, and working with non-technical users.",
       ],
-      imageSrc: "/images/facilities-new/facility-4.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "IT technician working on a network rack.",
     },
     {
@@ -413,7 +413,7 @@ export const itSupportVisuals: PageVisualConfig = {
         "A foundation for more advanced IT, networking, or cybersecurity training.",
         "Experience that proves you can learn, troubleshoot, and support a team.",
       ],
-      imageSrc: "/images/facilities-new/facility-5.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "IT worker standing confidently in a server room.",
     },
   ],
@@ -427,7 +427,7 @@ export const entrepreneurshipVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "esb-hero-main",
-      imageSrc: "/images/students-new/student-6.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Entrepreneur working on a laptop in a small studio.",
       eyebrow: "Entrepreneurship & Small Business",
       title: "Turn Your Ideas Into a Real Small Business.",
@@ -438,7 +438,7 @@ export const entrepreneurshipVisuals: PageVisualConfig = {
     },
     {
       id: "esb-hero-earn",
-      imageSrc: "/images/students-new/student-7.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Person packaging products for their small business.",
       eyebrow: "Earn While You Build",
       title: "Build your business alongside work, family, and life.",
@@ -457,7 +457,7 @@ export const entrepreneurshipVisuals: PageVisualConfig = {
         "Planning, budgeting, marketing, and operations fundamentals.",
         "Support thinking through pricing, offers, and real-world execution.",
       ],
-      imageSrc: "/images/students-new/student-8.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Entrepreneur sketching business ideas in a notebook.",
     },
     {
@@ -468,7 +468,7 @@ export const entrepreneurshipVisuals: PageVisualConfig = {
         "A stronger foundation for funding, partnerships, or growth.",
         "Confidence to move from dreaming into doing.",
       ],
-      imageSrc: "/images/students-new/student-9.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Small business owner smiling in their shop.",
     },
   ],
@@ -482,7 +482,7 @@ export const buildingMaintenanceVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "bm-hero-main",
-      imageSrc: "/images/facilities-new/facility-6.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Maintenance worker checking a building system.",
       eyebrow: "Building Maintenance & Facilities",
       title: "Learn How to Keep Buildings Running Safely and Smoothly.",
@@ -493,7 +493,7 @@ export const buildingMaintenanceVisuals: PageVisualConfig = {
     },
     {
       id: "bm-hero-earn",
-      imageSrc: "/images/facilities-new/facility-7.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Facilities worker walking through a commercial building hallway.",
       eyebrow: "Earn While You Learn",
       title: "Gain experience keeping spaces safe and functional.",
@@ -512,7 +512,7 @@ export const buildingMaintenanceVisuals: PageVisualConfig = {
         "Drug-free workplace training aligned with maintenance expectations.",
         "Elevate modules covering basic systems, communication, and work order basics.",
       ],
-      imageSrc: "/images/facilities-new/facility-8.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Trainer explaining building systems to a small group.",
     },
     {
@@ -523,7 +523,7 @@ export const buildingMaintenanceVisuals: PageVisualConfig = {
         "Stepping stones into more specialized trades and supervisory roles.",
         "Experience that shows you can care for spaces where people live and work.",
       ],
-      imageSrc: "/images/facilities-new/facility-9.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Maintenance worker inspecting a facility.",
     },
   ],
@@ -537,7 +537,7 @@ export const taxVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "tax-hero-main",
-      imageSrc: "/images/students-new/student-10.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Learner reviewing tax forms with a community member.",
       eyebrow: "Tax & Financial Services",
       title: "Tax Preparation & IRS VITA Pathway",
@@ -548,7 +548,7 @@ export const taxVisuals: PageVisualConfig = {
     },
     {
       id: "tax-hero-earn",
-      imageSrc: "/images/students-new/student-11.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Tax preparer helping a client with paperwork.",
       eyebrow: "Earn While You Learn",
       title: "Serve your community while building professional skills.",
@@ -568,7 +568,7 @@ export const taxVisuals: PageVisualConfig = {
         "Basics of individual income tax, credits, and common deductions.",
         "Using tax software to complete accurate returns.",
       ],
-      imageSrc: "/images/students-new/student-12.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Student working through tax software on a laptop.",
     },
     {
@@ -580,7 +580,7 @@ export const taxVisuals: PageVisualConfig = {
         "A foundation to grow into advanced tax, accounting, or financial services roles.",
         "Opportunities to support families and build trust in your community.",
       ],
-      imageSrc: "/images/students-new/student-13.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Tax preparer smiling while meeting with a client.",
     },
   ],
@@ -594,7 +594,7 @@ export const businessEmsVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "business-ems-hero-main",
-      imageSrc: "/images/students-new/student-14.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Apprentice handling calls and scheduling in an office.",
       eyebrow: "Business & Service Operations",
       title: "Business EMS Apprenticeship",
@@ -613,7 +613,7 @@ export const businessEmsVisuals: PageVisualConfig = {
         "Customer service and communication across phone, email, and in-person.",
         "Intro to compliance, confidentiality, and teamwork in service settings.",
       ],
-      imageSrc: "/images/students-new/student-15.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Office apprentice working at a computer and phone.",
     },
   ],
@@ -627,7 +627,7 @@ export const nailsVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "nails-hero-main",
-      imageSrc: "/images/beauty/program-barber-training.jpg",
+      imageSrc: "/images/pages/barber-gallery-1.jpg",
       imageAlt: "Nail technician apprentice doing a manicure.",
       eyebrow: "Beauty & Wellness",
       title: "Nail Technician Apprenticeship",
@@ -646,7 +646,7 @@ export const nailsVisuals: PageVisualConfig = {
         "Sanitation, disinfection, and safety standards.",
         "Client experience, consultation, and rebooking.",
       ],
-      imageSrc: "/images/heroes-hq/programs-hero.jpg",
+      imageSrc: "/images/pages/comp-cta-career.jpg",
       imageAlt: "Close-up of apprentice painting a client's nails.",
     },
   ],
@@ -660,7 +660,7 @@ export const estheticianVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "esthetician-hero-main",
-      imageSrc: "/images/students-new/student-16.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Esthetician apprentice performing a facial.",
       eyebrow: "Skin Care & Spa",
       title: "Esthetician Apprenticeship",
@@ -679,7 +679,7 @@ export const estheticianVisuals: PageVisualConfig = {
         "Spa sanitation, safety, and infection control.",
         "Customer service and communication in spa environments.",
       ],
-      imageSrc: "/images/students-new/student-17.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Learner practicing a facial on a demo client.",
     },
   ],
@@ -693,7 +693,7 @@ export const culinaryVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "culinary-hero-main",
-      imageSrc: "/images/facilities-new/facility-10.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Culinary apprentice plating food in a kitchen.",
       eyebrow: "Food Service & Hospitality",
       title: "Culinary Apprenticeship",
@@ -712,7 +712,7 @@ export const culinaryVisuals: PageVisualConfig = {
         "Food safety, temperature control, and cleanliness.",
         "Working a line, timing, and communication with kitchen teams.",
       ],
-      imageSrc: "/images/facilities-new/facility-11.jpg",
+      imageSrc: "/images/pages/comp-layout-hero.jpg",
       imageAlt: "Kitchen apprentice chopping vegetables on a cutting board.",
     },
   ],
@@ -726,7 +726,7 @@ export const businessTechnicianVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "business-tech-hero-main",
-      imageSrc: "/images/students-new/student-18.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Business technician apprentice working on a laptop.",
       eyebrow: "Business & Office Technology",
       title: "Business Technician Apprenticeship",
@@ -745,7 +745,7 @@ export const businessTechnicianVisuals: PageVisualConfig = {
         "Customer support and communication in office environments.",
         "Intro to reports, checklists, and internal workflows.",
       ],
-      imageSrc: "/images/students-new/student-19.jpg",
+      imageSrc: "/images/pages/comp-pathway-classroom.jpg",
       imageAlt: "Apprentice using office software at a workstation.",
     },
   ],

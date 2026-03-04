@@ -122,7 +122,7 @@ export default function NewWorkflowPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-email-automation-new-hero.jpg" alt="New email automation" fill sizes="100vw" className="object-cover" priority />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
@@ -130,7 +130,7 @@ export default function NewWorkflowPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/career-services-hero.jpg"
+          src="/images/pages/admin-email-automation-new-d1.jpg"
           alt="Email marketing automation"
           fill
           className="object-cover"
@@ -570,7 +570,7 @@ export default function NewWorkflowPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes-hq/success-stories-hero.jpg"
+                    src="/images/pages/admin-email-automation-new-d2.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

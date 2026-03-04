@@ -24,15 +24,15 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: 'IT Help Desk', duration: '8 weeks', salary: '$55,510', href: '/programs/it-help-desk', image: '/images/programs-fresh/it-support.jpg' },
-  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/programs-fresh/cybersecurity.jpg' },
-  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/web-development', image: '/images/programs-fresh/web-dev.jpg' },
-  { title: 'Software Development', duration: '12 weeks', salary: '$104,000', href: '/programs/software-development', image: '/images/programs-fresh/software-dev.jpg' },
-  { title: 'Network Administration', duration: '10 weeks', salary: '$80,600', href: '/programs/network-administration', image: '/images/programs-fresh/network-admin.jpg' },
-  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/programs-fresh/cad-drafting.jpg' },
-  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/programs-fresh/graphic-design.jpg' },
-  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/programs-fresh/project-management.jpg' },
-  { title: 'Office Administration', duration: '6 weeks', salary: '$42,000', href: '/programs/office-administration', image: '/images/programs-fresh/office-admin.jpg' },
+  { title: 'IT Help Desk', duration: '8 weeks', salary: '$55,510', href: '/programs/it-help-desk', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/web-development', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Software Development', duration: '12 weeks', salary: '$104,000', href: '/programs/software-development', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Network Administration', duration: '10 weeks', salary: '$80,600', href: '/programs/network-administration', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/pages/comp-program-template.jpg' },
+  { title: 'Office Administration', duration: '6 weeks', salary: '$42,000', href: '/programs/office-administration', image: '/images/pages/comp-program-template.jpg' },
 ];
 
 const config: ProgramPageConfig = {
@@ -42,7 +42,7 @@ const config: ProgramPageConfig = {
   duration: '6–12 weeks', cost: 'WorkOne funding available', format: 'In-person, Indianapolis', credential: 'CompTIA + Certiport + Meta',
   overview: 'Our technology programs prepare you for careers in IT support, cybersecurity, web development, software engineering, networking, and design. Every program includes industry-recognized certifications through CompTIA, Certiport, Meta, or Adobe. Training is hands-on in our computer labs with real-world projects.',
   highlights: ['Industry certifications from CompTIA, Certiport, Meta, Adobe', 'Hands-on training in equipped computer labs', 'Real-world projects for your portfolio', 'Job placement with tech employer partners', 'WorkOne funding available for eligible participants', 'DWD 4-Star and 5-Star Top Job programs'],
-  overviewImage: '/images/programs-hq/technology-hero.jpg', overviewImageAlt: 'Technology students working in a computer lab',
+  overviewImage: '/images/pages/comp-cta-training.jpg', overviewImageAlt: 'Technology students working in a computer lab',
   salaryNumber: 78000, salaryLabel: 'Average salary across technology programs', salaryPrefix: '$',
   credentials: ['CompTIA A+', 'CompTIA Security+', 'CompTIA Network+', 'Meta Digital Marketing', 'Adobe Certified Professional', 'Certiport IT Specialist'],
   steps: [

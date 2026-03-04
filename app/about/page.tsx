@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'A nonprofit workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
+    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
     type: 'website',
   },
 };
@@ -35,7 +35,7 @@ export default function AboutPage() {
       {/* Visual hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image
-          src="/images/heroes-hq/team-hero.jpg"
+          src="/images/pages/about-team-hero.jpg"
           alt="Elevate for Humanity team and workforce training"
           fill
           sizes="100vw"
@@ -104,7 +104,7 @@ export default function AboutPage() {
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-career-training.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
@@ -123,7 +123,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-funding-nav.jpg" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
@@ -142,7 +142,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Placement &amp; Employer Partnerships</h3>
@@ -161,7 +161,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-supportive-services.jpg" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
@@ -240,32 +240,32 @@ export default function AboutPage() {
             {[
               {
                 title: 'Justice-Involved Individuals',
-                image: '/images/heroes-hq/jri-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
-                image: '/images/heroes-hq/funding-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
               },
               {
                 title: 'Veterans',
-                image: '/images/heroes-hq/success-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
               },
               {
                 title: 'Young Adults (16–24)',
-                image: '/images/programs-hq/students-learning.jpg',
+                image: '/images/pages/comp-cta-training.jpg',
                 desc: 'Young people who are not sure what to do after high school. WIOA Youth funding covers career training that leads to a credential and a job in weeks, not years.',
               },
               {
                 title: 'Career Changers',
-                image: '/images/heroes-hq/how-it-works-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
               },
               {
                 title: 'Employers & Workforce Partners',
-                image: '/images/heroes-hq/employer-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
               },
             ].map((item) => (
@@ -366,7 +366,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row">
               <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0">
                 <Image
-                  src={founder.headshotSrc || '/images/heroes-hq/team-hero.jpg'}
+                  src={founder.headshotSrc || '/images/pages/comp-cta-career.jpg'}
                   alt={founder.name}
                   fill
                   sizes="(max-width: 640px) 100vw, 288px"
@@ -419,7 +419,7 @@ export default function AboutPage() {
               >
                 <div className="relative w-full aspect-[3/4] max-w-[240px] mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
                   <Image
-                    src={member.headshotSrc || '/images/heroes-hq/team-hero.jpg'}
+                    src={member.headshotSrc || '/images/pages/comp-cta-career.jpg'}
                     alt={member.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -443,12 +443,12 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/programs-hq/cna-training.jpg', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/programs-hq/cdl-trucking.jpg', href: '/programs/cdl' },
-              { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/programs-hq/hvac-technician.jpg', href: '/programs/hvac-technician' },
-              { name: 'Electrical', duration: '12–16 weeks', image: '/images/programs-hq/electrical.jpg', href: '/programs/electrical' },
-              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/programs-hq/barber-training.jpg', href: '/programs/barber-apprenticeship' },
-              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/programs-hq/cybersecurity.jpg', href: '/programs/technology' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cna' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cdl' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/comp-cta-training.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/technology' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36">
@@ -476,7 +476,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner with Elevate" fill sizes="50vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
@@ -488,7 +488,7 @@ export default function AboutPage() {
             </Link>
             <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career pathways" fill sizes="50vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-career-pathways.jpg" alt="Career pathways" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: 'Structured workforce pathways: screening, training, credentialing, apprenticeship, placement, and advancement.',
     url: 'https://www.elevateforhumanity.org/pathways',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/programs-hero.jpg', width: 1200, height: 630, alt: 'Elevate career pathways' }],
+    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'Elevate career pathways' }],
     type: 'website',
   },
 };
@@ -24,7 +24,7 @@ const STAGES = [
   {
     num: 1,
     title: 'Eligibility & Barrier Removal',
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
@@ -34,7 +34,7 @@ const STAGES = [
   {
     num: 2,
     title: 'Cohort Training',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/pathways/training-model',
     what: 'You join a training cohort — a group of students who start and finish together. Training combines classroom instruction, hands-on lab work, and online coursework. Trades students work with real tools and equipment. Healthcare students do clinical rotations. CDL students get 160+ hours behind the wheel.',
     who: 'Enrolled participants who have completed eligibility screening and funding confirmation.',
@@ -44,7 +44,7 @@ const STAGES = [
   {
     num: 3,
     title: 'Industry Credential',
-    image: '/images/heroes-hq/success-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     href: '/credentials',
     what: 'At the end of training, you sit for a certification exam issued by a recognized third-party organization — not by Elevate. You earn a credential that employers across the country recognize and require for hiring.',
     who: 'Students who have completed their training program and met all requirements.',
@@ -54,7 +54,7 @@ const STAGES = [
   {
     num: 4,
     title: 'Apprenticeship & Job Placement',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     href: '/career-services/job-placement',
     what: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. For apprenticeship tracks (barber, building trades), you are placed with a host employer and earn wages while completing on-the-job training hours.',
     who: 'Graduates who have earned their credential. Apprentices who are completing on-the-job training hours.',
@@ -64,7 +64,7 @@ const STAGES = [
   {
     num: 5,
     title: 'Advancement & Upskilling',
-    image: '/images/heroes-hq/career-services-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     href: '/career-services',
     what: 'After placement, you are not on your own. We track your employment at 6 months and 12 months. You keep access to the learning platform for continued education. Many graduates come back to stack additional credentials — for example, CNA to Medical Assistant to LPN to RN.',
     who: 'All program graduates. Ongoing support is included at no additional cost.',
@@ -77,7 +77,7 @@ const STAGES = [
 const PROGRAMS = [
   {
     name: 'CNA Certification',
-    image: '/images/programs-hq/cna-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/cna',
     duration: '4–6 weeks',
     credential: 'Certified Nursing Assistant (CNA)',
@@ -89,7 +89,7 @@ const PROGRAMS = [
   },
   {
     name: 'CDL Commercial Driving',
-    image: '/images/programs-hq/cdl-trucking.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/cdl',
     duration: '4–6 weeks (160+ hours)',
     credential: 'CDL Class A or Class B',
@@ -101,7 +101,7 @@ const PROGRAMS = [
   },
   {
     name: 'Barber Apprenticeship',
-    image: '/images/programs-hq/barber-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/barber-apprenticeship',
     duration: '~18 months (1,500 hours)',
     credential: 'Indiana Barber License',
@@ -113,7 +113,7 @@ const PROGRAMS = [
   },
   {
     name: 'Building Technician with HVAC Fundamentals',
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',
     credential: 'EPA 608 + OSHA 30',
@@ -125,7 +125,7 @@ const PROGRAMS = [
   },
   {
     name: 'Electrical',
-    image: '/images/programs-hq/electrical.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/electrical',
     duration: '12–16 weeks',
     credential: 'OSHA 10 + NCCER Electrical Level 1',
@@ -137,7 +137,7 @@ const PROGRAMS = [
   },
   {
     name: 'Welding',
-    image: '/images/programs-hq/welding.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/welding',
     duration: '12–16 weeks (400+ hours hands-on)',
     credential: 'AWS Welding Certifications + OSHA 10',
@@ -149,7 +149,7 @@ const PROGRAMS = [
   },
   {
     name: 'IT Support',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/it-help-desk',
     duration: '8–12 weeks',
     credential: 'IT Specialist — Device Configuration & Management',
@@ -161,7 +161,7 @@ const PROGRAMS = [
   },
   {
     name: 'Cybersecurity',
-    image: '/images/programs-hq/cybersecurity.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     href: '/programs/cybersecurity-analyst',
     duration: '12–16 weeks',
     credential: 'IT Specialist — Cybersecurity',
@@ -185,7 +185,7 @@ export default function PathwaysPage() {
       {/* ── Visual Hero (no text overlay) ── */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/pathways-page-2.jpg"
           alt="Workforce training students in a classroom and lab setting"
           fill
           sizes="100vw"
@@ -386,7 +386,7 @@ export default function PathwaysPage() {
           <div className="space-y-4 text-gray-700">
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/pathways-page-2.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We navigate funding for you</h3>
@@ -395,7 +395,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/heroes-hq/success-hero.jpg" alt="Credentials" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/pathways-page-2.jpg" alt="Credentials" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Your credential is issued by a recognized authority — not by us</h3>
@@ -404,7 +404,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/pathways-page-2.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We connect you to employers who are actually hiring</h3>
@@ -413,7 +413,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Ongoing support" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/pathways-page-2.jpg" alt="Ongoing support" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Support does not end when you graduate</h3>

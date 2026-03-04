@@ -36,7 +36,7 @@ export default async function ProgramGeneratorPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-program-gen-hero.jpg" alt="Program generator" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Program Generator" }]} />
@@ -44,7 +44,7 @@ export default async function ProgramGeneratorPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/pages/admin-program-gen-detail.jpg"
           alt="Program Generator"
           fill
           className="object-cover"

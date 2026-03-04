@@ -150,7 +150,7 @@ export default function HealthcareFundamentalsCoursePage() {
 
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
               <Image
-                src="/images/programs-hq/healthcare-hero.jpg"
+                src="/images/pages/lms-page-2.jpg"
                 alt="Healthcare Fundamentals Course"
                 fill
                 className="object-cover"

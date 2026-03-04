@@ -40,7 +40,7 @@ export default function CommunityCoursesPage() {
             id: c.id,
             title: c.course_name || c.title || 'Untitled Course',
             instructor: c.instructor_name || 'Community Instructor',
-            image: c.image_url || '/images/healthcare/program-cna-training.jpg',
+            image: c.image_url || '/images/pages/comp-pathway-healthcare.jpg',
             rating: c.rating || [4.8, 4.6, 4.9, 4.7, 4.5][i % 5],
             students: c.enrolled_count || [156, 89, 234, 67, 312][i % 5],
             duration: `${c.duration_hours || [12, 8, 16, 24, 10][i % 5]} hours`,

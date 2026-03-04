@@ -62,7 +62,7 @@ export default async function UsersReportPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-reports-users-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">

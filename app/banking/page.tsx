@@ -52,7 +52,7 @@ export default async function BankingPage() {
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs/efh-business-startup-marketing-hero.jpg"
+          src="/images/pages/banking-page-2.jpg"
           alt="Banking Services"
           fill
           className="object-cover"

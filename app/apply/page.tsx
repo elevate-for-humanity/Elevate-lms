@@ -80,7 +80,7 @@ export default async function ApplyPage({
           <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-2/5 h-[200px] md:h-auto md:min-h-[280px]">
               <Image
-                src="/images/programs-hq/training-classroom.jpg"
+                src="/images/pages/apply-page-1.jpg"
                 alt="Students in hands-on career training"
                 fill
                 className="object-cover"
@@ -118,7 +118,7 @@ export default async function ApplyPage({
           <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
             <div className="relative h-[200px]">
               <Image
-                src="/images/heroes-hq/career-services-hero.jpg"
+                src="/images/pages/apply-page-1.jpg"
                 alt="Employer partnership meeting"
                 fill
                 className="object-cover"
@@ -161,7 +161,7 @@ export default async function ApplyPage({
           >
             <div className="relative h-[320px] sm:h-[360px]">
               <Image
-                src="/images/heroes-hq/success-hero.jpg"
+                src="/images/pages/apply-page-1.jpg"
                 alt="Launch your own training program with Elevate"
                 fill
                 className="object-cover"
@@ -191,7 +191,7 @@ export default async function ApplyPage({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
               {
-                image: '/images/heroes-hq/funding-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 alt: 'Funding assistance',
                 title: 'Funding & Grants',
                 desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Justice Reinvestment Initiative) supports individuals with justice involvement.',
@@ -200,13 +200,13 @@ export default async function ApplyPage({
               },
 
               {
-                image: '/images/hero/hero-early-childhood.jpg',
+                image: '/images/pages/comp-home-hero.jpg',
                 alt: 'Childcare support',
                 title: 'Childcare Support',
                 desc: 'Referrals and assistance finding affordable childcare during training hours.',
               },
               {
-                image: '/images/career-services/job-fair.jpg',
+                image: '/images/pages/resume-building-hero.jpg',
                 alt: 'Career placement services',
                 title: 'Career Placement',
                 desc: 'Resume help, interview prep, and direct employer connections before you graduate.',
@@ -214,19 +214,19 @@ export default async function ApplyPage({
                 linkLabel: 'View Career Services',
               },
               {
-                image: '/images/efh/sections/coaching.jpg',
+                image: '/images/pages/comp-home-highlight-health.jpg',
                 alt: 'Case management team',
                 title: 'Case Management',
                 desc: 'A dedicated advisor checks in weekly to help you stay on track.',
               },
               {
-                image: '/images/barber/training.jpg',
+                image: '/images/pages/barber-gallery-1.jpg',
                 alt: 'Barber apprenticeship training in a real barbershop',
                 title: 'Barber Apprenticeship',
                 desc: 'Train in a real barbershop, earn while you learn, and get your Indiana barber license. 2,000 hours of hands-on experience.',
               },
               {
-                image: '/images/heroes-hq/programs-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 alt: 'Credential and certification support',
                 title: 'Credential Support',
                 desc: 'Exam prep, testing fees, and licensing assistance included with your program.',

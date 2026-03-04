@@ -46,7 +46,7 @@ export default async function JoinCommunityPage() {
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Join the Elevate Community" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/community-page-2.jpg" alt="Join the Elevate Community" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Benefits */}

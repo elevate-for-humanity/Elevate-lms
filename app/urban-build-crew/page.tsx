@@ -21,7 +21,7 @@ export default function UrbanBuildCrewPage() {
         ]}
       />
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/trades/program-construction-training.jpg" alt="Urban Build Crew" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/urban-build-crew-page-1.jpg" alt="Urban Build Crew" fill className="object-cover" priority sizes="100vw" />
       </section>
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">

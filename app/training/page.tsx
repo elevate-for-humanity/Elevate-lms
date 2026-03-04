@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const PROGRAM_AREAS = [
-  { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.jpg' },
-  { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.jpg' },
-  { title: 'Technology', desc: 'IT Support, Cybersecurity, Certiport Certifications', icon: Monitor, href: '/programs/technology', image: '/images/programs-hq/technology-hero.jpg' },
-  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/programs-hq/training-classroom.jpg' },
-  { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/programs-hq/barber-hero.jpg' },
-  { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/programs-hq/business-training.jpg' },
+  { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Technology', desc: 'IT Support, Cybersecurity, Certiport Certifications', icon: Monitor, href: '/programs/technology', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/pages/comp-cta-training.jpg' },
 ];
 
 export default function TrainingPage() {
@@ -30,7 +30,7 @@ export default function TrainingPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/efh/programs/trades.jpg" alt="Career training programs" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/training-page-3.jpg" alt="Career training programs" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

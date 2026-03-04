@@ -181,7 +181,7 @@ export function TutorialSystem({
                 controls
                 playsInline
                 className="w-full"
-                poster="/images/heroes-hq/programs-hero.jpg"
+                poster="/images/pages/comp-cta-career.jpg"
               >
                 Your browser does not support the video tag.
               </video>

@@ -74,7 +74,7 @@ export default function FAQPage() {
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes-hq/how-it-works-hero.jpg"
+          src="/images/pages/faq-page-1.jpg"
           alt="Students in a workforce training classroom"
           fill
           quality={90}

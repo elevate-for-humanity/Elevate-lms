@@ -73,7 +73,7 @@ export default function ProgramCoursesPage() {
       {/* Hero Banner */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/programs-hq/training-classroom.jpg" alt="Professional training courses and certification programs" fill sizes="100vw" className="object-cover" />
+          <Image src="/images/pages/programs-slug-courses-hero.jpg" alt="Professional training courses and certification programs" fill sizes="100vw" className="object-cover" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-6 text-center">
@@ -114,33 +114,33 @@ export default function ProgramCoursesPage() {
               const categoryImages: Record<string, string[]> = {
                 'healthcare': [
                   '/hero-images/healthcare-category.jpg',
-                  '/images/programs/cna-hero.jpg',
-                  '/images/programs/efh-cna-hero.jpg'
+                  '/images/pages/comp-cta-programs.jpg',
+                  '/images/pages/comp-cta-programs.jpg'
                 ],
                 'skilled-trades': [
                   '/hero-images/skilled-trades-category.jpg',
-                  '/images/programs/hvac-hero.jpg',
-                  '/images/programs/building-technician-hero.jpg'
+                  '/images/pages/comp-cta-programs.jpg',
+                  '/images/pages/comp-cta-programs.jpg'
                 ],
                 'technology': [
                   '/hero-images/technology-category.jpg',
                   '/hero-images/technology-hero.jpg',
-                  '/images/programs-hq/technology-hero.jpg'
+                  '/images/pages/comp-cta-training.jpg'
                 ],
                 'business': [
-                  '/images/heroes-hq/career-services-hero.jpg',
-                  '/images/programs/efh-business-startup-marketing-hero.jpg',
-                  '/images/programs/efh-tax-office-startup-hero.jpg'
+                  '/images/pages/comp-cta-career.jpg',
+                  '/images/pages/comp-cta-programs.jpg',
+                  '/images/pages/comp-cta-programs.jpg'
                 ],
                 'transportation': [
-                  '/images/programs-hq/training-classroom.jpg',
-                  '/images/programs/cdl-hero.jpg',
-                  '/images/programs/cdl-hero.jpg'
+                  '/images/pages/comp-cta-training.jpg',
+                  '/images/pages/comp-cta-programs.jpg',
+                  '/images/pages/comp-cta-programs.jpg'
                 ],
                 'barber': [
                   '/hero-images/barber-beauty-category.jpg',
-                  '/images/barber/hero.jpg',
-                  '/images/programs/efh-barber-hero.jpg'
+                  '/images/pages/barber-gallery-1.jpg',
+                  '/images/pages/comp-cta-programs.jpg'
                 ]
               };
               
@@ -172,7 +172,7 @@ export default function ProgramCoursesPage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/heroes-hq/programs-hero.jpg';
+                        target.src = '/images/pages/comp-cta-career.jpg';
                       }}
                     />
                     <div className="absolute top-4 right-4">

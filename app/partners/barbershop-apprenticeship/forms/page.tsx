@@ -123,10 +123,10 @@ const categoryLabels: Record<string, { label: string; icon: typeof FileText; col
 };
 
 const categoryPhotos: Record<string, { src: string; alt: string }> = {
-  legal: { src: '/images/barber/barber-tools.jpg', alt: 'Barber tools and legal agreements' },
-  compliance: { src: '/images/barber/barber-cutting.jpg', alt: 'Licensed barber performing a cut' },
-  insurance: { src: '/images/barber/barber-shop-interior.jpg', alt: 'Barbershop interior' },
-  training: { src: '/images/barber/training.jpg', alt: 'Barber training session' },
+  legal: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber tools and legal agreements' },
+  compliance: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Licensed barber performing a cut' },
+  insurance: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barbershop interior' },
+  training: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber training session' },
 };
 
 const actionLabels: Record<string, string> = {
@@ -157,7 +157,7 @@ export default function RequiredFormsPage() {
       {/* Hero */}
       <section className="relative py-16 overflow-hidden">
         <Image
-          src="/images/programs-hq/barber-hero.jpg"
+          src="/images/pages/partners-pub-page-2.jpg"
           alt="Barbershop partner forms"
           fill
           className="object-cover"
@@ -204,7 +204,7 @@ export default function RequiredFormsPage() {
             className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all group"
           >
             <div className="relative h-32">
-              <Image src="/images/barber/barber-tools.jpg" alt="Sign MOU" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+              <Image src="/images/pages/barber-tools.jpg" alt="Sign MOU" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Sign MOU</p>
@@ -216,7 +216,7 @@ export default function RequiredFormsPage() {
             className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all group"
           >
             <div className="relative h-32">
-              <Image src="/images/barber/training.jpg" alt="Partner Handbook" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+              <Image src="/images/pages/barber-training.jpg" alt="Partner Handbook" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Partner Handbook</p>
@@ -228,7 +228,7 @@ export default function RequiredFormsPage() {
             className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all group"
           >
             <div className="relative h-32">
-              <Image src="/images/barber/barber-shop-interior.jpg" alt="Policy Forms" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+              <Image src="/images/pages/barber-shop-interior.jpg" alt="Policy Forms" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Policy Forms</p>

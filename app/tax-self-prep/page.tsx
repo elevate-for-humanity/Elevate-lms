@@ -55,7 +55,7 @@ export default async function TaxSelfPrepPage() {
           {/* Hero Section */}
           <section className="relative h-48 md:h-64 overflow-hidden">
             <Image
-              src="/images/courses/barber-apprenticeship-10002417-cover.jpg"
+              src="/images/pages/tax-self-prep-hero.jpg"
               alt="Hero"
               fill
               className="object-cover"

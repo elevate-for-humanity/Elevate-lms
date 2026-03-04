@@ -26,7 +26,7 @@ export default async function InstructorPWAPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-48 sm:h-56">
-        <Image src="/images/programs-hq/training-classroom.jpg" alt="Instructor in classroom" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-4.jpg" alt="Instructor in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900/80 to-purple-900/95" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SAM.gov Assistant - Federal Contractor Registration Made Simple',
     description: 'Complete your SAM.gov registration in hours, not days. Step-by-step wizard, compliance monitoring, and automatic renewal reminders.',
-    images: ['/images/apps/sam-gov/hero.jpg'],
+    images: ['/images/pages/comp-universal-hero.jpg'],
   },
 };
 
@@ -36,11 +36,11 @@ const productData = {
   rating: 4.9,
   reviewCount: 127,
   images: [
-    { src: '/images/apps/sam-gov/hero.jpg', alt: 'SAM.gov Assistant Dashboard', type: 'image' as const },
-    { src: '/images/apps/sam-gov/dashboard.jpg', alt: 'Registration Progress', type: 'image' as const },
-    { src: '/images/apps/sam-gov/compliance.jpg', alt: 'Compliance Monitoring', type: 'image' as const },
-    { src: '/images/apps/sam-gov/registration.jpg', alt: 'Step-by-Step Wizard', type: 'image' as const },
-    { src: '/images/apps/sam-gov/hero.jpg', alt: 'Product Demo Video', type: 'video' as const },
+    { src: '/images/pages/comp-universal-hero.jpg', alt: 'SAM.gov Assistant Dashboard', type: 'image' as const },
+    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Registration Progress', type: 'image' as const },
+    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Compliance Monitoring', type: 'image' as const },
+    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Step-by-Step Wizard', type: 'image' as const },
+    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Product Demo Video', type: 'video' as const },
   ],
   features: [
     {

@@ -39,19 +39,19 @@ export default async function WorkforceBoardPage() {
 
   const features = [
     {
-      image: '/images/programs-hq/healthcare-hero.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       title: 'Performance Dashboards',
       description: 'Real-time metrics on enrollment, completion, and employment outcomes',
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/gallery/image9.jpg',
+      image: '/images/pages/features-hero.jpg',
       title: 'Compliance Reporting',
       description: 'Automated WIOA, DOL, and state compliance reports with audit trails',
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/programs-hq/cybersecurity.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       title: 'Participant Tracking',
       description: 'Monitor participant progress, services, and outcomes across all programs',
       href: '/workforce-board/participants',
@@ -63,13 +63,13 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/programs-hq/cdl-trucking.jpg',
+      image: '/images/pages/comp-cta-training.jpg',
       title: 'Goal Monitoring',
       description: 'Track progress toward performance goals and benchmarks',
       href: '/workforce-board/reports/performance',
     },
     {
-      image: '/images/beauty/hero-program-barber.jpg',
+      image: '/images/pages/barber-gallery-1.jpg',
       title: 'Audit Readiness',
       description: 'Maintain audit-ready documentation and compliance records',
       href: '/workforce-board/reports',
@@ -96,7 +96,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/employment',
     },
     {
-      image: '/images/heroes-hq/success-stories-hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
       title: 'Supportive Services',
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',

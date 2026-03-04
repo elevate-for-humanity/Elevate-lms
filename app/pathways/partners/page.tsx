@@ -21,7 +21,7 @@ export default function PartnersPage() {
 
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer and workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/pathways-page-3.jpg" alt="Employer and workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Intro */}
@@ -58,42 +58,42 @@ export default function PartnersPage() {
                 step: 1,
                 title: 'You tell us what you need',
                 time: '1 phone call or email',
-                image: '/images/heroes-hq/contact-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'You contact us and describe your situation: how many participants you want to train, what industry, what timeline, and what funding source you are using (WIOA, employer-sponsored, grant, etc.). We ask about your participants — their backgrounds, barriers, and goals — so we can match them to the right program.',
               },
               {
                 step: 2,
                 title: 'We design the cohort',
                 time: '3–5 business days',
-                image: '/images/programs-hq/training-classroom.jpg',
+                image: '/images/pages/comp-cta-training.jpg',
                 desc: 'We configure a cohort for your group: start date, program track, credential targets, class schedule, and reporting cadence. If you need evening or weekend classes, we can accommodate that. If your participants need supportive services (transportation, childcare referrals), we coordinate those. You approve the plan before we start.',
               },
               {
                 step: 3,
                 title: 'Your participants enroll',
                 time: '1–2 weeks',
-                image: '/images/programs-hq/students-learning.jpg',
+                image: '/images/pages/comp-cta-training.jpg',
                 desc: 'You refer participants to us. We handle eligibility screening, document collection, account setup on our learning platform, and orientation scheduling. Each participant gets a login to track their own progress. You get a roster with enrollment confirmation.',
               },
               {
                 step: 4,
                 title: 'Training begins',
                 time: '4–16 weeks depending on program',
-                image: '/images/heroes-hq/programs-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Your cohort starts training together. Depending on the program, this includes classroom instruction, hands-on lab work, clinical rotations, behind-the-wheel training, or online coursework with live instructor sessions. You receive progress reports at the frequency you choose — weekly or biweekly.',
               },
               {
                 step: 5,
                 title: 'Participants earn credentials',
                 time: 'End of program',
-                image: '/images/heroes-hq/success-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, Certiport, AWS, Indiana PLA) — not by Elevate.',
               },
               {
                 step: 6,
                 title: 'Placement and outcome reporting',
                 time: 'Ongoing after program completion',
-                image: '/images/heroes-hq/career-services-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 desc: 'Our career services team helps participants with resume building, interview preparation, and direct employer introductions. We track employment outcomes at 6 months and 12 months. You receive a final cohort report with credential attainment rates, employment rates, employer names, job titles, and wage data.',
               },
             ].map((s) => (
@@ -177,7 +177,7 @@ export default function PartnersPage() {
               {
                 type: 'Workforce Boards & Government Agencies',
                 examples: 'WorkOne centers, Indiana DWD, regional workforce boards, county agencies',
-                image: '/images/heroes-hq/how-it-works-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 what: [
                   'WIOA-eligible training programs listed on the Eligible Training Provider List (ETPL)',
                   'Cohort-based training with published start dates, durations, and credential outcomes',
@@ -189,7 +189,7 @@ export default function PartnersPage() {
               {
                 type: 'Community Organizations',
                 examples: 'Goodwill, community centers, reentry programs, faith-based organizations',
-                image: '/images/heroes-hq/about-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 what: [
                   'Custom cohorts designed for your participant population and their specific needs',
                   'Flexible scheduling — day, evening, and weekend options where available',
@@ -202,7 +202,7 @@ export default function PartnersPage() {
               {
                 type: 'Employers',
                 examples: 'HVAC contractors, healthcare facilities, trucking companies, barbershops, IT firms',
-                image: '/images/heroes-hq/employer-hero.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
                 what: [
                   'Apprenticeship host site opportunities — we handle DOL registration, RAPIDS paperwork, and compliance',
                   'Custom training cohorts aligned to your specific hiring needs and job requirements',
@@ -215,7 +215,7 @@ export default function PartnersPage() {
               {
                 type: 'Educational Institutions',
                 examples: 'Community colleges, career centers, high schools, adult education programs',
-                image: '/images/programs-hq/students-learning.jpg',
+                image: '/images/pages/comp-cta-training.jpg',
                 what: [
                   'Articulation and credit transfer discussions for students moving between programs',
                   'Dual enrollment or bridge program partnerships',

@@ -99,7 +99,7 @@ const recentPosts = [
     icon: Facebook,
     time: '2 hours ago',
     content: 'Congratulations to our latest graduates! 🎓 Another cohort of skilled professionals ready to make their mark.',
-    image: '/images/social/social-post-1.jpg',
+    image: '/images/pages/social-media-1.jpg',
     likes: 45,
     comments: 12,
   },
@@ -116,7 +116,7 @@ const recentPosts = [
     icon: Instagram,
     time: '1 day ago',
     content: 'Behind the scenes at our training facility! Our students are working hard to build their futures. 💪',
-    image: '/images/social/social-post-2.jpg',
+    image: '/images/pages/social-media-1.jpg',
     likes: 156,
     comments: 34,
   },
@@ -127,7 +127,7 @@ const defaultVideos = [
   {
     id: 'video1',
     title: 'Welcome to Elevate for Humanity',
-    thumbnail: '/images/heroes-hq/career-services-hero.jpg',
+    thumbnail: '/images/pages/comp-cta-career.jpg',
     duration: '2:45',
     views: '1.2K',
     youtubeId: 'dQw4w9WgXcQ',
@@ -135,7 +135,7 @@ const defaultVideos = [
   {
     id: 'video2',
     title: 'Student Success Story: From Unemployed to Certified',
-    thumbnail: '/images/social/social-post-2.jpg',
+    thumbnail: '/images/pages/social-media-1.jpg',
     duration: '4:30',
     views: '856',
     youtubeId: 'dQw4w9WgXcQ',
@@ -143,7 +143,7 @@ const defaultVideos = [
   {
     id: 'video3',
     title: 'How WIOA Funding Works',
-    thumbnail: '/images/social/social-video-3.jpg',
+    thumbnail: '/images/pages/social-media-1.jpg',
     duration: '3:15',
     views: '2.1K',
     youtubeId: 'dQw4w9WgXcQ',
@@ -252,7 +252,7 @@ export default function SocialMediaPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Connect with Elevate for Humanity" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/social-page-1.jpg" alt="Connect with Elevate for Humanity" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

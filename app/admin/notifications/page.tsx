@@ -66,12 +66,12 @@ export default function NotificationsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-notifications-hero.jpg" alt="Notifications" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/contact-hero.jpg"
+          src="/images/pages/admin-notifications-detail.jpg"
           alt="Notifications"
           fill
           className="object-cover"

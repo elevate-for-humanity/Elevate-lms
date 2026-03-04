@@ -16,7 +16,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
-        <Image src="/images/trades/hero-program-plumbing.jpg" alt="Plumbing" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/programs-plumbing-apply-hero.jpg" alt="Plumbing" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-4">
@@ -26,22 +26,22 @@ export default function ApplyPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-3 gap-6 mb-10">
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/trades/plumbing.jpg" alt="Plumbing training" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/programs-plumbing-apply-d1.jpg" alt="Plumbing training" width={400} height={300} className="w-full h-48 object-cover" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Duration</p><p className="text-black">8-12 Weeks</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/trades/program-plumbing-training.jpg" alt="Plumbing program" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/programs-plumbing-apply-d2.jpg" alt="Plumbing program" width={400} height={300} className="w-full h-48 object-cover" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Cost</p><p className="text-black">Free with WIOA funding</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/trades/program-plumbing-training.jpg" alt="Plumbing career" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/pages/programs-plumbing-apply-d2.jpg" alt="Plumbing career" width={400} height={300} className="w-full h-48 object-cover" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Format</p><p className="text-black">Rolling enrollment</p></div>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-10">
           <Link href="/inquiry?program=plumbing" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/trades/plumbing.jpg" alt="Request information about Plumbing" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/programs-plumbing-apply-d1.jpg" alt="Request information about Plumbing" width={600} height={300} className="w-full h-52 object-cover" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Request Information</h3>
               <p className="text-black mb-4">Get program details, schedules, and eligibility info sent to you.</p>
@@ -49,7 +49,7 @@ export default function ApplyPage() {
             </div>
           </Link>
           <Link href="/apply/student?program=plumbing" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/trades/hero-program-plumbing.jpg" alt="Apply for Plumbing" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/programs-plumbing-apply-hero.jpg" alt="Apply for Plumbing" width={600} height={300} className="w-full h-52 object-cover" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
               <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>

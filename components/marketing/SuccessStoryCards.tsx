@@ -6,7 +6,7 @@ const stories = [
   {
     name: 'Graduate',
     program: 'Public Safety & Reentry Specialist',
-    image: '/images/heroes-hq/success-stories-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     beforeJob: 'Unemployed after incarceration',
     afterJob: 'Reentry Specialist',
     salary: '$45,000/year',
@@ -15,7 +15,7 @@ const stories = [
   {
     name: 'Sarah Martinez',
     program: 'Medical Assistant',
-    image: '/images/heroes/workforce-partner-1.jpg',
+    image: '/images/pages/comp-highlights-success.jpg',
     beforeJob: 'Retail cashier, $12/hour',
     afterJob: 'Medical Assistant',
     salary: '$38,000/year',
@@ -24,7 +24,7 @@ const stories = [
   {
     name: 'James Wilson',
     program: 'HVAC Technician',
-    image: '/images/efh/sections/staffing.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
     beforeJob: 'Fast food worker',
     afterJob: 'HVAC Technician',
     salary: '$52,000/year',

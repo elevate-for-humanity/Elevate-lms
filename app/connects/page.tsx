@@ -19,7 +19,7 @@ const PORTALS = [
     desc: 'Access courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
     href: '/student-portal',
     loginHref: '/login?redirect=/lms/dashboard',
-    image: '/images/programs-hq/students-learning.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     icon: '/images/icons/book.png',
     features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule'],
     accent: 'bg-brand-blue-600 hover:bg-brand-blue-700',
@@ -30,7 +30,7 @@ const PORTALS = [
     desc: 'Manage apprentices, track training progress, access compliance documents, and connect with program coordinators.',
     href: '/employer-portal',
     loginHref: '/login?redirect=/employer/dashboard',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     icon: '/images/icons/users.png',
     features: ['Apprentice Mgmt', 'Training Progress', 'Compliance', 'Hiring Tools'],
     accent: 'bg-green-600 hover:bg-green-700',
@@ -41,7 +41,7 @@ const PORTALS = [
     desc: 'Collaborate on programs, access partnership resources, track referrals, and manage your organization\'s involvement.',
     href: '/partner-portal',
     loginHref: '/login?redirect=/partner',
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     icon: '/images/icons/trending-up.png',
     features: ['Collaboration', 'Referral Tracking', 'Resources', 'Reports'],
     accent: 'bg-purple-600 hover:bg-purple-700',
@@ -52,7 +52,7 @@ const PORTALS = [
     desc: 'Manage students, track enrollments, record attendance, generate reports, and access administrative tools.',
     href: '/staff-portal',
     loginHref: '/login?redirect=/staff-portal/dashboard',
-    image: '/images/heroes-hq/team-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     icon: '/images/icons/clock.png',
     features: ['Student Mgmt', 'Attendance', 'Reports', 'Scheduling'],
     accent: 'bg-amber-600 hover:bg-amber-700',
@@ -63,7 +63,7 @@ const PORTALS = [
     desc: 'Access workforce development data, program outcomes, compliance reports, and funding utilization dashboards.',
     href: '/workforce-board',
     loginHref: '/login?redirect=/workforce-board',
-    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     icon: '/images/icons/dollar.png',
     features: ['Outcomes Data', 'Compliance', 'Funding Reports', 'Analytics'],
     accent: 'bg-teal-600 hover:bg-teal-700',
@@ -74,7 +74,7 @@ const PORTALS = [
     desc: 'Full platform administration. Manage users, programs, enrollments, content, analytics, and system configuration.',
     href: '/admin-login',
     loginHref: '/login?redirect=/admin/dashboard',
-    image: '/images/heroes-hq/success-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     icon: '/images/icons/shield.png',
     features: ['User Mgmt', 'Program Admin', 'Analytics', 'System Config'],
     accent: 'bg-brand-red-600 hover:bg-brand-red-700',
@@ -144,7 +144,7 @@ export default function ConnectsLandingPage() {
       {/* VIDEO HERO — no overlay, text below */}
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '340px' }}>
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/heroes-hq/about-hero.jpg">
+          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/comp-cta-career.jpg">
             <source src="/videos/dashboard-admin-narrated.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/videos/elevate-overview-with-narration.mp3" preload="none" onEnded={() => setVoiceActive(false)} />

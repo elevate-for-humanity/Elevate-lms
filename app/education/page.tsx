@@ -19,59 +19,59 @@ const PROGRAMS = [
   {
     title: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/programs-hq/healthcare-hero.jpg',
-    icon: '/images/programs/efh-cna-card.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
+    icon: '/images/pages/comp-cta-programs.jpg',
     desc: 'CNA, Medical Assistant, Phlebotomy, and more. Hands-on clinical training for in-demand healthcare careers.',
     tags: ['CNA', 'Medical Assistant', 'Phlebotomy', 'CPR & First Aid'],
   },
   {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/trades/hero-program-welding.jpg',
-    icon: '/images/trades/program-hvac-technician.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
+    icon: '/images/pages/comp-pathway-trades.jpg',
     desc: 'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
     tags: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
   },
   {
     title: 'Technology',
     href: '/programs/technology',
-    image: '/images/programs-hq/cybersecurity.jpg',
-    icon: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
+    icon: '/images/pages/comp-cta-training.jpg',
     desc: 'Cybersecurity, IT Support, Software Development, and Networking. Launch a career in tech.',
     tags: ['Cybersecurity', 'IT Help Desk', 'Software Dev'],
   },
   {
     title: 'CDL & Transportation',
     href: '/programs/cdl',
-    image: '/images/trades/program-cdl-commercial-driving.jpg',
-    icon: '/images/trades/program-cdl-overview.jpg',
+    image: '/images/pages/comp-pathway-trades.jpg',
+    icon: '/images/pages/comp-pathway-trades.jpg',
     desc: 'Commercial Driving License training with job placement. Class A and Class B CDL programs.',
     tags: ['CDL Class A', 'CDL Class B', 'Diesel Mechanic'],
   },
   {
     title: 'Beauty & Barbering',
     href: '/programs/barber-apprenticeship',
-    image: '/images/programs/efh-barber-hero.jpg',
-    icon: '/images/programs/efh-beauty-career-educator-card.jpg',
+    image: '/images/pages/comp-cta-programs.jpg',
+    icon: '/images/pages/comp-cta-programs.jpg',
     desc: 'Barber apprenticeships and cosmetology training. Learn from licensed professionals in real shop settings.',
     tags: ['Barber Apprenticeship', 'Cosmetology', 'Nail Tech'],
   },
   {
     title: 'Business & Finance',
     href: '/programs/business',
-    image: '/images/programs/efh-business-startup-marketing-hero.jpg',
-    icon: '/images/programs/efh-tax-office-startup-card.jpg',
+    image: '/images/pages/comp-cta-programs.jpg',
+    icon: '/images/pages/comp-cta-programs.jpg',
     desc: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship programs.',
     tags: ['Bookkeeping', 'Tax Prep', 'Entrepreneurship'],
   },
 ];
 
 const LOCATIONS = [
-  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/programs-hq/training-classroom.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
-  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/programs-hq/students-learning.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
-  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/trades/program-electrical-training.jpg', desc: 'Career training aligned with Ohio industry demand.' },
-  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/trades/program-construction-training.jpg', desc: 'Expanding workforce development across Tennessee.' },
-  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/programs-hq/cdl-trucking.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
+  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/comp-cta-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
+  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/comp-cta-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
+  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Career training aligned with Ohio industry demand.' },
+  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Expanding workforce development across Tennessee.' },
+  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/comp-cta-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
 ];
 
 const STATS = [
@@ -138,7 +138,7 @@ export default function EducationLandingPage() {
       {/* VIDEO HERO — no overlay, text below video */}
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '360px' }}>
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/heroes-hq/programs-hero.jpg">
+          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/comp-cta-career.jpg">
             <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />

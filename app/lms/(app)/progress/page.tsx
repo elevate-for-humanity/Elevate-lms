@@ -179,7 +179,7 @@ export default async function ProgressPage() {
         <LmsHeroBanner
           title="My Progress"
           subtitle={`${stats.completedLessons} lessons completed across ${stats.totalCourses} courses. ${overallProgress}% overall completion.`}
-          image="/images/heroes-hq/how-it-works-hero.jpg"
+          image="/images/pages/comp-cta-career.jpg"
           eyebrow="Learning Analytics"
           cta={{ label: 'Continue Learning', href: '/lms/courses' }}
         />

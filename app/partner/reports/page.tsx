@@ -100,7 +100,7 @@ export default async function PartnerReportsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Partner reports" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-12.jpg" alt="Partner reports" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

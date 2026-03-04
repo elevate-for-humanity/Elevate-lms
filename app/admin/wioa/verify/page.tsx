@@ -134,7 +134,7 @@ export default async function WIOAVerifyPage({
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-wioa-verify-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-5xl mx-auto">
         <Link href="/admin/wioa/verify" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">

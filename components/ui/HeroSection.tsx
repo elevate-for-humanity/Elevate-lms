@@ -19,7 +19,7 @@ import Link from 'next/link';
  * <HeroSection
  *   title="Program Title"
  *   subtitle="Brief description"
- *   image="/images/heroes/program.jpg"
+ *   image="/images/pages/comp-highlights-success.jpg"
  *   variant="split"
  *   ctaPrimary={{ label: "Apply Now", href: "/apply" }}
  * />

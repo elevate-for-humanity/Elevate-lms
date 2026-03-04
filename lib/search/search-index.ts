@@ -30,7 +30,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['barber', 'barbering', 'cosmetology', 'hair', 'cutting', 'fades', 'apprentice', 'license'],
-    image: '/images/programs-hq/barber-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -42,7 +42,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['cna', 'nursing', 'healthcare', 'medical', 'nurse', 'assistant', 'clinical', 'hospital'],
-    image: '/images/programs-hq/cna-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -54,7 +54,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['hvac', 'heating', 'cooling', 'air conditioning', 'refrigeration', 'epa', 'technician'],
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -66,7 +66,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['cdl', 'truck', 'driver', 'trucking', 'commercial', 'driving', 'transportation', 'logistics'],
-    image: '/images/programs-hq/cdl-trucking.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -78,7 +78,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['tax', 'taxes', 'irs', 'preparer', 'preparation', 'accounting', 'finance', 'ptin'],
-    image: '/images/programs-hq/tax-preparation.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$499',
   },
 
@@ -93,7 +93,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['organizations', 'developers'],
     keywords: ['lms', 'platform', 'license', 'core', 'basic', 'starter', 'learning management'],
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$4,999',
   },
   {
@@ -104,7 +104,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['organizations'],
     keywords: ['school', 'training', 'provider', 'white-label', 'wioa', 'compliance', 'lms', 'platform'],
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$15,000',
     badge: 'Most Popular',
   },
@@ -116,7 +116,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['organizations'],
     keywords: ['enterprise', 'multi-site', 'api', 'integration', 'custom', 'large', 'organization'],
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/pages/store-recommendations.jpg',
     price: '$50,000',
   },
   {
@@ -127,7 +127,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['developers'],
     keywords: ['developer', 'source code', 'self-host', 'github', 'clone', 'agency', 'code'],
-    image: '/images/programs-hq/cybersecurity.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$299',
   },
   {
@@ -138,7 +138,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['developers'],
     keywords: ['developer', 'pro', 'commercial', 'source code', 'white-label', 'resell'],
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$999',
   },
 
@@ -153,7 +153,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['wioa', 'compliance', 'pirl', 'workforce', 'reporting', 'tracking', 'dol'],
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     price: '$1,999',
   },
   {
@@ -164,7 +164,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['ferpa', 'privacy', 'student data', 'encryption', 'compliance', 'security'],
-    image: '/images/programs-hq/cybersecurity.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$999',
   },
   {
@@ -175,7 +175,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['grant', 'reporting', 'federal', 'state', 'dol', 'export', 'outcomes'],
-    image: '/images/programs-hq/business-office.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$999',
   },
   {
@@ -186,7 +186,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations', 'students'],
     keywords: ['ai', 'tutor', 'artificial intelligence', 'chatbot', 'support', 'learning', '24/7'],
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: '$999',
     badge: 'New',
   },
@@ -202,7 +202,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['tools', 'equipment', 'kit', 'professional', 'hvac', 'barber', 'shears'],
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     id: 'shop-apparel',
@@ -212,7 +212,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['scrubs', 'uniform', 'apparel', 'clothing', 'medical', 'hoodie', 'shirt'],
-    image: '/images/programs-hq/healthcare-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     id: 'shop-books',
@@ -222,7 +222,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['books', 'study', 'guide', 'textbook', 'exam', 'prep', 'materials'],
-    image: '/images/programs-hq/business-office.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
 
   // ============================================
@@ -236,7 +236,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'resource',
     audiences: ['students'],
     keywords: ['workbook', 'download', 'pdf', 'study', 'materials', 'free'],
-    image: '/images/programs-hq/business-office.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     price: 'Free',
   },
   {
@@ -247,7 +247,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'resource',
     audiences: ['students', 'everyone'],
     keywords: ['courses', 'marketplace', 'online', 'learning', 'training', 'expert'],
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
 
   // ============================================

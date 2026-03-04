@@ -230,7 +230,7 @@ export default async function AccreditationPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-accreditation-hero.jpg" alt="Accreditation management" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <div className="bg-white border-b">

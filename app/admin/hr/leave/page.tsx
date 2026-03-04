@@ -28,7 +28,7 @@ export default async function LeavePage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="HR administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-hr-leave-hero.jpg" alt="HR administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">

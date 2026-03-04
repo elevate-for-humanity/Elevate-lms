@@ -85,7 +85,7 @@ export default async function LicenseRequestsAdminPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-license-requests-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <h1 className="text-3xl font-bold text-zinc-900">License Requests</h1>
       <p className="mt-2 text-zinc-700">

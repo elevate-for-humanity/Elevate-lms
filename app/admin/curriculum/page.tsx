@@ -66,7 +66,7 @@ export default async function CurriculumPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-curriculum-hero.jpg" alt="Curriculum management" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
@@ -78,7 +78,7 @@ export default async function CurriculumPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/admin-curriculum-detail.jpg"
           alt="Curriculum Management"
           fill
           className="object-cover"

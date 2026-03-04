@@ -65,7 +65,7 @@ export default async function ForEmployersPage() {
       <section className="relative w-full">
         <div className="relative h-[350px] md:h-[450px] w-full overflow-hidden">
           <Image
-            src="/images/heroes-hq/employer-hero.jpg"
+            src="/images/pages/for-employers-page-1.jpg"
             alt="Employer partner meeting with Elevate for Humanity team"
             fill
             className="object-cover"

@@ -258,7 +258,7 @@ export default function SignMOUPage() {
       {/* Hero */}
       <section className="relative py-12 overflow-hidden">
         <Image
-          src="/images/programs-hq/barber-hero.jpg"
+          src="/images/pages/partners-pub-page-5.jpg"
           alt="Sign MOU"
           fill
           className="object-cover"

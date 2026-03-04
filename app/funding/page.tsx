@@ -15,14 +15,14 @@ export const metadata: Metadata = {
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/funding-hero.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
+    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Workforce Funding | Elevate for Humanity',
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
-    images: ['/images/heroes-hq/funding-hero.jpg'],
+    images: ['/images/pages/comp-cta-career.jpg'],
   },
 };
 
@@ -38,7 +38,7 @@ export default function FundingPage() {
 
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/trades/program-building-technology.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/funding-page-5.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
             Workforce Funding
@@ -56,7 +56,7 @@ export default function FundingPage() {
             {/* WIOA */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA workforce funding" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/funding-page-3.jpg" alt="WIOA workforce funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
@@ -81,7 +81,7 @@ export default function FundingPage() {
             {/* WRG */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/programs-hq/phlebotomy.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/funding-page-3.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -106,7 +106,7 @@ export default function FundingPage() {
             {/* JRI */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/trades/program-building-construction.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/funding-page-5.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -131,7 +131,7 @@ export default function FundingPage() {
             {/* VR — Vocational Rehabilitation */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Vocational rehabilitation services" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/funding-page-3.jpg" alt="Vocational rehabilitation services" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -156,7 +156,7 @@ export default function FundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="On-the-job training with employer" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/funding-page-3.jpg" alt="On-the-job training with employer" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">

@@ -92,7 +92,7 @@ export default function CourseLeaderboardPage() {
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="/images/programs-hq/training-classroom.jpg"
+            src="/images/pages/courses-page-2.jpg"
             alt="Leaderboard"
             fill
             className="object-cover"
@@ -153,7 +153,7 @@ export default function CourseLeaderboardPage() {
                   </div>
                   <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/programs-hq/training-classroom.jpg"
+                      src="/images/pages/courses-page-2.jpg"
                       alt="Students achieving goals"
                       fill
                       className="object-cover"

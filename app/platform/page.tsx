@@ -20,30 +20,30 @@ export const metadata: Metadata = {
 /* ------------------------------------------------------------------ */
 
 const pipelineSteps = [
-  { step: '1', label: 'Intake & Eligibility', desc: 'WIOA screening, enrollment, funding verification', image: '/images/hp/apply-online.jpg' },
-  { step: '2', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid programs', image: '/images/programs-hq/training-classroom.jpg' },
-  { step: '3', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready reports', image: '/images/heroes-hq/how-it-works-hero.jpg' },
-  { step: '4', label: 'Employer Placement', desc: 'Pipeline matching, partner hiring, career services', image: '/images/hp/employer.jpg' },
-  { step: '5', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention', image: '/images/heroes-hq/success-hero.jpg' },
+  { step: '1', label: 'Intake & Eligibility', desc: 'WIOA screening, enrollment, funding verification', image: '/images/pages/homepage-why-elevate.jpg' },
+  { step: '2', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid programs', image: '/images/pages/comp-cta-training.jpg' },
+  { step: '3', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready reports', image: '/images/pages/comp-cta-career.jpg' },
+  { step: '4', label: 'Employer Placement', desc: 'Pipeline matching, partner hiring, career services', image: '/images/pages/homepage-why-elevate.jpg' },
+  { step: '5', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention', image: '/images/pages/comp-cta-career.jpg' },
 ];
 
 const audiences = [
-  { title: 'Training Providers', desc: 'Deliver industry-aligned programs with built-in compliance and credential issuance.', href: '/platform/training-providers', image: '/images/hp/school.jpg' },
-  { title: 'Employers', desc: 'Access trained candidates, manage apprenticeships, track workforce pipelines.', href: '/platform/employer-portal', image: '/images/hp/employer.jpg' },
-  { title: 'Workforce Boards', desc: 'WIOA reporting, outcome dashboards, multi-provider oversight.', href: '/platform/workforce-boards', image: '/images/hp/government.jpg' },
-  { title: 'Partners & Nonprofits', desc: 'Plug into shared infrastructure for funded training delivery.', href: '/platform/partners', image: '/images/hp/candidates.jpg' },
+  { title: 'Training Providers', desc: 'Deliver industry-aligned programs with built-in compliance and credential issuance.', href: '/platform/training-providers', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Employers', desc: 'Access trained candidates, manage apprenticeships, track workforce pipelines.', href: '/platform/employer-portal', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Workforce Boards', desc: 'WIOA reporting, outcome dashboards, multi-provider oversight.', href: '/platform/workforce-boards', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Partners & Nonprofits', desc: 'Plug into shared infrastructure for funded training delivery.', href: '/platform/partners', image: '/images/pages/homepage-why-elevate.jpg' },
 ];
 
 const modules = [
-  { title: 'Partners', desc: 'Training providers, employers, workforce boards, and community organizations operating on the platform.', href: '/platform/partners', image: '/images/hp/candidates.jpg' },
-  { title: 'Managed Platform', desc: 'We operate it, you use it. Hosting, compliance reporting, updates, and support — zero engineering burden.', href: '/platform/managed', image: '/images/programs-hq/technology-hero.jpg' },
-  { title: 'Enterprise Access', desc: 'Enterprise source-use deployments for organizations with dedicated technical teams.', href: '/platform/enterprise', image: '/images/programs-hq/cybersecurity.jpg' },
-  { title: 'Workforce Boards', desc: 'WIOA-aligned dashboards, multi-provider reporting, and state agency integration.', href: '/platform/workforce-boards', image: '/images/hp/government.jpg' },
-  { title: 'Licensing', desc: "License models, qualification criteria, and what's included in each tier.", href: '/platform/licensing', image: '/images/heroes-hq/programs-hero.jpg' },
-  { title: 'Licensing Models', desc: 'Detailed breakdown of all four license types: Program Holder, Independent, Apprenticeship, and À La Carte.', href: '/platform/overview', image: '/images/hp/funding.jpg' },
-  { title: 'Program Holders', desc: 'MOU-based network for training providers operating under the Elevate umbrella.', href: '/platform/program-holders', image: '/images/hp/school.jpg' },
-  { title: 'Sponsors', desc: 'Sponsor licensing for organizations funding workforce programs at scale.', href: '/platform/sponsors', image: '/images/heroes-hq/employer-hero.jpg' },
-  { title: 'Workforce Analytics', desc: 'Enrollment, completion, credential, and employment outcome data across all programs.', href: '/platform/workforce-analytics', image: '/images/heroes-hq/how-it-works-hero.jpg' },
+  { title: 'Partners', desc: 'Training providers, employers, workforce boards, and community organizations operating on the platform.', href: '/platform/partners', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Managed Platform', desc: 'We operate it, you use it. Hosting, compliance reporting, updates, and support — zero engineering burden.', href: '/platform/managed', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Enterprise Access', desc: 'Enterprise source-use deployments for organizations with dedicated technical teams.', href: '/platform/enterprise', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Workforce Boards', desc: 'WIOA-aligned dashboards, multi-provider reporting, and state agency integration.', href: '/platform/workforce-boards', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Licensing', desc: "License models, qualification criteria, and what's included in each tier.", href: '/platform/licensing', image: '/images/pages/comp-cta-career.jpg' },
+  { title: 'Licensing Models', desc: 'Detailed breakdown of all four license types: Program Holder, Independent, Apprenticeship, and À La Carte.', href: '/platform/overview', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Program Holders', desc: 'MOU-based network for training providers operating under the Elevate umbrella.', href: '/platform/program-holders', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Sponsors', desc: 'Sponsor licensing for organizations funding workforce programs at scale.', href: '/platform/sponsors', image: '/images/pages/comp-cta-career.jpg' },
+  { title: 'Workforce Analytics', desc: 'Enrollment, completion, credential, and employment outcome data across all programs.', href: '/platform/workforce-analytics', image: '/images/pages/comp-cta-career.jpg' },
 ];
 
 const governancePrinciples = [
@@ -247,7 +247,7 @@ export default function PlatformPage() {
       {/* ===== CTA ===== */}
       <section className="relative py-20 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/platform-page-2.jpg"
           alt="Workforce training in action"
           fill
           className="object-cover"

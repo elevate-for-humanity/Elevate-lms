@@ -44,7 +44,7 @@ export default function PrepaidCardPage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs/efh-business-startup-marketing-hero.jpg"
+          src="/images/pages/banking-page-3.jpg"
           alt="Prepaid Card"
           fill
           className="object-cover"

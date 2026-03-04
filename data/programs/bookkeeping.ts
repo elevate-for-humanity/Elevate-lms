@@ -7,7 +7,7 @@ export const BOOKKEEPING: ProgramSchema = {
   sector: 'business',
   category: 'Accounting & Finance',
 
-  heroImage: '/images/programs-hq/business-office.jpg',
+  heroImage: '/images/pages/comp-cta-training.jpg',
   heroImageAlt: 'Bookkeeper working with financial documents and QuickBooks software',
 
   deliveryMode: 'in-person',

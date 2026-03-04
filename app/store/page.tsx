@@ -20,7 +20,7 @@ export default function StorePage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/store-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* ============ HERO — Video on the right, pitch on the left ============ */}
@@ -107,10 +107,10 @@ export default function StorePage() {
           <p className="text-slate-600 text-center mb-10">Real screenshots from the platform. This is what your staff and students will use every day.</p>
           <div className="grid sm:grid-cols-2 gap-6">
             {[
-              { img: '/images/demos/admin-dashboard-thumb.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
-              { img: '/images/demos/employer-portal-thumb.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
-              { img: '/images/demos/course-builder-thumb.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
-              { img: '/images/demos/lms-overview-thumb.jpg', label: 'Student View — courses, certificates, career services' },
+              { img: '/images/pages/demos-hero.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
+              { img: '/images/pages/demos-hero.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
+              { img: '/images/pages/demos-hero.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
+              { img: '/images/pages/demos-hero.jpg', label: 'Student View — courses, certificates, career services' },
             ].map(s => (
               <div key={s.img} className="group">
                 <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-slate-200">
@@ -134,9 +134,9 @@ export default function StorePage() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5 mb-8">
             {[
-              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/demos/admin-dashboard-thumb.jpg' },
-              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/demos/employer-portal-thumb.jpg' },
-              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/demos/course-builder-thumb.jpg' },
+              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/pages/demos-hero.jpg' },
+              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/pages/demos-hero.jpg' },
+              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/pages/demos-hero.jpg' },
             ].map(d => (
               <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition">
                 <div className="relative aspect-video">
@@ -166,9 +166,9 @@ export default function StorePage() {
           </p>
           <div className="space-y-6">
             {[
-              { title: 'Workforce Boards', desc: 'WIOA eligibility determination, ITA management, PIRL reporting, provider network oversight, quarterly performance metrics. Replace your current patchwork of systems with one platform that does it all.', img: '/images/homepage/government-agencies.jpg' },
-              { title: 'Training Providers', desc: 'Student enrollment, attendance tracking, course delivery, credential issuance, outcome reporting to funders. Stop emailing spreadsheets to your workforce board.', img: '/images/efh/hero/hero-main-clean.jpg' },
-              { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/programs-hq/skilled-trades-hero.jpg' },
+              { title: 'Workforce Boards', desc: 'WIOA eligibility determination, ITA management, PIRL reporting, provider network oversight, quarterly performance metrics. Replace your current patchwork of systems with one platform that does it all.', img: '/images/pages/homepage-why-elevate.jpg' },
+              { title: 'Training Providers', desc: 'Student enrollment, attendance tracking, course delivery, credential issuance, outcome reporting to funders. Stop emailing spreadsheets to your workforce board.', img: '/images/pages/comp-home-highlight-health.jpg' },
+              { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/pages/comp-cta-training.jpg' },
             ].map((item) => (
               <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
                 <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0">

@@ -110,7 +110,7 @@ export default async function DocumentationPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/lms-hero-banner.jpg"
+          src="/images/pages/program-holder-docs.jpg"
           alt="Documentation"
           fill
           className="object-cover"

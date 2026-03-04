@@ -6,8 +6,6 @@ import { Metadata } from 'next';
 import { Heart, Users, Clock, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
-
 export const metadata: Metadata = {
   title: 'Volunteer Opportunities | Elevate For Humanity',
   description: 'Make a difference in your community. Join our volunteer programs.',
@@ -53,10 +51,16 @@ export default async function VolunteerPage() {
         </div>
       </div>
 
-
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/partner-join-narrated.mp4" posterSrc="/images/efh/sections/coaching.jpg" posterAlt="Volunteer" />
-
+      {/* Hero */}
+      <div className="relative h-[40vh] min-h-[300px] flex items-center">
+        <Image
+          src="/images/pages/volunteer-page-1.jpg"
+          alt="Volunteer with Elevate"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Benefits */}

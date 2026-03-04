@@ -107,7 +107,7 @@ export default async function LearningPathsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-hero.jpg"
+          src="/images/pages/lms-page-4.jpg"
           alt="Learning Paths"
           fill
           className="object-cover"
@@ -147,7 +147,7 @@ export default async function LearningPathsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes-hq/success-hero.jpg"
+                  src="/images/pages/lms-page-4.jpg"
                   alt="Learning Paths"
                   fill
                   className="object-cover"

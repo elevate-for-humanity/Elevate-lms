@@ -57,7 +57,7 @@ function CheckoutSuccessContent() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/store-checkout-success-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600 mx-auto mb-4" />

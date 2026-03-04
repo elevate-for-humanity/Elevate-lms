@@ -21,7 +21,7 @@ export default function OJTAndFundingPage() {
 
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/homepage/earn-while-you-learn.png" alt="Earn while you learn" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/ojt-and-funding-page-1.jpg" alt="Earn while you learn" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Earn While You Learn</h1>
@@ -40,7 +40,7 @@ export default function OJTAndFundingPage() {
             {/* Apprenticeship */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[200px]">
-                <Image src="/images/barber/training.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/barber-training.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Apprenticeships</h3>
@@ -64,7 +64,7 @@ export default function OJTAndFundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[200px]">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/ojt-and-funding-page-1.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">On-the-Job Training (OJT)</h3>

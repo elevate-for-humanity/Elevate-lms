@@ -76,7 +76,7 @@ export default async function CompliancePage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Compliance administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-compliance-hero.jpg" alt="Compliance dashboard" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
@@ -88,7 +88,7 @@ export default async function CompliancePage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/pages/admin-compliance-detail.jpg"
           alt="Compliance"
           fill
           className="object-cover"

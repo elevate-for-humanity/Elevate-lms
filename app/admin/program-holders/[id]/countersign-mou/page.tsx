@@ -65,12 +65,12 @@ export default async function CountersignMouPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-ph-countersign-hero.jpg" alt="Countersign MOU" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
+          src="/images/pages/admin-ph-countersign-detail.jpg"
           alt="Countersign Mou"
           fill
           className="object-cover"

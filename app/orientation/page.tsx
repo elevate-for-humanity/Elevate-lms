@@ -5,8 +5,6 @@ import Image from 'next/image';
 import OrientationFormClient from './OrientationFormClient';
 
 
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
-
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/orientation' },
   title: 'Orientation | Elevate For Humanity',
@@ -21,10 +19,18 @@ export default async function OrientationPage() {
         <Breadcrumbs items={[{ label: 'Orientation' }]} />
       </div>
 
-
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/orientation-full.mp4" posterSrc="/images/efh/sections/classroom.jpg" posterAlt="Orientation" />
-
+      {/* Hero — image only, no text overlay */}
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] overflow-hidden">
+        <Image
+          src="/images/pages/orientation-page-1.jpg"
+          alt="Orientation session"
+          fill
+          className="object-cover"
+          quality={90}
+          priority
+          sizes="100vw"
+        />
+      </section>
 
       {/* Title + Intro */}
       <section className="py-12 bg-white">

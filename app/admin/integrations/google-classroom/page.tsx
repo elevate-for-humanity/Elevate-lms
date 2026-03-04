@@ -65,12 +65,12 @@ export default async function GoogleClassroomPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-integrations-gc-hero.jpg" alt="Google Classroom integration" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/cybersecurity.jpg"
+          src="/images/pages/admin-integrations-gc-detail.jpg"
           alt="Google Classroom"
           fill
           className="object-cover"

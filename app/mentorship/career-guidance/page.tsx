@@ -38,7 +38,7 @@ export default function CareerGuidancePage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Career Guidance" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/mentorship-page-1.jpg" alt="Career Guidance" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

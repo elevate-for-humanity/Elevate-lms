@@ -22,7 +22,7 @@ export default function TaxPreparationPage() {
       </div>
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
-        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax Preparation" fill sizes="100vw" className="object-cover" quality={85} priority />
+        <Image src="/images/pages/supersonic-page-8.jpg" alt="Tax Preparation" fill sizes="100vw" className="object-cover" quality={85} priority />
       </section>
 
       {/* Content */}

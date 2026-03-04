@@ -23,7 +23,7 @@ export default function EmploymentSupportPage() {
       {/* Hero — image only, no text overlay */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image
-          src="/images/employment-support/hero-clean.jpg"
+          src="/images/pages/employment-support-page-1.jpg"
           alt="Employment support services at Elevate for Humanity"
           fill
           sizes="100vw"
@@ -60,32 +60,32 @@ export default function EmploymentSupportPage() {
               {
                 title: 'One-on-One Career Coaching',
                 desc: 'Work directly with a career advisor to set goals, identify strengths, and build a personalized employment plan.',
-                image: '/images/employment-support/career-coaching.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
               {
                 title: 'Resume & Application Assistance',
                 desc: 'Get help building a professional resume, completing job applications, and creating cover letters tailored to your target industry.',
-                image: '/images/employment-support/resume-assistance.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
               {
                 title: 'Interview Preparation',
                 desc: 'Practice with mock interviews, receive feedback, and learn how to present yourself confidently to employers.',
-                image: '/images/employment-support/interview-prep.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
               {
                 title: 'Employer Connections',
                 desc: 'We connect you directly with employer partners who are actively hiring in your field through our partner network.',
-                image: '/images/employment-support/employer-connections.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
               {
                 title: 'Barrier-to-Employment Support',
                 desc: 'Transportation coordination, referral support, and assistance addressing challenges that impact your ability to work.',
-                image: '/images/employment-support/barrier-support.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
               {
                 title: 'Post-Placement Retention',
                 desc: 'Follow-up support after you start working to help you stay employed, resolve workplace issues, and advance in your career.',
-                image: '/images/employment-support/retention-support.jpg',
+                image: '/images/pages/comp-cta-career.jpg',
               },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
@@ -137,7 +137,7 @@ export default function EmploymentSupportPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto min-h-[300px]">
               <Image
-                src="/images/employment-support/who-we-serve.jpg"
+                src="/images/pages/employment-support-page-1.jpg"
                 alt="Participants in a training session"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -183,7 +183,7 @@ export default function EmploymentSupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="relative h-[200px] rounded-xl overflow-hidden mb-4">
                 <Image
-                  src="/images/employment-support/industry-training.jpg"
+                  src="/images/pages/employment-support-page-1.jpg"
                   alt="Hands-on industry training"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -206,7 +206,7 @@ export default function EmploymentSupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="relative h-[200px] rounded-xl overflow-hidden mb-4">
                 <Image
-                  src="/images/employment-support/one-on-one-support.jpg"
+                  src="/images/pages/employment-support-page-1.jpg"
                   alt="One-on-one career coaching session"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

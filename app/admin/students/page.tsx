@@ -102,7 +102,7 @@ export default async function StudentsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student enrollment" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-students-hero.jpg" alt="Student enrollment" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
@@ -114,7 +114,7 @@ export default async function StudentsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-hero.jpg"
+          src="/images/pages/admin-students-hero.jpg"
           alt="Students Management"
           fill
           className="object-cover"

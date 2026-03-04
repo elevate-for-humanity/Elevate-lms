@@ -42,7 +42,7 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <Image
-            src="/images/heroes-hq/about-hero.jpg"
+            src="/images/pages/store-demo-video-hero.jpg"
             alt="Elevate platform walkthrough"
             fill
             className="object-cover"

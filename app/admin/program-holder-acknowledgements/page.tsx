@@ -73,7 +73,7 @@ export default async function ProgramHolderAcknowledgementsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-ph-ack-hero.jpg" alt="Program holder acknowledgements" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Program Holder Acknowledgements" }]} />
@@ -81,7 +81,7 @@ export default async function ProgramHolderAcknowledgementsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/pages/admin-ph-ack-detail.jpg"
           alt="Program Holder Acknowledgements"
           fill
           className="object-cover"

@@ -54,7 +54,7 @@ export default function StateProgramsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Indiana state funding programs" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/funding-page-4.jpg" alt="Indiana state funding programs" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

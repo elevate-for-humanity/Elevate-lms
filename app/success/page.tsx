@@ -44,7 +44,7 @@ export default async function SuccessStoriesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Success Stories" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/success-page-1.jpg" alt="Success Stories" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -61,7 +61,7 @@ export default async function SuccessStoriesPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative w-full h-64">
                 <Image
-                  src="/images/heroes-hq/success-hero.jpg"
+                  src="/images/pages/success-page-1.jpg"
                   alt="Student success at Elevate for Humanity"
                   fill
                   className="object-cover"
@@ -82,7 +82,7 @@ export default async function SuccessStoriesPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative w-full h-64">
                 <Image
-                  src="/images/programs/efh-barber-hero.jpg"
+                  src="/images/pages/success-page-1.jpg"
                   alt="Barber Training"
                   fill
                   className="object-cover"
@@ -103,7 +103,7 @@ export default async function SuccessStoriesPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative w-full h-64">
                 <Image
-                  src="/images/programs/efh-business-startup-marketing-hero.jpg"
+                  src="/images/pages/success-page-1.jpg"
                   alt="Business Training"
                   fill
                   className="object-cover"

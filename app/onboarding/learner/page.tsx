@@ -34,7 +34,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Add your contact information, emergency contacts, and preferences so we can support you throughout the program.',
     href: '/profile/edit',
     icon: User,
-    image: '/images/heroes-hq/about-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     imageAlt: 'Student completing profile at Elevate for Humanity',
     required: true,
   },
@@ -44,7 +44,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Submit your government-issued ID, proof of eligibility (WIOA letter, referral, or self-pay agreement), and any prior certifications.',
     href: '/documents/upload',
     icon: FileText,
-    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     imageAlt: 'Document submission process',
     required: true,
   },
@@ -54,7 +54,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Review and confirm how your training will be funded — WIOA sponsorship, DOL grant, employer sponsorship, or self-pay.',
     href: '/funding/confirm',
     icon: CreditCard,
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
     imageAlt: 'Funding and financial aid options',
     required: true,
   },
@@ -64,7 +64,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Choose your preferred class times and cohort start date. Day and evening options available.',
     href: '/schedule/select',
     icon: Calendar,
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     imageAlt: 'Training classroom schedule selection',
     required: true,
   },
@@ -74,7 +74,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Watch the orientation video, review program policies, attendance requirements, and acknowledge the student handbook.',
     href: '/onboarding/learner/orientation',
     icon: BookOpen,
-    image: '/images/programs-hq/students-learning.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     imageAlt: 'Students in orientation session',
     required: true,
   },
@@ -217,7 +217,7 @@ export default async function LearnerOnboardingPage() {
       <section className="relative overflow-hidden bg-slate-900">
         <div className="absolute inset-0">
           <Image
-            src="/images/heroes-hq/success-hero.jpg"
+            src="/images/pages/onboarding-page-1.jpg"
             alt="Students at Elevate for Humanity"
             fill
             className="object-cover opacity-25"
@@ -265,7 +265,7 @@ export default async function LearnerOnboardingPage() {
             <div className="relative flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/heroes-hq/success-stories-hero.jpg"
+                  src="/images/pages/onboarding-page-1.jpg"
                   alt="Enrollment approved"
                   width={80}
                   height={80}
@@ -433,7 +433,7 @@ export default async function LearnerOnboardingPage() {
           <div className="relative overflow-hidden rounded-2xl bg-slate-900">
             <div className="absolute inset-0">
               <Image
-                src="/images/heroes-hq/contact-hero.jpg"
+                src="/images/pages/onboarding-page-1.jpg"
                 alt="Contact Elevate for Humanity support"
                 fill
                 className="object-cover opacity-20"

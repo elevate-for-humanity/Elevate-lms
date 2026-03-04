@@ -99,7 +99,7 @@ export default function SocialMediaPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/cybersecurity.jpg"
+          src="/images/pages/admin-social-hero.jpg"
           alt="Social Media"
           fill
           className="object-cover"
@@ -419,7 +419,7 @@ export default function SocialMediaPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes-hq/programs-hero.jpg"
+                    src="/images/pages/admin-social-hero.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"
@@ -513,7 +513,7 @@ function ScheduleSlot({ time, status, campaign }: ScheduleSlotProps) {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-social-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="flex items-center space-x-4">
         <Clock className="w-5 h-5 text-black" />

@@ -11,7 +11,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare',
 
-  heroImage: '/images/programs-hq/healthcare-hero.jpg',
+  heroImage: '/images/pages/comp-pathway-healthcare.jpg',
   heroImageAlt: 'Pharmacy technician preparing medication in a pharmacy setting',
 
   deliveryMode: 'hybrid',

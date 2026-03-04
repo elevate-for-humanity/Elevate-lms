@@ -18,25 +18,25 @@ const features = [
   {
     title: 'Screen Reader Support',
     description: 'Full compatibility with JAWS, NVDA, VoiceOver, and other assistive technologies.',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['ARIA labels', 'Semantic HTML', 'Alt text automation', 'Focus management'],
   },
   {
     title: 'Keyboard Navigation',
     description: 'Complete keyboard accessibility for all interactive elements.',
-    image: '/images/programs-hq/it-support.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     items: ['Tab order optimization', 'Skip links', 'Focus indicators', 'Shortcut keys'],
   },
   {
     title: 'Visual Accessibility',
     description: 'Color contrast, text sizing, and visual presentation compliance.',
-    image: '/images/homepage/coaching-support-dashboard.png',
+    image: '/images/pages/homepage-why-elevate.jpg',
     items: ['4.5:1 contrast ratio', 'Resizable text', 'No color-only info', 'Reduced motion'],
   },
   {
     title: 'Multimedia Accessibility',
     description: 'Captions, transcripts, and audio descriptions for all media.',
-    image: '/images/homepage/coaching-support-dashboard.png',
+    image: '/images/pages/homepage-why-elevate.jpg',
     items: ['Closed captions', 'Transcripts', 'Audio descriptions', 'Sign language'],
   },
 ];
@@ -68,7 +68,7 @@ export default function WCAGCompliancePage() {
       </div>
 {/* Avatar Guide */}
       <AvatarGuide
-        avatarImage="/images/team-hq/instructor-1.jpg"
+        avatarImage="/images/pages/store-recommendations.jpg"
         avatarName="Alex"
         welcomeMessage="Hi! I'm Alex. Accessibility isn't just compliance - it's about making learning available to everyone. Let me show you how we make that happen."
         steps={guideSteps}
@@ -97,7 +97,7 @@ export default function WCAGCompliancePage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/programs-hq/technology-hero.jpg" alt="WCAG" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/store-compliance-wcag-hero.jpg" alt="WCAG" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

@@ -2,14 +2,14 @@ import Image from 'next/image';
 import { CREDENTIALS, CURRICULUM } from '../barber-program-data';
 
 const CURRICULUM_IMAGES = [
-  '/images/barber/gallery-1.jpg',
-  '/images/barber/gallery-2.jpg',
-  '/images/barber/gallery-3.jpg',
-  '/images/barber/training.jpg',
-  '/images/barber/barber-cutting.jpg',
+  '/images/pages/barber-gallery-1.jpg',
+  '/images/pages/barber-gallery-1.jpg',
+  '/images/pages/barber-gallery-1.jpg',
+  '/images/pages/barber-gallery-1.jpg',
+  '/images/pages/barber-gallery-1.jpg',
   '/images/barber-highlight-1.jpg',
   '/images/barber-highlight-2.jpg',
-  '/images/programs-hq/barber-hero.jpg',
+  '/images/pages/comp-cta-training.jpg',
 ];
 
 export function BarberCredentials() {
@@ -70,7 +70,7 @@ export function BarberCredentials() {
           <div className="grid sm:grid-cols-2 gap-6">
             <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
-                <Image src="/images/barber/gallery-1.jpg" alt="Supervised barber training" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                <Image src="/images/pages/barber-gallery-1.jpg" alt="Supervised barber training" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Supervised Training</h3>
@@ -79,7 +79,7 @@ export function BarberCredentials() {
             </div>
             <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
-                <Image src="/images/barber/gallery-2.jpg" alt="Barber performance evaluation" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                <Image src="/images/pages/barber-gallery-2.jpg" alt="Barber performance evaluation" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Performance Evaluations</h3>
@@ -88,7 +88,7 @@ export function BarberCredentials() {
             </div>
             <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
-                <Image src="/images/barber/gallery-3.jpg" alt="Barbershop employment" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                <Image src="/images/pages/barber-gallery-3.jpg" alt="Barbershop employment" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Employment Structure</h3>
@@ -97,7 +97,7 @@ export function BarberCredentials() {
             </div>
             <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
-                <Image src="/images/barber/training.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                <Image src="/images/pages/barber-training.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">OJT Hour Logging</h3>

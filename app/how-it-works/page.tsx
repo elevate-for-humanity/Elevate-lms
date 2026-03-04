@@ -13,14 +13,14 @@ export const metadata: Metadata = {
     description: 'From assessment to employment and follow-up support. See exactly how Elevate workforce and employment services work.',
     url: 'https://www.elevateforhumanity.org/how-it-works',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/how-it-works-hero.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
+    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'How It Works | Elevate for Humanity',
     description: 'From assessment to employment and follow-up support.',
-    images: ['/images/heroes-hq/how-it-works-hero.jpg'],
+    images: ['/images/pages/comp-cta-career.jpg'],
   },
 };
 
@@ -51,11 +51,11 @@ export default function HowItWorksPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="space-y-5">
             {[
-              { step: '1', title: 'Assessment & Intake', desc: 'We start with an individualized assessment to understand your goals, skills, experience, and any barriers to employment. If you qualify for funded training (WIOA, WRG, JRI, or VR), we help you navigate the enrollment process including Indiana Career Connect registration and WorkOne referral.', image: '/images/homepage/funding-navigation.png', cta: 'Check Eligibility', href: '/check-eligibility', external: false },
-              { step: '2', title: 'Training & Certification', desc: 'Enroll in an industry-recognized credential program matched to your career goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Programs run 4-16 weeks with instructor oversight. Some programs offer earn-while-you-learn apprenticeship pathways.', image: '/images/homepage/training-program-collage.png', cta: 'View Programs', href: '/programs', external: false },
-              { step: '3', title: 'One-on-One Employment Support', desc: 'Every participant receives individualized career coaching throughout the program. This includes resume development, job readiness skills, application assistance, mock interviews, and personalized career planning. Support is adapted to your strengths and needs.', image: '/images/heroes-hq/career-services-hero.jpg', cta: 'Employment Support Services', href: '/employment-support', external: false },
-              { step: '4', title: 'Employer Matching & Placement', desc: 'We connect you directly with employers in our hiring network. Staff coordinate introductions, schedule interviews, and support you through the hiring process. We provide employment assistance and employer connection support across healthcare, trades, IT, business, and more.', image: '/images/heroes-hq/employer-hero.jpg', cta: 'Employer Network', href: '/for-employers', external: false },
-              { step: '5', title: 'Follow-Up & Retention Support', desc: 'Support does not end at placement. We provide ongoing retention check-ins at 30, 60, 90, and 180 days. If workplace challenges arise, we help you navigate them. Our goal is long-term employment stability and career advancement.', image: '/images/heroes-hq/success-hero.jpg', cta: 'Learn More', href: '/employment-support', external: false },
+              { step: '1', title: 'Assessment & Intake', desc: 'We start with an individualized assessment to understand your goals, skills, experience, and any barriers to employment. If you qualify for funded training (WIOA, WRG, JRI, or VR), we help you navigate the enrollment process including Indiana Career Connect registration and WorkOne referral.', image: '/images/pages/homepage-why-elevate.jpg', cta: 'Check Eligibility', href: '/check-eligibility', external: false },
+              { step: '2', title: 'Training & Certification', desc: 'Enroll in an industry-recognized credential program matched to your career goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Programs run 4-16 weeks with instructor oversight. Some programs offer earn-while-you-learn apprenticeship pathways.', image: '/images/pages/homepage-why-elevate.jpg', cta: 'View Programs', href: '/programs', external: false },
+              { step: '3', title: 'One-on-One Employment Support', desc: 'Every participant receives individualized career coaching throughout the program. This includes resume development, job readiness skills, application assistance, mock interviews, and personalized career planning. Support is adapted to your strengths and needs.', image: '/images/pages/comp-cta-career.jpg', cta: 'Employment Support Services', href: '/employment-support', external: false },
+              { step: '4', title: 'Employer Matching & Placement', desc: 'We connect you directly with employers in our hiring network. Staff coordinate introductions, schedule interviews, and support you through the hiring process. We provide employment assistance and employer connection support across healthcare, trades, IT, business, and more.', image: '/images/pages/comp-cta-career.jpg', cta: 'Employer Network', href: '/for-employers', external: false },
+              { step: '5', title: 'Follow-Up & Retention Support', desc: 'Support does not end at placement. We provide ongoing retention check-ins at 30, 60, 90, and 180 days. If workplace challenges arise, we help you navigate them. Our goal is long-term employment stability and career advancement.', image: '/images/pages/comp-cta-career.jpg', cta: 'Learn More', href: '/employment-support', external: false },
             ].map((item) => (
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">

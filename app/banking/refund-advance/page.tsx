@@ -43,7 +43,7 @@ export default function RefundAdvancePage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs/efh-business-startup-marketing-hero.jpg"
+          src="/images/pages/banking-page-4.jpg"
           alt="Refund Advance"
           fill
           className="object-cover"

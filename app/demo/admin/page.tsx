@@ -18,7 +18,7 @@ export default function DemoAdminPage() {
 
       {/* Hero Image */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-7.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <AdminDemoClient
         students={DEMO_STUDENTS}

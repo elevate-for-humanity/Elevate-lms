@@ -38,12 +38,12 @@ const steps: QuizStep[] = [
     question: 'What kind of work excites you?',
     subtitle: 'Pick the field that feels right — you can always explore others later.',
     options: [
-      { id: 'healthcare', label: 'Healthcare', image: '/images/hero/hero-healthcare.jpg', description: 'Help people heal and stay healthy' },
-      { id: 'trades', label: 'Skilled Trades', image: '/images/trades/hero-program-hvac.jpg', description: 'Build, fix, and create with your hands' },
+      { id: 'healthcare', label: 'Healthcare', image: '/images/pages/comp-home-hero.jpg', description: 'Help people heal and stay healthy' },
+      { id: 'trades', label: 'Skilled Trades', image: '/images/pages/comp-pathway-trades.jpg', description: 'Build, fix, and create with your hands' },
       { id: 'cdl', label: 'CDL / Trucking', image: '/images/cdl-vibrant.jpg', description: 'Hit the road and earn $50K+' },
-      { id: 'tech', label: 'Technology', image: '/images/programs-hq/it-support.jpg', description: 'IT support, cybersecurity, web dev' },
+      { id: 'tech', label: 'Technology', image: '/images/pages/comp-cta-training.jpg', description: 'IT support, cybersecurity, web dev' },
       { id: 'barber', label: 'Barbering', image: '/images/barber-hero-new.jpg', description: 'Earn while you learn a creative trade' },
-      { id: 'safety', label: 'CPR & First Aid', image: '/images/programs-hq/healthcare-hero.jpg', description: 'Same-day HSI certification' },
+      { id: 'safety', label: 'CPR & First Aid', image: '/images/pages/comp-cta-training.jpg', description: 'Same-day HSI certification' },
     ],
   },
   {

@@ -77,7 +77,7 @@ const templateFileContents: Record<string, string> = {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-stories-hero.jpg"
+          src="/images/pages/admin-editor-detail.jpg"
           alt="Hero"
           fill
           className="object-cover"
@@ -181,7 +181,7 @@ export default function EditorPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-editor-hero.jpg" alt="Content editor" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <div className="h-12 bg-slate-800 text-white flex items-center justify-between px-4">

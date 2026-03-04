@@ -98,7 +98,7 @@ export default function ComplianceAutomationPage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/heroes-hq/funding-hero.jpg"
+          src="/images/pages/store-addons-compliance-hero.jpg"
           alt="Compliance Automation"
           fill
           className="object-cover"

@@ -55,7 +55,7 @@ export default async function AdminPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/pages/programs-admin-hero.jpg"
           alt="Program Holder Admin Portal"
           fill sizes="100vw"
           className="object-cover"
@@ -95,7 +95,7 @@ export default async function AdminPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/programs-hq/technology-hero.jpg"
+                  src="/images/pages/programs-admin-detail.jpg"
                   alt="Admin"
                   fill sizes="100vw"
                   className="object-cover"

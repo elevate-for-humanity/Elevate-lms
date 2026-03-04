@@ -26,7 +26,7 @@ const programs = (dbRows as any[]) || [];
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
 <div className="relative h-64 bg-brand-blue-800">
         <Image
-          src="/images/community/community-hero.jpg"
+          src="/images/pages/employer-portal-page-3.jpg"
           alt="Employer programs"
           fill
           className="object-cover opacity-20"

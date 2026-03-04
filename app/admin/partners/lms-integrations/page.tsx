@@ -65,12 +65,12 @@ export default async function LmsIntegrationsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-partners-lms-hero.jpg" alt="LMS integrations" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/employers/partnership-meeting.jpg"
+          src="/images/pages/admin-partners-lms-detail.jpg"
           alt="Lms Integrations"
           fill
           className="object-cover"

@@ -155,7 +155,7 @@ export default function TrainingProvidersPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/training-classroom.jpg" alt="Training provider partnership" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/platform-page-5.jpg" alt="Training provider partnership" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

@@ -112,7 +112,7 @@ export default function StoreBuilderPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Store administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-store-clones-hero.jpg" alt="Store administration" fill sizes="100vw" className="object-cover" priority />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Clones" }]} />
@@ -120,7 +120,7 @@ export default function StoreBuilderPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/technology-hero.jpg"
+          src="/images/pages/admin-store-clones-hero.jpg"
           alt="Clones"
           fill
           className="object-cover"
@@ -487,7 +487,7 @@ export default function StoreBuilderPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/programs-hq/it-support.jpg"
+                    src="/images/pages/admin-store-clones-hero.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

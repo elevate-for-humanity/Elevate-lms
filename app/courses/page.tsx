@@ -26,12 +26,12 @@ export const metadata: Metadata = {
 const categories = ['All', 'Healthcare', 'Trades', 'Beauty', 'Transportation', 'Technology'];
 
 const featuredCategories = [
-  { slug: 'healthcare', name: 'Healthcare', image: '/images/programs-hq/healthcare-hero.jpg', courses: 5, description: 'CNA, Medical Assistant, Phlebotomy, CPR & First Aid, and Pharmacy Technician training.' },
-  { slug: 'skilled-trades', name: 'Skilled Trades', image: '/images/programs-hq/skilled-trades-hero.jpg', courses: 6, description: 'HVAC, Electrical, Welding, Plumbing, and Construction certifications.' },
-  { slug: 'technology', name: 'Technology', image: '/images/programs-hq/technology-hero.jpg', courses: 4, description: 'Cybersecurity, IT Help Desk, Software Development, and Networking.' },
-  { slug: 'cdl', name: 'CDL & Transportation', image: '/images/programs-hq/cdl-trucking.jpg', courses: 3, description: 'Class A and Class B CDL training with job placement assistance.' },
-  { slug: 'barber-apprenticeship', name: 'Beauty & Barbering', image: '/images/programs-hq/barber-hero.jpg', courses: 3, description: 'Barber apprenticeships, cosmetology, and nail technician programs.' },
-  { slug: 'business', name: 'Business & Finance', image: '/images/programs-hq/business-training.jpg', courses: 4, description: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship.' },
+  { slug: 'healthcare', name: 'Healthcare', image: '/images/pages/comp-cta-training.jpg', courses: 5, description: 'CNA, Medical Assistant, Phlebotomy, CPR & First Aid, and Pharmacy Technician training.' },
+  { slug: 'skilled-trades', name: 'Skilled Trades', image: '/images/pages/comp-cta-training.jpg', courses: 6, description: 'HVAC, Electrical, Welding, Plumbing, and Construction certifications.' },
+  { slug: 'technology', name: 'Technology', image: '/images/pages/comp-cta-training.jpg', courses: 4, description: 'Cybersecurity, IT Help Desk, Software Development, and Networking.' },
+  { slug: 'cdl', name: 'CDL & Transportation', image: '/images/pages/comp-cta-training.jpg', courses: 3, description: 'Class A and Class B CDL training with job placement assistance.' },
+  { slug: 'barber-apprenticeship', name: 'Beauty & Barbering', image: '/images/pages/comp-cta-training.jpg', courses: 3, description: 'Barber apprenticeships, cosmetology, and nail technician programs.' },
+  { slug: 'business', name: 'Business & Finance', image: '/images/pages/comp-cta-training.jpg', courses: 4, description: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship.' },
 ];
 
 const microClasses = [
@@ -79,7 +79,7 @@ export default async function CoursesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/courses-page-9.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -174,7 +174,7 @@ export default async function CoursesPage() {
                 >
                   <div className="relative h-40">
                     <Image
-                      src={course.image_url || '/images/heroes-hq/programs-hero.jpg'}
+                      src={course.image_url || '/images/pages/comp-cta-career.jpg'}
                       alt={course.title}
                       fill
                       className="object-cover"

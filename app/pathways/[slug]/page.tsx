@@ -52,7 +52,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
 
       <header className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src={`/images/pathways/${pathway.slug}.jpg`}
+          src="/images/pages/comp-home-highlight-biz.jpg"
           alt={pathway.title}
           fill
           className="object-cover"
@@ -64,7 +64,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto max-w-6xl px-6 py-12 grid gap-10 md:grid-cols-2">
           <div className="relative h-[320px] w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
             <Image
-              src={`/images/pathways/${pathway.slug}.jpg`}
+              src="/images/pages/comp-home-highlight-biz.jpg"
               alt={pathway.title}
               fill
               className="object-cover"

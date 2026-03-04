@@ -72,7 +72,7 @@ export default async function DocumentCenterPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-document-center-hero.jpg" alt="Document center" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Document Center" }]} />
@@ -80,7 +80,7 @@ export default async function DocumentCenterPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
+          src="/images/pages/admin-document-center-detail.jpg"
           alt="Document Center"
           fill
           className="object-cover"

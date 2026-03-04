@@ -31,7 +31,7 @@ export default function NetworkingPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/gallery/image4.jpg" alt="Professional Networking" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/networking-hero.jpg" alt="Professional Networking" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       <section className="py-16 bg-white">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-// Image asset: /images/programs-new/program-23.jpg
+// Image asset: /images/pages/funding-impact-1.jpg
 
 export const metadata: Metadata = {
   title: "Employer Dashboard - Manage Jobs & Candidates",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Employer Dashboard | Elevate for Humanity",
     description: "Post jobs, review candidates, and manage your workforce pipeline.",
-    images: ["/images/heroes-hq/programs-hero.jpg"],
+    images: ["/images/pages/comp-cta-career.jpg"],
     type: "website",
   },
 };

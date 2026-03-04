@@ -214,7 +214,7 @@ export default function HvacApplyPage() {
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
           <Image
-            src="/images/trades/program-hvac-technician.jpg"
+            src="/images/pages/programs-hvac-apply-hero.jpg"
             alt="HVAC technician working on an air conditioning unit"
             fill
             className="object-cover"

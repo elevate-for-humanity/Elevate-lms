@@ -17,32 +17,32 @@ const benefits = [
   {
     title: 'Student Referrals',
     description: 'Receive pre-screened, WIOA-eligible students ready to enroll in your programs.',
-    image: '/images/heroes-hq/programs-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
   {
     title: 'ETPL Listing Support',
     description: 'We help you get listed on the Eligible Training Provider List for WIOA funding.',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Marketing Support',
     description: 'Your programs featured on our website and promoted to workforce partners.',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Compliance Assistance',
     description: 'Support with WIOA reporting requirements and documentation.',
-    image: '/images/programs-hq/business-training.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Employer Connections',
     description: 'Connect your graduates with our network of hiring employers.',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     title: 'Streamlined Enrollment',
     description: 'Our team handles eligibility verification and funding paperwork.',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
 ];
 
@@ -58,32 +58,32 @@ const programTypes = [
   {
     name: 'Healthcare',
     examples: 'CNA, Medical Assistant, Phlebotomy, EMT',
-    image: '/images/programs-hq/healthcare-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     name: 'Skilled Trades',
     examples: 'HVAC, Electrical, Plumbing, Welding',
-    image: '/images/programs-hq/training-classroom.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     name: 'Technology',
     examples: 'IT Support, Cybersecurity, Web Development',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     name: 'Transportation',
     examples: 'CDL, Forklift, Logistics',
-    image: '/images/efh/sections/coaching.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
   },
   {
     name: 'Business',
     examples: 'Accounting, Office Admin, Project Management',
-    image: '/images/efh/sections/staffing.jpg',
+    image: '/images/pages/comp-home-highlight-health.jpg',
   },
   {
     name: 'Beauty & Wellness',
     examples: 'Barber, Cosmetology, Esthetician',
-    image: '/images/programs/barber.jpg',
+    image: '/images/pages/comp-cta-programs.jpg',
   },
 ];
 
@@ -97,7 +97,7 @@ export default function TrainingProvidersPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/learners/coaching-session.jpg" alt="Training Providers Partnership" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/training-providers-page-1.jpg" alt="Training Providers Partnership" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -193,7 +193,7 @@ export default function TrainingProvidersPage() {
             
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/heroes-hq/employer-hero.jpg"
+                src="/images/pages/training-providers-page-1.jpg"
                 alt="Training classroom"
                 fill
                 className="object-cover"

@@ -77,7 +77,7 @@ export default async function AdminEnrollmentsPage() {
       </div>
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Enrollment management" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-enrollments-hero.jpg" alt="Enrollment management" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-6">

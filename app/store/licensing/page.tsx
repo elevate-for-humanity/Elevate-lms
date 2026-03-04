@@ -91,7 +91,7 @@ export default function StoreLicensesPage() {
             </div>
             <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-xl border border-slate-200">
               <Image
-                src="/images/demos/admin-dashboard-thumb.jpg"
+                src="/images/pages/store-licensing-hero.jpg"
                 alt="Elevate platform admin dashboard"
                 fill
                 className="object-cover"

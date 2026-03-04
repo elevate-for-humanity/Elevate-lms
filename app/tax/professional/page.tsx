@@ -17,7 +17,7 @@ export default function ProfessionalTaxPage() {
       </div>
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
-        <Image src="/images/pathways/business-hero.jpg" alt="Professional Tax Services" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
+        <Image src="/images/pages/tax-page-2.jpg" alt="Professional Tax Services" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
         
         
       </section>

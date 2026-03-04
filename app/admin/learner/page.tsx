@@ -57,7 +57,7 @@ export default async function LearnerPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student enrollment" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-learner-hero.jpg" alt="Learner management" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Learner" }]} />
@@ -65,7 +65,7 @@ export default async function LearnerPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/career-services-hero.jpg"
+          src="/images/pages/admin-learner-detail.jpg"
           alt="Learner Management"
           fill
           className="object-cover"

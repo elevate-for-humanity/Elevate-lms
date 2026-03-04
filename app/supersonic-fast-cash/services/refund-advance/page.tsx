@@ -99,7 +99,7 @@ export default function RefundAdvancePage() {
       </div>
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Refund Advance" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/supersonic-page-7.jpg" alt="Refund Advance" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Benefits */}

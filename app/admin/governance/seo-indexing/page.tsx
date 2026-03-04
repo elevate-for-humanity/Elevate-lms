@@ -64,7 +64,7 @@ export default function SeoIndexingPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-gov-seo-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
       </section>
       <Breadcrumbs
         items={[

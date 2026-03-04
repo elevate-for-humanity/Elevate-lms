@@ -263,7 +263,7 @@ export default async function TutorialsPage() {
       {/* Hero Banner */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-hero.jpg"
+          src="/images/pages/help-page-2.jpg"
           alt="Students learning with video tutorials"
           fill
           className="object-cover"

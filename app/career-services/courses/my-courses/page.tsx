@@ -101,7 +101,7 @@ export default async function MyCoursesPage() {
                 >
                   <div className="relative h-40">
                     <Image
-                      src={purchase.course?.image_url || '/images/heroes-hq/funding-hero.jpg'}
+                      src={purchase.course?.image_url || '/images/pages/comp-cta-career.jpg'}
                       alt={purchase.course?.title}
                       fill
                       className="object-cover"
@@ -144,7 +144,7 @@ export default async function MyCoursesPage() {
                 >
                   <div className="relative h-40">
                     <Image
-                      src={course.image_url || '/images/business/tax-prep.jpg'}
+                      src={course.image_url || '/images/pages/apply-employer-hero.jpg'}
                       alt={course.title}
                       fill
                       className="object-cover"

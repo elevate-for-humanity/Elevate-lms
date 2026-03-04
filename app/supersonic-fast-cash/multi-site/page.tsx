@@ -138,7 +138,7 @@ export default function MultiSitePage() {
       </div>
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/programs-hq/tax-preparation.jpg" alt="Multi-Site Tax Office" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/supersonic-page-2.jpg" alt="Multi-Site Tax Office" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Stats */}

@@ -67,7 +67,7 @@ export default async function HowToUsePage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/homepage/student-portal-interface.png"
+          src="/images/pages/programs-page-1.jpg"
           alt="How To Use"
           fill sizes="100vw"
           className="object-cover"

@@ -133,7 +133,7 @@ export default async function ServicesPage() {
 {/* Hero */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
         <Image alt="Tax preparation services" 
-          src="/images/homepage/wraparound-support.jpg" 
+          src="/images/pages/supersonic-fast-cash-page-1.jpg" 
           alt="Professional Tax Services" 
           fill
           className="object-cover" 

@@ -158,7 +158,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* Course Header — image hero */}
       <div className="relative h-[200px] sm:h-[280px] md:h-[340px]">
         <Image
-          src={course.thumbnail_url || '/images/programs-hq/training-classroom.jpg'}
+          src={course.thumbnail_url || '/images/pages/comp-cta-training.jpg'}
           alt={course.course_name}
           fill
           sizes="100vw"

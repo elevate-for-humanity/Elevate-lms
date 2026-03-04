@@ -38,14 +38,14 @@ export const metadata: Metadata = {
     description: 'Explore scholarships, grants, and funding options for career training.',
     url: `${SITE_URL}/scholarships`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/hero-new/hero-7.jpg`, width: 1200, height: 630, alt: 'Scholarships and Financial Aid' }],
+    images: [{ url: `${SITE_URL}/images/pages/philanthropy-hero.jpg`, width: 1200, height: 630, alt: 'Scholarships and Financial Aid' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Scholarships & Financial Aid | Training Funding',
     description: 'Explore scholarships, grants, and funding options for career training.',
-    images: [`${SITE_URL}/images/heroes-hq/funding-hero.jpg`],
+    images: [`${SITE_URL}/images/pages/comp-cta-career.jpg`],
   },
 };
 
@@ -77,7 +77,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
         <Image alt="Scholarship opportunities" 
-          src="/images/heroes-hq/funding-hero.jpg" 
+          src="/images/pages/scholarships-page-1.jpg" 
           alt="Scholarships and Financial Aid" 
           fill 
           className="object-cover" 

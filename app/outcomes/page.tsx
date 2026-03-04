@@ -23,7 +23,7 @@ export default function OutcomesMethodologyPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student outcomes and placement rates" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/outcomes-page-1.jpg" alt="Student outcomes and placement rates" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <div className="bg-slate-900 text-white py-12">

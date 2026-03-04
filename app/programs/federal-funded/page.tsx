@@ -28,7 +28,7 @@ const config: ProgramPageConfig = {
   duration: '3–16 weeks', cost: '$0 for eligible participants', format: 'In-person, Indianapolis', credential: 'Varies by program',
   overview: 'Federal workforce programs cover the full cost of training for eligible participants. WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and JRI (Justice Reinvestment Initiative) fund tuition, textbooks, supplies, certification exams, and supportive services like transportation and childcare. Eligible participants pay nothing out of pocket. Credentials earned depend on the program — some are issued by Elevate (certificates of completion), while others are administered by external certifying bodies (state licenses, national exams).',
   highlights: ['$0 tuition for eligible participants', 'Books, supplies, and uniforms included', 'Certification exam fees covered', 'Supportive services (transportation, childcare)', 'Career counseling and job placement', 'Available for unemployed, underemployed, and justice-involved individuals'],
-  overviewImage: '/images/programs-fresh/healthcare.jpg', overviewImageAlt: 'Students in a funded training program',
+  overviewImage: '/images/pages/comp-program-template.jpg', overviewImageAlt: 'Students in a funded training program',
   salaryNumber: 0, salaryLabel: 'No-cost training for eligible participants', salaryPrefix: '',
   curriculum: [
     { title: 'Funding Sources', topics: ['WIOA (Workforce Innovation and Opportunity Act)', 'WRG (Workforce Ready Grant)', 'JRI (Justice Reinvestment Initiative)', 'Registered Apprenticeship incentives'] },

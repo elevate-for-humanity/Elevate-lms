@@ -18,7 +18,7 @@ export default function FreeTaxPage() {
       </div>
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
-        <Image src="/images/business/office-admin.jpg" alt="Free Tax Preparation" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
+        <Image src="/images/pages/tax-free-hero.jpg" alt="Free Tax Preparation" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
         
       </section>
 

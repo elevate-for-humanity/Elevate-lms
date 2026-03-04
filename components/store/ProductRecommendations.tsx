@@ -77,7 +77,7 @@ export default function ProductRecommendations({ productId, showAvatar = true }:
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-orange-500">
                   <Image
-                    src="/images/team-hq/instructor-1.jpg"
+                    src="/images/pages/store-recommendations.jpg"
                     alt="Sales Guide"
                     width={48}
                     height={48}

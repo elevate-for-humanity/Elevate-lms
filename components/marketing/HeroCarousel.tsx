@@ -52,7 +52,7 @@ const slides: Slide[] = [
     title: "An engine for talent pipelines.",
     highlight: "OJT · WEX · apprenticeships · JRI.",
     body: "Elevate plugs into courts, boards, and HR so funded training actually turns into staffed positions and measurable outcomes.",
-    image: "/images/programs-hq/training-classroom.jpg",
+    image: "/images/pages/comp-cta-training.jpg",
     primaryCtaLabel: "Partner with Elevate",
     primaryCtaHref: "/employers",
     secondaryCtaLabel: "View employer one-pager",

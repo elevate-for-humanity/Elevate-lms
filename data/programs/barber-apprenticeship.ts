@@ -13,7 +13,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   sector: 'personal-services',
   category: 'Personal Services',
 
-  heroImage: '/images/programs-hq/barber-hero.jpg',
+  heroImage: '/images/pages/barber-gallery-1.jpg',
   heroImageAlt: 'Barber apprentice cutting hair in a barbershop',
 
   deliveryMode: 'hybrid',

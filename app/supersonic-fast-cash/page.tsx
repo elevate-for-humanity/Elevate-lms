@@ -47,7 +47,7 @@ export default function SupersonicFastCashPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax Refund Services" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/supersonic-page-3.jpg" alt="Tax Refund Services" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -133,7 +133,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/program-tax-preparation.jpg" alt="Tax Preparation" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/pages/supersonic-tax-prep.jpg" alt="Tax Preparation" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
@@ -150,7 +150,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/program-tax-preparation.jpg" alt="Refund Advance" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/pages/supersonic-tax-prep.jpg" alt="Refund Advance" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-green-600 transition-colors">
@@ -167,7 +167,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="DIY Tax Filing" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/pages/supersonic-page-3.jpg" alt="DIY Tax Filing" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
@@ -184,7 +184,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/heroes-hq/team-hero.jpg" alt="Audit Protection" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/pages/supersonic-page-3.jpg" alt="Audit Protection" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-red-600 transition-colors">
@@ -201,7 +201,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/tax-prep-certification-optimized.jpg" alt="Tax Preparer Training" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/pages/supersonic-tax-cert.jpg" alt="Tax Preparer Training" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-orange-600 transition-colors">
@@ -276,7 +276,7 @@ export default function SupersonicFastCashPage() {
 
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/programs-hq/tax-preparation.jpg"
+                src="/images/pages/supersonic-page-3.jpg"
                 alt="Supersonic Fast Cash Office"
                 fill
                 className="object-cover"

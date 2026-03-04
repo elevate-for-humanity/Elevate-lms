@@ -98,7 +98,7 @@ export default function AutomationPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-email-automation-hero.jpg" alt="Email automation" fill sizes="100vw" className="object-cover" priority />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Automation" }]} />
@@ -106,7 +106,7 @@ export default function AutomationPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/programs-hq/business-training.jpg"
+          src="/images/pages/admin-email-automation-d1.jpg"
           alt="Automation"
           fill
           className="object-cover"
@@ -402,7 +402,7 @@ export default function AutomationPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/pathways/business-hero.jpg"
+                    src="/images/pages/admin-email-automation-d2.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

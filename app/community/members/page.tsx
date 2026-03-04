@@ -58,7 +58,7 @@ export default async function MembersPage() {
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Community Members" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/community-page-4.jpg" alt="Community Members" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Categories */}

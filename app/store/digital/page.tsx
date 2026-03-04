@@ -73,7 +73,7 @@ export default function StoreDigitalPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/programs-hq/technology-hero.jpg" alt="AI Studio Demo" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/pages/store-digital-hero.jpg" alt="AI Studio Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />
@@ -87,7 +87,7 @@ export default function StoreDigitalPage() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/programs-hq/business-office.jpg" alt="SAM.gov Assistant Demo" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/pages/store-digital-detail1.jpg" alt="SAM.gov Assistant Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />
@@ -101,7 +101,7 @@ export default function StoreDigitalPage() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/programs-hq/technology-hero.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/pages/store-digital-detail2.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />
@@ -140,7 +140,7 @@ export default function StoreDigitalPage() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={product.image || '/images/technology/hero-program-pharmacy-tech.jpg'}
+                    src={product.image || '/images/pages/comp-universal-hero.jpg'}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -226,7 +226,7 @@ export default function StoreDigitalPage() {
               >
                 <div className="relative h-40">
                   <Image
-                    src={product.image || '/images/technology/hero-program-pharmacy-tech.jpg'}
+                    src={product.image || '/images/pages/comp-universal-hero.jpg'}
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"

@@ -78,7 +78,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/instructor-page-5.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-5xl mx-auto px-4 py-8">
         <nav className="text-sm mb-4">

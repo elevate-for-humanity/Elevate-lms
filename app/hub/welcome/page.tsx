@@ -32,25 +32,25 @@ export default async function HubWelcomePage() {
     {
       title: 'Classroom',
       description: 'Access your courses, track progress, and continue your learning journey.',
-      image: '/images/hub/dashboard.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
       href: '/hub/classroom',
     },
     {
       title: 'Leaderboard',
       description: 'See how you rank among peers and earn recognition for your achievements.',
-      image: '/images/community/community-hero.jpg',
+      image: '/images/pages/comp-home-pathways-support.jpg',
       href: '/hub/leaderboard',
     },
     {
       title: 'Members',
       description: 'Connect with fellow learners, mentors, and industry professionals.',
-      image: '/images/hub/cta.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
       href: '/hub/members',
     },
     {
       title: 'Calendar',
       description: 'View upcoming events, workshops, and live sessions.',
-      image: '/images/community/community-hero.jpg',
+      image: '/images/pages/comp-home-pathways-support.jpg',
       href: '/hub/calendar',
     },
   ];
@@ -60,17 +60,17 @@ export default async function HubWelcomePage() {
     {
       title: 'Real-Time Progress Tracking',
       description: 'See exactly where you are in your program. No guessing - the system shows your status, completion percentage, and what comes next.',
-      image: '/images/hub/analytics.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
     },
     {
       title: 'Automated Guidance',
       description: 'The platform tells you what to do next. Receive smart nudges, reminders, and step-by-step guidance to stay on track.',
-      image: '/images/heroes-hq/team-hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
     },
     {
       title: 'Compliance Documentation',
       description: 'All your hours, credentials, and progress are documented automatically. Ready for audits, certifications, and employer verification.',
-      image: '/images/heroes-hq/success-hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
     },
   ];
 
@@ -80,19 +80,19 @@ export default async function HubWelcomePage() {
       name: 'Healthcare Graduate',
       program: 'CNA Certification',
       quote: 'The Hub made it easy to track my clinical hours and know exactly what I needed to complete.',
-      image: '/images/hub/student.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
     },
     {
       name: 'Trades Apprentice',
       program: 'Building Technician with HVAC Fundamentals',
       quote: 'I could see my progress every day. The system kept me accountable and on schedule.',
-      image: '/images/hub/instructor.jpg',
+      image: '/images/pages/comp-universal-hero.jpg',
     },
     {
       name: 'Tech Graduate',
       program: 'IT Support',
       quote: 'Having everything in one place - courses, certifications, job prep - made all the difference.',
-      image: '/images/heroes-hq/about-hero.jpg',
+      image: '/images/pages/comp-cta-career.jpg',
     },
   ];
 
@@ -101,7 +101,7 @@ export default async function HubWelcomePage() {
       {/* Hero Section */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/team-hero.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/hub-page-1.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -258,7 +258,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/heroes-hq/success-hero.jpg"
+                    src="/images/pages/hub-page-1.jpg"
                     alt="Apply for a program"
                     fill
                     className="object-cover"
@@ -274,7 +274,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/efh/hero/hero-main-clean.jpg"
+                    src="/images/pages/hub-page-1.jpg"
                     alt="Get enrolled"
                     fill
                     className="object-cover"
@@ -290,7 +290,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/getting-started-hero.jpg"
+                    src="/images/pages/hub-page-1.jpg"
                     alt="Complete and succeed"
                     fill
                     className="object-cover"

@@ -75,7 +75,7 @@ export default function IPLAExamSignup() {
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[280px] max-h-[400px]">
         <Image
-          src="/images/programs-hq/barber-hero.jpg"
+          src="/images/pages/apprenticeships-page-1.jpg"
           alt="Barber apprentice preparing for licensing exam"
           fill sizes="100vw"
           className="object-cover"

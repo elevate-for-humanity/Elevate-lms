@@ -91,7 +91,7 @@ export default async function StoreSuccessPage({
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/store-success-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">

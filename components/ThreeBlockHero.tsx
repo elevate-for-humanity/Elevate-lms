@@ -22,7 +22,7 @@ const heroBlocks = [
     color: " ",
   },
   {
-    image: "/images/employers/partnership-hiring-event.jpg",
+    image: "/images/pages/apply-employer-hero.jpg",
     title: "Direct Job Placement",
     description: "Our staffing team connects you with employers before graduation",
     cta: "Learn About Job Support",

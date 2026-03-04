@@ -101,7 +101,7 @@ export default async function SupportPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/efh/hero/hero-main-clean.jpg"
+          src="/images/pages/program-holder-page-3.jpg"
           alt="Support"
           fill
           className="object-cover"

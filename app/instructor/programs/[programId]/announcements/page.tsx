@@ -124,7 +124,7 @@ export default function InstructorProgramAnnouncementsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/instructor-page-10.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>

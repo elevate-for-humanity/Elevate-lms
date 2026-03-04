@@ -76,7 +76,7 @@ export default async function TuitionFeesPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Tuition and fee information" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/tuition-fees-page-1.jpg" alt="Tuition and fee information" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Header */}

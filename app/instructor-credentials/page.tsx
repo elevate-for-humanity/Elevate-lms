@@ -163,7 +163,7 @@ export default function InstructorCredentialsPage() {
       {/* Hero */}
       <section className="relative h-[260px] sm:h-[340px]">
         <Image
-          src="/images/heroes-hq/career-services-hero.jpg"
+          src="/images/pages/instructor-credentials-page-1.jpg"
           alt="Professional instructor working with students"
           fill
           sizes="100vw"

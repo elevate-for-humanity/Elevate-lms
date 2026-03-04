@@ -22,7 +22,7 @@ const addOns = [
     href: '/store/add-ons/community-hub',
     icon: Users,
     price: '$1,997',
-    image: '/images/programs-hq/students-learning.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',
@@ -47,7 +47,7 @@ const moreAddOns = [
     description: 'Advanced reporting and predictive analytics for student outcomes. Real-time dashboards, custom reports, and cohort analysis.',
     href: '/store/add-ons/analytics-pro',
     price: '$1,497',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/pages/comp-cta-training.jpg',
   },
   {
     id: 'compliance-automation',
@@ -55,7 +55,7 @@ const moreAddOns = [
     description: 'Automated compliance tracking and reporting for WIOA, grants, FERPA, and accreditation requirements.',
     href: '/store/add-ons/compliance-automation',
     price: '$1,297',
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/comp-cta-career.jpg',
   },
 ];
 
@@ -85,7 +85,7 @@ export default function AddOnsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/store-addons-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

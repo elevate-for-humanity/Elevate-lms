@@ -157,7 +157,7 @@ export default function AutomationQAPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-automation-qa-hero.jpg" alt="Automation QA" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>

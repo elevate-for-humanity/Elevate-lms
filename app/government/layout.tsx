@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-// Image asset: /images/programs-new/program-16.jpg
+// Image asset: /images/pages/funding-impact-1.jpg
 
 export const metadata: Metadata = {
   title: "Government & Workforce Boards - Partner Portal",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Government & Workforce Boards Portal | Elevate for Humanity",
     description: "Access compliance data, contracts, and reporting for workforce boards and government partners.",
-    images: ["/images/efh/hero/hero-main-clean.jpg"],
+    images: ["/images/pages/comp-home-highlight-health.jpg"],
     type: "website",
   },
 };

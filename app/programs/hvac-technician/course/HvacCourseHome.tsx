@@ -36,22 +36,22 @@ const TYPE_LABEL: Record<CourseLesson['type'], string> = {
 
 // One image per module — all real workforce/HVAC photos
 const MODULE_PHOTO: string[] = [
-  '/images/programs-hq/hvac-technician.jpg',
-  '/images/trades/program-hvac-overview.jpg',
-  '/images/trades/hero-program-electrical.jpg',
-  '/images/trades/program-hvac-technician.jpg',
-  '/images/trades/program-building-technology.jpg',
-  '/images/trades/hero-program-hvac.jpg',
-  '/images/programs-hq/training-classroom.jpg',
-  '/images/trades/program-building-construction.jpg',
-  '/images/trades/program-construction-training.jpg',
-  '/images/trades/program-electrical-training.jpg',
-  '/images/trades/program-welding-training.jpg',
-  '/images/programs-hq/skilled-trades-hero.jpg',
-  '/images/programs-hq/students-learning.jpg',
-  '/images/heroes-hq/programs-hero.jpg',
-  '/images/heroes-hq/success-hero.jpg',
-  '/images/heroes-hq/career-services-hero.jpg',
+  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-pathway-trades.jpg',
+  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/comp-cta-career.jpg',
+  '/images/pages/comp-cta-career.jpg',
+  '/images/pages/comp-cta-career.jpg',
 ];
 
 function modProgress(mod: CourseModule, done: string[]) {
@@ -239,7 +239,7 @@ export default function HvacCourseHome({
           ═══════════════════════════════════════════════════════════ */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-brand-blue-900">
-          <Image src="/images/trades/program-hvac-technician.jpg" alt="HVAC technician working" fill className="object-cover opacity-20" priority />
+          <Image src="/images/pages/programs-hvac-course-hero.jpg" alt="HVAC technician working" fill className="object-cover opacity-20" priority />
         </div>
         {/* Red accent stripe */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-brand-red-600" />

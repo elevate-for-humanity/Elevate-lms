@@ -46,7 +46,7 @@ export default function SourceUseLicensePage() {
             <div className="max-w-3xl mx-auto">
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
                 <Image
-                  src="/images/demos/lms-overview-thumb.jpg"
+                  src="/images/pages/store-licensing-enterprise-hero.jpg"
                   alt="Elevate platform overview"
                   fill
                   className="object-cover"

@@ -111,7 +111,7 @@ function SignedOutView() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <div className="relative h-56 sm:h-64">
-        <Image src="/images/programs-hq/students-learning.jpg" alt="Students in classroom" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-blue-900/80 to-brand-blue-900/95" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
@@ -165,7 +165,7 @@ export default async function StudentPWAPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-44 sm:h-52">
-        <Image src="/images/programs-hq/students-learning.jpg" alt="Students in classroom" fill className="object-cover" priority />
+        <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-blue-900/80 to-brand-blue-900/95" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={36} height={36} className="mb-2" />

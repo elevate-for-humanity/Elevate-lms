@@ -34,7 +34,7 @@ const services = (dbRows as any[]) || [];
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/workforce-partners-page-1.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -137,7 +137,7 @@ const services = (dbRows as any[]) || [];
               </Link>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/heroes-hq/employer-hero.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/workforce-partners-page-1.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

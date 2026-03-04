@@ -93,7 +93,7 @@ export default function CourseDiscussionsPage() {
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="/images/community/community-hero.jpg"
+            src="/images/pages/courses-page-1.jpg"
             alt="Discussions"
             fill
             className="object-cover"
@@ -154,7 +154,7 @@ export default function CourseDiscussionsPage() {
                   </div>
                   <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/programs-hq/training-classroom.jpg"
+                      src="/images/pages/courses-page-1.jpg"
                       alt="Students in discussion"
                       fill
                       className="object-cover"

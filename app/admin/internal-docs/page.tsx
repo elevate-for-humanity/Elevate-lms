@@ -72,7 +72,7 @@ export default async function InternalDocsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-internal-docs-hero.jpg" alt="Internal docs" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Internal Docs" }]} />
@@ -80,7 +80,7 @@ export default async function InternalDocsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-hero.jpg"
+          src="/images/pages/admin-internal-docs-detail.jpg"
           alt="Internal Docs"
           fill
           className="object-cover"

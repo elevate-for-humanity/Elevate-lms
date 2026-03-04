@@ -62,7 +62,7 @@ export default async function ProductDetailPage({ params }: Props) {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/platform-page-1.jpg"
           alt={product.name}
           fill
           className="object-cover"

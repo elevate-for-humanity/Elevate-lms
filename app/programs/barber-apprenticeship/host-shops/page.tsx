@@ -27,7 +27,7 @@ export default function HostShopsPage() {
       {/* Hero */}
       <section className="relative h-[60vh] min-h-[450px] max-h-[600px]">
         <Image
-          src="/images/barber/gallery-1.jpg"
+          src="/images/pages/barber-gallery-1.jpg"
           alt="Professional barbershop interior"
           fill sizes="100vw"
           className="object-cover"
@@ -47,7 +47,7 @@ export default function HostShopsPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/barber/training.jpg"
+                src="/images/pages/barber-training.jpg"
                 alt="Barber training apprentice"
                 fill
                 className="object-cover"
@@ -99,7 +99,7 @@ export default function HostShopsPage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/barber/gallery-2.jpg"
+                src="/images/pages/barber-gallery-2.jpg"
                 alt="Professional barbershop"
                 fill
                 className="object-cover"
@@ -111,7 +111,7 @@ export default function HostShopsPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/barber/gallery-3.jpg"
+                src="/images/pages/barber-gallery-3.jpg"
                 alt="Barber with client"
                 fill
                 className="object-cover"

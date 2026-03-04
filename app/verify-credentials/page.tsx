@@ -48,7 +48,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.apprenticeship.gov/partner-finder',
     verificationInstructions: 'Search for "Elevate for Humanity" in the DOL Apprenticeship Partner Finder',
     icon: Shield,
-    image: '/images/credentials/dol-apprenticeship.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'federal',
   },
   {
@@ -60,7 +60,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://intraining.dwd.in.gov/',
     verificationInstructions: 'Search INTraining for Location ID 10004621 or "Elevate for Humanity"',
     icon: Building2,
-    image: '/images/credentials/etpl-listing.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'state',
   },
   {
@@ -72,7 +72,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.in.gov/doe/students/private-schools/',
     verificationInstructions: 'Contact Indiana DOE to verify approval status',
     icon: Award,
-    image: '/images/credentials/doe-approval.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'state',
   },
   {
@@ -84,7 +84,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://intraining.dwd.in.gov/',
     verificationInstructions: 'WIOA eligibility verified through ETPL listing on INTraining',
     icon: FileCheck,
-    image: '/images/credentials/wioa-eligible.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'funding',
   },
   {
@@ -96,7 +96,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.in.gov/che/state-financial-aid/state-financial-aid-by-program/workforce-ready-grant/',
     verificationInstructions: 'WRG eligibility tied to ETPL-approved programs',
     icon: BadgeCheck,
-    image: '/images/credentials/workforce-ready-grant.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'funding',
   },
   {
@@ -108,7 +108,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: null,
     verificationInstructions: 'Contact Indiana DOC or local WorkOne office to verify JRI partnership',
     icon: Shield,
-    image: '/images/credentials/jri-funding.jpg',
+    image: '/images/pages/credential-partners-hero.jpg',
     category: 'funding',
   },
 ];
@@ -201,7 +201,7 @@ export default function VerifyCredentialsPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image
-          src="/images/credentials/verify-hero.jpg"
+          src="/images/pages/verify-credentials-page-1.jpg"
           alt="Elevate for Humanity credential verification"
           fill
           sizes="100vw"

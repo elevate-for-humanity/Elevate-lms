@@ -27,7 +27,7 @@ export default function HVACCurriculumPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px]">
-        <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC Technician Training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/programs-hvac-curriculum-hero.jpg" alt="HVAC Technician Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>
         </div>

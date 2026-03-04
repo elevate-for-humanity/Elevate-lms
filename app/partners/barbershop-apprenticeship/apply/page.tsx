@@ -127,7 +127,7 @@ export default function BarbershopPartnerApplyPage() {
       {/* Hero */}
       <section className="relative py-12 overflow-hidden">
         <Image
-          src="/images/programs-hq/barber-hero.jpg"
+          src="/images/pages/partners-pub-page-1.jpg"
           alt="Barbershop partner application"
           fill
           className="object-cover"

@@ -26,7 +26,7 @@ export default function InstructorPortalLanding() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/hero-new/hero-7.jpg" alt="Instructor Portal" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/instructor-hero.jpg" alt="Instructor Portal" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -44,7 +44,7 @@ export default function InstructorPortalLanding() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/trades/program-building-construction.jpg" alt="Course Management" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-page-1.jpg" alt="Course Management" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Course Management</h3>
@@ -53,7 +53,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-page-9.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Student Roster</h3>
@@ -62,7 +62,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/career-coaching-new.jpg" alt="Progress Tracking" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-page-1.jpg" alt="Progress Tracking" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Progress Tracking</h3>
@@ -71,7 +71,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/gallery/image3.jpg" alt="Grading" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-grading.jpg" alt="Grading" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Grading</h3>
@@ -80,7 +80,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/heroes-hq/success-hero.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-page-9.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Communication</h3>
@@ -89,7 +89,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/instructor-page-9.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Certifications</h3>

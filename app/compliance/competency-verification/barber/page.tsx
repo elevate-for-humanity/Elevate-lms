@@ -141,7 +141,7 @@ export default function BarberCompetencyRubricPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[300px] print:hidden">
         <Image
-          src="/images/programs-hq/barber-training.jpg"
+          src="/images/pages/compliance-page-1.jpg"
           alt="Barber apprentice training in a barbershop"
           fill
           sizes="100vw"

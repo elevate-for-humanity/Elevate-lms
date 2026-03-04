@@ -58,7 +58,7 @@ export default function SupersonicPage() {
       </div>
 <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/pages/supersonic-page-1.jpg"
           alt="Supersonic Program"
           fill
           className="object-cover"

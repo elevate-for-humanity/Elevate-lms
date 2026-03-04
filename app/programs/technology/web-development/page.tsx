@@ -170,7 +170,7 @@ export default function WebDevelopmentPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/it-support.jpg" alt="Student coding" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/programs-tech-webdev-hero.jpg" alt="Student coding" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-black mb-6">Build a Professional Portfolio</h2>

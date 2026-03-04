@@ -185,7 +185,7 @@ export default function UniversalMarketingPage({
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px] rounded-xl overflow-hidden shadow-2xl">
                 <Image
-                  src="/images/programs-hq/training-classroom.jpg"
+                  src="/images/pages/comp-universal-hero.jpg"
                   alt="Take action today"
                   fill
                   className="object-cover"

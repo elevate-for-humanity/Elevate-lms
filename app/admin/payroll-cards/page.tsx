@@ -72,7 +72,7 @@ export default async function PayrollCardsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="HR administration" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-payroll-cards-hero.jpg" alt="Payroll cards" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Payroll Cards" }]} />
@@ -80,7 +80,7 @@ export default async function PayrollCardsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-stories-hero.jpg"
+          src="/images/pages/admin-payroll-cards-detail.jpg"
           alt="Payroll Cards"
           fill
           className="object-cover"

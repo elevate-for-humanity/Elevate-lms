@@ -13,7 +13,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group">
             <div className="relative h-64">
               <Image
-                src="/images/pathways/business-hero.jpg"
+                src="/images/pages/comp-home-highlight-biz.jpg"
                 alt="Students in training"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -37,7 +37,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group">
             <div className="relative h-64">
               <Image
-                src="/images/efh/hero/hero-health.jpg"
+                src="/images/pages/comp-home-highlight-health.jpg"
                 alt="Training programs"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -61,7 +61,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group">
             <div className="relative h-64">
               <Image
-                src="/images/business/success-1.jpg"
+                src="/images/pages/comp-home-highlight-success.jpg"
                 alt="Career success"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"

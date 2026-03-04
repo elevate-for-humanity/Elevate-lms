@@ -207,7 +207,7 @@ export default function BarberPartnerPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/programs-hq/barber-hero.jpg" alt="Barber program" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/partner-page-11.jpg" alt="Barber program" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

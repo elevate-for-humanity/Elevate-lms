@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/heroes-hq/employer-hero.jpg' },
-  { title: 'Attendance', desc: 'Track and record student attendance.', image: '/images/hero-new/hero-8.jpg' },
-  { title: 'Reports', desc: 'Generate and view performance reports.', image: '/images/business/tax-prep.jpg' },
-  { title: 'Scheduling', desc: 'Manage class schedules and appointments.', image: '/images/healthcare/medical-assistant.jpg' },
-  { title: 'Documents', desc: 'Access and manage important documents.', image: '/images/programs-hq/it-support.jpg' },
-  { title: 'Settings', desc: 'Configure portal preferences and settings.', image: '/images/programs-hq/healthcare-hero.jpg' },
+  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/pages/comp-cta-career.jpg' },
+  { title: 'Attendance', desc: 'Track and record student attendance.', image: '/images/pages/philanthropy-hero.jpg' },
+  { title: 'Reports', desc: 'Generate and view performance reports.', image: '/images/pages/apply-employer-hero.jpg' },
+  { title: 'Scheduling', desc: 'Manage class schedules and appointments.', image: '/images/pages/comp-pathway-healthcare.jpg' },
+  { title: 'Documents', desc: 'Access and manage important documents.', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Settings', desc: 'Configure portal preferences and settings.', image: '/images/pages/comp-cta-training.jpg' },
 ];
 
 export default function StaffPortalLanding() {
@@ -31,7 +31,7 @@ export default function StaffPortalLanding() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
-          <Image src="/images/getting-started-hero.jpg" alt="Staff Portal" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/staff-portal-page-1.jpg" alt="Staff Portal" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

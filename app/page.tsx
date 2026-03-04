@@ -103,10 +103,10 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/pages/homepage-why-elevate.jpg', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Training may be fully funded for eligible participants. Check your eligibility.', cta: 'Check Eligibility', image: '/images/pages/homepage-why-elevate.jpg', alt: 'Funding and financial aid' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/pages/homepage-why-elevate.jpg', alt: 'Employer partnership meeting' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/pages/homepage-why-elevate.jpg', alt: 'Training program office' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom' },
+              { href: '/funding', label: 'I need funding', desc: 'Training may be fully funded for eligible participants. Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office' },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -148,7 +148,7 @@ export default function HomePage() {
                 items: ['Healthcare: CNA, Medical Assistant, Phlebotomy', 'Skilled Trades: HVAC, Electrical, Welding, CDL', 'Technology: IT Support, Cybersecurity', 'Finance & Accounting: Tax Preparation, Bookkeeping, Payroll'],
                 href: '/programs',
                 cta: 'View Credential Pathways',
-                image: '/images/pages/homepage-why-elevate.jpg',
+                image: '/images/hp/choose-program.jpg',
               },
               {
                 title: 'National Credential Validation',
@@ -156,7 +156,7 @@ export default function HomePage() {
                 items: ['EPA 608 Universal (Mainstream Engineering)', 'OSHA 10/30-Hour (DOL card)', 'ACT WorkKeys / NCRC', 'Certiport (IC3, MOS, Entrepreneurship)', 'NRF RISE Up (Retail Industry)', 'CPR/First Aid (AHA/HSI)'],
                 href: '/credentials',
                 cta: 'View All Credentials',
-                image: '/images/pages/homepage-why-elevate.jpg',
+                image: '/images/hp/complete-training.jpg',
               },
               {
                 title: 'Employer Placement Partnerships',
@@ -164,7 +164,7 @@ export default function HomePage() {
                 items: ['Pre-screened, credentialed candidates', 'WOTC tax credits ($2,400–$9,600/hire)', 'OJT wage reimbursement (50–75%)', 'Registered Apprenticeship pathways'],
                 href: '/employer',
                 cta: 'Employer Partnerships',
-                image: '/images/pages/homepage-why-elevate.jpg',
+                image: '/images/hp/candidates.jpg',
               },
             ].map((pillar) => (
               <div key={pillar.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -330,11 +330,11 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/pages/comp-cta-career.jpg' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/pages/homepage-why-elevate.jpg', external: true },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
+              { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.jpg' },
+              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="w-full aspect-[3/2] object-cover" />
@@ -377,10 +377,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'OJT Reimbursement', desc: 'On-the-Job Training through WorkOne reimburses 50–75% of a new hire\'s wages during the training period per local board policy. Formal OJT contract and training plan required.', href: '/ojt-and-funding', image: '/images/pages/homepage-why-elevate.jpg' },
-              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/pages/homepage-why-elevate.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/hp/candidates.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/hp/wotc.jpg' },
+              { label: 'OJT Reimbursement', desc: 'On-the-Job Training through WorkOne reimburses 50–75% of a new hire\'s wages during the training period per local board policy. Formal OJT contract and training plan required.', href: '/ojt-and-funding', image: '/images/hp/ojt.jpg' },
+              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/hp/post-jobs.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} sizes="(max-width: 640px) 100vw, 50vw" className="w-full aspect-[3/2] object-cover" />
@@ -435,7 +435,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/pages/homepage-why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} sizes="(max-width: 1024px) 100vw, 50vw" className="w-full aspect-[4/3] object-cover" />
+              <Image src="/images/hp/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} sizes="(max-width: 1024px) 100vw, 50vw" className="w-full aspect-[4/3] object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>
@@ -479,9 +479,9 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { quote: 'WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I\'m making $42,000 a year with full benefits.', name: 'Sarah M.', program: 'Medical Assistant', salary: '$42K/yr', photo: '/images/pages/comp-highlights-success.jpg' },
-              { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training', salary: '$55K/yr', photo: '/images/pages/comp-highlights-success.jpg' },
-              { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification', salary: '$38K/yr', photo: '/images/pages/comp-highlights-success.jpg' },
+              { quote: 'WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I\'m making $42,000 a year with full benefits.', name: 'Sarah M.', program: 'Medical Assistant', salary: '$42K/yr', photo: '/images/testimonials-hq/person-1.jpg' },
+              { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training', salary: '$55K/yr', photo: '/images/testimonials-hq/person-4.jpg' },
+              { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification', salary: '$38K/yr', photo: '/images/testimonials-hq/person-3.jpg' },
             ].map((t) => (
               <div key={t.name} className="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-2 mb-4">

@@ -453,16 +453,17 @@ const nextConfig = {
       { source: '/programs/cdl-transportation', destination: '/programs/cdl-training', permanent: true },
       // CNA — /programs/cna is the canonical page
       { source: '/programs/cna-cert', destination: '/programs/cna', permanent: true },
+      { source: '/programs/cna-certification', destination: '/programs/cna', permanent: true },
+      { source: '/programs/cna-certification/enroll', destination: '/programs/cna/enroll', permanent: true },
       // HVAC
       { source: '/programs/hvac', destination: '/programs/hvac-technician', permanent: true },
       // Barber & Beauty
       { source: '/programs/barber', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/programs/beauty', destination: '/programs/barber-apprenticeship', permanent: true },
-      // Business
-      // Tax — real page is /programs/tax-preparation
+      // Business / Finance pathway
       { source: '/programs/tax-prep', destination: '/programs/tax-preparation', permanent: true },
-      { source: '/programs/tax-entrepreneurship', destination: '/programs/tax-preparation', permanent: true },
-      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-preparation', permanent: true },
+      { source: '/programs/tax-entrepreneurship', destination: '/programs/finance-bookkeeping-accounting', permanent: true },
+      { source: '/programs/tax-prep-financial-services', destination: '/programs/finance-bookkeeping-accounting', permanent: true },
       // Healthcare aliases
       // Human Services
       // Skilled Trades aliases

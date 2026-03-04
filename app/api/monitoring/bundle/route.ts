@@ -18,7 +18,8 @@ export const maxDuration = 60;
 
 async function guardAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -33,7 +34,7 @@ async function guardAdmin() {
   return null;
 }
 
-async function safeQuery(supabase: any, table: string, select = '*', options?: { limit?: number; order?: string }) {
+async function safeQuery(db: any, table: string, select = '*', options?: { limit?: number; order?: string }) {
   try {
     let query = db.from(table).select(select, { count: 'exact' });
     if (options?.order) query = query.order(options.order, { ascending: false });
@@ -54,8 +55,9 @@ async function _GET(req: Request) {
     if (denied) return denied;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    if (!supabase) {
+    const _admin = createAdminClient();
+    const db = _admin || supabase;
+    if (!db) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
 
@@ -75,19 +77,19 @@ async function _GET(req: Request) {
       fundingCases,
       rapidsSubmissions,
     ] = await Promise.all([
-      safeQuery(supabase, 'training_courses', 'id, course_name, course_code, is_active, duration_hours'),
-      safeQuery(supabase, 'training_lessons', 'id, title, video_url, course_id', { limit: 1000 }),
-      safeQuery(supabase, 'enrollments', 'id, user_id, course_id, status, created_at', { limit: 200, order: 'created_at' }),
-      safeQuery(supabase, 'profiles', 'id, role, created_at', { limit: 1 }),
-      safeQuery(supabase, 'lesson_progress', 'id, user_id, lesson_id, completed', { limit: 200 }),
-      safeQuery(supabase, 'course_progress', 'id', { limit: 1 }),
-      safeQuery(supabase, 'certificates', 'id, user_id, course_id, issued_at', { limit: 100 }),
-      safeQuery(supabase, 'credentials', 'id, name, issuer', { limit: 50 }),
-      safeQuery(supabase, 'partner_lms_enrollments', 'id, provider_id, status', { limit: 100 }),
-      safeQuery(supabase, 'partner_lms_providers', 'id, provider_type, is_active'),
-      safeQuery(supabase, 'rapids_tracking', 'id'),
-      safeQuery(supabase, 'funding_cases', 'id, status'),
-      safeQuery(supabase, 'rapids_submissions', 'id'),
+      safeQuery(db, 'training_courses', 'id, course_name, course_code, is_active, duration_hours'),
+      safeQuery(db, 'training_lessons', 'id, title, video_url, course_id', { limit: 1000 }),
+      safeQuery(db, 'enrollments', 'id, user_id, course_id, status, created_at', { limit: 200, order: 'created_at' }),
+      safeQuery(db, 'profiles', 'id, role, created_at', { limit: 1 }),
+      safeQuery(db, 'lesson_progress', 'id, user_id, lesson_id, completed', { limit: 200 }),
+      safeQuery(db, 'course_progress', 'id', { limit: 1 }),
+      safeQuery(db, 'certificates', 'id, user_id, course_id, issued_at', { limit: 100 }),
+      safeQuery(db, 'credentials', 'id, name, issuer', { limit: 50 }),
+      safeQuery(db, 'partner_lms_enrollments', 'id, provider_id, status', { limit: 100 }),
+      safeQuery(db, 'partner_lms_providers', 'id, provider_type, is_active'),
+      safeQuery(db, 'rapids_tracking', 'id'),
+      safeQuery(db, 'funding_cases', 'id, status'),
+      safeQuery(db, 'rapids_submissions', 'id'),
     ]);
 
     // Video coverage

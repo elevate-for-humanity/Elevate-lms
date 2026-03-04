@@ -89,6 +89,9 @@ const EXCLUDED_PREFIXES = [
   // Separate domain — not part of this sitemap
   '/supersonic-fast-cash',
   '/supersonic',
+  // Redirect-only routes — canonical URLs are elsewhere
+  '/programs/cna-certification',
+  '/programs/cdl/waitlist',
 ];
 
 // Segments that indicate private routes regardless of position

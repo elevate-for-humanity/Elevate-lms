@@ -179,6 +179,32 @@ export default async function CompliancePage() {
         </section>
 
         <section>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Workforce Board Alignment</h2>
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 text-gray-700">
+            <p>
+              Elevate for Humanity coordinates with the local workforce development board through <strong>WorkOne Indianapolis (Region 5)</strong> for all WIOA-funded participant services. This includes referrals, OJT contracts, work experience authorizations, credential attainment reporting, and employment outcome tracking.
+            </p>
+            <p>
+              OJT reimbursement rates, work experience stipends, and internship wage structures are governed by local board policy — not set by Elevate. All placements require approval from the assigned WorkOne career advisor or case manager before training begins.
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4 mt-4">
+              <Link href="/compliance/internship-agreement" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+                <h3 className="font-semibold text-gray-900 text-sm">Internship Agreement</h3>
+                <p className="text-xs text-gray-500 mt-1">Structured work-based learning placement template</p>
+              </Link>
+              <Link href="/compliance/ojt-training-plan" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+                <h3 className="font-semibold text-gray-900 text-sm">OJT Training Plan</h3>
+                <p className="text-xs text-gray-500 mt-1">Skills schedule, evaluation timeline, compliance notes</p>
+              </Link>
+              <Link href="/compliance/internship-evaluation" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+                <h3 className="font-semibold text-gray-900 text-sm">Evaluation Form</h3>
+                <p className="text-xs text-gray-500 mt-1">Supervisor competency assessment (midpoint + final)</p>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Policies</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <Link href="/privacy-policy" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">

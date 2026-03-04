@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/tax-career-paths.mp4',
-  title: 'Tax Preparation', subtitle: 'Prepare individual and small business tax returns. Earn your IRS PTIN and start earning during tax season.',
+  title: 'Tax Preparation', subtitle: 'Tier 1 of the Finance, Bookkeeping & Accounting Credential Pathway. Prepare individual and small business tax returns. Earn your IRS PTIN and start earning during tax season.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '6 weeks', cost: '$1,800', format: 'In-person, Indianapolis', credential: 'IRS PTIN + AFSP',
   overview: 'This 6-week program teaches federal and state income tax preparation for individuals and small businesses. You will learn to use professional tax software, understand tax law, and prepare common return types (1040, Schedule C, 1099). Graduates earn their IRS Preparer Tax Identification Number (PTIN) and are eligible for the Annual Filing Season Program (AFSP).',
@@ -53,9 +53,10 @@ const config: ProgramPageConfig = {
     { question: 'Do I need accounting experience?', answer: 'No. This program teaches tax preparation from the basics. If you can do basic math and follow instructions, you can learn to prepare tax returns.' },
     { question: 'When should I take this program?', answer: 'Ideally before tax season (January–April). Classes typically start in October or November so you are ready to work by January.' },
     { question: 'Can I start my own tax business?', answer: 'Yes. With your PTIN, you can legally prepare tax returns for compensation. Many graduates start their own seasonal tax preparation business.' },
+    { question: 'Is this part of a larger pathway?', answer: 'Yes. Tax Preparation is Tier 1 of the Finance, Bookkeeping & Accounting Credential Pathway. After completing this program, you can advance to Tier 2 (Bookkeeping & QuickBooks) and Tier 3 (Enrolled Agent Preparation). The full pathway is ETPL-registered and WIOA-eligible under program #10004627.' },
   ],
   applyHref: '/apply?program=tax-preparation',
-  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Business', href: '/programs/business' }, { label: 'Tax Preparation' }],
+  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Finance, Bookkeeping & Accounting', href: '/programs/finance-bookkeeping-accounting' }, { label: 'Tax Preparation' }],
 };
 
 export default function Page() {

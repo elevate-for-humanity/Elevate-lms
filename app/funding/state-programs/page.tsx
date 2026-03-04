@@ -15,7 +15,7 @@ const PROGRAMS = [
   {
     name: 'Next Level Jobs — Workforce Ready Grant',
     admin: 'Indiana Commission for Higher Education',
-    desc: 'Covers tuition and fees for eligible certificate programs in high-demand fields. Available at approved training providers across Indiana.',
+    desc: 'Covers tuition and fees for eligible credential pathway programs in high-demand fields. Available at approved workforce credential providers across Indiana.',
     fields: ['Healthcare', 'IT & Business', 'Advanced Manufacturing', 'Transportation & Logistics', 'Building & Construction'],
     eligible: ['Indiana resident', 'Do not already hold a bachelor\'s degree', 'Enroll in an eligible certificate program'],
   },

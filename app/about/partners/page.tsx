@@ -10,7 +10,7 @@ import { createPublicClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Our Partners | Elevate for Humanity',
-  description: 'Elevate for Humanity partners with workforce boards, employers, training providers, and government agencies to deliver free career training in Indianapolis.',
+  description: 'Elevate for Humanity partners with workforce boards, employers, credential providers, and government agencies to deliver funded credential pathway programs in Indianapolis.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/about/partners',
   },
@@ -52,7 +52,7 @@ export default async function PartnersPage() {
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Partners</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">We collaborate with government agencies, employers, and training providers to deliver free, funded career training.</p>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
           </div>
         </div>
       </section>
@@ -178,7 +178,7 @@ export default async function PartnersPage() {
           <Handshake className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
-            Join our network of employers, training providers, and workforce organizations.
+            Join our network of employers, credential partners, and workforce organizations.
           </p>
           <Link
             href="/contact?subject=Partnership%20Inquiry"

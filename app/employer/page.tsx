@@ -72,7 +72,7 @@ export default function EmployerPage() {
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
             {[
               { title: 'WOTC Tax Credit', amount: '$2,400-$9,600 per hire', desc: 'Federal tax credit: $2,400/hire for TANF, SNAP, ex-felons, long-term unemployed. Up to $9,600 for qualified veterans. 40% of first-year wages (25% if 120-399 hours). We file Form 8850 within the 28-day deadline. Authorized through Dec 31, 2025.', image: '/images/programs-hq/business-office.jpg', href: '/funding' },
-              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. WorkOne pays a portion of wages during the training period.', image: '/images/employers/partnership-office-meeting.jpg', href: '/ojt-and-funding' },
+              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. Through WorkOne Indianapolis, the local workforce board reimburses 50–75% of wages during the training period per local board policy. Formal OJT contract required.', image: '/images/employers/partnership-office-meeting.jpg', href: '/ojt-and-funding' },
               { title: 'WIOA Upskilling', amount: 'Tuition covered', desc: 'Upskill current employees with WIOA-funded training in healthcare, IT, skilled trades, and more.', image: '/images/heroes-hq/funding-hero.jpg', href: '/wioa-eligibility' },
               { title: 'Workforce Ready Grant', amount: 'State-funded certifications', desc: 'Indiana covers tuition for high-demand certifications through the WRG program.', image: '/images/programs-hq/students-learning.jpg', href: '/funding' },
             ].map((item) => (

@@ -69,7 +69,7 @@ export default function OJTAndFundingPage() {
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">On-the-Job Training (OJT)</h3>
                 <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                  Get hired by an employer and train on the job. WorkOne reimburses your employer 50-75% of your wages during training, so employers are motivated to hire and train you.
+                  Get hired by an employer and train on the job. Through WorkOne Indianapolis (Region 5), the local workforce board reimburses your employer 50–75% of your wages during training per local board policy, so employers are motivated to hire and train you.
                 </p>
                 <div className="space-y-2 mb-4">
                   {['Full employment from day one', 'Employer receives wage reimbursement', 'Training customized to the job', 'Leads to permanent employment', 'Available across many industries'].map((item) => (
@@ -96,7 +96,7 @@ export default function OJTAndFundingPage() {
             {[
               { step: '1', title: 'Apply at Elevate', desc: 'Submit a student application and tell us you are interested in earn-while-you-learn.' },
               { step: '2', title: 'Register at Indiana Career Connect', desc: 'Create your account at indianacareerconnect.com for funding eligibility.' },
-              { step: '3', title: 'Meet with WorkOne', desc: 'Schedule an appointment to determine your WIOA/OJT eligibility.' },
+              { step: '3', title: 'Meet with WorkOne', desc: 'Schedule an appointment at WorkOne Indianapolis to determine your WIOA/OJT eligibility. Your career advisor will review funding options and authorize the OJT contract.' },
               { step: '4', title: 'Get Matched', desc: 'We match you with an apprenticeship or OJT employer in your field.' },
               { step: '5', title: 'Start Earning', desc: 'Begin working and training on day one. Earn a paycheck while you learn.' },
             ].map((item) => (

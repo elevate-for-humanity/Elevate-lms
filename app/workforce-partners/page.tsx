@@ -114,7 +114,7 @@ const services = (dbRows as any[]) || [];
             <div className="text-white">
               <h2 className="text-3xl font-black mb-6">For WorkOne Staff</h2>
               <p className="text-brand-blue-100 mb-6">
-                Career advisors and case managers: We've created resources specifically for you to help your clients access our training programs.
+                Career advisors and case managers: We coordinate directly with WorkOne Indianapolis (Region 5) for participant referrals, OJT contracts, work experience authorizations, and outcome reporting.
               </p>
               <ul className="space-y-4 mb-8">
                 {[
@@ -122,6 +122,9 @@ const services = (dbRows as any[]) || [];
                   'ITA request forms and processing guides',
                   'Direct contact for student referrals',
                   'Real-time enrollment and progress updates',
+                  'Weekly progress reports for active participants',
+                  'Credential attainment reported within 5 business days',
+                  'OJT training plans and internship agreements available',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="text-slate-400 flex-shrink-0">•</span>

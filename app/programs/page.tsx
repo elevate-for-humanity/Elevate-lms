@@ -9,8 +9,8 @@ import { getTotalHoursRange } from '@/lib/programs/program-schema';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 export const metadata: Metadata = {
-  title: 'Training Programs | Elevate for Humanity',
-  description: 'Workforce training programs in skilled trades, healthcare, and personal services. WIOA and Next Level Jobs funding available. Indianapolis, Indiana.',
+  title: 'Credential Pathways | Funded Career Training Programs',
+  description: 'Credential pathway programs in healthcare, skilled trades, technology, CDL, barbering, and business. Each pathway includes nationally recognized certifications. Training may be fully funded through WIOA and state workforce programs.',
 };
 
 export default function ProgramCatalogPage() {
@@ -34,7 +34,7 @@ export default function ProgramCatalogPage() {
               <ChevronRight className="w-3 h-3" />
               <span className="text-white font-medium">Programs</span>
             </nav>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">Training Programs</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white">Credential Pathways</h1>
             <p className="text-white/80 mt-2 max-w-2xl">
               Industry-recognized credentials. Competency-based training. Workforce-funded pathways to employment.
             </p>

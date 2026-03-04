@@ -208,6 +208,7 @@ export default function ProgramPageLayout({
             {/* Row 1: Title + CTA */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
               <div className="flex-1 min-w-0">
+                <p className="text-brand-red-600 font-bold text-xs uppercase tracking-wider mb-2">Credential Pathway</p>
                 <div className="flex items-center gap-3 mb-2">
                   {c.badge && (
                     <span className={`text-[11px] font-bold text-white px-2.5 py-0.5 rounded-full ${badgeMap[c.badgeColor || 'red']}`}>
@@ -276,8 +277,8 @@ export default function ProgramPageLayout({
           <div className="max-w-5xl mx-auto px-6">
             <div className="grid lg:grid-cols-5 gap-10 items-start">
               <div className="lg:col-span-3">
-                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Program Overview</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">What You&apos;ll Get</h2>
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Credential Pathway Overview</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">What This Pathway Includes</h2>
                 <p className="text-slate-600 leading-relaxed">{c.overview}</p>
                 <ul className="mt-6 space-y-3">
                   {c.highlights.map((h) => (
@@ -503,8 +504,8 @@ export default function ProgramPageLayout({
           <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
-                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Industry-Recognized Credentials</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">What You&apos;ll Earn</h2>
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">National Credentials</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Credentials You&apos;ll Earn</h2>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {c.credentials.map((cr, i) => {
@@ -754,23 +755,23 @@ export default function ProgramPageLayout({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-              Ready to Change Your Life?
+              Start This Credential Pathway
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-lg mx-auto">
-              Apply in minutes. Most students begin training within 2–4 weeks.
+              Apply in minutes. Training may be fully funded. Graduate with nationally recognized credentials.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
                 href={applyHref}
                 className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors"
               >
-                Get Started Today
+                Apply Now
               </Link>
               <Link
                 href="/programs"
                 className="bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-800 transition-colors"
               >
-                Browse All Programs
+                All Credential Pathways
               </Link>
             </div>
           </div>

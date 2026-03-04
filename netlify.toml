@@ -248,13 +248,62 @@
 
 # ============================================
 # LMS DOMAIN (elevateforhumanityeducation.com)
-# Do NOT redirect - handled by middleware -> /student-portal
+# 301 to canonical domain to prevent duplicate content indexing.
+# Student portal is accessible at www.elevateforhumanity.org/student-portal
 # ============================================
+
+[[redirects]]
+  from = "https://elevateforhumanityeducation.com/*"
+  to = "https://www.elevateforhumanity.org/student-portal/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.elevateforhumanityeducation.com/*"
+  to = "https://www.elevateforhumanity.org/student-portal/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://elevateforhumanityeducation.com/*"
+  to = "https://www.elevateforhumanity.org/student-portal/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.elevateforhumanityeducation.com/*"
+  to = "https://www.elevateforhumanity.org/student-portal/:splat"
+  status = 301
+  force = true
 
 # ============================================
 # SUPERSONIC DOMAIN (supersonicfastermoney.com)
-# Do NOT redirect - handled by middleware -> /supersonic-fast-cash
+# 301 to canonical domain to prevent duplicate content indexing.
 # ============================================
+
+[[redirects]]
+  from = "https://supersonicfastermoney.com/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.supersonicfastermoney.com/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://supersonicfastermoney.com/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.supersonicfastermoney.com/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 301
+  force = true
 
 # ============================================
 # CANONICAL DOMAIN REDIRECTS (301 = permanent)

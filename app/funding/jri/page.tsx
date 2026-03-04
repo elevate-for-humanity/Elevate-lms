@@ -53,7 +53,7 @@ export default function JRIFundingPage() {
                 The Job-Ready Incentive (JRI) is an Indiana state program designed to cover the cost of career training for eligible justice-involved individuals. Administered by the Indiana Department of Workforce Development (DWD), JRI removes financial barriers so participants can focus on earning certifications and building careers.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                Elevate for Humanity is an approved JRI training provider. Our programs are designed to get participants certified and employed in high-demand fields within weeks, not years.
+                Elevate for Humanity is an approved JRI credential pathway provider. Our programs are designed to get participants certified with nationally recognized credentials and employed in high-demand fields within weeks, not years.
               </p>
               <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
                 Apply for JRI Funding <ArrowRight className="w-5 h-5" />

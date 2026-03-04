@@ -67,7 +67,7 @@ export default function CNAEnrollPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          program: 'cna-certification',
+          program: 'cna',
           price: PROGRAM_DETAILS.price,
           paymentPlan: formData.paymentOption === 'payment-plan' ? {
             downPayment: PROGRAM_DETAILS.downPayment,

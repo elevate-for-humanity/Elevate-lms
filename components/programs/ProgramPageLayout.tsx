@@ -185,45 +185,31 @@ export default function ProgramPageLayout({
         </div>
       )}
 
-      {/* ===== TITLE + QUICK FACTS ===== */}
+      {/* ===== PROGRAM IDENTITY — two-column compressed block ===== */}
       <InView animation="fade-up">
-        <section className="bg-white py-10 sm:py-14">
+        <section className="bg-white py-8 sm:py-10 border-b border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            {/* Row 1: Title + CTA */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
               <div className="flex-1 min-w-0">
-                {c.badge && (
-                  <span className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-4 ${badgeMap[c.badgeColor || 'red']}`}>
-                    {c.badge}
-                  </span>
-                )}
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-[1.1]">
+                <div className="flex items-center gap-3 mb-2">
+                  {c.badge && (
+                    <span className={`text-[11px] font-bold text-white px-2.5 py-0.5 rounded-full ${badgeMap[c.badgeColor || 'red']}`}>
+                      {c.badge}
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight">
                   {c.title}
                 </h1>
-                <p className="text-slate-500 text-lg mt-3 max-w-xl leading-relaxed">
+                <p className="text-slate-500 mt-1 max-w-2xl leading-relaxed text-sm sm:text-base">
                   {c.subtitle}
                 </p>
-
-                {/* Quick facts — inline, not a strip */}
-                <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
-                  {[
-                    { label: 'Duration', value: c.duration },
-                    { label: 'Cost', value: c.cost },
-                    { label: 'Format', value: c.format },
-                    { label: 'Credential', value: c.credential },
-                  ].map((f) => (
-                    <div key={f.label}>
-                      <span className="text-slate-400">{f.label}</span>
-                      <span className="ml-1.5 font-semibold text-slate-900">{f.value}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
-
-              {/* CTA */}
-              <div className="flex flex-col gap-2 lg:pt-4 shrink-0">
+              <div className="flex flex-row gap-2 shrink-0">
                 <Link
                   href={applyHref}
-                  className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base"
+                  className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-sm"
                 >
                   Apply Now
                   <ArrowRight className="w-4 h-4" />
@@ -231,19 +217,38 @@ export default function ProgramPageLayout({
                 {c.courseHref && (
                   <Link
                     href={c.courseHref}
-                    className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all text-base"
+                    className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-all text-sm"
                   >
                     Access Course
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 )}
-                <Link
-                  href="/wioa-eligibility"
-                  className="text-center text-sm text-slate-500 hover:text-brand-red-600 transition-colors"
-                >
-                  Check funding eligibility →
-                </Link>
               </div>
+            </div>
+
+            {/* Row 2: Four fact cards — single glance */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: 'Duration', value: c.duration, icon: '⏱' },
+                { label: 'Format', value: c.format, icon: '📍' },
+                { label: 'Cost', value: c.cost, icon: '💰' },
+                { label: 'Credentials', value: c.credential, icon: '🏆' },
+              ].map((f) => (
+                <div key={f.label} className="bg-slate-50 rounded-lg px-4 py-3 border border-slate-100">
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">{f.icon} {f.label}</div>
+                  <div className="font-bold text-slate-900 text-sm mt-0.5 leading-snug">{f.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Funding link */}
+            <div className="mt-3 text-center lg:text-left">
+              <Link
+                href="/wioa-eligibility"
+                className="text-xs text-slate-400 hover:text-brand-red-600 transition-colors"
+              >
+                Check funding eligibility →
+              </Link>
             </div>
           </div>
         </section>
@@ -476,24 +481,33 @@ export default function ProgramPageLayout({
         </InView>
       )}
 
-      {/* ===== CREDENTIALS ===== */}
+      {/* ===== CREDENTIALS — institutional seal cards ===== */}
       {c.credentials && c.credentials.length > 0 && (
         <InView animation="fade-up">
           <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
-              <div className="text-center mb-8">
-                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Credentials</p>
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Industry-Recognized Credentials</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">What You&apos;ll Earn</h2>
               </div>
-              <div className="flex flex-wrap justify-center gap-3">
-                {c.credentials.map((cr, i) => (
-                  <ScrollReveal key={cr} delay={i * 60} direction="up">
-                    <div className="flex items-center gap-2 bg-white border border-brand-green-200 rounded-full px-5 py-2.5 shadow-sm">
-                      <Award className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-brand-green-800">{cr}</span>
-                    </div>
-                  </ScrollReveal>
-                ))}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {c.credentials.map((cr, i) => {
+                  // Split credential on " — " to get name and issuer
+                  const parts = cr.split(' — ');
+                  const name = parts[0];
+                  const issuer = parts[1] || '';
+                  return (
+                    <ScrollReveal key={cr} delay={i * 60} direction="up">
+                      <div className="bg-white rounded-xl p-5 border border-slate-200 text-center h-full flex flex-col items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-12 h-12 rounded-full bg-brand-green-50 flex items-center justify-center mb-3">
+                          <Award className="w-6 h-6 text-brand-green-600" />
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-sm leading-snug mb-1">{name}</h3>
+                        {issuer && <p className="text-xs text-slate-500 leading-snug">{issuer}</p>}
+                      </div>
+                    </ScrollReveal>
+                  );
+                })}
               </div>
             </div>
           </section>

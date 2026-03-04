@@ -222,10 +222,10 @@ export default function HvacCourseHome({
       <div className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center gap-6 md:gap-10 text-sm">
           {[
-            { icon: Clock, text: <>12 weeks &middot; Hybrid</> },
+            { icon: Clock, text: <>12 weeks &middot; 15–20 hrs/wk</> },
             { icon: BookOpen, text: <>{total} lessons &middot; {course.modules.length} modules</> },
-            { icon: Award, text: <>3 certifications included</> },
-            { icon: Users, text: <>Hybrid: Online + Hands-on</> },
+            { icon: Award, text: <>6 credentials included</> },
+            { icon: Users, text: <>Online RTI + Lab + OJT</> },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-slate-600">
               <item.icon className="w-4 h-4 text-brand-blue-500" />
@@ -282,15 +282,21 @@ export default function HvacCourseHome({
           <section className="mb-14">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Program Outcomes</h2>
             <p className="text-sm text-slate-500 mb-6">By completion, graduates will be able to:</p>
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-              <ol className="space-y-3">
-                {course.programOutcomes.map((outcome, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="flex-shrink-0 w-7 h-7 bg-brand-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center mt-0.5">{i + 1}</span>
-                    <span className="text-sm text-slate-700 leading-relaxed">{outcome}</span>
-                  </li>
-                ))}
-              </ol>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {course.programOutcomes.map((outcome, i) => {
+                // Extract a short headline from the outcome
+                const headlines = ['Refrigerant Compliance', 'System Diagnostics', 'Precision Measurement', 'Equipment Installation', 'Jobsite Safety'];
+                const headline = headlines[i] || `Competency ${i + 1}`;
+                return (
+                  <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="flex-shrink-0 w-8 h-8 bg-brand-red-600 text-white text-xs font-bold rounded-lg flex items-center justify-center">{i + 1}</span>
+                      <h3 className="font-bold text-slate-900 text-sm">{headline}</h3>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed">{outcome}</p>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
@@ -302,25 +308,41 @@ export default function HvacCourseHome({
           <section className="mb-14">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Career Pathway</h2>
             <p className="text-sm text-slate-500 mb-6">Industry progression from entry to mastery.</p>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {course.credentialPathway.map((level, i) => (
-                <div key={i} className={`relative border rounded-2xl p-5 ${i === 0 ? 'bg-brand-red-50 border-brand-red-200' : 'bg-white border-slate-200'}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-brand-red-600 text-white' : 'bg-slate-200 text-slate-600'}`}>{level.level}</span>
-                    <h3 className="font-bold text-slate-900 text-sm">{level.title}</h3>
+
+            {/* Horizontal timeline */}
+            <div className="relative">
+              {/* Connector line — hidden on mobile */}
+              <div className="hidden lg:block absolute top-10 left-[10%] right-[10%] h-0.5 bg-slate-200" />
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+                {course.credentialPathway.map((level, i) => (
+                  <div key={i} className="flex flex-col items-center text-center">
+                    {/* Node */}
+                    <div className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold mb-3 shadow-md ${
+                      i === 0
+                        ? 'bg-brand-red-600 text-white ring-4 ring-brand-red-100'
+                        : 'bg-white text-slate-600 border-2 border-slate-200'
+                    }`}>
+                      {level.level}
+                    </div>
+                    {i === 0 && <span className="px-2.5 py-0.5 bg-brand-red-600 text-white text-[10px] font-bold rounded-full mb-2">THIS PROGRAM</span>}
+                    <h3 className="font-bold text-slate-900 text-sm mb-1">{level.title}</h3>
+                    <p className="text-[11px] text-slate-400 mb-2">{level.typicalTimeline}</p>
+                    <ul className="space-y-1 text-left">
+                      {level.requirements.map((req, j) => (
+                        <li key={j} className="text-xs text-slate-600 flex items-start gap-1.5">
+                          <CheckCircle className={`w-3 h-3 mt-0.5 flex-shrink-0 ${i === 0 ? 'text-brand-red-500' : 'text-slate-400'}`} />
+                          {req}
+                        </li>
+                      ))}
+                    </ul>
+                    {/* Arrow between nodes — hidden on mobile */}
+                    {i < course.credentialPathway.length - 1 && (
+                      <div className="hidden lg:block absolute top-8 text-slate-300 text-xl" style={{ left: `${(i + 1) * 25}%`, transform: 'translateX(-50%)' }}>→</div>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-500 mb-3">{level.typicalTimeline}</p>
-                  <ul className="space-y-1">
-                    {level.requirements.map((req, j) => (
-                      <li key={j} className="text-xs text-slate-600 flex items-start gap-1.5">
-                        <CheckCircle className={`w-3 h-3 mt-0.5 flex-shrink-0 ${i === 0 ? 'text-brand-red-500' : 'text-slate-400'}`} />
-                        {req}
-                      </li>
-                    ))}
-                  </ul>
-                  {i === 0 && <span className="absolute top-2 right-2 px-2 py-0.5 bg-brand-red-600 text-white text-[10px] font-bold rounded-full">THIS PROGRAM</span>}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
         )}
@@ -330,8 +352,8 @@ export default function HvacCourseHome({
             ═══════════════════════════════════════════════════════════ */}
         <section className="mb-14">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">12-Week Schedule</h2>
-          <p className="text-sm text-slate-500 mb-6">Weekly competency milestones.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <p className="text-sm text-slate-500 mb-6">Weekly competency milestones — 20 hours/week hybrid instruction.</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             {course.modules
               .filter(m => m.weekAssignment)
               .reduce((acc, mod) => {
@@ -346,17 +368,12 @@ export default function HvacCourseHome({
               }, [] as { week: number; statement: string; modules: string[] }[])
               .sort((a, b) => a.week - b.week)
               .map(w => (
-                <div key={w.week} className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand-blue-300 transition">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-6 h-6 bg-brand-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">{w.week}</span>
-                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Week {w.week}</span>
+                <div key={w.week} className="bg-white border border-slate-200 rounded-lg p-3 hover:border-brand-blue-300 transition">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="w-5 h-5 bg-brand-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{w.week}</span>
+                    <span className="text-[11px] font-bold text-slate-900">Wk {w.week}</span>
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-2">{w.statement}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {w.modules.map((m, i) => (
-                      <span key={i} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{m}</span>
-                    ))}
-                  </div>
+                  <p className="text-[11px] text-slate-600 leading-snug">{w.statement}</p>
                 </div>
               ))}
           </div>
@@ -447,38 +464,51 @@ export default function HvacCourseHome({
         {/* ═══════════════════════════════════════════════════════════
             ALIGNMENT — Two columns, clean lists
             ═══════════════════════════════════════════════════════════ */}
-        <section className="mb-14 grid sm:grid-cols-2 gap-6">
-          <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-2xl p-6">
-            <h3 className="font-bold text-brand-blue-900 text-lg mb-4">Regulatory Alignment</h3>
-            <ul className="space-y-3">
-              {[
-                'EPA Section 608 Universal — all equipment types',
-                'OSHA 30-Hour Construction Safety Standard',
-                'Nationally accredited CPR/First Aid/AED',
-                'NRF Rise Up Retail Industry Fundamentals',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-brand-blue-800">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-500 mt-0.5 flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-brand-red-50 border border-brand-red-100 rounded-2xl p-6">
-            <h3 className="font-bold text-brand-red-900 text-lg mb-4">Workforce Standards</h3>
-            <ul className="space-y-3">
-              {[
-                'U.S. Department of Labor competency framework',
-                'WIOA Title I eligible training provider (ETPL)',
-                'Documented assessment checkpoints per module',
-                'Participant progress tracking and completion reporting',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-brand-red-800">
-                  <CheckCircle className="w-4 h-4 text-brand-red-500 mt-0.5 flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+        <section className="mb-14">
+          <div className="bg-slate-900 rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center gap-3">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                <Award className="w-5 h-5 text-slate-900" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-sm">Standards Alignment</h3>
+                <p className="text-slate-400 text-[11px]">This program operates within recognized workforce and industry frameworks.</p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-700">
+              <div className="p-6">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">Industry Certifications</h4>
+                <ul className="space-y-3">
+                  {[
+                    'EPA Section 608 Universal — all equipment types',
+                    'OSHA 30-Hour Construction Safety (DOL card)',
+                    'Nationally accredited CPR/First Aid/AED',
+                    'NRF Rise Up Retail Industry Fundamentals',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">
+                      <CheckCircle className="w-4 h-4 text-brand-green-400 mt-0.5 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="p-6">
+                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">Workforce Compliance</h4>
+                <ul className="space-y-3">
+                  {[
+                    'U.S. Department of Labor competency framework',
+                    'WIOA Title I eligible training provider (ETPL #10004322)',
+                    'Documented assessment checkpoints per module',
+                    'Participant progress tracking and completion reporting',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">
+                      <CheckCircle className="w-4 h-4 text-brand-green-400 mt-0.5 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 

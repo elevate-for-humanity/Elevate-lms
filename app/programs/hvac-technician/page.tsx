@@ -33,7 +33,7 @@ const config: ProgramPageConfig = {
   credential: 'EPA 608 Universal + OSHA 30 + CPR/AED',
 
   totalHours: 240,
-  schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
+  schedule: 'Mon–Fri, 15–20 hours per week (flexible scheduling)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults. Contact us for schedule options.',
   cohortSize: '10–15 participants per cohort',
   admissionRequirements: [
@@ -194,9 +194,9 @@ const config: ProgramPageConfig = {
   },
 
   hoursBreakdown: [
-    { label: 'Online Instruction (LMS)', hours: 96 },
-    { label: 'Hands-on Lab Training', hours: 72 },
-    { label: 'On-the-Job Training (OJT)', hours: 72 },
+    { label: 'Online Coursework (LMS)', hours: 130 },
+    { label: 'Lab Demonstrations / Guided Practice', hours: 70 },
+    { label: 'Employer Exposure / Field Observation', hours: 40 },
   ],
 
   assessmentStructure: {

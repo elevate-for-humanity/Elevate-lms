@@ -51,6 +51,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== INSTITUTIONAL TRUST BAR ===== */}
+      <section className="bg-white border-b border-slate-200 py-6">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mb-4">Institutional Affiliations &amp; Workforce Alignment</p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full" />
+              <span>U.S. Department of Labor — Registered Apprenticeship Sponsor</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full" />
+              <span>Indiana DWD — ETPL Listed Training Provider</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full" />
+              <span>WorkOne — Workforce Partner</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full" />
+              <span>WIOA Title I — Approved Provider</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-brand-green-600 rounded-full" />
+              <span>Next Level Jobs — Workforce Ready Grant Eligible</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-slate-700">
+            <span><strong className="text-slate-900">8</strong> Training Programs</span>
+            <span><strong className="text-slate-900">35+</strong> Industry Credentials</span>
+            <span><strong className="text-slate-900">5</strong> Career Sectors</span>
+            <span><strong className="text-slate-900">20+</strong> Employer Partners</span>
+            <span className="text-brand-green-700 font-semibold">$0 Tuition with Approved Funding</span>
+          </div>
+        </div>
+      </section>
+
       {/* ===== AUDIENCE QUICK LINKS ===== */}
       <InView animation="fade-up">
       <section className="py-10 sm:py-12 bg-slate-50 border-t border-slate-100">

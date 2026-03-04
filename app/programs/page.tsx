@@ -42,13 +42,27 @@ export default function ProgramCatalogPage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="bg-slate-900 py-4">
-        <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-white">
-          <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.length}</strong> Programs</span>
-          <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.reduce((sum, p) => sum + p.credentials.length, 0)}</strong> Credentials</span>
-          <span><strong className="text-brand-blue-400">{new Set(ALL_PROGRAMS.map((p) => p.sector)).size}</strong> Industry Sectors</span>
-          <span><strong className="text-brand-green-400">$0</strong> with WIOA Funding</span>
+      {/* Institutional Stats Bar */}
+      <section className="bg-slate-900 py-5">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-white">
+            <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.length}</strong> Programs</span>
+            <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.reduce((sum, p) => sum + p.credentials.length, 0)}</strong> Industry Credentials</span>
+            <span><strong className="text-brand-blue-400">{new Set(ALL_PROGRAMS.map((p) => p.sector)).size}</strong> Sectors</span>
+            <span><strong className="text-brand-blue-400">{new Set(ALL_PROGRAMS.flatMap((p) => p.employerPartners)).size}</strong> Employer Partners</span>
+            <span><strong className="text-brand-green-400">$0</strong> with WIOA Funding</span>
+          </div>
+          {/* Credential Pipeline Summary */}
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mb-3">Credential Outcomes by Program</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {ALL_PROGRAMS.map((p) => (
+                <span key={p.slug} className="text-[11px] bg-white/5 border border-white/10 text-slate-300 px-3 py-1 rounded-full">
+                  {p.title} → <strong className="text-white">{p.credentials[0]?.name}</strong>
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

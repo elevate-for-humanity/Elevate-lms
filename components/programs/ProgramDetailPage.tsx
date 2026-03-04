@@ -343,6 +343,40 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
         </div>
       </section>
 
+      {/* ═══ INDUSTRY & EMPLOYER PARTNERS ══════════════════════════ */}
+      {p.employerPartners.length > 0 && (
+        <section className="bg-white py-10 border-t border-slate-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <SectionHeader icon={Building2} title="Industry & Employer Partners" />
+            <p className="text-sm text-slate-600 mt-2 max-w-3xl">
+              Our curriculum is shaped by employer input. Graduates enter a hiring pipeline with these organizations.
+            </p>
+            <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {p.employerPartners.map((partner, i) => (
+                <div key={i} className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
+                  <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-4 h-4 text-brand-blue-600" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-800">{partner}</span>
+                </div>
+              ))}
+            </div>
+            {p.credentialPipeline && p.credentialPipeline.length > 0 && (
+              <div className="mt-6 bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-brand-green-800 mb-2">Where Graduates Work</p>
+                <div className="flex flex-wrap gap-2">
+                  {p.credentialPipeline.map((cp, i) => (
+                    <span key={i} className="text-xs bg-white border border-brand-green-300 text-brand-green-700 px-3 py-1 rounded-full font-medium">
+                      {cp.jobRole}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ═══ FAQ ════════════════════════════════════════════════════ */}
       {p.faqs.length > 0 && (
         <section className="bg-slate-50 py-10">

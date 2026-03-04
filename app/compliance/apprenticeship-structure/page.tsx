@@ -377,7 +377,7 @@ export default function ApprenticeshipStructurePage() {
               { label: 'Assessments', desc: 'Competency exams, quizzes, and skill evaluations with scored records' },
               { label: 'Instructor Verification', desc: 'Instructor sign-off on attendance, skill evaluations, and phase advancement' },
               { label: 'OJT Hour Logging', desc: 'Employer-submitted OJT hours with supervisor verification' },
-              { label: 'Cohort Progress Reports', desc: 'Structured reports for workforce partners (La Plaza, WorkOne, etc.)' },
+              { label: 'Cohort Progress Reports', desc: 'Structured reports for workforce partners (WorkOne, community organizations, etc.)' },
             ].map((item, i) => (
               <div key={i} className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
                 <p className="font-semibold text-gray-900 text-sm mb-1">{item.label}</p>

@@ -72,7 +72,7 @@ export default async function SelectSchedulePage() {
     {
       id: 'HVAC-2026-C1',
       name: 'HVAC Technician — Cohort 1',
-      partner: 'La Plaza',
+      partner: 'Workforce Partner',
       startDate: 'February 24, 2026',
       endDate: 'July 10, 2026',
       schedule: 'Monday–Friday, 8:00 AM – 2:30 PM',

@@ -36,7 +36,7 @@ export default function PartnersPage() {
             </p>
             <p>
               If you are a case manager at WorkOne, a program director at a community organization
-              like La Plaza or Goodwill, an HR director at a company that needs trained workers, or
+              like Goodwill or a community organization, an HR director at a company that needs trained workers, or
               a grant administrator evaluating training providers — this page is for you.
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function PartnersPage() {
               },
               {
                 type: 'Community Organizations',
-                examples: 'La Plaza, Goodwill, community centers, reentry programs, faith-based organizations',
+                examples: 'Goodwill, community centers, reentry programs, faith-based organizations',
                 image: '/images/heroes-hq/about-hero.jpg',
                 what: [
                   'Custom cohorts designed for your participant population and their specific needs',

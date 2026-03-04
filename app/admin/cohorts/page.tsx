@@ -18,9 +18,9 @@ export const metadata: Metadata = {
 
 const COHORT_1 = {
   id: 'HVAC-2026-C1',
-  name: 'HVAC Technician — Cohort 1 (La Plaza)',
+  name: 'HVAC Technician — Cohort 1',
   program: 'HVAC Technician Pathway',
-  partner: 'La Plaza',
+  partner: 'Workforce Partner',
   startDate: '2026-02-24',
   endDate: '2026-07-10',
   weeks: 20,
@@ -238,7 +238,7 @@ export default async function CohortTrackerPage() {
                   { label: 'Format', value: 'CSV + PDF (Salesforce-compatible)' },
                   { label: 'Post-Placement', value: '90-day and 180-day follow-up' },
                   { label: 'Escalation', value: 'Alert after 2 consecutive absences' },
-                  { label: 'LOC Contact', value: 'Dulce Vega (La Plaza)' },
+                  { label: 'LOC Contact', value: 'Workforce Partner Contact' },
                 ].map((r) => (
                   <div key={r.label} className="flex items-start justify-between">
                     <span className="text-xs text-gray-600">{r.label}</span>

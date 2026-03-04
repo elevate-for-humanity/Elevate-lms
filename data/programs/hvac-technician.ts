@@ -7,7 +7,6 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
  * This is the gold standard. All other programs must match this structure.
  * Structure: 6–8 weeks classroom + 2–4 weeks hands-on/OJT = 10–12 weeks total
  * Hours math: 12 weeks × 20 hrs/week = 240 hours total
- * Funding: Lilly Endowment and Cummins Foundation grants cover tuition.
  * EPA 608 proctored on-site — Elevate is an approved EPA 608 proctor testing site.
  */
 export const HVAC_TECHNICIAN: ProgramSchema = {
@@ -38,7 +37,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   schedule: '6–8 weeks classroom instruction + 2–4 weeks hands-on/OJT (flexible scheduling based on cohort)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 tuition — funded through Lilly Endowment and Cummins Foundation workforce grants.',
+  fundingStatement: '$0 tuition with approved workforce funding. WIOA, Next Level Jobs, and Workforce Ready Grant accepted.',
   selfPayCost: '$5,000 (payment plans available)',
   badge: 'Grant Funded',
   badgeColor: 'green',
@@ -299,8 +298,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   employerPartners: [
     'Jesse J. Wilkerson & Associates — Construction',
     'Indianapolis-area HVAC contractors (hiring pipeline)',
-    'Lilly Endowment — Workforce Grant Funder',
-    'Cummins Foundation — Workforce Grant Funder',
+    'Indianapolis-area HVAC employers (hiring pipeline)',
   ],
   pricingIncludes: [
     '240 instructional hours (12 weeks)',
@@ -311,12 +309,12 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement support and resume assistance',
   ],
-  paymentTerms: 'Grant-funded through Lilly Endowment and Cummins Foundation workforce grants — $0 tuition for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant also accepted. Payment plans available for self-pay students.',
+  paymentTerms: '$0 tuition for eligible participants through WIOA, Next Level Jobs, and Workforce Ready Grant funding. Payment plans available for self-pay students.',
 
   // ─── FAQ ─────────────────────────────────────────────────────────
   faqs: [
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. Week 1 covers orientation, tools, and safety. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
-    { question: 'Is this program free?', answer: 'Yes. Tuition is covered through workforce grants from Lilly Endowment and Cummins Foundation. WIOA, Next Level Jobs, and Workforce Ready Grant funding is also accepted. Self-pay is $5,000 with payment plans available.' },
+    { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant funding covers tuition, tools, certification exam fees, and materials. Self-pay is $5,000 with payment plans available.' },
     { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who purchases or handles refrigerants. The Universal level covers all equipment types. The exam has 80 questions across 4 sections — you need 70% on each section to pass. Elevate is an approved EPA 608 proctor testing site, so you take the exam here during the program.' },
     { question: 'What certifications will I earn?', answer: 'EPA 608 Universal (proctored on-site), OSHA 30-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included.' },
     { question: 'How is the program structured?', answer: '6–8 weeks of classroom instruction at our Indianapolis training center, followed by 2–4 weeks of hands-on training and employer jobsite placement. EPA 608 certification is proctored on-site during the program. Total duration is approximately 12 weeks.' },
@@ -333,5 +331,5 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
   // ─── SEO ─────────────────────────────────────────────────────────
   metaTitle: 'HVAC Technician Training | EPA 608 Proctor Site | Indianapolis',
-  metaDescription: '12-week HVAC program: 6–8 weeks classroom + 2–4 weeks hands-on. EPA 608 Universal proctored on-site. Grant-funded through Lilly Endowment and Cummins Foundation. Indianapolis.',
+  metaDescription: '12-week HVAC program: 6–8 weeks classroom + 2–4 weeks hands-on. EPA 608 Universal proctored on-site. Workforce funding available. Indianapolis.',
 };

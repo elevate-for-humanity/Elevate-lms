@@ -79,7 +79,6 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap justify-center gap-x-8 gap-y-2 text-xs text-slate-500">
-            <span>Workforce training funded by <strong className="text-slate-700">Lilly Endowment</strong> and <strong className="text-slate-700">Cummins Foundation</strong> grants</span>
             <span>EPA 608 Approved Proctor Testing Site</span>
           </div>
           <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-slate-700">

@@ -90,11 +90,10 @@ const programOutcomes = [
 ];
 
 const fundingSources = [
-  { name: 'Lilly Endowment Workforce Grant', percentage: 40 },
-  { name: 'Cummins Foundation Workforce Grant', percentage: 30 },
-  { name: 'WIOA Adult & Dislocated Worker', percentage: 15 },
-  { name: 'Workforce Ready Grant (WRG) / Next Level Jobs', percentage: 10 },
-  { name: 'Self-Pay / Employer Sponsored', percentage: 5 },
+  { name: 'WIOA Adult & Dislocated Worker', percentage: 40 },
+  { name: 'Workforce Ready Grant (WRG) / Next Level Jobs', percentage: 30 },
+  { name: 'Employer-Sponsored / Grant-Funded', percentage: 20 },
+  { name: 'Self-Pay', percentage: 10 },
 ];
 
 export default function IndianaOutcomesPage() {
@@ -121,7 +120,7 @@ export default function IndianaOutcomesPage() {
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
             Grant-funded workforce training targets for 2026 cohorts in the Indianapolis region.
-            Programs funded through Lilly Endowment and Cummins Foundation workforce grants.
+            Programs funded through WIOA, Workforce Ready Grant, and employer-sponsored workforce grants.
             Outcome data will be updated as cohorts complete.
           </p>
         </div>

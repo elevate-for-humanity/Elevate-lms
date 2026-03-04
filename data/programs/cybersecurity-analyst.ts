@@ -188,7 +188,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   modality: 'Hybrid — Online instruction via LMS, hands-on labs using virtual cyber range',
   facilityInfo: 'Elevate training center, Indianapolis',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available.',
-  employerPartners: ['Resultant', 'Anthem (Elevance Health)', 'Eli Lilly IT Security', 'Indiana National Guard Cyber'],
+  employerPartners: ['Resultant', 'Anthem (Elevance Health)', 'Roche Diagnostics IT', 'Indiana National Guard Cyber'],
   pricingIncludes: [
     'CompTIA Security+ exam voucher',
     'CompTIA Network+ exam voucher',

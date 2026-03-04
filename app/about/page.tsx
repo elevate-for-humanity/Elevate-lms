@@ -9,11 +9,11 @@ const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
   title: 'About Us | Elevate for Humanity',
-  description: 'Elevate for Humanity is a nonprofit workforce development institute in Indianapolis providing funded career training in healthcare, trades, CDL, technology, and barbering. Founded by Elizabeth Greene.',
+  description: 'Elevate for Humanity is a workforce development institute in Indianapolis providing funded career training in healthcare, trades, CDL, technology, and barbering. Founded by Elizabeth Greene.',
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: 'About Elevate for Humanity',
-    description: 'A nonprofit workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
+    description: 'A workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
@@ -53,7 +53,7 @@ export default function AboutPage() {
           </div>
           <div className="text-gray-700 space-y-4">
             <p>
-              Elevate for Humanity is a nonprofit workforce development institute based in
+              Elevate for Humanity is a workforce development institute based in
               Indianapolis, Indiana. We provide funded career training to people who need it most —
               justice-involved individuals, low-income families, veterans, dislocated workers,
               individuals with disabilities, and anyone facing barriers to employment.

@@ -354,11 +354,11 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Candid/Guidestar Registered Nonprofit
+                    Candid/Guidestar Registered
                   </h3>
                   <p className="text-lg text-black">
-                    Verified nonprofit profile on the nation's leading nonprofit
-                    information platform
+                    Verified profile on Candid/Guidestar, the nation's leading
+                    organizational transparency platform
                   </p>
                 </div>
               </div>

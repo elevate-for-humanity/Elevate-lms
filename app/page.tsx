@@ -567,7 +567,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
             {[
-              'Workforce Credential Institute', '501(c)(3) Nonprofit', 'ETPL Listed', 'WIOA Provider', 'Workforce Ready Grant',
+              'Workforce Credential Institute', 'ETPL Listed', 'WIOA Provider', 'Workforce Ready Grant',
               'JRI Approved', 'Certiport Testing Center', 'WorkKeys Assessment Site', 'EPA 608 Testing Site',
               'OSHA 10/30', 'HSI Training Center', 'DOL Apprenticeship Sponsor', 'IRS Enrolled Agent',
             ].map((badge) => (

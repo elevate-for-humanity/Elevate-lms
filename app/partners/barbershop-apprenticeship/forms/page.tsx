@@ -8,6 +8,7 @@ import {
   FileText, CheckCircle2, Circle, AlertCircle, ArrowRight,
   Download, Shield, Clock, BookOpen,
 } from 'lucide-react';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 interface FormItem {
   id: string;
@@ -155,21 +156,14 @@ export default function RequiredFormsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative py-16 overflow-hidden">
-        <Image
-          src="/images/pages/partners-pub-page-2.jpg"
-          alt="Barbershop partner forms"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-white/40" />
-        <div className="relative max-w-6xl mx-auto px-4">
-          <h1 className="text-4xl font-black text-gray-900 mb-4">Required Forms & Documents</h1>
-          <p className="text-xl text-gray-700 max-w-3xl">
-            Complete all required forms before hosting apprentices. Track your progress below.
-          </p>
+      <section className="bg-white py-6 border-b">
+        <div className="max-w-6xl mx-auto px-4">
+          <InstitutionalHeader
+            documentType="Required Forms"
+            title="Worksite Partner Forms & Documents"
+            subtitle="Complete all required forms before hosting apprentices. Track your progress below."
+            noDivider
+          />
         </div>
       </section>
 

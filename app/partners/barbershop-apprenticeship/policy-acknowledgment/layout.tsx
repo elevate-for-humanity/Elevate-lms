@@ -1,3 +1,7 @@
+export const dynamic = 'force-dynamic';
+
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -5,6 +9,22 @@ export const metadata: Metadata = {
   description: 'Review and acknowledge barbershop apprenticeship policies.',
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function PolicyLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const supabase = await createClient();
+
+  if (!supabase) {
+    redirect('/login?redirect=/partners/barbershop-apprenticeship/policy-acknowledgment');
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/partners/barbershop-apprenticeship/policy-acknowledgment');
+  }
+
+  return <>{children}</>;
 }

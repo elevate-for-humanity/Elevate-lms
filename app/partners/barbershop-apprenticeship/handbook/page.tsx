@@ -2,8 +2,10 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
+import { DocumentFooter } from '@/components/documents/DocumentFooter';
 import {
-  BookOpen, Shield, Clock, Users, AlertTriangle, Phone,
+  Shield, Clock, Users, AlertTriangle, Phone,
   CheckCircle2, FileText, Scale, Heart, ArrowRight,
 } from 'lucide-react';
 
@@ -13,14 +15,14 @@ export const metadata: Metadata = {
 };
 
 const sectionPhotos: Record<string, { src: string; alt: string }> = {
-  role: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber mentoring apprentice' },
-  compensation: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber tools and station' },
-  hours: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber cutting hair' },
-  competencies: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barber performing fade cut' },
-  safety: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Clean barbershop interior' },
-  communication: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barbershop team' },
-  prohibited: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Professional barbershop' },
-  termination: { src: '/images/pages/barber-gallery-1.jpg', alt: 'Barbershop workspace' },
+  role: { src: '/images/pages/barber-apprentice-learning.jpg', alt: 'Barber mentoring apprentice' },
+  compensation: { src: '/images/pages/barber-tools-closeup.jpg', alt: 'Barber tools and station' },
+  hours: { src: '/images/pages/barber-clippers-work.jpg', alt: 'Barber cutting hair' },
+  competencies: { src: '/images/pages/barber-fade-cut.jpg', alt: 'Barber performing fade cut' },
+  safety: { src: '/images/pages/barber-shop-wide.jpg', alt: 'Clean barbershop interior' },
+  communication: { src: '/images/pages/barber-client-consult.jpg', alt: 'Barbershop team' },
+  prohibited: { src: '/images/pages/barber-station-mirror.jpg', alt: 'Professional barbershop' },
+  termination: { src: '/images/pages/barber-products-shelf.jpg', alt: 'Barbershop workspace' },
 };
 
 const sections = [
@@ -164,27 +166,15 @@ export default function PartnerHandbookPage() {
         ]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative py-16 overflow-hidden">
-        <Image
-          src="/images/pages/partners-pub-page-3.jpg"
-          alt="Barber training session"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-white/40" />
-        <div className="relative max-w-6xl mx-auto px-4">
-          <div className="flex items-center gap-2 text-brand-blue-700 mb-3">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-sm font-semibold uppercase tracking-wider">Partner Resource</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Partner Handbook</h1>
-          <p className="text-xl text-gray-700 max-w-3xl">
-            Everything you need to know about your responsibilities, policies, and guidelines
-            as a barbershop apprenticeship worksite partner.
-          </p>
+      {/* Institutional Header */}
+      <section className="bg-white py-8 border-b">
+        <div className="max-w-6xl mx-auto px-4">
+          <InstitutionalHeader
+            documentType="Partner Handbook"
+            title="Barbershop Apprenticeship — Worksite Partner Handbook"
+            subtitle="Responsibilities, policies, and guidelines for barbershop apprenticeship worksite partners."
+            version="1.0"
+          />
         </div>
       </section>
 
@@ -215,16 +205,16 @@ export default function PartnerHandbookPage() {
       {/* Photo Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
         <div className="relative h-48">
-          <Image src="/images/pages/barber-cutting.jpg" alt="Barber cutting hair" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-beard-trim.jpg" alt="Barber trimming beard" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/pages/barber-fade.jpg" alt="Barber performing fade" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-straight-razor.jpg" alt="Barber performing straight razor shave" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/pages/barber-shop-interior.jpg" alt="Barbershop interior" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-cape-client.jpg" alt="Client in barber chair" fill className="object-cover" sizes="25vw" />
         </div>
         <div className="relative h-48">
-          <Image src="/images/pages/barber-tools.jpg" alt="Barber tools and equipment" fill className="object-cover" sizes="25vw" />
+          <Image src="/images/pages/barber-styling-hair.jpg" alt="Barber styling hair" fill className="object-cover" sizes="25vw" />
         </div>
       </div>
 
@@ -313,6 +303,11 @@ export default function PartnerHandbookPage() {
             </Link>
           </div>
         </section>
+
+        {/* Institutional Footer */}
+        <div className="max-w-6xl mx-auto px-4 pb-8">
+          <DocumentFooter confidential notice="This handbook is provided to approved worksite partners only. Content is subject to revision." />
+        </div>
       </div>
     </div>
   );

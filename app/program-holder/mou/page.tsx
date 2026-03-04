@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/program-holder/mou' },
@@ -25,8 +26,12 @@ export default async function ProgramHolderMOUPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/program-holder" className="hover:text-primary">Program Holder</Link></li><li>/</li><li className="text-gray-900 font-medium">MOU</li></ol></nav>
-          <h1 className="text-3xl font-bold text-gray-900">Memorandum of Understanding</h1>
-          <p className="text-gray-600 mt-2">Your partnership agreement details</p>
+          <InstitutionalHeader
+            documentType="Memorandum of Understanding"
+            title="Partnership Agreement"
+            subtitle="Your partnership agreement details"
+            noDivider
+          />
         </div>
         {mou ? (
           <div className="bg-white rounded-lg shadow-sm border p-6">

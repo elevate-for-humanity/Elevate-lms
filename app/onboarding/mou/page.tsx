@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { SignatureInput } from '@/components/onboarding/SignatureInput';
 import { ArrowLeft, CheckCircle2, FileText, Building2, Users, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 const MOU_VERSION = '2025.1';
 
@@ -170,17 +171,15 @@ export default function MOUPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-8 h-8 text-brand-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Memorandum of Understanding
-          </h1>
-          <p className="text-slate-600">
-            Review the partnership terms below and sign to acknowledge your understanding.
-          </p>
+        {/* Institutional Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+          <InstitutionalHeader
+            documentType="Memorandum of Understanding"
+            title="Partnership Agreement"
+            subtitle="Review the partnership terms below and sign to acknowledge your understanding."
+            version={MOU_VERSION}
+            noDivider
+          />
         </div>
 
         {alreadySigned && !signed ? (

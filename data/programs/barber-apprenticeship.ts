@@ -13,7 +13,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   sector: 'personal-services',
   category: 'Personal Services',
 
-  heroImage: '/images/pages/barber-gallery-1.jpg',
+  heroImage: '/images/pages/barber-hero-main.jpg',
   heroImageAlt: 'Barber apprentice cutting hair in a barbershop',
 
   deliveryMode: 'hybrid',
@@ -45,12 +45,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       issuer: 'U.S. Department of Labor',
       description: 'National credential recognizing completion of a registered apprenticeship program. Portable across all 50 states.',
       validity: 'Lifetime',
-    },
-    {
-      name: 'OSHA 10-Hour General Industry Safety',
-      issuer: 'U.S. Department of Labor / OSHA',
-      description: 'Workplace safety certification covering bloodborne pathogens, chemical safety, and ergonomics for personal services.',
-      validity: 'Lifetime (DOL card)',
     },
     {
       name: 'Barbershop Business Management Certificate',
@@ -259,7 +253,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     '900 hours of training (52 weeks)',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
-    'OSHA 10-Hour certification',
     'CPR/First Aid/AED certification',
     'LMS access for full program duration',
     'Career placement and shop matching',

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SignMOUForm } from './SignMOUForm';
 import { FileText, Shield } from 'lucide-react';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,15 +50,12 @@ export default async function SignMOUPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="mx-auto max-w-4xl px-6 py-6">
-          <div className="flex items-center gap-3">
-            <FileText className="text-brand-blue-600" size={32} />
-            <div>
-              <h1 className="text-3xl font-bold text-black">
-                Sign Program Partner MOU
-              </h1>
-              <p className="text-black mt-1">Memorandum of Understanding</p>
-            </div>
-          </div>
+          <InstitutionalHeader
+            documentType="Memorandum of Understanding"
+            title="Program Partner Agreement"
+            subtitle="Review and digitally sign your partnership agreement."
+            noDivider
+          />
         </div>
       </div>
 

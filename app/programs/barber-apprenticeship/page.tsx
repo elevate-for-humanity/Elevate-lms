@@ -2,9 +2,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
-import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import { validateProgram } from '@/lib/programs/program-schema';
+import BarberApprenticeshipClient from './BarberApprenticeshipClient';
 
 const p = BARBER_APPRENTICESHIP;
 
@@ -36,7 +36,7 @@ export default function BarberApprenticeshipPage() {
           outcomes: p.outcomes.map((o) => o.statement),
         }}
       />
-      <ProgramDetailPage program={p} />
+      <BarberApprenticeshipClient program={p} />
     </>
   );
 }

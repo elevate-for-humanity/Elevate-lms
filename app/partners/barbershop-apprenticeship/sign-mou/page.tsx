@@ -8,6 +8,7 @@ import {
   FileText, CheckCircle2, Eraser, Download, Send,
   Loader2, AlertCircle, ArrowLeft,
 } from 'lucide-react';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 // MOU content sections for display
 const MOU_SECTIONS = [
@@ -255,41 +256,26 @@ export default function SignMOUPage() {
         ]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative py-12 overflow-hidden">
-        <Image
-          src="/images/pages/partners-pub-page-5.jpg"
-          alt="Sign MOU"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-white/40" />
-        <div className="relative max-w-4xl mx-auto px-4">
-          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
-            <ArrowLeft className="w-4 h-4" /> Back to Partner Page
-          </Link>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Sign Memorandum of Understanding</h1>
-          <p className="text-gray-700">
-            Review the MOU terms below, fill in your information, and provide your digital signature.
-          </p>
-        </div>
-      </section>
+      {/* Institutional Document Header */}
+      <div className="max-w-4xl mx-auto px-4 pt-6">
+        <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Partner Page
+        </Link>
+      </div>
 
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 py-8">
         {/* MOU Content */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6 border-b bg-slate-50 rounded-t-xl">
-            <div className="flex items-center gap-3">
-              <FileText className="w-6 h-6 text-brand-blue-600" />
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">Memorandum of Understanding</h2>
-                <p className="text-sm text-gray-500">Indiana Barbershop Apprenticeship Program — Worksite Partner Agreement</p>
-              </div>
-            </div>
-            <div className="mt-3 text-sm text-gray-600">
-              <p><strong>Between:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute ("Sponsor")</p>
-              <p><strong>And:</strong> Your barbershop ("Shop")</p>
+          <div className="p-6 border-b rounded-t-xl">
+            <InstitutionalHeader
+              documentType="Memorandum of Understanding"
+              title="Indiana Barbershop Apprenticeship Program"
+              subtitle="Worksite Partner Agreement"
+              noDivider
+            />
+            <div className="text-sm text-gray-600 border-t border-slate-200 pt-4 mt-2">
+              <p><strong>Between:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute (&ldquo;Sponsor&rdquo;)</p>
+              <p><strong>And:</strong> Your barbershop (&ldquo;Shop&rdquo;)</p>
             </div>
           </div>
           <div className="p-6 space-y-6 max-h-[500px] overflow-y-auto">

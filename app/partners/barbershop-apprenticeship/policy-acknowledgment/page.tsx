@@ -8,6 +8,7 @@ import {
   Shield, CheckCircle2, Loader2, AlertCircle, ArrowLeft,
   Send, BookOpen,
 } from 'lucide-react';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 interface PolicyItem {
   id: string;
@@ -178,24 +179,18 @@ export default function PolicyAcknowledgmentPage() {
         ]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative py-12 overflow-hidden">
-        <Image
-          src="/images/pages/partners-pub-page-4.jpg"
-          alt="Policy acknowledgment"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-white/40" />
-        <div className="relative max-w-4xl mx-auto px-4">
+      {/* Institutional Header */}
+      <section className="bg-white py-6 border-b">
+        <div className="max-w-4xl mx-auto px-4">
           <Link href="/partners/barbershop-apprenticeship/forms" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Forms
           </Link>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Policy Acknowledgment</h1>
-          <p className="text-gray-700">
-            Review and acknowledge each policy below. All {POLICIES.length} policies must be acknowledged.
-          </p>
+          <InstitutionalHeader
+            documentType="Policy Acknowledgment"
+            title="Worksite Partner Policy Review"
+            subtitle={`Review and acknowledge each policy below. All ${POLICIES.length} policies must be acknowledged.`}
+            noDivider
+          />
         </div>
       </section>
 

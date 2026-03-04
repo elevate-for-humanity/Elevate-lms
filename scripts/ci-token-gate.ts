@@ -134,6 +134,64 @@ function walkDir(dir: string): string[] {
   return files;
 }
 
+// --- Forbidden old image path patterns ---
+// These directories were deleted; any reference is a broken link.
+const FORBIDDEN_IMAGE_PATTERNS = [
+  /\/images\/heroes-hq\//,
+  /\/images\/programs-hq\//,
+  /\/images\/trades\//,
+  /\/images\/efh\//,
+  /\/images\/success-new\//,
+  /\/images\/students-new\//,
+  /\/images\/pexels-/,
+  /images\.pexels\.com/,
+];
+
+// Files that legitimately use external Pexels URLs or old patterns
+const IMAGE_SCAN_EXCLUDE = [
+  /preview\/\[previewId\]/, // dynamic preview page uses external URLs
+  /api\/ai-studio\/stock-media/, // stock media API returns Pexels URLs
+];
+
+// Also scan .ts files for image path references (data files)
+const IMAGE_SCAN_DIRS = ['app', 'components', 'data'];
+const IMAGE_SCAN_EXTENSIONS = ['.tsx', '.jsx', '.ts'];
+
+interface ImageViolation {
+  file: string;
+  line: number;
+  pattern: string;
+  context: string;
+}
+
+function scanForForbiddenImages(filePath: string): ImageViolation[] {
+  // Skip files that legitimately use external image URLs
+  if (IMAGE_SCAN_EXCLUDE.some((pattern) => pattern.test(filePath))) return [];
+
+  const violations: ImageViolation[] = [];
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const lines = content.split('\n');
+
+  lines.forEach((line, lineIndex) => {
+    // Skip comments
+    if (/^\s*\/\//.test(line) || /^\s*\/\*/.test(line) || /^\s*\*/.test(line)) return;
+
+    for (const pattern of FORBIDDEN_IMAGE_PATTERNS) {
+      if (pattern.test(line)) {
+        violations.push({
+          file: filePath,
+          line: lineIndex + 1,
+          pattern: pattern.source,
+          context: line.trim().substring(0, 120),
+        });
+        break; // one violation per line is enough
+      }
+    }
+  });
+
+  return violations;
+}
+
 function main() {
   console.log('🔍 CI Token Gate - Scanning for banned tokens...\n');
   
@@ -150,33 +208,92 @@ function main() {
       allViolations.push(...violations);
     }
   }
-  
-  if (allViolations.length === 0) {
-    console.log('✅ No banned tokens found. Build can proceed.\n');
+
+  // --- Forbidden image path scan ---
+  console.log('🔍 Scanning for forbidden old image paths...\n');
+  const imageViolations: ImageViolation[] = [];
+
+  for (const scanDir of IMAGE_SCAN_DIRS) {
+    const dirPath = path.join(rootDir, scanDir);
+    if (!fs.existsSync(dirPath)) continue;
+
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    const files: string[] = [];
+
+    function walkForImages(dir: string) {
+      if (!fs.existsSync(dir)) return;
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (shouldExclude(fullPath)) continue;
+        if (entry.isDirectory()) {
+          walkForImages(fullPath);
+        } else if (entry.isFile() && IMAGE_SCAN_EXTENSIONS.some((ext) => entry.name.endsWith(ext))) {
+          files.push(fullPath);
+        }
+      }
+    }
+
+    walkForImages(dirPath);
+
+    for (const file of files) {
+      const relativePath = path.relative(rootDir, file);
+      const violations = scanForForbiddenImages(file).map((v) => ({ ...v, file: relativePath }));
+      imageViolations.push(...violations);
+    }
+  }
+
+  const hasTokenViolations = allViolations.length > 0;
+  const hasImageViolations = imageViolations.length > 0;
+
+  if (!hasTokenViolations && !hasImageViolations) {
+    console.log('✅ No banned tokens or forbidden image paths found. Build can proceed.\n');
     process.exit(0);
   }
-  
-  console.log(`❌ Found ${allViolations.length} banned token(s):\n`);
-  
-  // Group by file
-  const byFile: Record<string, Violation[]> = {};
-  allViolations.forEach((v) => {
-    if (!byFile[v.file]) byFile[v.file] = [];
-    byFile[v.file].push(v);
-  });
-  
-  Object.entries(byFile).forEach(([file, violations]) => {
-    console.log(`📄 ${file}`);
-    violations.forEach((v) => {
-      console.log(`   Line ${v.line}: "${v.token}"`);
-      console.log(`   → ${v.context}`);
+
+  if (hasTokenViolations) {
+    console.log(`❌ Found ${allViolations.length} banned token(s):\n`);
+    
+    const byFile: Record<string, Violation[]> = {};
+    allViolations.forEach((v) => {
+      if (!byFile[v.file]) byFile[v.file] = [];
+      byFile[v.file].push(v);
     });
+    
+    Object.entries(byFile).forEach(([file, violations]) => {
+      console.log(`📄 ${file}`);
+      violations.forEach((v) => {
+        console.log(`   Line ${v.line}: "${v.token}"`);
+        console.log(`   → ${v.context}`);
+      });
+      console.log('');
+    });
+    
+    console.log('Banned tokens:', CI_BANNED_TOKENS.join(', '));
     console.log('');
-  });
-  
-  console.log('Build failed. Remove placeholder content before deploying.\n');
-  console.log('Banned tokens:', CI_BANNED_TOKENS.join(', '));
-  
+  }
+
+  if (hasImageViolations) {
+    console.log(`❌ Found ${imageViolations.length} forbidden old image path(s):\n`);
+
+    const byFile: Record<string, ImageViolation[]> = {};
+    imageViolations.forEach((v) => {
+      if (!byFile[v.file]) byFile[v.file] = [];
+      byFile[v.file].push(v);
+    });
+
+    Object.entries(byFile).forEach(([file, violations]) => {
+      console.log(`📄 ${file}`);
+      violations.forEach((v) => {
+        console.log(`   Line ${v.line}: ${v.pattern}`);
+        console.log(`   → ${v.context}`);
+      });
+      console.log('');
+    });
+
+    console.log('These image directories no longer exist. Use /images/pages/ paths instead.\n');
+  }
+
+  console.log('Build failed. Fix violations before deploying.\n');
   process.exit(1);
 }
 

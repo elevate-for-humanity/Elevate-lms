@@ -9,6 +9,7 @@ import {
   ArrowLeft, Loader2, AlertCircle, Download,
   BookOpen, FileText, ClipboardCheck, ShieldCheck, ArrowRight,
 } from 'lucide-react';
+import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader';
 
 const compensationModels = [
   { value: 'hourly', label: 'Hourly Wage' },
@@ -125,22 +126,17 @@ export default function BarbershopPartnerApplyPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative py-12 overflow-hidden">
-        <Image
-          src="/images/pages/partners-pub-page-1.jpg"
-          alt="Barbershop partner application"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-white/40" />
-        <div className="relative max-w-5xl mx-auto px-4">
+      <section className="bg-white py-6 border-b">
+        <div className="max-w-5xl mx-auto px-4">
           <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Information
           </Link>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Barbershop Partner Application</h1>
-          <p className="text-gray-700">Complete this form to apply as a worksite partner for the Indiana Barber Apprenticeship program.</p>
+          <InstitutionalHeader
+            documentType="Partner Application"
+            title="Barbershop Worksite Partner Application"
+            subtitle="Complete this form to apply as a worksite partner for the Indiana Barber Apprenticeship program."
+            noDivider
+          />
         </div>
       </section>
 

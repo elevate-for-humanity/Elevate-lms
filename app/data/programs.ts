@@ -83,20 +83,20 @@ export const programs: Program[] = [
     name: 'Building Technician with HVAC Fundamentals',
     heroTitle: 'HVAC Technician Career Training',
     heroSubtitle:
-      'Master heating, cooling, and refrigeration in 4-9 months. HVAC technicians are in high demand everywhere—companies need skilled workers now. Get hands-on training with real equipment and graduate ready for a career with excellent pay and job security.',
+      'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal certification — proctored on-site at our approved testing facility. 6–8 weeks classroom plus 2–4 weeks hands-on training.',
     shortDescription:
-      'Master heating, cooling, and refrigeration in 4-9 months. HVAC technicians are in high demand everywhere—companies need skilled workers now. Get hands-on training with real equipment and graduate ready for a career with excellent pay and job security.',
+      'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal certification — proctored on-site at our approved testing facility. 6–8 weeks classroom plus 2–4 weeks hands-on training.',
     longDescription:
-      "The HVAC Technician program is designed for individuals who enjoy working with their hands, solving problems, and building technical skill. This program teaches students how to diagnose, repair, and maintain HVAC systems while understanding safety, electrical fundamentals, and customer service. You will complete online theory and hands-on lab practice, giving you the confidence to enter the field ready to work. This pathway leads to in-demand roles, with strong long-term career growth.\n\nWhat You'll Learn:\n- HVAC system components and operation\n- Electrical testing and troubleshooting\n- Refrigeration cycle fundamentals\n- Equipment installation and repair\n- Preventative maintenance practices\n- Safety, EPA preparation, and customer communication\n\nWho This Program Is For:\n- Career changers seeking a skilled trade\n- Individuals who enjoy technical, hands-on work\n- Adults needing a stable, high-demand job path\n- Students preparing for apprenticeships or OJT\n\nProgram Format:\n- Hybrid: Online coursework + hands-on labs\n- Length: 16–24 weeks\n- Schedule: Day, evening, or weekend options\n\nFunding & Approvals:\n- Workforce funding may be available (location dependent)\n- Employer OJT/sponsorship options may apply\n\nCareer Outcomes:\n- HVAC Technician (entry-level)\n- Maintenance Technician\n- Building Operations Support",
+      "The HVAC Technician program prepares students to diagnose, repair, and maintain heating, ventilation, air conditioning, and refrigeration systems. Training covers electrical fundamentals, refrigeration theory, system installation, and EPA 608 certification prep — proctored on-site.\n\nProgram Format:\n- 6–8 weeks classroom instruction at our Indianapolis training center\n- 2–4 weeks hands-on training and employer jobsite placement\n- 12 weeks total, 240 instructional hours\n- Hybrid: Online Related Technical Instruction via LMS + hands-on labs\n\nWhat You'll Learn:\n- HVAC system components and operation\n- Electrical testing and troubleshooting\n- Refrigeration cycle fundamentals\n- Equipment installation and repair\n- Preventative maintenance practices\n- Safety, EPA preparation, and customer communication\n\nCredentials:\n- EPA 608 Universal Certification (proctored on-site)\n- OSHA 30-Hour Construction Safety\n- CPR / First Aid\n\nCareer Outcomes:\n- HVAC Technician (entry-level)\n- Maintenance Technician\n- Building Operations Support",
     heroImage: '/images/pages/comp-cta-training.jpg',
     heroImageAlt: 'HVAC student working on an air conditioning unit',
     heroVideo: '/videos/hvac-hero-final.mp4',
-    duration: '4-9 months (320-720 hours)',
-    clockHours: 720,
-    schedule: 'Day, evening, or weekend options',
-    delivery: 'Hybrid (Lab + Field Training)',
+    duration: '12 weeks (240 hours)',
+    clockHours: 240,
+    schedule: '6–8 weeks classroom + 2–4 weeks hands-on/OJT',
+    delivery: 'Hybrid — Online RTI via LMS + hands-on labs at training facility',
     credential:
-      'Industry-recognized HVAC Technician certificate; EPA 608 prep included',
+      'EPA 608 Universal Certification (proctored on-site), OSHA 30-Hour Construction Safety, CPR/First Aid',
     approvals: [
       'Workforce funding may be available (location dependent)',
       'Employer OJT/sponsorship options may apply',

@@ -125,6 +125,12 @@ export default function ServerFooter() {
                 </li>
               ))}
             </ul>
+            <div className="mt-5 pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Employers and workforce agencies interested in hiring credentialed graduates or partnering on training programs can{' '}
+                <Link href="/partnerships" className="text-brand-blue-400 hover:text-brand-blue-300 underline">connect with our workforce team</Link>.
+              </p>
+            </div>
           </div>
 
           {/* Column 4: Portals & Access */}

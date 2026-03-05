@@ -5,7 +5,7 @@ import { workoneOnboardingEmail } from '@/lib/email/templates/workone-onboarding
 import { barberOnboardingEmail } from '@/lib/email/templates/barber-onboarding';
 import { logger } from '@/lib/logger';
 
-const ADMIN_BCC = 'elevateforhumanityedu@gmail.com';
+const ADMIN_BCC = 'elevate4humanityedu@gmail.com';
 
 // Programs that go through the barber/beauty flow (not WorkOne)
 const BARBER_PROGRAMS = [

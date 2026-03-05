@@ -27,8 +27,8 @@ interface ApplicationData {
   supervisorName: string;
   supervisorLicenseNumber: string;
   supervisorYearsLicensed?: string;
-  employmentModel: string;
-  hasWorkersComp: string;
+  compensationModel: string;
+  workersCompStatus: string;
   canSuperviseAndVerify: string;
   mouAcknowledged: boolean;
   consentAcknowledged: boolean;
@@ -49,13 +49,12 @@ const REQUIRED_FIELDS = [
   'indianaShopLicenseNumber',
   'supervisorName',
   'supervisorLicenseNumber',
-  'employmentModel',
-  'hasWorkersComp',
+  'compensationModel',
+  'workersCompStatus',
   'canSuperviseAndVerify',
 ] as const;
 
-const VALID_EMPLOYMENT_MODELS = ['hourly', 'commission', 'hybrid', 'not_sure'];
-const VALID_COMPENSATION_MODELS = ['hourly', 'commission', 'hybrid'];
+const VALID_COMPENSATION_MODELS = ['hourly', 'hybrid'];
 const VALID_WC_STATUSES = ['verified', 'exempt', 'none'];
 
 function validateEmail(email: string): boolean {
@@ -239,8 +238,8 @@ async function _POST(req: Request) {
       <p><strong>Address:</strong> ${body.shopAddressLine1}${body.shopAddressLine2 ? ', ' + body.shopAddressLine2 : ''}, ${body.shopCity}, ${body.shopState} ${body.shopZip}</p>
       <p><strong>Shop License #:</strong> ${body.indianaShopLicenseNumber}</p>
       <p><strong>Supervisor:</strong> ${body.supervisorName} (License: ${body.supervisorLicenseNumber}, ${body.supervisorYearsLicensed || 'N/A'} years)</p>
-      <p><strong>Employment Model:</strong> ${body.employmentModel}</p>
-      <p><strong>Workers' Comp:</strong> ${body.hasWorkersComp}</p>
+      <p><strong>Compensation Model:</strong> ${body.compensationModel}</p>
+      <p><strong>Workers' Comp:</strong> ${body.workersCompStatus}</p>
       <p><strong>Can Supervise:</strong> ${body.canSuperviseAndVerify}</p>
       ${body.notes ? `<p><strong>Notes:</strong> ${body.notes}</p>` : ''}
       <hr>

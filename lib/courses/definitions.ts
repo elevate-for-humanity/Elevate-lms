@@ -28,7 +28,7 @@ export interface CompetencyObjective {
   /** Tolerance or standard where applicable (e.g., "±2°F", "500 microns", "85%") */
   standard?: string;
   /** Which credential this maps to */
-  credentialAlignment?: "EPA 608 Core" | "EPA 608 Type I" | "EPA 608 Type II" | "EPA 608 Type III" | "OSHA 30" | "CPR/AED" | "Residential HVAC";
+  credentialAlignment?: "EPA 608 Core" | "EPA 608 Type I" | "EPA 608 Type II" | "EPA 608 Type III" | "OSHA 10" | "CPR/AED" | "Residential HVAC";
 }
 
 export interface WeekAssignment {
@@ -322,7 +322,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
     slug: "hvac-technician",
     title: "HVAC Technician",
     subtitle:
-      "12-week workforce pathway: EPA 608 Universal, OSHA 30, residential HVAC certification, and employer placement.",
+      "12-week workforce pathway: EPA 608 Universal, OSHA 10, residential HVAC certification, and employer placement.",
     category: "Skilled Trades",
     partner: "HVAC / Trades Partner",
     estimatedDurationWeeks: 12,
@@ -337,7 +337,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
       "Demonstrate OSHA-compliant jobsite conduct and safety practices",
     ],
     credentialPathway: [
-      { level: "1", title: "HVAC Apprentice", requirements: ["EPA 608 Universal", "OSHA 30", "CPR/AED", "480+ training hours"], typicalTimeline: "12 weeks (this program)" },
+      { level: "1", title: "HVAC Apprentice", requirements: ["EPA 608 Universal", "OSHA 10", "CPR/AED", "480+ training hours"], typicalTimeline: "12 weeks (this program)" },
       { level: "2", title: "HVAC Journeyman", requirements: ["2,000+ OJT hours", "State journeyman exam", "Employer sponsorship"], typicalTimeline: "1–2 years post-program" },
       { level: "3", title: "HVAC Master Technician", requirements: ["4,000+ OJT hours", "NATE certification", "Advanced diagnostics"], typicalTimeline: "3–5 years" },
       { level: "4", title: "HVAC Contractor", requirements: ["Master license", "Business license", "Insurance/bonding"], typicalTimeline: "5+ years" },
@@ -346,8 +346,8 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
       "Pass EPA Section 608 Universal Certification exam",
       "Earn Residential HVAC Certification 1",
       "Earn Residential HVAC Certification 2 — Refrigeration Diagnostics",
-      "Complete OSHA 30 Construction Safety",
-      "Earn CPR/AED certification",
+      "Complete OSHA 10-Hour Construction Safety through CareerSafe",
+      "Earn CPR/AED certification through CareerSafe",
       "Qualify for entry-level HVAC technician positions with employer partners",
     ],
     modules: [
@@ -357,7 +357,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
         description: "Program overview, expectations, funding orientation, and career pathways in HVAC.",
         weekAssignment: { week: 1, weeklyCompetencyStatement: "Identify program credentials, explain the refrigeration cycle at a conceptual level, and demonstrate basic tool identification" },
         objectives: [
-          "Identify the three credentials earned in this program (EPA 608, OSHA 30, CPR)",
+          "Identify the three credentials earned in this program (EPA 608, OSHA 10, CPR)",
           "Describe WIOA funding requirements including attendance and documentation",
           "Outline career progression from apprentice to journeyman to master HVAC technician",
           "Demonstrate understanding of program expectations and support services",
@@ -389,7 +389,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
         competencyObjectives: [
           { id: "hvac-02-co1", statement: "Diagram the heating cycle and cooling cycle showing direction of heat transfer" },
           { id: "hvac-02-co2", statement: "Demonstrate proper connection of gauge manifold to a system with correct hose routing", standard: "Zero cross-contamination, correct high/low side identification" },
-          { id: "hvac-02-co3", statement: "Execute lockout/tagout procedure on a live disconnect per OSHA 1910.147", credentialAlignment: "OSHA 30" },
+          { id: "hvac-02-co3", statement: "Execute lockout/tagout procedure on a live disconnect per OSHA 1910.147", credentialAlignment: "OSHA 10" },
           { id: "hvac-02-co4", statement: "Identify compressor, condenser, evaporator, metering device, and air handler on a live split system", standard: "5/5 correct within 2 minutes" },
         ],
         lessons: [
@@ -691,9 +691,9 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
       },
       {
         id: "hvac-14",
-        title: "OSHA 30 — Construction Safety",
+        title: "OSHA 10 — Construction Safety (CareerSafe)",
         description: "30-hour OSHA construction safety course. Fall protection, electrical safety, PPE, and hazard communication.",
-        weekAssignment: { week: 11, weeklyCompetencyStatement: "Pass OSHA 30 final exam and demonstrate lockout/tagout, fall protection selection, and GHS label reading" },
+        weekAssignment: { week: 11, weeklyCompetencyStatement: "Pass OSHA 10 final exam and demonstrate lockout/tagout, fall protection selection, and GHS label reading" },
         objectives: [
           "Identify OSHA worker rights and employer responsibilities",
           "Apply fall protection standards for ladders, scaffolding, and elevated work",
@@ -701,27 +701,27 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
           "Read GHS labels and Safety Data Sheets for hazard communication compliance",
         ],
         competencyObjectives: [
-          { id: "hvac-14-co1", statement: "Execute a lockout/tagout procedure on a simulated HVAC disconnect following OSHA 1910.147", credentialAlignment: "OSHA 30" },
-          { id: "hvac-14-co2", statement: "Select correct fall protection equipment for three given work scenarios", standard: "3/3 correct selections", credentialAlignment: "OSHA 30" },
-          { id: "hvac-14-co3", statement: "Read a GHS label and Safety Data Sheet and identify hazard class, PPE required, and first aid measures", credentialAlignment: "OSHA 30" },
-          { id: "hvac-14-co4", statement: "Pass OSHA 30 final exam", standard: "70% minimum to earn OSHA 30-Hour card", credentialAlignment: "OSHA 30" },
+          { id: "hvac-14-co1", statement: "Execute a lockout/tagout procedure on a simulated HVAC disconnect following OSHA 1910.147", credentialAlignment: "OSHA 10" },
+          { id: "hvac-14-co2", statement: "Select correct fall protection equipment for three given work scenarios", standard: "3/3 correct selections", credentialAlignment: "OSHA 10" },
+          { id: "hvac-14-co3", statement: "Read a GHS label and Safety Data Sheet and identify hazard class, PPE required, and first aid measures", credentialAlignment: "OSHA 10" },
+          { id: "hvac-14-co4", statement: "Pass OSHA 10 final exam", standard: "70% minimum to earn OSHA 10-Hour card (issued by CareerSafe/DOL)", credentialAlignment: "OSHA 10" },
         ],
-        milestone: "OSHA 30-Hour Construction Safety Card",
+        milestone: "OSHA 10-Hour Construction Safety Card (CareerSafe)",
         lessons: [
-          { id: "hvac-14-01", title: "OSHA 30 Overview & Worker Rights", type: "video", durationMinutes: 30, description: "OSHA standards, worker rights, employer responsibilities, and how to file a complaint" },
+          { id: "hvac-14-01", title: "OSHA 10 Overview & Worker Rights (CareerSafe)", type: "video", durationMinutes: 30, description: "OSHA standards, worker rights, employer responsibilities — delivered through CareerSafe online platform" },
           { id: "hvac-14-02", title: "Fall Protection", type: "video", durationMinutes: 45, description: "Ladder safety, scaffolding, guardrails, personal fall arrest systems" },
           { id: "hvac-14-03", title: "Electrical Safety", type: "video", durationMinutes: 30, description: "Lockout/tagout, arc flash, ground fault protection, and safe work practices" },
           { id: "hvac-14-04", title: "Hazard Communication (HazCom)", type: "reading", description: "GHS labels, Safety Data Sheets, chemical hazards, and right-to-know" },
           { id: "hvac-14-05", title: "PPE Selection & Use", type: "video", durationMinutes: 20, description: "Hard hats, safety glasses, gloves, respirators, and hearing protection" },
           { id: "hvac-14-06", title: "Confined Spaces & Excavations", type: "video", durationMinutes: 25, description: "Permit-required confined spaces, atmospheric testing, and trench safety" },
           { id: "hvac-14-07", title: "Fire Prevention & Welding Safety", type: "reading", description: "Hot work permits, fire extinguisher types, and brazing safety for HVAC" },
-          { id: "hvac-14-08", title: "OSHA 30 Final Exam", type: "quiz", durationMinutes: 45, description: "Comprehensive OSHA 30 assessment — must pass to earn OSHA 30 card", passThreshold: 70, assessesObjectives: ["hvac-14-co1", "hvac-14-co2", "hvac-14-co3", "hvac-14-co4"] },
+          { id: "hvac-14-08", title: "OSHA 10 Final Exam (CareerSafe)", type: "quiz", durationMinutes: 45, description: "CareerSafe proctored OSHA 10 assessment — DOL card issued upon passing", passThreshold: 70, assessesObjectives: ["hvac-14-co1", "hvac-14-co2", "hvac-14-co3", "hvac-14-co4"] },
         ],
       },
       {
         id: "hvac-15",
-        title: "CPR/AED & Workforce Certifications",
-        description: "CPR/AED/First Aid certification and NRF Rise Up Retail Industry Fundamentals.",
+        title: "CPR/AED & Workforce Certifications (CareerSafe)",
+        description: "CPR/AED/First Aid certification through CareerSafe and NRF Rise Up Retail Industry Fundamentals.",
         weekAssignment: { week: 12, weeklyCompetencyStatement: "Perform adult CPR at correct depth and rate on a manikin, operate an AED, pass the proctored EPA 608 Universal exam, and complete employer mock interview" },
         objectives: [
           "Perform adult CPR with proper compression depth, rate, and rescue breathing",
@@ -734,7 +734,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
           { id: "hvac-15-co2", statement: "Operate an AED on a training manikin: power on, attach pads, deliver shock when prompted", credentialAlignment: "CPR/AED" },
           { id: "hvac-15-co3", statement: "Pass NRF Rise Up Retail Industry Fundamentals assessment", standard: "70% minimum" },
         ],
-        milestone: "CPR/AED Certification",
+        milestone: "CPR/AED Certification (CareerSafe)",
         lessons: [
           { id: "hvac-15-01", title: "CPR & AED — Adult", type: "video", durationMinutes: 30, description: "Chest compressions, rescue breathing, AED operation for adults" },
           { id: "hvac-15-02", title: "First Aid Basics", type: "video", durationMinutes: 25, description: "Bleeding control, shock, burns, heat/cold emergencies, and when to call 911" },
@@ -750,7 +750,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
         weekAssignment: { week: 12, weeklyCompetencyStatement: "Pass the proctored EPA 608 Universal exam (70% per section), complete a trade-specific resume, and demonstrate interview readiness in a mock employer interview" },
         objectives: [
           "Pass the proctored EPA 608 Universal certification exam",
-          "Build a trade-specific resume highlighting EPA 608, OSHA 30, and training hours",
+          "Build a trade-specific resume highlighting EPA 608, OSHA 10, and training hours",
           "Demonstrate interview readiness for entry-level HVAC technician positions",
           "Complete employer partner orientation and OJT internship preparation",
         ],
@@ -758,7 +758,7 @@ export const COURSE_DEFINITIONS: CourseDefinition[] = [
           { id: "hvac-16-co1", statement: "Pass the proctored EPA 608 Universal certification exam", standard: "70% minimum on each of 4 sections (Core, Type I, Type II, Type III)", credentialAlignment: "EPA 608 Core" },
           { id: "hvac-16-co2", statement: "Produce a trade-specific resume listing all earned credentials, training hours, and lab competencies", standard: "Resume reviewed and approved by career services" },
           { id: "hvac-16-co3", statement: "Complete a 15-minute mock interview with an employer partner or career coach", standard: "Satisfactory rating on professionalism, technical knowledge, and communication" },
-          { id: "hvac-16-co4", statement: "Verify all program credentials earned: EPA 608 Universal, OSHA 30, CPR/AED, Rise Up", standard: "All 4 credentials documented in student file" },
+          { id: "hvac-16-co4", statement: "Verify all program credentials earned: EPA 608 Universal, OSHA 10, CPR/AED, Rise Up", standard: "All 4 credentials documented in student file" },
         ],
         milestone: "Program Complete — Workforce Ready",
         lessons: [

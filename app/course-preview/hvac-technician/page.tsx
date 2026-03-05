@@ -171,8 +171,9 @@ export default function HVACClassroomPreview() {
   const [videoProgress, setVideoProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const mod = course.modules[currentModuleIndex];
-  const modId = mod.id || `hvac-${String(currentModuleIndex + 1).padStart(2, '0')}`;
+  const isCareerSafe = currentModuleIndex === course.modules.length;
+  const mod = isCareerSafe ? course.modules[0] : course.modules[currentModuleIndex]; // fallback for CareerSafe view
+  const modId = isCareerSafe ? 'careersafe' : (mod.id || `hvac-${String(currentModuleIndex + 1).padStart(2, '0')}`);
 
   const modCompleted = completedTabs[modId] || new Set<TabId>();
   const isTabDone = (tab: TabId) => modCompleted.has(tab);
@@ -289,12 +290,54 @@ export default function HVACClassroomPreview() {
               </button>
             );
           })}
+
+          {/* CareerSafe External Certifications */}
+          <div className="mt-4 pt-4 border-t border-slate-200">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">External Certifications</p>
+            <button
+              onClick={() => { setCurrentModuleIndex(course.modules.length); setSidebarOpen(false); }}
+              className={`w-full text-left p-3 rounded-lg mb-1 transition ${
+                currentModuleIndex === course.modules.length
+                  ? 'bg-amber-50 border-l-4 border-amber-500'
+                  : 'hover:bg-slate-50 border-l-4 border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                  currentModuleIndex === course.modules.length
+                    ? 'bg-amber-100 text-amber-600'
+                    : 'bg-slate-100 text-slate-600'
+                }`}>
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium truncate ${currentModuleIndex === course.modules.length ? 'text-amber-800' : 'text-slate-800'}`}>CareerSafe Certifications</p>
+                  <p className="text-xs text-slate-400">OSHA 10 &middot; CPR/AED</p>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto pt-10">
         <div className="max-w-4xl mx-auto px-4 md:px-8 py-6">
+
+          {/* CareerSafe special view */}
+          {currentModuleIndex === course.modules.length ? (
+            <>
+              <div className="mb-6">
+                <p className="text-sm text-amber-600 font-medium">Required External Certifications</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">CareerSafe — OSHA 10 &amp; CPR/AED</h1>
+                <p className="text-slate-600 mt-2 text-sm">These credentials are delivered through CareerSafe&apos;s online platform. Elevate provides access — CareerSafe issues the DOL cards.</p>
+              </div>
+              <div className="space-y-8">
+                {HVAC_MODULE_CONTENT['careersafe']}
+              </div>
+            </>
+          ) : (
+          <>
           {/* Module header */}
           <div className="mb-6">
             <p className="text-sm text-brand-blue-600 font-medium">Module {currentModuleIndex + 1} of {course.modules.length}</p>
@@ -549,6 +592,8 @@ export default function HVACClassroomPreview() {
               {!allTabsDone ? <><Lock className="w-4 h-4" /> Complete All Tabs</> : <>Next Module <ChevronRight className="w-5 h-5" /></>}
             </button>
           </div>
+          </>
+          )}
         </div>
       </main>
     </div>

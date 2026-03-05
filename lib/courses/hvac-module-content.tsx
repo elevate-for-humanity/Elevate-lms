@@ -437,6 +437,131 @@ function Module01() {
   );
 }
 
+/* ── CareerSafe External Certifications ── */
+
+function CareerSafeCertifications() {
+  const certs = [
+    {
+      name: 'OSHA 10-Hour Construction Safety',
+      provider: 'CareerSafe',
+      issuer: 'U.S. Department of Labor',
+      format: 'Online, self-paced through CareerSafe platform',
+      duration: '10 hours',
+      credential: 'DOL OSHA 10-Hour Wallet Card',
+      description: 'Covers hazard recognition, worker rights, fall protection, electrical safety, PPE, HazCom/GHS, and the Fatal Four. Required by most HVAC employers before you can work on a job site.',
+      topics: [
+        'OSHA standards and worker rights',
+        'Fall protection (6-foot trigger in construction)',
+        'Electrical safety and lockout/tagout',
+        'Hazard Communication (GHS labels and SDS)',
+        'Personal Protective Equipment',
+        'Fire prevention and protection',
+        'Caught-in/between and struck-by hazards',
+      ],
+      whyRequired: 'Most HVAC employers require the OSHA 10-Hour card before your first day on a job site. It proves you understand basic construction safety and can recognize hazards.',
+    },
+    {
+      name: 'CPR/AED & First Aid',
+      provider: 'CareerSafe',
+      issuer: 'CareerSafe (OSHA-accepted)',
+      format: 'Online through CareerSafe platform + hands-on skills verification',
+      duration: '4-6 hours',
+      credential: 'CPR/AED/First Aid Certification Card',
+      description: 'Adult CPR, AED operation, and basic first aid. HVAC technicians work alone on rooftops, in attics, and in mechanical rooms — knowing how to respond to a medical emergency can save a life.',
+      topics: [
+        'Adult CPR — compression depth, rate, and rescue breathing',
+        'AED operation — pad placement and shock delivery',
+        'Choking response for conscious and unconscious adults',
+        'Bleeding control and wound care',
+        'Shock recognition and treatment',
+        'Burns, heat exhaustion, and cold emergencies',
+        'When to call 911',
+      ],
+      whyRequired: 'HVAC work involves electrical shock risk, heat exposure, and working alone. CPR/First Aid certification shows employers you can handle emergencies on the job.',
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <SectionHeading>Required External Certifications — CareerSafe</SectionHeading>
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 mb-6">
+          <p className="text-sm text-brand-blue-800 leading-relaxed">
+            These certifications are delivered through <span className="font-bold">CareerSafe</span>, an authorized OSHA Education Center.
+            You complete the coursework on CareerSafe&apos;s online platform and receive your credentials directly from them.
+            Elevate for Humanity provides access and support — CareerSafe issues the cards.
+          </p>
+        </div>
+      </div>
+
+      {certs.map((cert) => (
+        <div key={cert.name} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div className="bg-slate-900 text-white px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold">{cert.name}</h3>
+                <p className="text-sm text-slate-300 mt-0.5">Delivered by {cert.provider} &middot; {cert.duration}</p>
+              </div>
+              <span className="bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full">
+                REQUIRED
+              </span>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-5">
+            <div>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">What You Earn</h4>
+              <p className="text-sm text-slate-800 font-medium">{cert.credential}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Issued by: {cert.issuer}</p>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">About This Certification</h4>
+              <p className="text-sm text-slate-700 leading-relaxed">{cert.description}</p>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">Format</h4>
+              <p className="text-sm text-slate-700">{cert.format}</p>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">Topics Covered</h4>
+              <ul className="space-y-1.5">
+                {cert.topics.map((t) => (
+                  <li key={t} className="text-sm text-slate-700 flex gap-2">
+                    <span className="text-brand-green-500 flex-shrink-0 mt-0.5">&#10003;</span>
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h4 className="text-xs font-bold text-amber-700 uppercase mb-1">Why This Is Required</h4>
+              <p className="text-sm text-amber-900">{cert.whyRequired}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div className="bg-slate-100 border border-slate-200 rounded-xl p-5 text-center">
+        <p className="text-xs font-bold text-slate-500 uppercase mb-1">Credential Summary</p>
+        <p className="text-sm text-slate-700">
+          Upon completing this program, you will hold <span className="font-bold">three industry credentials</span>:
+        </p>
+        <div className="flex flex-wrap justify-center gap-3 mt-3">
+          {['EPA 608 Universal', 'OSHA 10-Hour (CareerSafe)', 'CPR/AED (CareerSafe)'].map((c) => (
+            <span key={c} className="bg-white border border-slate-300 text-slate-800 text-sm font-medium px-4 py-2 rounded-full">
+              {c}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Build the content map for all 16 modules ── */
 
 function buildContentMap(): Record<string, React.ReactNode> {
@@ -452,6 +577,9 @@ function buildContentMap(): Record<string, React.ReactNode> {
       map[modId] = <ModuleContent mod={mod} />;
     }
   }
+
+  // CareerSafe external certifications (rendered after Module 16)
+  map['careersafe'] = <CareerSafeCertifications />;
 
   return map;
 }

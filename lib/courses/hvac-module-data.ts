@@ -35,7 +35,7 @@ export const HVAC_MODULE_DATA: ModuleData[] = [
     skills: [
       'Understand what HVAC technicians do on a daily basis',
       'Identify the four career levels: apprentice, journeyman, master, contractor',
-      'Explain the three credentials earned in this program (EPA 608, OSHA 30, CPR)',
+      'Explain the three credentials earned in this program (EPA 608, OSHA 10, CPR)',
       'Describe WIOA funding requirements including attendance and documentation',
       'Map the difference between residential, commercial, and industrial HVAC work',
     ],
@@ -51,7 +51,7 @@ export const HVAC_MODULE_DATA: ModuleData[] = [
     title: 'Safety Fundamentals and OSHA Principles',
     week: 'Week 2',
     teaches: 'Safety is the foundation of all skilled trades. Students learn workplace safety practices used in mechanical trades and building maintenance. Topics include electrical safety, lockout/tagout procedures, ladder safety, personal protective equipment, and hazard recognition. Students learn basic OSHA safety principles used in the HVAC and maintenance industry.',
-    whyItMatters: 'HVAC technicians work with high voltage electricity, pressurized refrigerant, natural gas, and heavy equipment — often in attics at 140°F or on rooftops in winter. One mistake can kill you. Every employer requires safety training before you touch equipment. OSHA 30 certification makes you more hireable and can add $2-4/hr to your pay.',
+    whyItMatters: 'HVAC technicians work with high voltage electricity, pressurized refrigerant, natural gas, and heavy equipment — often in attics at 140°F or on rooftops in winter. One mistake can kill you. Every employer requires safety training before you touch equipment. OSHA 10 certification makes you more hireable and can add $2-4/hr to your pay.',
     tools: [
       { name: 'Safety Glasses', whatItIs: 'Impact-resistant eyewear that protects your eyes from debris, refrigerant spray, and electrical arc flash.', usedFor: 'Worn at all times when working on any HVAC equipment. Refrigerant liquid can cause instant frostbite to your eyes.' },
       { name: 'Work Gloves', whatItIs: 'Insulated gloves rated for the voltage you are working with. Different gloves for electrical work vs. refrigerant handling.', usedFor: 'Protecting hands from electrical shock, sharp metal edges on sheet metal ductwork, and frostbite from liquid refrigerant.' },
@@ -507,7 +507,7 @@ export const HVAC_MODULE_DATA: ModuleData[] = [
     teaches: 'Technicians must demonstrate professionalism and workplace readiness. This module prepares students for employment by teaching job search strategies, resume building, interview skills, employer expectations, and workplace communication. Students learn how to interact with customers, document service calls, and present themselves as professionals.',
     whyItMatters: 'You can be the best diagnostician in the class, but if you cannot show up on time, communicate professionally, and present yourself well in an interview, you will not get hired — or you will not keep the job. Employers hire attitude and train skill. This module makes sure you have both.',
     tools: [
-      { name: 'Professional Resume', whatItIs: 'A one-page document highlighting your credentials (EPA 608, OSHA 30, CPR), training hours, and skills.', usedFor: 'Applying for HVAC technician positions. Your resume should lead with your certifications, then your training, then any work experience.' },
+      { name: 'Professional Resume', whatItIs: 'A one-page document highlighting your credentials (EPA 608, OSHA 10, CPR), training hours, and skills.', usedFor: 'Applying for HVAC technician positions. Your resume should lead with your certifications, then your training, then any work experience.' },
       { name: 'Interview Preparation Guide', whatItIs: 'Common interview questions for entry-level HVAC positions and how to answer them.', usedFor: 'Practicing answers to questions like "Why did you choose HVAC?", "What would you do if you could not diagnose a problem?", and "How do you handle a difficult customer?"' },
     ],
     systems: [

@@ -22,36 +22,31 @@ export default function HomeHeroVideo() {
     return () => video.removeEventListener('loadeddata', play);
   }, []);
 
-  // Play voiceover when hero scrolls into view
+  // Play voiceover on first user interaction (scroll, click, touch, or keypress)
   useEffect(() => {
-    const container = containerRef.current;
     const audio = voiceoverRef.current;
-    if (!container || !audio) return;
+    if (!audio) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayedVoiceover.current) {
-          hasPlayedVoiceover.current = true;
-          audio.play().catch(() => {
-            // Browser blocked autoplay — try on next user gesture
-            hasPlayedVoiceover.current = false;
-            const tryPlay = () => {
-              if (!hasPlayedVoiceover.current) {
-                hasPlayedVoiceover.current = true;
-                audio.play().catch(() => {});
-              }
-            };
-            window.addEventListener('click', tryPlay, { once: true, passive: true });
-            window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-            window.addEventListener('scroll', tryPlay, { once: true, passive: true });
-          });
-        }
-      },
-      { threshold: 0.3 },
-    );
+    const tryPlay = () => {
+      if (hasPlayedVoiceover.current) return;
+      hasPlayedVoiceover.current = true;
+      audio.play().catch(() => {
+        // If still blocked, reset so next gesture can try
+        hasPlayedVoiceover.current = false;
+      });
+    };
 
-    observer.observe(container);
-    return () => observer.disconnect();
+    window.addEventListener('scroll', tryPlay, { once: true, passive: true });
+    window.addEventListener('click', tryPlay, { once: true, passive: true });
+    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+    window.addEventListener('keydown', tryPlay, { once: true, passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', tryPlay);
+      window.removeEventListener('click', tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
+      window.removeEventListener('keydown', tryPlay);
+    };
   }, []);
 
   return (

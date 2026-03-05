@@ -151,7 +151,7 @@ export default function CourseLeaderboardPage() {
                       </li>
                     </ul>
                   </div>
-                  <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
                       src="/images/pages/courses-page-2.jpg"
                       alt="Students achieving goals"

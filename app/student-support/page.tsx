@@ -56,7 +56,7 @@ export default function StudentSupportPage() {
       </div>
 
       {/* Video Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <ProgramHeroBanner videoSrc="/videos/student-portal-hero.mp4" />
         <div className="absolute inset-0 z-10 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">

@@ -44,7 +44,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
         {program.heroVideo ? (
           <ProgramHeroBanner videoSrc={program.heroVideo} />
         ) : (
-          <div className="relative w-full h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+          <div className="relative w-full h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
             <Image src={images.hero} alt={program.name || program.heroTitle || 'Program'} fill className="object-cover" priority sizes="100vw" />
           </div>
         )}
@@ -212,7 +212,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
         <Image
           src={images.bottomCta}
           alt="Start your career journey"

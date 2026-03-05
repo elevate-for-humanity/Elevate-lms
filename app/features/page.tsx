@@ -59,7 +59,7 @@ export default function FeaturesPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/features-hero.jpg" alt="Platform features" fill className="object-cover" priority sizes="100vw" />
         
       </section>

@@ -22,7 +22,7 @@ export default function PartnershipsPage() {
       </div>
 
       {/* Hero Image — no text overlay */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
         <Image src="/images/pages/partnerships-page-1.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
       </section>
 

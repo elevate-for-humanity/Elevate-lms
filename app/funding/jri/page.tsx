@@ -38,7 +38,7 @@ export default function JRIFundingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/funding-page-2.jpg" alt="JRI Job-Ready Incentive program" fill className="object-cover" priority sizes="100vw" />
         
       </section>

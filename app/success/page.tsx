@@ -43,7 +43,7 @@ export default async function SuccessStoriesPage() {
       {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[60vh] min-h-[400px] max-h-[720px] w-full overflow-hidden">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/success-page-1.jpg" alt="Success Stories" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">

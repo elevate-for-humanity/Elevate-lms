@@ -97,7 +97,7 @@ export default function TutoringPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
         <Image src="/images/pages/tutoring-page-1.jpg" alt="Students receiving one-on-one tutoring at Elevate training center" fill sizes="100vw" className="object-cover" priority />
       </section>
 

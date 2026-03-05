@@ -183,7 +183,7 @@ export default function PathwaysPage() {
       </div>
 
       {/* ── Visual Hero (no text overlay) ── */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
         <Image
           src="/images/pages/pathways-page-2.jpg"
           alt="Workforce training students in a classroom and lab setting"

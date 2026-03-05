@@ -96,7 +96,7 @@ export default async function CommunityPage() {
       </div>
 
       {/* Clean Hero - Image Only */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
         <Image
           src="/images/pages/community-page-5.jpg"
           alt="Community members collaborating"

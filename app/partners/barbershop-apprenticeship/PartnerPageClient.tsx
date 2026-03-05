@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Phone } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import VideoHero from '@/components/ui/VideoHero';
 
@@ -22,17 +22,17 @@ export default function PartnerPageClient() {
       />
 
       {/* CTA Section below hero */}
-      <section className="bg-slate-900 text-white py-16">
+      <section className="bg-white py-16 border-b border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Barbershop Partner Program</h1>
-          <p className="text-xl text-slate-200 mb-8 max-w-2xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4">Barbershop Partner Program</h1>
+          <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
             Host apprentices in your shop. Develop talent. Grow your team through Indiana&apos;s
             USDOL Registered Barber Apprenticeship.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/partners/barbershop-apprenticeship/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white rounded-lg font-bold text-lg hover:bg-orange-600 transition-colors"
+              className="inline-flex items-center justify-center px-10 py-4 bg-brand-red-600 text-white rounded-xl font-extrabold text-lg hover:bg-brand-red-700 transition-colors"
             >
               Apply as a Partner Shop <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
@@ -40,7 +40,7 @@ export default function PartnerPageClient() {
               href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-lg font-bold text-lg hover:bg-white hover:text-slate-900 transition-colors"
+              className="inline-flex items-center justify-center px-10 py-4 border-2 border-brand-blue-600 text-brand-blue-600 rounded-xl font-extrabold text-lg hover:bg-brand-blue-50 transition-colors"
             >
               Schedule a Call
             </a>
@@ -166,24 +166,24 @@ export default function PartnerPageClient() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-500 text-white">
+      <section className="py-16 bg-white border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Partner With Us?</h2>
-          <p className="text-lg text-orange-100 mb-8">
+          <h2 className="text-3xl font-extrabold text-black mb-4">Ready to Partner With Us?</h2>
+          <p className="text-lg text-slate-600 mb-8">
             Join the Indiana Barber Apprenticeship program and start developing talent for your shop.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/partners/barbershop-apprenticeship/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 rounded-lg font-bold text-lg hover:bg-orange-50 transition-colors"
+              className="inline-flex items-center justify-center px-10 py-4 bg-brand-red-600 text-white rounded-xl font-extrabold text-lg hover:bg-brand-red-700 transition-colors"
             >
               Start Your Application <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <a
               href="tel:+13173143757"
-              className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-lg font-bold text-lg hover:bg-orange-600 transition-colors"
+              className="inline-flex items-center justify-center px-10 py-4 border-2 border-brand-blue-600 text-brand-blue-600 rounded-xl font-extrabold text-lg hover:bg-brand-blue-50 transition-colors"
             >
-              <Phone className="w-5 h-5 mr-2" /> (317) 314-3757
+              (317) 314-3757
             </a>
           </div>
           <Link

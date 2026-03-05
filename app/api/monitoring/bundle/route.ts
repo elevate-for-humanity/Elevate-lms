@@ -18,8 +18,7 @@ export const maxDuration = 60;
 
 async function guardAdmin() {
   const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -55,11 +54,11 @@ async function _GET(req: Request) {
     if (denied) return denied;
 
     const supabase = await createClient();
-    const _admin = createAdminClient();
-    const db = _admin || supabase;
-    if (!db) {
+    if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
+    const _admin = createAdminClient();
+    const db = _admin || supabase;
 
     // Only query tables verified to exist in production DB
     const [

@@ -24,7 +24,7 @@ export const PROGRAMS: Record<string, ProgramFacts> = {
     name: 'HVAC Technician',
     category: 'Skilled Trades',
     credentials: ['EPA 608 Universal (prep)', 'OSHA 30-Hour Construction Safety', 'Residential HVAC Cert 1', 'Residential HVAC Cert 2', 'CPR/First Aid'],
-    duration: '20 weeks',
+    duration: '12 weeks',
     format: 'Hybrid (online theory + hands-on labs)',
     schedule: 'Cohort-based, set during onboarding',
     fundingNotes: ['WIOA eligible', 'Workforce Ready Grant eligible', 'Next Level Jobs eligible'],

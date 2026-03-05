@@ -51,14 +51,14 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
       validity: 'Lifetime (no renewal required)',
     },
     {
-      name: 'OSHA 30-Hour Construction Safety',
-      issuer: 'U.S. Department of Labor / OSHA',
+      name: 'OSHA 10-Hour Construction Safety',
+      issuer: 'CareerSafe / U.S. Department of Labor',
       description: 'DOL-issued card covering fall protection, electrical safety, HazCom, and confined spaces.',
       validity: 'Lifetime (DOL card)',
     },
     {
       name: 'CPR / First Aid / AED',
-      issuer: 'American Heart Association or American Red Cross',
+      issuer: 'CareerSafe',
       description: 'Nationally accredited emergency response certification.',
       validity: '2 years',
     },
@@ -91,7 +91,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     {
       title: 'HVAC Apprentice / Helper',
       timeframe: '0–6 months after program',
-      requirements: 'EPA 608 + OSHA 30 (earned in program)',
+      requirements: 'EPA 608 + OSHA 10 (earned in program)',
       salaryRange: '$35,000–$42,000',
     },
     {
@@ -124,7 +124,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     { week: 'Week 7', title: 'EPA 608 Type I & II', competencyMilestone: 'Evacuate to 500 microns, demonstrate leak detection methods' },
     { week: 'Week 8', title: 'EPA 608 Type III & Universal Prep', competencyMilestone: 'Pass 100-question Universal practice exam (70% per section)' },
     { week: 'Week 9–10', title: 'Advanced Skills', competencyMilestone: 'Charge by superheat/subcooling (±2°F), pass 150 psi braze test, 4/4 fault diagnoses' },
-    { week: 'Week 11', title: 'Troubleshooting & OSHA', competencyMilestone: '3 faults diagnosed in 30 min each, complete OSHA 30-Hour certification' },
+    { week: 'Week 11', title: 'Troubleshooting & OSHA', competencyMilestone: '3 faults diagnosed in 30 min each, complete OSHA 10-Hour certification' },
     { week: 'Week 12', title: 'Certification & Placement', competencyMilestone: 'Pass proctored EPA 608 exam, earn CPR/AED, complete mock interviews' },
   ],
 
@@ -163,8 +163,8 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
       topics: ['Refrigerant charging: subcooling and superheat methods (±2°F)', 'System diagnostics with manifold gauges — 4/4 fault diagnoses', 'Ductwork design and static pressure (±0.02 in. w.c.)', 'Equipment sizing (Manual J basics)', 'Brazing and line set installation — passes 150 psi nitrogen test'],
     },
     {
-      title: 'Systematic Troubleshooting & OSHA 30',
-      topics: ['Systematic troubleshooting method (6 steps)', 'Common AC failures: bad capacitor, frozen coil, low charge', 'Common heating failures: ignition, heat exchanger, gas valve', '3 faults diagnosed in 30 minutes each', 'OSHA 30-Hour Construction Safety certification', 'Fall protection, electrical safety, HazCom, confined spaces'],
+      title: 'Systematic Troubleshooting & OSHA 10',
+      topics: ['Systematic troubleshooting method (6 steps)', 'Common AC failures: bad capacitor, frozen coil, low charge', 'Common heating failures: ignition, heat exchanger, gas valve', '3 faults diagnosed in 30 minutes each', 'OSHA 10-Hour Construction Safety certification', 'Fall protection, electrical safety, HazCom, confined spaces'],
     },
     {
       title: 'Certification & Career Placement',
@@ -247,8 +247,8 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
       jobRole: 'Entry-level HVAC Technician',
     },
     {
-      training: 'OSHA 30-Hour Construction (Weeks 1–4)',
-      certification: 'OSHA 30 DOL Card',
+      training: 'OSHA 10-Hour Construction (Weeks 1–4)',
+      certification: 'OSHA 10 DOL Card',
       certBody: 'U.S. Department of Labor',
       jobRole: 'Construction / Trades Worker',
     },
@@ -303,7 +303,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   pricingIncludes: [
     '240 instructional hours (12 weeks)',
     'EPA 608 Universal exam fee (ESCO or Mainstream Engineering)',
-    'OSHA 30-Hour Construction Safety certification',
+    'OSHA 10-Hour Construction Safety certification',
     'CPR/First Aid/AED certification',
     'All PPE, tools, and materials',
     'LMS access for full program duration',
@@ -316,7 +316,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. Week 1 covers orientation, tools, and safety. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
     { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant funding covers tuition, tools, certification exam fees, and materials. Self-pay is $5,000 with payment plans available.' },
     { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who purchases or handles refrigerants. The Universal level covers all equipment types. The exam has 80 questions across 4 sections — you need 70% on each section to pass. Elevate is an approved EPA 608 proctor testing site, so you take the exam here during the program.' },
-    { question: 'What certifications will I earn?', answer: 'EPA 608 Universal (proctored on-site), OSHA 30-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included.' },
+    { question: 'What certifications will I earn?', answer: 'EPA 608 Universal (proctored on-site), OSHA 10-Hour Construction Safety, CPR/First Aid/AED, Residential HVAC Certification 1 & 2, and Rise Up (NRF Foundation). All exam fees are included.' },
     { question: 'How is the program structured?', answer: '6–8 weeks of classroom instruction at our Indianapolis training center, followed by 2–4 weeks of hands-on training and employer jobsite placement. EPA 608 certification is proctored on-site during the program. Total duration is approximately 12 weeks.' },
     { question: 'What happens after I graduate?', answer: 'Our career services team helps with resume building, mock interviews, and direct introductions to HVAC employer partners in the Indianapolis region. The target is employment at $14+/hour within 18 months of enrollment. The median salary for HVAC technicians in Indiana is $52,000/year.' },
     { question: 'Where is the training located?', answer: 'Classroom instruction and EPA 608 proctored testing take place at the Elevate training center in Indianapolis. Hands-on/OJT placement is with employer partners in the Indianapolis metropolitan area.' },

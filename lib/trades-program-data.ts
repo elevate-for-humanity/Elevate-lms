@@ -35,8 +35,8 @@ export const HVAC_DATA: TradesProgramData = {
     { name: 'EPA Section 608 Universal Certification', issuingBody: 'U.S. Environmental Protection Agency (EPA)' },
     { name: 'Residential HVAC Certification 1', issuingBody: 'Industry Certification Body' },
     { name: 'Residential HVAC Certification 2 — Refrigeration Diagnostics', issuingBody: 'Industry Certification Body' },
-    { name: 'OSHA 30 — Construction Safety', issuingBody: 'OSHA / CareerSafe' },
-    { name: 'CPR', issuingBody: 'American Heart Association / American Red Cross' },
+    { name: 'OSHA 10-Hour — Construction Safety', issuingBody: 'CareerSafe / U.S. Department of Labor' },
+    { name: 'CPR/AED & First Aid', issuingBody: 'CareerSafe' },
     { name: 'Rise Up — Retail Industry Fundamentals', issuingBody: 'National Retail Federation (NRF)' },
   ],
   curriculum: [

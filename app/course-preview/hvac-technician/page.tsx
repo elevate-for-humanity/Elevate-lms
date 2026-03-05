@@ -1,461 +1,556 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  FileText,
   Video,
   FlaskConical,
   ClipboardList,
-  MessageSquare,
   CheckCircle,
-  Clock,
+  Lock,
   Menu,
   X,
   GraduationCap,
-  Download,
+  Wrench,
+  Eye,
 } from 'lucide-react';
 import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
+import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
+import { PostVideoQuiz } from '@/components/lms/PostVideoQuiz';
+import TroubleshootScenario from '@/components/lms/TroubleshootScenario';
+import CondenserDiagram from '@/components/hvac-labs/CondenserDiagram';
+import { CONDENSER_SCENARIOS } from '@/lib/simulations/condenser-scenarios';
+import { HVAC_QUIZ_BANKS } from '@/lib/courses/hvac-quiz-banks';
+import { HVAC_MODULE_CONTENT } from '@/lib/courses/hvac-module-content';
+import { getModuleDiagrams } from '@/lib/courses/hvac-visual-library';
+import { getModuleEquipment } from '@/lib/courses/hvac-equipment-models';
+import { getModuleScenarios } from '@/lib/courses/hvac-service-scenarios';
+import {
+  RefrigerationCycleDiagram,
+  CondenserBreakdownDiagram,
+  ThermostatWiringDiagram,
+  HVACSystemOverview,
+  FurnaceBreakdownDiagram,
+  ElectricalCircuitDiagram,
+  DuctDistributionDiagram,
+  TroubleshootingFlowchart,
+} from '@/components/hvac-diagrams';
 
 const course = COURSE_DEFINITIONS.find((c) => c.slug === 'hvac-technician')!;
 
-// Flatten all lessons with module context
-const allLessons = course.modules.flatMap((mod, mi) =>
-  mod.lessons.map((lesson, li) => ({
-    ...lesson,
-    moduleTitle: mod.title,
-    moduleIndex: mi,
-    lessonIndex: li,
-    globalIndex: 0,
-  }))
-);
-allLessons.forEach((l, i) => (l.globalIndex = i));
+type TabId = 'video' | 'content' | 'lab' | 'quiz';
 
-const typeConfig: Record<string, { icon: typeof Video; label: string; color: string; bgColor: string }> = {
-  video: { icon: Video, label: 'Video Lesson', color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-50' },
-  reading: { icon: FileText, label: 'Reading', color: 'text-amber-600', bgColor: 'bg-amber-50' },
-  quiz: { icon: ClipboardList, label: 'Quiz', color: 'text-purple-600', bgColor: 'bg-purple-50' },
-  lab: { icon: FlaskConical, label: 'Lab Exercise', color: 'text-brand-green-600', bgColor: 'bg-brand-green-50' },
+const TABS: { id: TabId; label: string; icon: typeof Video }[] = [
+  { id: 'video', label: 'Video', icon: Video },
+  { id: 'content', label: 'Content', icon: BookOpen },
+  { id: 'lab', label: 'Lab', icon: FlaskConical },
+  { id: 'quiz', label: 'Quiz', icon: ClipboardList },
+];
+
+const LAB_MODULES = ['hvac-05', 'hvac-08', 'hvac-11', 'hvac-13'];
+
+/** Map diagram IDs to their interactive components */
+const DIAGRAM_COMPONENTS: Record<string, React.ReactNode> = {
+  'hvac-system-overview': <HVACSystemOverview />,
+  'refrigeration-cycle': <RefrigerationCycleDiagram />,
+  'condenser-breakdown': <CondenserBreakdownDiagram />,
+  'furnace-breakdown': <FurnaceBreakdownDiagram />,
+  'thermostat-wiring': <ThermostatWiringDiagram />,
+  'control-circuit': <ElectricalCircuitDiagram />,
+  'duct-distribution': <DuctDistributionDiagram />,
+  'troubleshooting-flowchart': <TroubleshootingFlowchart />,
 };
 
-function getLessonContent(lesson: (typeof allLessons)[0]) {
-  if (lesson.type === 'video') {
-    return (
-      <div className="bg-slate-900 aspect-video rounded-xl flex items-center justify-center relative group">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition cursor-pointer">
-            <Video className="w-10 h-10 text-white ml-1" />
-          </div>
-          <p className="text-white/80 text-sm">Video content — {lesson.durationMinutes || 15} minutes</p>
-          <p className="text-white/50 text-xs mt-1">Preview mode — video playback available in enrolled LMS</p>
-        </div>
-        <div className="absolute top-4 left-4 bg-slate-900/70 text-white px-3 py-1.5 rounded text-xs">
-          Lesson {lesson.globalIndex + 1} of {allLessons.length}
-        </div>
-      </div>
-    );
-  }
+function ServiceCallCard({ scenario }: { scenario: ReturnType<typeof getModuleScenarios>[number] }) {
+  const [expanded, setExpanded] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
 
-  if (lesson.type === 'lab') {
-    return (
-      <div className="bg-gradient-to-br from-brand-green-50 to-emerald-50 rounded-xl p-8 border border-brand-green-200">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
-            <FlaskConical className="w-5 h-5 text-brand-green-600" />
-          </div>
-          <div>
-            <p className="font-semibold text-brand-green-900">Hands-On Lab</p>
-            <p className="text-sm text-brand-green-700">{lesson.durationMinutes || 60} minutes</p>
-          </div>
-        </div>
-        <p className="text-brand-green-800 mb-4">{lesson.description}</p>
-        <div className="bg-white/60 rounded-lg p-4 text-sm text-brand-green-700">
-          <p className="font-medium mb-2">Lab Requirements:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Complete prerequisite reading/video lessons</li>
-            <li>Access to lab equipment and workspace</li>
-            <li>Instructor supervision required</li>
-            <li>Document results in lab worksheet</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  if (lesson.type === 'quiz') {
-    return (
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-8 border border-purple-200">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-            <ClipboardList className="w-5 h-5 text-purple-600" />
-          </div>
-          <div>
-            <p className="font-semibold text-purple-900">Knowledge Check</p>
-            <p className="text-sm text-purple-700">{lesson.durationMinutes || 15} minutes &middot; 70% passing score</p>
-          </div>
-        </div>
-        <p className="text-purple-800 mb-4">{lesson.description}</p>
-        <div className="bg-white/60 rounded-lg p-4 text-sm text-purple-700">
-          <p className="font-medium mb-2">Quiz Details:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Multiple choice and short answer questions</li>
-            <li>Covers material from this module</li>
-            <li>Exam fees and retesting policies vary by certifying organization</li>
-            <li>Must pass to unlock next module</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  // Reading
   return (
-    <div className="bg-white rounded-xl p-8 border border-slate-200">
-      <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-        <BookOpen className="w-4 h-4" />
-        <span>Reading &middot; Lesson {lesson.globalIndex + 1} of {allLessons.length}</span>
-      </div>
-      <div className="prose max-w-none">
-        <p className="text-slate-700 text-lg leading-relaxed">{lesson.description}</p>
-        <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
-          <p className="text-sm text-slate-500 italic">
-            Full lesson content available in the enrolled LMS. This preview shows the course structure and lesson descriptions.
-          </p>
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left px-5 py-4 hover:bg-slate-50 transition"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
+              scenario.difficulty === 'beginner' ? 'bg-green-100 text-green-700'
+                : scenario.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-red-100 text-red-700'
+            }`}>
+              {scenario.difficulty}
+            </span>
+            <h4 className="font-bold text-slate-900 mt-2">&ldquo;{scenario.complaint}&rdquo;</h4>
+            <p className="text-sm text-slate-500 mt-1">{scenario.conditions}</p>
+          </div>
+          <ChevronRight className={`w-5 h-5 text-slate-400 transition-transform flex-shrink-0 ${expanded ? 'rotate-90' : ''}`} />
         </div>
-      </div>
+      </button>
+
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+          <div className="bg-slate-50 rounded-lg p-4">
+            <p className="text-xs font-bold text-slate-500 uppercase mb-1">System Info</p>
+            <p className="text-sm text-slate-700">{scenario.systemInfo}</p>
+          </div>
+
+          {!showAnswer ? (
+            <div className="space-y-3">
+              <h4 className="font-bold text-slate-900">Diagnostic Steps</h4>
+              <p className="text-sm text-slate-600">Follow each step. What would you check next?</p>
+              {scenario.diagnosticSteps.slice(0, currentStep + 1).map((step, i) => (
+                <div key={i} className={`rounded-lg p-4 border ${step.isKeyFinding ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-slate-200'}`}>
+                  <p className="text-sm font-semibold text-slate-800">Step {i + 1}: {step.action}</p>
+                  <p className="text-sm text-slate-600 mt-1">
+                    <span className="font-medium">Finding:</span> {step.finding}
+                  </p>
+                  {step.isKeyFinding && (
+                    <p className="text-xs font-bold text-yellow-700 mt-1">⚡ Key Finding</p>
+                  )}
+                </div>
+              ))}
+              {currentStep < scenario.diagnosticSteps.length - 1 ? (
+                <button
+                  onClick={() => setCurrentStep((s) => s + 1)}
+                  className="w-full py-2.5 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition text-sm"
+                >
+                  Next Step →
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowAnswer(true)}
+                  className="w-full py-2.5 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition text-sm"
+                >
+                  Reveal Diagnosis & Repair
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-xs font-bold text-green-700 uppercase mb-1">Root Cause</p>
+                <p className="text-sm text-slate-800">{scenario.rootCause}</p>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-xs font-bold text-blue-700 uppercase mb-1">Correct Repair</p>
+                <p className="text-sm text-slate-800">{scenario.correctRepair}</p>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-xs font-bold text-red-700 uppercase mb-1">Common Mistakes</p>
+                <ul className="space-y-1 mt-1">
+                  {scenario.commonMistakes.map((m, i) => (
+                    <li key={i} className="text-sm text-slate-700 flex gap-2">
+                      <span className="text-red-500 flex-shrink-0">✗</span>
+                      <span>{m}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                onClick={() => { setShowAnswer(false); setCurrentStep(0); }}
+                className="w-full py-2.5 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition text-sm"
+              >
+                ↺ Try Again
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 export default function HVACClassroomPreview() {
-  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
-  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState('overview');
+  const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabId>('video');
+  const [completedTabs, setCompletedTabs] = useState<Record<string, Set<TabId>>>({});
+  const [videoProgress, setVideoProgress] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const lesson = allLessons[currentLessonIndex];
-  const config = typeConfig[lesson.type] || typeConfig.reading;
-  const Icon = config.icon;
+  const mod = course.modules[currentModuleIndex];
+  const modId = mod.id || `hvac-${String(currentModuleIndex + 1).padStart(2, '0')}`;
 
-  const completedCount = completedIds.size;
-  const progressPct = Math.round((completedCount / allLessons.length) * 100);
+  const modCompleted = completedTabs[modId] || new Set<TabId>();
+  const isTabDone = (tab: TabId) => modCompleted.has(tab);
+  // Preview mode — all tabs and modules are accessible
+  const isTabUnlocked = (_tab: TabId) => true;
+  const allTabsDone = TABS.every((t) => isTabDone(t.id));
+  const isModuleUnlocked = (_mi: number) => true;
 
-  const currentModule = course.modules[lesson.moduleIndex];
-
-  const toggleComplete = () => {
-    setCompletedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(lesson.id)) {
-        next.delete(lesson.id);
-      } else {
-        next.add(lesson.id);
-      }
+  const completeTab = (tab: TabId) => {
+    setCompletedTabs((prev) => {
+      const next = { ...prev };
+      const set = new Set(next[modId] || []);
+      set.add(tab);
+      next[modId] = set;
       return next;
     });
-  };
-
-  const goTo = (index: number) => {
-    setCurrentLessonIndex(index);
-    setSidebarOpen(false);
-    setActiveTab('overview');
-  };
-
-  const moduleGroups = useMemo(() => {
-    const groups: { module: (typeof course.modules)[0]; lessons: typeof allLessons; startIndex: number }[] = [];
-    let idx = 0;
-    for (const mod of course.modules) {
-      groups.push({
-        module: mod,
-        lessons: allLessons.slice(idx, idx + mod.lessons.length),
-        startIndex: idx,
-      });
-      idx += mod.lessons.length;
+    const idx = TABS.findIndex((t) => t.id === tab);
+    if (idx < TABS.length - 1) {
+      setTimeout(() => setActiveTab(TABS[idx + 1].id), 800);
     }
-    return groups;
-  }, []);
+  };
+
+  const goToModule = (mi: number) => {
+    if (!isModuleUnlocked(mi)) return;
+    setCurrentModuleIndex(mi);
+    setActiveTab('video');
+    setVideoProgress(0);
+    setSidebarOpen(false);
+  };
+
+  const completedModuleCount = course.modules.filter((_, mi) => {
+    const id = course.modules[mi].id || `hvac-${String(mi + 1).padStart(2, '0')}`;
+    const done = completedTabs[id] || new Set<TabId>();
+    return TABS.every((t) => done.has(t.id));
+  }).length;
+  const overallProgress = Math.round((completedModuleCount / course.modules.length) * 100);
+
+  const videoLessons = mod.lessons.filter((l) => l.type === 'video');
 
   return (
     <div className="flex h-screen bg-slate-50">
-      {/* Preview Banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-brand-orange-500 text-white text-center py-1.5 text-sm font-medium">
+      {/* Banner */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-brand-blue-700 text-white text-center py-2 text-sm font-medium">
         <GraduationCap className="w-4 h-4 inline mr-2" />
-        Course Preview — This is how enrolled students experience the HVAC Technician program
-        <Link href="/apply?program=hvac-technician" className="ml-3 underline hover:no-underline">
-          Apply Now
-        </Link>
+        Course Preview — HVAC Technician Program
+        <Link href="/apply?program=hvac-technician" className="ml-3 underline hover:no-underline">Apply Now</Link>
       </div>
 
-      {/* Mobile Sidebar Toggle */}
+      {/* Mobile toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="md:hidden fixed top-12 left-4 z-50 bg-white p-2.5 rounded-lg shadow-lg"
-        aria-label="Toggle lesson list"
+        aria-label="Toggle module list"
       >
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-slate-900/50 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen && <div className="fixed inset-0 bg-slate-900/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
-      <aside
-        className={`${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 w-80 bg-white border-r overflow-y-auto transition-transform duration-300 fixed md:relative h-full z-40 pt-10`}
-      >
+      <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 bg-white border-r overflow-y-auto transition-transform duration-300 fixed md:relative h-full z-40 pt-10`}>
         <div className="p-5 border-b">
-          <Link
-            href="/programs/hvac-technician"
-            className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mb-3 inline-flex items-center gap-1"
-          >
-            <ChevronLeft className="w-4 h-4" /> Back to Program
+          <Link href="/programs/hvac-technician" className="text-sm text-brand-blue-600 hover:underline flex items-center gap-1">
+            <ChevronLeft className="w-3 h-3" /> Back to Program
           </Link>
-          <h2 className="font-bold text-lg text-slate-900">{course.title}</h2>
+          <h2 className="font-bold text-lg text-slate-900 mt-2">{course.title}</h2>
           <div className="mt-3">
-            <div className="flex justify-between text-sm text-slate-600 mb-1">
-              <span>{completedCount} of {allLessons.length} lessons</span>
-              <span>{progressPct}%</span>
+            <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <span>{completedModuleCount}/{course.modules.length} modules</span>
+              <span>{overallProgress}%</span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-2">
-              <div
-                className="bg-brand-green-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progressPct}%` }}
-              />
+            <div className="bg-slate-100 rounded-full h-2">
+              <div className="bg-brand-green-600 h-2 rounded-full transition-all duration-500" style={{ width: `${overallProgress}%` }} />
             </div>
           </div>
         </div>
 
-        <nav className="p-3" aria-label="Course lessons">
-          {moduleGroups.map((group, gi) => (
-            <div key={group.module.id} className="mb-4">
-              <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Module {gi + 1}: {group.module.title}
-              </div>
-              {group.lessons.map((l) => {
-                const isActive = l.globalIndex === currentLessonIndex;
-                const isDone = completedIds.has(l.id);
-                const LIcon = typeConfig[l.type]?.icon || FileText;
-                return (
-                  <button
-                    key={l.id}
-                    onClick={() => goTo(l.globalIndex)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg mb-1 transition text-left ${
-                      isActive
-                        ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
-                        : 'hover:bg-slate-50 border-l-4 border-transparent'
-                    }`}
-                  >
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        isDone
-                          ? 'bg-brand-green-100 text-brand-green-600'
-                          : isActive
-                            ? 'bg-brand-blue-100 text-brand-blue-600'
-                            : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      {isDone ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : (
-                        <LIcon className="w-3.5 h-3.5" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div
-                        className={`text-sm truncate ${
-                          isActive ? 'font-semibold text-brand-blue-900' : isDone ? 'text-slate-500' : 'text-slate-800'
-                        }`}
-                      >
-                        {l.title}
-                      </div>
-                      <div className="text-xs text-slate-400">
-                        {l.durationMinutes ? `${l.durationMinutes}m` : '~15m'} &middot; {l.type}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </nav>
+        <div className="p-3">
+          {course.modules.map((m, mi) => {
+            const mId = m.id || `hvac-${String(mi + 1).padStart(2, '0')}`;
+            const mDone = completedTabs[mId] || new Set<TabId>();
+            const mAllDone = TABS.every((t) => mDone.has(t.id));
+            const locked = !isModuleUnlocked(mi);
+            const isActive = mi === currentModuleIndex;
+
+            return (
+              <button
+                key={mi}
+                onClick={() => goToModule(mi)}
+                disabled={locked}
+                className={`w-full text-left p-3 rounded-lg mb-1 transition ${
+                  locked ? 'opacity-40 cursor-not-allowed'
+                    : isActive ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
+                    : 'hover:bg-slate-50 border-l-4 border-transparent'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                    locked ? 'bg-slate-200 text-slate-400'
+                      : mAllDone ? 'bg-brand-green-100 text-brand-green-600'
+                      : isActive ? 'bg-brand-blue-100 text-brand-blue-600'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {locked ? <Lock className="w-3.5 h-3.5" />
+                      : mAllDone ? <CheckCircle className="w-4 h-4" />
+                      : mi + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${locked ? 'text-slate-400' : 'text-slate-800'}`}>{m.title}</p>
+                    <p className="text-xs text-slate-400">
+                      {locked ? 'Complete previous module' : `${mDone.size}/${TABS.length} tabs`}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto pt-10">
-        <div className="max-w-4xl mx-auto p-4 md:p-8">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-            <span>Module {lesson.moduleIndex + 1}</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="truncate">{currentModule.title}</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-700 font-medium">Lesson {lesson.lessonIndex + 1}</span>
-          </div>
-
-          {/* Lesson Content */}
+      {/* Main */}
+      <main className="flex-1 overflow-y-auto pt-10">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 py-6">
+          {/* Module header */}
           <div className="mb-6">
-            {getLessonContent(lesson)}
-          </div>
-
-          {/* Title + Mark Complete */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${config.bgColor} ${config.color}`}>
-                  <Icon className="w-3 h-3" />
-                  {config.label}
-                </span>
-                {lesson.durationMinutes && (
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {lesson.durationMinutes} min
-                  </span>
-                )}
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{lesson.title}</h1>
-            </div>
-            <button
-              onClick={toggleComplete}
-              className={`px-6 py-3 rounded-lg font-semibold transition flex-shrink-0 ${
-                completedIds.has(lesson.id)
-                  ? 'bg-brand-green-100 text-brand-green-700 border-2 border-brand-green-600'
-                  : 'bg-brand-green-600 hover:bg-brand-green-700 text-white'
-              }`}
-            >
-              {completedIds.has(lesson.id) ? (
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5" /> Completed
-                </span>
-              ) : (
-                'Mark as Complete'
-              )}
-            </button>
+            <p className="text-sm text-brand-blue-600 font-medium">Module {currentModuleIndex + 1} of {course.modules.length}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">{mod.title}</h1>
+            {mod.competency && <p className="text-slate-600 mt-2 text-sm">{mod.competency}</p>}
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-slate-200 mb-6">
-            <div className="flex gap-6 overflow-x-auto">
-              {[
-                { key: 'overview', label: 'Overview', icon: BookOpen },
-                { key: 'resources', label: 'Resources', icon: FileText },
-                { key: 'notes', label: 'Notes', icon: MessageSquare },
-              ].map((tab) => (
+          <div className="flex border-b border-slate-200 mb-6 overflow-x-auto">
+            {TABS.map((tab) => {
+              const done = isTabDone(tab.id);
+              const unlocked = isTabUnlocked(tab.id);
+              const active = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
                 <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`pb-3 px-1 font-semibold whitespace-nowrap flex items-center gap-2 text-sm ${
-                    activeTab === tab.key
-                      ? 'border-b-2 border-brand-blue-600 text-brand-blue-600'
-                      : 'text-slate-500 hover:text-slate-700'
+                  key={tab.id}
+                  onClick={() => unlocked && setActiveTab(tab.id)}
+                  disabled={!unlocked}
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
+                    !unlocked ? 'border-transparent text-slate-300 cursor-not-allowed'
+                      : active ? 'border-brand-blue-600 text-brand-blue-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  <tab.icon className="w-4 h-4" />
+                  {!unlocked ? <Lock className="w-4 h-4" />
+                    : done ? <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                    : <Icon className="w-4 h-4" />}
                   {tab.label}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
 
-          {/* Tab Content */}
-          <div className="mb-8">
-            {activeTab === 'overview' && (
-              <div className="prose max-w-none">
-                <p className="text-slate-700 text-lg leading-relaxed">{lesson.description}</p>
-                <div className="mt-6 grid sm:grid-cols-2 gap-4 not-prose">
-                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
-                    <p className="text-xs font-medium text-slate-400 uppercase mb-1">Module</p>
-                    <p className="text-sm font-semibold text-slate-800">{currentModule.title}</p>
-                    <p className="text-xs text-slate-500 mt-1">{currentModule.description}</p>
-                  </div>
-                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
-                    <p className="text-xs font-medium text-slate-400 uppercase mb-1">Credentials Earned</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {course.outcomes.slice(0, 3).map((o, i) => (
-                        <span key={i} className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded">
-                          {o.replace(/^(Pass|Earn|Complete) /, '')}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'resources' && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200 hover:border-brand-blue-300 transition cursor-pointer">
-                  <Download className="w-5 h-5 text-brand-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">Lesson Worksheet</p>
-                    <p className="text-xs text-slate-500">PDF — Available after enrollment</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200 hover:border-brand-blue-300 transition cursor-pointer">
-                  <Download className="w-5 h-5 text-brand-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">Study Guide</p>
-                    <p className="text-xs text-slate-500">PDF — Available after enrollment</p>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-400 mt-4">
-                  Downloadable resources are available to enrolled students.
-                </p>
-              </div>
-            )}
-
-            {activeTab === 'notes' && (
-              <div className="bg-white rounded-lg border border-slate-200 p-6">
-                <textarea
-                  className="w-full h-40 border border-slate-200 rounded-lg p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  placeholder="Take notes on this lesson... (preview mode — notes are saved in the enrolled LMS)"
+          {/* ── VIDEO TAB ── */}
+          {activeTab === 'video' && (
+            <div>
+              {currentModuleIndex === 0 ? (
+                <InteractiveVideoPlayer
+                  videoUrl="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-01-01-v13.mp4"
+                  title={mod.title}
+                  onProgress={(p: number) => setVideoProgress(p)}
+                  onComplete={() => completeTab('video')}
                 />
-                <p className="text-xs text-slate-400 mt-2">
-                  Notes are saved per-lesson in the enrolled LMS with your Digital Binder.
-                </p>
+              ) : (
+                <div className="bg-slate-900 aspect-video rounded-xl flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-lg font-semibold">{mod.title}</p>
+                    <p className="text-sm text-slate-400 mt-1">
+                      {videoLessons.length} video{videoLessons.length !== 1 ? 's' : ''} · {videoLessons.reduce((s, l) => s + (l.durationMinutes || 15), 0)} min
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="mt-4 flex items-center gap-3 text-sm">
+                <div className="flex-1 bg-slate-200 rounded-full h-2">
+                  <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${videoProgress}%` }} />
+                </div>
+                <span className="text-slate-500">{Math.round(videoProgress)}%</span>
               </div>
-            )}
-          </div>
+              {currentModuleIndex !== 0 && !isTabDone('video') && (
+                <button onClick={() => completeTab('video')} className="mt-4 w-full py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition">
+                  Mark Video Complete — Continue to Content
+                </button>
+              )}
+              {isTabDone('video') && (
+                <p className="mt-4 flex items-center gap-2 text-brand-green-600 text-sm font-medium"><CheckCircle className="w-4 h-4" /> Video complete</p>
+              )}
+            </div>
+          )}
 
-          {/* Navigation */}
-          <div className="flex items-center justify-between border-t border-slate-200 pt-6 pb-12">
+          {/* ── CONTENT TAB ── */}
+          {activeTab === 'content' && (
+            <div className="space-y-8">
+              {/* Module content from data-driven renderer */}
+              {HVAC_MODULE_CONTENT[modId]}
+
+              {/* Interactive Diagrams — always rendered when available */}
+              {(() => {
+                const diagrams = getModuleDiagrams(modId);
+                const interactiveDiagrams = diagrams.filter((d) => d.hasInteractive && DIAGRAM_COMPONENTS[d.id]);
+                const staticDiagrams = diagrams.filter((d) => !d.hasInteractive || !DIAGRAM_COMPONENTS[d.id]);
+                if (diagrams.length === 0) return null;
+                return (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Eye className="w-5 h-5 text-brand-blue-600" />
+                      <h2 className="text-xl font-bold text-slate-900">Interactive Diagrams</h2>
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      Click on components in each diagram to learn what they do. These same diagrams appear throughout the program — repetition builds understanding.
+                    </p>
+                    {interactiveDiagrams.map((d) => (
+                      <div key={d.id}>{DIAGRAM_COMPONENTS[d.id]}</div>
+                    ))}
+                    {staticDiagrams.length > 0 && (
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {staticDiagrams.map((d) => (
+                          <div key={d.id} className="bg-white border border-slate-200 rounded-lg p-4">
+                            <h3 className="font-semibold text-slate-800 text-sm">{d.name}</h3>
+                            <p className="text-xs text-slate-500 mt-1">{d.learningObjective}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {!isTabDone('content') && (
+                <button onClick={() => completeTab('content')} className="mt-6 w-full py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition">
+                  I&apos;ve Read Everything — Continue to Lab
+                </button>
+              )}
+              {isTabDone('content') && (
+                <p className="mt-4 flex items-center gap-2 text-brand-green-600 text-sm font-medium"><CheckCircle className="w-4 h-4" /> Content complete</p>
+              )}
+            </div>
+          )}
+
+          {/* ── LAB TAB ── */}
+          {activeTab === 'lab' && (
+            <div>
+              {LAB_MODULES.includes(modId) ? (
+                <div className="space-y-6">
+                  <CondenserDiagram mode="explore" />
+                  <TroubleshootScenario
+                    scenarios={CONDENSER_SCENARIOS}
+                    equipmentLabel="Residential Condenser Unit"
+                    onComplete={(result: { correct: boolean }) => { if (result.correct) completeTab('lab'); }}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-bold text-slate-900">Hands-On Lab</h2>
+
+                  {/* Lab lessons */}
+                  {mod.lessons.filter((l) => l.type === 'lab').map((l, i) => (
+                    <div key={i} className="bg-white border border-slate-200 rounded-lg p-5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FlaskConical className="w-5 h-5 text-brand-green-600" />
+                        <h3 className="font-semibold text-slate-800">{l.title}</h3>
+                      </div>
+                      <p className="text-sm text-slate-600">{l.description}</p>
+                    </div>
+                  ))}
+
+                  {/* Interactive diagram labs (quiz mode) */}
+                  {(() => {
+                    const diagrams = getModuleDiagrams(modId);
+                    const quizDiagrams = diagrams.filter((d) => d.hasInteractive && DIAGRAM_COMPONENTS[d.id]);
+                    if (quizDiagrams.length === 0) return null;
+                    return (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-slate-900">Interactive Diagram Lab</h3>
+                        <p className="text-sm text-slate-600">
+                          Identify the components in each diagram. Click on each part to reveal its name and function.
+                        </p>
+                        {quizDiagrams.map((d) => {
+                          // Render quiz-mode versions of diagrams
+                          const quizComponents: Record<string, React.ReactNode> = {
+                            'hvac-system-overview': <HVACSystemOverview mode="quiz" />,
+                            'refrigeration-cycle': <RefrigerationCycleDiagram mode="quiz" />,
+                            'condenser-breakdown': <CondenserBreakdownDiagram mode="quiz" />,
+                            'furnace-breakdown': <FurnaceBreakdownDiagram mode="quiz" />,
+                            'thermostat-wiring': <ThermostatWiringDiagram mode="quiz" />,
+                            'control-circuit': <ElectricalCircuitDiagram mode="quiz" />,
+                            'duct-distribution': <DuctDistributionDiagram mode="quiz" />,
+                            'troubleshooting-flowchart': <TroubleshootingFlowchart mode="guided" />,
+                          };
+                          return quizComponents[d.id] ? <div key={d.id}>{quizComponents[d.id]}</div> : null;
+                        })}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Service call scenarios */}
+                  {(() => {
+                    const scenarios = getModuleScenarios(modId);
+                    if (scenarios.length === 0) return null;
+                    return (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-slate-900">Service Call Scenarios</h3>
+                        <p className="text-sm text-slate-600">
+                          Work through real diagnostic scenarios. Follow the steps a technician would take on an actual service call.
+                        </p>
+                        {scenarios.map((scenario) => (
+                          <ServiceCallCard key={scenario.id} scenario={scenario} />
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  {mod.lessons.filter((l) => l.type === 'lab').length === 0 &&
+                   getModuleDiagrams(modId).filter((d) => d.hasInteractive).length === 0 &&
+                   getModuleScenarios(modId).length === 0 && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+                      <FlaskConical className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                      <p className="text-slate-500">This module&apos;s lab is completed during OJT (on-the-job training).</p>
+                    </div>
+                  )}
+                  {!isTabDone('lab') && (
+                    <button onClick={() => completeTab('lab')} className="mt-4 w-full py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition">
+                      Mark Lab Complete — Continue to Quiz
+                    </button>
+                  )}
+                </div>
+              )}
+              {isTabDone('lab') && (
+                <p className="mt-4 flex items-center gap-2 text-brand-green-600 text-sm font-medium"><CheckCircle className="w-4 h-4" /> Lab complete</p>
+              )}
+            </div>
+          )}
+
+          {/* ── QUIZ TAB ── */}
+          {activeTab === 'quiz' && (
+            <div>
+              <PostVideoQuiz
+                questions={HVAC_QUIZ_BANKS[modId] || HVAC_QUIZ_BANKS['hvac-05']}
+                passingScore={80}
+                videoWatchGateMet={true}
+                onComplete={(score: number, passed: boolean) => { if (passed) completeTab('quiz'); }}
+                onUnlock={() => completeTab('quiz')}
+              />
+              {isTabDone('quiz') && (
+                <p className="mt-4 flex items-center gap-2 text-brand-green-600 text-sm font-medium"><CheckCircle className="w-4 h-4" /> Quiz passed</p>
+              )}
+            </div>
+          )}
+
+          {/* Module nav */}
+          <div className="flex items-center justify-between border-t border-slate-200 pt-6 pb-12 mt-8">
             <button
-              onClick={() => currentLessonIndex > 0 && goTo(currentLessonIndex - 1)}
-              disabled={currentLessonIndex === 0}
+              onClick={() => currentModuleIndex > 0 && goToModule(currentModuleIndex - 1)}
+              disabled={currentModuleIndex === 0}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
-                currentLessonIndex === 0
-                  ? 'text-slate-300 cursor-not-allowed'
-                  : 'text-slate-700 hover:bg-slate-100'
+                currentModuleIndex === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <ChevronLeft className="w-5 h-5" />
-              Previous
+              <ChevronLeft className="w-5 h-5" /> Previous Module
             </button>
-            <span className="text-sm text-slate-400">
-              {currentLessonIndex + 1} / {allLessons.length}
-            </span>
             <button
-              onClick={() => currentLessonIndex < allLessons.length - 1 && goTo(currentLessonIndex + 1)}
-              disabled={currentLessonIndex === allLessons.length - 1}
+              onClick={() => allTabsDone && currentModuleIndex < course.modules.length - 1 && goToModule(currentModuleIndex + 1)}
+              disabled={!allTabsDone || currentModuleIndex === course.modules.length - 1}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
-                currentLessonIndex === allLessons.length - 1
+                !allTabsDone || currentModuleIndex === course.modules.length - 1
                   ? 'text-slate-300 cursor-not-allowed'
                   : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
               }`}
             >
-              Next
-              <ChevronRight className="w-5 h-5" />
+              {!allTabsDone ? <><Lock className="w-4 h-4" /> Complete All Tabs</> : <>Next Module <ChevronRight className="w-5 h-5" /></>}
             </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

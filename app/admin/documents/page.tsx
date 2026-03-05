@@ -35,7 +35,10 @@ export default async function DocumentsPage() {
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li className="text-gray-900 font-medium">Documents</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">Document Center</h1><p className="text-gray-600 mt-2">{count || 0} documents</p></div>
-            <Link href="/admin/documents/upload" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Upload Document</Link>
+            <div className="flex gap-3">
+              <Link href="/admin/documents/templates" className="bg-white text-brand-blue-600 border border-brand-blue-600 px-4 py-2 rounded-lg hover:bg-brand-blue-50 font-medium">Templates</Link>
+              <Link href="/admin/documents/upload" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Upload Document</Link>
+            </div>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">

@@ -20,6 +20,16 @@ import {
   SkipForward,
 } from 'lucide-react';
 
+/* Checkpoint types — exported for callers like /preview/video-quiz */
+export type CheckpointType = 'quiz' | 'hotspot' | 'scenario' | 'reflection' | 'key-concept';
+interface CheckpointBase { type: CheckpointType; timestamp: number; }
+export interface CheckpointQuiz extends CheckpointBase { type: 'quiz'; question: string; options: string[]; answer: number; explanation?: string; }
+export interface CheckpointHotspot extends CheckpointBase { type: 'hotspot'; prompt: string; areas: { label: string; correct: boolean; info: string }[]; }
+export interface CheckpointScenario extends CheckpointBase { type: 'scenario'; situation: string; choices: { text: string; feedback: string; correct: boolean }[]; }
+export interface CheckpointReflection extends CheckpointBase { type: 'reflection'; prompt: string; minChars?: number; }
+export interface CheckpointKeyConcept extends CheckpointBase { type: 'key-concept'; concept: string; bullets?: string[]; }
+export type Checkpoint = CheckpointQuiz | CheckpointHotspot | CheckpointScenario | CheckpointReflection | CheckpointKeyConcept;
+
 interface VideoQuiz {
   id: string;
   timestamp: number; // seconds
@@ -45,6 +55,7 @@ interface TranscriptSegment {
 interface InteractiveVideoPlayerProps {
   videoUrl: string;
   title: string;
+  checkpoints?: Checkpoint[];
   quizzes?: VideoQuiz[];
   transcript?: TranscriptSegment[];
   onProgress?: (progress: number) => void;
@@ -54,6 +65,7 @@ interface InteractiveVideoPlayerProps {
 export default function InteractiveVideoPlayer({
   videoUrl,
   title,
+  checkpoints: _checkpoints,
   quizzes = [],
   transcript = [],
   onProgress,

@@ -110,6 +110,8 @@ core.*
 !app/store/demo/core/
 
 # Temporary logs and outputs (cleanup)
+output/
+public/videos/*.mp4
 *.log
 *-summary.txt
 check-result.json

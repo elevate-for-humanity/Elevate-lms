@@ -85,7 +85,6 @@ function LessonDrawer({ module, index, done, onClose }: {
         {/* Header image */}
         <div className="relative h-52">
           <Image src={MODULE_PHOTO[index] || MODULE_PHOTO[0]} alt={module.title} fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/90 via-brand-blue-900/40 to-transparent" />
           <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition shadow-lg">
             <X className="w-4 h-4" />
           </button>
@@ -466,7 +465,6 @@ export default function HvacCourseHome({
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
                     <div className="absolute top-3 left-3 px-2.5 py-1 bg-white text-brand-blue-800 text-[11px] font-bold rounded-lg shadow">
                       {mod.weekAssignment ? `Week ${mod.weekAssignment.week}` : `Module ${i + 1}`}

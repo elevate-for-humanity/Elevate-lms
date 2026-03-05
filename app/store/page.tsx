@@ -141,7 +141,6 @@ export default function StorePage() {
               <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition">
                 <div className="relative aspect-video">
                   <Image src={d.img} alt={d.label} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                 </div>
                 <div className="p-4">
                   <h3 className="text-white font-bold mb-1">{d.label}</h3>

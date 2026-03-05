@@ -25,7 +25,6 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       <section className="relative">
         <div className="relative h-[320px] sm:h-[400px] lg:h-[480px]">
           <Image src="/images/pages/barber-hero-main.jpg" alt="Barber cutting hair in a professional barbershop" fill className="object-cover" priority sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         <div className="max-w-6xl mx-auto px-4 -mt-28 relative z-10 pb-8">
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 sm:p-8">

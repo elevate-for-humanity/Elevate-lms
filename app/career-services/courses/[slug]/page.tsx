@@ -154,7 +154,7 @@ export default async function CourseDetailPage({
                   height={400}
                   className="w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition">
                     <Play className="w-8 h-8 text-brand-blue-600 ml-1" fill="currentColor" />
                   </div>

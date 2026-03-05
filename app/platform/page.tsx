@@ -72,7 +72,7 @@ export default function PlatformPage() {
       {/* ===== VIDEO HERO ===== */}
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <ProgramHeroBanner videoSrc="/videos/lms-learning.mp4" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10 flex items-center">
+        <div className="absolute inset-0 z-10 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
             <p className="text-sm uppercase tracking-wider text-white/70 mb-3">Elevate for Humanity</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 max-w-3xl">
@@ -162,7 +162,6 @@ export default function PlatformPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{a.title}</h3>
                   </div>
@@ -202,7 +201,6 @@ export default function PlatformPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{m.title}</h3>
                   </div>
@@ -252,7 +250,6 @@ export default function PlatformPage() {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-brand-red-600/90" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Operate on the Platform?

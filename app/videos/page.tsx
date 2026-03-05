@@ -94,7 +94,7 @@ export default async function VideosPage() {
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           className="object-cover group-hover:scale-105 transition"
                         />
-                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition">
                             <Play className="w-8 h-8 text-brand-orange-600 ml-1" />
                           </div>

@@ -184,7 +184,6 @@ export default async function CourseDetailPage({
             className="object-cover opacity-30"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">

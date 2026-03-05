@@ -53,7 +53,6 @@ export default function EmployersPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-slate-900/50" />
         <div className="relative max-w-6xl mx-auto px-4 py-12 text-white">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 max-w-3xl leading-tight">
             The Government Will Pay You to Train Your Next Hire

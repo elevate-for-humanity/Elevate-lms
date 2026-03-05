@@ -103,7 +103,6 @@ export default function AccreditationPage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/35 to-transparent" />
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-5xl mx-auto px-4">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">

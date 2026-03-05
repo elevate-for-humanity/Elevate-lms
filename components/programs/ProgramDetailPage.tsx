@@ -49,7 +49,6 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         </div>
 
         <div className="max-w-6xl mx-auto px-4 -mt-24 relative z-10 pb-8">

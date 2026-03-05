@@ -72,7 +72,6 @@ export default async function ForEmployersPage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4 max-w-4xl">
               <h1 className="text-4xl md:text-6xl font-black text-white mb-4">

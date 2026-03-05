@@ -223,7 +223,6 @@ export default async function LearnerOnboardingPage() {
             className="object-cover opacity-25"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
         </div>
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">

@@ -81,7 +81,6 @@ export default function IPLAExamSignup() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-slate-900/20" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-3 mb-2">

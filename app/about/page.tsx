@@ -232,6 +232,38 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Institutional Governance */}
+      <section className="py-12 bg-white border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Centralized Workforce Development &amp; Apprenticeship Sponsor</h2>
+          <p className="text-sm text-gray-700 mb-4">
+            Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
+          </p>
+          <p className="text-sm text-gray-600 mb-6">
+            Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Related Technical Instruction</h3>
+              <p className="text-xs text-gray-600">Delivered by the institute through structured curriculum and learning systems.</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">On-the-Job Training</h3>
+              <p className="text-xs text-gray-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Oversight &amp; Compliance</h3>
+              <p className="text-xs text-gray-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <Link href="/governance" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+              View Governance &amp; Program Structure <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Who We Serve — with images */}
       <section className="py-12 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">

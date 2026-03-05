@@ -124,7 +124,6 @@ export default function CompetencyVerificationPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
             <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">

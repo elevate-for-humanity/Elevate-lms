@@ -116,7 +116,6 @@ export default function ScheduleConsultationPage() {
       {/* Hero */}
       <div className="relative h-40 sm:h-48 overflow-hidden">
         <Image src="/images/pages/schedule-consultation-page-1.jpg" alt="Schedule enrollment consultation" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 to-slate-900/90" />
         <div className="absolute inset-0 flex flex-col justify-end p-6 max-w-3xl mx-auto">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Schedule a Consultation</h1>
           <p className="text-slate-300 text-sm mt-1">Meet with our enrollment team to discuss your training goals</p>

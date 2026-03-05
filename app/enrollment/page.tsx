@@ -77,7 +77,6 @@ export default async function EnrollmentPage() {
               <Link key={p.name} href={p.href} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group">
                 <div className="relative h-40">
                   <Image src={p.image} alt={p.name} fill className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{p.name}</h3>
                   </div>

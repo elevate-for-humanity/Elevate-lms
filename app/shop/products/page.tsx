@@ -142,7 +142,7 @@ export default async function ProductsPage() {
                 <div className="h-40 bg-gray-100 flex items-center justify-center relative">
                   <Package className="w-16 h-16 text-gray-300" />
                   {!product.in_stock && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <span className="px-3 py-1 bg-white text-gray-900 rounded-full text-sm font-medium">
                         Out of Stock
                       </span>

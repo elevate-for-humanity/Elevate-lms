@@ -31,7 +31,6 @@ export default async function EnrollmentPWAPage() {
       {/* Hero */}
       <div className="relative h-48 sm:h-56">
         <Image src="/images/pages/demo-page-3.jpg" alt="Student enrollment" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-orange-900/80 to-orange-900/95" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Enrollment Center</h1>

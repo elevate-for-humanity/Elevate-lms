@@ -84,7 +84,7 @@ export default async function RiseFoundationPage() {
           sizes="100vw"
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+        <div className="absolute inset-0" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
             <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
@@ -164,7 +164,6 @@ export default async function RiseFoundationPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4">
                   <div className="flex items-center gap-2 text-white">
                     <Heart className="w-5 h-5" />
@@ -218,7 +217,6 @@ export default async function RiseFoundationPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4">
                   <div className="flex items-center gap-2 text-white">
                     <Sparkles className="w-5 h-5" />
@@ -274,7 +272,6 @@ export default async function RiseFoundationPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4">
                   <div className="flex items-center gap-2 text-white">
                     <Users className="w-5 h-5" />

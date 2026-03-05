@@ -101,23 +101,25 @@ export default function HomePage() {
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
             Choose your path below. Each option takes you directly to the information you need — everything starts online.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Training may be fully funded for eligible participants. Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom' },
+              { href: '/funding', label: 'I need funding', desc: 'Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting' },
+              { href: '/store', label: 'I run a school', desc: 'License the platform.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office' },
             ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
+                className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <Image src={item.image} alt={item.alt} width={600} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="p-5 flex flex-col flex-1">
-                  <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
-                  <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
-                  <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
+                <div className="relative h-24 sm:h-32">
+                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+                <div className="p-3 sm:p-4">
+                  <span className="font-bold text-sm sm:text-base text-slate-900 block mb-0.5">{item.label}</span>
+                  <span className="text-xs text-slate-500 block mb-2">{item.desc}</span>
+                  <span className="text-brand-red-600 font-semibold text-xs group-hover:underline">
                     {item.cta} →
                   </span>
                 </div>
@@ -134,52 +136,41 @@ export default function HomePage() {
       <InView animation="fade-up">
       <section aria-label="Three pillars" className="py-10 sm:py-14">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Our Model</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Three Pillars of Workforce Readiness</h2>
-            <p className="text-lg text-slate-700 max-w-3xl mx-auto">Every credential pathway at Elevate is built on three pillars — ensuring graduates are trained, certified, and employed.</p>
+            <p className="text-base text-slate-700 max-w-3xl mx-auto">Every credential pathway is built on three pillars — trained, certified, and employed.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-5">
             {[
               {
                 title: 'Industry-Aligned Training',
-                desc: 'Programs designed around employer hiring requirements — not academic theory. Curriculum maps directly to the credentials employers list in job postings.',
-                items: ['Healthcare: CNA, Medical Assistant, Phlebotomy', 'Skilled Trades: HVAC, Electrical, Welding, CDL', 'Technology: IT Support, Cybersecurity', 'Finance & Accounting: Tax Preparation, Bookkeeping, Payroll'],
+                desc: 'Healthcare, Skilled Trades, CDL, Technology, and Barbering — each mapped to employer hiring requirements and national credentials.',
                 href: '/programs',
-                cta: 'View Credential Pathways',
+                cta: 'View Programs',
                 image: '/images/hp/choose-program.jpg',
               },
               {
                 title: 'National Credential Validation',
-                desc: 'Every program culminates in one or more nationally recognized certifications — proctored on-site at our authorized testing center.',
-                items: ['EPA 608 Universal (Mainstream Engineering)', 'OSHA 10/30-Hour (DOL card)', 'ACT WorkKeys / NCRC', 'Certiport (IC3, MOS, Entrepreneurship)', 'NRF RISE Up (Retail Industry)', 'CPR/First Aid (AHA/HSI)'],
+                desc: 'EPA 608, OSHA 10/30, WorkKeys NCRC, Certiport, NRF RISE Up, and CPR/First Aid — proctored on-site at our authorized testing center.',
                 href: '/credentials',
-                cta: 'View All Credentials',
+                cta: 'View Credentials',
                 image: '/images/hp/complete-training.jpg',
               },
               {
-                title: 'Employer Placement Partnerships',
-                desc: 'Direct hiring pipelines with Indiana employers. Graduates enter the workforce with credentials, background checks, and career services support.',
-                items: ['Pre-screened, credentialed candidates', 'WOTC tax credits ($2,400–$9,600/hire)', 'OJT wage reimbursement (50–75%)', 'Registered Apprenticeship pathways'],
+                title: 'Employer Placement',
+                desc: 'Direct hiring pipelines with Indiana employers. WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship pathways.',
                 href: '/employer',
-                cta: 'Employer Partnerships',
+                cta: 'Employer Info',
                 image: '/images/hp/candidates.jpg',
               },
             ].map((pillar) => (
               <div key={pillar.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
                 <Image src={pillar.image} alt={pillar.title} width={600} height={400} sizes="(max-width: 768px) 100vw, 33vw" className="w-full aspect-[3/2] object-cover" />
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{pillar.title}</h3>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900 mb-1.5">{pillar.title}</h3>
                   <p className="text-slate-600 text-sm mb-4">{pillar.desc}</p>
-                  <ul className="space-y-1.5 mb-5">
-                    {pillar.items.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                        <span className="text-brand-green-600 mt-0.5 flex-shrink-0">✓</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
                   <Link href={pillar.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
                     {pillar.cta} →
                   </Link>
@@ -201,27 +192,28 @@ export default function HomePage() {
             <p className="text-lg text-slate-700 max-w-3xl mx-auto">Each program leads to nationally recognized certifications. Training may be fully funded for eligible participants through WIOA, WRG, and JRI.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {PROGRAMS.filter(p => p.etplApproved).slice(0, 9).map((program) => (
               <Link
                 key={program.slug}
                 href={`/programs/${program.slug}`}
-                className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden"
+                className="flex flex-row sm:flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden"
               >
-                <Image
-                  src={program.image}
-                  alt={program.name}
-                  width={600}
-                  height={400}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-bold text-lg text-slate-900 mb-1 group-hover:text-brand-red-600 transition-colors">{program.name}</h3>
-                  <p className="text-sm text-slate-600 mb-3 flex-1 line-clamp-2">{program.blurb}</p>
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-                    <span className="text-xs font-semibold text-slate-500">{program.duration}</span>
-                    <span className="text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2.5 py-1 rounded-full">{program.funding}</span>
+                <div className="relative w-28 sm:w-full h-auto sm:h-40 flex-shrink-0">
+                  <Image
+                    src={program.image}
+                    alt={program.name}
+                    fill
+                    sizes="(max-width: 640px) 112px, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-3 sm:p-4 flex flex-col flex-1 min-w-0">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-0.5 group-hover:text-brand-red-600 transition-colors">{program.name}</h3>
+                  <p className="text-xs text-slate-500 mb-2 line-clamp-2 hidden sm:block">{program.blurb}</p>
+                  <div className="flex items-center gap-2 mt-auto">
+                    <span className="text-[10px] sm:text-xs font-semibold text-slate-500">{program.duration}</span>
+                    <span className="text-[10px] sm:text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2 py-0.5 rounded-full">{program.funding}</span>
                   </div>
                 </div>
               </Link>
@@ -240,40 +232,7 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== INSTITUTIONAL GOVERNANCE ===== */}
-      <InView animation="fade-up">
-      <section aria-label="About the institute" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">About the Institute</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">A Centralized Workforce Development &amp; Apprenticeship Sponsor</h2>
-          <p className="text-lg text-slate-700 leading-relaxed mb-6">
-            Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
-          </p>
-          <p className="text-base text-slate-600 leading-relaxed mb-6">
-            Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-6 mt-8">
-            <div className="bg-white rounded-lg p-5 border border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-2">Related Technical Instruction</h3>
-              <p className="text-sm text-slate-600">Delivered by the institute through structured curriculum and learning systems.</p>
-            </div>
-            <div className="bg-white rounded-lg p-5 border border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-2">On-the-Job Training</h3>
-              <p className="text-sm text-slate-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
-            </div>
-            <div className="bg-white rounded-lg p-5 border border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-2">Oversight &amp; Compliance</h3>
-              <p className="text-sm text-slate-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
-            </div>
-          </div>
-          <div className="mt-6">
-            <Link href="/governance" className="text-brand-red-600 font-semibold hover:underline text-sm">
-              View Governance &amp; Program Structure →
-            </Link>
-          </div>
-        </div>
-      </section>
-      </InView>
+
 
       {/* ===== NATIONAL CREDENTIAL VALIDATION ===== */}
       <InView animation="fade-up">
@@ -332,7 +291,7 @@ export default function HomePage() {
             {[
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
-              { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.jpg' },
+              { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/hp/funding.jpg' },
               { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
@@ -370,37 +329,28 @@ export default function HomePage() {
       <InView animation="fade-up">
       <section aria-label="Employer partnerships" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Credentialed Graduates</h2>
-          <p className="text-lg text-slate-700 mb-8">
-            Every graduate holds nationally recognized credentials, has completed hands-on training, and is workforce-ready. Access WOTC tax credits and OJT wage reimbursement.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
-            {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/hp/candidates.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/hp/wotc.jpg' },
-              { label: 'OJT Reimbursement', desc: 'On-the-Job Training through WorkOne reimburses 50–75% of a new hire\'s wages during the training period per local board policy. Formal OJT contract and training plan required.', href: '/ojt-and-funding', image: '/images/hp/ojt.jpg' },
-              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/hp/post-jobs.jpg' },
-            ].map((item) => (
-              <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} sizes="(max-width: 640px) 100vw, 50vw" className="w-full aspect-[3/2] object-cover" />
-                <div className="p-5">
-                  <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
-                  <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
-                  <Link href={item.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                    Learn More
-                  </Link>
-                </div>
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Credentialed Graduates</h2>
+              <p className="text-slate-700 mb-4">
+                Every graduate holds nationally recognized credentials, has completed hands-on training, and is workforce-ready. Access <Link href="/employer" className="text-brand-red-600 font-semibold underline">WOTC tax credits</Link> ($2,400–$9,600 per qualifying hire) and <Link href="/ojt-and-funding" className="text-brand-red-600 font-semibold underline">OJT wage reimbursement</Link> (50–75% of wages during training).
+              </p>
+              <p className="text-slate-700 mb-6">
+                Post open positions on our <Link href="/employer" className="text-brand-red-600 font-semibold underline">job board</Link> and our career services team will match you with pre-screened, credentialed candidates.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center text-sm">
+                  Employer Portal
+                </Link>
+                <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center text-sm">
+                  Become a Partner
+                </Link>
               </div>
-            ))}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
-              Employer Portal
-            </Link>
-            <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
-              Become a Partner
-            </Link>
+            </div>
+            <div className="relative h-64 sm:h-80 rounded-xl overflow-hidden">
+              <Image src="/images/hp/candidates.jpg" alt="Credentialed graduates ready for employment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+            </div>
           </div>
         </div>
       </section>
@@ -507,29 +457,6 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== EMPLOYMENT SUPPORT ===== */}
-      <InView animation="fade-up">
-      <section aria-label="Employment support" className="py-10 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-900">One-on-one employment support</h2>
-            <p className="mt-3 text-slate-700">
-              In addition to training, we provide individualized, one-on-one support to help participants prepare for and pursue
-              competitive community employment, including job readiness, applications, interview prep, and employer connections.
-            </p>
-            <div className="mt-4">
-              <Link
-                href="/employment-support"
-                className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-              >
-                Learn about support services
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-      </InView>
-
       {/* ===== CTA ===== */}
       <InView animation="fade-up">
       <section aria-label="Get started" className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
@@ -555,7 +482,7 @@ export default function HomePage() {
       <section className="py-8 bg-slate-50 border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-6">
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
             {[
               { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
               { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
@@ -564,20 +491,6 @@ export default function HomePage() {
             ].map((logo) => (
               <Image key={logo.alt} src={logo.src} alt={logo.alt} width={100} height={40} className="object-contain h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             ))}
-          </div>
-          <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
-            {[
-              'Workforce Credential Institute', 'ETPL Listed', 'WIOA Provider', 'Workforce Ready Grant',
-              'JRI Approved', 'Certiport Testing Center', 'WorkKeys Assessment Site', 'EPA 608 Testing Site',
-              'OSHA 10/30', 'HSI Training Center', 'DOL Apprenticeship Sponsor', 'IRS Enrolled Agent',
-            ].map((badge) => (
-              <span key={badge} className="inline-block bg-white border border-slate-200 text-slate-600 text-[11px] font-medium px-2.5 py-1 rounded-full">
-                {badge}
-              </span>
-            ))}
-            <Link href="/credentials" className="inline-block text-brand-blue-600 text-[11px] font-semibold px-2.5 py-1 hover:underline">
-              View all credentials →
-            </Link>
           </div>
         </div>
       </section>

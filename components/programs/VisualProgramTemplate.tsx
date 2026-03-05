@@ -110,7 +110,6 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
                     sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <p className="absolute bottom-3 left-3 right-3 text-white text-sm font-medium">
                     {item}
                   </p>
@@ -221,7 +220,6 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -282,7 +280,6 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           sizes="(max-width: 640px) 50vw, 25vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
           {step}
         </div>

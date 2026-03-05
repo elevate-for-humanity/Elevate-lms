@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,8 +13,7 @@ import { InstitutionalHeader } from '@/components/documents/InstitutionalHeader'
 
 const compensationModels = [
   { value: 'hourly', label: 'Hourly Wage' },
-  { value: 'commission', label: 'Commission' },
-  { value: 'hybrid', label: 'Hybrid (Wage + Commission)' },
+  { value: 'hybrid', label: 'Hybrid (Hourly Base + Commission)' },
 ];
 
 const workersCompOptions = [
@@ -82,6 +81,65 @@ export default function BarbershopPartnerApplyPage() {
     honeypot: '',
   });
 
+  // Signature canvas
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSigned, setHasSigned] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+  }, []);
+
+  const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    if ('touches' in e) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
+  }, []);
+
+  const startDrawing = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  }, [getPos]);
+
+  const draw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const { x, y } = getPos(e);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    setHasSigned(true);
+  }, [isDrawing, getPos]);
+
+  const stopDrawing = useCallback(() => setIsDrawing(false), []);
+
+  const clearSignature = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSigned(false);
+  }, []);
+
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -95,14 +153,20 @@ export default function BarbershopPartnerApplyPage() {
       return;
     }
 
+    if (!hasSigned) {
+      setError('Please provide your signature before submitting.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
+      const signatureData = canvasRef.current?.toDataURL('image/png') || '';
       const response = await fetch('/api/partners/barbershop-apprenticeship/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, signatureData }),
       });
 
       const result = await response.json();
@@ -282,7 +346,7 @@ export default function BarbershopPartnerApplyPage() {
                   </label>
                   <p className="text-xs text-gray-500 mb-2">
                     DOL Registered Apprenticeships require the apprentice to be an employee of the host shop,
-                    regardless of compensation model (hourly, commission, or hybrid).
+                    regardless of compensation model (hourly or hybrid). Sole commission is not permitted.
                   </p>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
@@ -404,6 +468,38 @@ export default function BarbershopPartnerApplyPage() {
                   </label>
                 </div>
               </div>
+            </div>
+
+            {/* Signature */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Applicant Signature *</h2>
+              <p className="text-sm text-gray-500 mb-4">Sign below to confirm that the information provided is accurate and complete.</p>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white">
+                <canvas
+                  ref={canvasRef}
+                  className="w-full h-32 cursor-crosshair touch-none"
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawing}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDrawing}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                {hasSigned ? (
+                  <p className="text-sm text-green-600 font-medium">Signature captured</p>
+                ) : (
+                  <p className="text-sm text-gray-400">Draw your signature above</p>
+                )}
+                <button type="button" onClick={clearSignature} className="text-sm text-gray-500 hover:text-gray-700 underline">
+                  Clear
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                By signing, you agree that this electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
+              </p>
             </div>
 
             {/* Honeypot */}

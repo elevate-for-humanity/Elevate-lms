@@ -30,7 +30,7 @@ const MOU_SECTIONS = [
   },
   {
     title: '5. Compensation',
-    content: 'Apprentices are paid employees. Compensation options: Hourly ($10.00–$15.00/hr recommended), Commission (30%–50% of services performed), or Hybrid ($8.00–$10.00/hr base + 15%–25% commission). All models must meet Indiana minimum wage ($7.25/hr). Commission models must average at least minimum wage per pay period. Apprentices retain 100% of tips.',
+    content: 'Apprentices are paid employees and cannot be paid on a sole commission basis. Compensation options: Hourly ($10.00–$15.00/hr recommended) or Hybrid ($8.00–$10.00/hr base + 15%–25% commission). All models must meet Indiana minimum wage ($7.25/hr). Progressive wage increases are required as the apprentice gains skills and hours. Apprentices retain 100% of tips.',
   },
   {
     title: '6. Term & Termination',
@@ -366,7 +366,6 @@ export default function SignMOUPage() {
               >
                 <option value="">Select model</option>
                 <option value="hourly">Hourly Wage ($10.00–$15.00/hr recommended)</option>
-                <option value="commission">Commission (30%–50% of services)</option>
                 <option value="hybrid">Hybrid ($8–$10/hr base + 15%–25% commission)</option>
               </select>
             </div>

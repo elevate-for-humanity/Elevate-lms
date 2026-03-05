@@ -33,6 +33,7 @@ interface ApplicationData {
   mouAcknowledged: boolean;
   consentAcknowledged: boolean;
   notes?: string;
+  signatureData?: string;
   honeypot?: string;
 }
 
@@ -211,6 +212,7 @@ async function _POST(req: Request) {
         mou_acknowledged: body.mouAcknowledged,
         consent_acknowledged: body.consentAcknowledged,
         notes: body.notes?.trim() || null,
+        signature_data: body.signatureData || null,
         source_url: req.headers.get('referer') || null,
         user_agent: req.headers.get('user-agent') || null,
         ip_hash: hashIP(identifier),

@@ -1,11 +1,7 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import {
   Shield,
   GraduationCap,
@@ -27,11 +23,82 @@ export const metadata: Metadata = {
 
 /* ── Credential Partner Registry Data ── */
 
-export default async function CredentialPartnersPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
-const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
+const CREDENTIAL_PARTNERS = [
+  {
+    program: 'Phlebotomy Technician',
+    partnerType: 'National Certifying Body',
+    licensingBody: 'National Healthcareer Association (NHA)',
+    programAssignment: 'Certified Phlebotomy Technician (CPT) exam',
+    mouStatus: 'MOU Required — in process',
+    credentialIssued: 'CPT — Certified Phlebotomy Technician',
+    credentialIssuer: 'NHA (National Healthcareer Association)',
+    licenseStatus: 'Self-Pay · Not ETPL Listed',
+    instructorReq: 'Phlebotomist with 2+ years clinical experience; CPT or equivalent credential',
+    notes: 'Program is not currently on the WorkOne/ETPL funded list. Self-pay with BNPL options. NHA exam fee ~$135. Students register directly with NHA for exam.',
+  },
+  {
+    program: 'Medical Assistant',
+    partnerType: 'National Certifying Body',
+    licensingBody: 'National Healthcareer Association (NHA)',
+    programAssignment: 'Certified Clinical Medical Assistant (CCMA) exam',
+    mouStatus: 'Active',
+    credentialIssued: 'CCMA — Certified Clinical Medical Assistant',
+    credentialIssuer: 'NHA (National Healthcareer Association)',
+    licenseStatus: 'WIOA / WRG Eligible',
+    instructorReq: 'Credentialed Medical Assistant or RN with clinical teaching experience',
+    notes: 'NHA exam fee ~$155. Students register through Elevate enrollment process.',
+  },
+  {
+    program: 'CNA — Certified Nursing Assistant',
+    partnerType: 'State Licensing Board',
+    licensingBody: 'Indiana State Department of Health (ISDH)',
+    programAssignment: 'Indiana CNA Competency Exam (written + skills)',
+    mouStatus: 'Active',
+    credentialIssued: 'Indiana CNA Certification',
+    credentialIssuer: 'Indiana State Department of Health',
+    licenseStatus: 'WIOA / WRG Eligible',
+    instructorReq: 'RN with 2+ years nursing experience; state-approved CNA instructor',
+    notes: 'Exam administered by Pearson VUE. Fee ~$115. Clinical hours completed at approved healthcare facility.',
+  },
+  {
+    program: 'Barber Apprenticeship',
+    partnerType: 'State Licensing Board',
+    licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
+    programAssignment: 'Indiana Barber License — PSI exam',
+    mouStatus: 'Active',
+    credentialIssued: 'Indiana Barber License',
+    credentialIssuer: 'Indiana IPLA',
+    licenseStatus: 'DOL Registered Apprenticeship',
+    instructorReq: 'Licensed Indiana Barber with 5+ years experience; registered apprenticeship sponsor',
+    notes: 'DOL Registered Apprenticeship. PSI exam fee ~$75. Apprentices earn wages during training.',
+  },
+  {
+    program: 'HVAC / Building Technician',
+    partnerType: 'Federal Certifying Body',
+    licensingBody: 'U.S. Environmental Protection Agency (EPA)',
+    programAssignment: 'EPA 608 Universal Certification',
+    mouStatus: 'Active',
+    credentialIssued: 'EPA 608 Universal Certificate',
+    credentialIssuer: 'EPA-approved testing organization',
+    licenseStatus: 'WIOA / WRG Eligible',
+    instructorReq: 'EPA 608 Universal certified technician with 3+ years field experience',
+    notes: 'EPA 608 exam fee ~$150. NCCER credentials also available for advanced students.',
+  },
+  {
+    program: 'CDL — Commercial Driver License',
+    partnerType: 'State Licensing Agency',
+    licensingBody: 'Indiana Bureau of Motor Vehicles (BMV)',
+    programAssignment: 'Indiana CDL Class A Skills and Knowledge Test',
+    mouStatus: 'Active',
+    credentialIssued: 'Indiana CDL Class A License',
+    credentialIssuer: 'Indiana BMV',
+    licenseStatus: 'WIOA / WRG Eligible',
+    instructorReq: 'CDL-A holder with 3+ years commercial driving; state-approved CDL instructor',
+    notes: 'BMV skills test fee ~$50. DOT physical and drug screen required prior to enrollment.',
+  },
+];
+
+export default function CredentialPartnersPage() {
 
   return (
     <div className="bg-white min-h-screen">
@@ -84,7 +151,7 @@ const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
           {/* Summary Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
             <div className="bg-slate-50 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-brand-blue-600">{CREDENTIAL_PARTNERS.length}</p>
+              <p className="text-2xl font-bold text-brand-blue-600">6</p>
               <p className="text-xs text-gray-600 mt-1">Programs Covered</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-4 text-center">
@@ -96,7 +163,7 @@ const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
               <p className="text-xs text-gray-600 mt-1">State/Federal Approved</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-brand-blue-600">8</p>
+              <p className="text-2xl font-bold text-brand-blue-600">6</p>
               <p className="text-xs text-gray-600 mt-1">Credential Types</p>
             </div>
           </div>

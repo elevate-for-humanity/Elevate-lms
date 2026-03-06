@@ -21,7 +21,7 @@ const testimonials: Testimonial[] = [
     name: "Sarah Martinez",
     title: "Medical Assistant Graduate, 2024",
     rating: 5,
-    image: "/testimonials/sarah.jpg"
+    image: "/images/testimonials-hq/person-1.jpg"
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const testimonials: Testimonial[] = [
     name: "Graduate",
     title: "Barber Graduate, 2023",
     rating: 5,
-    image: "/testimonials/marcus.jpg"
+    image: "/images/testimonials-hq/person-2.jpg"
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const testimonials: Testimonial[] = [
     name: "David Rodriguez",
     title: "Welding Graduate, 2024",
     rating: 5,
-    image: "/testimonials/david.jpg"
+    image: "/images/testimonials-hq/person-3.jpg"
   },
   {
     id: 4,
@@ -45,7 +45,7 @@ const testimonials: Testimonial[] = [
     name: "Jennifer Williams",
     title: "Medical Assistant Graduate, 2023",
     rating: 5,
-    image: "/testimonials/jennifer.jpg"
+    image: "/images/testimonials-hq/person-4.jpg"
   },
   {
     id: 5,
@@ -53,7 +53,7 @@ const testimonials: Testimonial[] = [
     name: "Michael Chen",
     title: "HVAC Graduate, 2024",
     rating: 5,
-    image: "/testimonials/michael.jpg"
+    image: "/images/testimonials-hq/person-5.jpg"
   }
 ];
 

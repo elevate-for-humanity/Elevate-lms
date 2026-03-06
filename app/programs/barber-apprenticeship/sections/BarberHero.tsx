@@ -21,6 +21,19 @@ export function BarberHero() {
         />
       </section>
 
+      {/* Waitlist Notice Banner */}
+      <section className="bg-amber-50 border-y border-amber-300">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+            <span className="font-bold text-amber-900 text-sm uppercase tracking-wide">Waitlist Open</span>
+          </div>
+          <p className="text-amber-800 text-sm leading-snug">
+            Classes are scheduled to begin <strong>late May – early June 2025</strong>. We are currently gathering barbershops to participate as placement sites. You are on the waitlist — we will be in contact with next steps as soon as placements are confirmed.
+          </p>
+        </div>
+      </section>
+
       {/* Title + CTAs below hero */}
       <section className="py-8 bg-white border-b">
         <div className="max-w-5xl mx-auto px-4">
@@ -31,7 +44,7 @@ export function BarberHero() {
               Learn More <ArrowRight className="w-4 h-4" />
             </a>
             <Link href="/inquiry?subject=Barber+Apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-              Apply Now <ArrowRight className="w-4 h-4" />
+              Join Waitlist <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

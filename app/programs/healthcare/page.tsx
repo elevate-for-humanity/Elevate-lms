@@ -31,7 +31,7 @@ const config: ProgramPageConfig = {
   voiceoverSrc: '/audio/heroes/healthcare.mp3',
 
   title: 'Healthcare Programs',
-  subtitle: 'Launch a career in healthcare. CNA, Medical Assistant, Phlebotomy, and more — most programs are free with WIOA funding.',
+  subtitle: 'Launch a career in healthcare. CNA and Medical Assistant are free with WIOA funding. Phlebotomy is self-pay with BNPL options available.',
   badge: 'Free with WIOA',
   badgeColor: 'green',
 
@@ -111,9 +111,9 @@ const healthcarePrograms = [
   {
     title: 'Phlebotomy Technician',
     duration: '8–10 weeks',
-    desc: 'Venipuncture, specimen handling, and lab safety. CPT certification included.',
+    desc: 'Venipuncture, specimen handling, and lab safety. NHA CPT certification included. Self-pay — BNPL available. Not currently on WorkOne ETPL funded list.',
     href: '/programs/phlebotomy',
-    image: '/images/pages/comp-highlights-team.jpg',
+    image: '/images/pages/certifications-page-1.jpg',
   },
   {
     title: 'CPR & First Aid',

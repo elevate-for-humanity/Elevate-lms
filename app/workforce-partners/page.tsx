@@ -1,13 +1,9 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Users, MapPin, Phone, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
+import { Phone, ArrowRight, Handshake } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',
   description: 'Partner with Elevate for Humanity to connect job seekers with free career training. WorkOne centers, community organizations, and workforce boards - learn how we work together.',
@@ -16,12 +12,7 @@ export const metadata: Metadata = {
 
 
 
-export default async function WorkforcePartnersPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('programs').select('*').limit(50);
-const partners = (dbRows as any[]) || [];
-const services = (dbRows as any[]) || [];
+export default function WorkforcePartnersPage() {
 
   return (
     <div className="min-h-screen bg-white">
@@ -66,40 +57,48 @@ const services = (dbRows as any[]) || [];
             Elevate for Humanity is an approved training provider on Indiana's Eligible Training Provider List (ETPL). Here's how we partner with workforce organizations.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center">
-                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <service.icon className="w-7 h-7 text-brand-blue-600" />
+            {[
+              { title: 'Participant Referrals', desc: 'WorkOne career advisors refer WIOA-eligible participants directly to our programs using Individual Training Accounts (ITAs).', image: '/images/pages/workforce-board-page-1.jpg' },
+              { title: 'OJT Contracts', desc: 'We coordinate On-the-Job Training contracts with WorkOne Indianapolis for employer wage reimbursement during training.', image: '/images/pages/workforce-board-page-3.jpg' },
+              { title: 'Progress Reporting', desc: 'We submit attendance, credential attainment, and job placement data back to your office on your schedule.', image: '/images/pages/workforce-board-page-5.jpg' },
+              { title: 'Co-Enrollment', desc: 'Students can be co-enrolled in WIOA and other programs simultaneously. We coordinate with case managers to avoid duplication.', image: '/images/pages/workforce-board-page-7.jpg' },
+            ].map((service) => (
+              <div key={service.title} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+                <div className="relative h-36">
+                  <Image src={service.image} alt={service.title} fill sizes="25vw" className="object-cover" />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{service.title}</h3>
-                <p className="text-slate-600 text-sm">{service.desc}</p>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 mb-2">{service.title}</h3>
+                  <p className="text-slate-600 text-sm">{service.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Our Partners */}
+      {/* Partner Types */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-4">Our Partners</h2>
+          <h2 className="text-3xl font-black text-center mb-4">Who We Partner With</h2>
           <p className="text-center text-slate-600 mb-12">Organizations we work with to serve Indiana job seekers</p>
           <div className="grid md:grid-cols-2 gap-8">
-            {partners.map((partner, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
-                <div className="relative h-48">
-                  <Image src={partner.image} alt={partner.name} fill sizes="100vw" className="object-cover" />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-brand-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">{partner.type}</span>
+            {[
+              { type: 'Workforce Board', name: 'WorkOne Indianapolis (Region 5)', desc: 'Our primary workforce board partner. We accept WIOA Adult, Dislocated Worker, and Youth referrals. ITA-funded enrollment processed through INTraining (Location ID: 10004621).', image: '/images/pages/workforce-partners-page-1.jpg' },
+              { type: 'State Agency', name: 'Indiana DWD / ETPL', desc: 'Listed on the Indiana Eligible Training Provider List. Programs approved for WIOA funding statewide. Annual performance data submitted to DWD.', image: '/images/pages/workforce-board-page-2.jpg' },
+              { type: 'Reentry', name: 'JRI & Community Corrections', desc: 'JRI-approved provider. We accept referrals from probation officers, community corrections, and reentry coordinators. Progress reports sent on your schedule.', image: '/images/pages/workforce-board-page-4.jpg' },
+              { type: 'Housing', name: 'Housing Authorities & FSS Programs', desc: 'We accept FSS and Section 3 resident referrals from IHA and other Indiana housing authorities for career training and credential programs.', image: '/images/pages/workforce-board-page-6.jpg' },
+            ].map((partner) => (
+              <div key={partner.name} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex">
+                <div className="relative w-36 flex-shrink-0">
+                  <Image src={partner.image} alt={partner.name} fill sizes="144px" className="object-cover" />
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-brand-blue-600 text-white px-2 py-0.5 rounded text-xs font-bold">{partner.type}</span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{partner.name}</h3>
-                  <p className="text-slate-600 text-sm mb-4">{partner.description}</p>
-                  <div className="flex items-center gap-2 text-slate-500 text-sm">
-                    <MapPin className="w-4 h-4" />
-                    {partner.location}
-                  </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 mb-1">{partner.name}</h3>
+                  <p className="text-slate-600 text-sm">{partner.desc}</p>
                 </div>
               </div>
             ))}

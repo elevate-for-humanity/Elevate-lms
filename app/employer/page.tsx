@@ -45,9 +45,9 @@ export default function EmployerPage() {
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-5">
             {[
               { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/pages/apply-employer-hero.jpg' },
-              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/pages/apply-employer-hero.jpg' },
-              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/pages/apply-employer-hero.jpg' },
-              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/pages/apply-employer-hero.jpg' },
+              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/pages/training-classroom.jpg' },
+              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/pages/about-employer-partners.jpg' },
+              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/pages/employer-page-1.jpg' },
             ].map((item) => (
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 overflow-hidden bg-white border border-slate-200">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[160px] flex-shrink-0 sm:flex-shrink">
@@ -71,10 +71,10 @@ export default function EmployerPage() {
           <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">Grants and tax credits for qualifying hires</p>
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
             {[
-              { title: 'WOTC Tax Credit', amount: '$2,400-$9,600 per hire', desc: 'Federal tax credit: $2,400/hire for TANF, SNAP, ex-felons, long-term unemployed. Up to $9,600 for qualified veterans. 40% of first-year wages (25% if 120-399 hours). We file Form 8850 within the 28-day deadline. Authorized through Dec 31, 2025.', image: '/images/pages/comp-cta-training.jpg', href: '/funding' },
-              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. Through WorkOne Indianapolis, the local workforce board reimburses 50–75% of wages during the training period per local board policy. Formal OJT contract required.', image: '/images/pages/apply-employer-hero.jpg', href: '/ojt-and-funding' },
-              { title: 'WIOA Upskilling', amount: 'Tuition covered', desc: 'Upskill current employees with WIOA-funded training in healthcare, IT, skilled trades, and more.', image: '/images/pages/comp-cta-career.jpg', href: '/wioa-eligibility' },
-              { title: 'Workforce Ready Grant', amount: 'State-funded certifications', desc: 'Indiana covers tuition for high-demand certifications through the WRG program.', image: '/images/pages/comp-cta-training.jpg', href: '/funding' },
+              { title: 'WOTC Tax Credit', amount: '$2,400-$9,600 per hire', desc: 'Federal tax credit: $2,400/hire for TANF, SNAP, ex-felons, long-term unemployed. Up to $9,600 for qualified veterans. 40% of first-year wages (25% if 120-399 hours). We file Form 8850 within the 28-day deadline. Authorized through Dec 31, 2025.', image: '/images/pages/employer-page-2.jpg', href: '/funding' },
+              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. Through WorkOne Indianapolis, the local workforce board reimburses 50–75% of wages during the training period per local board policy. Formal OJT contract required.', image: '/images/pages/employers-page-1.jpg', href: '/ojt-and-funding' },
+              { title: 'WIOA Upskilling', amount: 'Tuition covered', desc: 'Upskill current employees with WIOA-funded training in healthcare, IT, skilled trades, and more.', image: '/images/pages/about-career-training.jpg', href: '/wioa-eligibility' },
+              { title: 'Workforce Ready Grant', amount: 'State-funded certifications', desc: 'Indiana covers tuition for high-demand certifications through the WRG program.', image: '/images/pages/certifications-page-1.jpg', href: '/funding' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="flex gap-4 bg-slate-50 border border-slate-200 p-4 hover:shadow-lg transition-shadow group">
                 <div className="relative w-20 h-20 sm:w-28 sm:h-28 overflow-hidden flex-shrink-0">

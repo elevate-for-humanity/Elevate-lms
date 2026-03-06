@@ -179,18 +179,22 @@ export function BarberEnrollment() {
       {/* CTA */}
       <section className="py-20 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
+            <span className="w-2 h-2 bg-amber-900 rounded-full animate-pulse" />
+            Classes Starting Late May – Early June 2025
+          </div>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-            Start Your Barber Career
+            Join the Waitlist
           </h2>
           <p className="text-xl text-slate-300 mb-4">
-            2,000-hour apprenticeship with licensed shop training. Apply today to check your eligibility.
+            We are finalizing barbershop placement sites now. Submit your application to secure your spot — we will contact you as soon as placements are confirmed.
           </p>
           <p className="text-slate-400 mb-8">
             Pay in full, use a payment plan, or apply for Buy Now Pay Later with {BNPL_PROVIDER_NAMES}.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mb-6">
             <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
-              Apply as Student <ArrowRight className="w-5 h-5" />
+              Join Waitlist <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               <Building2 className="w-5 h-5" /> Apply as Partner Shop

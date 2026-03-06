@@ -40,7 +40,7 @@ export default async function TuitionFeesPage() {
     { name: 'Electrical Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Plumbing Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Welding', duration: '10 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
-    { name: 'Phlebotomy Technician', duration: '8 weeks', tuition: 0, examFees: 135, examFeesNote: 'NHA CPT exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Phlebotomy Technician', duration: '8 weeks', tuition: 1795, examFees: 135, examFeesNote: 'NHA CPT exam', materials: 75, fundingType: 'Self-Pay · BNPL Available' },
     { name: 'Medical Assistant', duration: '16 weeks', tuition: 0, examFees: 155, examFeesNote: 'NHA CCMA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
     { name: 'Tax Preparation', duration: '8 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'Grant-Funded' },
     { name: 'Web Development', duration: '16 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },

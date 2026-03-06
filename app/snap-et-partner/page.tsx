@@ -21,12 +21,15 @@ export const metadata: Metadata = {
   keywords: [
     'SNAP E&T partner',
     'SNAP employment and training',
+    'TANF training provider Indiana',
     'WIOA SNAP alignment',
     'career pathway execution',
     'ETPL provider',
     'SNAP E&T third party',
+    'Third Party Partnership FSSA',
     'workforce development SNAP',
     'Indiana FSSA partner',
+    'DFR training partner',
     'WorkOne partner',
   ],
   alternates: {
@@ -449,32 +452,125 @@ export default function SNAPETPartnerPage() {
         </div>
       </section>
 
+      {/* FSSA / TANF / Third Party Partnership */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">FSSA Partnership & Third Party Reimbursement</h2>
+            <p className="text-xl text-black max-w-3xl mx-auto">
+              Elevate serves both SNAP and TANF participants through Indiana FSSA. TANF participation is mandatory;
+              many SNAP participants volunteer. We are positioned for Third Party Partnership (TPP) reimbursement.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Who We Serve */}
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
+              <h3 className="text-2xl font-bold mb-6">Who We Serve</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                  <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">SNAP</div>
+                  <div>
+                    <p className="font-semibold text-slate-900">SNAP Participants</p>
+                    <p className="text-sm text-slate-600">Voluntary enrollment. USDA FNS funded. We accept referrals directly and can refer eligible students back for additional support services.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                  <div className="w-10 h-10 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">TANF</div>
+                  <div>
+                    <p className="font-semibold text-slate-900">TANF Participants</p>
+                    <p className="text-sm text-slate-600">Mandatory program. Our credential-bearing programs satisfy work activity requirements. Attendance and progress reported on your schedule.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* TPP */}
+            <div className="bg-brand-blue-50 rounded-xl p-8 border border-brand-blue-200">
+              <h3 className="text-2xl font-bold mb-4">Third Party Partnership (TPP)</h3>
+              <p className="text-slate-700 mb-6">
+                Through a TPP with FSSA, eligible training providers may receive <strong>50% reimbursement</strong> for
+                allowable costs tied to SNAP participant enrollment — including trainer salaries, supplies, and certain
+                program expenses. Costs are reimbursed proportionally based on SNAP share of enrollment.
+              </p>
+              <div className="space-y-3">
+                {[
+                  '50% of allowable costs reimbursed',
+                  'Eligible: trainer salaries, supplies, program expenses',
+                  'Proportional to SNAP participant share',
+                  'Administered through Indiana FSSA / DFR',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="w-5 h-5 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">✓</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Referral flow */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4">FSSA Refers Participants to Elevate</h3>
+              <ol className="space-y-3">
+                {[
+                  'Case manager identifies participant ready for career training',
+                  'Participant referred to Elevate for enrollment',
+                  'Elevate enrolls and begins credential program',
+                  'Attendance and progress reported back per your schedule',
+                  'Participant earns credential and enters employment',
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <span className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4">Elevate Refers Students to FSSA</h3>
+              <ol className="space-y-3">
+                {[
+                  'Elevate identifies an enrolled student who may be SNAP or TANF eligible',
+                  'Student connected to FSSA for additional employment and support services',
+                  'FSSA provides wraparound services (transportation, childcare, job placement)',
+                  'Student continues training at Elevate while receiving FSSA support',
+                  'Both organizations share outcome data for reporting',
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <span className="w-6 h-6 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Partner?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
-            Contact us to discuss SNAP E&T partnership opportunities
+            Contact us to discuss SNAP E&T and FSSA partnership opportunities
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact"
+              href="/fssa-partnership-request"
               className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-yellow-400 text-brand-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg"
             >
-              Contact Us <ArrowRight className="w-5 h-5" />
+              Submit Partnership Request <ArrowRight className="w-5 h-5" />
             </Link>
-            <a
-              href="/support"
+            <Link
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
             >
-              <Phone className="w-5 h-5" /> Get Help Online
-            </a>
-          </div>
-          <p className="mt-6 text-brand-blue-200">Elizabeth Greene, Founder & CEO</p>
-          <div className="mt-8 flex flex-wrap gap-4 justify-center">
-            <Link href="/fssa-partnership-request" className="text-yellow-400 hover:underline font-semibold">
-              FSSA Partnership Request →
+              <Phone className="w-5 h-5" /> Contact Us
             </Link>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-4 justify-center">
             <Link href="/grants" className="text-yellow-400 hover:underline font-semibold">
               View All Funding Options →
             </Link>

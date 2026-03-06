@@ -73,32 +73,32 @@ export default async function CareersPage() {
 
   const benefits = [
     {
-      image: '/images/icons/dollar.png',
+      image: '/images/pages/career-services-page-2.jpg',
       title: 'Competitive Salary',
       description: 'Fair compensation with performance bonuses and annual raises based on performance',
     },
     {
-      image: '/images/icons/shield.png',
+      image: '/images/pages/career-services-page-3.jpg',
       title: 'Health Benefits',
       description: 'Comprehensive health, dental, and vision coverage for you and your family',
     },
     {
-      image: '/images/icons/clock.png',
+      image: '/images/pages/career-services-page-4.jpg',
       title: 'Paid Time Off',
       description: 'Generous PTO and holiday schedule with work-life balance',
     },
     {
-      image: '/images/icons/book.png',
+      image: '/images/pages/career-services-page-5.jpg',
       title: 'Professional Development',
       description: 'Continuous learning and growth opportunities with training stipends',
     },
     {
-      image: '/images/icons/users.png',
+      image: '/images/pages/career-services-page-6.jpg',
       title: 'Remote Work',
       description: 'Flexible work arrangements with hybrid and fully remote options',
     },
     {
-      image: '/images/icons/award.png',
+      image: '/images/pages/comp-highlights-team.jpg',
       title: 'Mission-Driven',
       description: "Make a real impact on people's lives through workforce development",
     },
@@ -186,12 +186,13 @@ export default async function CareersPage() {
                   key={index}
                   className="bg-white text-center p-8 rounded-lg border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition"
                 >
-                  <div className="w-16 h-16 mx-auto mb-4">
-                    <Image alt="Career opportunity" 
-                      src={benefit.image} 
-                      alt={benefit.title} 
-                      width={64} 
-                      height={64}
+                  <div className="relative w-full h-40 mb-4 overflow-hidden rounded-lg">
+                    <Image
+                      src={benefit.image}
+                      alt={benefit.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
                     />
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-black">

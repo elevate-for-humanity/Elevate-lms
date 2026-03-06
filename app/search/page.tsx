@@ -31,8 +31,8 @@ const programs = [
     name: 'Healthcare',
     href: '/programs/healthcare',
     image: '/images/pages/comp-cta-training.jpg',
-    certs: ['CNA', 'Medical Assistant', 'Phlebotomy'],
-    funding: 'WIOA & WRG eligible',
+    certs: ['CNA', 'Medical Assistant', 'Phlebotomy*'],
+    funding: 'WIOA & WRG eligible · *Phlebotomy self-pay',
   },
   {
     name: 'Skilled Trades',

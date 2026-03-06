@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 };
 
 const certPrograms = [
-  { name: 'CNA — Certified Nursing Assistant', duration: '4-6 weeks', cost: 'Free with WIOA/WRG', image: '/images/pages/comp-cta-training.jpg', href: '/programs/healthcare' },
-  { name: 'CDL — Commercial Driver License', duration: '4-8 weeks', cost: 'Free with WRG', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cdl' },
-  { name: 'HVAC Technician + EPA 608', duration: '8-12 weeks', cost: 'Free with WIOA', image: '/images/pages/comp-cta-training.jpg', href: '/programs/skilled-trades' },
-  { name: 'Barber Apprenticeship', duration: '18-24 months', cost: 'Paid apprenticeship', image: '/images/pages/comp-cta-training.jpg', href: '/programs/barber-apprenticeship' },
-  { name: 'Phlebotomy Technician', duration: '6-8 weeks', cost: 'Free with WIOA/WRG', image: '/images/pages/comp-cta-training.jpg', href: '/programs/healthcare' },
-  { name: 'CPR/AED/First Aid (HSI)', duration: '1 day', cost: '$65-$85', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cpr-first-aid' },
-  { name: 'OSHA 10 / OSHA 30', duration: '2-4 days', cost: 'Included with trades programs', image: '/images/pages/comp-pathway-trades.jpg', href: '/programs/skilled-trades' },
-  { name: 'Welding Certification', duration: '8-12 weeks', cost: 'Free with WIOA', image: '/images/pages/comp-pathway-trades.jpg', href: '/programs/skilled-trades' },
+  { name: 'CNA — Certified Nursing Assistant', duration: '4-6 weeks', cost: 'Free with WIOA/WRG', image: '/images/pages/cna-nursing.jpg', href: '/programs/healthcare' },
+  { name: 'CDL — Commercial Driver License', duration: '4-8 weeks', cost: 'Free with WRG', image: '/images/pages/cdl-training.jpg', href: '/programs/cdl' },
+  { name: 'HVAC Technician + EPA 608', duration: '8-12 weeks', cost: 'Free with WIOA', image: '/images/pages/hvac-technician.jpg', href: '/programs/skilled-trades' },
+  { name: 'Barber Apprenticeship', duration: '18-24 months', cost: 'Paid apprenticeship', image: '/images/pages/barber-training.jpg', href: '/programs/barber-apprenticeship' },
+  { name: 'Phlebotomy Technician', duration: '6-8 weeks', cost: 'Self-pay · BNPL available', image: '/images/pages/certifications-page-1.jpg', href: '/programs/healthcare' },
+  { name: 'CPR/AED/First Aid (HSI)', duration: '1 day', cost: '$65-$85', image: '/images/pages/training-page-2.jpg', href: '/programs/cpr-first-aid' },
+  { name: 'OSHA 10 / OSHA 30', duration: '2-4 days', cost: 'Included with trades programs', image: '/images/pages/comp-highlights-welding.jpg', href: '/programs/skilled-trades' },
+  { name: 'Welding Certification', duration: '8-12 weeks', cost: 'Free with WIOA', image: '/images/pages/welding.jpg', href: '/programs/skilled-trades' },
 ];
 
 export default function CertificationsPage() {

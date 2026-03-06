@@ -92,6 +92,67 @@ const EXCLUDED_PREFIXES = [
   // Redirect-only routes — canonical URLs are elsewhere
   '/programs/cna-certification',
   '/programs/cdl/waitlist',
+
+  // Portal/role-specific routes — auth-gated, not public content
+  '/apprentice',
+  '/employee',
+  '/partner',          // /partner/* (role portal) — /partners/* (public partner pages) is allowed
+  '/program-holder',
+  '/compliance',
+  '/ferpa',
+  '/hub',
+  '/leaderboard',
+  '/messages',
+  '/notifications',
+  '/profile',
+  '/transcript',
+  '/update-password',
+  '/verification-approvals',
+  '/suboffice-onboarding',
+  '/file-manager',
+  '/import',
+  '/generate',
+  '/proctor',
+  '/connect',
+  '/connects',
+
+  // Internal docs — not public-facing
+  '/docs/admins',
+  '/docs/api',
+  '/docs/lms',
+  '/docs/ENV',
+
+  // Community internal pages
+  '/community/admins',
+  '/community/classroom',
+  '/community/developers',
+
+  // Employer portal sub-routes (employer landing page /employer is public)
+  '/employer/analytics',
+  '/employer/apprenticeships',
+  '/employer/candidates',
+  '/employer/compliance',
+  '/employer/documents',
+  '/employer/hours',
+  '/employer/jobs',
+  '/employer/opportunities',
+  '/employer/placements',
+  '/employer/post-job',
+  '/employer/reports',
+  '/employer/verification',
+
+  // Internal-only policy/test pages
+  '/policies/disaster-recovery-test',
+  '/policies/dr-test-report',
+
+  // Shop internal pages
+  '/shop/reports',
+  '/shop/seller',
+  '/shop/products/new',
+
+  // Enrollment flow pages
+  '/enrollment',
+  '/enrollment-agreement',
 ];
 
 // Segments that indicate private routes regardless of position
@@ -104,6 +165,47 @@ const EXCLUDED_SEGMENTS = [
   '/signup',
   '/admin',
   '/demo',
+];
+
+// Route suffixes that indicate enrollment flows, success pages, or internal actions
+const EXCLUDED_SUFFIXES = [
+  '/apply',
+  '/apply/success',
+  '/enroll',
+  '/enrollment-success',
+  '/enrollment/confirmed',
+  '/documents',
+  '/documents/upload',
+  '/orientation',
+  '/curriculum',
+  '/course',
+  '/host-shops',
+  '/timeclock',
+  '/transfer-hours',
+  '/transfer-hours/request',
+  '/hours/log',
+  '/hours/history',
+  '/hours',
+  '/skills',
+  '/state-board',
+  '/handbook',
+  '/sign-mou',
+  '/mou',
+  '/success',
+  '/confirmed',
+  '/upload',
+  '/my-courses',
+  '/competency-test',
+  '/analytics',
+  '/candidates',
+  '/compliance',
+  '/placements',
+  '/verification',
+  '/opportunities',
+  '/apprenticeships/new',
+  '/products/new',
+  '/reports/new',
+  '/seller/register',
 ];
 
 // Priority mapping based on route patterns
@@ -185,6 +287,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // Check segment exclusions (e.g. /programs/admin, /store/checkout)
       const segments = route.split('/');
       if (segments.some(seg => EXCLUDED_SEGMENTS.includes(`/${seg}`))) return false;
+      // Check suffix exclusions — enrollment flows and internal sub-pages
+      if (EXCLUDED_SUFFIXES.some(suffix => route.endsWith(suffix))) return false;
       return true;
     })
     .sort();

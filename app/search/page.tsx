@@ -43,7 +43,7 @@ const programs = [
   },
   {
     name: 'CDL Training',
-    href: '/programs/cdl',
+    href: '/programs/cdl-training',
     image: '/images/pages/features-hero.jpg',
     certs: ['Class A CDL', 'Class B CDL'],
     funding: 'WRG eligible',

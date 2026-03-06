@@ -11,6 +11,9 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const metadata: Metadata = {
   title: 'Credential Pathways | Funded Career Training Programs',
   description: 'Credential pathway programs in healthcare, skilled trades, technology, CDL, barbering, and business. Each pathway includes nationally recognized certifications. Training may be fully funded through WIOA and state workforce programs.',
+  alternates: {
+    canonical: '/programs',
+  },
 };
 
 export default function ProgramCatalogPage() {

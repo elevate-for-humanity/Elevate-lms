@@ -7,49 +7,77 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { SocialShare } from '@/components/blog/SocialShare';
 import { ArrowLeft, Calendar, User, Clock, Tag } from 'lucide-react';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
+import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
 
 export const revalidate = 600;
 
 type Params = Promise<{ slug: string }>;
 
-async function getBlogPost(slug: string) {
-  const supabase = createAdminClient();
-  if (!supabase) return null;
-  
-  const { data: post, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single();
-  
-  if (error || !post) {
-    return null;
-  }
-  
-  // Increment view count
-  await supabase
-    .from('blog_posts')
-    .update({ views: (post.views || 0) + 1 })
-    .eq('id', post.id);
-  
-  return post;
+// Pre-render static post slugs at build time
+export async function generateStaticParams() {
+  return STATIC_POSTS.map((post) => ({ slug: post.slug }));
 }
 
-async function getRelatedPosts(category: string, currentSlug: string) {
-  const supabase = createAdminClient();
-  if (!supabase) return [];
-  
-  const { data: posts } = await supabase
-    .from('blog_posts')
-    .select('title, slug, excerpt, image, published_at')
-    .eq('published', true)
-    .eq('category', category)
-    .neq('slug', currentSlug)
-    .order('published_at', { ascending: false })
-    .limit(3);
-  
-  return posts || [];
+async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  // Check static posts first — no DB call needed
+  const staticPost = STATIC_POSTS.find((p) => p.slug === slug);
+  if (staticPost) return staticPost;
+
+  // Fall back to DB
+  try {
+    const supabase = createAdminClient();
+    if (!supabase) return null;
+
+    const { data: post, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single();
+
+    if (error || !post) return null;
+
+    // Increment view count (fire-and-forget)
+    supabase
+      .from('blog_posts')
+      .update({ views: (post.views || 0) + 1 })
+      .eq('id', post.id)
+      .then(() => {});
+
+    return post as BlogPost;
+  } catch {
+    return null;
+  }
+}
+
+async function getRelatedPosts(category: string, currentSlug: string): Promise<Partial<BlogPost>[]> {
+  // Static related posts
+  const staticRelated = STATIC_POSTS
+    .filter((p) => p.category === category && p.slug !== currentSlug)
+    .slice(0, 3);
+
+  if (staticRelated.length >= 3) return staticRelated;
+
+  // Top up from DB if needed
+  try {
+    const supabase = createAdminClient();
+    if (!supabase) return staticRelated;
+
+    const staticSlugs = staticRelated.map((p) => p.slug);
+    const { data: posts } = await supabase
+      .from('blog_posts')
+      .select('title, slug, excerpt, image, published_at')
+      .eq('published', true)
+      .eq('category', category)
+      .neq('slug', currentSlug)
+      .order('published_at', { ascending: false })
+      .limit(3 - staticRelated.length);
+
+    const dbRelated = (posts || []).filter((p: any) => !staticSlugs.includes(p.slug));
+    return [...staticRelated, ...dbRelated].slice(0, 3);
+  } catch {
+    return staticRelated;
+  }
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

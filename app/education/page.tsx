@@ -10,7 +10,7 @@ const NAV = [
   { label: 'Healthcare', href: '/programs/healthcare' },
   { label: 'Skilled Trades', href: '/programs/skilled-trades' },
   { label: 'Technology', href: '/programs/technology' },
-  { label: 'CDL', href: '/programs/cdl' },
+  { label: 'CDL', href: '/programs/cdl-training' },
   { label: 'Funding', href: '/funding' },
   { label: 'Locations', href: '/locations' },
 ];
@@ -42,7 +42,7 @@ const PROGRAMS = [
   },
   {
     title: 'CDL & Transportation',
-    href: '/programs/cdl',
+    href: '/programs/cdl-training',
     image: '/images/pages/comp-pathway-trades.jpg',
     icon: '/images/pages/comp-pathway-trades.jpg',
     desc: 'Commercial Driving License training with job placement. Class A and Class B CDL programs.',

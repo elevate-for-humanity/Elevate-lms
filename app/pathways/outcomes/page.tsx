@@ -34,7 +34,7 @@ const PROGRAMS = [
   {
     name: 'CDL Commercial Driving',
     image: '/images/pages/comp-cta-training.jpg',
-    href: '/programs/cdl',
+    href: '/programs/cdl-training',
     credential: 'Commercial Driver License (CDL) Class A or Class B',
     issuedBy: 'Indiana Bureau of Motor Vehicles (BMV)',
     whatItMeans: 'A CDL is a federal and state license that authorizes you to operate commercial vehicles — tractor-trailers, buses, tankers, and heavy trucks. Class A covers the largest vehicles (semi-trucks). Class B covers straight trucks and buses. This is not a training certificate — it is a government-issued license.',

@@ -44,7 +44,7 @@ const updates = [
     date: 'December 2025',
     title: 'CDL Training Program Launch',
     description: 'Commercial Driver License training now available. Class A and Class B certifications with job placement assistance.',
-    href: '/programs/cdl',
+    href: '/programs/cdl-training',
     category: 'Programs',
     icon: GraduationCap,
   },

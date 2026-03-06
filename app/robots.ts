@@ -70,6 +70,20 @@ export default function robots(): MetadataRoute.Robots {
           '/preview/',
           '/builder/',
           '/studio/',
+
+          // Query-string variants — not canonical, block indexing
+          '/programs?*',
+          '/search?*',
+
+          // Filter/search pages — thin, not canonical landing pages
+          '/search',
+
+          // Infrastructure and platform pages — not marketing content
+          '/platform',
+          '/docs',
+          '/help',
+
+
         ],
       },
     ],

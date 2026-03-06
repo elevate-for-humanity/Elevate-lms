@@ -305,6 +305,7 @@ const nextConfig = {
       { source: '/verifyemail', destination: '/verify-email', permanent: true },
       { source: '/lms/messages/new', destination: '/lms/messages', permanent: true },
       { source: '/lms/messages/support/new', destination: '/lms/messages', permanent: true },
+      { source: '/programs/building-maintenance', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-maintenance-tech', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-services-technician', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/business-financial', destination: '/programs/tax-preparation', permanent: true },

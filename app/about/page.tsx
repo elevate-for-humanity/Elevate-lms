@@ -476,7 +476,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cdl' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cdl-training' },
               { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/hvac-technician' },
               { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/electrical' },
               { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/comp-cta-training.jpg', href: '/programs/barber-apprenticeship' },

@@ -90,7 +90,7 @@ const PROGRAMS = [
   {
     name: 'CDL Commercial Driving',
     image: '/images/pages/comp-cta-training.jpg',
-    href: '/programs/cdl',
+    href: '/programs/cdl-training',
     duration: '4–6 weeks (160+ hours)',
     credential: 'CDL Class A or Class B',
     issuer: 'Indiana Bureau of Motor Vehicles',

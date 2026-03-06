@@ -268,7 +268,7 @@ export default function PartnersPage() {
               <tbody className="divide-y divide-gray-100">
                 {[
                   { name: 'CNA Certification', href: '/programs/cna', duration: '4–6 weeks', credential: 'CNA (Indiana ISDH)', funding: 'WIOA, JRI, Self-Pay' },
-                  { name: 'CDL Class A/B', href: '/programs/cdl', duration: '4–6 weeks', credential: 'CDL (Indiana BMV)', funding: 'WIOA, WRG, Self-Pay' },
+                  { name: 'CDL Class A/B', href: '/programs/cdl-training', duration: '4–6 weeks', credential: 'CDL (Indiana BMV)', funding: 'WIOA, WRG, Self-Pay' },
                   { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', duration: '12–16 weeks', credential: 'EPA 608 + OSHA 30', funding: 'WIOA, WRG, Employer' },
                   { name: 'Electrical', href: '/programs/electrical', duration: '12–16 weeks', credential: 'OSHA 10 + NCCER Level 1', funding: 'WIOA, WRG, Employer' },
                   { name: 'Welding', href: '/programs/welding', duration: '12–16 weeks', credential: 'AWS + OSHA 10', funding: 'WIOA, WRG, Employer' },

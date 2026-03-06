@@ -18,6 +18,7 @@ if (errors.length > 0) {
 export const metadata: Metadata = {
   title: p.metaTitle,
   description: p.metaDescription,
+  alternates: { canonical: '/programs/cdl-training' },
 };
 
 export default function CdlTrainingPage() {

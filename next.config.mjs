@@ -402,6 +402,9 @@ const nextConfig = {
       // Normalize "Institute" style routes into the infrastructure model
       { source: '/institute', destination: '/', permanent: true },
       { source: '/training-institute', destination: '/programs', permanent: true },
+      { source: '/data-protection', destination: '/security-and-data-protection', permanent: true },
+      { source: '/security-data-protection', destination: '/security-and-data-protection', permanent: true },
+      { source: '/data-privacy', destination: '/security-and-data-protection', permanent: true },
       { source: '/student/dashboard', destination: '/student-portal', permanent: true },
       
       // Fix old hero image paths

@@ -14,6 +14,32 @@ const COMMON_PASSWORDS = new Set([
   'elevate1', 'training', 'workforce', 'student1', 'admin123',
 ]);
 
+// Keyboard rows and common ascending/descending sequences to detect anywhere in the password
+const SEQUENTIAL_PATTERNS = [
+  '0123456789',
+  '9876543210',
+  'abcdefghijklmnopqrstuvwxyz',
+  'zyxwvutsrqponmlkjihgfedcba',
+  'qwertyuiop',
+  'poiuytrewq',
+  'asdfghjkl',
+  'lkjhgfdsa',
+  'zxcvbnm',
+  'mnbvcxz',
+];
+
+// Returns true if `password` contains any 4+ character run from a known sequence
+function containsSequentialRun(password: string, minRunLength = 4): boolean {
+  const lower = password.toLowerCase();
+  for (const seq of SEQUENTIAL_PATTERNS) {
+    for (let start = 0; start <= seq.length - minRunLength; start++) {
+      const run = seq.slice(start, start + minRunLength);
+      if (lower.includes(run)) return true;
+    }
+  }
+  return false;
+}
+
 export interface PasswordValidationResult {
   valid: boolean;
   errors: string[];
@@ -26,10 +52,6 @@ export function validatePassword(password: string): PasswordValidationResult {
     errors.push('Password must be at least 8 characters.');
   }
 
-  if (password.length > 0 && password.length < 8) {
-    // Already covered above
-  }
-
   if (COMMON_PASSWORDS.has(password.toLowerCase())) {
     errors.push('This password is too common. Choose something less predictable.');
   }
@@ -39,9 +61,9 @@ export function validatePassword(password: string): PasswordValidationResult {
     errors.push('Password cannot be all the same character.');
   }
 
-  // Check for sequential characters (e.g., "12345678", "abcdefgh")
-  if (/^(?:0123456789|abcdefghij|qwertyuiop)/.test(password.toLowerCase())) {
-    errors.push('Password cannot be a simple sequence.');
+  // Check for sequential keyboard or numeric runs anywhere in the password
+  if (containsSequentialRun(password)) {
+    errors.push('Password cannot contain a simple sequence (e.g. "1234", "abcd", "qwer").');
   }
 
   return {

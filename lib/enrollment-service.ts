@@ -39,8 +39,8 @@ export type EnrollmentResult = {
  * Uses UPSERT on (student_id, program_slug).
  *
  * - If no enrollment exists: creates one.
- * - If enrollment exists and is not ACTIVE: updates it.
- * - If enrollment exists and is ACTIVE: returns it unchanged.
+ * - If enrollment exists and is not active: updates it.
+ * - If enrollment exists and is active: returns it unchanged.
  * - Never throws. Returns { error } on failure.
  */
 export async function createOrUpdateEnrollment(
@@ -62,8 +62,8 @@ export async function createOrUpdateEnrollment(
     nextRequiredAction = 'ORIENTATION',
   } = input;
 
-  const resolvedStatus = status || (isDeposit ? 'DEPOSIT_PAID' : 'ACTIVE');
-  const resolvedPaymentStatus = paymentStatus || (isDeposit ? 'DEPOSIT_PAID' : (amountPaidCents === 0 ? 'WAIVED' : 'PAID'));
+  const resolvedStatus = status || (isDeposit ? 'deposit_paid' : 'active');
+  const resolvedPaymentStatus = paymentStatus || (isDeposit ? 'deposit_paid' : (amountPaidCents === 0 ? 'waived' : 'paid'));
 
   try {
     // Check for existing enrollment first (for action reporting)
@@ -74,7 +74,7 @@ export async function createOrUpdateEnrollment(
       .eq('program_slug', programSlug)
       .maybeSingle();
 
-    if (existing?.status === 'ACTIVE' || existing?.status === 'COMPLETED') {
+    if (existing?.status === 'active' || existing?.status === 'completed') {
       // Already active/completed — don't downgrade, just return
       logger.info(`[enrollment-service] Already ${existing.status}: ${programSlug} for ${studentId}`);
       return { id: existing.id, action: 'already_active' };

@@ -5,6 +5,10 @@ import { getModuleDiagrams } from './hvac-visual-library';
 import { getModuleScenarios } from './hvac-service-scenarios';
 import { HVAC_LESSON_CONTENT } from './hvac-lesson-content';
 import { COURSE_DEFINITIONS } from './definitions';
+import { getToolsByModule } from './hvac-tool-breakdowns';
+import { getProceduresByModule } from './hvac-procedures';
+import { EPA608_STUDY_TOPICS, EPA608_SECTIONS, getStudyTopicsBySection } from './hvac-epa608-prep';
+import { GAUGE_READING_EXERCISES, PT_CHART_DRILLS, CHARGING_SCENARIOS } from './hvac-diagnostic-exercises';
 
 const course = COURSE_DEFINITIONS.find((c) => c.slug === 'hvac-technician')!;
 
@@ -35,6 +39,8 @@ function ModuleContent({ mod }: { mod: ModuleData }) {
   const equipment = getModuleEquipment(modId);
   const diagrams = getModuleDiagrams(modId);
   const scenarios = getModuleScenarios(modId);
+  const tools = getToolsByModule(modId);
+  const procedures = getProceduresByModule(modId);
 
   return (
     <div className="space-y-8">
@@ -193,6 +199,295 @@ function ModuleContent({ mod }: { mod: ModuleData }) {
         </div>
       )}
 
+      {/* Tool Breakdowns */}
+      {tools.length > 0 && (
+        <div>
+          <SectionHeading>Tools You Will Use in This Module</SectionHeading>
+          <div className="space-y-4">
+            {tools.map((tool, toolIdx) => (
+              <details key={tool.id} open={toolIdx === 0} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
+                  <div className="flex items-center gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 text-xs font-bold">&#128295;</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{tool.name}</p>
+                      <p className="text-xs text-slate-400 capitalize">{tool.category} &middot; {tool.costRange}</p>
+                    </div>
+                  </div>
+                </summary>
+                <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">What It Is</h4>
+                    <p className="text-sm text-slate-700 leading-relaxed">{tool.whatItIs}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">What It Looks Like</h4>
+                    <p className="text-sm text-slate-700">{tool.whatItLooksLike}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">When to Use</h4>
+                    <p className="text-sm text-slate-700">{tool.whenToUse}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">How to Use — Step by Step</h4>
+                    <ol className="space-y-1.5 list-decimal list-inside">
+                      {tool.howToUse.map((step, i) => (
+                        <li key={i} className="text-sm text-slate-700">{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                  {tool.howToRead && (
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">How to Read It</h4>
+                      <p className="text-sm text-slate-700">{tool.howToRead}</p>
+                    </div>
+                  )}
+                  {tool.calibration && (
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-500 uppercase mb-1">Calibration</h4>
+                      <p className="text-sm text-slate-700">{tool.calibration}</p>
+                    </div>
+                  )}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="text-xs font-bold text-red-700 uppercase mb-1">Common Mistakes</h4>
+                    <ul className="space-y-1">
+                      {tool.commonMistakes.map((m, i) => (
+                        <li key={i} className="text-sm text-red-900 flex gap-2"><span className="text-red-400 flex-shrink-0">&#10007;</span><span>{m}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <h4 className="text-xs font-bold text-amber-700 uppercase mb-1">Safety Notes</h4>
+                    <ul className="space-y-1">
+                      {tool.safetyNotes.map((s, i) => (
+                        <li key={i} className="text-sm text-amber-900 flex gap-2"><span className="text-amber-500 flex-shrink-0">&#9888;</span><span>{s}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Step-by-Step Procedures */}
+      {procedures.length > 0 && (
+        <div>
+          <SectionHeading>Step-by-Step Procedures</SectionHeading>
+          <div className="space-y-4">
+            {procedures.map((proc, procIdx) => (
+              <details key={proc.id} open={procIdx === 0} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
+                  <div className="flex items-center gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-50 flex items-center justify-center text-brand-blue-600 text-xs font-bold">&#128221;</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{proc.title}</p>
+                      <p className="text-xs text-slate-400">{proc.whenToPerform}</p>
+                    </div>
+                  </div>
+                </summary>
+                <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Tools Required</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {proc.toolsRequired.map((t) => (
+                        <span key={t} className="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Procedure</h4>
+                    <div className="space-y-3">
+                      {proc.steps.map((s) => (
+                        <div key={s.step} className="flex gap-3">
+                          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-blue-50 flex items-center justify-center text-brand-blue-600 text-xs font-bold">{s.step}</span>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">{s.action}</p>
+                            <p className="text-xs text-slate-600 mt-0.5">{s.detail}</p>
+                            {s.warning && (
+                              <p className="text-xs text-red-600 mt-1 flex gap-1"><span>&#9888;</span>{s.warning}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="text-xs font-bold text-red-700 uppercase mb-1">Common Mistakes</h4>
+                    <ul className="space-y-1">
+                      {proc.commonMistakes.map((m, i) => (
+                        <li key={i} className="text-sm text-red-900 flex gap-2"><span className="text-red-400 flex-shrink-0">&#10007;</span><span>{m}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* EPA 608 Exam Prep — only for Module 13 */}
+      {modId === 'hvac-13' && (
+        <div>
+          <SectionHeading>EPA 608 Exam Preparation</SectionHeading>
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 mb-4">
+            <p className="text-sm text-brand-blue-800">Pass Core + Type I + Type II + Type III = <span className="font-bold">EPA 608 Universal Certification</span>. This is what employers want.</p>
+          </div>
+          <div className="space-y-4">
+            {EPA608_SECTIONS.map((section, secIdx) => {
+              const topics = getStudyTopicsBySection(section.id);
+              return (
+                <details key={section.id} open={secIdx === 0} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                  <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">{section.title}</p>
+                        <p className="text-xs text-slate-400">{section.questionCount} questions &middot; {section.passingScore}% to pass</p>
+                      </div>
+                      <span className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded-full">{topics.length} study topics</span>
+                    </div>
+                  </summary>
+                  <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+                    <p className="text-sm text-slate-600">{section.description}</p>
+                    {topics.map((topic) => (
+                      <div key={topic.id} className="bg-slate-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-bold text-slate-800">{topic.title}</h4>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${topic.examWeight === 'high' ? 'bg-red-100 text-red-700' : topic.examWeight === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'}`}>
+                            {topic.examWeight} weight
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed mb-3">{topic.content}</p>
+                        <h5 className="text-xs font-bold text-slate-500 uppercase mb-1">Key Facts to Memorize</h5>
+                        <ul className="space-y-1">
+                          {topic.keyFacts.map((f, i) => (
+                            <li key={i} className="text-xs text-slate-700 flex gap-2">
+                              <span className="text-brand-green-500 flex-shrink-0 mt-0.5">&#10003;</span>
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Diagnostic Exercises — Modules 5-8 */}
+      {['hvac-05', 'hvac-06', 'hvac-07', 'hvac-08'].includes(modId) && (
+        <div>
+          <SectionHeading>Diagnostic Exercises — Real Numbers</SectionHeading>
+
+          {/* PT Chart Drills */}
+          {modId === 'hvac-05' && (
+            <div className="mb-6">
+              <h3 className="text-sm font-bold text-slate-700 mb-3">PT Chart Speed Drills</h3>
+              <p className="text-xs text-slate-500 mb-3">Convert these pressures to saturation temperatures. You should be able to do this in under 5 seconds each.</p>
+              <div className="grid sm:grid-cols-3 gap-2">
+                {PT_CHART_DRILLS.map((drill) => (
+                  <details key={drill.id} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                    <summary className="px-3 py-2 cursor-pointer hover:bg-slate-50 text-sm">
+                      <span className="font-medium">{drill.refrigerant}</span> at <span className="font-bold">{drill.givenPressure} psig</span> = ?
+                    </summary>
+                    <div className="px-3 py-2 bg-brand-green-50 border-t border-slate-100">
+                      <p className="text-sm font-bold text-brand-green-700">{drill.correctSatTemp}°F</p>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Gauge Reading Exercises */}
+          <h3 className="text-sm font-bold text-slate-700 mb-3">Gauge Reading Scenarios</h3>
+          <p className="text-xs text-slate-500 mb-3">Read the gauges, calculate superheat and subcooling, and diagnose the problem.</p>
+          <div className="space-y-4">
+            {GAUGE_READING_EXERCISES.filter((e) =>
+              modId === 'hvac-05' ? e.difficulty === 'beginner' :
+              modId === 'hvac-06' ? e.difficulty === 'beginner' || e.difficulty === 'intermediate' :
+              true
+            ).map((ex, exIdx) => (
+              <details key={ex.id} open={exIdx === 0} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-slate-800">{ex.title}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${ex.difficulty === 'beginner' ? 'bg-green-100 text-green-700' : ex.difficulty === 'intermediate' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                      {ex.difficulty}
+                    </span>
+                  </div>
+                </summary>
+                <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+                  <div className="bg-slate-50 rounded-lg p-4">
+                    <p className="text-xs text-slate-500 mb-2">{ex.refrigerant} &middot; {ex.systemType} &middot; Outdoor: {ex.outdoorTemp}°F &middot; Indoor: {ex.indoorTemp}°F</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="text-center"><p className="text-xs text-slate-500">Suction</p><p className="text-lg font-bold text-brand-blue-600">{ex.suctionPressure} psig</p></div>
+                      <div className="text-center"><p className="text-xs text-slate-500">Discharge</p><p className="text-lg font-bold text-red-600">{ex.dischargePressure} psig</p></div>
+                      <div className="text-center"><p className="text-xs text-slate-500">Suction Line</p><p className="text-lg font-bold">{ex.suctionLineTemp}°F</p></div>
+                      <div className="text-center"><p className="text-xs text-slate-500">Liquid Line</p><p className="text-lg font-bold">{ex.liquidLineTemp}°F</p></div>
+                    </div>
+                  </div>
+                  <details className="bg-brand-green-50 border border-brand-green-200 rounded-lg overflow-hidden">
+                    <summary className="px-4 py-2 cursor-pointer text-sm font-medium text-brand-green-700">Show Answer</summary>
+                    <div className="px-4 pb-4 pt-2 space-y-2">
+                      <p className="text-sm"><span className="font-bold">Superheat:</span> {ex.suctionLineTemp}°F − {ex.suctionSatTemp}°F = <span className="font-bold text-brand-blue-600">{ex.superheat}°F</span></p>
+                      <p className="text-sm"><span className="font-bold">Subcooling:</span> {ex.liquidSatTemp}°F − {ex.liquidLineTemp}°F = <span className="font-bold text-brand-blue-600">{ex.subcooling}°F</span></p>
+                      <p className="text-sm font-bold text-slate-800 mt-2">{ex.diagnosis}</p>
+                      <p className="text-sm text-slate-700">{ex.explanation}</p>
+                      <p className="text-sm text-brand-green-700 font-medium mt-2">Correct Action: {ex.correctAction}</p>
+                    </div>
+                  </details>
+                </div>
+              </details>
+            ))}
+          </div>
+
+          {/* Charging Scenarios — Module 7-8 */}
+          {['hvac-07', 'hvac-08'].includes(modId) && (
+            <div className="mt-6">
+              <h3 className="text-sm font-bold text-slate-700 mb-3">Charging Scenarios</h3>
+              <div className="space-y-4">
+                {CHARGING_SCENARIOS.map((cs) => (
+                  <details key={cs.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                    <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
+                      <p className="text-sm font-semibold text-slate-800">{cs.title}</p>
+                      <p className="text-xs text-slate-400">{cs.systemType} &middot; {cs.meteringDevice} &middot; {cs.refrigerant}</p>
+                    </summary>
+                    <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+                      <div className="bg-slate-50 rounded-lg p-4">
+                        <p className="text-xs text-slate-500 mb-2">Outdoor: {cs.outdoorTemp}°F &middot; Indoor WB: {cs.indoorWetBulb}°F &middot; Nameplate: {cs.nameplateCharge}</p>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div><p className="text-xs text-slate-500">Superheat</p><p className="text-lg font-bold">{cs.currentReadings.superheat}°F</p></div>
+                          <div><p className="text-xs text-slate-500">Subcooling</p><p className="text-lg font-bold">{cs.currentReadings.subcooling}°F</p></div>
+                          <div><p className="text-xs text-slate-500">Target</p><p className="text-lg font-bold text-brand-green-600">{cs.targetReadings.subcooling ? `${cs.targetReadings.subcooling}°F SC` : `${cs.targetReadings.superheat}°F SH`}</p></div>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-800">{cs.diagnosis}</p>
+                        <p className="text-sm text-slate-600 mt-1">Add: {cs.amountToAdd}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Step-by-Step Charging Procedure</h4>
+                        <ol className="space-y-1.5 list-decimal list-inside">
+                          {cs.steps.map((step, i) => (
+                            <li key={i} className="text-sm text-slate-700">{step}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Job Tasks */}
       <div>
         <SectionHeading>Real Job Tasks This Prepares You For</SectionHeading>
@@ -206,10 +501,10 @@ function ModuleContent({ mod }: { mod: ModuleData }) {
         <div>
           <SectionHeading>Lessons in This Module</SectionHeading>
           <div className="space-y-4">
-            {courseMod.lessons.map((lesson) => {
+            {courseMod.lessons.map((lesson, lessonIdx) => {
               const deep = HVAC_LESSON_CONTENT[lesson.id];
               return (
-                <details key={lesson.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden group">
+                <details key={lesson.id} open={lessonIdx === 0} className="bg-white border border-slate-200 rounded-xl overflow-hidden group">
                   <summary className="px-5 py-4 cursor-pointer hover:bg-slate-50 transition">
                     <div className="flex items-center gap-3">
                       <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -359,8 +654,8 @@ function Module01() {
         <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Three Credentials</h2>
         {[
           { name: 'EPA 608 Universal Certification', issuer: 'U.S. Environmental Protection Agency', why: 'Federal law (Clean Air Act Section 608) requires this to purchase or handle any refrigerant. Without it, you cannot legally work on AC or refrigeration systems. Period.', details: ['Covers Type I (small appliances under 5 lbs), Type II (high-pressure like residential AC), Type III (low-pressure like commercial chillers)', 'Exam is 80 multiple-choice questions \u2014 you must pass each of the 4 sections with 70% or higher', 'Certification is lifetime \u2014 it never expires once you pass', 'Exam fee is $120-180 \u2014 covered by WIOA funding if you are eligible', 'You take the official proctored exam in Module 16 of this program'] },
-          { name: 'OSHA 30-Hour Construction Safety', issuer: 'OSHA / CareerSafe', why: 'Most HVAC employers will not hire you without OSHA 30. It proves you can recognize hazards, follow safety protocols, and protect yourself and your coworkers on a construction site.', details: ['30 hours of training covering fall protection, scaffolding, electrical safety, excavation, PPE, hazard communication, and more', 'You receive an official DOL (Department of Labor) wallet card upon completion', 'Many employers pay $2-4/hr more for OSHA 30 certified workers \u2014 that is $4,000-8,000 more per year', 'Covers Module 14 of this program \u2014 one full week dedicated to safety'] },
-          { name: 'CPR / AED / First Aid', issuer: 'American Heart Association', why: 'You will work in attics in 140\u00B0F heat, on rooftops in winter, in crawl spaces with limited air. Heat stroke, electrical shock, falls \u2014 knowing how to respond to a medical emergency is not optional in this trade.', details: ['Covers adult CPR, AED (automated external defibrillator) use, choking response, wound care, and shock management', 'Certification is valid for 2 years \u2014 you must renew it', 'Includes hands-on skills assessment with a mannequin \u2014 not just a written test', 'Takes approximately 4 hours to complete \u2014 covered in Module 15'] },
+          { name: 'OSHA 10-Hour Construction Safety', issuer: 'CareerSafe / U.S. Department of Labor', why: 'Most HVAC employers will not hire you without OSHA 10. It proves you can recognize hazards, follow safety protocols, and protect yourself and your coworkers on a job site. Delivered through CareerSafe — they issue the official DOL wallet card.', details: ['10 hours of online training through CareerSafe covering fall protection, electrical safety, PPE, hazard communication, and more', 'You receive an official DOL (Department of Labor) OSHA 10-Hour wallet card upon completion', 'Many employers pay $2-4/hr more for OSHA-certified workers', 'Covered in Module 14 of this program — CareerSafe delivers the coursework and issues the card'] },
+          { name: 'CPR / AED / First Aid', issuer: 'CareerSafe', why: 'You will work in attics in 140\u00B0F heat, on rooftops in winter, in crawl spaces with limited air. Heat stroke, electrical shock, falls \u2014 knowing how to respond to a medical emergency is not optional in this trade. Delivered through CareerSafe.', details: ['Covers adult CPR, AED (automated external defibrillator) use, choking response, wound care, and shock management', 'Certification is valid for 2 years \u2014 you must renew it', 'Online coursework through CareerSafe + hands-on skills verification', 'Covered in Module 15 of this program'] },
         ].map((c, i) => (
           <div key={i} className="bg-white border border-slate-200 rounded-xl p-6 mb-3">
             <h3 className="font-bold text-slate-900 text-lg">{c.name}</h3>
@@ -376,7 +671,7 @@ function Module01() {
         <h2 className="text-2xl font-bold text-slate-900 mb-4">How Your Training Is Paid For</h2>
         <p className="text-sm text-slate-600 mb-4">Most students in this program pay nothing out of pocket. Here is every funding option explained.</p>
         {[
-          { name: 'WIOA (Workforce Innovation and Opportunity Act)', what: 'Federal workforce funding administered through your local WorkOne office. This is the most common funding source for our students.', covers: ['Full tuition and program fees', 'Books, study guides, and printed materials', 'HVAC tool kit (gauge manifold, multimeter, hand tools)', 'Transportation \u2014 gas cards, bus passes, or mileage reimbursement', 'Childcare during training hours', 'Work clothing \u2014 steel-toe boots, safety glasses, work pants', 'All certification exam fees (EPA 608, OSHA 30, CPR)'], reqs: ['Must register at indianacareerconnect.com \u2014 this is required, do it now if you have not', 'Must meet income eligibility or other qualifying criteria (dislocated worker, veteran, etc.)', 'Must maintain 80% attendance throughout the program', 'Must complete all required documentation on time'] },
+          { name: 'WIOA (Workforce Innovation and Opportunity Act)', what: 'Federal workforce funding administered through your local WorkOne office. This is the most common funding source for our students.', covers: ['Full tuition and program fees', 'Books, study guides, and printed materials', 'HVAC tool kit (gauge manifold, multimeter, hand tools)', 'Transportation \u2014 gas cards, bus passes, or mileage reimbursement', 'Childcare during training hours', 'Work clothing \u2014 steel-toe boots, safety glasses, work pants', 'All certification exam fees (EPA 608, OSHA 10, CPR)'], reqs: ['Must register at indianacareerconnect.com \u2014 this is required, do it now if you have not', 'Must meet income eligibility or other qualifying criteria (dislocated worker, veteran, etc.)', 'Must maintain 80% attendance throughout the program', 'Must complete all required documentation on time'] },
           { name: 'Workforce Ready Grant (WRG)', what: 'Indiana state funding specifically for high-demand certifications. No income requirements \u2014 if you are an Indiana resident in an approved program, you may qualify.', covers: ['Full tuition for approved certificate programs', 'Open to all Indiana residents regardless of income'], reqs: ['Must be an Indiana resident', 'Must be enrolled in a program on the ETPL (Eligible Training Provider List)', 'Our HVAC program is ETPL-approved'] },
           { name: 'Justice Reinvestment Initiative (JRI)', what: 'Funding for justice-involved individuals re-entering the workforce. Your past does not define your future \u2014 this program is proof of that.', covers: ['Full tuition coverage', 'Supportive services including housing assistance', 'Job placement support after completion', 'Case management throughout the program'], reqs: ['Must be referred through the criminal justice system', 'Must meet program eligibility criteria', 'Must be committed to completing the full 16-week program'] },
           { name: 'Self-Pay Options', what: 'For students who do not qualify for grant funding. We will work with you to find a payment option.', covers: ['Flexible payment plans', 'Buy Now Pay Later: Klarna, Afterpay, Sezzle, Affirm, or Zip', 'Custom arrangements \u2014 talk to our enrollment team'], reqs: ['Contact the Elevate enrollment team to discuss your situation'] },
@@ -432,6 +727,7 @@ function Module01() {
           </div>
         ))}
       </div>
+
 
     </div>
   );

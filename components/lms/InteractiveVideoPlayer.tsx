@@ -194,26 +194,19 @@ export default function InteractiveVideoPlayer({
     }
   }, [currentTime, transcript, showCaptions]);
 
-  // Report progress
+  // Store callbacks in refs to avoid re-render churn
+  const onProgressRef = useRef(onProgress);
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onProgressRef.current = onProgress; }, [onProgress]);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+  const lastProgressRef = useRef(-1);
+  const completeFiredRef = useRef(false);
+
+  // Reset progress tracking when video changes
   useEffect(() => {
-    if (duration > 0) {
-      const progress = (currentTime / duration) * 100;
-      
-      if (onProgress) {
-        onProgress(progress);
-      }
-
-      // Save progress every 10%
-      if (Math.floor(progress) % 10 === 0) {
-        saveProgress(progress);
-      }
-
-      // Check if video is complete (watched 95%)
-      if (progress >= 95 && onComplete) {
-        onComplete();
-      }
-    }
-  }, [currentTime, duration, onProgress, onComplete]);
+    lastProgressRef.current = -1;
+    completeFiredRef.current = false;
+  }, [videoUrl]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -227,8 +220,29 @@ export default function InteractiveVideoPlayer({
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+    if (!videoRef.current) return;
+    const { currentTime: ct, duration: dur } = videoRef.current;
+    setCurrentTime(ct);
+
+    if (dur > 0) {
+      const pct = Math.round((ct / dur) * 100);
+
+      // Only notify when the rounded percentage actually changes
+      if (pct !== lastProgressRef.current) {
+        lastProgressRef.current = pct;
+        onProgressRef.current?.(pct);
+
+        // Save to DB every 10%
+        if (pct % 10 === 0) {
+          saveProgress(pct);
+        }
+      }
+
+      // Fire onComplete once when 95%+ reached
+      if (pct >= 95 && !completeFiredRef.current) {
+        completeFiredRef.current = true;
+        onCompleteRef.current?.();
+      }
     }
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
   ChevronLeft,
@@ -22,6 +22,9 @@ import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
 import { PostVideoQuiz } from '@/components/lms/PostVideoQuiz';
 import TroubleshootScenario from '@/components/lms/TroubleshootScenario';
 import CondenserDiagram from '@/components/hvac-labs/CondenserDiagram';
+import GaugeReadingLab from '@/components/hvac-labs/GaugeReadingLab';
+import EPA608PracticeExam from '@/components/hvac-labs/EPA608PracticeExam';
+import ComponentIDLab from '@/components/hvac-labs/ComponentIDLab';
 import { CONDENSER_SCENARIOS } from '@/lib/simulations/condenser-scenarios';
 import { HVAC_QUIZ_BANKS } from '@/lib/courses/hvac-quiz-banks';
 import { HVAC_MODULE_CONTENT } from '@/lib/courses/hvac-module-content';
@@ -44,13 +47,18 @@ const course = COURSE_DEFINITIONS.find((c) => c.slug === 'hvac-technician')!;
 type TabId = 'video' | 'content' | 'lab' | 'quiz';
 
 const TABS: { id: TabId; label: string; icon: typeof Video }[] = [
-  { id: 'video', label: 'Video', icon: Video },
   { id: 'content', label: 'Content', icon: BookOpen },
   { id: 'lab', label: 'Lab', icon: FlaskConical },
   { id: 'quiz', label: 'Quiz', icon: ClipboardList },
+  { id: 'video', label: 'Video', icon: Video },
 ];
 
-const LAB_MODULES = ['hvac-05', 'hvac-08', 'hvac-11', 'hvac-13'];
+// All modules have labs — interactive components mapped by module
+const LAB_MODULES = [
+  'hvac-01', 'hvac-02', 'hvac-03', 'hvac-04', 'hvac-05', 'hvac-06',
+  'hvac-07', 'hvac-08', 'hvac-09', 'hvac-10', 'hvac-11', 'hvac-12',
+  'hvac-13', 'hvac-14', 'hvac-15', 'hvac-16',
+];
 
 /** Map diagram IDs to their interactive components */
 const DIAGRAM_COMPONENTS: Record<string, React.ReactNode> = {
@@ -166,9 +174,12 @@ function ServiceCallCard({ scenario }: { scenario: ReturnType<typeof getModuleSc
 
 export default function HVACClassroomPreview() {
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<TabId>('video');
+  const [activeTab, setActiveTab] = useState<TabId>('content');
   const [completedTabs, setCompletedTabs] = useState<Record<string, Set<TabId>>>({});
   const [videoProgress, setVideoProgress] = useState(0);
+  const handleProgress = useCallback((p: number) => {
+    setVideoProgress((prev) => (prev === p ? prev : p));
+  }, []);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isCareerSafe = currentModuleIndex === course.modules.length;
@@ -199,7 +210,7 @@ export default function HVACClassroomPreview() {
   const goToModule = (mi: number) => {
     if (!isModuleUnlocked(mi)) return;
     setCurrentModuleIndex(mi);
-    setActiveTab('video');
+    setActiveTab('content');
     setVideoProgress(0);
     setSidebarOpen(false);
   };
@@ -379,7 +390,7 @@ export default function HVACClassroomPreview() {
                 <InteractiveVideoPlayer
                   videoUrl="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-01-01-v13.mp4"
                   title={mod.title}
-                  onProgress={(p: number) => setVideoProgress(p)}
+                  onProgress={handleProgress}
                   onComplete={() => completeTab('video')}
                 />
               ) : (
@@ -462,8 +473,32 @@ export default function HVACClassroomPreview() {
           {/* ── LAB TAB ── */}
           {activeTab === 'lab' && (
             <div>
-              {LAB_MODULES.includes(modId) ? (
-                <div className="space-y-6">
+              {/* Interactive Labs — mapped by module */}
+
+              {/* Component Identification — Modules 1-3 */}
+              {['hvac-01', 'hvac-02', 'hvac-03'].includes(modId) && (
+                <div className="mb-8">
+                  <ComponentIDLab />
+                </div>
+              )}
+
+              {/* Gauge Reading Lab — Modules 5-8 */}
+              {['hvac-05', 'hvac-06', 'hvac-07', 'hvac-08'].includes(modId) && (
+                <div className="mb-8">
+                  <GaugeReadingLab />
+                </div>
+              )}
+
+              {/* EPA 608 Practice Exam — Module 13 */}
+              {modId === 'hvac-13' && (
+                <div className="mb-8">
+                  <EPA608PracticeExam />
+                </div>
+              )}
+
+              {/* Condenser Diagram + Troubleshoot — Modules 4, 9-12 */}
+              {['hvac-04', 'hvac-09', 'hvac-10', 'hvac-11', 'hvac-12'].includes(modId) && (
+                <div className="space-y-6 mb-8">
                   <CondenserDiagram mode="explore" />
                   <TroubleshootScenario
                     scenarios={CONDENSER_SCENARIOS}
@@ -471,8 +506,9 @@ export default function HVACClassroomPreview() {
                     onComplete={(result: { correct: boolean }) => { if (result.correct) completeTab('lab'); }}
                   />
                 </div>
-              ) : (
-                <div className="space-y-6">
+              )}
+
+              <div className="space-y-6">
                   <h2 className="text-xl font-bold text-slate-900">Hands-On Lab</h2>
 
                   {/* Lab lessons */}
@@ -546,7 +582,6 @@ export default function HVACClassroomPreview() {
                     </button>
                   )}
                 </div>
-              )}
               {isTabDone('lab') && (
                 <p className="mt-4 flex items-center gap-2 text-brand-green-600 text-sm font-medium"><CheckCircle className="w-4 h-4" /> Lab complete</p>
               )}

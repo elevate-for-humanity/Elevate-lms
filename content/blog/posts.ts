@@ -30,7 +30,7 @@ export const STATIC_POSTS: BlogPost[] = [
     author_name: 'Elizabeth Greene',
     category: 'Funding',
     tags: ['WIOA', 'Funding', 'Free Training', 'Workforce Development'],
-    image: '/images/heroes-hq/funding-hero.jpg',
+    image: '/images/pages/funding-hero.jpg',
     published: true,
     content: `## What Is WIOA?
 
@@ -92,7 +92,7 @@ If you do not qualify for WIOA, you may still be eligible for:
     author_name: 'Elizabeth Greene',
     category: 'Credentials',
     tags: ['Credentials', 'Certifications', 'Career', 'Workforce'],
-    image: '/images/heroes-hq/success-hero.jpg',
+    image: '/images/pages/success-hero.jpg',
     published: true,
     content: `## Two Kinds of Paper
 
@@ -151,7 +151,7 @@ At Elevate, the answer to all three is clear. [View our full credential list](/c
     author_name: 'Elizabeth Greene',
     category: 'Career',
     tags: ['Career', 'Indiana', 'Workforce', 'WIOA', 'Job Training'],
-    image: '/images/heroes-hq/how-it-works-hero.jpg',
+    image: '/images/pages/how-it-works-hero.jpg',
     published: true,
     content: `## The 90-Day Window
 

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 import HomeHeroVideo from './HomeHeroVideo';
-import { InView } from '@/components/ui/InView';
 import { PROGRAMS } from '@/lib/programs-data';
 
 export const metadata: Metadata = {
@@ -92,7 +91,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
-      <InView animation="fade-up">
+      
       <section className="py-10 sm:py-12 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-3">
@@ -128,12 +127,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
 
 
       {/* ===== THREE PILLARS ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Three pillars" className="py-10 sm:py-14">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-8">
@@ -180,10 +179,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== FEATURED PROGRAMS ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Featured credential programs" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-10">
@@ -230,12 +229,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
 
 
       {/* ===== NATIONAL CREDENTIAL VALIDATION ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="National credential validation" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
@@ -276,10 +275,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== FUNDING ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
@@ -321,12 +320,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
 
 
       {/* ===== EMPLOYERS ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Employer partnerships" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -354,10 +353,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== EMPLOYMENT SUPPORT ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Employment support services" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -377,10 +376,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== WHY ELEVATE ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -417,10 +416,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== TESTIMONIALS ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Student testimonials" className="py-10 sm:py-14 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -455,10 +454,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== CTA ===== */}
-      <InView animation="fade-up">
+      
       <section aria-label="Get started" className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
@@ -476,7 +475,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      </InView>
+      
 
       {/* ===== TRUST BAR ===== */}
       <section className="py-8 bg-slate-50 border-t border-slate-100">

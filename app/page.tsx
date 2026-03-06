@@ -1,12 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
-
 import HomeHeroVideo from './HomeHeroVideo';
 import { PROGRAMS } from '@/lib/programs-data';
-
-const HomeBelowFold = dynamic(() => import('./HomeBelowFold'));
+import HomeBelowFold from './HomeBelowFold';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Credential Institute — Healthcare, Trades, CDL & Technology',

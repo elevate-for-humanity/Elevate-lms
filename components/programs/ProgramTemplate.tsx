@@ -35,6 +35,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
         <ProgramHeroBanner
           videoSrc={program.heroVideo}
           voiceoverSrc={program.voiceoverSrc}
+          posterImage={program.heroImage}
         />
       ) : (
         <section className="bg-zinc-900 text-white py-16">

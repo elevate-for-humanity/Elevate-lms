@@ -74,7 +74,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           onError={() => setVideoFailed(true)}
         />
       ) : posterImage ? (
@@ -95,7 +95,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
           <audio
             ref={voiceoverRef}
             src={voiceoverSrc}
-            preload="auto"
+            preload="metadata"
             onEnded={() => setVoiceActive(false)}
           />
           <button

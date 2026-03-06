@@ -6,9 +6,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'JRI — Justice Reinvestment Initiative | Job Ready Indy | Elevate for Humanity',
+  title: 'JRI — Justice Reinvestment Initiative & Job Ready Indy | Elevate for Humanity',
   description:
-    'Justice Reinvestment Initiative (JRI) funding through Job Ready Indy may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
+    'Justice Reinvestment Initiative (JRI) and Job Ready Indy funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/jri' },
 };
 
@@ -42,8 +42,8 @@ export default function JRIFundingPage() {
         <Image src="/images/pages/funding-page-2.jpg" alt="JRI Justice Reinvestment Initiative — Job Ready Indy" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/40 flex items-end">
           <div className="max-w-6xl mx-auto px-4 pb-10 w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Justice Reinvestment Initiative</h1>
-            <p className="text-xl text-white/90 font-medium">Job Ready Indy — Funded Career Training for Justice-Involved Individuals</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Justice Reinvestment Initiative (JRI)</h1>
+            <p className="text-xl text-white/90 font-medium">Delivered through Job Ready Indy — Funded Career Training for Justice-Involved Individuals</p>
           </div>
         </div>
       </section>
@@ -53,9 +53,9 @@ export default function JRIFundingPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-start">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is JRI?</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is JRI &amp; Job Ready Indy?</h2>
               <p className="text-slate-700 leading-relaxed mb-4">
-                The Justice Reinvestment Initiative (JRI) is an Indiana state program that funds career training for eligible justice-involved individuals through the <strong>Job Ready Indy</strong> initiative. Administered by the Indiana Department of Workforce Development (DWD), JRI removes financial barriers so participants can focus on earning certifications and building careers.
+                The <strong>Justice Reinvestment Initiative (JRI)</strong> is an Indiana state program that funds career training for eligible justice-involved individuals. It is delivered locally through <strong>Job Ready Indy</strong>, an initiative administered by the Indiana Department of Workforce Development (DWD). Together, JRI and Job Ready Indy remove financial barriers so participants can focus on earning certifications and building careers.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is an approved JRI credential pathway provider. Our programs are designed to get participants certified with nationally recognized credentials and employed in high-demand fields within weeks, not years.

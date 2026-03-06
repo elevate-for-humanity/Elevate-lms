@@ -117,7 +117,7 @@ Last verified: 882/882 pages, zero errors
 - `app/search/page.tsx` — Program search with cards, funding tags
 - `app/about/page.tsx` — Founder section, credentials, team preview
 - `app/funding/dol/page.tsx` — DOL Registered Apprenticeship
-- `app/funding/jri/page.tsx` — JRI funding with qualified language
+- `app/funding/jri/page.tsx` — JRI = Justice Reinvestment Initiative, delivered via Job Ready Indy (Indiana DWD)
 - `app/credentials/page.tsx` — 8 credentials with issuer/field
 - `app/training/certifications/page.tsx` — 8 cert programs
 - `app/features/page.tsx` — 6 platform features
@@ -140,6 +140,51 @@ All `blue-*` Tailwind classes have been migrated to `brand-blue-*` tokens across
 Semantic colors (indigo, teal, purple, emerald, cyan) are intentionally kept for UI state differentiation (status badges, category colors, charts).
 
 When adding new UI, always use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, or `brand-green-*` for brand elements.
+
+# Document Generation (Partnership Proposals)
+
+Elevate uses Node.js + `docx` (npm package) to generate `.docx` partnership proposals programmatically, then emails them via SendGrid.
+
+## Pattern
+
+```js
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+        WidthType, AlignmentType, BorderStyle, ImageRun, ShadingType,
+        convertInchesToTwip } = require('docx');
+```
+
+- Logo: `public/images/Elevate_for_Humanity_logo_81bf0fab.jpg` — render at 60×90px
+- Brand colors: `DARK = '1E293B'`, `RED = 'DC2626'`, `GRAY = '6B7280'`
+- Page margins: 1in top/bottom, 1.25in left/right
+- Font: Arial throughout, body size 22 (11pt), headings size 28 (14pt)
+- Output to `/tmp/` then attach to SendGrid email
+
+## SendGrid
+
+- API key stored in the generation script (not in env — keep as-is for now)
+- From address: `noreply@elevateforhumanity.org`
+- Reply-to: `elevate4humanityedu@gmail.com`
+- Recipient: `elevate4humanityedu@gmail.com` (Elizabeth Greene)
+
+## La Plaza Proposal — Current State (v4)
+
+File: `LaPlaza_Partnership_Proposal_Elevate_v4.docx`
+
+Program table (Section 2):
+| Program Length | 12 weeks (flexible based on hours/days per week) |
+| Classroom Instruction | 12 weeks |
+| Primary Credential | EPA Section 608 Universal (proctored on-site at Elevate) |
+| Additional Credentials | OSHA 10-Hour, ACT WorkKeys / NCRC |
+| Cohort Size | Up to 30 participants per cohort |
+| Service Area | Indianapolis / Marion County |
+
+Key decisions made:
+- OJT Placements row removed (employer agreements still pending)
+- Hands-On Training row removed (redundant with Classroom Instruction)
+- Program length set to 10 weeks
+- Cohort size: up to 30 participants
+
+---
 
 # Cleanup Status
 

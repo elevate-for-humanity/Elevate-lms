@@ -225,12 +225,20 @@ export default function HVACClassroomPreview() {
   const videoLessons = mod.lessons.filter((l) => l.type === 'video');
 
   return (
+    <>
+      {/* Hide site header/footer — course has its own layout */}
+      <style>{`
+        header, footer, nav, .site-header, .site-footer { display: none !important; }
+        #main-content { padding-top: 0 !important; }
+      `}</style>
     <div className="flex h-screen bg-slate-50">
       {/* Banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-brand-blue-700 text-white text-center py-2 text-sm font-medium">
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white text-center py-3 text-sm font-medium shadow-lg">
         <GraduationCap className="w-4 h-4 inline mr-2" />
-        Course Preview — HVAC Technician Program
-        <Link href="/apply?program=hvac-technician" className="ml-3 underline hover:no-underline">Apply Now</Link>
+        <span className="font-bold">HVAC Technician Program</span>
+        <span className="hidden sm:inline text-slate-400 mx-2">|</span>
+        <span className="hidden sm:inline text-slate-300">640 Hours &middot; EPA 608 &middot; OSHA 10 &middot; CPR/AED</span>
+        <Link href="/apply?program=hvac-technician" className="ml-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-3 py-1 rounded-full text-xs font-bold transition">Apply Now</Link>
       </div>
 
       {/* Mobile toggle */}
@@ -632,5 +640,6 @@ export default function HVACClassroomPreview() {
         </div>
       </main>
     </div>
+    </>
   );
 }

@@ -5,7 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Sun, Moon, BookOpen, CheckCircle2, ArrowLeft, Clock, MapPin } from 'lucide-react';
+import Image from 'next/image';
+import { CheckCircle2, ArrowLeft, Clock, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Select Schedule | Elevate for Humanity',
@@ -15,8 +16,9 @@ export const metadata: Metadata = {
 const SCHEDULE_OPTIONS = [
   {
     id: 'day',
+    image: '/images/pages/comp-cta-training.jpg',
+    imageAlt: 'Students in daytime HVAC training class',
     label: 'Day Classes',
-    icon: Sun,
     hours: 'Monday – Friday, 8:00 AM – 2:30 PM',
     location: 'Elevate Training Center, Indianapolis, IN',
     description: 'Full-time daytime schedule. Complete the program in 12 weeks.',
@@ -25,8 +27,9 @@ const SCHEDULE_OPTIONS = [
   },
   {
     id: 'evening',
+    image: '/images/pages/admin-apprenticeships-classroom.jpg',
+    imageAlt: 'Evening HVAC training class',
     label: 'Evening Classes',
-    icon: Moon,
     hours: 'Monday – Thursday, 5:30 PM – 9:00 PM',
     location: 'Elevate Training Center, Indianapolis, IN',
     description: 'For working adults. Program runs approximately 16 weeks.',
@@ -35,8 +38,9 @@ const SCHEDULE_OPTIONS = [
   },
   {
     id: 'self-paced',
+    image: '/images/pages/admin-analytics-learning-hero.jpg',
+    imageAlt: 'Student learning online at their own pace',
     label: 'Self-Paced Online',
-    icon: BookOpen,
     hours: 'Anytime — complete lessons on your own schedule',
     location: 'Online via Elevate LMS',
     description: 'Online coursework only. Hands-on labs scheduled separately at the training center.',
@@ -103,25 +107,31 @@ export default async function SelectSchedulePage() {
         </p>
 
         <form action={confirmSchedule} className="space-y-4">
-          {SCHEDULE_OPTIONS.map((opt, i) => {
-            const Icon = opt.icon;
-            return (
-              <label
-                key={opt.id}
-                className="block bg-white rounded-xl border-2 border-gray-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors"
-              >
-                <div className="flex items-start gap-4">
+          {SCHEDULE_OPTIONS.map((opt, i) => (
+            <label
+              key={opt.id}
+              className="block bg-white rounded-xl border-2 border-gray-200 cursor-pointer hover:border-brand-blue-300 transition-colors overflow-hidden"
+            >
+              <div className="flex flex-col sm:flex-row">
+                {/* Photo */}
+                <div className="relative w-full sm:w-44 h-36 sm:h-auto flex-shrink-0">
+                  <Image
+                    src={opt.image}
+                    alt={opt.imageAlt}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                {/* Content */}
+                <div className="flex items-start gap-3 p-5 flex-1">
                   <input
                     type="radio"
                     name="schedule_type"
                     value={opt.id}
                     required
                     defaultChecked={i === 0}
-                    className="mt-1"
+                    className="mt-1 flex-shrink-0"
                   />
-                  <div className="w-10 h-10 rounded-xl bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5 h-5 text-brand-blue-600" />
-                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-gray-900">{opt.label}</span>
@@ -129,7 +139,7 @@ export default async function SelectSchedulePage() {
                         {opt.badge}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 mb-2">{opt.description}</p>
+                    <p className="text-sm text-gray-500 mb-3">{opt.description}</p>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-xs text-gray-600">
                         <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
@@ -142,9 +152,9 @@ export default async function SelectSchedulePage() {
                     </div>
                   </div>
                 </div>
-              </label>
-            );
-          })}
+              </div>
+            </label>
+          ))}
 
           <div className="flex justify-end pt-2">
             <button

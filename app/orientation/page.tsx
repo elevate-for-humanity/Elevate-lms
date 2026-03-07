@@ -173,8 +173,14 @@ export default async function OrientationPage() {
               Apply Now
             </Link>
             <Link
-              href="/programs"
+              href="/orientation/competency-test"
               className="bg-slate-900 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition"
+            >
+              Take Competency Assessment
+            </Link>
+            <Link
+              href="/programs"
+              className="border-2 border-white/60 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
             >
               Browse Programs
             </Link>

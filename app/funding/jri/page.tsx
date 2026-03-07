@@ -109,7 +109,8 @@ export default function JRIFundingPage() {
           <p className="text-xl text-white/90 mb-10">JRI funding may give you a fresh start with funded career training. Check your eligibility today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/apply/student" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
-            <Link href="/contact" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
+            <Link href="/partners/jri" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">JRI Partner Courses</Link>
+            <Link href="/contact" className="border-2 border-white/60 text-white/90 px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
           </div>
         </div>
       </section>

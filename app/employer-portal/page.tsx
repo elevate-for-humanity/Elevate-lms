@@ -6,6 +6,7 @@ import Link from 'next/link';
 import {
   Users, Briefcase, FileText, BarChart3, ArrowRight,
   Building2, CheckCircle, Clock, TrendingUp, PlusCircle,
+  MessageSquare, BookOpen,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -92,6 +93,8 @@ export default async function EmployerPortalDashboard() {
         {[
           { title: 'Post a Job', href: '/employer-portal/jobs/new', icon: PlusCircle, desc: 'Create a new job posting', color: 'border-l-brand-blue-500' },
           { title: 'View Candidates', href: '/employer-portal/candidates', icon: Users, desc: 'Browse qualified candidates', color: 'border-l-brand-green-500' },
+          { title: 'Messages', href: '/employer-portal/messages', icon: MessageSquare, desc: 'Communicate with candidates and staff', color: 'border-l-indigo-500' },
+          { title: 'Hiring Guide', href: '/employer-portal/hiring-guide', icon: BookOpen, desc: 'Step-by-step guide to hiring graduates', color: 'border-l-teal-500' },
           { title: 'Company Profile', href: '/employer-portal/company', icon: Building2, desc: 'Update company information', color: 'border-l-amber-500' },
           { title: 'WOTC Credits', href: '/employer-portal/wotc', icon: TrendingUp, desc: 'Work Opportunity Tax Credits', color: 'border-l-purple-500' },
         ].map((a) => (

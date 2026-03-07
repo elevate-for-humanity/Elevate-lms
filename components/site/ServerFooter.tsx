@@ -46,6 +46,7 @@ const footerLinks = {
   portals: [
     { name: 'Student Portal', href: '/login' },
     { name: 'Get Started', href: '/getstarted' },
+    { name: 'Start Now (Self-Service)', href: '/call-now' },
     { name: 'Learning Hub', href: '/learning' },
     { name: 'Employer Portal', href: '/employer' },
     { name: 'Partner Portal', href: '/partner-portal' },

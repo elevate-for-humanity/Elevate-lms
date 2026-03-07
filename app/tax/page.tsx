@@ -67,6 +67,9 @@ export default function TaxServicesPage() {
             <Link href="/tax/supersonicfastcash/services" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               Supersonic Fast Cash
             </Link>
+            <Link href="/tax/supersonicfastcash/faq" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
+              Tax FAQ
+            </Link>
             <Link href="/tax/book-appointment" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Book Appointment
             </Link>

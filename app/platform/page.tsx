@@ -32,6 +32,7 @@ const audiences = [
   { title: 'Employers', desc: 'Access trained candidates, manage apprenticeships, track workforce pipelines.', href: '/platform/employer-portal', image: '/images/pages/homepage-why-elevate.jpg' },
   { title: 'Workforce Boards', desc: 'WIOA reporting, outcome dashboards, multi-provider oversight.', href: '/platform/workforce-boards', image: '/images/pages/homepage-why-elevate.jpg' },
   { title: 'Partners & Nonprofits', desc: 'Plug into shared infrastructure for funded training delivery.', href: '/platform/partners', image: '/images/pages/homepage-why-elevate.jpg' },
+  { title: 'Partner Portal', desc: 'Manage students, analytics, reporting, and program settings from one dashboard.', href: '/platform/partner-portal', image: '/images/pages/homepage-why-elevate.jpg' },
 ];
 
 const modules = [

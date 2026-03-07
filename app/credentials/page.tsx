@@ -153,6 +153,21 @@ export default function CredentialsPage() {
       </section>
 
       {/* Disclaimer */}
+      {/* HVAC credential resources */}
+      <section className="py-8 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">HVAC Credential Resources</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/credentials/checksheets" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              Performance Checksheets
+            </Link>
+            <Link href="/credentials/hvac-standards" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              HVAC Competency Standards
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="py-10 bg-amber-50 border-t border-amber-200">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-amber-800 text-sm leading-relaxed">

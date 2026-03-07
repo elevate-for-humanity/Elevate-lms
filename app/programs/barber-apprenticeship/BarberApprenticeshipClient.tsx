@@ -166,6 +166,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <p className="text-sm text-slate-400 mb-4">
                 Not sure if this program is right for you? Submit an inquiry and a career advisor will
                 contact you to discuss eligibility, funding options, and next steps. No commitment required.
+                {' '}<Link href="/forms/barber-apprenticeship-inquiry" className="underline font-medium">Use the inquiry form →</Link>
               </p>
               <Link
                 href="/contact?program=barber-apprenticeship"

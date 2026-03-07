@@ -607,6 +607,9 @@ export default function HvacCourseHome({
             <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Enroll Now'}
           </Link>
           <div className="flex flex-wrap justify-center gap-6 mt-5 text-sm">
+            <Link href="/course-preview/hvac-technician" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold">
+              Course Preview →
+            </Link>
             <Link href="/programs/hvac-technician/curriculum" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold">
               Full Curriculum →
             </Link>

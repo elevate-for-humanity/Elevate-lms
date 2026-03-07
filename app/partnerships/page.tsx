@@ -161,14 +161,20 @@ export default function PartnershipsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?subject=Partnership%20Inquiry"
+              href="/partners/training"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+            >
+              Training Provider Partnership <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/contact?subject=Partnership%20Inquiry"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               Contact Us <ArrowRight className="w-4 h-4" />
             </Link>
             <a
               href="tel:317-314-3757"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white/60 text-white/90 px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               (317) 314-3757

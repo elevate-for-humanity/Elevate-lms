@@ -115,7 +115,7 @@ export default function CompetencyVerificationPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[300px] print:hidden">
+      <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
         <Image
           src="/images/pages/compliance-page-2.jpg"
           alt="Competency assessment in progress"

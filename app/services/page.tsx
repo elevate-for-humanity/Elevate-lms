@@ -105,7 +105,7 @@ export default function ServicesPage() {
                 href={service.href}
                 className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={service.image}
                     alt={service.title}

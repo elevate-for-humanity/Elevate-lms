@@ -146,7 +146,7 @@ export default function DemosPage() {
                 className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-blue-300 hover:shadow-xl transition-all"
               >
                 {/* Thumbnail */}
-                <div className="relative h-56">
+                <div className="relative h-56 overflow-hidden">
                   <Image
                     src={demo.thumbnail}
                     alt={demo.title}

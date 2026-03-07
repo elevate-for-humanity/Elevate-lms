@@ -112,7 +112,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   return (
     <>
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/instructor-page-4.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       <SpeedGraderWrapper

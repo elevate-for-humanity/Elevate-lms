@@ -96,7 +96,7 @@ export default function CDLWaitlistPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-slate-900 text-white py-16">
+      <section className="relative bg-slate-900 text-white py-16 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/pages/programs-cdl-waitlist-hero.jpg" alt="CDL truck training" fill className="object-cover opacity-30" priority />
         </div>

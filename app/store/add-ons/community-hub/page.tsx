@@ -154,7 +154,7 @@ export default function CommunityHubPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature) => (
               <div key={feature.title} className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition">
-                <div className="relative h-44">
+                <div className="relative h-44 overflow-hidden">
                   <Image
                     src={feature.image}
                     alt={feature.title}

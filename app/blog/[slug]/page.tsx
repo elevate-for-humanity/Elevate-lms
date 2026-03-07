@@ -203,7 +203,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                   href={`/blog/${related.slug}`}
                   className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition group"
                 >
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <Image
                       src={related.image || '/images/pages/social-media-1.jpg'}
                       alt={related.title}

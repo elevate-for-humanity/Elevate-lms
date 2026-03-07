@@ -122,7 +122,7 @@ export default function TestingPage() {
             {examCategories.map((cat) => (
               <div key={cat.name} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
                 <div className="grid lg:grid-cols-3">
-                  <div className="relative h-48 lg:h-auto">
+                  <div className="relative h-48 lg:h-auto overflow-hidden">
                     <Image src={cat.image} alt={cat.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw" />
                   </div>
                   <div className="lg:col-span-2 p-6">

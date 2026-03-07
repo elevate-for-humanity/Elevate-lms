@@ -21,7 +21,7 @@ const hours = (dbRows as any[]) || [];
       <div className="space-y-6">
 
       {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image src="/images/pages/demo-page-17.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         {/* Summary */}

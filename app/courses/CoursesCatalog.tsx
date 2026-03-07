@@ -236,7 +236,7 @@ export default function CoursesCatalog({
                     className="bg-white rounded-lg shadow-sm border hover:shadow-lg transition-shadow overflow-hidden group"
                   >
                     {course.thumbnail_url ? (
-                      <div className="relative h-48   ">
+                      <div className="relative h-48    overflow-hidden">
                         <Image alt="Course thumbnail" loading="lazy"
                           src={course.thumbnail_url}
                           alt={course.title}

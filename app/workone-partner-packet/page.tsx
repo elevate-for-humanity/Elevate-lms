@@ -212,7 +212,7 @@ export default function WorkOnePartnerPacketPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
@@ -225,7 +225,7 @@ export default function WorkOnePartnerPacketPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
@@ -238,7 +238,7 @@ export default function WorkOnePartnerPacketPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/workone-packet-1.jpg" alt="Training" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
@@ -251,7 +251,7 @@ export default function WorkOnePartnerPacketPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/workone-packet-2.jpg" alt="Placement" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
@@ -294,7 +294,7 @@ export default function WorkOnePartnerPacketPage() {
               { title: 'Business & Office', duration: '4-8 weeks', credential: 'Microsoft Office, QuickBooks', funding: 'WIOA, WRG', image: '/images/pages/comp-cta-training.jpg' },
             ].map((program, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image src={program.image} alt={program.title} fill sizes="100vw" quality={85} className="object-cover" />
                 </div>
                 <div className="p-6">

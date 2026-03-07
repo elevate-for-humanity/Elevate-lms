@@ -59,7 +59,7 @@ export default async function SuccessStoriesPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="relative w-full h-64">
+              <div className="relative w-full h-64 overflow-hidden">
                 <Image
                   src="/images/pages/success-page-1.jpg"
                   alt="Student success at Elevate for Humanity"
@@ -80,7 +80,7 @@ export default async function SuccessStoriesPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="relative w-full h-64">
+              <div className="relative w-full h-64 overflow-hidden">
                 <Image
                   src="/images/pages/success-page-1.jpg"
                   alt="Barber Training"
@@ -101,7 +101,7 @@ export default async function SuccessStoriesPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="relative w-full h-64">
+              <div className="relative w-full h-64 overflow-hidden">
                 <Image
                   src="/images/pages/success-page-1.jpg"
                   alt="Business Training"

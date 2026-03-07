@@ -59,7 +59,7 @@ export default function JobPlacementPage() {
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
-            <div className="relative h-40">
+            <div className="relative h-40 overflow-hidden">
               <Image src="/images/pages/career-services-page-3.jpg" alt="Employer connections" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="p-8">
@@ -71,7 +71,7 @@ export default function JobPlacementPage() {
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
-            <div className="relative h-40">
+            <div className="relative h-40 overflow-hidden">
               <Image src="/images/pages/career-services-page-3.jpg" alt="Job matching" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="p-8">
@@ -83,7 +83,7 @@ export default function JobPlacementPage() {
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
-            <div className="relative h-40">
+            <div className="relative h-40 overflow-hidden">
               <Image src="/images/pages/career-services-page-3.jpg" alt="Interview preparation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="p-8">

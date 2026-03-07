@@ -83,7 +83,7 @@ function LessonDrawer({ module, index, done, onClose }: {
       <div className="relative w-full max-w-md bg-white shadow-2xl overflow-y-auto animate-in slide-in-from-right">
 
         {/* Header image */}
-        <div className="relative h-52">
+        <div className="relative h-52 overflow-hidden">
           <Image src={MODULE_PHOTO[index] || MODULE_PHOTO[0]} alt={module.title} fill className="object-cover" />
           <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition shadow-lg">
             <X className="w-4 h-4" />
@@ -458,7 +458,7 @@ export default function HvacCourseHome({
                   className="group text-left bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-brand-blue-300 transition-all duration-200"
                 >
                   {/* Image */}
-                  <div className="relative h-44">
+                  <div className="relative h-44 overflow-hidden">
                     <Image
                       src={MODULE_PHOTO[i] || MODULE_PHOTO[0]}
                       alt={mod.title}

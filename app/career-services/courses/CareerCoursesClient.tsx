@@ -189,7 +189,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {courses.map((course) => (
                 <div key={course.id} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col">
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <Image
                       src={course.image_url || '/images/pages/apply-employer-hero.jpg'}
                       alt={course.title}

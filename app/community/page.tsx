@@ -96,7 +96,7 @@ export default async function CommunityPage() {
       </div>
 
       {/* Clean Hero - Image Only */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/community-page-5.jpg"
           alt="Community members collaborating"
@@ -239,7 +239,7 @@ export default async function CommunityPage() {
               { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "/images/pages/comp-home-pathways-support.jpg" }
             ].map((event, index) => (
               <div key={index} className="bg-gray-50 rounded-xl overflow-hidden">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image
                     src={event.image}
                     alt={event.title}

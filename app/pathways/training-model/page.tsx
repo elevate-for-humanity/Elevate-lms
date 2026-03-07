@@ -20,7 +20,7 @@ export default function TrainingModelPage() {
       </div>
 
       {/* Visual hero */}
-      <section className="relative h-[280px] sm:h-[360px]">
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         <Image src="/images/pages/pathways-page-4.jpg" alt="Students in a hands-on training classroom" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -62,7 +62,7 @@ export default function TrainingModelPage() {
             {/* Hybrid */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
-                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
+                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image src="/images/pages/pathways-page-4.jpg" alt="Hands-on trades training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
@@ -88,7 +88,7 @@ export default function TrainingModelPage() {
             {/* In-person intensive */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
-                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
+                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image src="/images/pages/pathways-page-4.jpg" alt="CDL behind-the-wheel training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
@@ -114,7 +114,7 @@ export default function TrainingModelPage() {
             {/* Online */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
-                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0">
+                <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image src="/images/pages/pathways-page-4.jpg" alt="Online cybersecurity training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">

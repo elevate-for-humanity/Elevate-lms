@@ -114,7 +114,7 @@ export default function PlatformPage() {
             {pipelineSteps.map((s, i) => (
               <div key={s.step} className="relative">
                 <div className="bg-white rounded-xl overflow-hidden border border-slate-200 h-full">
-                  <div className="relative h-28">
+                  <div className="relative h-28 overflow-hidden">
                     <Image
                       src={s.image}
                       alt={s.label}
@@ -154,7 +154,7 @@ export default function PlatformPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {audiences.map((a) => (
               <div key={a.title} className="group bg-white rounded-xl overflow-hidden border border-slate-200 hover:border-brand-red-300 hover:shadow-lg transition-all">
-                <div className="relative h-44">
+                <div className="relative h-44 overflow-hidden">
                   <Image
                     src={a.image}
                     alt={a.title}
@@ -193,7 +193,7 @@ export default function PlatformPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {modules.map((m) => (
               <div key={m.title} className="group bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image
                     src={m.image}
                     alt={m.title}

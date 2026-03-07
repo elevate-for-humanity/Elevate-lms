@@ -89,7 +89,7 @@ export default async function OnboardingPage() {
               href="/onboarding/learner"
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/onboarding-page-2.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
@@ -125,7 +125,7 @@ export default async function OnboardingPage() {
               href="/program-holder/onboarding"
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/prog-hero-main-2.jpg" alt="Program Holder" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
@@ -160,7 +160,7 @@ export default async function OnboardingPage() {
               href="/onboarding/partner"
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/onboarding-page-2.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">

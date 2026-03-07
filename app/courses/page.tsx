@@ -130,7 +130,7 @@ export default async function CoursesPage() {
                 href={`/programs/${category.slug}`}
                 className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border border-slate-100"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={category.image}
                     alt={category.name}
@@ -172,7 +172,7 @@ export default async function CoursesPage() {
                   href={`/programs/${course.slug}`}
                   className="bg-slate-800 rounded-2xl overflow-hidden hover:bg-slate-700 transition-all group"
                 >
-                  <div className="relative h-40">
+                  <div className="relative h-40 overflow-hidden">
                     <Image
                       src={course.image_url || '/images/pages/comp-cta-career.jpg'}
                       alt={course.title}

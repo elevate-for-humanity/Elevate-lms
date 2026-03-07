@@ -161,7 +161,7 @@ export default function InstructorCredentialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[260px] sm:h-[340px]">
+      <section className="relative h-[260px] sm:h-[340px] overflow-hidden">
         <Image
           src="/images/pages/instructor-credentials-page-1.jpg"
           alt="Professional instructor working with students"

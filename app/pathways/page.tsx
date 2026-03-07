@@ -183,7 +183,7 @@ export default function PathwaysPage() {
       </div>
 
       {/* ── Visual Hero (no text overlay) ── */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/pathways-page-2.jpg"
           alt="Workforce training students in a classroom and lab setting"
@@ -243,7 +243,7 @@ export default function PathwaysPage() {
             {STAGES.map((s) => (
               <div key={s.num} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="flex flex-col lg:flex-row">
-                  <div className="relative h-64 lg:h-auto lg:w-96 flex-shrink-0">
+                  <div className="relative h-64 lg:h-auto lg:w-96 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 1024px) 100vw, 384px" className="object-cover" />
                     <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {s.num}
@@ -293,7 +293,7 @@ export default function PathwaysPage() {
             {PROGRAMS.map((p) => (
               <div key={p.name} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
                 <div className="flex flex-col lg:flex-row">
-                  <div className="relative h-56 lg:h-auto lg:w-80 flex-shrink-0">
+                  <div className="relative h-56 lg:h-auto lg:w-80 flex-shrink-0 overflow-hidden">
                     <Image src={p.image} alt={`${p.name} training`} fill sizes="(max-width: 1024px) 100vw, 320px" className="object-cover" />
                   </div>
                   <div className="p-6 flex-1">

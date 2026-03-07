@@ -111,7 +111,7 @@ export default function AddOnsPage() {
             <div key={addon.id} className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-12">
               <div className="grid lg:grid-cols-2">
                 {/* Image/Video Side */}
-                <div className="relative h-64 lg:h-auto min-h-[300px]">
+                <div className="relative h-64 lg:h-auto min-h-[300px] overflow-hidden">
                   <Image
                     src={addon.image}
                     alt={addon.title}
@@ -215,7 +215,7 @@ export default function AddOnsPage() {
                 key={item.id} 
                 className="group bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="relative h-44">
+                <div className="relative h-44 overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.title}

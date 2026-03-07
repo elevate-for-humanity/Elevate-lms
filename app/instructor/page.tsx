@@ -43,7 +43,7 @@ export default function InstructorPortalLanding() {
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Portal Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-page-1.jpg" alt="Course Management" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
@@ -52,7 +52,7 @@ export default function InstructorPortalLanding() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-page-9.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
@@ -61,7 +61,7 @@ export default function InstructorPortalLanding() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-page-1.jpg" alt="Progress Tracking" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
@@ -70,7 +70,7 @@ export default function InstructorPortalLanding() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-grading.jpg" alt="Grading" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
@@ -79,7 +79,7 @@ export default function InstructorPortalLanding() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-page-9.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
@@ -88,7 +88,7 @@ export default function InstructorPortalLanding() {
               </div>
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
+              <div className="relative h-32 overflow-hidden">
                 <Image src="/images/pages/instructor-page-9.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">

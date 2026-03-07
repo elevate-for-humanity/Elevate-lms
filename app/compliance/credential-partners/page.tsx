@@ -113,7 +113,7 @@ export default function CredentialPartnersPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[300px]">
+      <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
         <Image
           src="/images/pages/credential-partners-hero.jpg"
           alt="Credential partners and training providers"

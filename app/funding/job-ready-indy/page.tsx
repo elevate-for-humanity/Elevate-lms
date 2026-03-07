@@ -22,7 +22,7 @@ export default function JobReadyIndyPage() {
 
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image src="/images/heroes-hq/jri-hero.jpg" alt="Job Ready Indy workforce training" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/jri-hero.jpg" alt="Job Ready Indy workforce training" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/40 flex items-end">
           <div className="max-w-6xl mx-auto px-4 pb-10 w-full">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Job Ready Indy</h1>
@@ -48,7 +48,7 @@ export default function JobReadyIndyPage() {
               </Link>
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/students-learning.jpg" alt="Job Ready Indy career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/pages/student-portal-page-5.jpg" alt="Job Ready Indy career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>

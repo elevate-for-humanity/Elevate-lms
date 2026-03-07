@@ -21,7 +21,7 @@ export default function WIOAEligibilityPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[220px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[220px] sm:h-[320px] md:h-[400px] overflow-hidden">
         <Image src="/images/pages/wioa-eligibility-page-1.jpg" alt="WIOA funded career training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -70,7 +70,7 @@ export default function WIOAEligibilityPage() {
               },
             ].map((item) => (
               <div key={item.step} className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                <div className="relative h-[160px] sm:h-[180px]">
+                <div className="relative h-[160px] sm:h-[180px] overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                   <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
@@ -111,7 +111,7 @@ export default function WIOAEligibilityPage() {
               { title: 'Support Services', image: '/images/pages/comp-home-highlight-health.jpg' },
             ].map((item) => (
               <div key={item.title} className="rounded-xl overflow-hidden border border-slate-100 bg-white">
-                <div className="relative h-24 sm:h-32">
+                <div className="relative h-24 sm:h-32 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-3 text-center">
@@ -163,7 +163,7 @@ export default function WIOAEligibilityPage() {
               { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/pages/comp-cta-career.jpg' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">
-                <div className="relative h-[140px] sm:h-[160px]">
+                <div className="relative h-[140px] sm:h-[160px] overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-4">

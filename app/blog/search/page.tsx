@@ -106,7 +106,7 @@ export default async function BlogSearchPage({
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {post.featured_image && (
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <Image
                       loading="lazy"
                       src={post.featured_image}

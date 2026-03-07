@@ -33,7 +33,7 @@ export default function AboutPage() {
       </div>
 
       {/* Visual hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/about-team-hero.jpg"
           alt="Elevate for Humanity team and workforce training"
@@ -302,7 +302,7 @@ export default function AboutPage() {
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover" />
                 </div>
                 <div className="p-5">
@@ -337,7 +337,7 @@ export default function AboutPage() {
               { logo: '/images/partners/nextleveljobs.webp', name: 'Next Level Jobs', role: 'Workforce Ready Grant Provider', desc: 'Our high-demand certification programs qualify for the Workforce Ready Grant through Next Level Jobs.' },
             ].map((cred) => (
               <div key={cred.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5 text-center">
-                <div className="relative w-16 h-16 mx-auto mb-3">
+                <div className="relative w-16 h-16 mx-auto mb-3 overflow-hidden">
                   <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
@@ -396,7 +396,7 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="flex flex-col sm:flex-row">
-              <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0">
+              <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0 overflow-hidden">
                 <Image
                   src={founder.headshotSrc || '/images/pages/comp-cta-career.jpg'}
                   alt={founder.name}
@@ -483,7 +483,7 @@ export default function AboutPage() {
               { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/technology' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
-                <div className="relative h-36">
+                <div className="relative h-36 overflow-hidden">
                   <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-4">
@@ -507,7 +507,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
           <div className="grid sm:grid-cols-2 gap-6">
             <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
@@ -519,7 +519,7 @@ export default function AboutPage() {
               </div>
             </Link>
             <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-career-pathways.jpg" alt="Career pathways" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">

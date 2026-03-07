@@ -73,7 +73,7 @@ export default function GenerateReportPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/ferpa-page-8.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">

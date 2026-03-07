@@ -118,7 +118,7 @@ export default async function ClassroomPage() {
 
                 return (
                   <div key={course.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
-                    <div className="relative h-48">
+                    <div className="relative h-48 overflow-hidden">
                       {course.image_url ? (
                         <Image
                           src={course.image_url}

@@ -121,7 +121,7 @@ export default function CommunityCoursesPage() {
               href={`/community/marketplace/courses/${course.id}`}
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition"
             >
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src={course.image}
                   alt={course.title}

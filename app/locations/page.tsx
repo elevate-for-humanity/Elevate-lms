@@ -81,7 +81,7 @@ export default async function LocationsPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         <Image src="/images/pages/locations-page-1.jpg" alt="Training locations in Indianapolis" fill sizes="100vw" className="object-cover" priority />
       </section>
 

@@ -56,7 +56,7 @@ export default function WorkforcePartnershipPacketPage() {
       </div>
 
       {/* Hero — hidden on print */}
-      <section className="relative h-[240px] sm:h-[300px] print:hidden">
+      <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
         <Image
           src="/images/pages/workforce-partnership-hero.jpg"
           alt="Workforce partnership meeting"

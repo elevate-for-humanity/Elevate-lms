@@ -166,7 +166,7 @@ export default function StudentProfilePage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/student-portal-page-8.jpg" alt="Student profile" fill sizes="100vw" className="object-cover" priority />
       </section>
 

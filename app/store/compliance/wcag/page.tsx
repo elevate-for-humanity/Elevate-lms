@@ -118,7 +118,7 @@ export default function WCAGCompliancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-xl transition-all group">
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>

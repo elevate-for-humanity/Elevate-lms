@@ -19,7 +19,7 @@ export default function StorePage() {
     <div className="bg-white min-h-screen">
 
       {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         <Image src="/images/pages/store-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -170,7 +170,7 @@ export default function StorePage() {
               { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/pages/comp-cta-training.jpg' },
             ].map((item) => (
               <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
-                <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0">
+                <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0 overflow-hidden">
                   <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px" />
                 </div>
                 <div className="p-6">

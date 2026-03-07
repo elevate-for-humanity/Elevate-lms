@@ -257,7 +257,7 @@ export default function StudentPortalPage() {
                 href={link.href}
                 className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-blue-600 hover:shadow-lg transition group"
               >
-                <div className="relative h-36">
+                <div className="relative h-36 overflow-hidden">
                   <Image src={link.image} alt={link.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-6">

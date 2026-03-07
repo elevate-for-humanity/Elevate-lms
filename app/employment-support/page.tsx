@@ -21,7 +21,7 @@ export default function EmploymentSupportPage() {
       </div>
 
       {/* Hero — image only, no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
         <Image
           src="/images/pages/employment-support-page-1.jpg"
           alt="Employment support services at Elevate for Humanity"
@@ -89,7 +89,7 @@ export default function EmploymentSupportPage() {
               },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
-                <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink">
+                <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, (max-width: 1024px) 50vw, 33vw" className="object-cover" loading="lazy" />
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">

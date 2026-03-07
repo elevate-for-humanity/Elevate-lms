@@ -23,7 +23,7 @@ export default function EnrollmentAgreementPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/enrollment-agreement-page-1.jpg" alt="Enrollment agreement" fill sizes="100vw" className="object-cover" priority />
       </section>
 

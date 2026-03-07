@@ -100,7 +100,7 @@ export default async function GovernmentPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/government-page-1.jpg"
                   alt="Workforce Development Boards"
@@ -136,7 +136,7 @@ export default async function GovernmentPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/government-page-1.jpg"
                   alt="State Agencies"
@@ -172,7 +172,7 @@ export default async function GovernmentPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/government-page-1.jpg"
                   alt="Federal Programs"
@@ -383,7 +383,7 @@ export default async function GovernmentPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/government-2.jpg"
                   alt="Proven Results"
@@ -404,7 +404,7 @@ export default async function GovernmentPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/government-3.jpg"
                   alt="Priority Populations"
@@ -425,7 +425,7 @@ export default async function GovernmentPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/government-4.jpg"
                   alt="Employer Partnerships"
@@ -446,7 +446,7 @@ export default async function GovernmentPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/government-5.jpg"
                   alt="Transparent Reporting"

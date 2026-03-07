@@ -27,7 +27,7 @@ export default async function StorePWAPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="relative h-48 sm:h-56">
+      <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-5.jpg" alt="Elevate Store" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
@@ -57,7 +57,7 @@ export default async function StorePWAPage() {
           <div className="grid grid-cols-2 gap-3">
             {featured.slice(0, 4).map((product: any) => (
               <Link key={product.id} href={`/store/${product.slug || product.id}`} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="relative h-28 bg-slate-100">
+                <div className="relative h-28 bg-slate-100 overflow-hidden">
                   {product.image_url ? (
                     <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                   ) : (

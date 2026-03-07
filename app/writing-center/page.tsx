@@ -85,7 +85,7 @@ export default function WritingCenterPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/writing-center-page-1.jpg" alt="Student receiving writing assistance at the Elevate Writing Center" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -109,7 +109,7 @@ export default function WritingCenterPage() {
               whileInView={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
-              <div className="relative h-56">
+              <div className="relative h-56 overflow-hidden">
                 <Image src="/images/pages/writing-center-page-1.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
               </div>
               <div className="p-8">
@@ -127,7 +127,7 @@ export default function WritingCenterPage() {
               whileInView={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
-              <div className="relative h-56">
+              <div className="relative h-56 overflow-hidden">
                 <Image src="/images/pages/writing-center-page-1.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
               </div>
               <div className="p-8">
@@ -159,7 +159,7 @@ export default function WritingCenterPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-slate-50 rounded-2xl overflow-hidden"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image src={service.image} alt={service.title} fill className="object-cover" />
                 </div>
                 <div className="p-6">

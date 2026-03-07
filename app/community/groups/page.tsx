@@ -128,7 +128,7 @@ export default async function GroupsPage() {
                   href={`/community/groups/${group.id}`}
                   className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition"
                 >
-                  <div className="relative h-32">
+                  <div className="relative h-32 overflow-hidden">
                     <Image
                       src={group.image}
                       alt={group.name}
@@ -187,7 +187,7 @@ export default async function GroupsPage() {
                       href={`/community/groups/${group.id}`}
                       className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition"
                     >
-                      <div className="relative h-32">
+                      <div className="relative h-32 overflow-hidden">
                         {group.image_url ? (
                           <Image
                             src={group.image_url}

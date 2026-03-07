@@ -99,7 +99,7 @@ export default async function MyCoursesPage() {
                   href={`/career-services/courses/${purchase.course?.slug}/learn`}
                   className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition group"
                 >
-                  <div className="relative h-40">
+                  <div className="relative h-40 overflow-hidden">
                     <Image
                       src={purchase.course?.image_url || '/images/pages/comp-cta-career.jpg'}
                       alt={purchase.course?.title}
@@ -142,7 +142,7 @@ export default async function MyCoursesPage() {
                   key={course.id}
                   className="bg-white rounded-xl shadow-sm border overflow-hidden"
                 >
-                  <div className="relative h-40">
+                  <div className="relative h-40 overflow-hidden">
                     <Image
                       src={course.image_url || '/images/pages/apply-employer-hero.jpg'}
                       alt={course.title}

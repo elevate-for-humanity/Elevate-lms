@@ -134,7 +134,7 @@ export default function SolutionsPage() {
                 </Link>
               </div>
             </div>
-            <div className="relative h-96 bg-white/10 rounded-2xl backdrop-blur-sm p-8">
+            <div className="relative h-96 bg-white/10 rounded-2xl backdrop-blur-sm p-8 overflow-hidden">
               <div className="text-center">
                 <div className="text-6xl mb-4">
                   <GraduationCap className="w-5 h-5 inline-block" />

@@ -77,7 +77,7 @@ export default function ResourcesPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         <Image src="/images/pages/resources-page-1.jpg" alt="Resource hub for students and partners" fill sizes="100vw" className="object-cover" priority />
       </section>
 

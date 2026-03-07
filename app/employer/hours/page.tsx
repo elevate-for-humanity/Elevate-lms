@@ -60,7 +60,7 @@ export default async function EmployerHoursPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/employer-page-1.jpg" alt="Employer hours management" fill sizes="100vw" className="object-cover" priority />
       </section>
 

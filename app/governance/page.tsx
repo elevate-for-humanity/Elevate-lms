@@ -13,7 +13,7 @@ export default function GovernancePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[200px] sm:h-[280px]">
+      <section className="relative h-[200px] sm:h-[280px] overflow-hidden">
         <Image src="/images/pages/governance-page-1.jpg" alt="Governance and program structure" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/70" />
         <div className="absolute inset-0 flex items-center justify-center">

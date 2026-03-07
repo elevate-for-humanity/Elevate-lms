@@ -141,7 +141,7 @@ export default function AnalyticsProPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {useCases.map((useCase) => (
               <div key={useCase.title} className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={useCase.image}
                     alt={useCase.title}

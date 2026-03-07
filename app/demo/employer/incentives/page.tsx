@@ -18,7 +18,7 @@ const incentives = (dbRows as any[]) || [];
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
 
       {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image src="/images/pages/demo-page-14.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="bg-white rounded-xl border p-4">

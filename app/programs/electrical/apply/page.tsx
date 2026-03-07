@@ -15,7 +15,7 @@ export default function ApplyPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
+      <div className="relative h-[40vh] min-h-[300px] max-h-[400px] overflow-hidden">
         <Image src="/images/pages/programs-electrical-apply-hero.jpg" alt="Electrical" fill sizes="100vw" className="object-cover" priority />
       </div>
 

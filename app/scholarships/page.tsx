@@ -75,7 +75,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px]">
+      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <Image alt="Scholarship opportunities" 
           src="/images/pages/scholarships-page-1.jpg" 
           alt="Scholarships and Financial Aid" 

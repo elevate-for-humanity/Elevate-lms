@@ -56,7 +56,7 @@ export default function StoreCoursesPage() {
                 key={course.id}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={course.image || '/images/pages/course-create-hero.jpg'}
                     alt={course.name}

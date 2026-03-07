@@ -122,7 +122,7 @@ export default function TrainingProvidersPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit) => (
               <div key={benefit.title} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition">
-                <div className="relative h-36">
+                <div className="relative h-36 overflow-hidden">
                   <Image src={benefit.image} alt={benefit.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-6">

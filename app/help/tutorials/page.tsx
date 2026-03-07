@@ -288,9 +288,9 @@ export default async function TutorialsPage() {
                 className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:border-brand-blue-500 hover:shadow-lg transition-all group"
               >
                 {/* Video Thumbnail Placeholder */}
-                <div className="relative h-48 bg-brand-blue-600 flex items-center justify-center">
+                <div className="relative h-48 bg-brand-blue-600 flex items-center justify-center overflow-hidden">
                   
-                  <div className="relative z-10 w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="relative z-10 w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform overflow-hidden">
                     <Play className="w-8 h-8 text-white ml-1" />
                   </div>
                   <div className="absolute bottom-4 right-4 bg-slate-800 text-white text-sm px-2 py-1 rounded">

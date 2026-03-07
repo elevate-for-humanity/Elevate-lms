@@ -199,7 +199,7 @@ export default function VerifyCredentialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
         <Image
           src="/images/pages/verify-credentials-page-1.jpg"
           alt="Elevate for Humanity credential verification"

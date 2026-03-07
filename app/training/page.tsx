@@ -52,7 +52,7 @@ export default function TrainingPage() {
               const Icon = p.icon;
               return (
                 <Link key={p.title} href={p.href} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all">
-                  <div className="relative h-40">
+                  <div className="relative h-40 overflow-hidden">
                     <Image src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
                   </div>
                   <div className="p-5">

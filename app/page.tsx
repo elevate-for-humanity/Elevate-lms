@@ -111,8 +111,8 @@ export default function HomePage() {
                 href={item.href}
                 className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <div className="relative h-24 sm:h-32 w-full overflow-hidden">
-                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-36 sm:h-44 w-full overflow-hidden">
+                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover object-center group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-3 sm:p-4">
                   <span className="font-bold text-sm sm:text-base text-slate-900 block mb-0.5">{item.label}</span>
@@ -244,7 +244,7 @@ export default function HomePage() {
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
               { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/hp/funding.jpg' },
               { label: 'JRI — Justice Reinvestment Initiative', desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
-              { label: 'Job Ready Indy', desc: 'Indianapolis initiative connecting Marion County residents to funded credential training.', href: '/funding/job-ready-indy', image: '/images/heroes-hq/jri-hero.jpg' },
+              { label: 'Job Ready Indy', desc: 'Indianapolis initiative connecting Marion County residents to funded credential training.', href: '/funding/job-ready-indy', image: '/images/pages/jri-hero.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">

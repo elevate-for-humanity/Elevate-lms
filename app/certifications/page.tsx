@@ -39,7 +39,7 @@ export default function CertificationsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {certifications.map((cert, i) => (
               <div key={i} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image
                     src={cert.image}
                     alt={cert.name}

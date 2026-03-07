@@ -40,7 +40,7 @@ export default async function StaffApplicationPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="relative h-[200px] sm:h-[260px]">
+      <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/apply-page-3.jpg" alt="Join our team" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>

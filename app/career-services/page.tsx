@@ -26,7 +26,7 @@ export default function CareerServicesPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -50,7 +50,7 @@ export default function CareerServicesPage() {
               { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/pages/comp-cta-career.jpg' },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
-                <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink">
+                <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">

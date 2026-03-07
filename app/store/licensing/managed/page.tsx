@@ -153,7 +153,7 @@ export default function ManagedPlatformPage() {
               { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/pages/comp-cta-career.jpg' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                <div className="relative h-36">
+                <div className="relative h-36 overflow-hidden">
                   <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
                 <div className="p-5">

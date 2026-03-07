@@ -24,7 +24,7 @@ const programs = (dbRows as any[]) || [];
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
-<div className="relative h-64 bg-brand-blue-800">
+<div className="relative h-64 bg-brand-blue-800 overflow-hidden">
         <Image
           src="/images/pages/employer-portal-page-3.jpg"
           alt="Employer programs"
@@ -54,7 +54,7 @@ const programs = (dbRows as any[]) || [];
           {programs.map((program) => (
             <div key={program.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="md:flex">
-                <div className="md:w-1/3 relative h-64 md:h-auto">
+                <div className="md:w-1/3 relative h-64 md:h-auto overflow-hidden">
                   <Image
                     src={program.image}
                     alt={program.name}

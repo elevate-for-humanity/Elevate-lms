@@ -77,7 +77,7 @@ export default async function MarketplaceProductsPage() {
               return (
                 <div key={product.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition group">
                   {images[0] && (
-                    <div className="relative h-48 bg-gray-100">
+                    <div className="relative h-48 bg-gray-100 overflow-hidden">
                       <Image
                         src={images[0]}
                         alt={product.title}

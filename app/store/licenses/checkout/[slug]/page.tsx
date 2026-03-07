@@ -78,7 +78,7 @@ function CheckoutForm({
     <form onSubmit={handleSubmit} className="space-y-6">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/store-licenses-checkout-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
       <PaymentElement />

@@ -18,7 +18,7 @@ const courses = (dbRows as any[]) || [];
       <div className="space-y-4">
 
       {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
+      <section className="relative h-[60vh] min-h-[400px] max-h-[720px] overflow-hidden">
         <Image src="/images/pages/demo-page-16.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
         {courses.map((c, i) => (

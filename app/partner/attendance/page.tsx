@@ -87,7 +87,7 @@ export default async function PartnerAttendancePage() {
     <div>
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-2.jpg" alt="Partner attendance" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-slate-50 border-b -mx-4 -mt-6 px-4 py-3 mb-6">

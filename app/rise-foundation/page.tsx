@@ -341,7 +341,7 @@ export default async function RiseFoundationPage() {
               { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/pages/comp-cta-career.jpg' },
             ].map((product) => (
               <div key={product.name} className="bg-white rounded-xl overflow-hidden border shadow-sm hover:shadow-lg transition">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image src={product.image} alt={product.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, 25vw" />
                 </div>
                 <div className="p-5">

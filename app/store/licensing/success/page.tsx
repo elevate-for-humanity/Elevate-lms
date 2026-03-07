@@ -92,7 +92,7 @@ function SuccessContent() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/store-licensing-success-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
         <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />

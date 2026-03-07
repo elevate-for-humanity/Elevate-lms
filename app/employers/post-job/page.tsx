@@ -53,7 +53,7 @@ export default function PostJobPage() {
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4 max-w-2xl text-center">
           <div className="bg-white rounded-lg shadow-sm p-8">
-            <div className="relative w-32 h-32 mx-auto mb-6">
+            <div className="relative w-32 h-32 mx-auto mb-6 overflow-hidden">
               <Image
                 src="/images/pages/employers-page-2.jpg"
                 alt="Success"

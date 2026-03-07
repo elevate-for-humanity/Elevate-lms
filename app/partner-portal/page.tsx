@@ -128,7 +128,7 @@ export default async function PartnerPortalPage() {
     <div>
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-portal-page-1.jpg" alt="Partner portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}

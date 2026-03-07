@@ -138,7 +138,7 @@ export default function StoreDigitalPage() {
                 href={`/store/digital/${product.slug}`}
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group border border-slate-100"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={product.image || '/images/pages/comp-universal-hero.jpg'}
                     alt={product.name}
@@ -224,7 +224,7 @@ export default function StoreDigitalPage() {
                 href={`/store/digital/${product.slug}`}
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
               >
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image
                     src={product.image || '/images/pages/comp-universal-hero.jpg'}
                     alt={product.name}

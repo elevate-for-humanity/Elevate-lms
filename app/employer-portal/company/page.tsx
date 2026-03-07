@@ -110,7 +110,7 @@ export default async function CompanyProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cover Image */}
-      <div className="relative h-64 bg-brand-blue-600">
+      <div className="relative h-64 bg-brand-blue-600 overflow-hidden">
         {companyData.cover && (
           <Image
             src={companyData.cover}

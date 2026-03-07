@@ -92,7 +92,7 @@ export default function TaxServicesPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* VITA Free Tax Prep */}
             <div className="bg-white rounded-2xl border-2 border-brand-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/tax-page-1.jpg"
                   alt="VITA Free Tax Preparation"
@@ -152,7 +152,7 @@ export default function TaxServicesPage() {
 
             {/* Supersonic Fast Cash */}
             <div className="bg-white rounded-2xl border-2 border-brand-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/tax-page-1.jpg"
                   alt="Supersonic Fast Cash Tax Services"

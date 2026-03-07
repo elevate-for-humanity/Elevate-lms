@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function CareerCounselingPage() {
   return (
     <div>
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/career-counseling-page-1.jpg" alt="Career counseling and job placement" fill sizes="100vw" className="object-cover" priority />
       </section>
       <AICareerCounseling />

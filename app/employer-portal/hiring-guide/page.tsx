@@ -68,7 +68,7 @@ export default function HiringGuidePage() {
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
-<div className="relative h-80 bg-brand-blue-800">
+<div className="relative h-80 bg-brand-blue-800 overflow-hidden">
         <Image
           src="/images/pages/employer-portal-page-2.jpg"
           alt="Hiring guide"

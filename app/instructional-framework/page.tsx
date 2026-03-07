@@ -129,7 +129,7 @@ export default function InstructionalFrameworkPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[260px] sm:h-[340px]">
+      <section className="relative h-[260px] sm:h-[340px] overflow-hidden">
         <Image
           src="/images/pages/instructional-framework-page-1.jpg"
           alt="Instructor-led classroom training session"

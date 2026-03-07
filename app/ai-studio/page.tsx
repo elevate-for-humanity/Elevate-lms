@@ -399,7 +399,7 @@ export default function AIStudioPage() {
                       </div>
 
                       {asset.type === 'image' && (
-                        <div className="relative w-full h-32 mb-2">
+                        <div className="relative w-full h-32 mb-2 overflow-hidden">
                           <Image
                             src={asset.url}
                             alt={asset.prompt}
@@ -411,7 +411,7 @@ export default function AIStudioPage() {
                       )}
 
                       {(asset.type === 'video' || asset.type === 'avatar') && (
-                        <div className="relative w-full h-32 bg-gray-100 rounded-lg mb-2 flex items-center justify-center">
+                        <div className="relative w-full h-32 bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                           <Play className="w-8 h-8 text-black" />
                         </div>
                       )}

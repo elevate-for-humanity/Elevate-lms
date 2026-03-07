@@ -98,7 +98,7 @@ export default function StudentSupportPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
               <div key={service.title} className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition">
-                <div className="relative h-44">
+                <div className="relative h-44 overflow-hidden">
                   <Image
                     src={service.image}
                     alt={service.title}

@@ -69,7 +69,7 @@ export default function FundingImpactPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="Participants in training"
@@ -88,7 +88,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/funding-impact-1.jpg"
                   alt="Credential attainment"
@@ -107,7 +107,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/funding-impact-2.jpg"
                   alt="Employment success"
@@ -126,7 +126,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-40">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="Wage increase"
@@ -267,7 +267,7 @@ export default function FundingImpactPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/funding-impact-4.jpg"
                   alt="Graduate J. success story"
@@ -298,7 +298,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/funding-impact-5.jpg"
                   alt="Sarah T. success story"
@@ -328,7 +328,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="David W. success story"
@@ -385,7 +385,7 @@ export default function FundingImpactPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-indigo-50 rounded-xl overflow-hidden border border-indigo-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="Family stability"
@@ -420,7 +420,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-brand-blue-50 rounded-xl overflow-hidden border border-brand-blue-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="Employer benefits"
@@ -455,7 +455,7 @@ export default function FundingImpactPage() {
             </div>
 
             <div className="bg-brand-green-50 rounded-xl overflow-hidden border border-brand-green-200">
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src="/images/pages/fundingimpact-page-1.jpg"
                   alt="Economic growth"

@@ -122,7 +122,7 @@ export default function AlumniPage() {
             <div className="grid md:grid-cols-3 gap-8">
               {featuredAlumni.map((alumni) => (
                 <div key={alumni.name} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <Image
                       src={alumni.image}
                       alt={alumni.name}

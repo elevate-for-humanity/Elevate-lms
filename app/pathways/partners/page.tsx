@@ -20,7 +20,7 @@ export default function PartnersPage() {
       </div>
 
       {/* Visual hero */}
-      <section className="relative h-[280px] sm:h-[360px]">
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         <Image src="/images/pages/pathways-page-3.jpg" alt="Employer and workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -99,7 +99,7 @@ export default function PartnersPage() {
             ].map((s) => (
               <div key={s.step} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="flex flex-col sm:flex-row">
-                  <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0">
+                  <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
                     <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
                       {s.step}
@@ -226,7 +226,7 @@ export default function PartnersPage() {
             ].map((p) => (
               <div key={p.type} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="flex flex-col sm:flex-row">
-                  <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0">
+                  <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 overflow-hidden">
                     <Image src={p.image} alt={p.type} fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
                   </div>
                   <div className="p-5 flex-1">

@@ -178,7 +178,7 @@ export default function OutcomesPage() {
       </div>
 
       {/* Visual hero */}
-      <section className="relative h-[280px] sm:h-[360px]">
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         <Image src="/images/pages/pathways-page-1.jpg" alt="Graduates celebrating credential completion" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -207,7 +207,7 @@ export default function OutcomesPage() {
           {PROGRAMS.map((p) => (
             <div key={p.name} id={p.name.toLowerCase().replace(/\s+/g, '-')} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               {/* Program image */}
-              <div className="relative h-56 sm:h-72">
+              <div className="relative h-56 sm:h-72 overflow-hidden">
                 <Image src={p.image} alt={`${p.name} training`} fill sizes="100vw" className="object-cover" />
               </div>
 

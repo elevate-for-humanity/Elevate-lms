@@ -154,7 +154,7 @@ export default function GrantProgramsPage() {
                 key={program.slug}
                 className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={program.heroImage}
                     alt={program.heroImageAlt}

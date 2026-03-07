@@ -202,7 +202,7 @@ export default function HandbookAcknowledgePage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/student-portal-page-4.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="text-center">

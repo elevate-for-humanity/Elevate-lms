@@ -19,7 +19,7 @@ export default function Page() {
         <Breadcrumbs items={[{ label: "Getstarted" }]} />
       </div>
 {/* Hero Banner with Video */}
-      <section className="relative min-h-[500px] flex items-center">
+      <section className="relative min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <video
             autoPlay

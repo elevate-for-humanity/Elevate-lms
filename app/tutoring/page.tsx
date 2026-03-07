@@ -97,7 +97,7 @@ export default function TutoringPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/tutoring-page-1.jpg" alt="Students receiving one-on-one tutoring at Elevate training center" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -129,7 +129,7 @@ export default function TutoringPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm"
               >
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
                   <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">{item.step}</div>
                 </div>
@@ -159,7 +159,7 @@ export default function TutoringPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-slate-50 rounded-2xl overflow-hidden"
               >
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image src={subject.image} alt={subject.title} fill className="object-cover" />
                 </div>
                 <div className="p-6">

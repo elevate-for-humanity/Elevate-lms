@@ -106,7 +106,7 @@ export default async function MarketplacePage() {
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               data-tour={index === 0 ? "marketplace-course" : undefined}
             >
-              <div className="relative h-48">
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src={course.image_url || '/images/pages/comp-home-pathways-support.jpg'}
                   alt={course.title}

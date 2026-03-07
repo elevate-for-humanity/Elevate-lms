@@ -78,7 +78,7 @@ export default async function ProgramHolderDashboard() {
     <div className="min-h-screen">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/instructor-page-8.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}

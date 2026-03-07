@@ -25,7 +25,7 @@ export default async function EmployerPWAPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
-      <div className="relative h-48 sm:h-56">
+      <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-2.jpg" alt="Employer partnership" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />

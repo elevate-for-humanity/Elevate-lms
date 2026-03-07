@@ -139,7 +139,7 @@ export default function BarberCompetencyRubricPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[300px] print:hidden">
+      <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
         <Image
           src="/images/pages/compliance-page-1.jpg"
           alt="Barber apprentice training in a barbershop"

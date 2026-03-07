@@ -42,7 +42,7 @@ export default async function CompliancePage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/store-compliance-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">

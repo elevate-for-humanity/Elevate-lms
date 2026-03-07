@@ -24,7 +24,7 @@ export default function WorkforcePartnersPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px]">
+      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <Image src="/images/pages/workforce-partners-page-1.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
@@ -64,7 +64,7 @@ export default function WorkforcePartnersPage() {
               { title: 'Co-Enrollment', desc: 'Students can be co-enrolled in WIOA and other programs simultaneously. We coordinate with case managers to avoid duplication.', image: '/images/pages/workforce-board-page-7.jpg' },
             ].map((service) => (
               <div key={service.title} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
-                <div className="relative h-36">
+                <div className="relative h-36 overflow-hidden">
                   <Image src={service.image} alt={service.title} fill sizes="25vw" className="object-cover" />
                 </div>
                 <div className="p-5">

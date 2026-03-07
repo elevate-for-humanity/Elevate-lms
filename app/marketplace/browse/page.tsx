@@ -85,7 +85,7 @@ export default async function MarketplaceBrowsePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {itemList.map((item: any) => (
               <div key={item.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image alt="Product listing" 
                     src={item.image_url || '/images/pages/features-hero.jpg'} 
                     alt={item.title} 
@@ -122,7 +122,7 @@ export default async function MarketplaceBrowsePage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
-            <div className="relative h-48">
+            <div className="relative h-48 overflow-hidden">
               <Image src="/images/pages/marketplace-page-1.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">

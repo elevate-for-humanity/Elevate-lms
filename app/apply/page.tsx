@@ -78,7 +78,7 @@ export default async function ApplyPage({
           className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
         >
           <div className="flex flex-col md:flex-row">
-            <div className="relative w-full md:w-2/5 h-[200px] md:h-auto md:min-h-[280px]">
+            <div className="relative w-full md:w-2/5 h-[200px] md:h-auto md:min-h-[280px] overflow-hidden">
               <Image
                 src="/images/pages/apply-page-1.jpg"
                 alt="Students in hands-on career training"
@@ -116,7 +116,7 @@ export default async function ApplyPage({
 
           {/* Employer */}
           <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
-            <div className="relative h-[200px]">
+            <div className="relative h-[200px] overflow-hidden">
               <Image
                 src="/images/pages/apply-page-1.jpg"
                 alt="Employer partnership meeting"
@@ -159,7 +159,7 @@ export default async function ApplyPage({
             href="/apply/program-holder"
             className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group relative"
           >
-            <div className="relative h-[320px] sm:h-[360px]">
+            <div className="relative h-[320px] sm:h-[360px] overflow-hidden">
               <Image
                 src="/images/pages/apply-page-1.jpg"
                 alt="Launch your own training program with Elevate"
@@ -233,7 +233,7 @@ export default async function ApplyPage({
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl overflow-hidden border border-slate-100">
-                <div className="relative h-32 sm:h-36">
+                <div className="relative h-32 sm:h-36 overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.alt}

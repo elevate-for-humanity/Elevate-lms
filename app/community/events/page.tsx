@@ -199,7 +199,7 @@ export default async function EventsPage() {
                 
                 return (
                   <div key={event.id} className="bg-white rounded-xl overflow-hidden shadow-sm border hover:shadow-lg transition">
-                    <div className="relative h-40">
+                    <div className="relative h-40 overflow-hidden">
                       {event.image_url ? (
                         <Image
                           src={event.image_url}

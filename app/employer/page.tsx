@@ -22,7 +22,7 @@ export default function EmployerPage() {
       </div>
 
       {/* Hero — clean image, no text overlay */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/employer-page-2.jpg" alt="Employer partnership with Elevate for Humanity" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -50,7 +50,7 @@ export default function EmployerPage() {
               { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/pages/employer-page-1.jpg' },
             ].map((item) => (
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 overflow-hidden bg-white border border-slate-200">
-                <div className="relative w-28 h-28 sm:w-full sm:h-[160px] flex-shrink-0 sm:flex-shrink">
+                <div className="relative w-28 h-28 sm:w-full sm:h-[160px] flex-shrink-0 sm:flex-shrink overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, 25vw" quality={90} className="object-cover" />
                   <div className="absolute top-2 left-2 w-7 h-7 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
                 </div>

@@ -75,7 +75,7 @@ export default async function EnrollmentPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {featured.map((p) => (
               <Link key={p.name} href={p.href} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group">
-                <div className="relative h-40">
+                <div className="relative h-40 overflow-hidden">
                   <Image src={p.image} alt={p.name} fill className="object-cover" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{p.name}</h3>

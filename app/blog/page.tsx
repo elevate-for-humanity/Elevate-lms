@@ -70,7 +70,7 @@ export default async function BlogPage() {
               href={`/blog/${featured.slug}`}
               className="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden md:flex hover:shadow-md transition-shadow"
             >
-              <div className="md:w-1/2 relative h-64 md:h-auto bg-slate-100">
+              <div className="md:w-1/2 relative h-64 md:h-auto bg-slate-100 overflow-hidden">
                 <Image
                   src={featured.image}
                   alt={featured.title}
@@ -118,7 +118,7 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="relative h-48 bg-slate-100">
+                  <div className="relative h-48 bg-slate-100 overflow-hidden">
                     <Image
                       src={post.image}
                       alt={post.title}

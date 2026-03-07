@@ -345,7 +345,7 @@ export default async function LearnerOnboardingPage() {
               >
                 <div className="flex flex-col sm:flex-row">
                   {/* Step image */}
-                  <div className="relative w-full sm:w-48 lg:w-56 h-40 sm:h-auto flex-shrink-0">
+                  <div className="relative w-full sm:w-48 lg:w-56 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
                     <Image
                       src={step.image}
                       alt={step.imageAlt}

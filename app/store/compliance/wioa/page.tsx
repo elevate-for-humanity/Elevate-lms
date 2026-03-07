@@ -189,7 +189,7 @@ export default function WIOACompliancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-brand-green-500 hover:shadow-xl transition-all group">
-                <div className="relative h-48">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={feature.image}
                     alt={feature.title}

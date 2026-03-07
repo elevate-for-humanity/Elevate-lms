@@ -224,7 +224,7 @@ export default async function HubWelcomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             {successStories.map((story) => (
               <div key={story.name} className="bg-slate-800 rounded-2xl overflow-hidden">
-                <div className="relative h-56">
+                <div className="relative h-56 overflow-hidden">
                   <Image
                     src={story.image}
                     alt={story.name}

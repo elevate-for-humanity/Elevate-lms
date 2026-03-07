@@ -71,7 +71,7 @@ export default function PartnersIndexPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px]">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/images/pages/partners-pub-page-7.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
       </section>
 

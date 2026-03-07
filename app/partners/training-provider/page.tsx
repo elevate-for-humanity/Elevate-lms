@@ -74,7 +74,7 @@ export default function TrainingProviderPage() {
           <div className="grid sm:grid-cols-2 gap-8">
             {BENEFITS.map((item) => (
               <div key={item.title} className="flex gap-5 items-start border border-slate-200 rounded-xl overflow-hidden">
-                <div className="relative w-32 h-32 flex-shrink-0">
+                <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="128px" className="object-cover" />
                 </div>
                 <div className="py-4 pr-4">
@@ -120,7 +120,7 @@ export default function TrainingProviderPage() {
               { step: '3', title: 'Receive Referrals', desc: 'Funded students are referred to your programs. We handle enrollment coordination and reporting.', image: '/images/pages/partners-pub-page-7.jpg' },
             ].map((item) => (
               <div key={item.step} className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                <div className="relative h-44">
+                <div className="relative h-44 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="33vw" className="object-cover" />
                   <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
                     {item.step}

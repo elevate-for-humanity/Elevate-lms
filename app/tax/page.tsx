@@ -58,17 +58,17 @@ export default function TaxServicesPage() {
       <section className="py-4 bg-gray-100 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/tax" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
+            <Link href="/tax/free" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               VITA Free Tax Prep
             </Link>
-            <Link href="/supersonic-fast-cash" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
+            <Link href="/tax/professional" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
+              Professional Services
+            </Link>
+            <Link href="/tax/supersonicfastcash/services" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               Supersonic Fast Cash
             </Link>
-            <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
-              Locations
-            </Link>
-            <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
-              What to Bring
+            <Link href="/tax/book-appointment" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
+              Book Appointment
             </Link>
             <Link href="/tax/volunteer" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               Volunteer
@@ -141,7 +141,7 @@ export default function TaxServicesPage() {
                 </ul>
 
                 <Link
-                  href="/tax"
+                  href="/tax/free"
                   className="block w-full text-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 text-white rounded-xl font-bold transition-colors"
                 >
                   Get Free Tax Help
@@ -201,7 +201,7 @@ export default function TaxServicesPage() {
                 </ul>
 
                 <Link
-                  href="/supersonic-fast-cash"
+                  href="/tax/professional"
                   className="block w-full text-center px-6 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-xl font-bold transition-colors"
                 >
                   Get Started Now

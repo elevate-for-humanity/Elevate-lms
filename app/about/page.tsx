@@ -93,6 +93,11 @@ export default function AboutPage() {
             facing barriers to employment with high-quality, funded career training, individualized
             employment support, and direct employer placement.
           </p>
+          <div className="mt-6">
+            <Link href="/about/mission" className="inline-flex items-center text-white/80 hover:text-white text-sm font-semibold underline underline-offset-4">
+              Full mission statement &amp; values <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -505,10 +510,10 @@ export default function AboutPage() {
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-3 gap-6">
             <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="50vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
@@ -518,9 +523,21 @@ export default function AboutPage() {
                 </span>
               </div>
             </Link>
+            <Link href="/about/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+              <div className="relative h-40 overflow-hidden">
+                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>
+                <p className="text-sm text-gray-600 mb-2">Employers, workforce boards, and community organizations we work with across Central Indiana.</p>
+                <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
+                  View Partners <ArrowRight className="ml-1 w-4 h-4" />
+                </span>
+              </div>
+            </Link>
             <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-career-pathways.jpg" alt="Career pathways" fill sizes="50vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-career-pathways.jpg" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>

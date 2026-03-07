@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Clock, DollarSign, MapPin } from 'lucide-react';
+import { ArrowRight, Clock, DollarSign, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Certification Training Programs | Elevate for Humanity',
@@ -78,6 +78,20 @@ export default function CertificationsPage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Short-format options */}
+      <section className="py-10 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Need Something Shorter?</h2>
+          <p className="text-sm text-slate-600 mb-4">
+            Micro-classes are 4–8 hour focused sessions covering CPR, OSHA 10, food handler safety, and more.
+            Available as standalone or add-ons to any program.
+          </p>
+          <Link href="/microclasses" className="inline-flex items-center text-brand-red-600 font-semibold text-sm hover:text-brand-red-700">
+            Browse Micro-Classes <ArrowRight className="ml-1 w-4 h-4" />
+          </Link>
         </div>
       </section>
 

@@ -522,7 +522,7 @@ export default async function StudentDashboardOrchestrated() {
                 <div className="flex items-center justify-between">
                   <span className="text-black">Programs Enrolled</span>
                   <span className="font-bold text-black">
-                    {enrollments?.length || 0}
+                    {allEnrollments?.length || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

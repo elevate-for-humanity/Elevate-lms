@@ -21,25 +21,9 @@ const REQUIRED_AGREEMENTS: AgreementDef[] = [
   {
     type: 'enrollment',
     title: 'Enrollment Agreement',
-    description: 'This agreement outlines the terms and conditions of your enrollment, including program details, tuition and fees, refund policy, attendance requirements, and your obligations as a student at Elevate for Humanity Career & Technical Institute.',
+    description: 'This agreement outlines the terms and conditions of your enrollment, including program details, tuition and fees, refund policy, attendance requirements, and your obligations as a student at Elevate for Humanity Career & Technical Institute. By signing, you also confirm you have read and agree to the Participation Agreement (student code of conduct, attendance, safety) and FERPA Consent (sharing records with your funding source).',
     documentUrl: '/legal/enrollment-agreement',
     icon: FileText,
-    version: '2025.1',
-  },
-  {
-    type: 'participation',
-    title: 'Participation Agreement',
-    description: 'This agreement confirms that you understand and agree to follow all program policies including the student code of conduct, attendance requirements (80% minimum), dress code, safety protocols, drug and alcohol policy, and academic integrity standards.',
-    documentUrl: '/legal/participation-agreement',
-    icon: Users,
-    version: '2025.1',
-  },
-  {
-    type: 'ferpa',
-    title: 'FERPA Consent Form',
-    description: 'The Family Educational Rights and Privacy Act (FERPA) protects your educational records. This consent authorizes Elevate for Humanity to share your enrollment status, attendance, grades, and progress with your funding source (WorkOne, employer sponsor, or other agency). You may revoke this consent at any time in writing.',
-    documentUrl: '/legal/ferpa-consent',
-    icon: Shield,
     version: '2025.1',
   },
 ];

@@ -136,7 +136,6 @@ export default function ProgramOrientationVideo({
                 controls
                 autoPlay
                 playsInline
-                crossOrigin="anonymous"
                 preload="auto"
                 onEnded={handleVideoEnd}
                 onPlay={() => setIsPlaying(true)}

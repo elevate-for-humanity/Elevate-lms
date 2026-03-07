@@ -45,6 +45,7 @@ async function _POST(request: NextRequest) {
         signature_data: params.signatureData || null,
         signature_typed: params.signatureTyped || null,
         acceptance_context: params.acceptanceContext || null,
+        role_at_signing: params.roleAtSigning || 'student',
         accepted_at: new Date().toISOString(),
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
         user_agent: request.headers.get('user-agent') || 'unknown',

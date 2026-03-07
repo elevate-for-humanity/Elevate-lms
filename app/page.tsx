@@ -3,7 +3,6 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 import HomeHeroVideo from './HomeHeroVideo';
-import { PROGRAMS } from '@/lib/programs-data';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Credential Institute — Healthcare, Trades, CDL & Technology',
@@ -181,54 +180,7 @@ export default function HomePage() {
       </section>
       
 
-      {/* ===== FEATURED PROGRAMS ===== */}
-      
-      <section aria-label="Featured credential programs" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Credential Pathways</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Featured Programs</h2>
-            <p className="text-lg text-slate-700 max-w-3xl mx-auto">Each program leads to nationally recognized certifications. Training may be fully funded for eligible participants through WIOA, WRG, and JRI.</p>
-          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {PROGRAMS.filter(p => p.etplApproved).slice(0, 9).map((program) => (
-              <Link
-                key={program.slug}
-                href={`/programs/${program.slug}`}
-                className="flex flex-row sm:flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden"
-              >
-                <div className="relative w-28 sm:w-full h-auto sm:h-40 flex-shrink-0">
-                  <Image
-                    src={program.image}
-                    alt={program.name}
-                    fill
-                    sizes="(max-width: 640px) 112px, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-3 sm:p-4 flex flex-col flex-1 min-w-0">
-                  <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-0.5 group-hover:text-brand-red-600 transition-colors">{program.name}</h3>
-                  <p className="text-xs text-slate-500 mb-2 line-clamp-2 hidden sm:block">{program.blurb}</p>
-                  <div className="flex items-center gap-2 mt-auto">
-                    <span className="text-[10px] sm:text-xs font-semibold text-slate-500">{program.duration}</span>
-                    <span className="text-[10px] sm:text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2 py-0.5 rounded-full">{program.funding}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors shadow-lg shadow-brand-red-600/20">
-              View All Programs
-            </Link>
-            <Link href="/apply/student" className="border-2 border-brand-red-600 text-brand-red-600 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors">
-              Apply Now
-            </Link>
-          </div>
-        </div>
-      </section>
       
 
 

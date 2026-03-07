@@ -123,6 +123,26 @@ export default async function LicensePage() {
         </div>
       </section>
 
+      {/* Quick nav */}
+      <section className="py-3 bg-slate-800 border-b border-slate-700">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/license/features" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
+              Full Feature List
+            </Link>
+            <Link href="/license/integrations" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
+              Integrations
+            </Link>
+            <Link href="/license/pricing" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
+              Pricing
+            </Link>
+            <Link href="/license/onboarding" className="px-4 py-1.5 bg-brand-orange-600 text-white rounded-full text-sm font-medium hover:bg-brand-orange-700 transition-colors">
+              Start Onboarding
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">

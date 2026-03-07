@@ -19,6 +19,7 @@ const footerLinks = {
     { name: 'Apprenticeships', href: '/programs/barber-apprenticeship' },
     { name: 'Certifications', href: '/training/certifications' },
     { name: 'Career Services', href: '/career-counseling' },
+    { name: 'Platform Features', href: '/features' },
   ],
   funding: [
     { name: 'How Enrollment Works', href: '/how-it-works' },
@@ -30,6 +31,7 @@ const footerLinks = {
   ],
   partners: [
     { name: 'Employer Partners', href: '/employer' },
+    { name: 'Government & Agencies', href: '/government' },
     { name: 'Workforce Boards', href: '/workforce-board' },
     { name: 'Partner Directory', href: '/directory' },
     { name: 'Become a Partner', href: '/partnerships' },
@@ -39,6 +41,7 @@ const footerLinks = {
     { name: 'Student Portal', href: '/login' },
     { name: 'Employer Portal', href: '/employer' },
     { name: 'Partner Portal', href: '/partner-portal' },
+    { name: 'Mobile App', href: '/mobile-app' },
     { name: 'Support', href: '/support' },
     { name: 'FAQ', href: '/faq' },
   ],

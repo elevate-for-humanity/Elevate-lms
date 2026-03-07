@@ -109,6 +109,12 @@ export default function ProgramCatalogPage() {
               Apply Now
             </Link>
             <Link
+              href="/for/students"
+              className="bg-slate-700 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-600 transition-colors"
+            >
+              Student Overview
+            </Link>
+            <Link
               href="/contact"
               className="border border-slate-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:border-white transition-colors"
             >

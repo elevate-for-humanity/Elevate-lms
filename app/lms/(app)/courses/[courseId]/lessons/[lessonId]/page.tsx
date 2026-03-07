@@ -24,8 +24,16 @@ import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
-import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
+import { HVAC_COURSE_ID, HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
 import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
+import { HVAC_VIDEO_MAP } from '@/lib/courses/hvac-video-map';
+import { HVAC_LESSON_NUMBER_TO_DEF_ID } from '@/lib/courses/hvac-lesson-number-map';
+import dynamic from 'next/dynamic';
+
+const HvacLessonVideo = dynamic(
+  () => import('@/components/lms/HvacLessonVideo'),
+  { ssr: false }
+);
 
 export default function LessonPage() {
   const params = useParams();
@@ -462,20 +470,34 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
-        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
+        ) : (lesson.video_url && !lesson.video_url.includes('/generated/lessons/')) || (courseId === HVAC_COURSE_ID && lesson.lesson_number && HVAC_VIDEO_MAP[HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number]]) ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {/* Video/audio lesson with real media file */}
-            <InteractiveVideoPlayer
-              videoUrl={lesson.video_url}
-              title={lesson.title}
-              onComplete={() => {
-                if (!isCompleted) {
-                  setIsCompleted(true);
-                  markComplete();
-                }
-              }}
-            />
-            {/* Show lesson content below video */}
+            {(() => {
+              const defId = lesson.lesson_number ? HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number] : undefined;
+              const hvacVideo = defId ? HVAC_VIDEO_MAP[defId] : undefined;
+
+              const completeHandler = () => { if (!isCompleted) { setIsCompleted(true); markComplete(); } };
+
+              if (courseId === HVAC_COURSE_ID && defId && hvacVideo) {
+                return (
+                  <HvacLessonVideo
+                    lessonDefId={defId}
+                    brollVideoUrl={hvacVideo.videoUrl}
+                    lessonTitle={lesson.title}
+                    onProgress={(pct) => { if (pct >= 90) completeHandler(); }}
+                    onComplete={completeHandler}
+                  />
+                );
+              }
+
+              return (
+                <InteractiveVideoPlayer
+                  videoUrl={lesson.video_url}
+                  title={lesson.title}
+                  onComplete={completeHandler}
+                />
+              );
+            })()}
             {lesson.content && (
               <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
                 <div

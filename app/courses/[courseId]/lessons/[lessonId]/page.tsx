@@ -451,7 +451,6 @@ export default function LessonPage() {
                     const unlocked = isLessonUnlocked(lessonIdx);
 
                     if (!unlocked && !isCurrent) {
-                      // Locked lesson — not clickable
                       return (
                         <div
                           key={l.id}

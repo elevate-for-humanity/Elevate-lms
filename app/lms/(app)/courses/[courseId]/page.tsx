@@ -155,76 +155,74 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Course Header — image hero */}
-      <div className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-        <Image
-          src={course.thumbnail_url || '/images/pages/comp-cta-training.jpg'}
-          alt={course.course_name}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-      </div>
-      <div className="bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid lg:grid-cols-3 gap-8">
+      {/* Course Header — vibrant full-bleed hero */}
+      <div className="relative overflow-hidden" style={{ minHeight: '380px' }}>
+        {/* Hero image */}
+        <div className="absolute inset-0">
+          <Image
+            src={course.thumbnail_url || '/images/pages/comp-cta-training.jpg'}
+            alt={course.course_name}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+          {/* Vibrant gradient overlay — blue left, fades right */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, #1d4ed8ee 0%, #2563ebcc 40%, #dc262688 75%, transparent 100%)' }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        </div>
+
+        {/* Content over image */}
+        <div className="relative max-w-7xl mx-auto px-4 py-10">
+          <div className="grid lg:grid-cols-3 gap-8 items-end">
             <div className="lg:col-span-2">
-              <nav className="flex items-center gap-2 text-white/70 text-sm mb-4">
+              <nav className="flex items-center gap-2 text-white/70 text-sm mb-5">
                 <Link href="/lms/dashboard" className="hover:text-white transition">Dashboard</Link>
                 <ChevronRight className="w-4 h-4" />
                 <Link href="/lms/courses" className="hover:text-white transition">Courses</Link>
                 <ChevronRight className="w-4 h-4" />
-                <span className="text-white">{course.course_name}</span>
+                <span className="text-white font-medium">{course.course_name}</span>
               </nav>
 
-              <h1 className="text-3xl md:text-4xl font-black mb-4">{course.course_name}</h1>
-              
+              <h1 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-lg">
+                {course.course_name}
+              </h1>
+
               {course.description && (
-                <p className="text-white/85 text-lg mb-6 max-w-xl">{course.description}</p>
+                <p className="text-white/90 text-base md:text-lg mb-6 max-w-xl leading-relaxed">
+                  {course.description}
+                </p>
               )}
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-white/90">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  <span>{typedLessons.length} Lessons</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  <span>
-                    {totalHours > 0 ? `${totalHours}h ` : ''}{remainingMinutes}m
+              {/* Stat pills */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {[
+                  { icon: BookOpen, label: `${typedLessons.length} Lessons` },
+                  { icon: Clock,    label: `${totalHours > 0 ? `${totalHours}h ` : ''}${remainingMinutes}m` },
+                  ...(quizzes?.length ? [{ icon: FileText, label: `${quizzes.length} Quizzes` }] : []),
+                  { icon: Award,    label: 'Certificate' },
+                ].map(({ icon: Icon, label }) => (
+                  <span key={label} className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30">
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
                   </span>
-                </div>
-                {quizzes && quizzes.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    <span>{quizzes.length} Quiz{quizzes.length !== 1 ? 'zes' : ''}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  <span>Certificate</span>
-                </div>
+                ))}
               </div>
 
-              {/* Credential alignment banner */}
+              {/* Credential alignment */}
               {course.certification_name && (
-                <div className="mt-6 flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
-                  <Award className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                  <p className="text-sm text-white/90">
-                    <span className="text-amber-400 font-semibold">Credential Alignment:</span>{' '}
-                    This course prepares you for{' '}
-                    <span className="font-medium">{course.certification_name}</span>
-                    {course.certification_body && (
-                      <span className="text-white/50"> issued by {course.certification_body}</span>
-                    )}
+                <div className="inline-flex items-center gap-2 bg-brand-orange-500/90 backdrop-blur-sm rounded-xl px-4 py-2.5 border border-brand-orange-400/50">
+                  <Award className="w-4 h-4 text-white flex-shrink-0" />
+                  <p className="text-sm text-white font-semibold">
+                    Prepares for {course.certification_name}
+                    {course.certification_body && <span className="font-normal opacity-80"> · {course.certification_body}</span>}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Course Card */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 text-slate-900">
+            {/* Course action card — white, floats over hero */}
+            <div className="bg-white rounded-2xl shadow-2xl p-6 text-slate-900">
               {course.thumbnail_url ? (
                 <div className="relative h-40 rounded-xl overflow-hidden mb-4">
                   <Image

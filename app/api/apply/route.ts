@@ -153,12 +153,14 @@ export const POST = withRateLimit(
         `,
       });
 
-      // Send SMS alert via AT&T email gateway
-      await sendEmail({
-        to: ADMIN_SMS,
-        subject: 'New App',
-        html: `${firstName} ${lastName}\n${program}\n${phone}`,
-      });
+      // SMS alert via AT&T email-to-SMS gateway (only if configured)
+      if (ADMIN_SMS) {
+        await sendEmail({
+          to: ADMIN_SMS,
+          subject: 'New App',
+          html: `${firstName} ${lastName}\n${program}\n${phone}`,
+        }).catch((err) => logger.warn('[apply] SMS alert failed:', err));
+      }
 
       // Trigger routing automation asynchronously (non-blocking)
       // On error: creates review_queue item, never blocks user flow

@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -56,42 +56,41 @@ async function _POST(req: Request) {
 
   // Send notification email
   try {
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
+    await sendEmail({
       to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
       subject: `New License Request: ${payload.full_name} (${payload.desired_tier})`,
-      text:
-        `New License Request\n\n` +
-        `Name: ${payload.full_name}\n` +
-        `Org: ${payload.organization || '-'}\n` +
-        `Email: ${payload.email}\n` +
-        `Phone: ${payload.phone || '-'}\n` +
-        `Tier: ${payload.desired_tier}\n\n` +
-        `Launch Goal:\n${payload.launch_goal}\n\n` +
-        `Agreement Ack: ${payload.agreement_ack}\n`,
+      html:
+        `<p>New License Request</p>` +
+        `<p><strong>Name:</strong> ${payload.full_name}<br>` +
+        `<strong>Org:</strong> ${payload.organization || '-'}<br>` +
+        `<strong>Email:</strong> ${payload.email}<br>` +
+        `<strong>Phone:</strong> ${payload.phone || '-'}<br>` +
+        `<strong>Tier:</strong> ${payload.desired_tier}</p>` +
+        `<p><strong>Launch Goal:</strong><br>${payload.launch_goal}</p>` +
+        `<p><strong>Agreement Ack:</strong> ${payload.agreement_ack}</p>`,
     });
 
-    // SMS alert via AT&T gateway
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
-      to: process.env.ADMIN_SMS_GATEWAY || '',
-      subject: 'License',
-      text: `${payload.full_name}\n${payload.organization || ''}\n${payload.desired_tier}`,
-    });
+    // SMS alert via AT&T email-to-SMS gateway (only if configured)
+    if (process.env.ADMIN_SMS_GATEWAY) {
+      await sendEmail({
+        to: process.env.ADMIN_SMS_GATEWAY,
+        subject: 'License',
+        html: `${payload.full_name}\n${payload.organization || ''}\n${payload.desired_tier}`,
+      }).catch((err) => logger.warn('[license-request] SMS alert failed:', err));
+    }
 
-    // Send auto-reply to submitter
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
+    // Auto-reply to submitter
+    await sendEmail({
       to: payload.email,
       subject: 'We received your licensing request | Elevate for Humanity',
-      text:
-        `Thank you for your licensing request.\n\n` +
-        `We review access requests internally. If approved, you will receive onboarding and terms.\n\n` +
-        `— Elevate for Humanity\n`,
+      html:
+        `<p>Thank you for your licensing request.</p>` +
+        `<p>We review access requests internally. If approved, you will receive onboarding and terms.</p>` +
+        `<p>— Elevate for Humanity</p>`,
     });
   } catch (emailError) {
-      logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
-    }
+    logger.error('[license-request] Email failed:', emailError instanceof Error ? emailError : undefined);
+  }
 
   return NextResponse.redirect(new URL('/licensing?submitted=true', req.url), {
     status: 303,

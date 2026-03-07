@@ -36,10 +36,18 @@ async function _POST(req: Request) {
 
     const { name, email, phone, program, funding } = data;
 
+    // Validate before touching the database
+    if (!name || !email || !phone || !program) {
+      return NextResponse.json(
+        { error: 'Please fill in all required fields' },
+        { status: 400 }
+      );
+    }
+
     // Save inquiry to database
     try {
       const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+      const _admin = createAdminClient(); const db = _admin || supabase;
       await db.from('inquiries').insert({
         name,
         email,
@@ -53,13 +61,6 @@ async function _POST(req: Request) {
     } catch (dbError) {
       logger.error('Failed to save inquiry to database:', dbError);
       // Continue with email even if DB fails
-    }
-
-    if (!name || !email || !phone || !program) {
-      return NextResponse.json(
-        { error: 'Please fill in all required fields' },
-        { status: 400 }
-      );
     }
 
     // Send confirmation email to inquirer
@@ -103,12 +104,14 @@ async function _POST(req: Request) {
       `,
     });
 
-    // SMS alert via AT&T gateway
-    await sendEmail({
-      to: ADMIN_SMS,
-      subject: 'Inquiry',
-      html: `${name}\n${program}\n${phone}`,
-    });
+    // SMS alert via AT&T email-to-SMS gateway (only if configured)
+    if (ADMIN_SMS) {
+      await sendEmail({
+        to: ADMIN_SMS,
+        subject: 'Inquiry',
+        html: `${name}\n${program}\n${phone}`,
+      }).catch((err) => logger.warn('[inquiry] SMS alert failed:', err));
+    }
 
     if (contentType?.includes('application/json')) {
       return NextResponse.json({ success: true });

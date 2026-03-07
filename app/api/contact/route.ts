@@ -167,19 +167,10 @@ async function _POST(req: Request) {
 
 // Send email notification (async, non-blocking)
 async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    logger.warn('RESEND_API_KEY not configured, skipping email notification');
-    return;
-  }
+  const { sendEmail } = await import('@/lib/email/sendgrid');
 
   try {
-    const { Resend } = await import('resend');
-    const resend = new Resend(resendApiKey);
-
-    await resend.emails.send({
-      from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
+    await sendEmail({
       to: 'elevate4humanityedu@gmail.com',
       subject: `New Inquiry from ${data.name}`,
       html: `
@@ -195,13 +186,14 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
       `,
     });
 
-    // SMS alert via AT&T gateway
-    await resend.emails.send({
-      from: 'Elevate <noreply@elevateforhumanity.org>',
-      to: process.env.ADMIN_SMS_GATEWAY || '',
-      subject: 'Contact',
-      text: `${data.name}\n${data.email}\n${data.message.substring(0, 100)}`,
-    });
+    // SMS alert via AT&T email-to-SMS gateway (only if configured)
+    if (process.env.ADMIN_SMS_GATEWAY) {
+      await sendEmail({
+        to: process.env.ADMIN_SMS_GATEWAY,
+        subject: 'Contact',
+        html: `${data.name}\n${data.email}\n${data.message.substring(0, 100)}`,
+      }).catch((err) => logger.warn('[contact] SMS alert failed:', err));
+    }
   } catch (error: unknown) {
     logger.error('Failed to send email notification:', error as Error);
     throw error;

@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -43,44 +43,42 @@ async function _POST(request: NextRequest) {
 
     // Send notification email
     try {
-      await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
+      await sendEmail({
         to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
         subject: `New Partner Inquiry: ${data.fullName} (${data.relationshipType})`,
-        text:
-          `New Partner Inquiry\n\n` +
-          `Name: ${data.fullName}\n` +
-          `Org: ${data.organization || '-'}\n` +
-          `Email: ${data.email}\n` +
-          `Phone: ${data.phone || '-'}\n` +
-          `Relationship: ${data.relationshipType}\n\n` +
-          `Value:\n${data.resources}\n\n` +
-          `Seeking: ${data.seeking}\n` +
-          `Agreement Ack: ${data.writtenAgreement}\n\n` +
-          `Additional Info:\n${data.additionalInfo || '-'}\n`,
+        html:
+          `<p><strong>Name:</strong> ${data.fullName}<br>` +
+          `<strong>Org:</strong> ${data.organization || '-'}<br>` +
+          `<strong>Email:</strong> ${data.email}<br>` +
+          `<strong>Phone:</strong> ${data.phone || '-'}<br>` +
+          `<strong>Relationship:</strong> ${data.relationshipType}</p>` +
+          `<p><strong>Value:</strong><br>${data.resources}</p>` +
+          `<p><strong>Seeking:</strong> ${data.seeking}<br>` +
+          `<strong>Agreement Ack:</strong> ${data.writtenAgreement}</p>` +
+          `<p><strong>Additional Info:</strong><br>${data.additionalInfo || '-'}</p>`,
       });
 
-      // SMS alert via AT&T gateway
-      await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
-        to: process.env.ADMIN_SMS_GATEWAY || '',
-        subject: 'Partner',
-        text: `${data.fullName}\n${data.organization || ''}\n${data.relationshipType}`,
-      });
+      // SMS alert via AT&T email-to-SMS gateway (only if configured)
+      if (process.env.ADMIN_SMS_GATEWAY) {
+        await sendEmail({
+          to: process.env.ADMIN_SMS_GATEWAY,
+          subject: 'Partner',
+          html: `${data.fullName}\n${data.organization || ''}\n${data.relationshipType}`,
+        }).catch((err) => logger.warn('[partner-inquiry] SMS alert failed:', err));
+      }
 
-      // Send auto-reply to submitter
-      await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
+      // Auto-reply to submitter
+      await sendEmail({
         to: data.email,
         subject: 'We received your partner inquiry | Elevate for Humanity',
-        text:
-          `Thank you for your inquiry.\n\n` +
-          `We review requests through our structured process to protect participants and platform integrity.\n` +
-          `If there is alignment, our team will follow up with next steps.\n\n` +
-          `— Elevate for Humanity\n`,
+        html:
+          `<p>Thank you for your inquiry.</p>` +
+          `<p>We review requests through our structured process to protect participants and platform integrity. ` +
+          `If there is alignment, our team will follow up with next steps.</p>` +
+          `<p>— Elevate for Humanity</p>`,
       });
     } catch (emailError) {
-        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      logger.error('[partner-inquiry] Email failed:', emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json({ success: true });

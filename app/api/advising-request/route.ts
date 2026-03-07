@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { sendEmail } from '@/lib/email/sendgrid';
 
 async function _POST(request: Request) {
   try {
@@ -47,48 +48,32 @@ async function _POST(request: Request) {
       // Continue even if database insert fails - we'll still send the email
     }
 
-    // Send email notification (optional - requires email service setup)
-    // You can use Resend, SendGrid, or similar
     try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: 'Elevate For Humanity <noreply@elevateforhumanity.org>',
-          to: 'elevate4humanityedu@gmail.com',
-          subject: `New Advising Request from ${name}`,
-          html: `
-            <h2>New Advising Request</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Email:</strong> ${email || 'Not provided'}</p>
-            <p><strong>Program Interest:</strong> ${programInterest || 'Not specified'}</p>
-            <p><strong>Preferred Contact Methods:</strong> ${Array.isArray(contactMethod) ? contactMethod.join(', ') : 'Not specified'}</p>
-            <p><strong>Questions/Notes:</strong></p>
-            <p>${questions || 'None provided'}</p>
-          `,
-        }),
+      await sendEmail({
+        to: 'elevate4humanityedu@gmail.com',
+        subject: `New Advising Request from ${name}`,
+        html: `
+          <h2>New Advising Request</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+          <p><strong>Program Interest:</strong> ${programInterest || 'Not specified'}</p>
+          <p><strong>Preferred Contact Methods:</strong> ${Array.isArray(contactMethod) ? contactMethod.join(', ') : 'Not specified'}</p>
+          <p><strong>Questions/Notes:</strong></p>
+          <p>${questions || 'None provided'}</p>
+        `,
       });
 
-      // SMS alert via AT&T gateway
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: 'Elevate <noreply@elevateforhumanity.org>',
-          to: process.env.ADMIN_SMS_GATEWAY || '',
+      // SMS alert via AT&T email-to-SMS gateway (only if configured)
+      if (process.env.ADMIN_SMS_GATEWAY) {
+        await sendEmail({
+          to: process.env.ADMIN_SMS_GATEWAY,
           subject: 'Advising',
-          text: `${name}\n${phone}\n${programInterest || 'General'}`,
-        }),
-      });
+          html: `${name}\n${phone}\n${programInterest || 'General'}`,
+        }).catch((err) => logger.warn('[advising-request] SMS alert failed:', err));
+      }
     } catch (emailError) {
-      logger.error('Email error:', emailError);
+      logger.error('[advising-request] Email failed:', emailError);
       // Don't fail the request if email fails
     }
 

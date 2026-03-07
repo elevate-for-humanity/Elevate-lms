@@ -90,53 +90,48 @@ async function _POST(req: Request) {
 
     // Send email notification
     try {
-      const resendApiKey = process.env.RESEND_API_KEY;
-      if (resendApiKey) {
-        const { Resend } = await import('resend');
-        const resend = new Resend(resendApiKey);
+      const { sendEmail } = await import('@/lib/email/sendgrid');
 
-        await resend.emails.send({
-          from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-          to: 'elevate4humanityedu@gmail.com',
-          subject: `Meeting Request from ${data.name}`,
-          html: `
-            <h2>New Meeting Request</h2>
-            <p><strong>Name:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Phone:</strong> ${data.phone}</p>
-            <p><strong>Type:</strong> ${data.meetingType === 'virtual' ? 'Virtual Meeting (Google Meet)' : 'Phone Call'}</p>
-            <p><strong>Date:</strong> ${dateStr}</p>
-            <p><strong>Time:</strong> ${data.time}</p>
-            ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : ''}
-            <hr>
-            <p><em>Submitted from www.elevateforhumanity.org/schedule/meeting</em></p>
-          `,
-        });
+      await sendEmail({
+        to: 'elevate4humanityedu@gmail.com',
+        subject: `Meeting Request from ${data.name}`,
+        html: `
+          <h2>New Meeting Request</h2>
+          <p><strong>Name:</strong> ${data.name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone}</p>
+          <p><strong>Type:</strong> ${data.meetingType === 'virtual' ? 'Virtual Meeting (Google Meet)' : 'Phone Call'}</p>
+          <p><strong>Date:</strong> ${dateStr}</p>
+          <p><strong>Time:</strong> ${data.time}</p>
+          ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : ''}
+          <hr>
+          <p><em>Submitted from www.elevateforhumanity.org/schedule/meeting</em></p>
+        `,
+      });
 
-        // Confirmation email to the requester
-        await resend.emails.send({
-          from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-          to: data.email,
-          subject: 'Meeting Request Received — Elevate for Humanity',
-          html: `
-            <h2>Your Meeting Request Has Been Received</h2>
-            <p>Hi ${data.name.split(' ')[0]},</p>
-            <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call'}</strong>.</p>
-            <p><strong>Requested Date:</strong> ${dateStr}<br>
-            <strong>Requested Time:</strong> ${data.time}</p>
-            <p>Our team will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.</p>
-            <p>If you need to reach us sooner, email <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>.</p>
-            <p>— Elevate for Humanity</p>
-          `,
-        });
+      // Confirmation email to the requester
+      await sendEmail({
+        to: data.email,
+        subject: 'Meeting Request Received — Elevate for Humanity',
+        html: `
+          <h2>Your Meeting Request Has Been Received</h2>
+          <p>Hi ${data.name.split(' ')[0]},</p>
+          <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call'}</strong>.</p>
+          <p><strong>Requested Date:</strong> ${dateStr}<br>
+          <strong>Requested Time:</strong> ${data.time}</p>
+          <p>Our team will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.</p>
+          <p>If you need to reach us sooner, email <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>.</p>
+          <p>— Elevate for Humanity</p>
+        `,
+      });
 
-        // SMS alert
-        await resend.emails.send({
-          from: 'Elevate <noreply@elevateforhumanity.org>',
-          to: process.env.ADMIN_SMS_GATEWAY || '',
+      // SMS alert via AT&T email-to-SMS gateway (only if configured)
+      if (process.env.ADMIN_SMS_GATEWAY) {
+        await sendEmail({
+          to: process.env.ADMIN_SMS_GATEWAY,
           subject: 'Meeting',
-          text: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
-        });
+          html: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
+        }).catch((err) => logger.warn('[booking] SMS alert failed:', err));
       }
     } catch (emailErr) {
       logger.error('Failed to send meeting notification email:', emailErr);

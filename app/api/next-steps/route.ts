@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { sendEmail } from '@/lib/email/sendgrid';
 
 function computeProgress(row: any) {
   const checks = [
@@ -184,58 +185,50 @@ const supabase = await createClient();
     const userEmail = userData?.user?.email || 'Unknown';
     const progress = computeProgress(data);
 
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: 'elevate4humanityedu@gmail.com',
-        subject: `🔔 Student Checklist Updated: ${userEmail}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #000;">Student Checklist Update</h2>
-
-            <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 5px 0;"><strong>Student:</strong> ${userEmail}</p>
-              <p style="margin: 5px 0;"><strong>Program:</strong> ${data.program_code || 'Not selected'}</p>
-              <p style="margin: 5px 0;"><strong>Progress:</strong> ${progress.done}/${progress.total} steps complete (${progress.percent}%)</p>
-            </div>
-
-            <h3 style="color: #000;">Updated Fields:</h3>
-            <ul style="line-height: 1.8;">
-              ${Object.keys(update)
-                .map((key) => {
-                  const value = update[key];
-                  const displayValue = typeof value === 'boolean'
-                    ? (value ? '✅ Yes' : '❌ No')
-                    : value || '(empty)';
-                  return `<li><strong>${key.replace(/_/g, ' ')}:</strong> ${displayValue}</li>`;
-                })
-                .join('')}
-            </ul>
-
-            <div style="margin-top: 30px; padding: 15px; background: #000; border-radius: 8px;">
-              <a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/next-steps"
-                 style="color: #fff; text-decoration: none; font-weight: bold;">
-                📋 View All Student Checklists →
-              </a>
-            </div>
+    await sendEmail({
+      to: 'elevate4humanityedu@gmail.com',
+      subject: `Student Checklist Updated: ${userEmail}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #000;">Student Checklist Update</h2>
+          <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>Student:</strong> ${userEmail}</p>
+            <p style="margin: 5px 0;"><strong>Program:</strong> ${data.program_code || 'Not selected'}</p>
+            <p style="margin: 5px 0;"><strong>Progress:</strong> ${progress.done}/${progress.total} steps complete (${progress.percent}%)</p>
           </div>
-        `,
-      }),
+          <h3 style="color: #000;">Updated Fields:</h3>
+          <ul style="line-height: 1.8;">
+            ${Object.keys(update)
+              .map((key) => {
+                const value = update[key];
+                const displayValue = typeof value === 'boolean'
+                  ? (value ? 'Yes' : 'No')
+                  : value || '(empty)';
+                return `<li><strong>${key.replace(/_/g, ' ')}:</strong> ${displayValue}</li>`;
+              })
+              .join('')}
+          </ul>
+          <div style="margin-top: 30px; padding: 15px; background: #000; border-radius: 8px;">
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/next-steps"
+               style="color: #fff; text-decoration: none; font-weight: bold;">
+              View All Student Checklists
+            </a>
+          </div>
+        </div>
+      `,
     });
-    // SMS alert via AT&T gateway
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: process.env.ADMIN_SMS_GATEWAY || '',
+
+    // SMS alert via AT&T email-to-SMS gateway (only if configured)
+    if (process.env.ADMIN_SMS_GATEWAY) {
+      await sendEmail({
+        to: process.env.ADMIN_SMS_GATEWAY,
         subject: 'Checklist',
         html: `${userEmail}\n${data.program_code || 'General'}\n${progress.percent}% done`,
-      }),
-    });
-  } catch (emailError) {
-      logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }).catch((err) => logger.warn('[next-steps] SMS alert failed:', err));
     }
+  } catch (emailError) {
+    logger.error('[next-steps] Email notification failed:', emailError instanceof Error ? emailError : undefined);
+  }
 
   return NextResponse.json({ ...data, progress: computeProgress(data) });
 }

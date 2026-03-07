@@ -147,6 +147,17 @@ export default function WIOAEligibilityPage() {
               </div>
             ))}
           </div>
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <Link href="/wioa-eligibility/low-income" className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-100 transition-colors">
+              Low-Income Guidelines →
+            </Link>
+            <Link href="/wioa-eligibility/public-assistance" className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-100 transition-colors">
+              Public Assistance Recipients →
+            </Link>
+            <Link href="/wioa-eligibility/veterans" className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-100 transition-colors">
+              Veterans Eligibility →
+            </Link>
+          </div>
         </div>
       </section>
 

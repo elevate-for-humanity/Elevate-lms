@@ -93,7 +93,7 @@ export const WELDING: ProgramSchema = {
     { title: 'Welding Inspector', salary: '$70,000–$95,000' },
   ],
 
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/welding' },
+  cta: { applyHref: '/programs/welding/apply', advisorHref: '/contact', courseHref: '/programs/welding' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Ability to lift 50 lbs', 'No prior welding experience required'],
   equipmentIncluded: 'Welding helmet, gloves, and all consumables provided. Certification exam fees included.',
   modality: 'In-person — hands-on welding lab at Elevate training facility',

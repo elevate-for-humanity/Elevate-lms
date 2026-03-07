@@ -7,6 +7,9 @@ import { IT_HELP_DESK } from './it-help-desk';
 import { CYBERSECURITY_ANALYST } from './cybersecurity-analyst';
 import { BOOKKEEPING } from './bookkeeping';
 import { OFFICE_ADMINISTRATION } from './office-administration';
+import { CONSTRUCTION_TRADES } from './construction-trades-certification';
+import { NETWORK_SUPPORT } from './network-support-technician';
+import { WEB_DEVELOPMENT } from './web-development';
 
 /**
  * Program Catalog — All programs grouped by sector.
@@ -21,6 +24,9 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   CYBERSECURITY_ANALYST,
   BOOKKEEPING,
   OFFICE_ADMINISTRATION,
+  CONSTRUCTION_TRADES,
+  NETWORK_SUPPORT,
+  WEB_DEVELOPMENT,
 ];
 
 export const SECTORS = [

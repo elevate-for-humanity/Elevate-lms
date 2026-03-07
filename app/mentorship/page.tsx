@@ -58,6 +58,28 @@ export default function MentorshipPage() {
         </div>
       </section>
 
+      <section className="py-10 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-lg font-bold text-slate-900 mb-5">Mentorship Focus Areas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { label: 'Career Guidance', href: '/mentorship/career-guidance' },
+              { label: 'Goal Setting', href: '/mentorship/goal-setting' },
+              { label: 'Industry Insights', href: '/mentorship/industry-insights' },
+              { label: 'Networking', href: '/mentorship/networking' },
+              { label: 'Ongoing Support', href: '/mentorship/ongoing-support' },
+              { label: 'Skill Development', href: '/mentorship/skill-development' },
+            ].map((item) => (
+              <Link key={item.href} href={item.href}
+                className="flex items-center justify-between px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-700 transition-colors">
+                {item.label}
+                <ArrowRight className="w-4 h-4 flex-shrink-0 text-slate-400" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">How It Works</h2>

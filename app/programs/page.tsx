@@ -124,6 +124,21 @@ export default function ProgramCatalogPage() {
         </div>
       </section>
 
+      {/* Additional Program Types */}
+      <section className="bg-white border-t py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also Available</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/programs/micro-programs" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              Micro Programs &amp; Short Certifications
+            </Link>
+            <Link href="/programs/federal-funded" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              Federally Funded Programs
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Institutional Footer */}
       <section className="bg-slate-50 border-t py-8">
         <div className="max-w-6xl mx-auto px-4 text-xs text-slate-500 space-y-2">

@@ -95,7 +95,7 @@ export const PLUMBING: ProgramSchema = {
     { title: 'Commercial Plumber', salary: '$55,000–$75,000' },
   ],
 
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/plumbing' },
+  cta: { applyHref: '/programs/plumbing/apply', advisorHref: '/contact', courseHref: '/programs/plumbing' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior plumbing experience required'],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',
   modality: 'Hybrid — In-person hands-on labs, LMS-supported theory, live instructor sessions',

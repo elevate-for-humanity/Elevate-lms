@@ -150,6 +150,14 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
                   >
                     Talk to an Advisor
                   </Link>
+                  {p.cta.courseHref && (
+                    <Link
+                      href={p.cta.courseHref}
+                      className="block w-full text-center text-brand-blue-600 hover:text-brand-blue-800 font-semibold py-2 text-xs mt-1"
+                    >
+                      View Course Details →
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

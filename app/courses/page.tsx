@@ -274,6 +274,33 @@ export default async function CoursesPage() {
         </div>
       </section>
 
+      {/* Partner course catalogs */}
+      <section className="py-8 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Course Catalogs by Provider</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/courses/epa-608" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              EPA Section 608 Prep
+            </Link>
+            <Link href="/courses/careersafe" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              CareerSafe OSHA
+            </Link>
+            <Link href="/courses/hsi" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              HSI Safety Training
+            </Link>
+            <Link href="/courses/nds" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              DOT Compliance (NDS)
+            </Link>
+            <Link href="/courses/nrf" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              NRF RISE Up
+            </Link>
+            <Link href="/courses/capital-readiness" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+              Capital Readiness
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* COURSE COMPLETION TRACKING */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

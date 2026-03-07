@@ -59,7 +59,7 @@ export const SANITATION: ProgramSchema = {
     { title: 'Food Service Worker', salary: '$28,000–$35,000' },
     { title: 'Barber/Cosmetologist (with license)', salary: '$30,000–$50,000' },
   ],
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/sanitation-infection-control' },
+  cta: { applyHref: '/programs/sanitation-infection-control/apply', advisorHref: '/contact', courseHref: '/programs/sanitation-infection-control' },
   admissionRequirements: ['16 years or older', 'No prerequisites', 'No prior training required'],
   equipmentIncluded: 'All PPE, supplies, and certification exam fees included',
   modality: 'Hybrid — In-person hands-on practice, LMS-supported theory',

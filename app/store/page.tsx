@@ -273,6 +273,33 @@ export default function StorePage() {
         </div>
       </section>
 
+      {/* ============ ALSO IN THE STORE ============ */}
+      <section className="py-10 bg-white border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/store/courses" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              Certification Courses
+            </Link>
+            <Link href="/store/digital" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              Digital Resources
+            </Link>
+            <Link href="/store/ai-studio" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              AI Studio
+            </Link>
+            <Link href="/store/apps/grants" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              Grants App
+            </Link>
+            <Link href="/store/apps/sam-gov" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              SAM.gov Assistant
+            </Link>
+            <Link href="/store/apps/website-builder" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+              Website Builder
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ============ FAQ ============ */}
       <StoreFAQ />
 

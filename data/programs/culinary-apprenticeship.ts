@@ -54,7 +54,7 @@ export const CULINARY: ProgramSchema = {
     { title: 'Sous Chef', salary: '$40,000–$55,000' },
     { title: 'Executive Chef', salary: '$55,000–$80,000' },
   ],
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/culinary-apprenticeship' },
+  cta: { applyHref: '/programs/culinary-apprenticeship/apply', advisorHref: '/contact', courseHref: '/programs/culinary-apprenticeship' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Interest in culinary career', 'Able to stand for extended periods'],
   equipmentIncluded: 'Knife kit provided. Kitchen uniforms and supplies provided by host kitchen.',
   modality: 'In-person — supervised training in a professional kitchen',

@@ -67,6 +67,48 @@ const solutions = [
     cta: 'Contact Sales',
     href: '/contact?topic=enterprise',
   },
+  {
+    title: 'Distance Learning',
+    icon: GraduationCap,
+    description:
+      'Fully online delivery for remote learners and distributed cohorts',
+    features: [
+      'Async & live session support',
+      'Virtual proctoring',
+      'Progress tracking',
+      'Mobile-friendly interface',
+    ],
+    cta: 'Learn More',
+    href: '/solutions/distance-learning',
+  },
+  {
+    title: 'Higher Education',
+    icon: Building2,
+    description:
+      'Credential and continuing education programs for colleges and universities',
+    features: [
+      'Credit hour tracking',
+      'Accreditation reporting',
+      'Student information integration',
+      'Workforce alignment',
+    ],
+    cta: 'Learn More',
+    href: '/solutions/higher-ed',
+  },
+  {
+    title: 'K-12 Career Pathways',
+    icon: Users,
+    description:
+      'Career and technical education pathways for high school students',
+    features: [
+      'CTE program management',
+      'Dual enrollment support',
+      'Industry credential prep',
+      'Parent & counselor portals',
+    ],
+    cta: 'Learn More',
+    href: '/solutions/k12',
+  },
 ];
 
 const products = [

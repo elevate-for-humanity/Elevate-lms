@@ -89,7 +89,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     { title: 'EKG Technician', salary: '$35,000–$45,000' },
     { title: 'Clinical Coordinator', salary: '$42,000–$55,000' },
   ],
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/medical-assistant' },
+  cta: { applyHref: '/programs/medical-assistant/apply', advisorHref: '/contact', courseHref: '/programs/medical-assistant' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'No prior healthcare experience required', 'Background check required for clinical placement'],
   equipmentIncluded: 'All clinical supplies, lab equipment, and NHA certification exam fees included',
   modality: 'Hybrid — In-person clinical labs, LMS-supported theory, live instructor sessions',

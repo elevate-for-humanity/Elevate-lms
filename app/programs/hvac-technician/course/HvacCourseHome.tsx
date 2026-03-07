@@ -606,6 +606,14 @@ export default function HvacCourseHome({
             className="inline-flex items-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition text-sm shadow-lg shadow-brand-red-600/25">
             <Play className="w-4 h-4" /> {done > 0 ? 'Continue Learning' : 'Enroll Now'}
           </Link>
+          <div className="flex flex-wrap justify-center gap-6 mt-5 text-sm">
+            <Link href="/programs/hvac-technician/curriculum" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold">
+              Full Curriculum →
+            </Link>
+            <Link href="/programs/hvac-technician/study-guide" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold">
+              EPA 608 Study Guide →
+            </Link>
+          </div>
         </section>
       </div>
 

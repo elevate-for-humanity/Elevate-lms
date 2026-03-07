@@ -333,6 +333,51 @@ export default function SupersonicFastCashPage() {
               <Users className="w-8 h-8 text-brand-red-600" />
               <span className="font-semibold text-gray-900">Join Our Team</span>
             </Link>
+            <Link
+              href="/supersonic-fast-cash/careers/training"
+              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="font-semibold text-gray-900">Tax Training Program</span>
+            </Link>
+            <Link
+              href="/supersonic-fast-cash/services/payroll"
+              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="font-semibold text-gray-900">Payroll Services</span>
+            </Link>
+            <Link
+              href="/supersonic-fast-cash/tools/software-download"
+              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="font-semibold text-gray-900">Software Download</span>
+            </Link>
+            <Link
+              href="/supersonic-fast-cash/transparency"
+              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="font-semibold text-gray-900">How We Operate</span>
+            </Link>
+          </div>
+          <div className="mt-6 pt-5 border-t border-gray-100">
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Service Areas</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Indiana', href: '/supersonic-fast-cash/tax-preparation-indiana' },
+                { label: 'Illinois', href: '/supersonic-fast-cash/tax-preparation-illinois' },
+                { label: 'Ohio', href: '/supersonic-fast-cash/tax-preparation-ohio' },
+                { label: 'Tennessee', href: '/supersonic-fast-cash/tax-preparation-tennessee' },
+                { label: 'Texas', href: '/supersonic-fast-cash/tax-preparation-texas' },
+              ].map((s) => (
+                <Link key={s.href} href={s.href}
+                  className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-brand-red-50 hover:text-brand-red-700 transition-colors">
+                  {s.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -101,6 +101,12 @@ export default async function WorkforceBoardPage() {
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',
     },
+    {
+      image: '/images/pages/comp-cta-training.jpg',
+      title: 'Follow-Ups',
+      description: 'Track post-exit follow-up contacts and outcomes',
+      href: '/workforce-board/follow-ups',
+    },
   ];
 
   return (

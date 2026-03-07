@@ -100,7 +100,7 @@ export const ELECTRICAL: ProgramSchema = {
     { title: 'Maintenance Electrician', salary: '$48,000–$65,000' },
   ],
 
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/electrical' },
+  cta: { applyHref: '/programs/electrical/apply', advisorHref: '/contact', courseHref: '/programs/electrical' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior electrical experience required'],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',
   modality: 'Hybrid — In-person hands-on labs, LMS-supported theory, live instructor sessions',

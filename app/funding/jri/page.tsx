@@ -6,29 +6,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'JRI — Justice Reinvestment Initiative & Job Ready Indy | Elevate for Humanity',
+  title: 'JRI — Justice Reinvestment Initiative | Elevate for Humanity',
   description:
-    'Justice Reinvestment Initiative (JRI) and Job Ready Indy funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
+    'Justice Reinvestment Initiative (JRI) funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/jri' },
 };
 
-const eligibility = [
-  'Currently or formerly justice-involved',
-  'Indiana resident',
-  'At least 18 years of age',
-  'Enrolled in or accepted to an eligible training program',
-  'Not currently receiving other state tuition funding for the same program',
-];
-
-const coveredItems = [
-  'Tuition and training fees',
-  'Certification and exam fees',
-  'Required tools, uniforms, and supplies',
-  'Background check fees (where applicable)',
-];
-
 export default function JRIFundingPage() {
-
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
@@ -39,11 +23,11 @@ export default function JRIFundingPage() {
 
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image src="/images/pages/funding-page-2.jpg" alt="JRI Justice Reinvestment Initiative — Job Ready Indy" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/funding-page-2.jpg" alt="Justice Reinvestment Initiative career training" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/40 flex items-end">
           <div className="max-w-6xl mx-auto px-4 pb-10 w-full">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Justice Reinvestment Initiative (JRI)</h1>
-            <p className="text-xl text-white/90 font-medium">Delivered through Job Ready Indy — Funded Career Training for Justice-Involved Individuals</p>
+            <p className="text-xl text-white/90 font-medium">Funded Career Training for Justice-Involved Individuals</p>
           </div>
         </div>
       </section>
@@ -53,9 +37,9 @@ export default function JRIFundingPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-start">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is JRI &amp; Job Ready Indy?</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is JRI?</h2>
               <p className="text-slate-700 leading-relaxed mb-4">
-                The <strong>Justice Reinvestment Initiative (JRI)</strong> is an Indiana state program that funds career training for eligible justice-involved individuals. It is delivered locally through <strong>Job Ready Indy</strong>, an initiative administered by the Indiana Department of Workforce Development (DWD). Together, JRI and Job Ready Indy remove financial barriers so participants can focus on earning certifications and building careers.
+                The <strong>Justice Reinvestment Initiative (JRI)</strong> is an Indiana state program that funds career training for eligible justice-involved individuals. Administered by the Indiana Department of Workforce Development (DWD), JRI removes financial barriers so participants can focus on earning certifications and building careers.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is an approved JRI credential pathway provider. Our programs are designed to get participants certified with nationally recognized credentials and employed in high-demand fields within weeks, not years.
@@ -98,12 +82,12 @@ export default function JRIFundingPage() {
       {/* How to Apply */}
       <section className="py-14 sm:py-20">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">How to Get JRI Funding Through Job Ready Indy</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">How to Get JRI Funding</h2>
           <div className="space-y-6">
             {[
               { step: '1', title: 'Contact Elevate for Humanity', desc: 'Call (317) 314-3757 or apply online. Our enrollment team will verify your eligibility and help you choose a program.' },
               { step: '2', title: 'Register at WorkOne', desc: 'Create an account at indianacareerconnect.com and schedule an appointment with your local WorkOne office.' },
-              { step: '3', title: 'Get Approved Through Job Ready Indy', desc: 'WorkOne confirms your JRI eligibility under the Job Ready Indy initiative and issues a funding voucher for your training program.' },
+              { step: '3', title: 'Get Approved', desc: 'WorkOne confirms your JRI eligibility and issues a funding voucher for your training program.' },
               { step: '4', title: 'Start Training', desc: 'Begin your program. For approved participants, JRI covers tuition and related costs.' },
             ].map((s) => (
               <div key={s.step} className="flex gap-5 items-start">
@@ -122,7 +106,7 @@ export default function JRIFundingPage() {
       <section className="py-16 sm:py-24 bg-brand-green-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Your Past Doesn&apos;t Define Your Future</h2>
-          <p className="text-xl text-white/90 mb-10">JRI funding through Job Ready Indy may give you a fresh start with funded career training. Check your eligibility today.</p>
+          <p className="text-xl text-white/90 mb-10">JRI funding may give you a fresh start with funded career training. Check your eligibility today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/apply/student" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
             <Link href="/contact" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>

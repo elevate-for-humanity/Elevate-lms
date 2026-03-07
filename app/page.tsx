@@ -111,7 +111,7 @@ export default function HomePage() {
                 href={item.href}
                 className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <div className="relative h-24 sm:h-32">
+                <div className="relative h-24 sm:h-32 w-full overflow-hidden">
                   <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-3 sm:p-4">
@@ -243,7 +243,7 @@ export default function HomePage() {
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
               { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/hp/funding.jpg' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
+              { label: 'JRI — Justice Reinvestment Initiative', desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">

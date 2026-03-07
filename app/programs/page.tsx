@@ -20,7 +20,7 @@ export default function ProgramCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[300px]">
+      <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
         <Image
           src="/images/pages/programs-page-hero.jpg"
           alt="Students in a workforce training classroom"
@@ -154,13 +154,13 @@ function ProgramCard({ program: p }: { program: ProgramSchema }) {
       className="group block bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-brand-blue-300 hover:shadow-md transition-all"
     >
       {/* Image */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-40 w-full overflow-hidden">
         <Image
           src={p.heroImage}
           alt={p.heroImageAlt}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
-          sizes="(max-width: 640px) 100vw, 50vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {p.badge && (
           <span className={`absolute top-3 right-3 text-xs font-bold text-white px-2.5 py-1 rounded-full ${

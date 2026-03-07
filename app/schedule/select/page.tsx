@@ -5,12 +5,45 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Calendar, CheckCircle2, ArrowLeft, Clock, MapPin, Users } from 'lucide-react';
+import { Sun, Moon, BookOpen, CheckCircle2, ArrowLeft, Clock, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Select Schedule | Elevate for Humanity',
   robots: { index: false, follow: false },
 };
+
+const SCHEDULE_OPTIONS = [
+  {
+    id: 'day',
+    label: 'Day Classes',
+    icon: Sun,
+    hours: 'Monday – Friday, 8:00 AM – 2:30 PM',
+    location: 'Elevate Training Center, Indianapolis, IN',
+    description: 'Full-time daytime schedule. Complete the program in 12 weeks.',
+    badge: 'Most Popular',
+    badgeColor: 'bg-brand-blue-100 text-brand-blue-700',
+  },
+  {
+    id: 'evening',
+    label: 'Evening Classes',
+    icon: Moon,
+    hours: 'Monday – Thursday, 5:30 PM – 9:00 PM',
+    location: 'Elevate Training Center, Indianapolis, IN',
+    description: 'For working adults. Program runs approximately 16 weeks.',
+    badge: 'Flexible',
+    badgeColor: 'bg-purple-100 text-purple-700',
+  },
+  {
+    id: 'self-paced',
+    label: 'Self-Paced Online',
+    icon: BookOpen,
+    hours: 'Anytime — complete lessons on your own schedule',
+    location: 'Online via Elevate LMS',
+    description: 'Online coursework only. Hands-on labs scheduled separately at the training center.',
+    badge: 'Online',
+    badgeColor: 'bg-emerald-100 text-emerald-700',
+  },
+];
 
 async function confirmSchedule(formData: FormData) {
   'use server';
@@ -23,13 +56,14 @@ async function confirmSchedule(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const cohortId = formData.get('cohort_id') as string;
+  const scheduleType = formData.get('schedule_type') as string;
 
   await db.from('profiles').update({
     schedule_selected: true,
-    selected_cohort: cohortId,
+    selected_cohort: scheduleType,
   }).eq('id', user.id);
 
+  // Ensure training_enrollments row exists
   const { data: existing } = await db
     .from('training_enrollments')
     .select('id')
@@ -49,97 +83,78 @@ async function confirmSchedule(formData: FormData) {
   redirect('/onboarding/learner');
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric',
-  });
-}
-
 export default async function SelectSchedulePage() {
   const supabase = await createClient();
-  const admin = createAdminClient();
-  const db = admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-
-  const { data: dbCohorts } = await db
-    .from('cohorts')
-    .select('id, name, code, start_date, end_date, max_capacity, status, location, delivery_window_text, partner_name, notes')
-    .ilike('name', '%hvac%')
-    .eq('status', 'active')
-    .gte('start_date', new Date().toISOString().split('T')[0])
-    .order('start_date', { ascending: true });
-
-  const cohorts = dbCohorts || [];
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-2xl mx-auto">
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Select Schedule' }]} />
-        <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4">
+        <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Onboarding
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Select Your Schedule</h1>
-        <p className="text-sm text-gray-500 mb-6">
-          Choose the cohort that fits your schedule. All cohorts are held at the Elevate Training Center in Indianapolis.
-          WIOA and Workforce Ready Grant funding covers tuition for eligible students.
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Select Your Schedule</h1>
+        <p className="text-sm text-gray-500 mb-8">
+          Choose the schedule that works best for you. Your enrollment coordinator will confirm your exact start date after your application is approved.
         </p>
 
-        {cohorts.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-600 font-medium mb-1">No upcoming cohorts scheduled yet.</p>
-            <p className="text-sm text-gray-400">Contact us at (317) 760-7908 to be added to the waitlist.</p>
-          </div>
-        ) : (
-          <form action={confirmSchedule} className="space-y-4">
-            {cohorts.map((c, i) => (
-              <label key={c.id} className="block bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors">
-                <div className="flex items-start gap-3">
-                  <input type="radio" name="cohort_id" value={c.id} required className="mt-1" defaultChecked={i === 0} />
+        <form action={confirmSchedule} className="space-y-4">
+          {SCHEDULE_OPTIONS.map((opt, i) => {
+            const Icon = opt.icon;
+            return (
+              <label
+                key={opt.id}
+                className="block bg-white rounded-xl border-2 border-gray-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  <input
+                    type="radio"
+                    name="schedule_type"
+                    value={opt.id}
+                    required
+                    defaultChecked={i === 0}
+                    className="mt-1"
+                  />
+                  <div className="w-10 h-10 rounded-xl bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-brand-blue-600" />
+                  </div>
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-sm font-semibold text-gray-900">{c.name}</div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">Enrolling Now</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-900">{opt.label}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${opt.badgeColor}`}>
+                        {opt.badge}
+                      </span>
                     </div>
-                    {c.partner_name && <div className="text-xs text-gray-500 mb-2">Partner: {c.partner_name}</div>}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                    <p className="text-sm text-gray-500 mb-2">{opt.description}</p>
+                    <div className="space-y-1">
                       <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Calendar className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                        {formatDate(c.start_date)} — {formatDate(c.end_date)}
+                        <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                        {opt.hours}
                       </div>
-                      {c.delivery_window_text && (
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                          {c.delivery_window_text}
-                        </div>
-                      )}
-                      {c.location && (
-                        <div className="flex items-center gap-2 text-xs text-gray-600 sm:col-span-2">
-                          <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                          {c.location}
-                        </div>
-                      )}
-                      {c.max_capacity && (
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <Users className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                          Up to {c.max_capacity} students per cohort
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                        {opt.location}
+                      </div>
                     </div>
-                    {c.notes && <p className="text-xs text-gray-500 mt-2 italic">{c.notes}</p>}
                   </div>
                 </div>
               </label>
-            ))}
-            <div className="flex justify-end pt-4">
-              <button type="submit" className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
-                <CheckCircle2 className="w-4 h-4" /> Confirm Schedule
-              </button>
-            </div>
-          </form>
-        )}
+            );
+          })}
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-2.5 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Confirm Schedule
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

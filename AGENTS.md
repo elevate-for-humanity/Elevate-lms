@@ -117,7 +117,8 @@ Last verified: 882/882 pages, zero errors
 - `app/search/page.tsx` — Program search with cards, funding tags
 - `app/about/page.tsx` — Founder section, credentials, team preview
 - `app/funding/dol/page.tsx` — DOL Registered Apprenticeship
-- `app/funding/jri/page.tsx` — JRI = Justice Reinvestment Initiative, delivered via Job Ready Indy (Indiana DWD)
+- `app/funding/jri/page.tsx` — JRI = Justice Reinvestment Initiative (Indiana DWD state program, separate from Job Ready Indy)
+- `app/funding/job-ready-indy/page.tsx` — Job Ready Indy = Indianapolis workforce initiative for Marion County residents (separate from JRI)
 - `app/credentials/page.tsx` — 8 credentials with issuer/field
 - `app/training/certifications/page.tsx` — 8 cert programs
 - `app/features/page.tsx` — 6 platform features

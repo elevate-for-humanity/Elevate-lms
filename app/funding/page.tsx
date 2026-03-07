@@ -128,6 +128,31 @@ export default function FundingPage() {
               </div>
             </div>
 
+            {/* Job Ready Indy */}
+            <div className="rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-[180px] w-full overflow-hidden">
+                <Image src="/images/heroes-hq/jri-hero.jpg" alt="Job Ready Indy Indianapolis workforce initiative" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Indianapolis</div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Job Ready Indy</h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                  Indianapolis workforce initiative connecting Marion County residents to funded career training, credentials, and employer placement.
+                </p>
+                <div className="space-y-2 mb-4">
+                  {['Marion County residents', 'Funded credential pathways', 'Employer placement support', 'Healthcare, trades, tech, CDL'].map((item) => (
+                    <div key={item} className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
+                      <span className="text-slate-700 text-sm">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/funding/job-ready-indy" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
+                  Learn about Job Ready Indy <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
             {/* VR — Vocational Rehabilitation */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">

@@ -76,17 +76,24 @@ const COMPONENTS: ComponentInfo[] = [
 interface Props {
   mode?: 'explore' | 'quiz' | 'review';
   onComponentSelect?: (componentId: string) => void;
+  onComplete?: () => void;
 }
 
-export default function CondenserBreakdownDiagram({ mode = 'explore', onComponentSelect }: Props) {
+export default function CondenserBreakdownDiagram({ mode = 'explore', onComponentSelect, onComplete }: Props) {
   const [activeComponent, setActiveComponent] = useState<string | null>(null);
   const [revealedComponents, setRevealedComponents] = useState<Set<string>>(new Set());
 
   const handleClick = (id: string) => {
     setActiveComponent(id);
-    if (mode === 'quiz') {
-      setRevealedComponents((prev) => new Set(prev).add(id));
+    const next = new Set(revealedComponents).add(id);
+    if (mode === 'quiz') setRevealedComponents(next);
+    // In explore mode track visited too so onComplete fires
+    if (mode === 'explore') {
+      const visited = new Set(revealedComponents).add(id);
+      setRevealedComponents(visited);
+      if (visited.size >= COMPONENTS.length) onComplete?.();
     }
+    if (mode === 'quiz' && next.size >= COMPONENTS.length) onComplete?.();
     onComponentSelect?.(id);
   };
 

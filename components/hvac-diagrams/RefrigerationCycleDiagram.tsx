@@ -69,17 +69,18 @@ interface Props {
   /** 'explore' = click to learn, 'quiz' = label the stages, 'review' = all labels shown */
   mode?: 'explore' | 'quiz' | 'review';
   onStageSelect?: (stageId: string) => void;
+  onComplete?: () => void;
 }
 
-export default function RefrigerationCycleDiagram({ mode = 'explore', onStageSelect }: Props) {
+export default function RefrigerationCycleDiagram({ mode = 'explore', onStageSelect, onComplete }: Props) {
   const [activeStage, setActiveStage] = useState<string | null>(null);
   const [revealedStages, setRevealedStages] = useState<Set<string>>(new Set());
 
   const handleStageClick = (stageId: string) => {
     setActiveStage(stageId);
-    if (mode === 'quiz') {
-      setRevealedStages((prev) => new Set(prev).add(stageId));
-    }
+    const next = new Set(revealedStages).add(stageId);
+    if (mode === 'quiz' || mode === 'explore') setRevealedStages(next);
+    if (next.size >= STAGES.length) onComplete?.();
     onStageSelect?.(stageId);
   };
 

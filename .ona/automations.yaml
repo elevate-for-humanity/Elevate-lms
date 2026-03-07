@@ -28,6 +28,35 @@ tasks:
     dependsOn:
       - setup-env
 
+  generate-hvac-audio:
+    name: Generate HVAC lesson audio
+    description: >
+      Generate Marcus Johnson voiceover MP3s for all 94 HVAC lessons.
+      Skips lessons that already have audio in public/generated/lessons/.
+      Exits cleanly if OPENAI_API_KEY is not set — lessons use b-roll video.
+      Once generated, MP3s are committed to the repo and never regenerated.
+    command: |
+      npx tsx scripts/generate-hvac-audio.ts
+    triggeredBy:
+      - postDevcontainerStart
+    dependsOn:
+      - install-deps
+
+  generate-hvac-videos:
+    name: Generate HVAC lesson videos
+    description: >
+      Generate D-ID talking-head videos for all 94 HVAC lessons.
+      Uses instructor-trades.jpg + pre-generated lesson MP3s.
+      Skips lessons that already have video in public/generated/videos/.
+      Exits cleanly if DID_API_KEY is not set.
+      Once generated, MP4s are committed to the repo permanently.
+    command: |
+      npx tsx scripts/generate-hvac-videos-did.ts
+    triggeredBy:
+      - postDevcontainerStart
+    dependsOn:
+      - generate-hvac-audio
+
 services:
   dev-server:
     name: Dev Server

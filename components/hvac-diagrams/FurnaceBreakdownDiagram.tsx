@@ -82,15 +82,18 @@ const COMPONENTS: FurnaceComponent[] = [
 
 interface Props {
   mode?: 'explore' | 'quiz' | 'review';
+  onComplete?: () => void;
 }
 
-export default function FurnaceBreakdownDiagram({ mode = 'explore' }: Props) {
+export default function FurnaceBreakdownDiagram({ mode = 'explore', onComplete }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
 
   const handleClick = (id: string) => {
     setActiveId(id);
-    if (mode === 'quiz') setRevealed((p) => new Set(p).add(id));
+    const next = new Set(revealed).add(id);
+    if (mode === 'quiz' || mode === 'explore') setRevealed(next);
+    if (next.size >= COMPONENTS.length) onComplete?.();
   };
 
   const show = (id: string) => mode !== 'quiz' || revealed.has(id);

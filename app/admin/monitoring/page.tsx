@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Activity, AlertCircle, Database, Server, TrendingUp, Users, Zap } from 'lucide-react';
+import { Activity, AlertCircle, Database, Server, TrendingUp, Users, Zap, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface SystemStatus {
@@ -38,6 +38,8 @@ export default function MonitoringDashboard() {
   const [errors, setErrors] = useState<RecentError[]>([]);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [bundleLoading, setBundleLoading] = useState(false);
+  const [bundleError, setBundleError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStatus();
@@ -73,6 +75,33 @@ export default function MonitoringDashboard() {
       setErrors(data.errors || []);
     } catch (error) {
       console.error('Failed to fetch errors:', error);
+    }
+  };
+
+  const downloadBundle = async () => {
+    setBundleLoading(true);
+    setBundleError(null);
+    try {
+      const res = await fetch('/api/monitoring/bundle');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setBundleError(data.error || `Error ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `elevate-support-bundle-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setBundleError('Failed to download bundle. Check your connection and try again.');
+    } finally {
+      setBundleLoading(false);
     }
   };
 
@@ -169,9 +198,25 @@ export default function MonitoringDashboard() {
               >
                 Refresh Now
               </button>
+              <button
+                onClick={downloadBundle}
+                disabled={bundleLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                {bundleLoading ? 'Generating...' : 'Download Support Bundle'}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Bundle error */}
+        {bundleError && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center justify-between">
+            <span>{bundleError}</span>
+            <button onClick={() => setBundleError(null)} className="text-red-400 hover:text-red-600 ml-4">✕</button>
+          </div>
+        )}
 
         {/* Overall Status */}
         {status && (

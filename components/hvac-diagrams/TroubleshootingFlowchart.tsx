@@ -113,10 +113,11 @@ const NO_COOL_FLOW: FlowNode[] = [
 ];
 
 interface Props {
-  mode?: 'explore' | 'guided';
+  mode?: 'explore' | 'guided' | 'quiz' | 'review';
+  onComplete?: () => void;
 }
 
-export default function TroubleshootingFlowchart({ mode = 'explore' }: Props) {
+export default function TroubleshootingFlowchart({ mode = 'explore', onComplete }: Props) {
   const [activeNodeId, setActiveNodeId] = useState<string>('start');
   const [visitedNodes, setVisitedNodes] = useState<Set<string>>(new Set(['start']));
 
@@ -124,7 +125,13 @@ export default function TroubleshootingFlowchart({ mode = 'explore' }: Props) {
 
   const goTo = (nodeId: string) => {
     setActiveNodeId(nodeId);
-    setVisitedNodes((prev) => new Set(prev).add(nodeId));
+    setVisitedNodes((prev) => {
+      const next = new Set(prev).add(nodeId);
+      // Fire onComplete when student reaches any result node
+      const targetNode = NO_COOL_FLOW.find((n) => n.id === nodeId);
+      if (targetNode?.type === 'result') onComplete?.();
+      return next;
+    });
   };
 
   const nodeColor = (node: FlowNode) => {

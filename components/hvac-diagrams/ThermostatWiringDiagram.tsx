@@ -78,17 +78,18 @@ const WIRES: WireInfo[] = [
 interface Props {
   mode?: 'explore' | 'quiz' | 'review';
   onWireSelect?: (terminal: string) => void;
+  onComplete?: () => void;
 }
 
-export default function ThermostatWiringDiagram({ mode = 'explore', onWireSelect }: Props) {
+export default function ThermostatWiringDiagram({ mode = 'explore', onWireSelect, onComplete }: Props) {
   const [activeWire, setActiveWire] = useState<string | null>(null);
   const [revealedWires, setRevealedWires] = useState<Set<string>>(new Set());
 
   const handleClick = (terminal: string) => {
     setActiveWire(terminal);
-    if (mode === 'quiz') {
-      setRevealedWires((prev) => new Set(prev).add(terminal));
-    }
+    const next = new Set(revealedWires).add(terminal);
+    if (mode === 'quiz' || mode === 'explore') setRevealedWires(next);
+    if (next.size >= WIRES.length) onComplete?.();
     onWireSelect?.(terminal);
   };
 

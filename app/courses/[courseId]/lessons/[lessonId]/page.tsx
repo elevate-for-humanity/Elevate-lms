@@ -27,6 +27,33 @@ import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 import { LESSON_MODULE_MAP, getModuleForLesson } from '@/lib/courses/lesson-module-map';
+import { HVAC_COURSE_ID, HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
+import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
+import { HVAC_QUIZ_BANKS } from '@/lib/courses/hvac-quiz-banks';
+import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
+import { HVAC_VIDEO_MAP } from '@/lib/courses/hvac-video-map';
+import { HVAC_LESSON_NUMBER_TO_DEF_ID } from '@/lib/courses/hvac-lesson-number-map';
+import dynamic from 'next/dynamic';
+
+const HvacLessonEnrichment = dynamic(
+  () => import('@/components/lms/HvacLessonEnrichment'),
+  { ssr: false }
+);
+
+const MarcusInstructor = dynamic(
+  () => import('@/components/lms/MarcusInstructor'),
+  { ssr: false }
+);
+
+const PostVideoQuiz = dynamic(
+  () => import('@/components/lms/PostVideoQuiz').then((m) => ({ default: m.PostVideoQuiz })),
+  { ssr: false }
+);
+
+const HvacLessonVideo = dynamic(
+  () => import('@/components/lms/HvacLessonVideo'),
+  { ssr: false }
+);
 
 interface ModuleGroup {
   id: string;
@@ -92,7 +119,31 @@ export default function LessonPage() {
           return q;
         });
       }
-      setLesson({ ...lessonData, quiz_questions: qq || [], resources: lessonData.resources || [] });
+
+      // HVAC enrichment: fall back to local quiz bank when DB has no questions
+      let quizId = lessonData.quiz_id;
+      if (courseId === HVAC_COURSE_ID && lessonData.content_type === 'quiz' && (!qq || qq.length === 0)) {
+        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        if (defId && HVAC_QUIZ_MAP[defId]) {
+          qq = HVAC_QUIZ_MAP[defId].questions;
+          quizId = quizId || lessonData.id; // ensure quiz branch renders
+        }
+      }
+
+      // HVAC enrichment: replace placeholder HTML with real generated content
+      let content = lessonData.content;
+      if (courseId === HVAC_COURSE_ID && isPlaceholderContent(content)) {
+        const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
+        if (defId) content = buildLessonContent(defId);
+      }
+
+      setLesson({
+        ...lessonData,
+        content,
+        quiz_questions: qq || [],
+        quiz_id: quizId,
+        resources: lessonData.resources || [],
+      });
     }
     if (lessonsData) setLessons(lessonsData);
     if (modulesData) setModules(modulesData);
@@ -231,6 +282,16 @@ export default function LessonPage() {
     }
     return { base, takeaways, scenario };
   }, [lesson?.description]);
+
+  // Post-video quiz questions for HVAC video lessons (5 questions from module bank)
+  const postVideoQuizQuestions = useMemo(() => {
+    if (courseId !== HVAC_COURSE_ID || !lesson?.lesson_number) return [];
+    const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonId)?.[0];
+    if (!defId) return [];
+    const modId = defId.replace(/-\d+$/, ''); // e.g. 'hvac-05'
+    const bank = HVAC_QUIZ_BANKS[modId] ?? [];
+    return bank.slice(0, 5);
+  }, [courseId, lesson?.lesson_number, lessonId]);
 
   // Derive caption URL from lesson number (captions exist for L01-L04)
   const captionUrl = useMemo(() => {
@@ -514,7 +575,7 @@ export default function LessonPage() {
               />
             </div>
           </div>
-        ) : lesson.video_url ? (
+        ) : (lesson.video_url || (courseId === HVAC_COURSE_ID && lesson.lesson_number && HVAC_VIDEO_MAP[HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number]])) ? (
           <div className="max-w-5xl mx-auto p-3 sm:p-6 lg:p-8">
             {/* Module + lesson header */}
             <div className="mb-4">
@@ -527,28 +588,52 @@ export default function LessonPage() {
             </div>
 
             {/* Video player */}
-            <LessonPlayer
-              videoUrl={lesson.video_url}
-              lessonTitle={lesson.title}
-              moduleTitle={currentModule?.title}
-              transcript={lesson.transcript ?? null}
-              lessonContent={lesson.content ?? null}
-              lessonNumber={currentIndex + 1}
-              totalLessons={lessons.length}
-              durationMinutes={lesson.duration_minutes ?? undefined}
-              captionUrl={captionUrl}
-              onProgress={(percent: number) => {
-                setVideoWatchPercent(percent);
-                // Auto-mark complete when 90% watched
-                if (percent >= 90 && !isCompleted) {
-                  markComplete();
-                }
-              }}
-              onComplete={() => {
+            {(() => {
+              const defId = lesson.lesson_number
+                ? HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number]
+                : undefined;
+              const hvacVideo = defId ? HVAC_VIDEO_MAP[defId] : undefined;
+
+              const progressHandler = (pct: number) => {
+                setVideoWatchPercent(pct);
+                if (pct >= 90 && !isCompleted) markComplete();
+              };
+              const completeHandler = () => {
                 setVideoWatchPercent(100);
                 if (!isCompleted) markComplete();
-              }}
-            />
+              };
+
+              // HVAC: HvacLessonVideo checks for pre-generated lesson audio first,
+              // falls back to b-roll video. LessonPlayer handles all playback —
+              // no API key required, works with zero external dependencies.
+              if (courseId === HVAC_COURSE_ID && defId && hvacVideo) {
+                return (
+                  <HvacLessonVideo
+                    lessonDefId={defId}
+                    brollVideoUrl={hvacVideo.videoUrl}
+                    lessonTitle={lesson.title}
+                    onProgress={progressHandler}
+                    onComplete={completeHandler}
+                  />
+                );
+              }
+
+              return (
+                <LessonPlayer
+                  videoUrl={lesson.video_url!}
+                  lessonTitle={lesson.title}
+                  moduleTitle={currentModule?.title}
+                  transcript={lesson.transcript ?? null}
+                  lessonContent={lesson.content ?? null}
+                  lessonNumber={currentIndex + 1}
+                  totalLessons={lessons.length}
+                  durationMinutes={lesson.duration_minutes ?? undefined}
+                  captionUrl={captionUrl}
+                  onProgress={progressHandler}
+                  onComplete={completeHandler}
+                />
+              );
+            })()}
             {/* Watch progress indicator */}
             {!isCompleted && lesson.video_url && (
               <div className="mx-4 mt-2">
@@ -564,6 +649,19 @@ export default function LessonPage() {
                     style={{ width: `${Math.min(videoWatchPercent, 100)}%` }}
                   />
                 </div>
+              </div>
+            )}
+
+            {/* Post-video quiz for HVAC — fires after 90% watched */}
+            {courseId === HVAC_COURSE_ID && videoWatchPercent >= 90 && postVideoQuizQuestions.length > 0 && (
+              <div className="mt-6 px-4">
+                <PostVideoQuiz
+                  questions={postVideoQuizQuestions}
+                  passingScore={80}
+                  videoWatchGateMet={videoWatchPercent >= 90}
+                  onUnlock={() => { if (!isCompleted) markComplete(); }}
+                  onComplete={(_score, passed) => { if (passed && !isCompleted) markComplete(); }}
+                />
               </div>
             )}
           </div>
@@ -705,17 +803,38 @@ export default function LessonPage() {
           </div>
 
           {/* Tab content */}
-          {activeTab === 'content' && lesson.content && (
-            <div className="bg-white rounded-xl p-5 sm:p-8 shadow-sm border border-slate-200">
-              <div
-                className="prose max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900"
-                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
-              />
-            </div>
+          {activeTab === 'content' && (
+            courseId === HVAC_COURSE_ID && lesson.lesson_number ? (
+              <>
+                <HvacLessonEnrichment
+                  lessonNumber={lesson.lesson_number}
+                  lessonTitle={lesson.title}
+                />
+                <MarcusInstructor
+                  lessonNumber={lesson.lesson_number}
+                  lessonTitle={lesson.title}
+                />
+              </>
+            ) : lesson.content ? (
+              <div className="bg-white rounded-xl p-5 sm:p-8 shadow-sm border border-slate-200">
+                <div
+                  className="prose max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            ) : null
           )}
 
           {activeTab === 'practice' && (
             <div className="space-y-6">
+              {/* HVAC-specific practice content */}
+              {courseId === HVAC_COURSE_ID && lesson.lesson_number && (
+                <HvacLessonEnrichment
+                  lessonNumber={lesson.lesson_number}
+                  lessonTitle={lesson.title}
+                />
+              )}
+
               {/* Key Takeaways */}
               {parsedDescription.takeaways.length > 0 && (
                 <div className="bg-white rounded-xl p-5 sm:p-6 shadow-sm border border-slate-200">
@@ -769,7 +888,7 @@ export default function LessonPage() {
                 </div>
               )}
 
-              {parsedDescription.takeaways.length === 0 && !parsedDescription.scenario && competencyTags.length === 0 && (
+              {parsedDescription.takeaways.length === 0 && !parsedDescription.scenario && competencyTags.length === 0 && courseId !== HVAC_COURSE_ID && (
                 <p className="text-slate-500 text-sm py-4">No practice content available for this lesson.</p>
               )}
             </div>

@@ -117,11 +117,23 @@ export const PT_CHART_DRILLS: PTChartDrill[] = [
   { id: 'pt-08', refrigerant: 'R-22', givenPressure: 57, correctSatTemp: 40 },
   { id: 'pt-09', refrigerant: 'R-22', givenPressure: 121, correctSatTemp: 70 },
   { id: 'pt-10', refrigerant: 'R-22', givenPressure: 260, correctSatTemp: 100 },
-  { id: 'pt-11', refrigerant: 'R-410A', givenPressure: 72, correctSatTemp: 25 },
-  { id: 'pt-12', refrigerant: 'R-410A', givenPressure: 247, correctSatTemp: 80 },
-  { id: 'pt-13', refrigerant: 'R-22', givenPressure: 37, correctSatTemp: 25 },
-  { id: 'pt-14', refrigerant: 'R-22', givenPressure: 158, correctSatTemp: 80 },
+  { id: 'pt-11', refrigerant: 'R-410A', givenPressure: 72,  correctSatTemp: 25  },
+  { id: 'pt-12', refrigerant: 'R-410A', givenPressure: 247, correctSatTemp: 80  },
+  { id: 'pt-13', refrigerant: 'R-22',   givenPressure: 37,  correctSatTemp: 25  },
+  { id: 'pt-14', refrigerant: 'R-22',   givenPressure: 158, correctSatTemp: 80  },
   { id: 'pt-15', refrigerant: 'R-410A', givenPressure: 490, correctSatTemp: 130 },
+  // R-454B (Opteon XL41) — A2L replacement for R-410A, required on 2025+ equipment
+  { id: 'pt-16', refrigerant: 'R-454B', givenPressure: 101, correctSatTemp: 40  },
+  { id: 'pt-17', refrigerant: 'R-454B', givenPressure: 180, correctSatTemp: 70  },
+  { id: 'pt-18', refrigerant: 'R-454B', givenPressure: 291, correctSatTemp: 100 },
+  { id: 'pt-19', refrigerant: 'R-454B', givenPressure: 62,  correctSatTemp: 25  },
+  { id: 'pt-20', refrigerant: 'R-454B', givenPressure: 425, correctSatTemp: 130 },
+  // R-32 — used in mini-splits worldwide, A2L, GWP 675
+  { id: 'pt-21', refrigerant: 'R-32',   givenPressure: 124, correctSatTemp: 40  },
+  { id: 'pt-22', refrigerant: 'R-32',   givenPressure: 220, correctSatTemp: 70  },
+  { id: 'pt-23', refrigerant: 'R-32',   givenPressure: 354, correctSatTemp: 100 },
+  { id: 'pt-24', refrigerant: 'R-32',   givenPressure: 76,  correctSatTemp: 25  },
+  { id: 'pt-25', refrigerant: 'R-32',   givenPressure: 515, correctSatTemp: 130 },
 ];
 
 // ─── GAUGE READING EXERCISES ────────────────────────────

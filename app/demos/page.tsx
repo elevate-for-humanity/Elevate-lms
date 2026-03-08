@@ -19,7 +19,7 @@ const demos = [
     title: 'LMS Platform Overview',
     description: 'See how students navigate courses, track progress, earn certificates, and interact with AI tutors.',
     duration: '15 min',
-    thumbnail: '/images/pages/comp-cta-career.jpg',
+    thumbnail: '/images/pages/programs-page-hero.jpg',
     features: [
       'Student dashboard walkthrough',
       'Course enrollment and navigation',
@@ -53,7 +53,7 @@ const demos = [
     title: 'Admin Dashboard Tour',
     description: 'Explore the administrative tools for managing programs, students, courses, and compliance.',
     duration: '20 min',
-    thumbnail: '/images/pages/comp-cta-training.jpg',
+    thumbnail: '/images/pages/programs-page-hero.jpg',
     features: [
       'Student management',
       'Course builder and authoring',

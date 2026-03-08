@@ -19,32 +19,32 @@ const features = [
   {
     title: 'Discussion Forums',
     description: 'Categorized forums for Q&A, announcements, and peer discussions. Students help each other, instructors post updates, and cohorts stay connected between sessions.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
   {
     title: 'Member Groups',
     description: 'Create cohorts, study groups, and networking circles. Organize members by program, graduation year, or interest area with private group spaces.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
   {
     title: 'Leaderboards',
     description: 'Gamified rankings to drive engagement and healthy competition. Track participation, course completion, and community contributions with visible rankings.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
   {
     title: 'Points & Badges',
     description: 'Reward participation with points, badges, and achievements. Configurable point values for posts, replies, course completions, and event attendance.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
   {
     title: 'Events Calendar',
     description: 'Schedule events, webinars, and meetups with RSVP tracking. Integrated with Zoom for virtual events and Google Calendar for reminders.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
   {
     title: 'Analytics Dashboard',
     description: 'Real-time activity feed and engagement metrics. Track active members, post frequency, response times, and identify at-risk students before they disengage.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/about-partners-hero.jpg',
   },
 ];
 

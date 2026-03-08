@@ -15,14 +15,14 @@ export const metadata: Metadata = {
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
+    images: [{ url: '/images/pages/funding-page-5.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Workforce Funding | Elevate for Humanity',
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
-    images: ['/images/pages/comp-cta-career.jpg'],
+    images: ['/images/pages/funding-page-5.jpg'],
   },
 };
 

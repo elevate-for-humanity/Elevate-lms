@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 
 const pipelineSteps = [
   { step: '1', label: 'Intake & Eligibility', desc: 'WIOA screening, enrollment, funding verification', image: '/images/pages/homepage-why-elevate.jpg' },
-  { step: '2', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid programs', image: '/images/pages/comp-cta-training.jpg' },
-  { step: '3', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready reports', image: '/images/pages/comp-cta-career.jpg' },
+  { step: '2', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid programs', image: '/images/pages/technology-sector.jpg' },
+  { step: '3', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready reports', image: '/images/pages/technology-sector.jpg' },
   { step: '4', label: 'Employer Placement', desc: 'Pipeline matching, partner hiring, career services', image: '/images/pages/homepage-why-elevate.jpg' },
-  { step: '5', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention', image: '/images/pages/comp-cta-career.jpg' },
+  { step: '5', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention', image: '/images/pages/technology-sector.jpg' },
 ];
 
 const audiences = [
@@ -37,14 +37,14 @@ const audiences = [
 
 const modules = [
   { title: 'Partners', desc: 'Training providers, employers, workforce boards, and community organizations operating on the platform.', href: '/platform/partners', image: '/images/pages/homepage-why-elevate.jpg' },
-  { title: 'Managed Platform', desc: 'We operate it, you use it. Hosting, compliance reporting, updates, and support — zero engineering burden.', href: '/platform/managed', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'Enterprise Access', desc: 'Enterprise source-use deployments for organizations with dedicated technical teams.', href: '/platform/enterprise', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Managed Platform', desc: 'We operate it, you use it. Hosting, compliance reporting, updates, and support — zero engineering burden.', href: '/platform/managed', image: '/images/pages/technology-sector.jpg' },
+  { title: 'Enterprise Access', desc: 'Enterprise source-use deployments for organizations with dedicated technical teams.', href: '/platform/enterprise', image: '/images/pages/technology-sector.jpg' },
   { title: 'Workforce Boards', desc: 'WIOA-aligned dashboards, multi-provider reporting, and state agency integration.', href: '/platform/workforce-boards', image: '/images/pages/homepage-why-elevate.jpg' },
-  { title: 'Licensing', desc: "License models, qualification criteria, and what's included in each tier.", href: '/platform/licensing', image: '/images/pages/comp-cta-career.jpg' },
+  { title: 'Licensing', desc: "License models, qualification criteria, and what's included in each tier.", href: '/platform/licensing', image: '/images/pages/technology-sector.jpg' },
   { title: 'Licensing Models', desc: 'Detailed breakdown of all four license types: Program Holder, Independent, Apprenticeship, and À La Carte.', href: '/platform/overview', image: '/images/pages/homepage-why-elevate.jpg' },
   { title: 'Program Holders', desc: 'MOU-based network for training providers operating under the Elevate umbrella.', href: '/platform/program-holders', image: '/images/pages/homepage-why-elevate.jpg' },
-  { title: 'Sponsors', desc: 'Sponsor licensing for organizations funding workforce programs at scale.', href: '/platform/sponsors', image: '/images/pages/comp-cta-career.jpg' },
-  { title: 'Workforce Analytics', desc: 'Enrollment, completion, credential, and employment outcome data across all programs.', href: '/platform/workforce-analytics', image: '/images/pages/comp-cta-career.jpg' },
+  { title: 'Sponsors', desc: 'Sponsor licensing for organizations funding workforce programs at scale.', href: '/platform/sponsors', image: '/images/pages/technology-sector.jpg' },
+  { title: 'Workforce Analytics', desc: 'Enrollment, completion, credential, and employment outcome data across all programs.', href: '/platform/workforce-analytics', image: '/images/pages/technology-sector.jpg' },
 ];
 
 const governancePrinciples = [

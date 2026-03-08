@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Mobile App | Elevate For Humanity',
     description:
       'Install our mobile app directly from your browser. Access programs, track progress, and stay connected on the go.',
-    images: ['/images/pages/comp-cta-training.jpg'],
+    images: ['/images/pages/technology-sector.jpg'],
   },
 };
 

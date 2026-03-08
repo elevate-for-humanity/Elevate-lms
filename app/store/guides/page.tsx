@@ -33,7 +33,7 @@ const guides = [
     icon: Award,
     price: '$297',
     originalPrice: '$497',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/training-page-1.jpg',
     badge: 'Best Seller',
     features: [
       '150+ page comprehensive guide',
@@ -53,7 +53,7 @@ const guides = [
     icon: FileText,
     price: 'Included',
     originalPrice: null,
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-page-1.jpg',
     badge: 'Included with License',
     features: [
       'License tier comparison',

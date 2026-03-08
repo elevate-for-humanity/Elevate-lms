@@ -23,7 +23,7 @@ const steps = [
     number: 2,
     title: 'Review Candidates',
     description: 'Browse pre-screened candidates with verified WOTC eligibility. Each profile shows certifications, skills, and potential tax credits.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Check WOTC eligibility status', 'Review completed certifications', 'Look at work history'],
   },
   {
@@ -44,14 +44,14 @@ const steps = [
     number: 5,
     title: 'Onboard & Train',
     description: 'Use our onboarding checklists and training resources. Track progress and certifications in one place.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Complete I-9 and W-4', 'Assign training modules', 'Set 90-day goals'],
   },
   {
     number: 6,
     title: 'Claim Tax Credits',
     description: 'After 120+ hours worked, we process your WOTC certification. Credits appear on your next tax filing.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Track hours worked', 'Maintain employment records', 'File with annual taxes'],
   },
 ];

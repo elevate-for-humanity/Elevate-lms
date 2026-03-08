@@ -24,7 +24,7 @@ const dotTests = [
       'Clearinghouse query (if needed)',
       'Same-day scheduling available',
     ],
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
   {
     name: 'DOT Random Testing',
@@ -38,7 +38,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
   {
     name: 'DOT Post-Accident',

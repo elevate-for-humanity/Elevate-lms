@@ -5,7 +5,7 @@ export default function ComplianceAutomationCheckoutPage() {
     <AddOnCheckout
       productId="compliance-automation"
       productName="Compliance Automation"
-      productImage="/images/pages/comp-cta-career.jpg"
+      productImage="/images/pages/admin-compliance-audit-hero.jpg"
       backHref="/store/add-ons/compliance-automation"
       oneTimePrice={1297}
       monthlyPrice={374}

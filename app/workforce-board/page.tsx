@@ -39,7 +39,7 @@ export default async function WorkforceBoardPage() {
 
   const features = [
     {
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/workforce-board-page-1.jpg',
       title: 'Performance Dashboards',
       description: 'Real-time metrics on enrollment, completion, and employment outcomes',
       href: '/workforce-board/reports',
@@ -51,7 +51,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/workforce-board-page-1.jpg',
       title: 'Participant Tracking',
       description: 'Monitor participant progress, services, and outcomes across all programs',
       href: '/workforce-board/participants',
@@ -63,7 +63,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/workforce-board-page-1.jpg',
       title: 'Goal Monitoring',
       description: 'Track progress toward performance goals and benchmarks',
       href: '/workforce-board/reports/performance',
@@ -96,13 +96,13 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/employment',
     },
     {
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/workforce-board-page-1.jpg',
       title: 'Supportive Services',
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',
     },
     {
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/workforce-board-page-1.jpg',
       title: 'Follow-Ups',
       description: 'Track post-exit follow-up contacts and outcomes',
       href: '/workforce-board/follow-ups',

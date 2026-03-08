@@ -117,7 +117,7 @@ export default async function QuizzesPage() {
         <LmsHeroBanner
           title="Quizzes & Assessments"
           subtitle={`${stats.available} quizzes available. ${stats.completed} completed with ${stats.avgScore}% average score.`}
-          image="/images/pages/comp-cta-training.jpg"
+          image="/images/pages/training-classroom.jpg"
           eyebrow="Test Your Knowledge"
           cta={stats.available > stats.completed ? { label: 'Start Next Quiz', href: '#available-quizzes' } : undefined}
         />

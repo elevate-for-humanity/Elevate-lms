@@ -5,7 +5,7 @@ export default function AnalyticsProCheckoutPage() {
     <AddOnCheckout
       productId="analytics-pro"
       productName="Analytics Pro"
-      productImage="/images/pages/comp-cta-training.jpg"
+      productImage="/images/pages/admin-analytics-hero.jpg"
       backHref="/store/add-ons/analytics-pro"
       oneTimePrice={1497}
       monthlyPrice={424}

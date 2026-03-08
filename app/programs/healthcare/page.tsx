@@ -120,7 +120,7 @@ const healthcarePrograms = [
     duration: '1 day',
     desc: 'American Heart Association CPR, First Aid, and AED certification.',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/healthcare-sector.jpg',
   },
 ];
 

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const SCHEDULE_OPTIONS = [
   {
     id: 'day',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/schedule-consultation-page-1.jpg',
     imageAlt: 'Students in daytime HVAC training class',
     label: 'Day Classes',
     hours: 'Monday – Friday, 8:00 AM – 2:30 PM',

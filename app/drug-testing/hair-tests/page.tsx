@@ -25,7 +25,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
   {
     name: 'Hair Follicle 10-Panel',
@@ -42,7 +42,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
   {
     name: 'Hair 5-Panel (NO THC)',
@@ -58,7 +58,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
 ];
 

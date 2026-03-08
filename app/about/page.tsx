@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'A workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
+    images: [{ url: '/images/pages/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
     type: 'website',
   },
 };
@@ -277,32 +277,32 @@ export default function AboutPage() {
             {[
               {
                 title: 'Justice-Involved Individuals',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
               },
               {
                 title: 'Veterans',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
               },
               {
                 title: 'Young Adults (16–24)',
-                image: '/images/pages/comp-cta-training.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'Young people who are not sure what to do after high school. WIOA Youth funding covers career training that leads to a credential and a job in weeks, not years.',
               },
               {
                 title: 'Career Changers',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
               },
               {
                 title: 'Employers & Workforce Partners',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/about-hero.jpg',
                 desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
               },
             ].map((item) => (
@@ -403,7 +403,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row">
               <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0 overflow-hidden">
                 <Image
-                  src={founder.headshotSrc || '/images/pages/comp-cta-career.jpg'}
+                  src={founder.headshotSrc || '/images/pages/about-hero.jpg'}
                   alt={founder.name}
                   fill
                   sizes="(max-width: 640px) 100vw, 288px"
@@ -456,7 +456,7 @@ export default function AboutPage() {
               >
                 <div className="relative w-full aspect-[3/4] max-w-[240px] mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
                   <Image
-                    src={member.headshotSrc || '/images/pages/comp-cta-career.jpg'}
+                    src={member.headshotSrc || '/images/pages/about-hero.jpg'}
                     alt={member.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -480,12 +480,12 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/cdl-training' },
-              { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/hvac-technician' },
-              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/electrical' },
-              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/comp-cta-training.jpg', href: '/programs/barber-apprenticeship' },
-              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/comp-cta-training.jpg', href: '/programs/technology' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cna' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cdl-training' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/about-hero.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/technology' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36 overflow-hidden">

@@ -17,7 +17,7 @@ export default function PartnerPageClient() {
       {/* Video Hero — no text overlay */}
       <VideoHero
         videoSrc="/videos/barber-hero-final.mp4"
-        posterSrc="/images/pages/comp-cta-training.jpg"
+        posterSrc="/images/pages/barber-hero-main.jpg"
         posterAlt="Barber apprentice training in a barbershop"
       />
 

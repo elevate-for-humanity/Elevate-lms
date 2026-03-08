@@ -166,7 +166,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                 </div>
                 <div className="relative hidden lg:block">
                   <Image
-                    src={bundle.image_url || '/images/pages/comp-cta-career.jpg'}
+                    src={bundle.image_url || '/images/pages/career-services-page-3.jpg'}
                     alt={bundle.title}
                     fill
                     className="object-cover"

@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const PROGRAM_AREAS = [
-  { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'Technology', desc: 'IT Support, Cybersecurity, Certiport Certifications', icon: Monitor, href: '/programs/technology', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl-training', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/pages/comp-cta-training.jpg' },
-  { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/pages/training-page-1.jpg' },
+  { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/pages/training-page-1.jpg' },
+  { title: 'Technology', desc: 'IT Support, Cybersecurity, Certiport Certifications', icon: Monitor, href: '/programs/technology', image: '/images/pages/training-page-1.jpg' },
+  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl-training', image: '/images/pages/training-page-1.jpg' },
+  { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/pages/training-page-1.jpg' },
+  { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/pages/training-page-1.jpg' },
 ];
 
 export default function TrainingPage() {

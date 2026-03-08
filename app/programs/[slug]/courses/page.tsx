@@ -114,33 +114,33 @@ export default function ProgramCoursesPage() {
               const categoryImages: Record<string, string[]> = {
                 'healthcare': [
                   '/hero-images/healthcare-category.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg'
                 ],
                 'skilled-trades': [
                   '/hero-images/skilled-trades-category.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg'
                 ],
                 'technology': [
                   '/hero-images/technology-category.jpg',
                   '/hero-images/technology-hero.jpg',
-                  '/images/pages/comp-cta-training.jpg'
+                  '/images/pages/programs-page-hero.jpg'
                 ],
                 'business': [
-                  '/images/pages/comp-cta-career.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg'
                 ],
                 'transportation': [
-                  '/images/pages/comp-cta-training.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg',
+                  '/images/pages/programs-page-hero.jpg'
                 ],
                 'barber': [
                   '/hero-images/barber-beauty-category.jpg',
                   '/images/pages/barber-gallery-1.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/programs-page-hero.jpg'
                 ]
               };
               
@@ -172,7 +172,7 @@ export default function ProgramCoursesPage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/pages/comp-cta-career.jpg';
+                        target.src = '/images/pages/programs-page-hero.jpg';
                       }}
                     />
                     <div className="absolute top-4 right-4">

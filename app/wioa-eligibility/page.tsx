@@ -59,7 +59,7 @@ export default function WIOAEligibilityPage() {
               {
                 step: '2', title: 'WorkOne Appointment',
                 desc: 'Schedule a meeting at your local WorkOne center. They determine your funding eligibility.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/wioa-eligibility-page-1.jpg',
                 cta: 'Find WorkOne', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true,
               },
               {
@@ -107,7 +107,7 @@ export default function WIOAEligibilityPage() {
             {[
               { title: 'Tuition', image: '/images/pages/homepage-why-elevate.jpg' },
               { title: 'Books & Supplies', image: '/images/pages/homepage-why-elevate.jpg' },
-              { title: 'Certification Exams', image: '/images/pages/comp-cta-career.jpg' },
+              { title: 'Certification Exams', image: '/images/pages/wioa-eligibility-page-1.jpg' },
               { title: 'Support Services', image: '/images/pages/comp-home-highlight-health.jpg' },
             ].map((item) => (
               <div key={item.title} className="rounded-xl overflow-hidden border border-slate-100 bg-white">
@@ -169,9 +169,9 @@ export default function WIOAEligibilityPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
-              { title: 'Workforce Ready Grant', desc: 'Indiana state grant for high-demand certifications. No income requirements.', href: '/funding', image: '/images/pages/comp-cta-career.jpg' },
+              { title: 'Workforce Ready Grant', desc: 'Indiana state grant for high-demand certifications. No income requirements.', href: '/funding', image: '/images/pages/wioa-eligibility-page-1.jpg' },
               { title: 'Justice Reinvestment (JRI)', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/programs/jri', image: '/hero-images/jri-hero.jpg' },
-              { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/pages/comp-cta-career.jpg' },
+              { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/pages/wioa-eligibility-page-1.jpg' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">
                 <div className="relative h-[140px] sm:h-[160px] overflow-hidden">

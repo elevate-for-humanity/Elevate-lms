@@ -36,22 +36,22 @@ const TYPE_LABEL: Record<CourseLesson['type'], string> = {
 
 // One image per module — all real workforce/HVAC photos
 const MODULE_PHOTO: string[] = [
-  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/hvac-technician.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
-  '/images/pages/comp-cta-training.jpg',
+  '/images/pages/hvac-technician.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
   '/images/pages/comp-pathway-trades.jpg',
-  '/images/pages/comp-cta-training.jpg',
-  '/images/pages/comp-cta-training.jpg',
-  '/images/pages/comp-cta-career.jpg',
-  '/images/pages/comp-cta-career.jpg',
-  '/images/pages/comp-cta-career.jpg',
+  '/images/pages/hvac-technician.jpg',
+  '/images/pages/hvac-technician.jpg',
+  '/images/pages/hvac-technician.jpg',
+  '/images/pages/hvac-technician.jpg',
+  '/images/pages/hvac-technician.jpg',
 ];
 
 function modProgress(mod: CourseModule, done: string[]) {

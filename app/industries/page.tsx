@@ -143,7 +143,7 @@ export default async function IndustriesPage() {
         accentText="We Serve"
         subheadline="Career training across multiple high-demand industries"
         description="Explore programs in healthcare, skilled trades, transportation, technology, and more. All programs are 100% funded for eligible students with industry-recognized credentials."
-        imageSrc="/images/pages/comp-cta-career.jpg"
+        imageSrc="/images/pages/programs-page-hero.jpg"
         imageAlt="Industries We Serve"
         primaryCTA={{ text: "Explore Programs", href: "#industries" }}
         secondaryCTA={{ text: "Apply Now", href: "/apply" }}

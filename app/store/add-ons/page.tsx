@@ -22,7 +22,7 @@ const addOns = [
     href: '/store/add-ons/community-hub',
     icon: Users,
     price: '$1,997',
-    image: '/images/pages/programs-page-hero.jpg',
+    image: '/images/pages/training-cohort.jpg',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',
@@ -47,7 +47,7 @@ const moreAddOns = [
     description: 'Advanced reporting and predictive analytics for student outcomes. Real-time dashboards, custom reports, and cohort analysis.',
     href: '/store/add-ons/analytics-pro',
     price: '$1,497',
-    image: '/images/pages/programs-page-hero.jpg',
+    image: '/images/pages/wioa-meeting.jpg',
   },
   {
     id: 'compliance-automation',
@@ -55,7 +55,7 @@ const moreAddOns = [
     description: 'Automated compliance tracking and reporting for WIOA, grants, FERPA, and accreditation requirements.',
     href: '/store/add-ons/compliance-automation',
     price: '$1,297',
-    image: '/images/pages/programs-page-hero.jpg',
+    image: '/images/pages/workforce-training.jpg',
   },
 ];
 

@@ -3,7 +3,7 @@ export const TAX_PREPARATION: ProgramSchema = {
   slug: 'tax-preparation', title: 'Tax Preparation',
   subtitle: 'Earn your IRS PTIN and learn individual and small business tax preparation. 8-week program with real tax software training.',
   sector: 'business', category: 'Tax & Accounting',
-  heroImage: '/images/pages/tax-preparation.jpg', heroImageAlt: 'Tax preparation student learning tax filing procedures',
+  heroImage: '/images/pages/tax-prep-desk.jpg', heroImageAlt: 'Tax preparation student learning tax filing procedures',
   videoSrc: '/videos/tax-career-paths.mp4',
   deliveryMode: 'hybrid', durationWeeks: 8, hoursPerWeekMin: 15, hoursPerWeekMax: 20,
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 60, examPrep: 20, careerPlacement: 20 },

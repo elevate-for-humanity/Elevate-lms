@@ -7,7 +7,7 @@ export const ELECTRICAL: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Electrical',
 
-  heroImage: '/images/pages/electrical.jpg',
+  heroImage: '/images/pages/electrical-wiring.jpg',
   heroImageAlt: 'Electrical student working on wiring in a training lab',
   videoSrc: '/videos/electrician-trades.mp4',
 

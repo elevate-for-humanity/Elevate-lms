@@ -12,7 +12,7 @@ export const CNA: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare',
 
-  heroImage: '/images/pages/cna-nursing.jpg',
+  heroImage: '/images/pages/cna-patient-care.jpg',
   heroImageAlt: 'CNA student practicing patient care in a clinical setting',
   videoSrc: '/videos/cna-hero.mp4',
 

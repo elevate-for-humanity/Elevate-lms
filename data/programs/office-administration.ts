@@ -7,7 +7,7 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
   sector: 'business',
   category: 'Business Administration',
 
-  heroImage: '/images/pages/programs-page-hero.jpg',
+  heroImage: '/images/pages/office-admin-desk.jpg',
   heroImageAlt: 'Office administration and business training program',
   videoSrc: '/videos/business-finance.mp4',
 

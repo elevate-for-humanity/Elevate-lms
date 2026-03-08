@@ -6,7 +6,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
   subtitle: 'Same-day American Heart Association CPR/AED/First Aid certification. Hands-on skills practice with AHA-certified instructors.',
   sector: 'healthcare',
   category: 'Emergency Response',
-  heroImage: '/images/pages/cna-nursing.jpg',
+  heroImage: '/images/pages/cpr-mannequin.jpg',
   heroImageAlt: 'CPR and first aid training in a clinical setting',
   videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'in-person',

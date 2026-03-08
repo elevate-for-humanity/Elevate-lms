@@ -7,7 +7,7 @@ export const BOOKKEEPING: ProgramSchema = {
   sector: 'business',
   category: 'Accounting & Finance',
 
-  heroImage: '/images/pages/programs-page-hero.jpg',
+  heroImage: '/images/pages/bookkeeping-ledger.jpg',
   heroImageAlt: 'Bookkeeping and accounting training program',
   videoSrc: '/videos/business-finance.mp4',
 

@@ -24,7 +24,7 @@ const STAGES = [
   {
     num: 1,
     title: 'Eligibility & Barrier Removal',
-    image: '/images/pages/wioa-eligibility-page-1.jpg',
+    image: '/images/pages/wioa-meeting.jpg',
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
@@ -77,7 +77,7 @@ const STAGES = [
 const PROGRAMS = [
   {
     name: 'CNA Certification',
-    image: '/images/pages/cna-nursing.jpg',
+    image: '/images/pages/cna-patient-care.jpg',
     href: '/programs/cna',
     duration: '4–6 weeks',
     credential: 'Certified Nursing Assistant (CNA)',
@@ -89,7 +89,7 @@ const PROGRAMS = [
   },
   {
     name: 'CDL Commercial Driving',
-    image: '/images/pages/cdl-training.jpg',
+    image: '/images/pages/cdl-truck-highway.jpg',
     href: '/programs/cdl-training',
     duration: '4–6 weeks (160+ hours)',
     credential: 'CDL Class A or Class B',
@@ -113,7 +113,7 @@ const PROGRAMS = [
   },
   {
     name: 'Building Technician with HVAC Fundamentals',
-    image: '/images/pages/hvac-technician.jpg',
+    image: '/images/pages/hvac-unit.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',
     credential: 'EPA 608 + OSHA 30',
@@ -125,7 +125,7 @@ const PROGRAMS = [
   },
   {
     name: 'Electrical',
-    image: '/images/pages/electrical.jpg',
+    image: '/images/pages/electrical-wiring.jpg',
     href: '/programs/electrical',
     duration: '12–16 weeks',
     credential: 'OSHA 10 + NCCER Electrical Level 1',
@@ -137,7 +137,7 @@ const PROGRAMS = [
   },
   {
     name: 'Welding',
-    image: '/images/pages/welding.jpg',
+    image: '/images/pages/welding-sparks.jpg',
     href: '/programs/welding',
     duration: '12–16 weeks (400+ hours hands-on)',
     credential: 'AWS Welding Certifications + OSHA 10',
@@ -149,7 +149,7 @@ const PROGRAMS = [
   },
   {
     name: 'IT Support',
-    image: '/images/pages/it-help-desk.jpg',
+    image: '/images/pages/it-helpdesk-desk.jpg',
     href: '/programs/it-help-desk',
     duration: '8–12 weeks',
     credential: 'IT Specialist — Device Configuration & Management',
@@ -161,7 +161,7 @@ const PROGRAMS = [
   },
   {
     name: 'Cybersecurity',
-    image: '/images/pages/cybersecurity.jpg',
+    image: '/images/pages/cybersecurity-screen.jpg',
     href: '/programs/cybersecurity-analyst',
     duration: '12–16 weeks',
     credential: 'IT Specialist — Cybersecurity',
@@ -386,7 +386,7 @@ export default function PathwaysPage() {
           <div className="space-y-4 text-gray-700">
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/wioa-eligibility-page-1.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/wioa-meeting.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We navigate funding for you</h3>

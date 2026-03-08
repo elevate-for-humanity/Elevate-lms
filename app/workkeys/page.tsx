@@ -28,7 +28,7 @@ export default function WorkKeysPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
-        <Image src="/images/pages/wioa-eligibility-page-1.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover opacity-60" priority />
+        <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover opacity-60" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
       </section>
 

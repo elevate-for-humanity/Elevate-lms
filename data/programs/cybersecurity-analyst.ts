@@ -7,7 +7,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   sector: 'technology',
   category: 'Cybersecurity',
 
-  heroImage: '/images/pages/cybersecurity.jpg',
+  heroImage: '/images/pages/cybersecurity-screen.jpg',
   heroImageAlt: 'Cybersecurity student analyzing network security',
   videoSrc: '/videos/it-technology.mp4',
 

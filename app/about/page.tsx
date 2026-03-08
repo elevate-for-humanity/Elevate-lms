@@ -120,7 +120,7 @@ export default function AboutPage() {
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/about-career-training.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/pages/training-cohort.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
@@ -293,12 +293,12 @@ export default function AboutPage() {
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
-                image: '/images/pages/wioa-eligibility-page-1.jpg',
+                image: '/images/pages/wioa-meeting.jpg',
                 desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
               },
               {
                 title: 'Veterans',
-                image: '/images/pages/about-career-pathways.jpg',
+                image: '/images/pages/career-counseling.jpg',
                 desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
               },
               {
@@ -308,7 +308,7 @@ export default function AboutPage() {
               },
               {
                 title: 'Career Changers',
-                image: '/images/pages/about-career-training.jpg',
+                image: '/images/pages/workforce-training.jpg',
                 desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
               },
               {
@@ -549,7 +549,7 @@ export default function AboutPage() {
             </Link>
             <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-career-pathways.jpg" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/job-placement.jpg" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>

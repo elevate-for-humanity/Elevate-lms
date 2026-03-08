@@ -21,7 +21,7 @@ export default function ProgramCatalogPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        <Image src="/images/pages/programs-page-hero.jpg" alt="Students in a workforce training classroom" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/training-cohort.jpg" alt="Students in a workforce training classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">

@@ -7,7 +7,7 @@ export const WELDING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Welding & Fabrication',
 
-  heroImage: '/images/pages/welding.jpg',
+  heroImage: '/images/pages/welding-sparks.jpg',
   heroImageAlt: 'Welding student practicing MIG welding in a training lab',
   videoSrc: '/videos/welding-trades.mp4',
 

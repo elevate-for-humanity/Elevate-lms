@@ -69,7 +69,7 @@ export default function HomePage() {
             {/* Right: credential trust badges */}
             <div className="flex flex-col gap-4">
               <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden shadow-xl">
-                <Image src="/images/pages/about-career-training.jpg" alt="Elevate for Humanity career training" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+                <Image src="/images/pages/workforce-training.jpg" alt="Elevate for Humanity career training" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
               </div>
               <div className="bg-brand-green-900/40 border border-brand-green-700/40 rounded-xl p-4 text-center">
                 <p className="text-brand-green-300 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>

@@ -7,7 +7,7 @@ export const PLUMBING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Plumbing',
 
-  heroImage: '/images/pages/programs-plumbing-apply-hero.jpg',
+  heroImage: '/images/pages/plumbing-pipes.jpg',
   heroImageAlt: 'Plumbing student working on pipe installation',
   videoSrc: '/videos/welding-trades.mp4',
 

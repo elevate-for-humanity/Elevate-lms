@@ -96,7 +96,8 @@ export const TEAM: TeamMember[] = [
     title: 'Testing Center Coordinator & Exam Proctor',
     orgRole: 'Credential Testing',
     bio: 'Alberta Davis serves as a Testing Center Coordinator and Exam Proctor at Elevate for Humanity\'s Workforce Credential Testing Center in Indianapolis. She supports the administration of industry-recognized certification exams and workforce assessments for individuals, employers, schools, and workforce development partners.\n\nIn her role, Alberta coordinates testing appointments, prepares testing stations, and assists candidates through the check-in and identity verification process to ensure each testing session begins smoothly. As an exam proctor, she monitors in-person and live testing sessions to maintain compliance with certification provider policies and exam security standards.\n\nAlberta also assists with onsite testing events for partner organizations and workforce programs, helping expand access to credential testing opportunities across the community. Through her work, she helps maintain a secure, organized, and professional testing environment where candidates can focus on earning the certifications needed to advance in the workforce.',
-    headshotSrc: '/images/alberta-davis.jpg',
+    // headshotSrc: '/images/alberta-davis.jpg', // photo pending
+
     email: 'alberta@elevateforhumanity.org',
   },
 ];

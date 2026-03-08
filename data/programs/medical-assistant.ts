@@ -6,7 +6,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   subtitle: 'Prepare for the CCMA certification exam. Clinical and administrative medical assisting skills in 12 weeks.',
   sector: 'healthcare',
   category: 'Medical Assisting',
-  heroImage: '/images/pages/programs-medical-apply-hero.jpg',
+  heroImage: '/images/pages/medical-assistant-lab.jpg',
   heroImageAlt: 'Medical assistant student in clinical training',
   videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',

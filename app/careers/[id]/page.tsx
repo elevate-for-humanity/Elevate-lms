@@ -72,6 +72,27 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
         });
 
       if (insertErr) throw new Error(insertErr.message);
+
+      // Fire application_received + thank_you_applying emails
+      const emailBase = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        position: '', // populated server-side from job_posting
+      };
+      await Promise.allSettled([
+        fetch('/api/hr/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'application_received', params: emailBase }),
+        }),
+        fetch('/api/hr/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'thank_you_applying', params: emailBase }),
+        }),
+      ]);
+
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message || 'Submission failed. Please try again.');

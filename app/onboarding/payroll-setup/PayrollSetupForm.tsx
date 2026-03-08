@@ -1,131 +1,113 @@
-
-"use client";
-
-import React from 'react';
+'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  DollarSign,
-  CreditCard,
-  Building2,
-  Upload,
-  CheckCircle2,
-  AlertCircle,
-CheckCircle, } from 'lucide-react';
+  DollarSign, CreditCard, Building2, FileText,
+  Upload, CheckCircle2, AlertCircle, ChevronRight,
+  Banknote, Shield,
+} from 'lucide-react';
 
-interface PayrollSetupFormProps {
+interface Props {
   user: any;
   profile: any;
   rateConfigs: any[];
   existingProfile: any;
 }
 
-export default function PayrollSetupForm({
-  user,
-  profile,
-  rateConfigs,
-  existingProfile,
-}: PayrollSetupFormProps) {
+type PayMethod = 'direct_deposit' | 'pay_card' | 'check';
+
+const PAY_METHODS: { id: PayMethod; label: string; desc: string; icon: any; note?: string }[] = [
+  {
+    id: 'direct_deposit',
+    label: 'Direct Deposit',
+    desc: 'Funds deposited directly to your bank account each pay period.',
+    icon: Building2,
+    note: '1–2 business days',
+  },
+  {
+    id: 'pay_card',
+    label: 'Elevate Pay Card',
+    desc: 'Visa debit card loaded on pay day. No bank account required.',
+    icon: CreditCard,
+    note: 'Available same day',
+  },
+  {
+    id: 'check',
+    label: 'Paper Check',
+    desc: 'Mailed or available for pickup at the office on pay day.',
+    icon: Banknote,
+    note: 'Pickup or mail',
+  },
+];
+
+export default function PayrollSetupForm({ user, profile, rateConfigs, existingProfile }: Props) {
   const router = useRouter();
-
-  const [payoutMethod, setPayoutMethod] = useState(
-    existingProfile?.payout_method || 'STRIPE'
+  const [step, setStep] = useState<'method' | 'banking' | 'w9' | 'review' | 'done'>(
+    existingProfile ? 'review' : 'method'
   );
-  const [rate, setRate] = useState(existingProfile?.rate || '');
-  const [taxIdUploaded, setTaxIdUploaded] = useState(
-    existingProfile?.tax_id_uploaded || false
+  const [payMethod, setPayMethod] = useState<PayMethod>(
+    existingProfile?.payout_method?.toLowerCase() ?? 'direct_deposit'
   );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [banking, setBanking] = useState({
+    bankName: existingProfile?.bank_name ?? '',
+    accountType: existingProfile?.account_type ?? 'checking',
+    routingNumber: '',
+    accountNumber: '',
+  });
+  const [w9File, setW9File] = useState<File | null>(null);
+  const [w9Uploaded, setW9Uploaded] = useState(existingProfile?.status === 'active');
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
-  const rateConfig = rateConfigs.find(
-    (rc) => rc.payment_type === getPaymentType(profile.role)
-  );
-
-  function getPaymentType(role: string): string {
-    if (role === 'SITE_COORDINATOR') return 'FLAT';
-    return 'PERCENTAGE';
-  }
-
-  function getRoleDescription(role: string): string {
-    const descriptions: Record<string, string> = {
-      PROGRAM_HOLDER: 'Full program management (classroom + hands-on)',
-      WORKSITE_ONLY: 'Hands-on supervision only',
-      SITE_COORDINATOR: 'Student oversight and compliance monitoring',
-    };
-    return descriptions[role] || '';
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function submit() {
+    setSubmitting(true);
     setError('');
-    setIsSubmitting(true);
-
     try {
-      // Validate rate
-      if (!rate || parseFloat(rate) <= 0) {
-        throw new Error('Please enter a valid rate');
+      const fd = new FormData();
+      if (w9File) {
+        fd.append('file', w9File);
+        fd.append('documentType', 'w9');
+        const uploadRes = await fetch('/api/documents/upload', { method: 'POST', body: fd });
+        if (!uploadRes.ok) throw new Error('W-9 upload failed');
       }
 
-      if (rateConfig) {
-        const rateNum = parseFloat(rate);
-        if (rateNum < rateConfig.min_rate || rateNum > rateConfig.max_rate) {
-          throw new Error(
-            `Rate must be between ${rateConfig.min_rate} and ${rateConfig.max_rate}`
-          );
-        }
-      }
-
-      if (!taxIdUploaded) {
-        throw new Error('Please upload your W-9 tax form');
-      }
-
-      const response = await fetch('/api/onboarding/payroll-setup', {
+      const res = await fetch('/api/onboarding/payroll-setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           role: profile.role,
-          paymentType: getPaymentType(profile.role),
-          rate: parseFloat(rate),
-          payoutMethod,
-          taxIdUploaded,
+          paymentType: 'HOURLY',
+          rate: 0,
+          payoutMethod: payMethod.toUpperCase(),
+          taxIdUploaded: w9Uploaded || !!w9File,
+          bankName: banking.bankName,
+          accountType: banking.accountType,
+          routingNumber: banking.routingNumber,
+          accountNumber: banking.accountNumber,
         }),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to save payroll profile');
-      }
-
-      setSuccess(true);
-
-      // Redirect back to onboarding after 2 seconds
-      setTimeout(() => {
-        router.push('/onboarding/start');
-      }, 2000);
-    } catch (err: any) {
-      setError((err as Error).message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Setup failed');
+      setStep('done');
+    } catch (e: any) {
+      setError(e.message);
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
-  };
+  }
 
-  if (success) {
+  if (step === 'done') {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
-          <h2 className="text-2xl font-bold text-black mb-2">
-            Payroll Setup Complete!
-          </h2>
-          <p className="text-black mb-4">
-            Your payroll profile has been submitted for approval.
-          </p>
-          <p className="text-sm text-slate-500">
-            Redirecting you back to onboarding...
-          </p>
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-10 text-center">
+          <CheckCircle2 className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Payroll Setup Complete</h2>
+          <p className="text-slate-600 mb-6">Your payment method and W-9 have been submitted. HR will confirm within 1 business day.</p>
+          <button onClick={() => router.push('/onboarding/staff')}
+            className="w-full bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700">
+            Continue Onboarding
+          </button>
         </div>
       </div>
     );
@@ -134,271 +116,217 @@ export default function PayrollSetupForm({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-brand-green-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-brand-green-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-black">
-                Payroll Setup
-              </h1>
-              <p className="text-black mt-1">
-                Configure your payment method and tax information
-              </p>
-            </div>
+      <div className="bg-white border-b">
+        <div className="max-w-2xl mx-auto px-4 py-5 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center">
+            <DollarSign className="w-5 h-5 text-brand-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Payroll Setup</h1>
+            <p className="text-sm text-slate-500">Hi {profile.full_name ?? user.email} — choose how you'd like to be paid</p>
+          </div>
+        </div>
+        {/* Progress */}
+        <div className="max-w-2xl mx-auto px-4 pb-4">
+          <div className="flex gap-1">
+            {(['method', 'banking', 'w9', 'review'] as const).map((s, i) => (
+              <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${
+                ['method', 'banking', 'w9', 'review'].indexOf(step) >= i
+                  ? 'bg-brand-blue-600' : 'bg-slate-200'
+              }`} />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Form */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 space-y-8"
-        >
-          {/* Role & Rate Info */}
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
-              Your Role: {profile.role.replace(/_/g, ' ')}
-            </h3>
-            <p className="text-brand-blue-800 mb-4">
-              {getRoleDescription(profile.role)}
-            </p>
-            {rateConfig && (
-              <div className="bg-white rounded-lg p-4">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-sm text-black">Minimum</div>
-                    <div className="text-lg font-bold text-black">
-                      {rateConfig.payment_type === 'PERCENTAGE'
-                        ? `${rateConfig.min_rate}%`
-                        : `$${rateConfig.min_rate}`}
-                    </div>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+
+        {/* ── Step 1: Pay Method ── */}
+        {step === 'method' && (
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 mb-1">Choose your pay method</h2>
+            <p className="text-slate-500 text-sm mb-6">You can change this later by contacting HR.</p>
+            <div className="space-y-3">
+              {PAY_METHODS.map(({ id, label, desc, icon: Icon, note }) => (
+                <button key={id} type="button" onClick={() => setPayMethod(id)}
+                  className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 text-left transition-all ${
+                    payMethod === id
+                      ? 'border-brand-blue-600 bg-brand-blue-50'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    payMethod === id ? 'bg-brand-blue-600' : 'bg-slate-100'
+                  }`}>
+                    <Icon className={`w-6 h-6 ${payMethod === id ? 'text-white' : 'text-slate-500'}`} />
                   </div>
-                  <div>
-                    <div className="text-sm text-black">Default</div>
-                    <div className="text-lg font-bold text-brand-blue-600">
-                      {rateConfig.payment_type === 'PERCENTAGE'
-                        ? `${rateConfig.default_rate}%`
-                        : `$${rateConfig.default_rate}`}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-900">{label}</span>
+                      {note && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{note}</span>}
                     </div>
+                    <p className="text-sm text-slate-500 mt-0.5">{desc}</p>
                   </div>
-                  <div>
-                    <div className="text-sm text-black">Maximum</div>
-                    <div className="text-lg font-bold text-black">
-                      {rateConfig.payment_type === 'PERCENTAGE'
-                        ? `${rateConfig.max_rate}%`
-                        : `$${rateConfig.max_rate}`}
-                    </div>
-                  </div>
-                </div>
+                  {payMethod === id && <CheckCircle2 className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />}
+                </button>
+              ))}
+            </div>
+            {payMethod === 'pay_card' && (
+              <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                <strong>Elevate Pay Card:</strong> A Visa debit card will be mailed to your address on file within 5–7 business days of your first payroll run. Funds are loaded automatically each pay period.
               </div>
             )}
+            <button onClick={() => setStep(payMethod === 'direct_deposit' ? 'banking' : 'w9')}
+              className="mt-6 w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700">
+              Continue <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
+        )}
 
-          {/* Payment Rate */}
+        {/* ── Step 2: Banking (direct deposit only) ── */}
+        {step === 'banking' && (
           <div>
-            <label className="block text-sm font-medium text-black mb-2">
-              Your Rate{' '}
-              {rateConfig?.payment_type === 'PERCENTAGE'
-                ? '(%)'
-                : '($ per month)'}
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min={rateConfig?.min_rate}
-              max={rateConfig?.max_rate}
-              value={rate}
-              onChange={(e) => setRate(e.target.value)}
-              Content={rateConfig?.default_rate?.toString() || '0'}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-              required
-            />
-            {rateConfig && (
-              <p className="text-sm text-black mt-2">
-                Enter a rate between {rateConfig.min_rate} and{' '}
-                {rateConfig.max_rate}
-                {rateConfig.payment_type === 'PERCENTAGE' ? '%' : ' dollars'}
-              </p>
-            )}
-          </div>
-
-          {/* Payout Method */}
-          <div>
-            <label className="block text-sm font-medium text-black mb-3">
-              Payout Method
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setPayoutMethod('STRIPE')}
-                className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-colors text-left ${
-                  payoutMethod === 'STRIPE'
-                    ? 'border-brand-blue-600 bg-brand-blue-50'
-                    : 'border-slate-300 bg-white hover:border-slate-400'
-                }`}
-              >
-                <CreditCard
-                  className={`w-6 h-6 flex-shrink-0 ${
-                    payoutMethod === 'STRIPE'
-                      ? 'text-brand-blue-600'
-                      : 'text-slate-400'
-                  }`}
-                />
-                <div>
-                  <div
-                    className={`font-semibold ${
-                      payoutMethod === 'STRIPE'
-                        ? 'text-brand-blue-900'
-                        : 'text-black'
-                    }`}
-                  >
-                    Stripe Connect
-                  </div>
-                  <div className="text-sm text-black mt-1">
-                    Fast, secure payments to your bank account or debit card
-                  </div>
+            <h2 className="text-lg font-bold text-slate-900 mb-1">Bank account details</h2>
+            <p className="text-slate-500 text-sm mb-6">Your information is encrypted and used only for payroll deposits.</p>
+            <div className="bg-white rounded-xl border p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
+                <input value={banking.bankName} onChange={e => setBanking(b => ({ ...b, bankName: e.target.value }))}
+                  placeholder="e.g. Chase, Wells Fargo"
+                  className="w-full border rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Account Type</label>
+                <div className="flex gap-3">
+                  {['checking', 'savings'].map(t => (
+                    <button key={t} type="button" onClick={() => setBanking(b => ({ ...b, accountType: t }))}
+                      className={`flex-1 py-2.5 rounded-lg border-2 text-sm font-medium capitalize transition ${
+                        banking.accountType === t ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700' : 'border-slate-200 text-slate-600'
+                      }`}>{t}</button>
+                  ))}
                 </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPayoutMethod('ACH')}
-                className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-colors text-left ${
-                  payoutMethod === 'ACH'
-                    ? 'border-brand-blue-600 bg-brand-blue-50'
-                    : 'border-slate-300 bg-white hover:border-slate-400'
-                }`}
-              >
-                <Building2
-                  className={`w-6 h-6 flex-shrink-0 ${
-                    payoutMethod === 'ACH'
-                      ? 'text-brand-blue-600'
-                      : 'text-slate-400'
-                  }`}
-                />
-                <div>
-                  <div
-                    className={`font-semibold ${
-                      payoutMethod === 'ACH'
-                        ? 'text-brand-blue-900'
-                        : 'text-black'
-                    }`}
-                  >
-                    ACH Transfer
-                  </div>
-                  <div className="text-sm text-black mt-1">
-                    Direct deposit to your bank account (3-5 business days)
-                  </div>
-                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Routing Number</label>
+                <input value={banking.routingNumber} onChange={e => setBanking(b => ({ ...b, routingNumber: e.target.value }))}
+                  placeholder="9-digit routing number" maxLength={9}
+                  className="w-full border rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none font-mono" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
+                <input value={banking.accountNumber} onChange={e => setBanking(b => ({ ...b, accountNumber: e.target.value }))}
+                  placeholder="Account number"
+                  className="w-full border rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none font-mono" />
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-400 pt-1">
+                <Shield className="w-4 h-4" />
+                Encrypted with AES-256. Never shared with third parties.
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep('method')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+              <button onClick={() => setStep('w9')}
+                disabled={!banking.bankName || !banking.routingNumber || !banking.accountNumber}
+                className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50">
+                Continue <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
+        )}
 
-          {/* W-9 Upload */}
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-3 mb-4 text-sm text-brand-blue-900">
-            Your tax information is encrypted and stored securely. It is only used for payroll processing and is accessible to authorized payroll staff only.
-          </div>
+        {/* ── Step 3: W-9 ── */}
+        {step === 'w9' && (
           <div>
-            <label className="block text-sm font-medium text-black mb-2">
-              W-9 Tax Form
-            </label>
-            <div
-              className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                taxIdUploaded
-                  ? 'border-brand-green-300 bg-brand-green-50'
-                  : 'border-slate-300 bg-slate-50'
-              }`}
-            >
-              {taxIdUploaded ? (
-                <div className="flex items-center justify-center gap-3 text-brand-green-700">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
-                  <span className="font-medium">W-9 Uploaded</span>
+            <h2 className="text-lg font-bold text-slate-900 mb-1">W-9 Tax Form</h2>
+            <p className="text-slate-500 text-sm mb-6">Required by the IRS for all employees. Download, complete, and upload below.</p>
+            <div className="bg-white rounded-xl border p-6">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-brand-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-6 h-6 text-brand-red-600" />
                 </div>
-              ) : (
                 <div>
-                  <Upload className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                  <p className="text-black mb-2">
-                    Upload your completed W-9 form
-                  </p>
-                  <a
-                    href="https://www.irs.gov/pub/irs-pdf/fw9.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-brand-blue-600 hover:text-brand-blue-700 text-sm underline"
-                  >
-                    Download W-9 Form
+                  <p className="font-semibold text-slate-900">IRS Form W-9</p>
+                  <p className="text-sm text-slate-500 mt-0.5">Request for Taxpayer Identification Number</p>
+                  <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2 text-sm text-brand-blue-600 hover:underline font-medium">
+                    <Upload className="w-3.5 h-3.5" /> Download blank W-9 (IRS.gov)
                   </a>
                 </div>
+              </div>
+
+              {w9Uploaded ? (
+                <div className="flex items-center gap-3 bg-brand-green-50 border border-brand-green-200 rounded-xl px-4 py-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green-600" />
+                  <span className="text-sm font-medium text-brand-green-800">W-9 uploaded successfully</span>
+                  <button onClick={() => { setW9Uploaded(false); setW9File(null); }}
+                    className="ml-auto text-xs text-slate-400 hover:text-slate-600">Remove</button>
+                </div>
+              ) : (
+                <label className="block cursor-pointer">
+                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-brand-blue-400 hover:bg-brand-blue-50 transition">
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-slate-700">Click to upload your completed W-9</p>
+                    <p className="text-xs text-slate-400 mt-1">PDF, JPG, or PNG · Max 10MB</p>
+                    {w9File && <p className="text-xs text-brand-green-600 mt-2 font-medium">{w9File.name}</p>}
+                  </div>
+                  <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) { setW9File(f); setW9Uploaded(true); } }} />
+                </label>
               )}
             </div>
-            <button
-              type="button"
-              onClick={() => setTaxIdUploaded(!taxIdUploaded)}
-              className="mt-3 text-sm text-brand-blue-600 hover:text-brand-blue-700 underline"
-            >
-              {taxIdUploaded ? 'Remove W-9' : 'Mark as Uploaded (Demo)'}
-            </button>
-          </div>
-
-          {/* Payment Terms */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-            <h3 className="font-semibold text-black mb-3">Payment Terms</h3>
-            <ul className="space-y-2 text-sm text-black">
-              <li className="flex items-start gap-2">
-                <span className="text-brand-blue-600 mt-0.5">•</span>
-                <span>Payments are processed monthly, in arrears</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-brand-blue-600 mt-0.5">•</span>
-                <span>
-                  Payment is contingent on verified hours/progress and
-                  compliance
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-brand-blue-600 mt-0.5">•</span>
-                <span>1099 tax form will be issued annually</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-brand-blue-600 mt-0.5">•</span>
-                <span>
-                  Your payroll profile must be approved by Elevate for Humanity
-                  admin
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="flex items-start gap-3 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <span className="text-sm">{error}</span>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep(payMethod === 'direct_deposit' ? 'banking' : 'method')}
+                className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+              <button onClick={() => setStep('review')} disabled={!w9Uploaded}
+                className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50">
+                Continue <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex-1 px-6 py-3 border border-slate-300 text-black font-semibold rounded-lg hover:bg-slate-50"
-            >
-              Back
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !taxIdUploaded}
-              className="flex-1 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
-            </button>
           </div>
-        </form>
+        )}
+
+        {/* ── Step 4: Review & Submit ── */}
+        {step === 'review' && (
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 mb-1">Review & Submit</h2>
+            <p className="text-slate-500 text-sm mb-6">Confirm your payroll setup before submitting.</p>
+            <div className="bg-white rounded-xl border divide-y">
+              <div className="px-5 py-4 flex items-center justify-between">
+                <span className="text-sm text-slate-500">Pay Method</span>
+                <span className="text-sm font-semibold text-slate-900 capitalize">{payMethod.replace('_', ' ')}</span>
+              </div>
+              {payMethod === 'direct_deposit' && (
+                <>
+                  <div className="px-5 py-4 flex items-center justify-between">
+                    <span className="text-sm text-slate-500">Bank</span>
+                    <span className="text-sm font-semibold text-slate-900">{banking.bankName || '—'}</span>
+                  </div>
+                  <div className="px-5 py-4 flex items-center justify-between">
+                    <span className="text-sm text-slate-500">Account</span>
+                    <span className="text-sm font-semibold text-slate-900 capitalize">{banking.accountType} ···{banking.accountNumber.slice(-4)}</span>
+                  </div>
+                </>
+              )}
+              <div className="px-5 py-4 flex items-center justify-between">
+                <span className="text-sm text-slate-500">W-9</span>
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-brand-green-700">
+                  <CheckCircle2 className="w-4 h-4" /> Uploaded
+                </span>
+              </div>
+            </div>
+            {error && (
+              <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+              </div>
+            )}
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep('w9')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+              <button onClick={submit} disabled={submitting}
+                className="flex-1 flex items-center justify-center gap-2 bg-brand-green-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-green-700 disabled:opacity-50">
+                {submitting ? 'Submitting…' : 'Submit Payroll Setup'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

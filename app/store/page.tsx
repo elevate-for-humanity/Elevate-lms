@@ -18,6 +18,35 @@ export default function StorePage() {
   return (
     <div className="bg-white min-h-screen">
 
+      {/* Identity banner — clarifies the three-model structure */}
+      <div className="bg-slate-900 text-white py-4 border-b border-slate-700">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-10">
+            <div className="flex items-start gap-3">
+              <div className="w-1 h-10 bg-brand-red-500 rounded-full flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Training Provider</p>
+                <p className="text-sm text-white">We train students in Indianapolis through credential programs in trades, healthcare, and technology.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-1 h-10 bg-brand-blue-500 rounded-full flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Platform Licensor</p>
+                <p className="text-sm text-white">We license the same LMS we built for ourselves to other workforce organizations nationwide.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-1 h-10 bg-brand-orange-500 rounded-full flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Apprenticeship Sponsor</p>
+                <p className="text-sm text-white">We are a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301) for structured earn-and-learn programs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         <Image src="/images/pages/store-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />

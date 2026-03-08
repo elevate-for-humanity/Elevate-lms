@@ -85,7 +85,7 @@ function InquiryForm() {
         secondaryCTA={{ text: "Questions? Visit FAQ", href: "/faq" }}
         features={[
           "10-minute application with 2-3 day response",
-          "Funded training through WIOA and state grants",
+          "Workforce funding available for eligible Indiana residents",
           "Job placement support and career counseling included"
         ]}
         imageOnRight={true}

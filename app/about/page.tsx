@@ -188,7 +188,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Elevate for Humanity is a hybrid workforce training hub and DOL Registered Apprenticeship
+            Elevate for Humanity is a new workforce training institute and DOL Registered Apprenticeship
             Sponsor (RAPIDS: 2025-IN-132301). We coordinate employer-based hands-on instruction with
             online didactic learning — not a traditional campus model.
           </p>

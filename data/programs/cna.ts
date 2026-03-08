@@ -28,8 +28,9 @@ export const CNA: ProgramSchema = {
   schedule: 'Mon–Fri, 8:00 AM–2:30 PM (30 hrs/week)',
   eveningSchedule: 'Evening cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA funding. Next Level Jobs and employer sponsorship accepted.',
-  selfPayCost: '$2,800 (payment plans available)',
+  fundingStatement: 'Self-pay program. Flexible payment plans and BNPL options available.',
+  selfPayCost: '$2,800',
+  isSelfPay: true,
   badge: 'Funding Available',
   badgeColor: 'green',
 
@@ -141,7 +142,7 @@ export const CNA: ProgramSchema = {
     { standard: 'Indiana Administrative Code 410 IAC 16.2', description: 'Training meets Indiana requirements for CNA certification: minimum 105 hours (75 classroom + 30 clinical).' },
     { standard: 'OBRA 1987 (Federal)', description: 'Program complies with Omnibus Budget Reconciliation Act requirements for nurse aide training.' },
     { standard: 'Indiana State Department of Health', description: 'Curriculum approved by ISDH for CNA competency exam eligibility.' },
-    { standard: 'WIOA Title I', description: 'Program eligible for Workforce Innovation and Opportunity Act funding through Indiana DWD.' },
+    { standard: 'Indiana State Board of Nursing', description: 'CNA training program approved by the Indiana State Board of Nursing. Graduates are eligible to sit for the Indiana CNA competency exam.' },
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for Individual Training Accounts through local workforce boards.' },
   ],
 
@@ -263,12 +264,12 @@ export const CNA: ProgramSchema = {
     'Clinical placement coordination',
     'Career placement support',
   ],
-  paymentTerms: 'WIOA and Next Level Jobs funding accepted. Employer sponsorship available. Payment plans for self-pay students.',
+  paymentTerms: 'Self-pay program. $2,800 total tuition. Pay in full, split into installments, or use our income-share option. Pricing is Indiana-based — tuition rates vary by state.',
 
   faqs: [
     { question: 'Do I need healthcare experience?', answer: 'No. This program starts from the basics and prepares you for the Indiana CNA competency exam in 6 weeks.' },
     { question: 'What is the CNA exam?', answer: 'The Indiana CNA competency exam has two parts: a 75-question written test (90 minutes) and a clinical skills test where you perform 5 randomly selected skills in front of an evaluator.' },
-    { question: 'Is this program free?', answer: 'Yes, for eligible participants through WIOA or Next Level Jobs funding. Many employers also sponsor CNA training. Self-pay is $2,800 with payment plans available.' },
+    { question: 'Is this program covered by WIOA or state grants?', answer: 'No. The CNA program at Elevate is self-pay. It is not currently listed on the Indiana ETPL or covered by WIOA, Next Level Jobs, or Workforce Ready Grant. Tuition is $2,800 with flexible payment plans available.' },
     { question: 'Can I become an RN after this?', answer: 'Yes. CNA is the first step on the nursing career ladder. Many CNAs go on to earn LPN (1 year) or RN (2–4 years) credentials. CNA experience strengthens nursing school applications.' },
   ],
 
@@ -279,5 +280,5 @@ export const CNA: ProgramSchema = {
   ],
 
   metaTitle: 'CNA Training | Indiana Certified Nursing Assistant | Indianapolis',
-  metaDescription: '6-week CNA program. Indiana state certification, CPR/BLS, and 5 credentials. 150–180 hours. WIOA funding available.',
+  metaDescription: '6-week CNA program in Indianapolis, Indiana. State certification, CPR/BLS, and 5 credentials. 150–180 hours. Self-pay $2,800 with flexible payment plans.',
 };

@@ -6,7 +6,7 @@ import { DollarSign, Users, Building2, ArrowRight, Shield, GraduationCap } from 
 
 export const metadata: Metadata = {
   title: 'Grants & Scholarships | Get Your Training Paid For | Elevate For Humanity',
-  description: 'Indiana residents can get Funded career training through federal and state grants. No loans, no debt. See if you qualify for WIOA, Workforce Ready Grant, or other funding.',
+  description: 'Indiana residents may qualify for workforce funding through federal and state grants. Eligibility is required. See if you qualify for WIOA, Workforce Ready Grant, or other programs.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/grants' },
 };
 
@@ -39,7 +39,7 @@ export default function GrantsPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: DollarSign, title: '$0 Out of Pocket', desc: 'Grants cover everything. You pay nothing upfront or later.' },
+              { icon: DollarSign, title: 'Funding May Cover Tuition', desc: 'If you qualify, grants can cover tuition, books, and certification fees. Indiana residents only — eligibility is not guaranteed.' },
               { icon: GraduationCap, title: 'Real Certifications', desc: 'Earn industry credentials that employers actually want.' },
               { icon: Users, title: 'Support Services', desc: 'Many grants include help with transportation and childcare.' },
               { icon: Shield, title: 'No Risk', desc: 'Unlike loans, grants never need to be paid back. Ever.' },
@@ -74,7 +74,7 @@ export default function GrantsPage() {
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">WIOA (Workforce Innovation and Opportunity Act)</h3>
                   <p className="text-slate-600 mb-4">
-                    This is the main federal program that pays for career training. It&apos;s designed for adults who need new skills to get a good job. WIOA covers your tuition, books, supplies, certification exams, and can even help with transportation and childcare.
+                    WIOA is the main federal workforce funding program. It is designed for adults who need new skills to get a good job. If you qualify, WIOA can cover tuition, books, supplies, certification exams, and may help with transportation and childcare. Indiana residents only — eligibility is determined through WorkOne.
                   </p>
                   <div className="bg-slate-50 rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">You likely qualify if you:</h4>
@@ -138,7 +138,7 @@ export default function GrantsPage() {
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">SNAP Employment & Training</h3>
                   <p className="text-slate-600 mb-4">
-                    If you receive SNAP benefits (food stamps), you can get free job training plus extra support like transportation money and help finding childcare. This program is designed to help you become self-sufficient.
+                    If you receive SNAP benefits, you may qualify for funded job training plus support services like transportation assistance and childcare referrals. Indiana residents only — eligibility is determined through your local SNAP E&T provider.
                   </p>
                   <div className="bg-slate-50 rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">You qualify if you:</h4>

@@ -137,7 +137,7 @@ export default function MissionPage() {
                 determine destiny, and where employers have access to a skilled, diverse workforce.
               </p>
               <p className="text-lg text-gray-700 mb-6">
-                By 2030, we aim to train 10,000 individuals, partner with 500 employers, 
+                We aim to expand training capacity, deepen employer partnerships, 
                 and expand our programs to serve communities across the Midwest.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">

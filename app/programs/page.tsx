@@ -9,8 +9,8 @@ import { getTotalHoursRange } from '@/lib/programs/program-schema';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 export const metadata: Metadata = {
-  title: 'Credential Pathways | Funded Career Training Programs',
-  description: 'Credential pathway programs in healthcare, skilled trades, technology, CDL, barbering, and business. Each pathway includes nationally recognized certifications. Training may be fully funded through WIOA and state workforce programs.',
+  title: 'Credential Pathways | Career Training Programs | Indianapolis',
+  description: 'Credential pathway programs in healthcare, skilled trades, technology, CDL, barbering, and business. Indianapolis, Indiana. Nationally recognized certifications. Workforce funding available for eligible Indiana residents.',
   alternates: {
     canonical: '/programs',
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function ProgramCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
+      {/* Hero — image only, no text overlay */}
       <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
         <Image
           src="/images/pages/programs-page-hero.jpg"
@@ -29,20 +29,22 @@ export default function ProgramCatalogPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 pb-8 w-full">
-            <nav className="flex items-center gap-1.5 text-xs text-white/70 mb-3">
-              <Link href="/" className="hover:text-white">Home</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white font-medium">Programs</span>
-            </nav>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">Credential Pathways</h1>
-            <p className="text-white/80 mt-2 max-w-2xl">
-              Industry-recognized credentials. Competency-based training. Workforce-funded pathways to employment.
-            </p>
-          </div>
-        </div>
       </section>
+
+      {/* Page header — below image */}
+      <div className="bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-3">
+            <Link href="/" className="hover:text-slate-700">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-700 font-medium">Programs</span>
+          </nav>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Credential Pathways</h1>
+          <p className="text-slate-500 mt-2 max-w-2xl">
+            Industry-recognized credentials. Competency-based training. Indianapolis, Indiana.
+          </p>
+        </div>
+      </div>
 
       {/* Institutional Stats Bar */}
       <section className="bg-slate-900 py-5">
@@ -52,7 +54,7 @@ export default function ProgramCatalogPage() {
             <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.reduce((sum, p) => sum + p.credentials.length, 0)}</strong> Industry Credentials</span>
             <span><strong className="text-brand-blue-400">{new Set(ALL_PROGRAMS.map((p) => p.sector)).size}</strong> Sectors</span>
             <span><strong className="text-brand-blue-400">{new Set(ALL_PROGRAMS.flatMap((p) => p.employerPartners)).size}</strong> Employer Partners</span>
-            <span><strong className="text-brand-green-400">$0</strong> with WIOA Funding</span>
+            <span>Workforce funding available for eligible Indiana residents</span>
           </div>
           {/* Credential Pipeline Summary */}
           <div className="mt-4 pt-4 border-t border-white/10">
@@ -142,7 +144,7 @@ export default function ProgramCatalogPage() {
       {/* Institutional Footer */}
       <section className="bg-slate-50 border-t py-8">
         <div className="max-w-6xl mx-auto px-4 text-xs text-slate-500 space-y-2">
-          <p>Elevate for Humanity is an ETPL-listed training provider. Programs are eligible for WIOA, Next Level Jobs, and Workforce Ready Grant funding through Indiana DWD and local workforce boards.</p>
+          <p>Elevate for Humanity is an ETPL-listed training provider in Indianapolis, Indiana. Workforce funding through WIOA, Next Level Jobs, and Workforce Ready Grant is available for eligible Indiana residents. Eligibility is not guaranteed — you must qualify through WorkOne.</p>
           <p>Salary data sourced from the U.S. Bureau of Labor Statistics, Occupational Outlook Handbook (2024). Actual earnings vary by employer, location, experience, and market conditions.</p>
           <p>Credential requirements and exam formats are set by the issuing organizations and may change. Verify current requirements with the issuing body before enrollment.</p>
         </div>

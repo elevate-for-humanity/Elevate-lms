@@ -38,7 +38,7 @@ export default function TrainingDeliveryDisclosure() {
             <h2 className="text-lg font-bold text-slate-900 mb-3">Institutional Disclosure</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
               Elevate for Humanity (operating as 2Exclusive LLC-S, DBA Elevate for Humanity Career
-              &amp; Training Institute) is a <strong>hybrid workforce training hub</strong> and{' '}
+              &amp; Training Institute) is a <strong>workforce training institute</strong> and{' '}
               <strong>DOL Registered Apprenticeship Sponsor</strong> (RAPIDS: 2025-IN-132301). We are
               an Indiana DWD-approved training provider listed on the Eligible Training Provider List
               (ETPL). Elevate is <strong>not a traditional campus-based institution</strong>. Training

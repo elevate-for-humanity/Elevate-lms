@@ -42,7 +42,7 @@ const DEFAULT_PATHWAYS = [
   },
   {
     title: 'I Need Help with Funding',
-    description: 'Check if you qualify for WIOA, WRG, or other funding assistance.',
+    description: 'Check if you qualify for WIOA, WRG, or other funding assistance. Indiana residents only.',
     icon: Briefcase,
     href: '/funding',
     color: 'blue',
@@ -246,7 +246,7 @@ export default async function StartPage() {
               </div>
               <h3 className="font-bold mb-2">Apply</h3>
               <p className="text-gray-600 text-sm">
-                Complete a simple application and we'll check your eligibility for free training.
+                Complete a simple application and we'll check your eligibility for workforce funding. Indiana residents only — eligibility is not guaranteed.
               </p>
             </div>
             <div className="text-center">

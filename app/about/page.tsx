@@ -32,16 +32,20 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Visual hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image
-          src="/images/pages/about-team-hero.jpg"
-          alt="Elevate for Humanity team and workforce training"
-          fill
-          sizes="100vw"
-          quality={90} className="object-cover"
-          priority
-        />
+      {/* Video hero */}
+      <section className="relative h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[320px] overflow-hidden bg-slate-900">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-80"
+          poster="/images/pages/about-team-hero.jpg"
+        >
+          <source src="/videos/about-mission.mp4" type="video/mp4" />
+        </video>
+        {/* Gradient overlay — bottom fade so heading section below reads cleanly */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-slate-900/70" />
       </section>
 
       {/* Who We Are */}
@@ -277,32 +281,32 @@ export default function AboutPage() {
             {[
               {
                 title: 'Justice-Involved Individuals',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/funding-page-2.jpg',
                 desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/wioa-eligibility-page-1.jpg',
                 desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
               },
               {
                 title: 'Veterans',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/about-career-pathways.jpg',
                 desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
               },
               {
                 title: 'Young Adults (16–24)',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/career-services-page-2.jpg',
                 desc: 'Young people who are not sure what to do after high school. WIOA Youth funding covers career training that leads to a credential and a job in weeks, not years.',
               },
               {
                 title: 'Career Changers',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/about-career-training.jpg',
                 desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
               },
               {
                 title: 'Employers & Workforce Partners',
-                image: '/images/pages/about-hero.jpg',
+                image: '/images/pages/for-employers-page-1.jpg',
                 desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
               },
             ].map((item) => (
@@ -401,13 +405,14 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="flex flex-col sm:flex-row">
-              <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0 overflow-hidden">
+              <div className="relative h-80 sm:h-auto sm:w-80 flex-shrink-0 overflow-hidden">
                 <Image
-                  src={founder.headshotSrc || '/images/pages/about-hero.jpg'}
-                  alt={founder.name}
+                  src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
+                  alt="Elizabeth Greene, Founder & CEO of Elevate for Humanity"
                   fill
-                  sizes="(max-width: 640px) 100vw, 288px"
-                  quality={90} className="object-cover object-center"
+                  sizes="(max-width: 640px) 100vw, 320px"
+                  quality={95}
+                  className="object-cover object-top"
                 />
               </div>
               <div className="p-6 flex-1">

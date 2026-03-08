@@ -1,0 +1,37 @@
+ABOUT PAGE — VOICEOVER SCRIPT
+Elevate for Humanity | About Us Hero Banner
+Duration: ~60 seconds
+Voice: Elizabeth Greene (founder) or professional narrator
+Tone: Direct, warm, credible — not corporate
+
+---
+
+SCRIPT
+
+My name is Elizabeth Greene. I founded Elevate for Humanity because I know what it feels like
+to need a second chance — and not know where to start.
+
+We are a workforce training institute based in Indianapolis, Indiana.
+We train adults for real jobs in healthcare, skilled trades, CDL driving, barbering, and technology.
+Programs run four to sixteen weeks. Most are fully funded at no cost to eligible participants.
+
+We are not a college. We are not a staffing agency.
+We are a training institute that takes you from where you are today
+to a nationally recognized credential and a job offer —
+with funding, hands-on instruction, and employer connections built into every program.
+
+I am a U.S. military veteran, an IRS Enrolled Agent, and an EPA 608 Certified Proctor.
+I built this platform because the people who need it most deserve the same quality
+that everyone else takes for granted.
+
+If you are ready to start — we are ready for you.
+
+---
+
+PRODUCTION NOTES
+- Record at 44.1kHz, 16-bit, mono
+- Export as MP3 (128kbps) and MP4 (paired with b-roll of training facility)
+- B-roll suggestions: classroom instruction, hands-on lab work, credential exam, job placement handshake
+- Overlay text on video: "Elevate for Humanity" + "Indianapolis, Indiana" + "Now Enrolling"
+- No music bed — voice only, or very subtle ambient
+- File naming: about-voiceover.mp3 / about-hero-with-voice.mp4

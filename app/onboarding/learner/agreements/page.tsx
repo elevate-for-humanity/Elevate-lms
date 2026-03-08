@@ -71,49 +71,52 @@ export default function AgreementsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* VIDEO HERO — not muted, script plays on load */}
-      <div className="relative overflow-hidden" style={{ minHeight: 340 }}>
-        <div className="absolute inset-0">
-          <video
-            src="/videos/hvac-technician.mp4"
-            autoPlay
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            style={{ minHeight: 340 }}
-          />
-          <audio src="/generated/lessons/lesson-2f172cb2-4657-5460-9b93-f9b062ad8dd2.mp3" autoPlay preload="auto" />
-          <div className="absolute inset-0 bg-black/55" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        </div>
-        <div className="relative max-w-4xl mx-auto px-4 py-12">
-          <Link href="/onboarding/learner" className="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm mb-6 transition">
-            <ArrowLeft className="w-4 h-4" /> Back to Onboarding
-          </Link>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
-            Sign Your Enrollment Agreement
-          </h1>
-          <p className="text-white/80 text-lg max-w-xl">
-            One signature covers everything. Takes less than 60 seconds.
-          </p>
-        </div>
+      {/* VIDEO HERO — full bleed, no overlay text */}
+      <div className="relative w-full" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>
+        <video
+          src="/videos/hvac-technician.mp4"
+          autoPlay
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        <audio src="/generated/lessons/lesson-2f172cb2-4657-5460-9b93-f9b062ad8dd2.mp3" autoPlay preload="auto" />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-10">
+      {/* Back link below the video */}
+      <div className="max-w-4xl mx-auto px-4 pt-6">
+        <Link href="/onboarding/learner" className="inline-flex items-center gap-1 text-brand-blue-600 hover:text-brand-blue-800 text-sm transition">
+          <ArrowLeft className="w-4 h-4" /> Back to Onboarding
+        </Link>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-8">
+
+        <h1 className="text-2xl font-black text-slate-900 mb-1">Sign Your Enrollment Agreement</h1>
+        <p className="text-slate-500 text-sm mb-8">One signature covers everything. Takes less than 60 seconds.</p>
 
         {/* WHAT YOU'RE AGREEING TO — picture cards */}
         <h2 className="text-lg font-bold text-slate-900 mb-4">What you&apos;re agreeing to</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {AGREEMENT_POINTS.map((pt) => (
-            <div key={pt.title} className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-              <div className="relative h-28">
-                <Image src={pt.image} alt={pt.title} fill className="object-cover" />
-                <div className="absolute inset-0 bg-black/35" />
-                <div className="absolute bottom-2 left-2 right-2">
-                  <span className="text-white text-xs font-bold drop-shadow">{pt.title}</span>
+            <div key={pt.title} className="rounded-2xl overflow-hidden shadow-md flex flex-col">
+              {/* Image fills a fixed aspect ratio — no clipping, no overflow */}
+              <div className="relative w-full" style={{ paddingBottom: '66%' }}>
+                <Image
+                  src={pt.image}
+                  alt={pt.title}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
+                />
+                {/* Dark gradient from bottom so title is always readable */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 px-3 py-2">
+                  <span className="text-white text-sm font-bold leading-tight drop-shadow-md">{pt.title}</span>
                 </div>
               </div>
-              <div className="p-3">
+              {/* Description below image */}
+              <div className="bg-white flex-1 px-3 py-3">
                 <p className="text-xs text-slate-600 leading-relaxed">{pt.body}</p>
               </div>
             </div>

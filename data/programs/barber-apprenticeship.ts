@@ -14,7 +14,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   category: 'Personal Services',
 
   heroImage: '/images/pages/barber-hero-main.jpg',
-  heroImageAlt: 'Barber apprentice cutting hair in a barbershop',
+  heroImageAlt: 'Barber apprentice training at a licensed barbershop',
+  videoSrc: '/videos/barber-hero-final.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 52,

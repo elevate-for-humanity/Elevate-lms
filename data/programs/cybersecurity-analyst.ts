@@ -7,8 +7,9 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   sector: 'technology',
   category: 'Cybersecurity',
 
-  heroImage: '/images/pages/comp-universal-hero.jpg',
-  heroImageAlt: 'Cybersecurity analyst monitoring network security dashboards',
+  heroImage: '/images/pages/cybersecurity.jpg',
+  heroImageAlt: 'Cybersecurity student analyzing network security',
+  videoSrc: '/videos/it-technology.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 12,

@@ -12,8 +12,9 @@ export const CNA: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare',
 
-  heroImage: '/images/pages/comp-pathway-healthcare.jpg',
-  heroImageAlt: 'CNA student practicing patient care skills in a clinical setting',
+  heroImage: '/images/pages/cna-nursing.jpg',
+  heroImageAlt: 'CNA student practicing patient care in a clinical setting',
+  videoSrc: '/videos/cna-hero.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 6,

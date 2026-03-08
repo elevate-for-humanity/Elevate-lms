@@ -18,8 +18,8 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   category: 'Skilled Trades',
 
   // ─── Media ───────────────────────────────────────────────────────
-  heroImage: '/images/pages/comp-pathway-trades.jpg',
-  heroImageAlt: 'HVAC technician servicing an air conditioning unit',
+  heroImage: '/images/pages/hvac-technician.jpg',
+  heroImageAlt: 'HVAC technician student working on HVAC equipment',
   videoSrc: '/videos/hvac-hero-final.mp4',
   voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
 

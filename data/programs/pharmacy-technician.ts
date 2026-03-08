@@ -11,8 +11,9 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare',
 
-  heroImage: '/images/pages/comp-pathway-healthcare.jpg',
-  heroImageAlt: 'Pharmacy technician preparing medication in a pharmacy setting',
+  heroImage: '/images/pages/phlebotomy.jpg',
+  heroImageAlt: 'Pharmacy technician student in a clinical lab setting',
+  videoSrc: '/videos/healthcare-cna.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 10,

@@ -44,34 +44,131 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
     { bg: 'bg-brand-green-600',  light: 'bg-brand-green-50',  border: 'border-brand-green-200',  text: 'text-brand-green-700',  num: 'bg-brand-green-600 text-white' },
   ];
 
-  // Module photo thumbnails — real images cycling per module
-  const MODULE_PHOTOS = [
-    '/images/hp/train.jpg',
-    '/images/hp/school.jpg',
-    '/images/hp/complete-training.jpg',
-    '/images/hp/candidates.jpg',
-    '/images/hp/ojt.jpg',
-    '/images/hp/employer.jpg',
-    '/images/hp/why-elevate.jpg',
-    '/images/hp/choose-program.jpg',
-    '/images/hp/apply-online.jpg',
-    '/images/hp/healthcare.jpg',
-  ];
+  // Module photo thumbnails — matched to program sector so every page looks different
+  const SECTOR_PHOTOS: Record<string, string[]> = {
+    healthcare: [
+      '/images/pages/cna-nursing.jpg',
+      '/images/pages/programs-medical-apply-hero.jpg',
+      '/images/pages/programs-medical-apply-d1.jpg',
+      '/images/pages/programs-medical-apply-d2.jpg',
+      '/images/pages/healthcare-sector.jpg',
+      '/images/pages/cna-nursing.jpg',
+      '/images/pages/programs-medical-apply-hero.jpg',
+      '/images/pages/programs-medical-apply-d1.jpg',
+      '/images/pages/programs-medical-apply-d2.jpg',
+      '/images/pages/healthcare-sector.jpg',
+    ],
+    hvac: [
+      '/images/pages/hvac-technician.jpg',
+      '/images/pages/programs-electrical-apply-d1.jpg',
+      '/images/pages/programs-electrical-apply-d2.jpg',
+      '/images/pages/comp-highlights-electrical.jpg',
+      '/images/pages/skilled-trades-sector.jpg',
+      '/images/pages/hvac-technician.jpg',
+      '/images/pages/programs-electrical-apply-d1.jpg',
+      '/images/pages/programs-electrical-apply-d2.jpg',
+      '/images/pages/comp-highlights-electrical.jpg',
+      '/images/pages/skilled-trades-sector.jpg',
+    ],
+    trades: [
+      '/images/pages/electrical.jpg',
+      '/images/pages/welding.jpg',
+      '/images/pages/programs-welding-apply-d1.jpg',
+      '/images/pages/programs-welding-apply-d2.jpg',
+      '/images/pages/comp-highlights-welding.jpg',
+      '/images/pages/skilled-trades-sector.jpg',
+      '/images/pages/programs-electrical-apply-d1.jpg',
+      '/images/pages/programs-electrical-apply-d2.jpg',
+      '/images/pages/electrical.jpg',
+      '/images/pages/welding.jpg',
+    ],
+    cdl: [
+      '/images/pages/cdl-training.jpg',
+      '/images/pages/cdl-training.jpg',
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/cdl-training.jpg',
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/cdl-training.jpg',
+    ],
+    barber: [
+      '/images/pages/barber-hero-main.jpg',
+      '/images/pages/barber-hero-main.jpg',
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/barber-hero-main.jpg',
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/barber-hero-main.jpg',
+    ],
+    technology: [
+      '/images/pages/it-help-desk.jpg',
+      '/images/pages/cybersecurity.jpg',
+      '/images/pages/technology-sector.jpg',
+      '/images/pages/network-administration.jpg',
+      '/images/pages/programs-tech-webdev-hero.jpg',
+      '/images/pages/it-help-desk.jpg',
+      '/images/pages/cybersecurity.jpg',
+      '/images/pages/technology-sector.jpg',
+      '/images/pages/network-administration.jpg',
+      '/images/pages/programs-tech-webdev-hero.jpg',
+    ],
+    default: [
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-training.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/wioa-eligibility-page-1.jpg',
+      '/images/pages/programs-page-hero.jpg',
+      '/images/pages/about-career-training.jpg',
+      '/images/pages/career-services-hero.jpg',
+      '/images/pages/about-career-pathways.jpg',
+      '/images/pages/wioa-eligibility-page-1.jpg',
+    ],
+  };
+
+  // Pick sector based on program slug or category
+  const slug = p.slug || '';
+  const sectorKey =
+    slug.includes('cna') || slug.includes('medical') || slug.includes('phlebotomy') || slug.includes('cpr') || slug.includes('pharmacy') ? 'healthcare' :
+    slug.includes('hvac') || slug.includes('building') ? 'hvac' :
+    slug.includes('electrical') || slug.includes('welding') || slug.includes('plumbing') || slug.includes('carpentry') ? 'trades' :
+    slug.includes('cdl') || slug.includes('truck') ? 'cdl' :
+    slug.includes('barber') || slug.includes('cosmetology') || slug.includes('esthetician') ? 'barber' :
+    slug.includes('it') || slug.includes('cyber') || slug.includes('network') || slug.includes('tech') ? 'technology' :
+    'default';
+
+  const MODULE_PHOTOS = SECTOR_PHOTOS[sectorKey];
 
   return (
     <div className="min-h-screen bg-white">
       {/* ═══ A. VIBRANT HERO ════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
-        {/* Full-bleed hero image — no text overlay */}
-        <div className="relative h-[380px] sm:h-[480px]">
-          <Image
-            src={p.heroImage}
-            alt={p.heroImageAlt}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
+        {/* Full-bleed video or image hero — no text overlay */}
+        <div className="relative h-[380px] sm:h-[480px] bg-slate-900">
+          {p.videoSrc ? (
+            <video
+              autoPlay muted loop playsInline preload="auto"
+              poster={p.heroImage}
+              className="absolute inset-0 w-full h-full object-cover opacity-90"
+            >
+              <source src={p.videoSrc} type="video/mp4" />
+            </video>
+          ) : (
+            <Image
+              src={p.heroImage}
+              alt={p.heroImageAlt}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          )}
         </div>
 
         {/* Hero content — below image, white background */}

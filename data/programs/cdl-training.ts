@@ -7,8 +7,9 @@ export const CDL_TRAINING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Transportation',
 
-  heroImage: '/images/pages/comp-pathway-trades.jpg',
-  heroImageAlt: 'CDL student training with a semi-truck on a driving course',
+  heroImage: '/images/pages/cdl-training.jpg',
+  heroImageAlt: 'CDL student behind the wheel of a commercial truck',
+  videoSrc: '/videos/cdl-hero.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 6,

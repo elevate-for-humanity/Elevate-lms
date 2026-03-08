@@ -36,9 +36,11 @@ export function HomeHeroWithVoiceover({
 }: HomeHeroWithVoiceoverProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [showButton, setShowButton] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [showButton, setShowButton] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const hasAutoPlayed = useRef(false);
   const [config, setConfig] = useState<HeroConfig>({
     video_src: propVideoSrc || '/videos/hero.mp4',
     audio_src: propAudioSrc || '/audio/voiceover.mp3',
@@ -144,6 +146,40 @@ export function HomeHeroWithVoiceover({
     }
   };
 
+  // Autoplay audio when hero scrolls into view (fires once per page load)
+  useEffect(() => {
+    const section = sectionRef.current;
+    const audio = audioRef.current;
+    if (!section || !audio) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAutoPlayed.current) {
+          hasAutoPlayed.current = true;
+          audio.currentTime = 0;
+          audio.muted = false;
+          audio.play()
+            .then(() => {
+              setIsPlaying(true);
+              setIsMuted(false);
+              setShowButton(false);
+              trackInteraction('autoplay_voiceover');
+            })
+            .catch(() => {
+              // Browser blocked unmuted autoplay — show the unmute button
+              setShowButton(true);
+              setIsMuted(true);
+            });
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.audio_src]);
+
   // Handle audio end
   useEffect(() => {
     const audio = audioRef.current;
@@ -158,7 +194,7 @@ export function HomeHeroWithVoiceover({
   }, []);
 
   return (
-    <section className="relative h-[400px] md:h-[500px] lg:h-[600px] w-full overflow-hidden">
+    <section ref={sectionRef} className="relative h-[400px] md:h-[500px] lg:h-[600px] w-full overflow-hidden">
       {/* Video Background */}
       <video
         ref={videoRef}

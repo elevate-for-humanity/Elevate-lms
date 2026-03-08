@@ -26,45 +26,53 @@ export default function VideoHeroBanner({
 }: VideoHeroBannerProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const hasAutoPlayed = useRef(false);
 
   useEffect(() => {
-    setIsMounted(true);
-    setShouldLoadVideo(true);
-    
     const video = videoRef.current;
     if (!video) return;
+    video.addEventListener('canplay', () => setIsLoaded(true), { once: true });
+    video.addEventListener('error', () => { setHasError(true); setIsLoaded(true); }, { once: true });
+  }, [videoSrc]);
 
-    const handleCanPlay = () => {
-      setIsLoaded(true);
-    };
+  // Autoplay video + voiceover when banner scrolls into view
+  useEffect(() => {
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
 
-    const handleError = () => {
-      setHasError(true);
-      setIsLoaded(true);
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!hasAutoPlayed.current) {
+            hasAutoPlayed.current = true;
+            // Video background stays muted (background loop)
+            video.muted = true;
+            video.play().catch(() => {});
 
-    video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('error', handleError);
+            // Voiceover: attempt unmuted autoplay, silent fail if blocked
+            const audio = audioRef.current;
+            if (audio && voiceoverSrc) {
+              audio.currentTime = 0;
+              audio.muted = false;
+              audio.play().catch(() => {});
+            }
+          } else {
+            video.play().catch(() => {});
+          }
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.3 }
+    );
 
-    if (withAudio && video) {
-      video.muted = false;
-    }
-
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('error', handleError);
-    };
-  }, [withAudio, videoSrc]);
-
-  const handleUserInteraction = () => {
-    if (audioRef.current && voiceoverSrc && audioRef.current.paused) {
-      audioRef.current.play().catch(() => { /* Autoplay blocked */ });
-    }
-  };
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [voiceoverSrc]);
 
   // Check if this is being used as a standalone video (no headline)
   const isStandaloneVideo = !headline;
@@ -90,8 +98,8 @@ export default function VideoHeroBanner({
 
   return (
     <section
+      ref={sectionRef}
       className="relative w-full bg-brand-blue-900"
-      onClick={handleUserInteraction}
     >
       {/* Video Container - Full viewport height */}
       <div
@@ -101,15 +109,14 @@ export default function VideoHeroBanner({
           maxHeight: '900px',
         }}
       >
-        {/* Video Background - loads immediately */}
+        {/* Video Background */}
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
           loop
-          muted={!withAudio}
+          muted
           playsInline
           preload="metadata"
-          autoPlay
         >
           <source src={videoSrc} type="video/mp4" />
         </video>

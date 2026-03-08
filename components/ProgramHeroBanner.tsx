@@ -19,25 +19,44 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
   const containerRef = useRef<HTMLDivElement>(null);
   const [voiceActive, setVoiceActive] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
+  const hasAutoPlayed = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
     if (!video || !container) return;
 
-    // Play immediately on mount
+    // Play video immediately on mount (always muted for background loop)
     video.play().catch(() => {});
 
-    // Pause when scrolled off-screen, resume when visible
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           video.play().catch(() => {});
+
+          // Autoplay voiceover once when banner first scrolls into view
+          const audio = voiceoverRef.current;
+          if (audio && !hasAutoPlayed.current) {
+            hasAutoPlayed.current = true;
+            audio.currentTime = 0;
+            audio.muted = false;
+            audio.play()
+              .then(() => setVoiceActive(true))
+              .catch(() => {
+                // Browser blocked — leave button visible for manual trigger
+              });
+          }
         } else {
           video.pause();
+          // Pause voiceover when banner leaves viewport
+          const audio = voiceoverRef.current;
+          if (audio && !audio.paused) {
+            audio.pause();
+            setVoiceActive(false);
+          }
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     );
 
     observer.observe(container);

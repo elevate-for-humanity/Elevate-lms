@@ -11,17 +11,39 @@ interface VideoHeroBannerProps {
 
 export default function VideoHeroBanner({ videoSrc, posterSrc, posterAlt = 'Hero banner' }: VideoHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  const hasAutoPlayed = useRef(false);
+  const [muted, setMuted] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    const play = async () => {
-      try { await video.play(); } catch { /* poster stays visible */ }
-    };
-    if (video.readyState >= 2) play();
-    else video.addEventListener('loadeddata', play, { once: true });
-    return () => video.removeEventListener('loadeddata', play);
+    const section = sectionRef.current;
+    if (!video || !section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!hasAutoPlayed.current) {
+            hasAutoPlayed.current = true;
+            // Attempt unmuted autoplay; fall back to muted if browser blocks it
+            video.muted = false;
+            video.play().catch(() => {
+              video.muted = true;
+              setMuted(true);
+              video.play().catch(() => {});
+            });
+          } else {
+            video.play().catch(() => {});
+          }
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
   }, []);
 
   const toggleMute = () => {
@@ -32,11 +54,10 @@ export default function VideoHeroBanner({ videoSrc, posterSrc, posterAlt = 'Hero
   };
 
   return (
-    <section className="relative w-full aspect-[16/5] overflow-hidden bg-black">
+    <section ref={sectionRef} className="relative w-full aspect-[16/5] overflow-hidden bg-black">
       <video
         ref={videoRef}
         src={videoSrc}
-        muted
         loop
         playsInline
         preload="metadata"

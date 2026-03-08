@@ -36,7 +36,7 @@ export default async function PayrollPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="relative h-[160px] sm:h-[200px]">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Payroll management" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-hr-payroll-hero.jpg" alt="Payroll management" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/50" />
         <div className="absolute inset-0 flex items-end pb-6 px-6">
           <h1 className="text-2xl font-bold text-white">Payroll Management</h1>

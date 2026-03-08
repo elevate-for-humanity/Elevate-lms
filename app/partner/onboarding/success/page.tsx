@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Mail, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Mail, Clock, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -75,14 +75,32 @@ export default function PartnerOnboardingSuccessPage() {
                 </p>
               </div>
             </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <DollarSign className="w-5 h-5 text-brand-green-600" />
+              </div>
+              <div>
+                <p className="font-medium text-slate-900">Set Up Payroll</p>
+                <p className="text-sm text-slate-600">
+                  Connect your bank account or Elevate Pay Card and submit your W-9 so you can receive payroll deposits and program revenue.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">
             <Link
-              href="/programs/barber-apprenticeship"
+              href="/partner-portal"
               className="block w-full py-3 px-6 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
-              Back to Barber Program
+              Go to Partner Dashboard
+            </Link>
+            <Link
+              href="/onboarding/payroll-setup"
+              className="block w-full py-3 px-6 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition-colors"
+            >
+              Set Up Payroll &amp; Pay Method
             </Link>
             <Link
               href="/"

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   Users, Clock, FileText, ClipboardList, Settings,
   ArrowRight, AlertCircle, CheckCircle, BarChart3,
-  Scissors, Calendar, Upload,
+  Scissors, Calendar, Upload, DollarSign,
 } from 'lucide-react';
 import { MOUStatusBadge, MOUStatusAlert } from '@/components/MOUStatusBadge';
 
@@ -188,6 +188,7 @@ export default async function PartnerPortalPage() {
           { title: 'Upload Documents', href: '/partner/documents', icon: Upload, description: 'Submit required documents', color: 'border-l-amber-500' },
           { title: 'View Apprentices', href: '/partner/programs/barber', icon: Scissors, description: 'Manage current apprentices', color: 'border-l-pink-500' },
           { title: 'MOU Agreement', href: '/docs/Indiana-Barbershop-Apprenticeship-MOU', icon: FileText, description: 'View or download your Memorandum of Understanding', color: 'border-l-gray-500' },
+          { title: 'Payroll & Payouts', href: '/onboarding/payroll-setup', icon: DollarSign, description: 'Set up pay method, W-9, and view earnings', color: 'border-l-brand-green-500' },
           { title: 'Settings', href: '/partner/settings', icon: Settings, description: 'Manage shop profile and contacts', color: 'border-l-slate-400' },
         ].map((action) => (
           <Link key={action.title} href={action.href}

@@ -11,7 +11,9 @@ import {
   Video,
   FileText,
   HelpCircle,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  DollarSign,
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -201,6 +203,23 @@ export default async function ProgramHolderOnboarding() {
                 Log In →
               </Link>
             </div>
+
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-brand-green-700">4</span>
+              </div>
+              <h3 className="text-lg font-bold mb-3">Set Up Payroll</h3>
+              <p className="text-black mb-4">
+                Connect your bank account or Elevate Pay Card, submit your W-9,
+                and configure payroll for your staff.
+              </p>
+              <Link
+                href="/program-holder/payroll"
+                className="text-brand-green-700 font-semibold hover:underline"
+              >
+                Payroll Setup →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -288,6 +307,31 @@ export default async function ProgramHolderOnboarding() {
                 <li>• Check funding eligibility</li>
                 <li>• Enroll students directly</li>
               </ul>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="text-brand-green-700" size={24} />
+                </div>
+                <h3 className="text-lg font-bold">Payroll &amp; Payouts</h3>
+              </div>
+              <p className="text-black mb-4">
+                Set up your payout method, run bi-weekly payroll for your staff,
+                and view your earnings history — all from your dashboard.
+              </p>
+              <ul className="space-y-2 text-sm text-black">
+                <li>• Connect bank account or pay card</li>
+                <li>• Submit W-9 for tax compliance</li>
+                <li>• Run payroll for your team</li>
+                <li>• View pay stubs and YTD earnings</li>
+              </ul>
+              <Link
+                href="/program-holder/payroll"
+                className="inline-block mt-4 text-brand-green-700 font-semibold hover:underline text-sm"
+              >
+                Set Up Payroll →
+              </Link>
             </div>
           </div>
         </div>

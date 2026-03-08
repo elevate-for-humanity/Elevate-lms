@@ -239,6 +239,23 @@ export const PLATFORM_FEATURES = [
       'Data exports (CSV)',
     ],
   },
+  {
+    id: 'payroll',
+    name: 'HR & Payroll',
+    description: 'Built-in payroll processing, staff onboarding, and hiring pipeline for licensee organizations.',
+    capabilities: [
+      'Bi-weekly payroll runs with tax calculations (federal, state, FICA)',
+      'Pay methods: direct deposit, Elevate Pay Card (Visa), or paper check',
+      'W-9 collection and secure storage',
+      'Employee handbook with digital acknowledgment',
+      'Staff skills checklist and competency tracking',
+      'Hiring pipeline: job postings → competency test → video interview → offer',
+      'Automated HR emails at every hiring and onboarding step',
+      'Staff onboarding portal with completion tracking',
+    ],
+    tierAvailability: 'school_and_above',
+    addOnPrice: '$1,500/year',
+  },
 ];
 
 // ============================================

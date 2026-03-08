@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Users, BookOpen, TrendingUp, Settings, BarChart3, Calendar } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, TrendingUp, Settings, BarChart3, Calendar, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
@@ -131,6 +131,9 @@ export default async function ProgramHolderDashboardPage() {
                 </Link>
                 <Link href="/program-holder/reports" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-gray-700 hover:bg-gray-100">
                   <BarChart3 className="w-5 h-5" /> View Reports
+                </Link>
+                <Link href="/program-holder/payroll" className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg text-brand-green-700 hover:bg-brand-green-100">
+                  <DollarSign className="w-5 h-5" /> Payroll &amp; Payouts
                 </Link>
               </div>
             </div>

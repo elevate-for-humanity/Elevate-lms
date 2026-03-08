@@ -552,11 +552,6 @@ export default function LessonPage() {
                 questions={lesson.quiz_questions || []}
                 onComplete={async (score) => {
                   try {
-                    await fetch(`/api/lms/quizzes/${lesson.quiz_id}/submit`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ score, answers: [] }),
-                    });
                     if (score >= 80) {
                       setIsCompleted(true);
                       const response = await fetch(`/api/lessons/${lessonId}/complete`, {

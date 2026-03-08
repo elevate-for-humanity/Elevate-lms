@@ -79,7 +79,11 @@ async function _POST(
 
     const contentType = lessonDetail?.content_type || 'video';
 
-    // Quiz lessons require a passing attempt before they can be marked complete
+    // Quiz lessons require a passing attempt before they can be marked complete.
+    // HVAC quizzes use a local question bank (not the quizzes table), so
+    // quiz_attempts rows are never written for them. The client enforces the
+    // 80% pass threshold before calling this endpoint, so we skip the DB gate
+    // when no passing attempt exists but the lesson belongs to the HVAC course.
     if (contentType === 'quiz') {
       const { data: passingAttempt } = await db
         .from('quiz_attempts')
@@ -91,10 +95,15 @@ async function _POST(
         .maybeSingle();
 
       if (!passingAttempt) {
-        return NextResponse.json(
-          { error: 'Quiz must be passed before marking complete' },
-          { status: 403 }
-        );
+        // Allow completion if this is an HVAC course lesson (local quiz bank,
+        // no quiz_attempts rows). Client already enforced pass score.
+        const HVAC_COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
+        if (lesson.course_id !== HVAC_COURSE_ID) {
+          return NextResponse.json(
+            { error: 'Quiz must be passed before marking complete' },
+            { status: 403 }
+          );
+        }
       }
     }
 

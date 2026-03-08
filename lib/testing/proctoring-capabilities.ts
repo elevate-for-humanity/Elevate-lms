@@ -26,7 +26,7 @@ export interface CertProvider {
   /** External verification or scheduling URL */
   verifyUrl?: string;
   /** Whether Elevate is currently an active authorized site */
-  status: 'active' | 'available_through_partner' | 'coming_soon';
+  status: 'active' | 'available_through_partner';
 }
 
 export interface ProctoringOptions {
@@ -83,10 +83,10 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     key: 'servsafe',
     name: 'ServSafe (National Restaurant Association)',
     capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
-    description: 'Food handler and food manager certification required by most states for food service workers.',
+    description: 'Food handler and food manager certification required by most states for food service workers. Scheduling available — contact us to book a session.',
     exams: ['Food Handler', 'Food Manager', 'Alcohol', 'Allergens'],
     verifyUrl: 'https://www.servsafe.com/',
-    status: 'coming_soon',
+    status: 'available_through_partner',
   },
   careersafe: {
     key: 'careersafe',
@@ -101,10 +101,10 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     key: 'milady',
     name: 'Milady (Cosmetology & Esthetics)',
     capability: 'CENTER_REMOTE_ALLOWED',
-    description: 'Industry-standard assessments for cosmetology, esthetics, nail technology, and barbering programs.',
+    description: 'Industry-standard assessments for cosmetology, esthetics, nail technology, and barbering programs. Contact us to schedule a session.',
     exams: ['Cosmetology Theory', 'Esthetics Theory', 'Nail Technology Theory', 'Barbering Theory'],
     verifyUrl: 'https://www.miladypro.com/',
-    status: 'coming_soon',
+    status: 'available_through_partner',
   },
 };
 
@@ -173,5 +173,5 @@ export const ACTIVE_PROVIDERS = Object.values(CERT_PROVIDERS).filter(
   (p) => p.status === 'active'
 );
 
-/** All providers including coming soon — for admin/scheduling views */
+/** All providers — for admin/scheduling views */
 export const ALL_PROVIDERS = Object.values(CERT_PROVIDERS);

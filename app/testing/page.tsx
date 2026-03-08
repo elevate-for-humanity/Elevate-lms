@@ -99,8 +99,7 @@ const POLICIES = [
 
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   active:                    { label: 'Active',      cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
-  available_through_partner: { label: 'Via partner', cls: 'bg-amber-50 text-amber-700 border border-amber-200' },
-  coming_soon:               { label: 'Coming soon', cls: 'bg-slate-50 text-slate-400 border border-slate-200' },
+  available_through_partner: { label: 'Schedule a session', cls: 'bg-brand-blue-50 text-brand-blue-700 border border-brand-blue-200' },
 };
 
 export default function TestingCenterPage() {
@@ -300,7 +299,7 @@ export default function TestingCenterPage() {
           <div className="space-y-4">
             {ALL_PROVIDERS.map((provider) => {
               const labels = getProctoringLabels(provider.key);
-              const { label, cls } = STATUS_LABEL[provider.status] ?? STATUS_LABEL.coming_soon;
+              const { label, cls } = STATUS_LABEL[provider.status] ?? STATUS_LABEL.available_through_partner;
               return (
                 <div key={provider.key} className="bg-white border border-slate-200 rounded-2xl p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4">

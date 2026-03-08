@@ -101,36 +101,35 @@ export default function HomePage() {
               Choose your path below. Each option takes you directly to the information you need — everything starts online.
             </p>
           </ScrollReveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom', pos: 'object-center' },
-              { href: '/funding', label: 'I need funding', desc: 'Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid', pos: 'object-center' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse credential programs.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom', pos: 'object-center' },
+              { href: '/funding', label: 'I need funding', desc: 'Check WIOA eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid', pos: 'object-center' },
               { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting', pos: 'object-top' },
               { href: '/store', label: 'I run a school', desc: 'License the platform.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office', pos: 'object-top' },
-            ].map((item, i) => (
-              <ScrollReveal key={item.href} delay={i * 80}>
-                <Link
-                  href={item.href}
-                  className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden h-full"
-                >
-                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    <Image
-                      src={item.image}
-                      alt={item.alt}
-                      fill
-                      sizes="(max-width: 640px) 50vw, 25vw"
-                      className={`object-cover ${item.pos} group-hover:scale-105 transition-transform duration-500`}
-                    />
-                  </div>
-                  <div className="p-3 sm:p-4 flex flex-col flex-1">
-                    <span className="font-bold text-sm sm:text-base text-slate-900 block mb-0.5">{item.label}</span>
-                    <span className="text-xs text-slate-500 block mb-2">{item.desc}</span>
-                    <span className="text-brand-red-600 font-semibold text-xs group-hover:underline mt-auto">
-                      {item.cta} →
-                    </span>
-                  </div>
-                </Link>
-              </ScrollReveal>
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden"
+              >
+                <div className="relative w-full aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={item.image}
+                    alt={item.alt}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    className={`object-cover ${item.pos} group-hover:scale-105 transition-transform duration-500`}
+                  />
+                </div>
+                <div className="p-4 flex flex-col flex-1">
+                  <span className="font-bold text-sm sm:text-base text-slate-900 block mb-1">{item.label}</span>
+                  <span className="text-xs text-slate-500 block mb-3 flex-1">{item.desc}</span>
+                  <span className="text-brand-red-600 font-semibold text-xs group-hover:underline">
+                    {item.cta} →
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -149,7 +148,7 @@ export default function HomePage() {
             <p className="text-base text-slate-700 max-w-3xl mx-auto">Every credential pathway is built on three pillars — trained, certified, and employed.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-3 gap-5 items-stretch">
             {[
               {
                 title: 'Industry-Aligned Training',
@@ -172,19 +171,19 @@ export default function HomePage() {
                 cta: 'Employer Info',
                 image: '/images/hp/candidates.jpg',
               },
-            ].map((pillar, i) => (
-              <ScrollReveal key={pillar.title} delay={i * 100}>
-                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow h-full">
-                  <Image src={pillar.image} alt={pillar.title} width={600} height={400} sizes="(max-width: 768px) 100vw, 33vw" className="w-full aspect-[3/2] object-cover" />
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1.5">{pillar.title}</h3>
-                    <p className="text-slate-600 text-sm mb-4">{pillar.desc}</p>
-                    <Link href={pillar.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                      {pillar.cta} →
-                    </Link>
-                  </div>
+            ].map((pillar) => (
+              <div key={pillar.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                <div className="relative w-full aspect-[3/2] overflow-hidden">
+                  <Image src={pillar.image} alt={pillar.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                 </div>
-              </ScrollReveal>
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="text-lg font-bold text-slate-900 mb-1.5">{pillar.title}</h3>
+                  <p className="text-slate-600 text-sm mb-4 flex-1">{pillar.desc}</p>
+                  <Link href={pillar.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors self-start">
+                    {pillar.cta} →
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         </div>

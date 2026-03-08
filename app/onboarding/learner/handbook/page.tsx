@@ -259,12 +259,16 @@ export default function HandbookPage() {
         </p>
 
         {alreadyAcknowledged && (
-          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6 text-center">
-            <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-brand-green-900 mb-2">Handbook Acknowledged</h2>
-            <p className="text-brand-green-700 mb-4">You have acknowledged all sections of the student handbook.</p>
-            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
-              Continue Onboarding <ArrowLeft className="w-4 h-4 rotate-180" />
+          <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
+            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-7 h-7 text-slate-500" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Handbook Acknowledged</h2>
+              <p className="text-slate-500 text-sm">You have acknowledged all sections of the student handbook.</p>
+            </div>
+            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 flex-shrink-0">
+              Continue <ArrowLeft className="w-4 h-4 rotate-180" />
             </Link>
           </div>
         )}
@@ -279,7 +283,7 @@ export default function HandbookPage() {
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${(acknowledged.size / HANDBOOK_SECTIONS.length) * 100}%` }}
                 />
               </div>
@@ -292,16 +296,16 @@ export default function HandbookPage() {
                 const isAcked = acknowledged.has(section.id);
 
                 return (
-                  <div key={section.id} className={`bg-white border rounded-xl overflow-hidden ${isAcked ? 'border-brand-green-200' : 'border-gray-200'}`}>
+                  <div key={section.id} className={`bg-white border rounded-xl overflow-hidden ${isAcked ? 'border-brand-blue-200' : 'border-gray-200'}`}>
                     <button
                       type="button"
                       onClick={() => toggleExpand(section.id)}
                       className="w-full p-4 flex items-center gap-3 text-left hover:bg-gray-50"
                     >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-green-100' : 'bg-gray-100'}`}>
-                        {isAcked ? <CheckCircle2 className="w-4 h-4 text-brand-green-600" /> : <BookOpen className="w-4 h-4 text-gray-400" />}
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-blue-100' : 'bg-gray-100'}`}>
+                        {isAcked ? <CheckCircle2 className="w-4 h-4 text-brand-blue-600" /> : <BookOpen className="w-4 h-4 text-gray-400" />}
                       </div>
-                      <span className={`flex-1 font-semibold ${isAcked ? 'text-brand-green-900' : 'text-gray-900'}`}>
+                      <span className={`flex-1 font-semibold ${isAcked ? 'text-brand-blue-900' : 'text-gray-900'}`}>
                         {section.title}
                       </span>
                       {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}

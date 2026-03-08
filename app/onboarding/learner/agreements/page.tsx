@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { AgreementSignature } from '@/components/compliance/AgreementSignature';
 
 const AGREEMENT = {
@@ -125,12 +125,11 @@ export default function AgreementsPage() {
 
         {/* SIGNED */}
         {signed ? (
-          <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-8 text-center">
-            <CheckCircle2 className="w-14 h-14 text-brand-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-black text-brand-green-900 mb-2">Agreement Signed</h2>
-            <p className="text-brand-green-700 mb-6">Your enrollment agreement is on file.</p>
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Agreement Signed</h2>
+            <p className="text-slate-500 mb-6">Your enrollment agreement is on file.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-xl font-semibold hover:bg-brand-green-700 transition">
+              <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-700 transition">
                 Continue Onboarding <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/lms/courses/f0593164-55be-5867-98e7-8a86770a8dd0" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 transition">

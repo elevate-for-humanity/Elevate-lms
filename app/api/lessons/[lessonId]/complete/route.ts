@@ -48,10 +48,10 @@ async function _POST(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
     }
 
-    // Check if user is enrolled in the course
+    // Check if user is enrolled and approved
     const { data: enrollment } = await db
       .from('training_enrollments')
-      .select('id, status')
+      .select('id, status, approved_at')
       .eq('user_id', user.id)
       .eq('course_id', lesson.course_id)
       .single();
@@ -59,6 +59,13 @@ async function _POST(
     if (!enrollment) {
       return NextResponse.json(
         { error: 'Not enrolled in this course' },
+        { status: 403 }
+      );
+    }
+
+    if (enrollment.status === 'pending_approval' || !enrollment.approved_at) {
+      return NextResponse.json(
+        { error: 'Enrollment pending approval' },
         { status: 403 }
       );
     }

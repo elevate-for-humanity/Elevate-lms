@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: course } = await db
     .from('training_courses')
-    .select('title')
+    .select('course_name')
     .eq('id', courseId)
     .single();
 
@@ -76,11 +76,11 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Check if already enrolled
   const { data: existingEnrollment } = await db
-    .from('program_enrollments')
+    .from('training_enrollments')
     .select('id, status')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
-    .single();
+    .maybeSingle();
 
   if (existingEnrollment) {
     redirect(`/lms/courses/${courseId}`);

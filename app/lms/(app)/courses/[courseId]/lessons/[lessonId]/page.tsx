@@ -51,8 +51,10 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
+  const lessonOpenedAt = React.useRef<number>(Date.now());
 
   useEffect(() => {
+    lessonOpenedAt.current = Date.now();
     fetchLessonData();
   }, [lessonId]);
 
@@ -167,10 +169,12 @@ export default function LessonPage() {
 
     try {
       if (newStatus) {
+        // Send real elapsed time so the API minimum-seat-time check passes
+        const elapsedSeconds = Math.floor((Date.now() - lessonOpenedAt.current) / 1000);
         const response = await fetch(`/api/lessons/${lessonId}/complete`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ timeSpentSeconds: 0 }),
+          body: JSON.stringify({ timeSpentSeconds: elapsedSeconds }),
         });
 
         if (!response.ok) {

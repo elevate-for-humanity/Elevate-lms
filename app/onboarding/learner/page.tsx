@@ -266,9 +266,9 @@ export default async function LearnerOnboardingPage() {
                 <span className="text-slate-500">{completedSteps.length} of {ONBOARDING_STEPS.length} steps complete</span>
                 <span className="font-bold text-slate-700">{progress}%</span>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -280,53 +280,29 @@ export default async function LearnerOnboardingPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Enrollment approved — student can access courses */}
         {profile?.enrollment_status === 'active' && (
-          <div className="relative overflow-hidden bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-6 sm:p-8 mb-10">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
-            <div className="relative flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
-                <Image
-                  src="/images/pages/onboarding-page-1.jpg"
-                  alt="Enrollment approved"
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-black text-brand-green-900 mb-1">You&apos;re Approved!</h2>
-                <p className="text-brand-green-700">
-                  Your enrollment has been approved. Log in to your student portal to access your courses and begin training.
-                </p>
-              </div>
-              <Link
-                href="/lms/dashboard"
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-brand-green-600 text-white rounded-xl hover:bg-brand-green-700 font-bold transition-all hover:shadow-lg flex-shrink-0"
-              >
-                Go to Student Portal
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
+              <Image src="/images/pages/onboarding-page-1.jpg" alt="Enrollment approved" width={80} height={80} className="w-full h-full object-cover" />
             </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Approved</h2>
+              <p className="text-slate-500 text-sm">Your enrollment has been approved. Access your courses and begin training.</p>
+            </div>
+            <Link href="/lms/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
+              Go to Student Portal <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         )}
 
         {/* Pending admin approval banner */}
         {(justEnrolled || profile?.enrollment_status === 'pending_approval') && profile?.enrollment_status !== 'active' && (
-          <div className="relative overflow-hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 sm:p-8 mb-10">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
-            <div className="relative flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <ClipboardCheck className="w-10 h-10 text-amber-600" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-black text-amber-900 mb-1">Onboarding Complete — Pending Admin Approval</h2>
-                <p className="text-amber-800 mb-2">
-                  All your onboarding steps are done. An administrator will review your enrollment and documents.
-                </p>
-                <p className="text-amber-700 text-sm">
-                  You will receive an email once your enrollment is approved with instructions on when you can start class.
-                  No further action is needed from you at this time.
-                </p>
-              </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <ClipboardCheck className="w-8 h-8 text-slate-500" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-xl font-black text-slate-900 mb-1">Pending Admin Approval</h2>
+              <p className="text-slate-500 text-sm">All steps complete. An administrator will review your enrollment and contact you with your start date.</p>
             </div>
           </div>
         )}
@@ -346,8 +322,8 @@ export default async function LearnerOnboardingPage() {
           </div>
         )}
 
-        {/* Onboarding Steps — card grid with real images */}
-        <div className="space-y-4 sm:space-y-5">
+        {/* Onboarding Steps */}
+        <div className="space-y-3">
           {ONBOARDING_STEPS.map((step, index) => {
             const isComplete = completedSteps.includes(step.id);
             const isNext = nextStep?.id === step.id;
@@ -356,86 +332,51 @@ export default async function LearnerOnboardingPage() {
             return (
               <div
                 key={step.id}
-                className={`group relative overflow-hidden rounded-2xl border-2 transition-all ${
-                  isComplete
-                    ? 'border-brand-green-200 bg-white'
-                    : isNext
-                      ? 'border-brand-blue-300 bg-white shadow-md shadow-brand-blue-100'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                className={`group overflow-hidden rounded-2xl border transition-all bg-white ${
+                  isNext ? 'border-brand-blue-300 shadow-sm' : 'border-slate-200'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row">
                   {/* Step image */}
-                  <div className="relative w-full sm:w-48 lg:w-56 h-40 sm:h-auto flex-shrink-0 overflow-hidden">
+                  <div className="relative w-full sm:w-44 h-36 sm:h-auto flex-shrink-0 overflow-hidden">
                     <Image
                       src={step.image}
                       alt={step.imageAlt}
                       fill
-                      className={`object-cover ${isComplete ? 'opacity-60' : ''}`}
+                      sizes="(max-width: 640px) 100vw, 176px"
+                      className={`object-cover ${isComplete ? 'opacity-50 grayscale' : ''}`}
                     />
-                    {/* Step number overlay */}
-                    <div className={`absolute top-3 left-3 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                      isComplete
-                        ? 'bg-brand-green-500 text-white'
-                        : isNext
-                          ? 'bg-brand-blue-600 text-white'
-                          : 'bg-white/90 text-slate-700 backdrop-blur-sm'
-                    }`}>
-                      {isComplete ? '✓' : index + 1}
+                    {/* Step number — plain white pill, no color */}
+                    <div className="absolute top-3 left-3 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-xs font-bold text-slate-700">
+                      {index + 1}
                     </div>
                   </div>
 
                   {/* Step content */}
-                  <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center">
+                  <div className="flex-1 p-5 flex flex-col justify-center">
                     <div className="flex items-start gap-3">
-                      <div className={`hidden sm:flex w-10 h-10 rounded-xl items-center justify-center flex-shrink-0 ${
-                        isComplete
-                          ? 'bg-brand-green-100'
-                          : isNext
-                            ? 'bg-brand-blue-100'
-                            : 'bg-slate-100'
-                      }`}>
-                        <Icon className={`w-5 h-5 ${
-                          isComplete
-                            ? 'text-brand-green-600'
-                            : isNext
-                              ? 'text-brand-blue-600'
-                              : 'text-slate-500'
-                        }`} />
+                      <div className="hidden sm:flex w-9 h-9 rounded-xl bg-slate-100 items-center justify-center flex-shrink-0">
+                        <Icon className="w-4 h-4 text-slate-500" />
                       </div>
-
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className={`font-bold text-base sm:text-lg ${
-                            isComplete ? 'text-brand-green-900' : 'text-slate-900'
-                          }`}>
-                            {step.title}
-                          </h3>
-                          {step.required && !isComplete && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-orange-100 text-brand-orange-700 px-2 py-0.5 rounded-full">
-                              Required
-                            </span>
-                          )}
+                          <h3 className="font-bold text-slate-900">{step.title}</h3>
                           {isComplete && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full">
-                              Done
-                            </span>
+                            <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Done</span>
                           )}
                         </div>
-                        <p className="text-slate-600 text-sm leading-relaxed mb-3">{step.description}</p>
+                        <p className="text-slate-500 text-sm leading-relaxed mb-3">{step.description}</p>
 
-                        {isComplete ? (
-                          <span className="text-sm text-brand-green-600 font-semibold">Step completed</span>
-                        ) : (
+                        {!isComplete && (
                           <Link
                             href={step.href}
-                            className={`inline-flex items-center gap-2 text-sm font-bold transition-colors ${
+                            className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${
                               isNext
-                                ? 'bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700'
+                                ? 'bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700'
                                 : 'text-brand-blue-600 hover:text-brand-blue-800'
                             }`}
                           >
-                            {isNext ? 'Start This Step' : 'Complete This Step'}
+                            {isNext ? 'Start' : 'Complete'}
                             <ArrowRight className="w-4 h-4" />
                           </Link>
                         )}

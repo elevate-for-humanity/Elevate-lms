@@ -33,19 +33,25 @@ export default function AboutPage() {
       </div>
 
       {/* Video hero */}
-      <section className="relative h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[320px] overflow-hidden bg-slate-900">
+      <section className="relative h-[60vh] sm:h-[70vh] md:h-[78vh] min-h-[380px] overflow-hidden bg-slate-900">
         <video
           autoPlay
           muted
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-80"
-          poster="/images/pages/about-team-hero.jpg"
+          poster="/images/team/elizabeth-greene.jpg"
         >
           <source src="/videos/about-mission.mp4" type="video/mp4" />
         </video>
-        {/* Gradient overlay — bottom fade so heading section below reads cleanly */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-slate-900/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+        {/* Founder identity — shows while video loads and on the poster frame */}
+        <div className="absolute bottom-8 left-6 sm:left-10">
+          <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-1">Founder & CEO</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">Elizabeth Greene</h1>
+          <p className="text-slate-300 text-sm mt-1">Elevate for Humanity · Indianapolis, Indiana</p>
+        </div>
       </section>
 
       {/* Who We Are */}
@@ -453,7 +459,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            {TEAM.map((member) => (
+            {TEAM.filter((member) => member.id !== '1').map((member) => (
               <Link
                 key={member.id}
                 href={`/about/team#member-${member.id}`}

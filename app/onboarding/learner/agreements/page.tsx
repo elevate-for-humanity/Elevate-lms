@@ -71,16 +71,16 @@ export default function AgreementsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
 
-      {/* VIDEO HERO — full bleed, no overlay text */}
+      {/* VIDEO HERO — Elevate overview, full bleed, no overlay text */}
       <div className="relative w-full" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>
         <video
-          src="/videos/hvac-technician.mp4"
+          src="/videos/elevate-overview-with-narration.mp4"
           autoPlay
           loop
           playsInline
           className="w-full h-full object-cover"
         />
-        <audio src="/generated/lessons/lesson-2f172cb2-4657-5460-9b93-f9b062ad8dd2.mp3" autoPlay preload="auto" />
+        <audio src="/videos/elevate-overview-with-narration.mp3" autoPlay preload="auto" />
       </div>
 
       {/* Back link below the video */}

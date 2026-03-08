@@ -233,39 +233,40 @@ export default async function LearnerOnboardingPage() {
     <div className="min-h-screen bg-slate-50">
       <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding' }, { label: 'Student Onboarding' }]} />
 
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-slate-900">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/pages/onboarding-page-1.jpg"
-            alt="Students at Elevate for Humanity"
-            fill
-            className="object-cover opacity-25"
-            priority
-          />
-        </div>
+      {/* VIDEO HERO — full bleed, no text on top */}
+      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}>
+        <video
+          src="/videos/getting-started-hero.mp4"
+          autoPlay
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+      </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      {/* Page header below video */}
+      <section className="bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-2xl">
-            <p className="text-brand-blue-400 text-sm font-semibold uppercase tracking-wider mb-2">
+            <p className="text-brand-blue-600 text-sm font-semibold uppercase tracking-wider mb-1">
               Student Onboarding
             </p>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-3 leading-tight">
+            <h1 className="text-3xl font-black text-slate-900 mb-2 leading-tight">
               Welcome to Elevate for Humanity
             </h1>
-            <p className="text-lg text-slate-300 mb-6 leading-relaxed">
+            <p className="text-slate-500">
               {enrollmentProgramName
                 ? `Complete your onboarding for ${enrollmentProgramName} to begin training.`
                 : 'Complete these steps to finalize your enrollment and start your training program.'}
             </p>
 
             {/* Progress */}
-            <div className="max-w-md">
+            <div className="max-w-md mt-4">
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-400">{completedSteps.length} of {ONBOARDING_STEPS.length} steps complete</span>
-                <span className="font-bold text-white">{progress}%</span>
+                <span className="text-slate-500">{completedSteps.length} of {ONBOARDING_STEPS.length} steps complete</span>
+                <span className="font-bold text-slate-700">{progress}%</span>
               </div>
-              <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}

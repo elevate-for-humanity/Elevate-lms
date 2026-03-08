@@ -143,6 +143,10 @@ export default function DocumentsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* VIDEO HERO — full bleed, no text on top */}
+      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
+        <video src="/videos/elevate-overview-with-narration.mp4" autoPlay loop playsInline className="w-full h-full object-cover" />
+      </div>
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[

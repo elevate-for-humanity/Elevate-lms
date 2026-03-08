@@ -151,8 +151,9 @@ audit_crawl.json
 artifacts/
 
 # Netlify handler size: exclude generated media and dev artifacts
-public/generated/
+public/generated/videos/
 public/generated-images/
+# lesson MP3s are committed so they deploy to Netlify without an API key at build time
 /reports/
 audit-packet/
 lighthouse-*.json

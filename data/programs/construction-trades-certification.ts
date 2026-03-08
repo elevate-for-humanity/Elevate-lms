@@ -15,7 +15,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 100, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 8:00 AM–12:30 PM (20–25 hrs/week)',
   cohortSize: '12–16 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$3,800',
   badge: 'Funding Available',
   badgeColor: 'green',
@@ -86,7 +86,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Indianapolis-area construction contractors', 'HVAC companies', 'Warehouse and logistics employers'],
   pricingIncludes: ['180 instructional hours', 'OSHA 30-Hour certification', 'EPA 608 Universal certification', 'Forklift certification', 'CPR/First Aid', 'All materials and PPE'],
-  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Self-pay: $3,800 or payment plan.',
+  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $3,800 with payment plans.',
   faqs: [
     { question: 'What certifications will I earn?', answer: 'You will earn OSHA 30, EPA 608 Universal, forklift operator, and CPR/First Aid certifications — four industry credentials in 8 weeks.' },
     { question: 'Do I need construction experience?', answer: 'No. This program is designed for people entering the construction trades with no prior experience.' },
@@ -94,5 +94,5 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Construction Trades Certification' }],
   metaTitle: 'Construction Trades Certification | OSHA 30 + EPA 608 + Forklift | Indianapolis',
-  metaDescription: 'Earn OSHA 30, EPA 608, and forklift certifications in 8 weeks. Multi-trade foundation for construction careers. WIOA funding available. Indianapolis.',
+  metaDescription: 'Earn OSHA 30, EPA 608, and forklift certifications in 8 weeks. Multi-trade foundation for construction careers. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

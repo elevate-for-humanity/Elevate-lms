@@ -130,7 +130,7 @@ export default function WorkOnePartnerPacketPage() {
               </h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p className="mb-4">
-                  Elevate for Humanity is a <strong>registered apprenticeship sponsor</strong> and 
+                  Elevate for Humanity is a <strong>workforce training institute</strong> and registered apprenticeship sponsor and 
                   <strong> ETPL-approved workforce intermediary</strong> that helps Indiana employers 
                   implement earn-and-learn apprenticeship programs aligned with WIOA and WRG funding.
                 </p>

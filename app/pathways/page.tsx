@@ -28,7 +28,7 @@ const STAGES = [
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
-    funding: 'WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), JRI (Justice Reinvestment Initiative). Eligibility is determined through WorkOne. Qualifying participants pay nothing.',
+    funding: 'WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), JRI (Justice Reinvestment Initiative). Eligibility is determined through WorkOne. Eligibility is required — Indiana residents only. You must qualify through WorkOne.',
     timeline: '1–2 weeks from first contact to enrollment.',
   },
   {
@@ -84,7 +84,7 @@ const PROGRAMS = [
     issuer: 'Indiana State Dept. of Health',
     salary: '$30K–$42K/year',
     jobs: 'Hospitals, nursing homes, home health, assisted living, rehab centers',
-    funding: 'No cost for eligible WIOA participants',
+    funding: 'WIOA funding available for eligible Indiana residents',
     desc: 'Classroom instruction and clinical rotation at a healthcare facility. You learn patient care, vital signs, infection control, mobility techniques, and medical documentation. You take the Indiana state CNA exam at the end.',
   },
   {
@@ -96,7 +96,7 @@ const PROGRAMS = [
     issuer: 'Indiana Bureau of Motor Vehicles',
     salary: '$50K+ first year (OTR)',
     jobs: 'Schneider National, Werner, Swift, J.B. Hunt, FedEx Freight, UPS Freight, XPO Logistics',
-    funding: 'No cost for eligible WIOA participants (includes DOT physical, drug screen, permit fees, BMV test)',
+    funding: 'WIOA funding available for eligible Indiana residents (includes DOT physical, drug screen, permit fees, BMV test)',
     desc: 'Classroom instruction plus behind-the-wheel training on automatic and manual transmission trucks. You learn pre-trip inspections, backing maneuvers, road driving, and BMV test prep. Many employers offer $5K–$15K sign-on bonuses.',
   },
   {
@@ -119,8 +119,8 @@ const PROGRAMS = [
     credential: 'EPA 608 + OSHA 30',
     issuer: 'EPA + OSHA',
     salary: '$48K average starting ($60K–$80K+ experienced)',
-    jobs: 'HVAC contractors, property management, commercial maintenance — 50+ employer partners',
-    funding: 'No cost for eligible WIOA participants (includes tools, materials, certifications)',
+    jobs: 'HVAC contractors, property management, commercial maintenance',
+    funding: 'WIOA funding available for eligible Indiana residents (includes tools, materials, certifications)',
     desc: 'You learn heating, ventilation, air conditioning, and refrigeration. Hands-on lab work with real equipment. Flexible morning, afternoon, and evening classes. All tools and safety gear provided. Graduates receive a starter tool kit.',
   },
   {
@@ -132,7 +132,7 @@ const PROGRAMS = [
     issuer: 'OSHA + NCCER',
     salary: '$56K average starting ($55K–$75K journeyman, $100K+ master)',
     jobs: 'Electrical contractors, construction companies, property management, self-employment',
-    funding: 'No cost for eligible WIOA participants',
+    funding: 'WIOA funding available for eligible Indiana residents',
     desc: 'Electrical theory, National Electrical Code, residential and commercial wiring, conduit bending, troubleshooting, and safety. No prior experience needed. This program prepares you to start a 4-year electrical apprenticeship leading to journeyman licensure.',
   },
   {
@@ -144,7 +144,7 @@ const PROGRAMS = [
     issuer: 'American Welding Society + OSHA',
     salary: '$54K average starting ($80K–$150K+ specialized)',
     jobs: 'Manufacturing, fabrication shops, construction, aerospace, energy, shipbuilding',
-    funding: 'No cost for eligible WIOA participants (all safety equipment provided)',
+    funding: 'WIOA funding available for eligible Indiana residents (all safety equipment provided)',
     desc: 'You master four welding processes: Stick (SMAW), MIG (GMAW), TIG (GTAW), and Flux-Core (FCAW). Plus oxy-fuel cutting, plasma cutting, blueprint reading, welding symbols, and metallurgy. Day and evening classes available.',
   },
   {
@@ -156,7 +156,7 @@ const PROGRAMS = [
     issuer: 'Certiport',
     salary: '$35K–$60K (remote work available)',
     jobs: 'Help desk, desktop support, IT support specialist, field technician',
-    funding: 'No cost for eligible WIOA/JRI participants',
+    funding: 'WIOA/JRI funding available for eligible Indiana residents',
     desc: 'Hardware and software troubleshooting, network configuration, Windows/Linux/macOS, and cloud computing basics. Includes Certiport IT Specialist exam prep and practice tests.',
   },
   {
@@ -168,7 +168,7 @@ const PROGRAMS = [
     issuer: 'Certiport',
     salary: '$55K–$85K entry ($100K+ penetration testing)',
     jobs: 'Security analyst, SOC analyst, penetration tester, security engineer',
-    funding: 'No cost for eligible WIOA/JRI participants',
+    funding: 'WIOA/JRI funding available for eligible Indiana residents',
     desc: 'Network security, threat analysis, vulnerability assessment, incident response, cryptography, and compliance frameworks. Includes Certiport IT Specialist — Cybersecurity exam prep.',
   },
 ];
@@ -212,7 +212,7 @@ export default function PathwaysPage() {
               pathway structure is the same.
             </p>
             <p>
-              Many of our programs are available at no cost to eligible participants through
+              Funding assistance is available for eligible Indiana residents through
               WIOA (Workforce Innovation and Opportunity Act) funding administered by Indiana&apos;s
               Department of Workforce Development. Eligibility is determined through WorkOne
               career centers. For those who qualify, tuition, materials, certification exams,
@@ -364,9 +364,9 @@ export default function PathwaysPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {[
               { title: 'Career changers', desc: 'You are working a job that does not pay enough or does not have a future. You want a credential that leads to a real career with benefits and growth.' },
-              { title: 'Unemployed or underemployed', desc: 'You are out of work or working part-time. You may qualify for WIOA funding that covers 100% of your training, including materials and certification exams.' },
+              { title: 'Unemployed or underemployed', desc: 'You are out of work or working part-time. You may qualify for WIOA funding that covers tuition, materials, and certification exams. Indiana residents only — eligibility is not guaranteed.' },
               { title: 'Justice-impacted individuals', desc: 'You have a record and need a fresh start. JRI (Justice Reinvestment Initiative) funding may cover your training. Many of our employer partners hire regardless of background.' },
-              { title: 'Young adults (16–24)', desc: 'You are not sure what to do after high school. WIOA Youth funding can cover career training that leads to a credential and a job in weeks, not years.' },
+              { title: 'Young adults (16–24)', desc: 'You are not sure what to do after high school. WIOA Youth funding may cover career training for eligible Indiana residents. Eligibility is determined through WorkOne.' },
               { title: 'Veterans', desc: 'You have skills from military service. Our programs help you translate those skills into civilian credentials that employers recognize.' },
               { title: 'Employers and workforce partners', desc: 'You need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.' },
             ].map((item) => (
@@ -390,7 +390,7 @@ export default function PathwaysPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We navigate funding for you</h3>
-                <p className="text-sm">Most people do not know they qualify for free training. We walk you through federal and state workforce funding eligibility and handle the paperwork with your local WorkOne career center.</p>
+                <p className="text-sm">Many people do not know they may qualify for workforce funding. We walk you through eligibility and handle the paperwork with your local WorkOne career center. Indiana residents only.</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">
@@ -451,7 +451,7 @@ export default function PathwaysPage() {
           <h2 className="text-3xl font-bold mb-4">Ready to Start?</h2>
           <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             The first step is checking your eligibility. It takes about 5 minutes online.
-            If you qualify for funding, your entire training can be free.
+            If you qualify for funding, it can significantly reduce or cover your training costs. Indiana residents only — eligibility is not guaranteed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">

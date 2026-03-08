@@ -37,7 +37,7 @@ export default function DisclosuresPage() {
               Elevate For Humanity is a <strong>software platform</strong>. We provide technology tools for workforce development, learning management, and program administration.
             </p>
             <p className="text-gray-700 mb-4">
-              We are a technology company. We license software. That is our business.
+              Elevate for Humanity is a workforce training institute. We also license the platform we built to other workforce organizations.
             </p>
 
             <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">2. What We Are NOT</h2>

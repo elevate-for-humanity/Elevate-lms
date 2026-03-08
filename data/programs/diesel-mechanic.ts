@@ -10,14 +10,14 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   heroImage: '/images/pages/admin-fleet-hero.jpg',
   heroImageAlt: 'Diesel mechanic student working on an engine',
 
-  deliveryMode: 'in-person',
+  deliveryMode: 'hybrid',
   durationWeeks: 12,
   hoursPerWeekMin: 20,
   hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 160, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
   cohortSize: '10–12 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$5,500',
   badge: 'Accepting Interest',
   badgeColor: 'orange',
@@ -99,11 +99,11 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   cta: { applyHref: '/inquiry?program=diesel-mechanic', advisorHref: '/contact', courseHref: '/programs/diesel-mechanic' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Able to lift 50 lbs', 'Basic mechanical aptitude helpful but not required'],
   equipmentIncluded: 'All tools, diagnostic equipment, PPE, and certification exam fees included',
-  modality: 'In-person — hands-on diesel shop at Elevate training facility',
+  modality: 'Hybrid — Online theory via LMS, hands-on diesel shop at Elevate training facility',
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Indianapolis-area trucking companies', 'Fleet maintenance operations', 'Heavy equipment dealers'],
   pricingIncludes: ['240 instructional hours', 'OSHA 10-Hour certification', 'ASE exam prep materials', 'CPR/First Aid certification', 'All tools and PPE', 'Career placement support'],
-  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
+  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay pricing available — contact us.',
 
   faqs: [
     { question: 'Do I need prior mechanic experience?', answer: 'No. This program starts with engine theory fundamentals and builds to advanced diagnostics.' },
@@ -113,5 +113,5 @@ export const DIESEL_MECHANIC: ProgramSchema = {
 
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Diesel Mechanic' }],
   metaTitle: 'Diesel Mechanic Training | ASE Prep | Indianapolis',
-  metaDescription: 'Diesel engine repair and maintenance training. 12-week program with OSHA 10 and ASE prep. Diesel mechanics earn $55,000/year. WIOA funding available.',
+  metaDescription: 'Diesel engine repair and maintenance training. 12-week program with OSHA 10 and ASE prep. Diesel mechanics earn $55,000/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

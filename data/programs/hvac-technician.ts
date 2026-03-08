@@ -37,7 +37,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   schedule: '6–8 weeks classroom instruction + 2–4 weeks hands-on/OJT (flexible scheduling based on cohort)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 tuition with approved workforce funding. WIOA, Next Level Jobs, and Workforce Ready Grant accepted.',
+  fundingStatement: 'WIOA, Next Level Jobs, and Workforce Ready Grant funding available for eligible Indiana residents. Eligibility is not guaranteed — you must qualify through WorkOne. Self-pay: $5,000 with payment plans available.',
   selfPayCost: '$5,000 (payment plans available)',
   badge: 'Grant Funded',
   badgeColor: 'green',
@@ -309,7 +309,56 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement support and resume assistance',
   ],
-  paymentTerms: '$0 tuition for eligible participants through WIOA, Next Level Jobs, and Workforce Ready Grant funding. Payment plans available for self-pay students.',
+  paymentTerms: 'Funding through WIOA, Next Level Jobs, or Workforce Ready Grant is available for eligible Indiana residents only. Eligibility is determined through WorkOne — not all applicants qualify. Self-pay: $5,000 with flexible payment plans.',
+
+  // ─── Facility & Delivery Details ─────────────────────────────────
+  facilityDetails: {
+    address: '3901 N Meridian St, Suite 300, Indianapolis, IN 46208',
+    classSize: 'Up to 20 students per cohort',
+    labEquipment: 'HVAC training rigs (split systems, package units, heat pumps), EPA 608 exam station, refrigerant recovery equipment, electrical diagnostic tools',
+    instructors: [
+      {
+        name: 'Lead Instructor',
+        credential: 'EPA 608 Universal, OSHA 30-Hour, NATE-certified',
+        experience: '10+ years residential and commercial HVAC field experience',
+      },
+    ],
+  },
+
+  // ─── Program Description ─────────────────────────────────────────
+  programDescription: [
+    'The HVAC Technician program at Elevate for Humanity prepares students to install, maintain, and repair residential and light commercial heating, ventilation, air conditioning, and refrigeration systems. Training combines classroom instruction with hands-on lab work at our Indianapolis facility.',
+    'Students earn the EPA Section 608 Universal certification — the federal credential required by law to purchase and handle refrigerants — proctored on-site at our EPA-approved testing facility. Additional credentials include OSHA 10-Hour safety certification and ACT WorkKeys / NCRC.',
+    'The program runs 12 weeks: 6–8 weeks of Related Technical Instruction (RTI) covering refrigeration theory, electrical systems, load calculations, and system diagnostics, followed by 2–4 weeks of hands-on training at employer partner sites. Graduates are job-ready for entry-level HVAC service technician roles.',
+  ],
+
+  // ─── BNPL / Payment Options ──────────────────────────────────────
+  bnplOptions: {
+    headline: 'Tuition & Payment Options',
+    note: 'This program is not government funded. Tuition is paid directly to Elevate for Humanity. We offer flexible payment plans so cost is never a barrier to starting.',
+    plans: [
+      {
+        label: 'Pay in Full',
+        amount: '$4,750',
+        detail: 'One-time payment before program start. $250 discount applied.',
+      },
+      {
+        label: '2-Payment Plan',
+        amount: '$2,500 × 2',
+        detail: 'First payment due at enrollment, second payment due at week 6.',
+      },
+      {
+        label: '4-Payment Plan',
+        amount: '$1,312.50 × 4',
+        detail: 'Monthly payments over the 12-week program. No interest.',
+      },
+      {
+        label: 'Income Share',
+        amount: '8% of income',
+        detail: 'Pay nothing upfront. Repay 8% of gross monthly income for 24 months after placement. Capped at $6,000.',
+      },
+    ],
+  },
 
   // ─── FAQ ─────────────────────────────────────────────────────────
   faqs: [
@@ -331,5 +380,5 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
   // ─── SEO ─────────────────────────────────────────────────────────
   metaTitle: 'HVAC Technician Training | EPA 608 Proctor Site | Indianapolis',
-  metaDescription: '12-week HVAC program: 6–8 weeks classroom + 2–4 weeks hands-on. EPA 608 Universal proctored on-site. Workforce funding available. Indianapolis.',
+  metaDescription: '12-week HVAC program in Indianapolis, Indiana. EPA 608 Universal proctored on-site. WIOA and WRG funding available for eligible Indiana residents.',
 };

@@ -143,6 +143,20 @@ export interface ProgramSchema {
   cohortSize: string;
   fundingStatement: string;
   selfPayCost: string;
+  /** When true, program is not WIOA/grant eligible — self-pay only */
+  isSelfPay?: boolean;
+
+  // ─── Facility & Delivery Details ────────────────────────────────
+  facilityDetails?: {
+    address: string;
+    classSize: string;        // e.g. "Up to 20 students per cohort"
+    labEquipment?: string;    // e.g. "6 HVAC training rigs, EPA 608 exam station"
+    instructors: {
+      name: string;
+      credential: string;     // e.g. "EPA 608 Universal, OSHA 30"
+      experience: string;     // e.g. "12 years field experience"
+    }[];
+  };
   badge?: string;
   badgeColor?: 'red' | 'green' | 'blue' | 'orange' | 'purple';
 
@@ -176,6 +190,20 @@ export interface ProgramSchema {
 
   // ─── I. CTA ─────────────────────────────────────────────────────
   cta: CTALinks;
+
+  // ─── Program Description (2–4 paragraphs) ───────────────────────
+  programDescription?: string[];
+
+  // ─── BNPL / Payment Options ─────────────────────────────────────
+  bnplOptions?: {
+    headline: string;
+    note: string;       // e.g. "Not government funded — tuition is paid directly to Elevate"
+    plans: {
+      label: string;    // e.g. "Pay in Full"
+      amount: string;   // e.g. "$5,000"
+      detail: string;   // e.g. "One-time payment, 5% discount applied"
+    }[];
+  };
 
   // ─── J. Institutional Footer ────────────────────────────────────
   admissionRequirements: string[];

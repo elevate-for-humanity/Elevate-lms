@@ -13,7 +13,7 @@ import Link from 'next/link';
 import {
   Award, BookOpen, Briefcase, CheckCircle, Clock, DollarSign,
   GraduationCap, MapPin, Shield, TrendingUp, Users, ChevronRight,
-  Phone, FileText, Wrench, Building2,
+  Phone, FileText, Wrench, Building2, CreditCard, AlertCircle,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown } from '@/lib/programs/program-schema';
@@ -62,8 +62,8 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
     <div className="min-h-screen bg-white">
       {/* ═══ A. VIBRANT HERO ════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
-        {/* Full-bleed hero image */}
-        <div className="relative h-[420px] sm:h-[520px]">
+        {/* Full-bleed hero image — no text overlay */}
+        <div className="relative h-[380px] sm:h-[480px]">
           <Image
             src={p.heroImage}
             alt={p.heroImageAlt}
@@ -72,29 +72,26 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
             priority
             sizes="100vw"
           />
-          {/* Strong gradient so text is always readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 via-brand-blue-800/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         </div>
 
-        {/* Hero content — overlaid on image */}
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10 w-full">
+        {/* Hero content — below image, white background */}
+        <div className="bg-white border-b border-slate-100">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-white/70 mb-4">
+            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-4">
               {p.breadcrumbs.map((b, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <ChevronRight className="w-3 h-3" />}
                   {b.href ? (
-                    <Link href={b.href} className="hover:text-white transition-colors">{b.label}</Link>
+                    <Link href={b.href} className="hover:text-slate-700 transition-colors">{b.label}</Link>
                   ) : (
-                    <span className="text-white font-medium">{b.label}</span>
+                    <span className="text-slate-700 font-medium">{b.label}</span>
                   )}
                 </span>
               ))}
             </nav>
 
-            <div className="flex flex-col sm:flex-row sm:items-end gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
               <div className="flex-1">
                 {/* Badge */}
                 {p.badge && (
@@ -107,14 +104,14 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
                     {p.badge}
                   </span>
                 )}
-                <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-3 drop-shadow-lg">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
                 </h1>
-                <p className="text-white/85 text-base sm:text-lg max-w-2xl leading-relaxed">
+                <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
                   {p.subtitle}
                 </p>
 
-                {/* Quick stat pills — photo thumbnails */}
+                {/* Quick stat pills */}
                 <div className="flex flex-wrap gap-2 mt-5">
                   {[
                     { img: '/images/hp/complete-training.jpg', val: `${p.durationWeeks} weeks` },
@@ -122,8 +119,8 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
                     { img: '/images/hp/school.jpg',            val: `${p.credentials.length} credentials` },
                     { img: '/images/hp/candidates.jpg',        val: p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person' },
                   ].map(({ img, val }) => (
-                    <span key={val} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold pl-1 pr-3 py-1 rounded-full border border-white/30">
-                      <span className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/40">
+                    <span key={val} className="inline-flex items-center gap-2 bg-slate-100 text-slate-700 text-xs font-semibold pl-1 pr-3 py-1 rounded-full border border-slate-200">
+                      <span className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
                         <Image src={img} alt="" width={24} height={24} className="object-cover w-full h-full" />
                       </span>
                       {val}
@@ -135,9 +132,6 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
               {/* CTA card */}
               <div className="sm:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-2xl p-5">
-                  <p className="text-xs font-bold text-brand-green-600 uppercase tracking-wider mb-1">Grant Funded Available</p>
-                  <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
-                  <p className="text-xs text-slate-500 mb-4">self-pay · funding may cover 100%</p>
                   <Link
                     href={p.cta.applyHref}
                     className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-2"
@@ -165,7 +159,133 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
         </div>
       </section>
 
-      {/* ═══ MODULE PHOTO CARDS ══════════════════════════════════════ */}
+      {/* ═══ 5-QUESTION SUMMARY ═════════════════════════════════════ */}
+      <section className="bg-slate-900 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px bg-slate-700 rounded-xl overflow-hidden">
+            {[
+              {
+                q: 'What will I learn?',
+                a: Array.isArray(p.modules) && p.modules.length
+                  ? p.modules.slice(0, 3).map((m: { title: string }) => m.title).join(', ') + (p.modules.length > 3 ? ` + ${p.modules.length - 3} more modules` : '')
+                  : p.subtitle,
+              },
+              {
+                q: 'How long does it take?',
+                a: `${p.durationWeeks} weeks — ${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week. ${p.deliveryMode === 'hybrid' ? 'Hybrid: online + in-person labs.' : 'In-person.'}`,
+              },
+              {
+                q: 'What credential do I earn?',
+                a: Array.isArray(p.credentials) && p.credentials.length
+                  ? p.credentials.slice(0, 2).map((c: { name: string }) => c.name).join(' + ') + (p.credentials.length > 2 ? ` + ${p.credentials.length - 2} more` : '')
+                  : 'Industry-recognized certification',
+              },
+              {
+                q: 'What job does it lead to?',
+                a: Array.isArray(p.outcomes?.jobTitles) && p.outcomes.jobTitles.length
+                  ? p.outcomes.jobTitles.slice(0, 2).map((j: { title: string }) => j.title).join(', ')
+                  : Array.isArray(p.outcomes) && p.outcomes.length
+                  ? (p.outcomes as string[]).slice(0, 2).join(', ')
+                  : 'See outcomes below',
+              },
+              {
+                q: 'How do I enroll?',
+                a: 'Apply online in minutes. An advisor will contact you within 1 business day to confirm your seat.',
+              },
+            ].map(({ q, a }) => (
+              <div key={q} className="bg-slate-800 px-5 py-5">
+                <p className="text-xs font-bold text-brand-red-400 uppercase tracking-wider mb-2">{q}</p>
+                <p className="text-sm text-slate-200 leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 text-center">
+            <Link
+              href={p.cta.applyHref}
+              className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3 rounded-lg transition-colors text-sm"
+            >
+              Apply for a Founding Cohort Seat
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ PROGRAM DESCRIPTION ════════════════════════════════════ */}
+      {p.programDescription && p.programDescription.length > 0 && (
+        <section className="bg-white border-b border-slate-100 py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-5">About This Program</h2>
+              <div className="space-y-4">
+                {p.programDescription.map((para, i) => (
+                  <p key={i} className="text-slate-600 leading-relaxed">{para}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ FACILITY, INSTRUCTORS & CLASS SIZE ═════════════════════ */}
+      {p.facilityDetails && (
+        <section className="bg-slate-50 border-t border-slate-100 py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-6">Training Facility &amp; Delivery</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+              {/* Location */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Location</span>
+                </div>
+                <p className="text-sm text-slate-700 font-medium">{p.facilityDetails.address}</p>
+                <p className="text-xs text-slate-400 mt-1">Indianapolis, Indiana</p>
+              </div>
+
+              {/* Class size + modality */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Users className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Class Size &amp; Format</span>
+                </div>
+                <p className="text-sm text-slate-700 font-medium">{p.facilityDetails.classSize}</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  {p.deliveryMode === 'hybrid'
+                    ? 'Hybrid — online coursework via LMS + in-person labs and hands-on training'
+                    : p.deliveryMode === 'online'
+                    ? 'Fully online via LMS'
+                    : 'In-person at Elevate training facility'}
+                </p>
+              </div>
+
+              {/* Lab equipment */}
+              {p.facilityDetails.labEquipment && (
+                <div className="bg-white rounded-2xl border border-slate-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Wrench className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Lab Equipment</span>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed">{p.facilityDetails.labEquipment}</p>
+                </div>
+              )}
+
+              {/* Instructors */}
+              {p.facilityDetails.instructors.map((inst, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-200 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <GraduationCap className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{inst.name}</span>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-700 mb-1">{inst.credential}</p>
+                  <p className="text-xs text-slate-500">{inst.experience}</p>
+                </div>
+              ))}
+
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ═══ MODULE PHOTO GRID ══════════════════════════════════════ */}
       <section className="py-10 bg-white">
@@ -176,21 +296,23 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
               const photo = MODULE_PHOTOS[i % MODULE_PHOTOS.length];
               const color = MODULE_COLORS[i % MODULE_COLORS.length];
               return (
-                <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow-md hover:shadow-xl transition-shadow group">
-                  <Image
-                    src={photo}
-                    alt={mod.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  />
-                  {/* Color tint overlay */}
-                  <div className={`absolute inset-0 ${color.bg} opacity-50`} />
-                  {/* Bottom label */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Module {i + 1}</span>
-                    <p className="text-xs font-bold text-white leading-snug mt-0.5">{mod.title}</p>
+                <div key={i} className="rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group bg-white border border-slate-100">
+                  {/* Photo — fixed height, no overlay */}
+                  <div className="relative w-full h-32 overflow-hidden">
+                    <Image
+                      src={photo}
+                      alt={mod.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+                    <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${color.num}`}>
+                      {i + 1}
+                    </span>
+                  </div>
+                  {/* Label below image — no overlay */}
+                  <div className="px-3 py-2.5">
+                    <p className="text-xs font-bold text-slate-900 leading-snug">{mod.title}</p>
                   </div>
                 </div>
               );
@@ -199,21 +321,58 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
         </div>
       </section>
 
+      {/* ═══ BNPL / PAYMENT OPTIONS ═════════════════════════════════ */}
+      {p.bnplOptions && (
+        <section className="bg-slate-50 border-t border-slate-100 py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{p.bnplOptions.headline}</h2>
+
+            {/* Not-funded notice */}
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-8 max-w-2xl">
+              <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-800">{p.bnplOptions.note}</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {p.bnplOptions.plans.map((plan, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col gap-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-4 h-4 text-brand-blue-600" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{plan.label}</span>
+                  </div>
+                  <p className="text-2xl font-extrabold text-slate-900">{plan.amount}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">{plan.detail}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-slate-400 mt-5">
+              Payment plans are interest-free. Contact us at{' '}
+              <a href="tel:+13173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>{' '}
+              to discuss your options before enrolling.
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* ═══ CTA ════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-16" style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #dc2626 100%)' }}>
-        <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-white/10" />
+      <section className="relative overflow-hidden py-16 bg-slate-900">
         <div className="max-w-3xl mx-auto px-4 text-center relative">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
-          <p className="text-white/80 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
+          <p className="text-white/80 text-base max-w-xl mx-auto mb-2">{p.fundingStatement}</p>
+          <p className="text-white/50 text-xs max-w-lg mx-auto mb-8">
+            Workforce funding is available for eligible Indiana residents only. Eligibility is not guaranteed — you must qualify through WorkOne. Payment options available for self-pay students.
+          </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href={p.cta.applyHref}
               className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl"
             >
-              Enroll Now — It&apos;s Free to Apply
+              Apply Now
             </Link>
             <Link
               href={p.cta.advisorHref || '/contact'}

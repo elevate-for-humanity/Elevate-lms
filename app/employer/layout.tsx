@@ -28,18 +28,41 @@ const ONBOARDING_ALLOWED = [
   '/employer/settings',
 ];
 
+// Sub-routes that require an authenticated employer account
+const PORTAL_ROUTES = [
+  '/employer/dashboard',
+  '/employer/candidates',
+  '/employer/jobs',
+  '/employer/placements',
+  '/employer/hours',
+  '/employer/reports',
+  '/employer/analytics',
+  '/employer/apprenticeships',
+  '/employer/opportunities',
+  '/employer/shop',
+  '/employer/settings',
+  '/employer/compliance',
+  '/employer/post-job',
+  '/employer/verification',
+  '/employer/documents',
+];
+
 export default async function EmployerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  if (!supabase) redirect('/login');
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/employer');
+
+  // Public marketing page — no auth required
+  if (!user) {
+    return <>{children}</>;
+  }
+
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   const { data: profile } = await db
     .from('profiles')
@@ -47,8 +70,9 @@ export default async function EmployerLayout({
     .eq('id', user.id)
     .single();
 
+  // Non-employer logged-in users can still see the public page
   if (!profile || profile.role !== 'employer') {
-    redirect('/');
+    return <>{children}</>;
   }
 
   // Check onboarding status

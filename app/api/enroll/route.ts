@@ -72,6 +72,7 @@ async function _POST(req: NextRequest) {
         courseId,
         programId: programCode,
         paymentStatus: 'pending',
+        requireApproval: true,
       });
 
       if (!result.success) {

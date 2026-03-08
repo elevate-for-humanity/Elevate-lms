@@ -10,6 +10,8 @@ export interface EnrollmentData {
   paymentMethod?: string;
   startDate?: Date;
   endDate?: Date;
+  /** When true, enrollment is created as pending_approval instead of active */
+  requireApproval?: boolean;
 }
 
 export interface EnrollmentResult {
@@ -75,13 +77,14 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       }
     }
 
-    // Step 5: Create training enrollment — instant course access
+    // Step 5: Create training enrollment
+    const enrollmentStatus = data.requireApproval ? 'pending_approval' : 'active';
     const { data: enrollment, error: enrollError } = await supabase
       .from('training_enrollments')
       .insert({
         user_id: data.userId,
         course_id: data.courseId,
-        status: 'active',
+        status: enrollmentStatus,
         progress: 0,
         enrolled_at: new Date().toISOString(),
       })

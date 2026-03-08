@@ -66,20 +66,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: stats */}
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { stat: '8',    label: 'Career Training Programs' },
-                { stat: '35+',  label: 'Industry Credentials Offered' },
-                { stat: '20+',  label: 'Employer Hiring Partners' },
-                { stat: '$0',   label: 'Tuition for Eligible Participants' },
-              ].map((item) => (
-                <div key={item.label} className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
-                  <p className="text-4xl font-extrabold text-brand-red-400 mb-2">{item.stat}</p>
-                  <p className="text-slate-300 text-sm leading-snug">{item.label}</p>
-                </div>
-              ))}
-              <div className="col-span-2 bg-brand-green-900/40 border border-brand-green-700/40 rounded-xl p-4 text-center">
+            {/* Right: credential trust badges */}
+            <div className="flex flex-col gap-4">
+              <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden shadow-xl">
+                <Image src="/images/pages/about-career-training.jpg" alt="Elevate for Humanity career training" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              </div>
+              <div className="bg-brand-green-900/40 border border-brand-green-700/40 rounded-xl p-4 text-center">
                 <p className="text-brand-green-300 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>
               </div>
             </div>

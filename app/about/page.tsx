@@ -39,6 +39,7 @@ export default function AboutPage() {
           muted
           loop
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
           poster="/images/team/elizabeth-greene.jpg"
         >

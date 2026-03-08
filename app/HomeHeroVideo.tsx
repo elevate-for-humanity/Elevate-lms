@@ -39,12 +39,13 @@ export default function HomeHeroVideo() {
         fill priority sizes="100vw"
         className="object-cover object-center"
       />
-      {/* Silent looping video */}
+      {/* Silent looping video — plays immediately on load */}
       <video
         autoPlay muted loop playsInline
         onCanPlay={() => setVideoReady(true)}
-        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         poster="/images/pages/home-hero-video.jpg"
+        preload="auto"
       >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>

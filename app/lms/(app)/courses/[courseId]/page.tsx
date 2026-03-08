@@ -155,21 +155,26 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Course Header — vibrant full-bleed hero */}
+      {/* Course Header — video hero with separate audio narration */}
       <div className="relative overflow-hidden" style={{ minHeight: '380px' }}>
-        {/* Hero image */}
         <div className="absolute inset-0">
-          <Image
-            src={course.thumbnail_url || '/images/pages/comp-cta-training.jpg'}
-            alt={course.course_name}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
+          <video
+            src="/videos/hvac-technician.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+            style={{ minHeight: '380px' }}
           />
-          {/* Vibrant gradient overlay — blue left, fades right */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, #1d4ed8ee 0%, #2563ebcc 40%, #dc262688 75%, transparent 100%)' }} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* Narration audio — plays on load, not muted */}
+          <audio
+            src="/generated/lessons/lesson-2f172cb2-4657-5460-9b93-f9b062ad8dd2.mp3"
+            autoPlay
+            preload="auto"
+          />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         </div>
 
         {/* Content over image */}
@@ -357,17 +362,28 @@ export default async function CoursePage({ params }: { params: Params }) {
                           href={`/lms/courses/${courseId}/lessons/${lesson.id}`}
                           className="flex items-center gap-4 p-4 hover:bg-slate-50 transition"
                         >
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            isCompleted
-                              ? 'bg-brand-green-100'
-                              : 'bg-brand-blue-100 text-brand-blue-600'
-                          }`}>
-                            {isCompleted ? (
-                              <span className="w-3.5 h-3.5 rounded-full bg-brand-green-500 inline-block" />
-                            ) : lesson.content_type === 'video' ? (
-                              <Video className="w-5 h-5" />
-                            ) : (
-                              <FileText className="w-5 h-5" />
+                          <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                            <Image
+                              src={
+                                lesson.content_type === 'quiz'
+                                  ? '/images/pages/comp-cta-career.jpg'
+                                  : lesson.content_type === 'reading'
+                                  ? '/images/pages/about-career-training.jpg'
+                                  : '/images/pages/hvac-technician.jpg'
+                              }
+                              alt={lesson.title}
+                              fill
+                              className="object-cover"
+                            />
+                            {isCompleted && (
+                              <div className="absolute inset-0 bg-brand-green-600/70 flex items-center justify-center">
+                                <CheckCircle className="w-6 h-6 text-white" />
+                              </div>
+                            )}
+                            {!isCompleted && lesson.content_type === 'video' && (
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <Play className="w-5 h-5 text-white" />
+                              </div>
                             )}
                           </div>
                           <div className="flex-1">

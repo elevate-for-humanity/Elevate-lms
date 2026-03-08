@@ -15,7 +15,7 @@ const completionCerts = [
   { name: 'Bookkeeping & QuickBooks', desc: 'Double-entry bookkeeping, financial statements, and QuickBooks Online proficiency.', img: '/images/pages/certifications-page-1.jpg' },
   { name: 'Business Administration', desc: 'Microsoft Office, business communication, project management, and professional development.', img: '/images/pages/career-services-page-1.jpg' },
   { name: 'Tax Preparation', desc: 'Individual tax return preparation, IRS compliance, and tax software proficiency.', img: '/images/pages/courses-page-1.jpg' },
-  { name: 'Sanitation & Infection Control', desc: 'Disinfection procedures, bloodborne pathogen safety, and regulatory compliance.', img: '/images/pages/cna-nursing.jpg' },
+  { name: 'Sanitation & Infection Control', desc: 'Disinfection procedures, bloodborne pathogen safety, and regulatory compliance.', img: '/images/pages/sanitation.jpg' },
   { name: 'Micro Programs', desc: 'Short-term stackable credentials in safety, digital literacy, and professional development.', img: '/images/pages/certifications.jpg' },
 ];
 
@@ -25,16 +25,16 @@ const industryCerts = [
   { name: 'CNA (Certified Nursing Assistant)', issuer: 'Indiana State Dept. of Health', field: 'Healthcare', desc: 'State-certified credential for patient care. Requires state competency exam.', img: '/images/pages/healthcare-sector.jpg' },
   { name: 'CDL Class A License', issuer: 'Indiana BMV', field: 'Transportation', desc: 'Commercial driver license. Requires pre-trip, skills, and road test administered by the state.', img: '/images/pages/cdl-training.jpg' },
   { name: 'EPA Section 608', issuer: 'ESCO Institute / Mainstream Engineering', field: 'HVAC', desc: 'Required by federal law to handle refrigerants. Proctored on-site at our authorized testing center. Does not expire.', img: '/images/pages/hvac-technician.jpg' },
-  { name: 'QuickBooks Certified User', issuer: 'Certiport / Intuit', field: 'Business', desc: 'Vendor certification exam administered through Certiport testing centers.', img: '/images/pages/business-sector.jpg' },
-  { name: 'IT Specialist', issuer: 'Certiport', field: 'Technology', desc: 'Vendor certification in business applications, administered through Certiport.', img: '/images/pages/cybersecurity.jpg' },
-  { name: 'CompTIA A+', issuer: 'CompTIA', field: 'Technology', desc: 'Industry-standard IT support certification. Proctored exam through CompTIA testing network.', img: '/images/pages/it-help-desk.jpg' },
+  { name: 'QuickBooks Certified User', issuer: 'Certiport / Intuit', field: 'Business', desc: 'Vendor certification exam administered through Certiport testing centers.', img: '/images/pages/bookkeeping.jpg' },
+  { name: 'IT Specialist', issuer: 'Certiport', field: 'Technology', desc: 'Vendor certification in business applications, administered through Certiport.', img: '/images/pages/it-help-desk.jpg' },
+  { name: 'CompTIA A+', issuer: 'CompTIA', field: 'Technology', desc: 'Industry-standard IT support certification. Proctored exam through CompTIA testing network.', img: '/images/pages/network-administration.jpg' },
   { name: 'CompTIA Security+', issuer: 'CompTIA', field: 'Cybersecurity', desc: 'Baseline cybersecurity certification. Proctored exam through CompTIA testing network.', img: '/images/pages/cybersecurity.jpg' },
   { name: 'ServSafe Food Handler', issuer: 'National Restaurant Association', field: 'Culinary / Food Service', desc: 'Food safety certification. Valid 5 years. NRA-administered exam.', img: '/images/pages/culinary.jpg' },
   { name: 'NCCER Core', issuer: 'NCCER', field: 'Construction', desc: 'Foundational construction skills credential. NCCER-administered assessment.', img: '/images/pages/skilled-trades-sector.jpg' },
   { name: 'Phlebotomy Technician (CPT)', issuer: 'NHA', field: 'Healthcare', desc: 'National certification for blood draw and specimen collection. NHA-proctored exam.', img: '/images/pages/phlebotomy.jpg' },
   { name: 'Medical Assistant (CCMA)', issuer: 'NHA', field: 'Healthcare', desc: 'Clinical and administrative medical assisting. NHA-proctored exam.', img: '/images/pages/medical-assistant.jpg' },
-  { name: 'Indiana CPRS', issuer: 'Indiana DMHA', field: 'Behavioral Health', desc: 'State credential for peer recovery specialists. Requires supervised practicum hours and state application.', img: '/images/pages/career-services-page-1.jpg' },
-  { name: 'IRS PTIN', issuer: 'IRS', field: 'Tax Preparation', desc: 'Preparer Tax Identification Number. Required to prepare federal returns for compensation.', img: '/images/pages/certifications-page-1.jpg' },
+  { name: 'Indiana CPRS', issuer: 'Indiana DMHA', field: 'Behavioral Health', desc: 'State credential for peer recovery specialists. Requires supervised practicum hours and state application.', img: '/images/pages/peer-recovery.jpg' },
+  { name: 'IRS PTIN', issuer: 'IRS', field: 'Tax Preparation', desc: 'Preparer Tax Identification Number. Required to prepare federal returns for compensation.', img: '/images/pages/tax-preparation.jpg' },
 ];
 
 const apprenticeshipCreds = [

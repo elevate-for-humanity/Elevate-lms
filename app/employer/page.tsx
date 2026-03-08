@@ -1,62 +1,89 @@
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
+  title: 'Hire Trained Graduates | Employer Partnership | Elevate for Humanity',
+  description: 'Hire pre-screened, credentialed graduates. Access WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship sponsorship.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/employer' },
-  title: 'Employer Partnership | Elevate For Humanity',
-  description: 'Hire pre-screened, trained candidates. Access WOTC tax credits, OJT wage reimbursement, and WIOA-funded upskilling at no cost.',
 };
 
-export default function EmployerPage() {
+const INCENTIVES = [
+  { title: 'WOTC Tax Credit', desc: 'Up to $9,600 per qualifying hire through the Work Opportunity Tax Credit program.', img: '/images/pages/funding-impact-1.jpg', alt: 'WOTC tax credit for employers' },
+  { title: 'OJT Wage Reimbursement', desc: 'Reimburse up to 50% of wages during on-the-job training through WIOA funding.', img: '/images/pages/funding-impact-2.jpg', alt: 'OJT wage reimbursement' },
+  { title: 'Registered Apprenticeship', desc: 'Sponsor apprentices through our DOL-registered program. We handle compliance and reporting.', img: '/images/pages/apprenticeship-sponsor-page-1.jpg', alt: 'Registered apprenticeship sponsorship' },
+  { title: 'Pre-Screened Candidates', desc: 'Graduates arrive credentialed, drug-tested, and work-ready. No cold recruiting.', img: '/images/pages/hire-graduates-page-1.jpg', alt: 'Pre-screened credentialed candidates' },
+  { title: 'Credential Testing On-Site', desc: 'We proctor EPA 608, OSHA, WorkKeys, and more at our Indianapolis testing center.', img: '/images/pages/certifications-page-1.jpg', alt: 'On-site credential testing' },
+  { title: 'Upskill Your Workforce', desc: 'WIOA-funded upskilling for current employees at no cost to eligible participants.', img: '/images/pages/training-page-1.jpg', alt: 'Workforce upskilling programs' },
+];
 
+const SECTORS = [
+  { label: 'HVAC Technicians', credential: 'EPA 608 Universal', img: '/images/pages/hvac-technician.jpg' },
+  { label: 'CNA / Healthcare', credential: 'Indiana State Board', img: '/images/pages/healthcare-sector.jpg' },
+  { label: 'CDL Drivers', credential: 'Indiana BMV Class A', img: '/images/pages/cdl-training.jpg' },
+  { label: 'IT Support', credential: 'CompTIA A+', img: '/images/pages/it-help-desk.jpg' },
+  { label: 'Barbers', credential: 'Indiana IPLA License', img: '/images/pages/barber-hero-main.jpg' },
+  { label: 'Welders', credential: 'NCCER Core', img: '/images/pages/welding.jpg' },
+];
+
+const STEPS = [
+  { n: '1', title: 'Tell Us What You Need', desc: 'Share the roles, volume, and timeline. We match you to current and upcoming graduates.', img: '/images/pages/contact-page-1.jpg' },
+  { n: '2', title: 'Review Candidates', desc: 'We send pre-screened profiles. You interview who you want — no placement fees.', img: '/images/pages/career-services-page-2.jpg' },
+  { n: '3', title: 'Hire & Access Incentives', desc: 'We handle WOTC paperwork, OJT agreements, and apprenticeship compliance.', img: '/images/pages/employer-page-1.jpg' },
+  { n: '4', title: 'Ongoing Support', desc: 'Upskill your team, sponsor apprentices, or run group credential testing at our center.', img: '/images/pages/training-page-2.jpg' },
+];
+
+export default function EmployerPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Employer Partnership' }]} />
+
+      {/* Video hero */}
+      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-slate-900">
+        <video autoPlay muted loop playsInline poster="/images/pages/employer-hero.jpg"
+          className="absolute inset-0 w-full h-full object-cover opacity-65">
+          <source src="/videos/employer-hero.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+      </section>
+
+      {/* Header */}
+      <div className="bg-white border-b border-slate-100 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">For Employers</p>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-3">Hire Credentialed Graduates</h1>
+          <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            Elevate graduates arrive trained, tested, and credentialed. Access WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship sponsorship — all through one partner.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/testing/book?type=group-testing" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              Partner With Us <ChevronRight className="w-4 h-4" />
+            </Link>
+            <Link href="/employer/candidates" className="inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 font-semibold px-5 py-3 rounded-lg transition-colors text-sm">
+              Browse Candidates
+            </Link>
+            <a href="tel:+13173143757" className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 text-sm font-medium">
+              <Phone className="w-4 h-4" /> (317) 314-3757
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* Hero — clean image, no text overlay */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image src="/images/pages/employer-page-2.jpg" alt="Employer partnership with Elevate for Humanity" fill sizes="100vw" className="object-cover" priority />
-      </section>
-
-      {/* Headline below hero */}
-      <section className="py-8 sm:py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3">
-            Hire Trained, Job-Ready Candidates
-          </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            We recruit, screen, and train workers for your open positions. You interview and hire — no recruiting fees.
-          </p>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">How It Works</h2>
-          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-5">
-            {[
-              { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/pages/apply-employer-hero.jpg' },
-              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/pages/training-classroom.jpg' },
-              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/pages/about-employer-partners.jpg' },
-              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/pages/employer-page-1.jpg' },
-            ].map((item) => (
-              <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 overflow-hidden bg-white border border-slate-200">
-                <div className="relative w-28 h-28 sm:w-full sm:h-[160px] flex-shrink-0 sm:flex-shrink overflow-hidden">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, 25vw" quality={90} className="object-cover" />
-                  <div className="absolute top-2 left-2 w-7 h-7 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
+      {/* Incentives grid */}
+      <section className="py-14 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">What You Get</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Employer Benefits</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {INCENTIVES.map(({ title, desc, img, alt }) => (
+              <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
+                <div className="relative h-40 flex-shrink-0">
+                  <Image src={img} alt={alt} fill sizes="400px" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+                  <h3 className="absolute bottom-3 left-4 right-4 font-bold text-white text-sm leading-tight">{title}</h3>
                 </div>
-                <div className="py-3 pr-3 sm:p-4 flex-1">
-                  <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                <div className="p-4 flex-1">
+                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -64,101 +91,70 @@ export default function EmployerPage() {
         </div>
       </section>
 
-      {/* Grants & Tax Credits */}
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Save Money When You Hire</h2>
-          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">Grants and tax credits for qualifying hires</p>
-          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
-            {[
-              { title: 'WOTC Tax Credit', amount: '$2,400-$9,600 per hire', desc: 'Federal tax credit: $2,400/hire for TANF, SNAP, ex-felons, long-term unemployed. Up to $9,600 for qualified veterans. 40% of first-year wages (25% if 120-399 hours). We file Form 8850 within the 28-day deadline. Authorized through Dec 31, 2025.', image: '/images/pages/employer-page-2.jpg', href: '/funding' },
-              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. Through WorkOne Indianapolis, the local workforce board reimburses 50–75% of wages during the training period per local board policy. Formal OJT contract required.', image: '/images/pages/employers-page-1.jpg', href: '/ojt-and-funding' },
-              { title: 'WIOA Upskilling', amount: 'Tuition covered', desc: 'Upskill current employees with WIOA-funded training in healthcare, IT, skilled trades, and more.', image: '/images/pages/about-career-training.jpg', href: '/wioa-eligibility' },
-              { title: 'Workforce Ready Grant', amount: 'State-funded certifications', desc: 'Indiana covers tuition for high-demand certifications through the WRG program.', image: '/images/pages/certifications-page-1.jpg', href: '/funding' },
-            ].map((item) => (
-              <Link key={item.title} href={item.href} className="flex gap-4 bg-slate-50 border border-slate-200 p-4 hover:shadow-lg transition-shadow group">
-                <div className="relative w-20 h-20 sm:w-28 sm:h-28 overflow-hidden flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 80px, 112px" quality={90} className="object-cover" />
+      {/* Available sectors */}
+      <section className="py-14 bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Available Talent</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Sectors We Train</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {SECTORS.map(({ label, credential, img }) => (
+              <div key={label} className="group rounded-xl overflow-hidden border border-slate-200">
+                <div className="relative h-28">
+                  <Image src={img} alt={label} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+                  <p className="absolute bottom-2 left-2 right-2 text-white font-bold text-xs leading-tight">{label}</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-brand-red-600 font-semibold text-sm mb-1">{item.amount}</p>
-                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                <div className="p-2 bg-white">
+                  <p className="text-[10px] text-slate-400 leading-tight">{credential}</p>
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What You Get */}
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What You Get</h2>
-          <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3">
-            {['Pre-screened candidates', 'Skills-matched to your roles', 'No recruiting fees', 'Background checks available', 'Onboarding support', 'Ongoing retention help', 'Tax credit filing assistance', 'Dedicated account manager', 'Custom training programs'].map((item) => (
-              <div key={item} className="flex items-center gap-3 bg-white px-4 py-3 border border-slate-200">
-                <span className="w-2 h-2 bg-brand-red-600 rounded-full flex-shrink-0" />
-                <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Partner Compliance Requirements */}
-      <section className="py-8 sm:py-14 bg-white border-t">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-3">Worksite Compliance Standards</h2>
-          <p className="text-center text-slate-600 text-sm mb-8 max-w-2xl mx-auto">
-            Employers hosting apprentices or trainees must meet the following standards.
-            Elevate verifies compliance before registering worksites in the federal RAPIDS system.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="border border-slate-200 rounded-lg p-5">
-              <h3 className="font-semibold text-slate-900 text-sm mb-2">Insurance Requirements</h3>
-              <ul className="text-sm text-slate-600 space-y-1.5">
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>General Liability insurance (required for all partner worksites)</span></li>
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Workers&apos; Compensation insurance or valid state exemption (required when apprentices are on payroll)</span></li>
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Current Certificate of Insurance (COI) on file with Elevate</span></li>
-              </ul>
-            </div>
-            <div className="border border-slate-200 rounded-lg p-5">
-              <h3 className="font-semibold text-slate-900 text-sm mb-2">Worksite Standards</h3>
-              <ul className="text-sm text-slate-600 space-y-1.5">
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Valid state business and occupational licenses</span></li>
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Designated supervisor with required licensure and experience</span></li>
-                <li className="flex items-start gap-2"><span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full mt-1.5 flex-shrink-0" /><span>Commitment to structured training plan and hour verification</span></li>
-              </ul>
-            </div>
+      {/* How it works */}
+      <section className="py-14 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Process</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">How It Works</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {STEPS.map(({ n, title, desc, img }) => (
+              <div key={n} className="flex flex-col">
+                <div className="relative h-40 rounded-xl overflow-hidden mb-3 flex-shrink-0">
+                  <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
+                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-sm flex items-center justify-center shadow">{n}</div>
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1 text-sm">{title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <Link href="/employer/apprenticeships/new" className="px-4 py-2 bg-brand-red-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-red-700 transition-colors">
-              Register New Apprenticeship
-            </Link>
-            <Link href="/partners/barbershop-apprenticeship/handbook" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors">
-              Partner Handbook
-            </Link>
-          </div>
-          <p className="text-center text-xs text-slate-400 mt-4">
-            Questions? Contact{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>.
-          </p>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-8 sm:py-14 bg-slate-900">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Hiring Today</h2>
-          <p className="text-slate-300 mb-6 text-sm">Submit your hiring needs and we will match you with trained candidates.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg text-base transition-colors text-center">
-              Submit Hiring Needs <ArrowRight className="w-4 h-4 inline ml-1" />
-            </Link>
-            <Link href="/programs" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              View Training Programs
-            </Link>
+      {/* Dark CTA */}
+      <section className="py-14 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Hire?</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Start the Conversation</h2>
+              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                Tell us what roles you need to fill. We'll match you to current graduates, walk you through available incentives, and set up a hiring pipeline that works for your team.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/testing/book?type=group-testing" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
+                  Partner With Us <ChevronRight className="w-4 h-4" />
+                </Link>
+                <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm">
+                  Email Us
+                </a>
+              </div>
+            </div>
+            <div className="relative h-64 rounded-2xl overflow-hidden">
+              <Image src="/images/pages/employers-page-1.jpg" alt="Employer partnership meeting" fill sizes="600px" className="object-cover" />
+            </div>
           </div>
         </div>
       </section>

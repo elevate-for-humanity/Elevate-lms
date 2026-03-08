@@ -40,7 +40,7 @@ const PARTNERS = [
     type: 'WorkOne & Workforce Boards',
     headline: 'Send WIOA participants for credential testing',
     desc: 'WorkOne case managers schedule participants to complete industry certifications at our center. We handle proctoring, documentation, and PIRL-compatible outcome records. You solve a logistics problem — we run the testing infrastructure.',
-    img: '/images/pages/workforce-board-page-1.jpg',
+    img: '/images/pages/workforce-board-page-4.jpg',
     alt: 'WorkOne workforce board partnership',
     bullets: ['WIOA, Next Level Jobs, and JRI participants accepted', 'PIRL-compatible outcome documentation', 'Group sessions for cohorts of 2–8'],
     cta: 'Workforce Board Inquiry',
@@ -51,7 +51,7 @@ const PARTNERS = [
     type: 'CTE Programs & High Schools',
     headline: 'Credential testing for your students',
     desc: 'Indiana CTE programs can schedule group testing sessions for students completing IT, business, trades, or culinary pathways. You teach the content — we provide the authorized testing infrastructure. No testing lab required on your end.',
-    img: '/images/pages/courses-page-1.jpg',
+    img: '/images/pages/courses-page-5.jpg',
     alt: 'CTE high school credential testing',
     bullets: ['Microsoft Office Specialist, IC3, OSHA, ServSafe', 'Bus groups in — we handle check-in and proctoring', 'Two testing days per semester model available'],
     cta: 'School Partnership Request',
@@ -86,7 +86,7 @@ const TESTING_OPTIONS = [
     title: 'In-Person Proctored Testing',
     desc: 'Secure, supervised testing at our Indianapolis center. Required for certifications that mandate on-site proctoring, identity verification, and controlled conditions. This is the default format for all exams we administer.',
     note: null,
-    img: '/images/pages/certifications-page-1.jpg',
+    img: '/images/pages/competency-test-hero.jpg',
     alt: 'In-person proctored testing at Elevate',
   },
   {
@@ -121,12 +121,12 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
 
 const PROVIDER_IMAGES: Record<string, string> = {
   esco:       '/images/pages/hvac-technician.jpg',
-  nrf:        '/images/pages/career-services-page-1.jpg',
-  certiport:  '/images/pages/cybersecurity.jpg',
+  nrf:        '/images/pages/for-students-hero.jpg',
+  certiport:  '/images/pages/technology-sector.jpg',
   workkeys:   '/images/pages/courses-page-2.jpg',
-  servsafe:   '/images/pages/culinary.jpg',
-  careersafe: '/images/pages/comp-highlights-electrical.jpg',
-  milady:     '/images/pages/barber-training.jpg',
+  servsafe:   '/images/pages/courses-page-6.jpg',
+  careersafe: '/images/pages/construction-trades.jpg',
+  milady:     '/images/pages/cosmetology.jpg',
 };
 
 export default function TestingCenterPage() {
@@ -343,7 +343,7 @@ export default function TestingCenterPage() {
             {ALL_PROVIDERS.map((provider) => {
               const labels = getProctoringLabels(provider.key);
               const { label, cls } = STATUS_LABEL[provider.status] ?? STATUS_LABEL.available_through_partner;
-              const provImg = PROVIDER_IMAGES[provider.key] ?? '/images/pages/certifications-page-1.jpg';
+              const provImg = PROVIDER_IMAGES[provider.key] ?? '/images/pages/accreditation.jpg';
               return (
                 <div key={provider.key} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                   <div className="relative h-36">

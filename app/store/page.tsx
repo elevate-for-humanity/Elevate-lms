@@ -1,354 +1,161 @@
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3, Shield, Check } from 'lucide-react';
-import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
-import StoreDemoVideo from './StoreDemoVideo';
-import StoreFAQ from './StoreFAQ';
+import { ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'License the Elevate Platform | White-Label Workforce LMS',
-  description: 'License a turnkey workforce development platform. Automated enrollment, WIOA compliance, credential tracking, employer matching, and reporting.',
+  title: 'Platform Licensing & Store | Elevate for Humanity',
+  description: 'License the Elevate LMS platform for your school, workforce program, or organization. White-label, compliance-ready, and built for workforce training.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store' },
 };
 
+const PRODUCTS = [
+  { title: 'Starter License', price: '$299/mo', desc: 'Up to 50 learners. Full LMS, credential tracking, and employer portal. Ideal for small training providers.', img: '/images/pages/store-licensing-hero.jpg', href: '/store/licenses', cta: 'Get Started' },
+  { title: 'Professional License', price: '$699/mo', desc: 'Up to 250 learners. Adds custom branding, WIOA compliance module, and priority support.', img: '/images/pages/store-licensing-managed-hero.jpg', href: '/store/licenses', cta: 'Get Started' },
+  { title: 'Enterprise License', price: 'Custom', desc: 'Unlimited learners. White-label, API access, dedicated onboarding, and SLA support.', img: '/images/pages/store-licensing-enterprise-hero.jpg', href: '/store/licenses', cta: 'Contact Us' },
+];
+
+const FEATURES = [
+  { title: 'WIOA Compliance Module', desc: 'Built-in PIRL reporting, eligibility tracking, and documentation for workforce-funded programs.', img: '/images/pages/store-compliance-wioa-hero.jpg' },
+  { title: 'Credential Tracking', desc: 'Track every learner from enrollment through credential issuance. Integrates with external testing bodies.', img: '/images/pages/store-courses-hero.jpg' },
+  { title: 'Employer Portal', desc: 'Employers post jobs, review candidates, and manage OJT agreements directly in the platform.', img: '/images/pages/store-digital-hero.jpg' },
+  { title: 'Mobile-Ready', desc: 'Learners access courses, assignments, and credentials from any device. No app download required.', img: '/images/pages/mobile-app-page-1.jpg' },
+  { title: 'Analytics Dashboard', desc: 'Real-time enrollment, completion, and outcome data for administrators and funders.', img: '/images/pages/store-addons-analytics-hero.jpg' },
+  { title: 'White-Label Ready', desc: 'Your brand, your domain, your colors. Fully customizable for enterprise and partner deployments.', img: '/images/pages/store-addons-hero.jpg' },
+];
+
+const WHO = [
+  { label: 'Training Providers', desc: 'Run your programs on a purpose-built workforce LMS.', img: '/images/pages/training-providers-page-1.jpg' },
+  { label: 'Workforce Boards', desc: 'Manage WIOA participants, track outcomes, and report to funders.', img: '/images/pages/workforce-board-page-3.jpg' },
+  { label: 'Employers', desc: 'Upskill your workforce and manage apprenticeship compliance.', img: '/images/pages/employers-page-2.jpg' },
+  { label: 'Schools & CTE', desc: 'Deliver credential pathways with built-in testing center integration.', img: '/images/pages/courses-page-4.jpg' },
+];
+
 export default function StorePage() {
-
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-white">
 
-      {/* Identity banner — clarifies the three-model structure */}
-      <div className="bg-slate-900 text-white py-4 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-10">
-            <div className="flex items-start gap-3">
-              <div className="w-1 h-10 bg-brand-red-500 rounded-full flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Training Provider</p>
-                <p className="text-sm text-white">We train students in Indianapolis through credential programs in trades, healthcare, and technology.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1 h-10 bg-brand-blue-500 rounded-full flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Platform Licensor</p>
-                <p className="text-sm text-white">We license the same LMS we built for ourselves to other workforce organizations nationwide.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-1 h-10 bg-brand-orange-500 rounded-full flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Apprenticeship Sponsor</p>
-                <p className="text-sm text-white">We are a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301) for structured earn-and-learn programs.</p>
-              </div>
-            </div>
+      {/* Video hero */}
+      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-slate-900">
+        <video autoPlay muted loop playsInline poster="/images/pages/store-hero.jpg"
+          className="absolute inset-0 w-full h-full object-cover opacity-60">
+          <source src="/videos/dashboard-student-narrated.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+      </section>
+
+      {/* Header */}
+      <div className="bg-white border-b border-slate-100 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Platform Licensing</p>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-3">License the Platform</h1>
+          <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            The same LMS that powers Elevate for Humanity — available for your school, workforce program, or organization. WIOA-compliant, credential-ready, and built for workforce training.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/store/licenses" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              View Pricing <ChevronRight className="w-4 h-4" />
+            </Link>
+            <Link href="/demo" className="inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 font-semibold px-5 py-3 rounded-lg transition-colors text-sm">
+              Request a Demo
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
-        <Image src="/images/pages/store-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />
+      {/* Pricing */}
+      <section className="py-14 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Pricing</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">License Plans</h2>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {PRODUCTS.map(({ title, price, desc, img, href, cta }) => (
+              <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
+                <div className="relative h-44 flex-shrink-0">
+                  <Image src={img} alt={title} fill sizes="400px" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                  <div className="absolute bottom-3 left-4 right-4">
+                    <p className="text-brand-red-300 font-extrabold text-lg">{price}</p>
+                    <h3 className="font-bold text-white text-sm leading-tight">{title}</h3>
+                  </div>
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <p className="text-slate-500 text-sm leading-relaxed flex-1">{desc}</p>
+                  <Link href={href} className="mt-4 inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-lg transition-colors text-sm self-start">
+                    {cta} <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* ============ HERO — Video on the right, pitch on the left ============ */}
-      <section className="py-12 sm:py-20">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* Features */}
+      <section className="py-14 bg-white border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">What's Included</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Platform Features</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {FEATURES.map(({ title, desc, img }) => (
+              <div key={title} className="border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
+                <div className="relative h-36 flex-shrink-0">
+                  <Image src={img} alt={title} fill sizes="400px" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+                  <h3 className="absolute bottom-3 left-4 right-4 font-bold text-white text-sm leading-tight">{title}</h3>
+                </div>
+                <div className="p-4 flex-1 bg-white">
+                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who it's for */}
+      <section className="py-14 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Who It's For</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Built for Workforce Organizations</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {WHO.map(({ label, desc, img }) => (
+              <div key={label} className="rounded-xl overflow-hidden border border-slate-200 flex flex-col">
+                <div className="relative h-36">
+                  <Image src={img} alt={label} fill sizes="300px" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+                  <p className="absolute bottom-2 left-3 right-3 font-bold text-white text-xs leading-tight">{label}</p>
+                </div>
+                <div className="p-3 bg-white flex-1">
+                  <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-14 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="text-brand-red-600 font-semibold text-sm tracking-wider mb-4">WHITE-LABEL WORKFORCE PLATFORM</p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-[1.1] mb-5">
-                License the LMS that runs workforce programs end to end.
-              </h1>
-              <p className="text-lg text-slate-600 leading-relaxed mb-4">
-                Elevate replaces the spreadsheets, paper forms, and disconnected systems your organization uses today. One platform handles enrollment, eligibility, attendance, credentials, employer matching, compliance reporting, and grant tracking — all automated.
-              </p>
-              <p className="text-base text-slate-500 mb-6">
-                You get your own branded instance. We handle the infrastructure. Your staff focuses on people, not data entry.
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">See It in Action</h2>
+              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                Request a live demo and we'll walk you through the platform with your use case in mind — whether you're a training provider, workforce board, or employer.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/store/trial" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition">
-                  Start 14-Day Free Trial <ArrowRight className="w-4 h-4" />
+                <Link href="/demo" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
+                  Request a Demo <ChevronRight className="w-4 h-4" />
                 </Link>
-                <Link href="/demo/admin" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition">
-                  Try Full Demo — No Signup
+                <Link href="/store/licenses" className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm">
+                  View Pricing
                 </Link>
               </div>
-              <p className="text-xs text-slate-400 mt-3">No credit card required. Full platform access.</p>
             </div>
-            <div>
-              <StoreDemoVideo />
+            <div className="relative h-64 rounded-2xl overflow-hidden">
+              <Image src="/images/pages/store-demo-video-hero.jpg" alt="Platform demo" fill sizes="600px" className="object-cover" />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ TRUST METRICS ============ */}
-      <section className="py-8 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { value: '516+', label: 'Database Tables' },
-              { value: '938', label: 'Platform Pages' },
-              { value: '14', label: 'Program Types' },
-              { value: '3', label: 'Portal Views' },
-            ].map(m => (
-              <div key={m.label}>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900">{m.value}</div>
-                <div className="text-sm text-slate-500">{m.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ WHAT THE LICENSE INCLUDES ============ */}
-      <section className="py-14 sm:py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">What the license includes</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
-            Every license includes the full platform — three portals, all compliance tools, automated reporting, and white-label branding. Nothing is extra.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { icon: Users, title: 'Automated Enrollment', desc: 'Online applications, automatic eligibility checks, document collection, and approval workflows. No paper. No re-keying.' },
-              { icon: FileCheck, title: 'WIOA & Grant Compliance', desc: 'PIRL reporting, ITA tracking, eligibility documentation, and quarterly performance metrics — generated from enrollment data.' },
-              { icon: GraduationCap, title: 'Credential Issuance', desc: 'When a student completes a program, credentials are issued automatically. Employers verify them with a link.' },
-              { icon: Building2, title: 'Employer Portal', desc: 'Partners browse pre-screened candidates, track apprenticeship hours, manage OJT reimbursements, and sign MOUs.' },
-              { icon: BarChart3, title: 'Automated Reporting', desc: 'WIOA performance, grant utilization, enrollment trends, outcome data. Generated on demand. No manual assembly.' },
-              { icon: Zap, title: 'Your Brand, Your Domain', desc: 'Your logo, colors, and URL. Students and employers see your organization. The platform is invisible.' },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <item.icon className="w-5 h-5 text-brand-red-600 mb-3" />
-                <h3 className="font-bold text-slate-900 mb-1.5 text-sm">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ PLATFORM SCREENSHOTS ============ */}
-      <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">See what you&apos;re getting</h2>
-          <p className="text-slate-600 text-center mb-10">Real screenshots from the platform. This is what your staff and students will use every day.</p>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {[
-              { img: '/images/pages/demos-hero.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Student View — courses, certificates, career services' },
-            ].map(s => (
-              <div key={s.img} className="group">
-                <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-slate-200">
-                  <Image src={s.img} alt={s.label} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
-                </div>
-                <p className="text-sm text-slate-600 mt-2">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ FULL-ACCESS DEMO ============ */}
-      <section className="py-14 sm:py-20 bg-slate-900">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">Try the full platform. No signup. No time limit.</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Every screen is live and clickable. Search students, run reports, review applications, browse candidates.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-5 mb-8">
-            {[
-              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/pages/demos-hero.jpg' },
-              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/pages/demos-hero.jpg' },
-              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/pages/demos-hero.jpg' },
-            ].map(d => (
-              <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition">
-                <div className="relative aspect-video">
-                  <Image src={d.img} alt={d.label} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-white font-bold mb-1">{d.label}</h3>
-                  <p className="text-slate-400 text-sm mb-2">{d.desc}</p>
-                  <span className="text-brand-red-400 text-sm font-semibold inline-flex items-center gap-1">
-                    Open Live Demo <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <p className="text-slate-500 text-xs text-center">Demo uses sample data. Nothing affects real systems.</p>
-        </div>
-      </section>
-
-      {/* ============ WHO BUYS THIS ============ */}
-      <section className="py-14 sm:py-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">Who this is for</h2>
-          <p className="text-slate-600 text-center mb-10">
-            Organizations that manage WIOA-funded training, registered apprenticeships, or employer partnerships.
-          </p>
-          <div className="space-y-6">
-            {[
-              { title: 'Workforce Boards', desc: 'WIOA eligibility determination, ITA management, PIRL reporting, provider network oversight, quarterly performance metrics. Replace your current patchwork of systems with one platform that does it all.', img: '/images/pages/homepage-why-elevate.jpg' },
-              { title: 'Training Providers', desc: 'Student enrollment, attendance tracking, course delivery, credential issuance, outcome reporting to funders. Stop emailing spreadsheets to your workforce board.', img: '/images/pages/comp-home-highlight-health.jpg' },
-              { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/pages/comp-cta-training.jpg' },
-            ].map((item) => (
-              <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
-                <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0 overflow-hidden">
-                  <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px" />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ COMPLIANCE & TRUST ============ */}
-      <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center gap-3 justify-center mb-3">
-            <Shield className="w-6 h-6 text-brand-red-600" />
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Built for compliance</h2>
-          </div>
-          <p className="text-slate-600 text-center mb-10">
-            The platform is designed around the regulations workforce organizations already follow.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              { title: 'WIOA Title I', desc: 'Eligibility determination, ITA management, PIRL reporting, quarterly performance metrics.' },
-              { title: 'FERPA', desc: 'Student data privacy controls, consent tracking, role-based access, audit logs.' },
-              { title: 'DOL Apprenticeship', desc: 'Registered standards, hour tracking, wage schedules, completion documentation.' },
-              { title: 'Grant Reporting', desc: 'Automated reports for WIOA, state workforce grants, and institutional funders.' },
-            ].map((item) => (
-              <div key={item.title} className="flex gap-3 p-4 bg-white rounded-lg border border-slate-200">
-                <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-slate-600 text-sm">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ PRICING ============ */}
-      <section id="pricing" className="py-14 sm:py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">Licensing</h2>
-          <p className="text-slate-600 text-center mb-10">Two deployment options. Both start with a 14-day free trial.</p>
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Managed */}
-            <div className="border-2 border-brand-red-600 rounded-2xl p-8 relative">
-              <span className="absolute -top-3 left-6 bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Recommended</span>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Managed Platform</h3>
-              <div className="mb-1">
-                <span className="text-4xl font-black text-slate-900">$1,500</span>
-                <span className="text-slate-500">/mo</span>
-              </div>
-              <p className="text-sm text-slate-500 mb-4">$18,000/year + one-time setup fee. Cancel anytime.</p>
-              <p className="text-slate-600 text-sm mb-6">
-                Full platform with your branding and domain. All three portals, compliance tools, reporting, and support. Onboarding included. Launch in two weeks.
-              </p>
-              <ul className="space-y-2 mb-6">
-                {['Admin, Student & Employer portals', 'Your logo, colors, and domain', 'WIOA compliance & PIRL reporting', 'Automated credential issuance', 'Onboarding & data migration', 'Email & phone support'].map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                    <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/store/trial" className="block text-center bg-brand-red-600 text-white font-bold py-3 rounded-lg hover:bg-brand-red-700 transition">
-                Start 14-Day Free Trial
-              </Link>
-              <Link href="/store/licensing/managed" className="block text-center text-slate-600 text-sm font-medium mt-2 hover:underline">
-                View plans & purchase directly →
-              </Link>
-              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, {BNPL_CHECKOUT_LABEL} at checkout</p>
-            </div>
-            {/* Enterprise */}
-            <div className="border border-slate-200 rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Enterprise Source-Use</h3>
-              <div className="mb-1">
-                <span className="text-4xl font-black text-slate-900">$75,000</span>
-              </div>
-              <p className="text-sm text-slate-500 mb-4">One-time license + $15,000/year maintenance. Includes source code.</p>
-              <p className="text-slate-600 text-sm mb-6">
-                Deploy on your infrastructure with full source access. For state agencies and large workforce networks that need complete control.
-              </p>
-              <ul className="space-y-2 mb-6">
-                {['Everything in Managed', 'Self-hosted on your servers', 'Full source code access', '40 hours implementation support', 'Annual updates & patches', 'Volume licensing available'].map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                    <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/store/licensing/enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-50 transition">
-                View Enterprise License
-              </Link>
-              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, {BNPL_CHECKOUT_LABEL} at checkout</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ ALSO IN THE STORE ============ */}
-      <section className="py-10 bg-white border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/store/courses" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              Certification Courses
-            </Link>
-            <Link href="/store/digital" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              Digital Resources
-            </Link>
-            <Link href="/store/ai-studio" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              AI Studio
-            </Link>
-            <Link href="/store/apps/grants" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              Grants App
-            </Link>
-            <Link href="/store/apps/sam-gov" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              SAM.gov Assistant
-            </Link>
-            <Link href="/store/apps/website-builder" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              Website Builder
-            </Link>
-            <Link href="/creator/products" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
-              Creator Products
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ FAQ ============ */}
-      <StoreFAQ />
-
-      {/* ============ CTA ============ */}
-      <section className="py-14 sm:py-20 bg-slate-900">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">Try it free for 14 days.</h2>
-          <p className="text-lg text-slate-400 mb-8">
-            Your own branded instance, provisioned instantly. No credit card. Full platform access. Convert to a paid license when you&apos;re ready.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-8 py-3.5 rounded-lg transition">
-              Start 14-Day Free Trial <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/demo/admin" className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 font-semibold px-8 py-3.5 rounded-lg hover:bg-slate-100 transition">
-              Try Full Demo First
-            </Link>
           </div>
         </div>
       </section>

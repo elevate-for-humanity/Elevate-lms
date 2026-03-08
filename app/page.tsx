@@ -91,41 +91,41 @@ export default function HomePage() {
       </section>
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
-      <section className="py-10 sm:py-12 bg-slate-50 border-t border-slate-100">
+      <section className="py-12 sm:py-16 bg-slate-50">
         <div className="max-w-5xl mx-auto px-6">
           <ScrollReveal>
-            <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-2">
               How can we help you?
             </h2>
-            <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-              Choose your path below. Each option takes you directly to the information you need — everything starts online.
+            <p className="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+              Choose your path below. Each option takes you directly to the information you need.
             </p>
           </ScrollReveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom', pos: 'object-center' },
-              { href: '/funding', label: 'I need funding', desc: 'Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid', pos: 'object-center' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting', pos: 'object-top' },
-              { href: '/store', label: 'I run a school', desc: 'License the platform.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office', pos: 'object-top' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded credential programs in healthcare, trades, CDL, and technology.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom', pos: 'object-center' },
+              { href: '/funding', label: 'I need funding', desc: 'Check WIOA, WRG, and JRI eligibility. Many programs are free for qualifying participants.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid resources', pos: 'object-center' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC credits and OJT wage reimbursement.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting', pos: 'object-top' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your training organization.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office', pos: 'object-top' },
             ].map((item, i) => (
               <ScrollReveal key={item.href} delay={i * 80}>
                 <Link
                   href={item.href}
                   className="flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all group overflow-hidden h-full"
                 >
-                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
                     <Image
                       src={item.image}
                       alt={item.alt}
                       fill
-                      sizes="(max-width: 640px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className={`object-cover ${item.pos} group-hover:scale-105 transition-transform duration-500`}
                     />
                   </div>
-                  <div className="p-3 sm:p-4 flex flex-col flex-1">
-                    <span className="font-bold text-sm sm:text-base text-slate-900 block mb-0.5">{item.label}</span>
-                    <span className="text-xs text-slate-500 block mb-2">{item.desc}</span>
-                    <span className="text-brand-red-600 font-semibold text-xs group-hover:underline mt-auto">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
+                    <span className="font-bold text-base text-slate-900 block mb-1">{item.label}</span>
+                    <span className="text-sm text-slate-500 block mb-3 leading-snug">{item.desc}</span>
+                    <span className="text-brand-red-600 font-semibold text-sm group-hover:underline mt-auto">
                       {item.cta} →
                     </span>
                   </div>
@@ -135,13 +135,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-
-
 
       {/* ===== THREE PILLARS ===== */}
-      
-      <section aria-label="Three pillars" className="py-10 sm:py-14">
+      <div className="h-2 bg-brand-red-600" aria-hidden="true" />
+      <section aria-label="Three pillars" className="py-12 sm:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-8">
             <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Our Model</p>
@@ -189,16 +186,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-
-
-      
-
-
 
       {/* ===== NATIONAL CREDENTIAL VALIDATION ===== */}
-      
-      <section aria-label="National credential validation" className="py-10 sm:py-14 bg-white border-t border-slate-100">
+      <div className="h-2 bg-slate-900" aria-hidden="true" />
+      <section aria-label="National credential validation" className="py-12 sm:py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
             <div>
@@ -238,11 +229,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
 
       {/* ===== FUNDING ===== */}
-      
-      <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
+      <div className="h-2 bg-brand-green-600" aria-hidden="true" />
+      <section aria-label="Funding options" className="py-12 sm:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Funded Training for Eligible Participants</h2>
@@ -286,13 +276,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-
-
 
       {/* ===== EMPLOYERS ===== */}
-      
-      <section aria-label="Employer partnerships" className="py-10 sm:py-14 bg-white border-t border-slate-100">
+      <div className="h-2 bg-brand-red-600" aria-hidden="true" />
+      <section aria-label="Employer partnerships" className="py-12 sm:py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
@@ -322,8 +309,7 @@ export default function HomePage() {
       
 
       {/* ===== EMPLOYMENT SUPPORT ===== */}
-      
-      <section aria-label="Employment support services" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+      <section aria-label="Employment support services" className="py-10 sm:py-12 bg-slate-50 border-t-2 border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-2xl font-semibold text-slate-900">One-on-one employment support</h2>
@@ -342,10 +328,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
 
       {/* ===== WHY ELEVATE ===== */}
-      
+      <div className="h-2 bg-slate-900" aria-hidden="true" />
       <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -382,11 +367,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
 
       {/* ===== TESTIMONIALS ===== */}
-      
-      <section aria-label="Student testimonials" className="py-10 sm:py-14 bg-slate-50">
+      <div className="h-2 bg-brand-red-600" aria-hidden="true" />
+      <section aria-label="Student testimonials" className="py-12 sm:py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Real Students. Real Results.</h2>
@@ -423,7 +407,6 @@ export default function HomePage() {
       
 
       {/* ===== CTA ===== */}
-      
       <section aria-label="Get started" className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">

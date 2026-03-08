@@ -24,7 +24,7 @@ const STAGES = [
   {
     num: 1,
     title: 'Eligibility & Barrier Removal',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/wioa-eligibility-page-1.jpg',
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
@@ -34,7 +34,7 @@ const STAGES = [
   {
     num: 2,
     title: 'Cohort Training',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/comp-pathway-classroom.jpg',
     href: '/pathways/training-model',
     what: 'You join a training cohort — a group of students who start and finish together. Training combines classroom instruction, hands-on lab work, and online coursework. Trades students work with real tools and equipment. Healthcare students do clinical rotations. CDL students get 160+ hours behind the wheel.',
     who: 'Enrolled participants who have completed eligibility screening and funding confirmation.',
@@ -44,7 +44,7 @@ const STAGES = [
   {
     num: 3,
     title: 'Industry Credential',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/credentials-page-1.jpg',
     href: '/credentials',
     what: 'At the end of training, you sit for a certification exam issued by a recognized third-party organization — not by Elevate. You earn a credential that employers across the country recognize and require for hiring.',
     who: 'Students who have completed their training program and met all requirements.',
@@ -54,7 +54,7 @@ const STAGES = [
   {
     num: 4,
     title: 'Apprenticeship & Job Placement',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-services-page-1.jpg',
     href: '/career-services/job-placement',
     what: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. For apprenticeship tracks (barber, building trades), you are placed with a host employer and earn wages while completing on-the-job training hours.',
     who: 'Graduates who have earned their credential. Apprentices who are completing on-the-job training hours.',
@@ -64,7 +64,7 @@ const STAGES = [
   {
     num: 5,
     title: 'Advancement & Upskilling',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/comp-home-pathways-support.jpg',
     href: '/career-services',
     what: 'After placement, you are not on your own. We track your employment at 6 months and 12 months. You keep access to the learning platform for continued education. Many graduates come back to stack additional credentials — for example, CNA to Medical Assistant to LPN to RN.',
     who: 'All program graduates. Ongoing support is included at no additional cost.',
@@ -77,7 +77,7 @@ const STAGES = [
 const PROGRAMS = [
   {
     name: 'CNA Certification',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cna-nursing.jpg',
     href: '/programs/cna',
     duration: '4–6 weeks',
     credential: 'Certified Nursing Assistant (CNA)',
@@ -89,7 +89,7 @@ const PROGRAMS = [
   },
   {
     name: 'CDL Commercial Driving',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cdl-training.jpg',
     href: '/programs/cdl-training',
     duration: '4–6 weeks (160+ hours)',
     credential: 'CDL Class A or Class B',
@@ -101,7 +101,7 @@ const PROGRAMS = [
   },
   {
     name: 'Barber Apprenticeship',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/barber-hero-main.jpg',
     href: '/programs/barber-apprenticeship',
     duration: '~18 months (1,500 hours)',
     credential: 'Indiana Barber License',
@@ -113,7 +113,7 @@ const PROGRAMS = [
   },
   {
     name: 'Building Technician with HVAC Fundamentals',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',
     credential: 'EPA 608 + OSHA 30',
@@ -125,7 +125,7 @@ const PROGRAMS = [
   },
   {
     name: 'Electrical',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/electrical.jpg',
     href: '/programs/electrical',
     duration: '12–16 weeks',
     credential: 'OSHA 10 + NCCER Electrical Level 1',
@@ -137,7 +137,7 @@ const PROGRAMS = [
   },
   {
     name: 'Welding',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/welding.jpg',
     href: '/programs/welding',
     duration: '12–16 weeks (400+ hours hands-on)',
     credential: 'AWS Welding Certifications + OSHA 10',
@@ -149,7 +149,7 @@ const PROGRAMS = [
   },
   {
     name: 'IT Support',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/it-help-desk.jpg',
     href: '/programs/it-help-desk',
     duration: '8–12 weeks',
     credential: 'IT Specialist — Device Configuration & Management',
@@ -161,7 +161,7 @@ const PROGRAMS = [
   },
   {
     name: 'Cybersecurity',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cybersecurity.jpg',
     href: '/programs/cybersecurity-analyst',
     duration: '12–16 weeks',
     credential: 'IT Specialist — Cybersecurity',
@@ -386,7 +386,7 @@ export default function PathwaysPage() {
           <div className="space-y-4 text-gray-700">
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/wioa-eligibility-page-1.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We navigate funding for you</h3>
@@ -395,7 +395,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Credentials" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/credentials-page-1.jpg" alt="Nationally recognized credentials" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Your credential is issued by a recognized authority — not by us</h3>
@@ -404,7 +404,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/career-services-page-2.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We connect you to employers who are actually hiring</h3>
@@ -413,7 +413,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Ongoing support" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/comp-home-pathways-support.jpg" alt="Ongoing career support" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Support does not end when you graduate</h3>

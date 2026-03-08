@@ -1,58 +1,77 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { Volume2, VolumeX } from 'lucide-react';
 
 export default function HomeHeroVideo() {
   const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const hasPlayed = useRef(false);
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
+  // Set volume to max as soon as audio element is available
   useEffect(() => {
     const audio = voiceoverRef.current;
     if (!audio) return;
-
-    const tryPlay = () => {
-      if (hasPlayed.current) return;
-      hasPlayed.current = true;
-      audio.play().catch(() => {
-        // Browser still blocked — reset so next gesture retries
-        hasPlayed.current = false;
-      });
-    };
-
-    window.addEventListener('scroll',     tryPlay, { once: true, passive: true });
-    window.addEventListener('click',      tryPlay, { once: true, passive: true });
-    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-    window.addEventListener('keydown',    tryPlay, { once: true, passive: true });
-
-    return () => {
-      window.removeEventListener('scroll',     tryPlay);
-      window.removeEventListener('click',      tryPlay);
-      window.removeEventListener('touchstart', tryPlay);
-      window.removeEventListener('keydown',    tryPlay);
-    };
+    audio.volume = 1.0;
   }, []);
+
+  const toggleVoiceover = () => {
+    const audio = voiceoverRef.current;
+    if (!audio) return;
+    audio.volume = 1.0;
+    if (!voiceActive) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+      setVoiceActive(true);
+    } else {
+      audio.pause();
+      setVoiceActive(false);
+    }
+  };
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Poster shown until video loads */}
+      {/* Poster — shown until video loads */}
       <Image
         src="/images/pages/home-hero-video.jpg"
         alt="Elevate for Humanity career training"
         fill priority sizes="100vw"
         className="object-cover object-center"
       />
-      {/* Silent looping video — autoPlay+muted+playsInline is the only
-          cross-browser reliable combo (required for iOS autoplay policy) */}
+      {/* Silent looping video */}
       <video
         autoPlay muted loop playsInline
-        className="absolute inset-0 w-full h-full object-cover object-center"
+        onCanPlay={() => setVideoReady(true)}
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         poster="/images/pages/home-hero-video.jpg"
       >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
-      {/* Voiceover — plays on first user gesture (scroll, click, touch, key) */}
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" />
+
+      {/* Voiceover audio — volume forced to 1.0 */}
+      <audio
+        ref={voiceoverRef}
+        src="/audio/welcome-voiceover.mp3"
+        preload="auto"
+        onEnded={() => setVoiceActive(false)}
+      />
+
+      {/* Narration button — always visible, pulses when off */}
+      <button
+        onClick={toggleVoiceover}
+        className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all
+          ${voiceActive
+            ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
+            : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
+          }`}
+        aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+      >
+        {voiceActive
+          ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
+          : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>
+        }
+      </button>
     </div>
   );
 }

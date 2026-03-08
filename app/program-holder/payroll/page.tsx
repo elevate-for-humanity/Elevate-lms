@@ -24,7 +24,7 @@ function fmtDate(d: string | null) {
 }
 
 export default async function ProgramHolderPayrollPage() {
-  const { db, user, holderId } = await requireProgramHolder();
+  const { db, user, tenantId } = await requireProgramHolder();
 
   // Fetch payout profile
   const { data: payoutProfile } = await db
@@ -33,12 +33,16 @@ export default async function ProgramHolderPayrollPage() {
     .eq('user_id', user.id)
     .maybeSingle();
 
-  // Fetch payroll runs for this program holder's org (via tenant_id or user_id)
-  const { data: payrollRuns } = await db
+  // Fetch payroll runs scoped to this holder's tenant
+  const payrollRunsQuery = db
     .from('payroll_runs')
     .select('id, pay_period_start, pay_period_end, pay_date, status, total_gross, total_net, total_taxes, employee_count, created_at')
     .order('pay_date', { ascending: false })
     .limit(20);
+
+  const { data: payrollRuns } = tenantId
+    ? await payrollRunsQuery.eq('tenant_id', tenantId)
+    : await payrollRunsQuery.eq('processed_by', user.id);
 
   // Fetch pay stubs for this user
   const { data: stubs } = await db

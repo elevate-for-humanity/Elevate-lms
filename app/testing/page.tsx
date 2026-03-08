@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CalendarDays } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 const examCategories = [
   {
+    id: 'certiport',
     name: 'Certiport Authorized Testing',
     provider: 'Certiport (Pearson VUE)',
     image: '/images/pages/comp-cta-training.jpg',
@@ -26,8 +28,10 @@ const examCategories = [
       'Intuit QuickBooks Certified User (Desktop, Online)',
     ],
     access: 'On-site proctored',
+    bookable: true,
   },
   {
+    id: 'epa-608',
     name: 'EPA Section 608 Certification',
     provider: 'ESCO Institute (Authorized Proctor Site)',
     image: '/images/pages/comp-pathway-trades.jpg',
@@ -40,8 +44,10 @@ const examCategories = [
       'EPA 608 Universal (all types)',
     ],
     access: 'Proctored on-site — ESCO Authorized',
+    bookable: true,
   },
   {
+    id: 'osha',
     name: 'OSHA Safety Certifications',
     provider: 'CareerSafe / OSHA',
     image: '/images/pages/apprenticeships-hero.jpg',
@@ -53,8 +59,10 @@ const examCategories = [
       'OSHA 30-Hour Construction',
     ],
     access: 'Online with proctor verification',
+    bookable: false,
   },
   {
+    id: 'rise-up',
     name: 'Rise Up — National Retail Federation',
     provider: 'NRF Foundation',
     image: '/images/pages/apply-employer-hero.jpg',
@@ -65,8 +73,10 @@ const examCategories = [
       'Retail Industry Fundamentals',
     ],
     access: 'Hybrid coursework with proctored assessment',
+    bookable: true,
   },
   {
+    id: 'careersafe',
     name: 'CareerSafe Safety Training',
     provider: 'CareerSafe',
     image: '/images/pages/comp-pathway-trades.jpg',
@@ -78,6 +88,7 @@ const examCategories = [
       'Fire Safety',
     ],
     access: 'Online self-paced with assessment',
+    bookable: false,
   },
 ];
 
@@ -136,7 +147,7 @@ export default function TestingPage() {
                       </span>
                     </div>
                     <p className="text-slate-600 text-sm mb-4">{cat.description}</p>
-                    <div className="space-y-1">
+                    <div className="space-y-1 mb-5">
                       {cat.exams.map((exam) => (
                         <div key={exam} className="flex items-start gap-2 text-sm text-slate-700">
                           <span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full flex-shrink-0 mt-1.5" />
@@ -144,6 +155,15 @@ export default function TestingPage() {
                         </div>
                       ))}
                     </div>
+                    {cat.bookable && (
+                      <Link
+                        href={`/testing/book?exam=${cat.id}`}
+                        className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                      >
+                        <CalendarDays className="w-4 h-4" />
+                        Book a Seat
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

@@ -6,6 +6,8 @@ export interface ProgramHolderContext {
   user: { id: string; email?: string };
   profile: { id: string; role: string; full_name?: string; program_holder_id: string | null };
   holderId: string;
+  /** tenant_id from profiles — used to scope payroll_runs and other tenant-isolated tables */
+  tenantId: string | null;
   /** IDs of programs this holder can access (via program_holder_programs) */
   programIds: string[];
   /** Supabase client (admin if available, else user client) */
@@ -38,7 +40,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
 
   const { data: profile } = await db
     .from('profiles')
-    .select('id, role, full_name, email, program_holder_id')
+    .select('id, role, full_name, email, program_holder_id, tenant_id')
     .eq('id', user.id)
     .single();
 
@@ -68,6 +70,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     user: { id: user.id, email: user.email },
     profile,
     holderId,
+    tenantId: profile.tenant_id ?? null,
     programIds,
     db,
   };

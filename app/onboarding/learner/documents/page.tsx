@@ -196,7 +196,7 @@ export default function DocumentsPage() {
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+              className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
               style={{ width: `${(REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length / REQUIRED_DOCUMENTS.filter(d => d.required).length) * 100}%` }}
             />
           </div>
@@ -256,12 +256,16 @@ export default function DocumentsPage() {
         </div>
 
         {requiredComplete && (
-          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6 text-center">
-            <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-brand-green-900 mb-2">All Required Documents Uploaded</h2>
-            <p className="text-brand-green-700 mb-4">Your documents are pending review. You can continue with onboarding.</p>
-            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
-              Continue Onboarding <ArrowLeft className="w-4 h-4 rotate-180" />
+          <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
+            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <FileText className="w-7 h-7 text-slate-500" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">All Required Documents Uploaded</h2>
+              <p className="text-slate-500 text-sm">Your documents are pending review. You can continue with onboarding.</p>
+            </div>
+            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 flex-shrink-0">
+              Continue <ArrowLeft className="w-4 h-4 rotate-180" />
             </Link>
           </div>
         )}
@@ -280,17 +284,17 @@ export default function DocumentsPage() {
             const isUploading = uploading === doc.type;
 
             return (
-              <div key={doc.type} className={`bg-white border rounded-xl p-5 ${isUploaded ? 'border-brand-green-200' : 'border-gray-200'}`}>
+              <div key={doc.type} className={`bg-white border rounded-xl p-5 ${isUploaded ? 'border-brand-blue-200' : 'border-gray-200'}`}>
                 <div className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isUploaded ? 'bg-brand-green-100' : 'bg-gray-100'}`}>
-                    {isUploaded ? <CheckCircle2 className="w-5 h-5 text-brand-green-600" /> : <FileText className="w-5 h-5 text-gray-400" />}
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isUploaded ? 'bg-brand-blue-100' : 'bg-gray-100'}`}>
+                    {isUploaded ? <CheckCircle2 className="w-5 h-5 text-brand-blue-600" /> : <FileText className="w-5 h-5 text-gray-400" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className={`font-semibold ${isUploaded ? 'text-brand-green-900' : 'text-gray-900'}`}>{doc.title}</h3>
+                      <h3 className={`font-semibold ${isUploaded ? 'text-brand-blue-900' : 'text-gray-900'}`}>{doc.title}</h3>
                       {doc.required && !isUploaded && <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded">Required</span>}
                       {!doc.required && !isUploaded && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Optional</span>}
-                      {isUploaded && <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded font-medium">Uploaded</span>}
+                      {isUploaded && <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">Uploaded</span>}
                     </div>
                     <p className="text-gray-600 text-sm mb-2">{doc.description}</p>
                     <p className="text-xs text-gray-400 mb-3">Accepted: {doc.acceptedFormats}</p>
@@ -315,11 +319,7 @@ export default function DocumentsPage() {
                       <button
                         type="button"
                         onClick={() => fileInputRefs.current[doc.type]?.click()}
-                        className={`inline-flex items-center gap-2 text-sm font-medium ${
-                          isUploaded
-                            ? 'text-brand-green-600 hover:text-brand-green-800'
-                            : 'text-brand-blue-600 hover:text-brand-blue-800'
-                        }`}
+                        className="inline-flex items-center gap-2 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-800"
                       >
                         <Upload className="w-4 h-4" />
                         {isUploaded ? 'Replace File' : 'Upload File'}

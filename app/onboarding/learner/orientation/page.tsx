@@ -71,8 +71,21 @@ export default async function OrientationPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+
+      {/* VIDEO HERO — students learning, full bleed */}
+      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
+        <video
+          src="/videos/getting-started-hero.mp4"
+          autoPlay
+          loop
+          playsInline
+          muted
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Orientation' }]} />
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Student Orientation</h1>

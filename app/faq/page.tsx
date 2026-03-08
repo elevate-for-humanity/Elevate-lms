@@ -72,21 +72,15 @@ export default function FAQPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] flex items-center overflow-hidden">
-        <Image
-          src="/images/pages/faq-page-1.jpg"
-          alt="Students in a workforce training classroom"
-          fill
-          quality={90}
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
-            Frequently Asked Questions
-          </h1>
-        </div>
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
+        <Image src="/images/pages/faq-page-1.jpg" alt="Students in a workforce training classroom" fill quality={90} className="object-cover" priority />
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Frequently Asked Questions</h1>
+          <p className="text-slate-600 mt-2">Answers about programs, funding, enrollment, and credentials.</p>
+        </div>
+      </div>
 
       {/* Quick Links */}
       <section className="py-8 bg-white border-b">

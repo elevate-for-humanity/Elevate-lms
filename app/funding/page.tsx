@@ -37,14 +37,15 @@ export default function FundingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/funding-page-5.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
-            Workforce Funding
-          </h1>
-        </div>
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Workforce Funding</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl">Federal and state funding covers tuition, tools, and certification fees for eligible participants. Eligibility is determined through WorkOne — not Elevate.</p>
+        </div>
+      </div>
 
       {/* Funding Options */}
       <section className="py-8 sm:py-14 bg-white">

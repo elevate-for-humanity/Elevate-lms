@@ -14,17 +14,16 @@ export default function ApprenticeshipSponsorPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[220px] sm:h-[320px]">
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/apprenticeship-sponsor-page-1.jpg" alt="Apprenticeship sponsor" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/70" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-4">
-            <p className="text-brand-red-400 font-bold text-sm uppercase tracking-wide mb-2">USDOL Registered</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Apprenticeship Sponsor</h1>
-            <p className="text-slate-300 mt-3 text-lg max-w-2xl mx-auto">Centralized apprenticeship governance, instruction, and partner training site coordination.</p>
-          </div>
-        </div>
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">USDOL Registered</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Apprenticeship Sponsor</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl">Centralized apprenticeship governance, instruction, and partner training site coordination.</p>
+        </div>
+      </div>
 
       <div className="max-w-5xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Apprenticeship Sponsor' }]} />

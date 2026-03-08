@@ -12,6 +12,7 @@ import {
   Globe,
   Building2,
   ArrowRight,
+  CheckCircle,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -111,31 +112,31 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Sponsor dashboard (referrals, employers, apprentices)
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     RAPIDS lifecycle tracking
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     WIOA/WRG compatibility
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Employer onboarding + MOU workflow
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Audit logs + exports
                   </span>
@@ -196,37 +197,37 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     Everything in Starter
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     White-label branding (logo, domain, email)
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     Multi-trade programs
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     WOTC + OJT tracking
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     ETPL performance dashboards
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     WorkOne read-only oversight views
                   </span>
@@ -253,7 +254,7 @@ export default async function SponsorLicensingPage() {
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/icons/trending-up.png" alt="Enterprise" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
+                  <TrendingUp className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -284,37 +285,37 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Everything in Professional
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Multi-state rules engine
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Tenant licensing enforcement
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     SOC-style audit controls
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Monitoring response bundles
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Dedicated onboarding + training
                   </span>

@@ -13,15 +13,15 @@ export default function GovernancePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[200px] sm:h-[280px] overflow-hidden">
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/governance-page-1.jpg" alt="Governance and program structure" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/70" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Governance &amp; Program Structure</h1>
-          </div>
-        </div>
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Governance &amp; Program Structure</h1>
+          <p className="text-slate-600 mt-2">Institutional oversight, program delivery model, and compliance framework.</p>
+        </div>
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Governance & Program Structure' }]} />

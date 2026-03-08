@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Menu, X, Phone, Mail, Volume2, VolumeX } from 'lucide-react';
+import { ArrowRight, Menu, X, Phone, Mail, Volume2, VolumeX, BookOpen, Users, TrendingUp, Clock, DollarSign, Shield, CheckCircle, BarChart2 } from 'lucide-react';
 
 const NAV = [
   { label: 'Portals', href: '#portals' },
@@ -20,7 +20,7 @@ const PORTALS = [
     href: '/student-portal',
     loginHref: '/login?redirect=/lms/dashboard',
     image: '/images/pages/comp-cta-training.jpg',
-    icon: '/images/icons/book.png',
+    Icon: BookOpen,
     features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule'],
     accent: 'bg-brand-blue-600 hover:bg-brand-blue-700',
     tagBg: 'bg-brand-blue-50 text-brand-blue-700',
@@ -31,7 +31,7 @@ const PORTALS = [
     href: '/employer-portal',
     loginHref: '/login?redirect=/employer/dashboard',
     image: '/images/pages/comp-cta-career.jpg',
-    icon: '/images/icons/users.png',
+    Icon: Users,
     features: ['Apprentice Mgmt', 'Training Progress', 'Compliance', 'Hiring Tools'],
     accent: 'bg-green-600 hover:bg-green-700',
     tagBg: 'bg-green-50 text-green-700',
@@ -42,7 +42,7 @@ const PORTALS = [
     href: '/partner-portal',
     loginHref: '/login?redirect=/partner',
     image: '/images/pages/comp-cta-career.jpg',
-    icon: '/images/icons/trending-up.png',
+    Icon: TrendingUp,
     features: ['Collaboration', 'Referral Tracking', 'Resources', 'Reports'],
     accent: 'bg-purple-600 hover:bg-purple-700',
     tagBg: 'bg-purple-50 text-purple-700',
@@ -53,7 +53,7 @@ const PORTALS = [
     href: '/staff-portal',
     loginHref: '/login?redirect=/staff-portal/dashboard',
     image: '/images/pages/comp-cta-career.jpg',
-    icon: '/images/icons/clock.png',
+    Icon: Clock,
     features: ['Student Mgmt', 'Attendance', 'Reports', 'Scheduling'],
     accent: 'bg-amber-600 hover:bg-amber-700',
     tagBg: 'bg-amber-50 text-amber-700',
@@ -64,7 +64,7 @@ const PORTALS = [
     href: '/workforce-board',
     loginHref: '/login?redirect=/workforce-board',
     image: '/images/pages/comp-cta-career.jpg',
-    icon: '/images/icons/dollar.png',
+    Icon: DollarSign,
     features: ['Outcomes Data', 'Compliance', 'Funding Reports', 'Analytics'],
     accent: 'bg-teal-600 hover:bg-teal-700',
     tagBg: 'bg-teal-50 text-teal-700',
@@ -75,7 +75,7 @@ const PORTALS = [
     href: '/admin-login',
     loginHref: '/login?redirect=/admin/dashboard',
     image: '/images/pages/comp-cta-career.jpg',
-    icon: '/images/icons/shield.png',
+    Icon: Shield,
     features: ['User Mgmt', 'Program Admin', 'Analytics', 'System Config'],
     accent: 'bg-brand-red-600 hover:bg-brand-red-700',
     tagBg: 'bg-brand-red-50 text-brand-red-700',
@@ -83,10 +83,10 @@ const PORTALS = [
 ];
 
 const FEATURES = [
-  { icon: '/images/icons/trending-up.png', title: 'Personalized Dashboards', desc: 'Role-based views tailored to your needs' },
-  { icon: '/images/icons/check-circle.png', title: 'Real-Time Analytics', desc: 'Track progress, outcomes, and performance' },
-  { icon: '/images/icons/book.png', title: 'Document Management', desc: 'Access forms, reports, and compliance docs' },
-  { icon: '/images/icons/shield.png', title: 'Secure Access', desc: 'Role-based permissions and data protection' },
+  { Icon: TrendingUp, title: 'Personalized Dashboards', desc: 'Role-based views tailored to your needs' },
+  { Icon: BarChart2, title: 'Real-Time Analytics', desc: 'Track progress, outcomes, and performance' },
+  { Icon: BookOpen, title: 'Document Management', desc: 'Access forms, reports, and compliance docs' },
+  { Icon: Shield, title: 'Secure Access', desc: 'Role-based permissions and data protection' },
 ];
 
 export default function ConnectsLandingPage() {
@@ -157,7 +157,7 @@ export default function ConnectsLandingPage() {
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-cyan-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
-              <Image src="/images/icons/trending-up.png" alt="Trending up icon" width={16} height={16} className="w-4 h-4" /> Elevate Connects
+              <TrendingUp className="w-4 h-4" /> Elevate Connects
             </div>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Your Dashboard. Your Portal.</h1>
             <p className="text-base md:text-lg text-slate-300 mb-8 max-w-3xl mx-auto">One platform, every role. Access your personalized dashboard — whether you&apos;re a student, employer, partner, staff member, or administrator.</p>
@@ -174,7 +174,7 @@ export default function ConnectsLandingPage() {
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {FEATURES.map((f) => (
             <div key={f.title} className="flex items-start gap-3">
-              <Image src={f.icon} alt={`${f.title} icon`} width={28} height={28} className="w-7 h-7 mt-0.5 rounded" />
+              <f.Icon className="w-7 h-7 mt-0.5 text-brand-blue-600 flex-shrink-0" />
               <div>
                 <div className="text-sm font-semibold text-gray-900">{f.title}</div>
                 <div className="text-xs text-gray-500">{f.desc}</div>
@@ -199,7 +199,7 @@ export default function ConnectsLandingPage() {
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2.5 mb-3">
-                    <Image src={p.icon} alt={`${p.title} icon`} width={36} height={36} className="w-9 h-9 rounded-lg bg-gray-50 p-1 border border-gray-200" />
+                    <p.Icon className="w-9 h-9 text-slate-600 flex-shrink-0" />
                     <h3 className="text-lg font-bold text-gray-900">{p.title}</h3>
                   </div>
                   <p className="text-gray-600 text-sm mb-3">{p.desc}</p>
@@ -224,7 +224,7 @@ export default function ConnectsLandingPage() {
       {/* QUICK SIGN IN */}
       <section className="py-16 px-6 bg-slate-50">
         <div className="max-w-2xl mx-auto text-center">
-          <Image src="/images/icons/users.png" alt="User accounts icon" width={48} height={48} className="w-12 h-12 mx-auto mb-4 rounded" />
+          <Users className="w-12 h-12 mx-auto mb-4 text-cyan-600" />
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Already have an account?</h2>
           <p className="text-gray-600 mb-6">Sign in and you&apos;ll be automatically directed to your dashboard based on your role.</p>
           <Link href="/login" className="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-3.5 rounded-lg font-bold text-lg transition-colors">

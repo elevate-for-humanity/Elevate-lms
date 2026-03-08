@@ -62,43 +62,23 @@ export default async function ForEmployersPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[350px] md:h-[450px] w-full overflow-hidden">
-          <Image
-            src="/images/pages/for-employers-page-1.jpg"
-            alt="Employer partner meeting with Elevate for Humanity team"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center px-4 max-w-4xl">
-              <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-                Hire Trained, Certified Workers
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-8">
-                Access our talent pipeline of job-ready candidates trained in healthcare, skilled trades, technology, and business. No recruitment fees. WIOA and WOTC eligible.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/employer-portal"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition text-lg"
-                >
-                  <Building2 className="w-5 h-5" />
-                  Employer Portal
-                </Link>
-                <Link
-                  href="/employers/post-job"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition text-lg"
-                >
-                  Post a Job — Free
-                </Link>
-              </div>
-            </div>
+      <section className="relative h-[200px] sm:h-[260px] w-full overflow-hidden">
+        <Image src="/images/pages/for-employers-page-1.jpg" alt="Employer partner meeting with Elevate for Humanity team" fill className="object-cover" priority sizes="100vw" />
+      </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Hire Trained, Certified Workers</h1>
+          <p className="text-slate-600 mt-2 max-w-3xl">Access our talent pipeline of job-ready candidates trained in healthcare, skilled trades, technology, and business. No recruitment fees. WIOA and WOTC eligible.</p>
+          <div className="flex flex-wrap gap-3 mt-5">
+            <Link href="/employer-portal" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-2.5 rounded-lg font-bold transition text-sm">
+              <Building2 className="w-4 h-4" /> Employer Portal
+            </Link>
+            <Link href="/employers/post-job" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-bold hover:bg-slate-50 transition text-sm">
+              Post a Job — Free
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Stats Bar */}
       <section className="bg-slate-900 text-white py-6">

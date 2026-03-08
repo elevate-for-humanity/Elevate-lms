@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail } from 'lucide-react';
+import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 
 const NAV = [
   { label: 'Programs', href: '/programs' },
@@ -75,10 +75,10 @@ const LOCATIONS = [
 ];
 
 const STATS = [
-  { icon: '/images/icons/book.png', value: '30+', label: 'Training Programs' },
-  { icon: '/images/icons/users.png', value: '5', label: 'States Served' },
-  { icon: '/images/icons/award.png', value: '15+', label: 'Industry Certifications' },
-  { icon: '/images/icons/check-circle.png', value: '100%', label: 'Job Placement Support' },
+  { Icon: BookOpen, value: '30+', label: 'Training Programs' },
+  { Icon: Users, value: '5', label: 'States Served' },
+  { Icon: Award, value: '15+', label: 'Industry Certifications' },
+  { Icon: CheckCircle, value: '100%', label: 'Job Placement Support' },
 ];
 
 export default function EducationLandingPage() {
@@ -169,7 +169,7 @@ export default function EducationLandingPage() {
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="flex items-center gap-3 justify-center">
-              <Image src={s.icon} alt={s.label} width={36} height={36} className="w-9 h-9 rounded" />
+              <s.Icon className="w-9 h-9 text-brand-red-600 flex-shrink-0" />
               <div>
                 <div className="text-2xl font-bold text-gray-900">{s.value}</div>
                 <div className="text-sm text-gray-500">{s.label}</div>

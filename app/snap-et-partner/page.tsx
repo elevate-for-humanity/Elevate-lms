@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   Circle,
+  CheckCircle,
   Users,
   Award,
   TrendingUp,
@@ -156,7 +157,7 @@ export default function SNAPETPartnerPage() {
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Image src="/images/icons/trending-up.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-brand-blue-600" />
+                <TrendingUp className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Verified Outcomes</h3>
               <ul className="space-y-2 text-sm text-black">
@@ -217,7 +218,7 @@ export default function SNAPETPartnerPage() {
                     Aide, Peer Recovery Coach, CDL
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
+                    <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
                 <tr className="bg-gray-50">
@@ -227,7 +228,7 @@ export default function SNAPETPartnerPage() {
                     Maintenance), On-the-Job Training, Work-Based Learning
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
+                    <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
                 <tr>
@@ -237,7 +238,7 @@ export default function SNAPETPartnerPage() {
                     Resume Writing, Interview Prep
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
+                    <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
                 <tr className="bg-gray-50">
@@ -249,7 +250,7 @@ export default function SNAPETPartnerPage() {
                     Employer Connections
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
+                    <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
                 <tr>
@@ -259,7 +260,7 @@ export default function SNAPETPartnerPage() {
                     Emergency Support Services
                   </td>
                   <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
-                    <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
+                    <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
               </tbody>
@@ -287,27 +288,27 @@ export default function SNAPETPartnerPage() {
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Immediate absorption of SNAP E&T participants</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>80-hour monthly compliance tracking</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Automated reporting to FSSA/WorkOne</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Verified credential attainment</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Job placement with wage verification</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Braided funding coordination (WIOA + SNAP E&T)</span>
                 </li>
               </ul>
@@ -317,27 +318,27 @@ export default function SNAPETPartnerPage() {
               <h3 className="text-2xl font-bold mb-6">For Participants</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Industry-recognized credentials</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Stackable credential pathways</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Earn-while-you-learn apprenticeships</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Case management and support services</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Direct employer connections</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-brand-green-600" />
                   <span>Barrier removal (transportation, childcare)</span>
                 </li>
               </ul>

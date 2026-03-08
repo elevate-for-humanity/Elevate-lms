@@ -93,28 +93,15 @@ export default function AccreditationPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image
-            src="/images/pages/accreditation-hero.jpg"
-            alt="Workforce training classroom"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-5xl mx-auto px-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
-                Accreditation &amp; Compliance
-              </h1>
-              <p className="text-lg text-white/85 max-w-2xl drop-shadow">
-                ETPL-listed, DWD-approved workforce training with verifiable credentials and compliance documentation
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-[200px] sm:h-[260px] w-full overflow-hidden">
+        <Image src="/images/pages/accreditation-hero.jpg" alt="Workforce training classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Accreditation &amp; Compliance</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl">ETPL-listed, DWD-approved workforce training with verifiable credentials and compliance documentation.</p>
+        </div>
+      </div>
 
       {/* Credentials Grid */}
       <section className="py-16 bg-gray-50">

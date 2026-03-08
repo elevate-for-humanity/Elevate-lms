@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const PROGRAMS = [
   {
     name: 'CNA Certification',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cna-nursing.jpg',
     href: '/programs/cna',
     credential: 'Certified Nursing Assistant (CNA)',
     issuedBy: 'Indiana State Department of Health (ISDH)',
@@ -33,7 +33,7 @@ const PROGRAMS = [
   },
   {
     name: 'CDL Commercial Driving',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cdl-training.jpg',
     href: '/programs/cdl-training',
     credential: 'Commercial Driver License (CDL) Class A or Class B',
     issuedBy: 'Indiana Bureau of Motor Vehicles (BMV)',
@@ -54,7 +54,7 @@ const PROGRAMS = [
   },
   {
     name: 'Barber Apprenticeship',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/barber-hero-main.jpg',
     href: '/programs/barber-apprenticeship',
     credential: 'Indiana Barber License',
     issuedBy: 'Indiana Professional Licensing Agency (PLA) through a U.S. Department of Labor Registered Apprenticeship',
@@ -72,7 +72,7 @@ const PROGRAMS = [
   },
   {
     name: 'Building Technician with HVAC Fundamentals',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     credential: 'EPA Section 608 Certification + OSHA 30-Hour Safety Certification',
     issuedBy: 'U.S. Environmental Protection Agency (EPA) + Occupational Safety and Health Administration (OSHA)',
@@ -91,7 +91,7 @@ const PROGRAMS = [
   },
   {
     name: 'Electrical',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/electrical.jpg',
     href: '/programs/electrical',
     credential: 'OSHA 10-Hour Safety Certification + NCCER Electrical Level 1',
     issuedBy: 'OSHA + National Center for Construction Education and Research (NCCER)',
@@ -111,7 +111,7 @@ const PROGRAMS = [
   },
   {
     name: 'Welding',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/welding.jpg',
     href: '/programs/welding',
     credential: 'AWS Welding Certifications (D1.1 Structural Steel, 3G/4G Plate) + OSHA 10',
     issuedBy: 'American Welding Society (AWS) + OSHA',
@@ -130,7 +130,7 @@ const PROGRAMS = [
   },
   {
     name: 'IT Help Desk Technician',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/it-help-desk.jpg',
     href: '/programs/it-help-desk',
     credential: 'Certiport IT Specialist — Device Configuration & Management',
     issuedBy: 'Certiport (Pearson VUE)',
@@ -149,7 +149,7 @@ const PROGRAMS = [
   },
   {
     name: 'Cybersecurity Analyst',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/cybersecurity.jpg',
     href: '/programs/cybersecurity-analyst',
     credential: 'Certiport IT Specialist — Cybersecurity',
     issuedBy: 'Certiport (Pearson VUE)',

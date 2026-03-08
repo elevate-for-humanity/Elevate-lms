@@ -27,7 +27,7 @@ const programs = [
   { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
   { title: 'Electrical Technician', duration: '12 weeks', salary: '$60,240', href: '/programs/electrical', image: '/images/pages/comp-highlights-electrical.jpg' },
   { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/pages/comp-highlights-welding.jpg' },
-  { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/comp-cta-training.jpg' },
+  { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/programs-plumbing-apply-hero.jpg' },
   { title: 'CDL Class A Training', duration: '3–6 weeks', salary: '$62,000', href: '/programs/cdl-training', image: '/images/pages/comp-layout-hero.jpg' },
   { title: 'Diesel Mechanic', duration: '12 weeks', salary: '$55,000', href: '/programs/diesel-mechanic', image: '/images/pages/admin-fleet-hero.jpg' },
 ];
@@ -39,7 +39,7 @@ const config: ProgramPageConfig = {
   duration: '3–12 weeks', cost: '$0 with WIOA funding', format: 'Hybrid — Online + In-person, Indianapolis', credential: 'OSHA + Industry Certifications',
   overview: 'Our skilled trades programs prepare you for high-demand careers in construction, manufacturing, and transportation. Every program includes hands-on training with real tools and equipment, industry-recognized certifications, and job placement assistance. Most programs are free for eligible participants through WIOA funding.',
   highlights: ['Hands-on training from day one', 'OSHA safety certifications included', 'Industry-recognized credentials', 'Job placement with employer partners', 'Free for eligible participants through WIOA', 'Apprenticeship pathways available'],
-  overviewImage: '/images/pages/comp-cta-training.jpg', overviewImageAlt: 'Skilled trades students in a workshop',
+  overviewImage: '/images/pages/skilled-trades-sector.jpg', overviewImageAlt: 'Skilled trades students in a workshop',
   salaryNumber: 55000, salaryLabel: 'Average starting salary across skilled trades programs', salaryPrefix: '$',
   credentials: ['OSHA 10/30-Hour', 'NCCER Core', 'EPA 608', 'AWS D1.1', 'CDL Class A'],
   steps: [

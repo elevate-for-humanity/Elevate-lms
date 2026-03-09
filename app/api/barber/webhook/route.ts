@@ -124,10 +124,64 @@ async function _POST(request: NextRequest) {
 
         const customerId = session.customer as string;
         const customerEmail = session.customer_details?.email || session.customer_email || '';
-        const customerName = session.customer_details?.name || session.metadata?.customer_name || '';
-        const customerPhone = session.metadata?.customer_phone || '';
-        const applicationId = session.metadata?.application_id;
+        const customerName = session.customer_details?.name || session.metadata?.customerName || session.metadata?.customer_name || '';
+        const customerPhone = session.metadata?.customerPhone || session.metadata?.customer_phone || '';
+        const applicationId = session.metadata?.applicationId || session.metadata?.application_id;
         const checkoutType = session.metadata?.checkout_type;
+
+        // Provision student account for all barber checkout types
+        // This runs regardless of payment type — account creation is non-fatal
+        if (applicationId) {
+          try {
+            const { approveApplication } = await import('@/lib/enrollment/approve');
+            const { data: programRow } = await db
+              .from('programs')
+              .select('id')
+              .eq('slug', 'barber-apprenticeship')
+              .maybeSingle();
+
+            const result = await approveApplication(db, {
+              applicationId,
+              programId: programRow?.id || null,
+              fundingType: 'self-pay',
+            });
+
+            if (result.success) {
+              logger.info('[barber/webhook] Student account provisioned', {
+                applicationId,
+                userId: result.userId,
+                hasPasswordLink: !!result.passwordSetupLink,
+              });
+
+              // Send password setup email for new users
+              if (result.passwordSetupLink) {
+                const { sendEmail } = await import('@/lib/email/sendgrid');
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+                await sendEmail({
+                  to: customerEmail,
+                  subject: 'Set up your Elevate student account',
+                  html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #0f172a;">Your student account is ready</h2>
+  <p>Hi ${customerName || 'there'},</p>
+  <p>Your payment was received and your Elevate student account has been created. Click the button below to set your password and access your student portal.</p>
+  <div style="text-align: center; margin: 32px 0;">
+    <a href="${result.passwordSetupLink}" style="display: inline-block; background: #dc2626; color: white; padding: 16px 36px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
+  </div>
+  <p style="color: #64748b; font-size: 13px;">This link expires in 24 hours. After setting your password, log in at <a href="${siteUrl}/login">${siteUrl}/login</a></p>
+  <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+  <p style="color: #64748b; font-size: 13px;">Questions? Call (317) 314-3757 or reply to this email.</p>
+</div>
+                  `,
+                }).catch((e: unknown) => logger.warn('[barber/webhook] Password email failed (non-fatal)', e));
+              }
+            } else {
+              logger.warn('[barber/webhook] approveApplication failed (non-fatal)', { error: result.error });
+            }
+          } catch (approveErr) {
+            logger.warn('[barber/webhook] approveApplication threw (non-fatal)', approveErr);
+          }
+        }
 
         // Handle full tuition payment (with BNPL support)
         if (checkoutType === 'barber_full_tuition') {
@@ -265,6 +319,80 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           }
 
           logger.info(`Barber enrollment complete: ${customerId}, fullyPaid: ${fullyPaid}, bnpl: ${bnplProvider}`);
+          break;
+        }
+
+        // Public checkout types from /api/barber/checkout/public
+        if (
+          checkoutType === 'barber_setup_fee' ||
+          checkoutType === 'barber_pay_in_full' ||
+          checkoutType === 'barber_bnpl'
+        ) {
+          const amountPaidCents = session.amount_total || 0;
+          const weeksRemaining = parseInt(session.metadata?.weeks_remaining || session.metadata?.weeksRemaining || '50');
+          const hoursPerWeek = parseInt(session.metadata?.hours_per_week || session.metadata?.hoursPerWeek || '40');
+          const transferredHours = parseInt(session.metadata?.transferHours || '0');
+          const adjustedPriceCents = parseInt(session.metadata?.adjusted_price_cents || '498000');
+          const weeklyPaymentCents = parseInt(session.metadata?.weekly_payment_cents || session.metadata?.weeklyPaymentCents || '0');
+          const fullyPaid = checkoutType === 'barber_pay_in_full' || checkoutType === 'barber_bnpl';
+
+          // Record in barber_subscriptions
+          await db.from('barber_subscriptions').upsert({
+            stripe_customer_id: customerId,
+            customer_email: customerEmail,
+            customer_name: customerName,
+            status: 'active',
+            full_tuition_amount: adjustedPriceCents / 100,
+            amount_paid_at_checkout: amountPaidCents / 100,
+            remaining_balance: fullyPaid ? 0 : (adjustedPriceCents - amountPaidCents) / 100,
+            payment_method: checkoutType === 'barber_bnpl' ? 'bnpl' : 'card',
+            bnpl_provider: checkoutType === 'barber_bnpl' ? (session.metadata?.bnpl_provider || 'bnpl') : null,
+            fully_paid: fullyPaid,
+            weekly_payment_cents: fullyPaid ? 0 : weeklyPaymentCents,
+            weeks_remaining: fullyPaid ? 0 : weeksRemaining,
+            hours_per_week: hoursPerWeek,
+            transferred_hours_verified: transferredHours,
+            payment_model: fullyPaid ? 'paid_in_full' : 'setup_fee_plus_weekly',
+            created_at: new Date().toISOString(),
+          }, { onConflict: 'stripe_customer_id', ignoreDuplicates: false });
+
+          // Schedule weekly invoices for setup-fee payment plan
+          if (!fullyPaid && weeklyPaymentCents > 0 && weeksRemaining > 0) {
+            await scheduleWeeklyInvoices(stripe, {
+              customerId,
+              customerEmail,
+              weeksRemaining,
+              weeklyPaymentCents,
+              hoursPerWeek,
+              transferredHours,
+              applicationId,
+            });
+          }
+
+          // Notify staff
+          try {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            await sendEmail({
+              to: 'elevate4humanityedu@gmail.com',
+              subject: `New Barber Apprentice Enrolled — ${customerName || customerEmail}`,
+              html: `
+<p><strong>New barber apprentice enrolled via public checkout:</strong></p>
+<p>• Name: ${customerName}<br>
+• Email: ${customerEmail}<br>
+• Phone: ${customerPhone}<br>
+• Payment type: ${checkoutType}<br>
+• Amount paid: $${(amountPaidCents / 100).toFixed(2)}<br>
+• Transfer hours: ${transferredHours}<br>
+• Hours/week: ${hoursPerWeek}<br>
+• Weeks remaining: ${weeksRemaining}</p>
+<p>Please create Milady account and send credentials to student.</p>
+              `,
+            });
+          } catch (e) {
+            logger.warn('[barber/webhook] Staff notification failed (non-fatal)', e);
+          }
+
+          logger.info(`[barber/webhook] Public checkout complete: ${customerId}, type: ${checkoutType}`);
           break;
         }
 

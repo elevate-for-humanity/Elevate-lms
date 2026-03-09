@@ -34,7 +34,7 @@ function LoginForm() {
         password: password.trim(),
       });
 
-      if (error) throw error;
+      if (error) throw new Error(error.message || 'Invalid email or password');
 
       if (!data?.user) throw new Error('Login succeeded but no user returned');
 
@@ -103,7 +103,7 @@ function LoginForm() {
       }
     } catch (err: any) {
       const msg = err?.message || 'Invalid email or password';
-      console.error('Login error:', err);
+      console.error('Login error:', msg);
       setError(msg);
     } finally {
       setLoading(false);

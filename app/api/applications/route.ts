@@ -151,7 +151,7 @@ async function _POST(req: Request) {
 
     // Auto-approve through single pipeline
     let userId: string | null = null;
-    const passwordSetupLink: string | null = null;
+    let passwordSetupLink: string | null = null;
     try {
       const programSlug = body.programSlug || body.program || 'barber-apprenticeship';
       const { data: programRow } = await supabase
@@ -168,7 +168,12 @@ async function _POST(req: Request) {
 
       if (result.success) {
         userId = result.userId || null;
-        logger.info('[Applications] Auto-approved', { applicationId: data.id, userId });
+        passwordSetupLink = result.passwordSetupLink || null;
+        logger.info('[Applications] Auto-approved', {
+          applicationId: data.id,
+          userId,
+          hasPasswordLink: !!passwordSetupLink,
+        });
       } else {
         logger.warn('[Applications] Auto-approve failed (non-fatal)', { error: result.error });
       }

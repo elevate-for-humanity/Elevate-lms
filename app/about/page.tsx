@@ -45,8 +45,7 @@ export default function AboutPage() {
         >
           <source src="/videos/about-mission.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+
         {/* Founder identity — shows while video loads and on the poster frame */}
         <div className="absolute bottom-8 left-6 sm:left-10">
           <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-1">Founder & CEO</p>

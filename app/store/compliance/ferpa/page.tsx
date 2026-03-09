@@ -30,13 +30,13 @@ const features = [
   {
     title: 'Audit Logging',
     description: 'Complete audit trail of all data access and modifications.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/adult-learner.jpg',
     items: ['Access logging', 'Change tracking', 'Export history', 'Compliance reports'],
   },
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/adult-learner.jpg',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];

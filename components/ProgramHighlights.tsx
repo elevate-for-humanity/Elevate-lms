@@ -85,7 +85,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/pages/comp-highlights-electrical.jpg"
+                  src="/images/pages/electrical-wiring.jpg"
                   alt="Small class sizes"
                   fill
                   className="object-cover"
@@ -109,7 +109,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/pages/comp-highlights-welding.jpg"
+                  src="/images/pages/welding-sparks.jpg"
                   alt="Modern equipment"
                   fill
                   className="object-cover"

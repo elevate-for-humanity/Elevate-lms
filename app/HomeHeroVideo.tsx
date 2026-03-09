@@ -1,20 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Volume2, VolumeX } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function HomeHeroVideo() {
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const [voiceActive, setVoiceActive] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-
-  // Set volume to max as soon as audio element is available
-  useEffect(() => {
-    const audio = voiceoverRef.current;
-    if (!audio) return;
-    audio.volume = 1.0;
-  }, []);
 
   const toggleVoiceover = () => {
     const audio = voiceoverRef.current;
@@ -39,8 +34,9 @@ export default function HomeHeroVideo() {
         fill priority sizes="100vw"
         className="object-cover object-center"
       />
-      {/* Silent looping video — plays immediately on load */}
+      {/* Looping video — plays and unmutes on load */}
       <video
+        ref={videoRef}
         autoPlay muted loop playsInline
         onCanPlay={() => setVideoReady(true)}
         className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
@@ -50,7 +46,7 @@ export default function HomeHeroVideo() {
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
 
-      {/* Voiceover audio — volume forced to 1.0 */}
+      {/* Separate voiceover audio track */}
       <audio
         ref={voiceoverRef}
         src="/audio/welcome-voiceover.mp3"
@@ -58,7 +54,7 @@ export default function HomeHeroVideo() {
         onEnded={() => setVoiceActive(false)}
       />
 
-      {/* Narration button — always visible, pulses when off */}
+      {/* Narration toggle */}
       <button
         onClick={toggleVoiceover}
         className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all

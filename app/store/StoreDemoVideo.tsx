@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 
 /**
- * Single full-length platform walkthrough video.
- * Replace /videos/store-full-walkthrough.mp4 with the final sales video.
- * No playlist, no loop — plays once from start to finish.
+ * Demo video shown on the store page.
+ * Uses Module 1, Lesson 1 of the HVAC Technician course as a live sample
+ * of the course content organizations can license.
  */
 export default function StoreDemoVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -42,19 +42,20 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <Image
-            src="/images/pages/store-demo-video-hero.jpg"
-            alt="Elevate platform walkthrough"
+            src="/images/pages/hvac-technician.jpg"
+            alt="HVAC Technician course — Module 1 preview"
             fill
             className="object-cover"
             sizes="100vw"
             quality={90}
             priority
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
               <Play className="w-11 h-11 text-brand-red-600 ml-1" />
             </div>
-            <p className="text-white font-bold text-lg drop-shadow-lg">Watch Full Platform Walkthrough</p>
+            <p className="text-white font-bold text-lg drop-shadow-lg">Watch: HVAC Course — Module 1, Lesson 1</p>
+            <p className="text-white/80 text-sm mt-1 drop-shadow">Sample lesson from the licensable HVAC Technician course</p>
           </div>
         </>
       )}
@@ -69,7 +70,7 @@ export default function StoreDemoVideo() {
             controls={false}
             onEnded={() => setPlaying(false)}
           >
-            <source src="/videos/store-full-walkthrough.mp4" type="video/mp4" />
+            <source src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4" type="video/mp4" />
           </video>
           <div className="absolute bottom-0 inset-x-0 p-3 flex items-center justify-between bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); toggle(); }} className="text-white hover:text-white/80">

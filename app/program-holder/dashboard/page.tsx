@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { LayoutDashboard, Users, BookOpen, TrendingUp, Settings, BarChart3, Calendar, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -49,18 +50,25 @@ export default async function ProgramHolderDashboardPage() {
     <div className="min-h-screen bg-gray-100">
       <Breadcrumbs items={[{ label: 'Program Holder Dashboard' }]} />
 
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <LayoutDashboard className="w-8 h-8 text-brand-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Program Holder Portal</h1>
+      {/* Hero banner */}
+      <div className="relative h-48 sm:h-64 w-full overflow-hidden">
+        <Image
+          src="/images/pages/workforce-training.jpg"
+          alt="Program Holder Portal"
+          fill
+          className="object-cover object-center"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-slate-900/50 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">Elevate For Humanity</p>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Program Holder Portal</h1>
             </div>
-            <div className="flex items-center gap-4">
-              <Link href="/program-holder/settings" className="p-2 text-gray-600 hover:text-brand-blue-600">
-                <Settings className="w-6 h-6" />
-              </Link>
-            </div>
+            <Link href="/program-holder/settings" className="p-2 text-white/80 hover:text-white">
+              <Settings className="w-6 h-6" />
+            </Link>
           </div>
         </div>
       </div>

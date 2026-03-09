@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-
-import { useEffect, useRef } from 'react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface VideoBackgroundProps {
   videoUrl: string;
@@ -19,20 +19,10 @@ export function VideoBackground({
   className = '',
   children,
 }: VideoBackgroundProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    // Au video when component mounts
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Autoplay blocked, that's okay
-      });
-    }
-  }, []);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* Video Background */}
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
@@ -40,13 +30,17 @@ export function VideoBackground({
         muted
         loop
         playsInline
-        preload="none"
+        preload="metadata"
+        poster={poster}
       >
         <source src={videoUrl} type="video/mp4" />
       </video>
 
-      {/* Content */}
+      {overlay && <div className="absolute inset-0 bg-black/40 z-[1]" />}
+
       <div className="relative z-10">{children}</div>
+
+      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
     </div>
   );
 }

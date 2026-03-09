@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 import { 
   
   XCircle, 
@@ -86,6 +88,8 @@ export function ProgramPageTemplate({
   applyLink,
   contactPhone = '(317) 760-7908',
 }: ProgramPageProps) {
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}
@@ -99,15 +103,20 @@ export function ProgramPageTemplate({
       <section className="relative w-full min-h-[70vh] flex items-center">
         <div className="absolute inset-0 z-0">
           {heroVideo ? (
-            <video
-              src={heroVideo}
-              poster={heroImage}
-              className="w-full h-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+            <>
+              <video
+                ref={videoRef}
+                src={heroVideo}
+                poster={heroImage}
+                className="w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+              />
+              {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+            </>
           ) : (
             <Image
               src={heroImage}

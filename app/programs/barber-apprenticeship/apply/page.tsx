@@ -108,7 +108,7 @@ export default function BarberApprenticeshipApplyPage() {
         has_host_shop: formData.hasHostShop,
         host_shop_name: formData.hostShopName,
         hours_per_week: hoursPerWeek,
-        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${window.location.origin}/programs/barber-apprenticeship/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/programs/barber-apprenticeship/apply`,
       };
 

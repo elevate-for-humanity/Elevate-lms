@@ -27,7 +27,9 @@ export async function sendRecoveryEmail(email: string): Promise<{ success: boole
       type: 'recovery',
       email,
       options: {
-        redirectTo: `${SITE_URL}/auth/reset-password`,
+        // Must go through /auth/confirm so the server can call verifyOtp
+        // and set the session cookie before the reset form loads.
+        redirectTo: `${SITE_URL}/auth/confirm?next=/auth/reset-password`,
       },
     });
 

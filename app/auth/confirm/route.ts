@@ -25,15 +25,17 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      // Redirect to the specified next URL or default based on type
-      let redirectTo = next;
-      
-      if (type === 'signup' || type === 'email') {
+      let redirectTo: string;
+
+      if (type === 'recovery') {
+        // Use explicit next param if provided, otherwise default reset page
+        redirectTo = next !== '/' ? next : '/auth/reset-password';
+      } else if (type === 'signup' || type === 'email') {
         redirectTo = '/lms/dashboard?verified=true';
-      } else if (type === 'recovery') {
-        redirectTo = '/auth/reset-password';
       } else if (type === 'invite') {
         redirectTo = '/lms/dashboard?invited=true';
+      } else {
+        redirectTo = next;
       }
 
       return NextResponse.redirect(new URL(redirectTo, request.url));

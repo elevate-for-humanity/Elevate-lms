@@ -336,24 +336,21 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           const weeklyPaymentCents = parseInt(session.metadata?.weekly_payment_cents || session.metadata?.weeklyPaymentCents || '0');
           const fullyPaid = checkoutType === 'barber_pay_in_full' || checkoutType === 'barber_bnpl';
 
-          // Record in barber_subscriptions
+          // Record in barber_subscriptions (only columns that exist in the table)
           await db.from('barber_subscriptions').upsert({
             stripe_customer_id: customerId,
+            stripe_checkout_session_id: session.id,
             customer_email: customerEmail,
             customer_name: customerName,
             status: 'active',
-            full_tuition_amount: adjustedPriceCents / 100,
-            amount_paid_at_checkout: amountPaidCents / 100,
-            remaining_balance: fullyPaid ? 0 : (adjustedPriceCents - amountPaidCents) / 100,
-            payment_method: checkoutType === 'barber_bnpl' ? 'bnpl' : 'card',
-            bnpl_provider: checkoutType === 'barber_bnpl' ? (session.metadata?.bnpl_provider || 'bnpl') : null,
-            fully_paid: fullyPaid,
+            setup_fee_paid: checkoutType === 'barber_setup_fee',
+            setup_fee_amount: checkoutType === 'barber_setup_fee' ? amountPaidCents / 100 : 0,
             weekly_payment_cents: fullyPaid ? 0 : weeklyPaymentCents,
             weeks_remaining: fullyPaid ? 0 : weeksRemaining,
             hours_per_week: hoursPerWeek,
             transferred_hours_verified: transferredHours,
-            payment_model: fullyPaid ? 'paid_in_full' : 'setup_fee_plus_weekly',
             created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           }, { onConflict: 'stripe_customer_id', ignoreDuplicates: false });
 
           // Schedule weekly invoices for setup-fee payment plan

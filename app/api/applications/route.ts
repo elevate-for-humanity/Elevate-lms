@@ -126,7 +126,8 @@ async function _POST(req: Request) {
         email: body.email,
         city: body.city || 'Not provided',
         zip: body.zip || '00000',
-        program_interest: program, // TEXT field for program name/slug
+        program_interest: program,
+        program_slug: body.programSlug || body.program_slug || null,
         support_notes: notes,
         status: 'pending',
         source: body.source || 'website',

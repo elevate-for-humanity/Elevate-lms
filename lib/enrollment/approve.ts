@@ -110,7 +110,18 @@ export async function approveApplication(
   }
 
   // Step 2: Create program_enrollments
-  const resolvedProgramId = programId || app.program_id || null;
+  // Resolve program ID — try passed-in ID first, then app.program_id,
+  // then look up by program_slug or program_interest on the application
+  let resolvedProgramId = programId || app.program_id || null;
+  if (!resolvedProgramId && (app.program_slug || app.program_interest)) {
+    const slugToTry = app.program_slug || app.program_interest;
+    const { data: prog } = await db
+      .from('programs')
+      .select('id')
+      .or(`slug.eq.${slugToTry},name.ilike.%${slugToTry}%`)
+      .maybeSingle();
+    if (prog?.id) resolvedProgramId = prog.id;
+  }
   let enrollmentId: string | null = null;
 
   if (resolvedProgramId) {

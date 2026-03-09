@@ -90,7 +90,20 @@ export function useHeroVideo({
       return;
     }
 
-    // Play when visible, pause when scrolled away
+    // If already in viewport on mount (e.g. top-of-page hero), start immediately
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      startPlay();
+      // Still observe so we pause when scrolled away
+      const observer = new IntersectionObserver(
+        ([entry]) => { if (!entry.isIntersecting) el.pause(); else el.play().catch(() => {}); },
+        { threshold: 0 }
+      );
+      observer.observe(el);
+      return () => observer.disconnect();
+    }
+
+    // Play when scrolled into view, pause when scrolled away
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

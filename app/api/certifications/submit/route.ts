@@ -72,6 +72,17 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to submit certification' }, { status: 500 });
   }
 
+  // HVAC workflow: advance credential sequence when a cert is submitted for HVAC program
+  if (programId === 'hvac-technician') {
+    try {
+      const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
+      const wfResult = await advanceHvacWorkflow(user.id);
+      logger.info('[hvac-workflow] Advanced on cert submission', { userId: user.id, certificationName, ...wfResult });
+    } catch (wfErr) {
+      logger.error('[hvac-workflow] Advance failed (non-fatal):', wfErr);
+    }
+  }
+
   return NextResponse.json({ 
     success: true, 
     submission: data,

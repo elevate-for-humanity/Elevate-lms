@@ -79,6 +79,17 @@ async function _POST(request: NextRequest) {
     req: request,
   });
 
+  // HVAC workflow: advance credential sequence when admin approves a cert
+  if (action === 'approve' && data?.program_id === 'hvac-technician' && data?.user_id) {
+    try {
+      const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
+      const wfResult = await advanceHvacWorkflow(data.user_id);
+      logger.info('[hvac-workflow] Advanced on admin approval', { userId: data.user_id, ...wfResult });
+    } catch (wfErr) {
+      logger.error('[hvac-workflow] Advance failed (non-fatal):', wfErr);
+    }
+  }
+
   return NextResponse.json({ 
     success: true, 
     submission: data,

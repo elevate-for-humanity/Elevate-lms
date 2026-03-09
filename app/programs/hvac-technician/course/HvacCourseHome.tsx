@@ -17,6 +17,7 @@ import {
 import { QuizPanel } from './QuizPanel';
 import { EPA_608_CORE, EPA_608_TYPE_I, EPA_608_TYPE_II, EPA_608_TYPE_III, getUniversalExam } from '@/lib/courses/hvac-quizzes';
 import type { QuizQuestion } from '@/lib/courses/hvac-quizzes';
+import { CertificationTracker } from '@/components/lms/CertificationTracker';
 
 /* ── Helpers ── */
 
@@ -215,6 +216,7 @@ function PracticeQuizSection() {
 export default function HvacCourseHome({
   course, completedLessonIds = [], progressPercent = 0,
   lastLessonId = null, lastLessonTitle = null, totalTimeSeconds = 0,
+  userId = null,
 }: {
   course: CourseDefinition;
   completedLessonIds?: string[];
@@ -222,6 +224,7 @@ export default function HvacCourseHome({
   lastLessonId?: string | null;
   lastLessonTitle?: string | null;
   totalTimeSeconds?: number;
+  userId?: string | null;
 }) {
   const [openModule, setOpenModule] = useState<number | null>(null);
 
@@ -574,6 +577,15 @@ export default function HvacCourseHome({
         {/* ═══════════════════════════════════════════════════════════
             PRACTICE QUIZZES — EPA 608 exam prep
             ═══════════════════════════════════════════════════════════ */}
+        {/* Credential Progress — shows OSHA 10, CPR, EPA 608 status */}
+        {userId && progressPercent >= 50 && (
+          <section className="mb-14">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Credential Progress</h2>
+            <p className="text-sm text-slate-500 mb-6">Track your required certifications. Complete each one to earn your Certificate of Completion.</p>
+            <CertificationTracker programId="hvac-technician" userId={userId} />
+          </section>
+        )}
+
         <PracticeQuizSection />
 
         {/* ═══════════════════════════════════════════════════════════

@@ -1,5 +1,9 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface PageHeroProps {
   title: string;
@@ -16,6 +20,7 @@ export default function PageHero({
   backgroundVideo,
   height = 'medium',
 }: PageHeroProps) {
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
   const heightClasses = {
     small: 'h-[300px] md:h-[350px]',
     medium: 'h-[400px] md:h-[450px]',
@@ -28,15 +33,20 @@ export default function PageHero({
     >
       {/* Background */}
       {backgroundVideo ? (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
-        >
-          <source src={backgroundVideo} type="video/mp4" />
-        </video>
+        <>
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
+          >
+            <source src={backgroundVideo} type="video/mp4" />
+          </video>
+          {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+        </>
       ) : (
         <Image
           src={backgroundImage}

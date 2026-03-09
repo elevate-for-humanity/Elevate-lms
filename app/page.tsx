@@ -45,6 +45,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             {/* Left: plain-language explanation */}
+            <ScrollReveal direction="left">
             <div>
               <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
@@ -65,8 +66,10 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+            </ScrollReveal>
 
             {/* Right: 2x2 photo grid of program sectors */}
+            <ScrollReveal direction="right" delay={150}>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-2">
                 {[
@@ -84,6 +87,7 @@ export default function HomePage() {
                 <p className="text-brand-green-300 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>
               </div>
             </div>
+            </ScrollReveal>
 
           </div>
         </div>
@@ -296,9 +300,12 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <ScrollReveal direction="left">
             <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl order-last lg:order-first">
               <Image src="/images/pages/graduation-ceremony.jpg" alt="Credentialed Elevate graduates ready for employment" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
+            </ScrollReveal>
+            <ScrollReveal direction="right" delay={150}>
             <div>
               <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">For Employers</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">We build your next workforce pipeline</h2>
@@ -330,6 +337,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>

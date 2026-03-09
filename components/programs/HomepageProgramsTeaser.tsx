@@ -12,7 +12,7 @@ export function HomepageProgramsTeaser() {
     {
       title: "Barber & Beauty",
       description: "DOL Registered Apprenticeships",
-      image: "/images/pages/comp-cta-training.jpg",
+      image: "/images/pages/adult-learner.jpg",
       href: "/programs/barber-apprenticeship",
     },
     {

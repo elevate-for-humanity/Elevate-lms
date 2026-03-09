@@ -2,10 +2,11 @@
 
 /**
  * ScrollVideo — plays when ≥30% visible, pauses when scrolled away.
- * Drop-in replacement for <video autoPlay> in hero banners.
+ * Attempts to unmute on play; shows "Tap to unmute" if browser blocks it.
  */
 
-import { useEffect, useRef } from 'react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface ScrollVideoProps {
   src: string;
@@ -15,7 +16,6 @@ interface ScrollVideoProps {
   /** Fraction of the element that must be visible before playing (default 0.3) */
   threshold?: number;
   loop?: boolean;
-  muted?: boolean;
 }
 
 export function ScrollVideo({
@@ -25,41 +25,22 @@ export function ScrollVideo({
   style,
   threshold = 0.3,
   loop = true,
-  muted = true,
 }: ScrollVideoProps) {
-  const ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.play().catch(() => {
-            // Autoplay blocked — browser requires muted for autoplay
-          });
-        } else {
-          el.pause();
-        }
-      },
-      { threshold }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ threshold });
 
   return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      loop={loop}
-      muted={muted}
-      playsInline
-      className={className}
-      style={style}
-    />
+    <div className="relative">
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        loop={loop}
+        muted
+        playsInline
+        className={className}
+        style={style}
+      />
+      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+    </div>
   );
 }

@@ -37,7 +37,7 @@ const steps = [
     number: 4,
     title: 'Complete WOTC Forms',
     description: 'We handle IRS Form 8850 and state forms. Just verify hire date and we submit within the 28-day deadline.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/employer-handshake.jpg',
     tips: ['Sign forms within 28 days', 'Verify start date accuracy', 'Keep copies for records'],
   },
   {

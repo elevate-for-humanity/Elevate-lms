@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
 import { Clock, ArrowRight } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface Program {
   title: string;
@@ -82,20 +84,13 @@ export default function ProgramCategoryPage({
   avatarVideoSrc,
   avatarName,
 }: ProgramCategoryPageProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
   const [showContent, setShowContent] = useState(false);
   const colors = colorClasses[accentColor];
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 100);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = true;
-    video.play().catch(() => {});
   }, []);
 
   return (
@@ -114,8 +109,8 @@ export default function ProgramCategoryPage({
         >
           <source src={heroVideoSrc} type="video/mp4" />
         </video>
-        
-        
+        {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className={`max-w-2xl transition-all duration-700 ease-out ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <span className={`inline-block ${colors.badge} text-white text-sm font-semibold px-4 py-1 rounded-full mb-4`}>

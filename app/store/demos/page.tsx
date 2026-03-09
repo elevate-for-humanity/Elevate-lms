@@ -35,7 +35,7 @@ const demos = [
     id: 'learner',
     title: 'Student Experience',
     icon: GraduationCap,
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/wioa-meeting.jpg',
     alt: 'Students in a training classroom working on coursework',
     href: '/demo/learner',
     description: 'What your students see when they log in. Their courses, progress bars, apprenticeship hours logged, and certificates earned. This is the experience that keeps them showing up.',

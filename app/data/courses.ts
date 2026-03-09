@@ -677,6 +677,43 @@ export const COURSES: Course[] = [
     ],
     certification: 'EPA Section 608 Universal Certification',
   },
+  // HVAC Technician Full Course License — for organizations
+  {
+    id: 'hvac-technician-course-license',
+    slug: 'hvac-technician-course-license',
+    name: 'HVAC Technician Course License',
+    shortDescription: 'License the full 640-hour HVAC Technician course for your organization',
+    description: 'License Elevate\'s complete HVAC Technician course for delivery at your workforce program, community college, or training center. Includes all 16 modules, 94 lessons, interactive diagrams, EPA 608 prep, OSHA 10, and CPR/AED content. Delivered through your branded Elevate LMS instance or integrated into your existing platform via SCORM/xAPI. Includes instructor guide, student workbooks, and assessment banks.',
+    provider: 'Elevate for Humanity Career & Technical Institute',
+    category: 'HVAC & Trades',
+    price: 4500,
+    wholesaleCost: 0,
+    duration: '640 hours (16 modules)',
+    hours: 640,
+    image: '/images/pages/hvac-technician.jpg',
+    features: [
+      '16 modules, 94 lessons — full 640-hour curriculum',
+      'Interactive diagrams: refrigeration cycle, EPA 608, wiring, troubleshooting',
+      'EPA 608 Core, Type I, Type II, Type III prep with practice exams',
+      'OSHA 10-Hour and CPR/AED content included',
+      'SCORM/xAPI export for your existing LMS',
+      'Instructor guide and student workbooks',
+      'Assessment banks with 400+ questions',
+      'Annual content updates included',
+    ],
+    outcomes: [
+      'Students prepared for EPA 608 Universal certification',
+      'OSHA 10-Hour card eligible',
+      'CPR/AED certification eligible',
+      'Job-ready HVAC technician skills',
+    ],
+    requirements: [
+      'Active Elevate LMS license or SCORM-compatible LMS',
+      'Minimum cohort of 10 students per license term',
+      'Contact us for volume pricing',
+    ],
+    certification: 'EPA Section 608 Universal, OSHA 10, CPR/AED',
+  },
 ];
 
 // Helper functions

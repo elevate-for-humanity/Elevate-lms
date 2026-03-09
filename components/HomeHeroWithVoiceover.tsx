@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 interface HeroConfig {
   video_src: string;
@@ -34,7 +35,8 @@ export function HomeHeroWithVoiceover({
   ctaText: propCtaText,
   ctaLink: propCtaLink,
 }: HomeHeroWithVoiceoverProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // useHeroVideo handles video autoplay + unmute attempt; audio voiceover is separate
+  const { videoRef } = useHeroVideo({ pauseOffScreen: true });
   const audioRef = useRef<HTMLAudioElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [showButton, setShowButton] = useState(false);

@@ -10,14 +10,14 @@ export const metadata: Metadata = {
 };
 
 const PROGRAMS = [
-  { name: 'CNA Certification',            image: '/images/pages/cna-nursing.jpg',       href: '/programs/cna',                   duration: '4–6 weeks',   sector: 'Healthcare',      salary: '$30K–$42K' },
-  { name: 'CDL Commercial Driving',       image: '/images/pages/cdl-training.jpg',      href: '/programs/cdl-training',          duration: '4–6 weeks',   sector: 'Transportation',  salary: '$50K+' },
-  { name: 'Barber Apprenticeship',        image: '/images/pages/barber-hero-main.jpg',  href: '/programs/barber-apprenticeship', duration: '~18 months',  sector: 'Barbering',       salary: '$30K–$60K+' },
-  { name: 'HVAC / Building Technician',   image: '/images/pages/hvac-technician.jpg',   href: '/programs/hvac-technician',       duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$48K–$80K' },
-  { name: 'Electrical',                   image: '/images/pages/electrical.jpg',        href: '/programs/electrical',            duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$56K–$100K+' },
-  { name: 'Welding',                      image: '/images/pages/welding.jpg',           href: '/programs/welding',               duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$54K–$150K+' },
-  { name: 'IT Support',                   image: '/images/pages/it-help-desk.jpg',      href: '/programs/it-help-desk',          duration: '8–12 weeks',  sector: 'Technology',      salary: '$35K–$60K' },
-  { name: 'Cybersecurity',                image: '/images/pages/cybersecurity.jpg',     href: '/programs/cybersecurity-analyst', duration: '12–16 weeks', sector: 'Technology',      salary: '$55K–$100K+' },
+  { name: 'CNA Certification',            image: '/images/pages/cna-patient-care.jpg',    href: '/programs/cna',                   duration: '4–6 weeks',   sector: 'Healthcare',      salary: '$30K–$42K' },
+  { name: 'CDL Commercial Driving',       image: '/images/pages/cdl-truck-highway.jpg',   href: '/programs/cdl-training',          duration: '4–6 weeks',   sector: 'Transportation',  salary: '$50K+' },
+  { name: 'Barber Apprenticeship',        image: '/images/pages/barber-fade.jpg',          href: '/programs/barber-apprenticeship', duration: '~18 months',  sector: 'Barbering',       salary: '$30K–$60K+' },
+  { name: 'HVAC / Building Technician',   image: '/images/pages/hvac-unit.jpg',            href: '/programs/hvac-technician',       duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$48K–$80K' },
+  { name: 'Electrical',                   image: '/images/pages/electrical-wiring.jpg',    href: '/programs/electrical',            duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$56K–$100K+' },
+  { name: 'Welding',                      image: '/images/pages/welding-sparks.jpg',        href: '/programs/welding',               duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$54K–$150K+' },
+  { name: 'IT Support',                   image: '/images/pages/it-helpdesk-desk.jpg',     href: '/programs/it-help-desk',          duration: '8–12 weeks',  sector: 'Technology',      salary: '$35K–$60K' },
+  { name: 'Cybersecurity',                image: '/images/pages/cybersecurity-screen.jpg', href: '/programs/cybersecurity-analyst', duration: '12–16 weeks', sector: 'Technology',      salary: '$55K–$100K+' },
 ];
 
 export default function HomePage() {
@@ -66,10 +66,19 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: credential trust badges */}
+            {/* Right: 2x2 photo grid of program sectors */}
             <div className="flex flex-col gap-4">
-              <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden shadow-xl">
-                <Image src="/images/pages/workforce-training.jpg" alt="Elevate for Humanity career training" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { src: '/images/pages/cna-patient-care.jpg',   alt: 'CNA patient care training' },
+                  { src: '/images/pages/welding-sparks.jpg',      alt: 'Welding training program' },
+                  { src: '/images/pages/cdl-truck-highway.jpg',   alt: 'CDL commercial driving' },
+                  { src: '/images/pages/it-helpdesk-desk.jpg',    alt: 'IT support training' },
+                ].map((img) => (
+                  <div key={img.src} className="relative rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '4/3' }}>
+                    <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="25vw" />
+                  </div>
+                ))}
               </div>
               <div className="bg-brand-green-900/40 border border-brand-green-700/40 rounded-xl p-4 text-center">
                 <p className="text-brand-green-300 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>
@@ -142,28 +151,41 @@ export default function HomePage() {
                 num: '01',
                 title: 'Check your eligibility',
                 desc: 'Register at Indiana Career Connect and meet with a WorkOne case manager. They review your income, employment history, and barriers to determine which funding you qualify for — WIOA, Workforce Ready Grant, or JRI. This is free and takes about a week.',
+                image: '/images/pages/wioa-meeting.jpg',
+                alt: 'WorkOne career counseling session',
               },
               {
                 num: '02',
                 title: 'Enroll in a cohort',
                 desc: 'Once funding is confirmed, you join a scheduled cohort — a group that starts and finishes together. Training combines classroom instruction, hands-on lab work, and online coursework. All tools, materials, uniforms, and safety gear are provided.',
+                image: '/images/pages/training-cohort.jpg',
+                alt: 'Students enrolled in a training cohort',
               },
               {
                 num: '03',
                 title: 'Earn your credential',
                 desc: 'At the end of training, you sit for a proctored certification exam on-site at Elevate. Your credential is issued by the national certifying body — EPA, OSHA, Indiana ISDH, Indiana BMV, Certiport, or AWS. Not by us. Portable and verifiable nationwide.',
+                image: '/images/pages/healthcare-grad.jpg',
+                alt: 'Graduate earning a nationally recognized credential',
               },
               {
                 num: '04',
                 title: 'Get placed with an employer',
                 desc: 'Our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many students have job offers before their last day of class. We track your employment at 6 and 12 months.',
+                image: '/images/pages/employer-handshake.jpg',
+                alt: 'Graduate meeting with employer',
               },
             ].map((step, i) => (
               <ScrollReveal key={step.num} delay={i * 80}>
-                <div className="bg-white rounded-xl border border-slate-200 p-6 h-full flex flex-col">
-                  <div className="w-10 h-10 rounded-full bg-brand-red-600 text-white font-extrabold text-sm flex items-center justify-center mb-4 flex-shrink-0">{step.num}</div>
-                  <h3 className="font-bold text-slate-900 mb-2 text-base">{step.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed flex-1">{step.desc}</p>
+                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden h-full flex flex-col">
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                    <Image src={step.image} alt={step.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                    <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-xs flex items-center justify-center shadow-md">{step.num}</div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-bold text-slate-900 mb-2 text-base">{step.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed flex-1">{step.desc}</p>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}
@@ -195,7 +217,7 @@ export default function HomePage() {
                 tagColor: 'bg-brand-blue-700',
                 desc: 'The primary federal workforce funding program. Covers tuition, books, tools, and certification exam fees for eligible adults, dislocated workers, and youth ages 16–24. Administered through WorkOne career centers.',
                 href: '/funding/federal-programs',
-                image: '/images/hp/wioa.jpg',
+                image: '/images/pages/wioa-meeting.jpg',
               },
               {
                 label: 'Workforce Ready Grant',
@@ -203,7 +225,7 @@ export default function HomePage() {
                 tagColor: 'bg-brand-green-700',
                 desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants. Covers tuition and fees for programs in healthcare, IT, and skilled trades.',
                 href: '/funding/state-programs',
-                image: '/images/hp/grants.jpg',
+                image: '/images/pages/adult-learner.jpg',
               },
               {
                 label: 'Next Level Jobs',
@@ -211,7 +233,7 @@ export default function HomePage() {
                 tagColor: 'bg-brand-green-700',
                 desc: 'Indiana employer training grant covering certification costs in high-demand fields. Employers and training providers apply on behalf of participants.',
                 href: '/funding/state-programs',
-                image: '/images/hp/funding.jpg',
+                image: '/images/pages/job-placement.jpg',
               },
               {
                 label: 'JRI — Justice Reinvestment Initiative',
@@ -219,7 +241,7 @@ export default function HomePage() {
                 tagColor: 'bg-brand-green-700',
                 desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD. Many Elevate employer partners hire regardless of background.',
                 href: '/funding/jri',
-                image: '/images/hp/healthcare.jpg',
+                image: '/images/pages/career-counseling.jpg',
               },
               {
                 label: 'Job Ready Indy',
@@ -235,7 +257,7 @@ export default function HomePage() {
                 tagColor: 'bg-slate-600',
                 desc: 'The official Indiana portal to register, check eligibility, and apply for workforce funding. Start here if you are not sure which program you qualify for.',
                 href: 'https://indianacareerconnect.com',
-                image: '/images/hp/government.jpg',
+                image: '/images/pages/workforce-training.jpg',
                 external: true,
               },
             ].map((item, i) => (
@@ -275,7 +297,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl order-last lg:order-first">
-              <Image src="/images/hp/candidates.jpg" alt="Credentialed Elevate graduates ready for employment" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              <Image src="/images/pages/graduation-ceremony.jpg" alt="Credentialed Elevate graduates ready for employment" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
             <div>
               <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">For Employers</p>

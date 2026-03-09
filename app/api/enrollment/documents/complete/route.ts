@@ -62,16 +62,26 @@ async function _POST(req: Request) {
       logger.info('Documents submitted:', documents);
     }
 
-    // Advance state to documents_complete, then immediately to active
+    const now = new Date().toISOString();
+
+    // Advance state to active in program_enrollments
     const { error: updateError } = await db
       .from('program_enrollments')
       .update({
         enrollment_state: 'active',
-        documents_completed_at: new Date().toISOString(),
+        documents_completed_at: now,
+        documents_submitted_at: now,
         next_required_action: 'START_COURSE_1',
         status: 'ACTIVE',
       })
       .eq('id', enrollment_id);
+
+    // Mirror documents_submitted_at to training_enrollments — apprentice portal gate reads this
+    await db
+      .from('training_enrollments')
+      .update({ documents_submitted_at: now, updated_at: now })
+      .eq('user_id', user.id)
+      .is('documents_submitted_at', null);
 
     if (updateError) {
       logger.error('Failed to update enrollment:', updateError);

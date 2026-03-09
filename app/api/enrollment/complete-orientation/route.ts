@@ -24,28 +24,32 @@ async function _POST(req: Request) {
     }
 
     const { program } = await req.json();
+    const now = new Date().toISOString();
 
-    // Update enrollment to mark orientation complete
-    const { error } = await db
+    // Update program_enrollments (state machine)
+    await db
       .from('program_enrollments')
-      .update({ 
-        orientation_completed_at: new Date().toISOString(),
+      .update({
+        orientation_completed_at: now,
         status: 'orientation_complete',
-        updated_at: new Date().toISOString(),
+        enrollment_state: 'orientation_complete',
+        updated_at: now,
       })
       .eq('user_id', user.id)
       .is('orientation_completed_at', null);
 
-    // Also update program_enrollments state machine if exists
-    await db
-      .from('program_enrollments')
-      .update({ enrollment_state: 'orientation_complete', updated_at: new Date().toISOString() })
+    // Update training_enrollments — this is what the apprentice portal gate reads
+    const { error: teError } = await db
+      .from('training_enrollments')
+      .update({
+        orientation_completed_at: now,
+        updated_at: now,
+      })
       .eq('user_id', user.id)
-      .eq('enrollment_state', 'confirmed');
+      .is('orientation_completed_at', null);
 
-    if (error) {
-      logger.error('Error updating enrollment:', error);
-      // Don't fail - let the flow continue
+    if (teError) {
+      logger.warn('[complete-orientation] training_enrollments update failed (non-fatal)', teError);
     }
 
     return NextResponse.json({ success: true, program });

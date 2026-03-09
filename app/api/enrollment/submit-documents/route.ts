@@ -24,29 +24,30 @@ async function _POST(req: Request) {
     }
 
     const { program } = await req.json();
+    const now = new Date().toISOString();
 
-    // Update enrollment to mark documents submitted
+    // Update program_enrollments
     const { error } = await db
       .from('program_enrollments')
-      .update({ 
-        documents_submitted_at: new Date().toISOString(),
+      .update({
+        documents_submitted_at: now,
         status: 'active',
-        updated_at: new Date().toISOString(),
+        enrollment_state: 'active',
+        updated_at: now,
       })
       .eq('user_id', user.id)
       .is('documents_submitted_at', null);
 
-    // Also update program_enrollments state machine if exists
-    await db
-      .from('program_enrollments')
-      .update({ enrollment_state: 'active', updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .eq('enrollment_state', 'documents_complete');
-
     if (error) {
-      logger.error('Error updating enrollment:', error);
-      // Don't fail - let the flow continue
+      logger.error('Error updating program_enrollments:', error);
     }
+
+    // Mirror to training_enrollments — apprentice portal gate reads this
+    await db
+      .from('training_enrollments')
+      .update({ documents_submitted_at: now, updated_at: now })
+      .eq('user_id', user.id)
+      .is('documents_submitted_at', null);
 
     return NextResponse.json({ success: true, program });
   } catch (error) {

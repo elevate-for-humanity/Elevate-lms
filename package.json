@@ -189,7 +189,7 @@
     "web-vitals": "5.1.0"
   },
   "scripts": {
-    "preinstall": "corepack enable || true",
+
     "check:redirects": "node scripts/check-redirect-conflicts.mjs",
     "integrity:links": "node scripts/integrity/links.mjs",
     "integrity:media": "node scripts/integrity/media.mjs",

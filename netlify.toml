@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "pnpm install --no-frozen-lockfile && pnpm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
@@ -15,9 +15,10 @@
   NODE_OPTIONS = "--max-old-space-size=2560"
   NETLIFY_USE_PNPM = "true"
   PNPM_VERSION = "10.28.2"
+  # Netlify's build script runs "pnpm install" in CI mode (frozen lockfile by default).
+  # Pass --no-frozen-lockfile so it doesn't fail if lockfile drifts between commits.
+  PNPM_FLAGS = "--no-frozen-lockfile"
   # Prevent corepack from enforcing the packageManager field version.
-  # Netlify installs pnpm via npm (not corepack), so strict version matching
-  # can cause corepack to intercept and fail with exit code 2.
   COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"

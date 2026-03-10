@@ -49,19 +49,77 @@ export default function ProgramHolderSetup() {
     }
   };
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
   const handleSubmit = async () => {
+    setSubmitting(true);
+    setSubmitError('');
+
     try {
-      // API submission implemented
+      // Upload syllabus if provided
+      let syllabusUrl: string | null = null;
+      if (formData.syllabusFile) {
+        const fd = new FormData();
+        fd.append('file', formData.syllabusFile);
+        fd.append('bucket', 'documents');
+        fd.append('path', `program-holder/syllabus/${Date.now()}-${formData.syllabusFile.name}`);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          syllabusUrl = uploadData.url ?? null;
+        }
+      }
 
-      // After successful submission, redirect to identity verification
-      alert(
-        'Program setup submitted! Please complete identity verification to activate your account.'
-      );
+      // Upload bank document if provided
+      let bankDocumentUrl: string | null = null;
+      if (formData.bankDocument) {
+        const fd = new FormData();
+        fd.append('file', formData.bankDocument);
+        fd.append('bucket', 'documents');
+        fd.append('path', `program-holder/bank/${Date.now()}-${formData.bankDocument.name}`);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: fd });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          bankDocumentUrl = uploadData.url ?? null;
+        }
+      }
 
-      // Redirect to identity verification page
+      const res = await fetch('/api/program-holder/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationName: formData.organizationName,
+          programName: formData.programName,
+          programType: formData.programType,
+          programDuration: formData.programDuration,
+          certificationOffered: formData.certificationOffered,
+          targetIndustry: formData.targetIndustry,
+          prerequisitesRequired: formData.prerequisitesRequired,
+          deliveryMethod: formData.deliveryMethod,
+          assessmentType: formData.assessmentType,
+          customInstructions: formData.customInstructions,
+          syllabusUrl,
+          accountHolderName: formData.accountHolderName,
+          bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          routingNumber: formData.routingNumber,
+          accountType: formData.accountType,
+          bankDocumentUrl,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSubmitError(data.error || 'Submission failed. Please try again.');
+        return;
+      }
+
       window.location.href = '/program-holder/verify-identity';
-    } catch (error) { /* Error handled silently */ 
-      alert('Failed to submit. Please try again.');
+    } catch {
+      setSubmitError('An unexpected error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -553,18 +611,23 @@ export default function ProgramHolderSetup() {
                 </ol>
               </div>
 
+              {submitError && (
+                <p className="text-red-600 text-sm text-center">{submitError}</p>
+              )}
               <div className="flex gap-4">
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 bg-gray-300 text-black py-4 rounded-lg font-bold hover:bg-gray-400"
+                  disabled={submitting}
+                  className="flex-1 bg-gray-300 text-black py-4 rounded-lg font-bold hover:bg-gray-400 disabled:opacity-50"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
+                  disabled={submitting}
+                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700 disabled:opacity-50"
                 >
-                  Submit Program
+                  {submitting ? 'Submitting…' : 'Submit Program'}
                 </button>
               </div>
             </div>

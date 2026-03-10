@@ -120,7 +120,9 @@ export async function GET(request: NextRequest) {
           console.error('[auth/confirm] enrollment linking threw', { error: err?.message });
         }
       } else if (type === 'recovery') {
-        redirectTo = '/auth/reset-password';
+        // Use the next param set by sendRecoveryEmail's redirectTo option.
+        // Fall back to /auth/reset-password if next wasn't passed or was stripped.
+        redirectTo = next !== '/' ? next : '/auth/reset-password';
       } else if (type === 'invite') {
         redirectTo = '/lms/dashboard?invited=true';
       }

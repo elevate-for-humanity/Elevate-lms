@@ -11,6 +11,7 @@
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=8192"
   NETLIFY_USE_PNPM = "true"
+  PNPM_VERSION = "10.28.2"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXTAUTH_URL"

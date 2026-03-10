@@ -59,12 +59,12 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['SCORE Indianapolis mentors', 'Local business development organizations'],
   pricingIncludes: ['80 instructional hours', 'ESB certification exam', 'QuickBooks certification exam', 'Business plan template and tools', 'Mentorship connections'],
-  paymentTerms: 'WIOA and grant funding accepted. Self-pay: $1,500.',
+  paymentTerms: 'WIOA and grant funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $1,500 with payment plans.',
   faqs: [
     { question: 'Do I need a business idea?', answer: 'Having a business idea is helpful but not required. The first week helps you validate and refine your concept.' },
     { question: 'Is this for existing businesses too?', answer: 'Yes. Existing business owners benefit from the financial management, marketing, and certification components.' },
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Entrepreneurship' }],
   metaTitle: 'Entrepreneurship & Small Business | Certiport ESB | Indianapolis',
-  metaDescription: 'Launch or grow your business. Business planning, marketing, and ESB certification in 6 weeks. WIOA funding available. Indianapolis.',
+  metaDescription: 'Launch or grow your business. Business planning, marketing, and ESB certification in 6 weeks. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

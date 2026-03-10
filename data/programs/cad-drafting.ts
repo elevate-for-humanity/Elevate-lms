@@ -7,7 +7,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM (20 hrs/week)', cohortSize: '10–14 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$4,000',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.', selfPayCost: '$4,000',
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'Autodesk Certified User — AutoCAD', issuer: 'Autodesk / Certiport', description: 'Certification in AutoCAD 2D and 3D drafting.', validity: 'Lifetime (version-specific)' },
@@ -63,12 +63,12 @@ export const CAD_DRAFTING: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Jesse J. Wilkerson & Associates — Architecture & Construction', 'Indianapolis-area engineering firms'],
   pricingIncludes: ['220 instructional hours', 'AutoCAD certification exam', 'Revit certification exam', 'Autodesk software licenses', 'Career placement support'],
-  paymentTerms: 'WIOA and Next Level Jobs funding accepted. Self-pay: $4,000.',
+  paymentTerms: 'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $4,000 with payment plans.',
   faqs: [
     { question: 'Do I need drawing experience?', answer: 'No. The program starts with blueprint reading fundamentals and builds CAD skills from scratch.' },
     { question: 'What industries hire CAD drafters?', answer: 'Architecture, engineering, construction, manufacturing, and interior design firms all hire CAD drafters.' },
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'CAD/Drafting Technician' }],
   metaTitle: 'CAD/Drafting Technician | Autodesk Certified | Indianapolis',
-  metaDescription: 'Learn AutoCAD and Revit in 10 weeks. Earn Autodesk certifications. CAD drafters earn $60,290/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Learn AutoCAD and Revit in 10 weeks. Earn Autodesk certifications. CAD drafters earn $60,290/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

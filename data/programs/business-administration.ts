@@ -8,7 +8,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 60, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–12:00 PM (15–20 hrs/week)',
   eveningSchedule: 'Evening cohorts available.', cohortSize: '12–18 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$2,500',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.', selfPayCost: '$2,500',
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'Microsoft Office Specialist (MOS)', issuer: 'Certiport / Microsoft', description: 'Certification in Word, Excel, and PowerPoint.', validity: 'Lifetime (version-specific)' },
@@ -65,7 +65,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Indianapolis-area small businesses and offices'],
   pricingIncludes: ['140 instructional hours', 'MOS certification exam', 'QuickBooks certification exam', 'ESB certification exam', 'Laptop use during training', 'Career placement support'],
-  paymentTerms: 'WIOA and Next Level Jobs funding accepted. Self-pay: $2,500 or payment plan.',
+  paymentTerms: 'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $2,500 with payment plans.',
   faqs: [
     { question: 'Do I need computer experience?', answer: 'Basic computer skills (typing, using a mouse, navigating the internet) are required. No prior business or accounting experience needed.' },
     { question: 'What certifications will I earn?', answer: 'Microsoft Office Specialist, QuickBooks Certified User, and Entrepreneurship & Small Business — three Certiport certifications.' },
@@ -73,5 +73,5 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Business Administration' }],
   metaTitle: 'Business Administration | Certiport Certified | Indianapolis',
-  metaDescription: 'Earn Microsoft Office, QuickBooks, and ESB certifications in 8 weeks. WIOA funding available. Indianapolis.',
+  metaDescription: 'Earn Microsoft Office, QuickBooks, and ESB certifications in 8 weeks. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

@@ -61,7 +61,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
           <div className="text-center">
             <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden relative">
               <Image
-                src="/images/pages/comp-pathway-trades.jpg"
+                src="/images/pages/trades-classroom.jpg"
                 alt="Job placement"
                 fill
                 className="object-cover"

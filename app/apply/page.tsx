@@ -191,7 +191,7 @@ export default async function ApplyPage({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
               {
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/apply-page-1.jpg',
                 alt: 'Funding assistance',
                 title: 'Funding & Grants',
                 desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Justice Reinvestment Initiative) supports individuals with justice involvement.',
@@ -226,7 +226,7 @@ export default async function ApplyPage({
                 desc: 'Train in a real barbershop, earn while you learn, and get your Indiana barber license. 2,000 hours of hands-on experience.',
               },
               {
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/apply-page-1.jpg',
                 alt: 'Credential and certification support',
                 title: 'Credential Support',
                 desc: 'Exam prep, testing fees, and licensing assistance included with your program.',

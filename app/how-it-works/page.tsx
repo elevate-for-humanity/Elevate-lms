@@ -13,14 +13,14 @@ export const metadata: Metadata = {
     description: 'From assessment to employment and follow-up support. See exactly how Elevate workforce and employment services work.',
     url: 'https://www.elevateforhumanity.org/how-it-works',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
+    images: [{ url: '/images/pages/how-it-works-hero.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'How It Works | Elevate for Humanity',
     description: 'From assessment to employment and follow-up support.',
-    images: ['/images/pages/comp-cta-career.jpg'],
+    images: ['/images/pages/how-it-works-hero.jpg'],
   },
 };
 

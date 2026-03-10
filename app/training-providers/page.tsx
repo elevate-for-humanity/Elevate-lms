@@ -17,32 +17,32 @@ const benefits = [
   {
     title: 'Student Referrals',
     description: 'Receive pre-screened, WIOA-eligible students ready to enroll in your programs.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'ETPL Listing Support',
     description: 'We help you get listed on the Eligible Training Provider List for WIOA funding.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'Marketing Support',
     description: 'Your programs featured on our website and promoted to workforce partners.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'Compliance Assistance',
     description: 'Support with WIOA reporting requirements and documentation.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'Employer Connections',
     description: 'Connect your graduates with our network of hiring employers.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     title: 'Streamlined Enrollment',
     description: 'Our team handles eligibility verification and funding paperwork.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
 ];
 
@@ -58,17 +58,17 @@ const programTypes = [
   {
     name: 'Healthcare',
     examples: 'CNA, Medical Assistant, Phlebotomy, EMT',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     name: 'Skilled Trades',
     examples: 'HVAC, Electrical, Plumbing, Welding',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     name: 'Technology',
     examples: 'IT Support, Cybersecurity, Web Development',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
   {
     name: 'Transportation',
@@ -83,7 +83,7 @@ const programTypes = [
   {
     name: 'Beauty & Wellness',
     examples: 'Barber, Cosmetology, Esthetician',
-    image: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/training-providers-page-1.jpg',
   },
 ];
 

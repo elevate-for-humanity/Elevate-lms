@@ -113,35 +113,53 @@ export default function ProgramCoursesPage() {
               // Cycle through category images based on program
               const categoryImages: Record<string, string[]> = {
                 'healthcare': [
-                  '/hero-images/healthcare-category.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/cna-patient-care.jpg',
+                  '/images/pages/cna-vitals.jpg',
+                  '/images/pages/medical-assistant-lab.jpg',
+                  '/images/pages/phlebotomy-draw.jpg',
+                  '/images/pages/healthcare-classroom.jpg',
+                  '/images/pages/pharmacy-tech.jpg',
                 ],
                 'skilled-trades': [
-                  '/hero-images/skilled-trades-category.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/hvac-unit.jpg',
+                  '/images/pages/hvac-tools.jpg',
+                  '/images/pages/electrical-wiring.jpg',
+                  '/images/pages/electrical-panel.jpg',
+                  '/images/pages/welding-sparks.jpg',
+                  '/images/pages/plumbing-pipes.jpg',
                 ],
                 'technology': [
-                  '/hero-images/technology-category.jpg',
-                  '/hero-images/technology-hero.jpg',
-                  '/images/pages/comp-cta-training.jpg'
+                  '/images/pages/it-helpdesk-desk.jpg',
+                  '/images/pages/it-hardware.jpg',
+                  '/images/pages/it-networking.jpg',
+                  '/images/pages/cybersecurity-screen.jpg',
+                  '/images/pages/cybersecurity-code.jpg',
+                  '/images/pages/tech-classroom.jpg',
                 ],
                 'business': [
-                  '/images/pages/comp-cta-career.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/tax-prep-desk.jpg',
+                  '/images/pages/tax-forms.jpg',
+                  '/images/pages/bookkeeping-ledger.jpg',
+                  '/images/pages/office-admin-desk.jpg',
+                  '/images/pages/workforce-training.jpg',
+                  '/images/pages/career-counseling.jpg',
                 ],
                 'transportation': [
-                  '/images/pages/comp-cta-training.jpg',
-                  '/images/pages/comp-cta-programs.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
+                  '/images/pages/cdl-truck-highway.jpg',
+                  '/images/pages/cdl-cab-interior.jpg',
+                  '/images/pages/cdl-pretrip.jpg',
+                  '/images/pages/cdl-loading-dock.jpg',
+                  '/images/pages/cdl-driver-seat.jpg',
+                  '/images/pages/cdl-truck-highway.jpg',
                 ],
                 'barber': [
-                  '/hero-images/barber-beauty-category.jpg',
+                  '/images/pages/barber-fade.jpg',
+                  '/images/pages/barber-shop-interior.jpg',
+                  '/images/pages/barber-clippers.jpg',
+                  '/images/pages/barber-lineup.jpg',
+                  '/images/pages/barber-student.jpg',
                   '/images/pages/barber-gallery-1.jpg',
-                  '/images/pages/comp-cta-programs.jpg'
-                ]
+                ],
               };
               
               // Determine category from slug
@@ -172,7 +190,7 @@ export default function ProgramCoursesPage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/pages/comp-cta-career.jpg';
+                        target.src = '/images/pages/workforce-training.jpg';
                       }}
                     />
                     <div className="absolute top-4 right-4">

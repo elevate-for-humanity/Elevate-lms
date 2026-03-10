@@ -65,12 +65,12 @@ export default async function HubWelcomePage() {
     {
       title: 'Automated Guidance',
       description: 'The platform tells you what to do next. Receive smart nudges, reminders, and step-by-step guidance to stay on track.',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/career-services-page-1.jpg',
     },
     {
       title: 'Compliance Documentation',
       description: 'All your hours, credentials, and progress are documented automatically. Ready for audits, certifications, and employer verification.',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/career-services-page-1.jpg',
     },
   ];
 
@@ -92,7 +92,7 @@ export default async function HubWelcomePage() {
       name: 'Tech Graduate',
       program: 'IT Support',
       quote: 'Having everything in one place - courses, certifications, job prep - made all the difference.',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/career-services-page-1.jpg',
     },
   ];
 

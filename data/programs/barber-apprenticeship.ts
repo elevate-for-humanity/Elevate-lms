@@ -14,7 +14,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   category: 'Personal Services',
 
   heroImage: '/images/pages/barber-hero-main.jpg',
-  heroImageAlt: 'Barber apprentice cutting hair in a barbershop',
+  heroImageAlt: 'Barber apprentice training at a licensed barbershop',
+  videoSrc: '/videos/barber-hero-final.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 52,
@@ -28,7 +29,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
   cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: '$0 for apprentices. Employer-sponsored through DOL Registered Apprenticeship.',
+  fundingStatement: 'Employer-sponsored through DOL Registered Apprenticeship. Apprentices earn wages during training. Self-pay option: $3,500 with payment plans.',
   selfPayCost: '$3,500 (if not employer-sponsored)',
   badge: 'DOL Registered',
   badgeColor: 'blue',
@@ -257,7 +258,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement and shop matching',
   ],
-  paymentTerms: 'Employer-sponsored through DOL Registered Apprenticeship. WIOA supportive services available. Self-pay option: $3,500 with payment plans.',
+  paymentTerms: 'Employer-sponsored through DOL Registered Apprenticeship. Apprentices earn wages during training. Self-pay option: $3,500 with payment plans.',
 
   faqs: [
     { question: 'Do I get paid during the apprenticeship?', answer: 'Yes. As a DOL Registered Apprentice, you earn wages while training at your host barbershop. Starting pay is typically $12–$15/hour, increasing as you gain skills.' },
@@ -273,5 +274,5 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   metaTitle: 'Barber Apprenticeship | DOL Registered | Indianapolis',
-  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 1,500 hours. Earn while you learn. WIOA funding available.',
+  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 1,500 hours. Earn while you learn. Indianapolis.',
 };

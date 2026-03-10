@@ -6,7 +6,7 @@ const stories = [
   {
     name: 'Graduate',
     program: 'Public Safety & Reentry Specialist',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/job-placement.jpg',
     beforeJob: 'Unemployed after incarceration',
     afterJob: 'Reentry Specialist',
     salary: '$45,000/year',

@@ -33,9 +33,8 @@ export default async function ShopReportsPage() {
     .select('shop_id')
     .eq('user_id', user.id);
 
-  const shopIds = (staffRecords || []).map(s => s.shop_id);
+  const shopIds = (staffRecords || []).map((s: any) => s.shop_id);
 
-  // Get placements for those shops
   let reports: Array<{
     id: string;
     student_name: string;
@@ -47,31 +46,41 @@ export default async function ShopReportsPage() {
   }> = [];
 
   if (shopIds.length > 0) {
-    const { data: placements } = await db
-      .from('apprentice_placements')
-      .select('id')
-      .in('shop_id', shopIds);
+    // progress_entries is the live timeclock table; partner_id maps to shop
+    const { data: entries } = await db
+      .from('progress_entries')
+      .select(`
+        id,
+        work_date,
+        week_ending,
+        hours_worked,
+        status,
+        created_at,
+        apprentice_id,
+        apprentices:apprentice_id (
+          profiles:user_id ( full_name )
+        )
+      `)
+      .in('partner_id', shopIds)
+      .not('clock_out_at', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(100);
 
-    const placementIds = (placements || []).map(p => p.id);
-
-    if (placementIds.length > 0) {
-      const { data: weeklyReports } = await db
-        .from('apprentice_weekly_reports')
-        .select('id, placement_id, week_start, week_end, hours_total, status, created_at')
-        .in('placement_id', placementIds)
-        .order('created_at', { ascending: false })
-        .limit(100);
-
-      reports = (weeklyReports || []).map(r => ({
-        id: r.id,
-        student_name: `Placement ${r.placement_id?.slice(0, 8) || 'N/A'}`,
-        report_type: 'weekly',
-        period: `${new Date(r.week_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(r.week_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-        hours: r.hours_total || 0,
-        status: r.status || 'submitted',
-        created_at: r.created_at,
-      }));
-    }
+    reports = (entries || []).map((e: any) => {
+      const name = e.apprentices?.profiles?.full_name || `Apprentice ${e.apprentice_id?.slice(0, 8) || 'N/A'}`;
+      const weekEnd = e.week_ending ? new Date(e.week_ending) : new Date(e.work_date);
+      const weekStart = new Date(weekEnd);
+      weekStart.setDate(weekEnd.getDate() - 6);
+      return {
+        id: e.id,
+        student_name: name,
+        report_type: 'daily',
+        period: `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        hours: e.hours_worked || 0,
+        status: e.status || 'submitted',
+        created_at: e.created_at,
+      };
+    });
   }
 
   const totalHours = reports.reduce((sum, r) => sum + r.hours, 0);

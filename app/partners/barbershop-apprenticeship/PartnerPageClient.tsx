@@ -17,7 +17,7 @@ export default function PartnerPageClient() {
       {/* Video Hero — no text overlay */}
       <VideoHero
         videoSrc="/videos/barber-hero-final.mp4"
-        posterSrc="/images/pages/comp-cta-training.jpg"
+        posterSrc="/images/pages/barber-hero-main.jpg"
         posterAlt="Barber apprentice training in a barbershop"
       />
 
@@ -31,7 +31,7 @@ export default function PartnerPageClient() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/partners/barbershop-apprenticeship/apply"
+              href="/programs/barber-apprenticeship/apply?type=partner_shop"
               className="inline-flex items-center justify-center px-10 py-4 bg-brand-red-600 text-white rounded-xl font-extrabold text-lg hover:bg-brand-red-700 transition-colors"
             >
               Apply as a Partner Shop <ArrowRight className="w-5 h-5 ml-2" />
@@ -174,7 +174,7 @@ export default function PartnerPageClient() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/partners/barbershop-apprenticeship/apply"
+              href="/programs/barber-apprenticeship/apply?type=partner_shop"
               className="inline-flex items-center justify-center px-10 py-4 bg-brand-red-600 text-white rounded-xl font-extrabold text-lg hover:bg-brand-red-700 transition-colors"
             >
               Start Your Application <ArrowRight className="w-5 h-5 ml-2" />

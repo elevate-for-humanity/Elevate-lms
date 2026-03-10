@@ -16,7 +16,7 @@ interface Slide {
 }
 const slides: Slide[] = [
   {
-    image: "/images/pages/comp-cta-career.jpg",
+    image: "/images/pages/career-counseling.jpg",
     title: "Elevate for Humanity",
     text: "State-approved, federally aligned workforce training that opens doors to high-wage careers.",
     cta: {
@@ -61,7 +61,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/pages/comp-cta-career.jpg",
+    image: "/images/pages/career-counseling.jpg",
     title: "Career Services & Support",
     text: "Life coaching, mental health partnerships, and wraparound support to help you succeed.",
     cta: {
@@ -70,7 +70,7 @@ const slides: Slide[] = [
     }
   },
   {
-    image: "/images/pages/comp-cta-training.jpg",
+    image: "/images/pages/workforce-training.jpg",
     title: "Hands-On Training",
     text: "Real-world skills training with experienced instructors in state-of-the-art facilities.",
     cta: {

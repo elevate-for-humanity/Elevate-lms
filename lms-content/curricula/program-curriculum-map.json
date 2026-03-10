@@ -5,11 +5,36 @@
       "name": "CDL & Transportation",
       "duration": "4-8 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "OSHA 10-Hour Construction", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 10},
-        {"name": "CPR/AED", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "First Aid", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "CDL Training", "provider": "Partner Driving School", "delivery": "External", "hours": 160}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "OSHA 10-Hour Construction",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        },
+        {
+          "name": "CPR/AED",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "First Aid",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "CDL Training",
+          "provider": "Partner Driving School",
+          "delivery": "External",
+          "hours": 160
+        }
       ]
     },
     {
@@ -17,11 +42,36 @@
       "name": "CNA/Healthcare",
       "duration": "4-6 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "OSHA 10-Hour General Industry", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 10},
-        {"name": "Healthcare Provider CPR", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "Bloodborne Pathogens", "provider": "HSI", "delivery": "Online", "hours": 2},
-        {"name": "CNA Training", "provider": "State Approved Program", "delivery": "External", "hours": 75}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "OSHA 10-Hour General Industry",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        },
+        {
+          "name": "Healthcare Provider CPR",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "Bloodborne Pathogens",
+          "provider": "HSI",
+          "delivery": "Online",
+          "hours": 2
+        },
+        {
+          "name": "CNA Training",
+          "provider": "State Approved Program",
+          "delivery": "External",
+          "hours": 75
+        }
       ]
     },
     {
@@ -29,12 +79,42 @@
       "name": "Direct Support Professional",
       "duration": "2-4 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "OSHA 10-Hour General Industry", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 10},
-        {"name": "CPR/AED", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "First Aid", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "Bloodborne Pathogens", "provider": "HSI", "delivery": "Online", "hours": 2},
-        {"name": "DSP Core Competencies", "provider": "NADSP", "delivery": "External", "hours": 40}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "OSHA 10-Hour General Industry",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        },
+        {
+          "name": "CPR/AED",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "First Aid",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "Bloodborne Pathogens",
+          "provider": "HSI",
+          "delivery": "Online",
+          "hours": 2
+        },
+        {
+          "name": "DSP Core Competencies",
+          "provider": "NADSP",
+          "delivery": "External",
+          "hours": 40
+        }
       ]
     },
     {
@@ -42,10 +122,30 @@
       "name": "DOT Drug Collector",
       "duration": "1-2 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "DOT Oral Fluid Collector", "provider": "National Drug Screening", "delivery": "MyDrugTestTraining.com", "hours": 8},
-        {"name": "Mock Collections (5)", "provider": "National Drug Screening", "delivery": "In-person", "hours": 5},
-        {"name": "Bloodborne Pathogens", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 2}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "DOT Oral Fluid Collector",
+          "provider": "National Drug Screening",
+          "delivery": "MyDrugTestTraining.com",
+          "hours": 8
+        },
+        {
+          "name": "Mock Collections (5)",
+          "provider": "National Drug Screening",
+          "delivery": "In-person",
+          "hours": 5
+        },
+        {
+          "name": "Bloodborne Pathogens",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 2
+        }
       ]
     },
     {
@@ -53,11 +153,36 @@
       "name": "Tax Preparation",
       "duration": "4-6 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "Link & Learn Taxes", "provider": "IRS", "delivery": "irs.gov", "hours": 20},
-        {"name": "VITA Certification", "provider": "IRS", "delivery": "irs.gov", "hours": 10},
-        {"name": "Microsoft Office Specialist", "provider": "Certiport", "delivery": "Testing Center", "hours": 20},
-        {"name": "QuickBooks Certified User", "provider": "Certiport", "delivery": "Testing Center", "hours": 15}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "Link & Learn Taxes",
+          "provider": "IRS",
+          "delivery": "irs.gov",
+          "hours": 20
+        },
+        {
+          "name": "VITA Certification",
+          "provider": "IRS",
+          "delivery": "irs.gov",
+          "hours": 10
+        },
+        {
+          "name": "Microsoft Office Specialist",
+          "provider": "Certiport",
+          "delivery": "Testing Center",
+          "hours": 20
+        },
+        {
+          "name": "QuickBooks Certified User",
+          "provider": "Certiport",
+          "delivery": "Testing Center",
+          "hours": 15
+        }
       ]
     },
     {
@@ -65,10 +190,30 @@
       "name": "Cybersecurity",
       "duration": "8-12 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "IT Specialist - Network Security", "provider": "Certiport", "delivery": "Testing Center", "hours": 40},
-        {"name": "IT Specialist - Cybersecurity", "provider": "Certiport", "delivery": "Testing Center", "hours": 40},
-        {"name": "Microsoft Office Specialist", "provider": "Certiport", "delivery": "Testing Center", "hours": 20}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "IT Specialist - Network Security",
+          "provider": "Certiport",
+          "delivery": "Testing Center",
+          "hours": 40
+        },
+        {
+          "name": "IT Specialist - Cybersecurity",
+          "provider": "Certiport",
+          "delivery": "Testing Center",
+          "hours": 40
+        },
+        {
+          "name": "Microsoft Office Specialist",
+          "provider": "Certiport",
+          "delivery": "Testing Center",
+          "hours": 20
+        }
       ]
     },
     {
@@ -76,10 +221,30 @@
       "name": "Customer Service & Retail",
       "duration": "2-4 weeks",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "NRF Customer Service & Sales", "provider": "NRF Foundation", "delivery": "External", "hours": 15},
-        {"name": "NRF Business of Retail", "provider": "NRF Foundation", "delivery": "External", "hours": 15},
-        {"name": "OSHA 10-Hour General Industry", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 10}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "NRF Customer Service & Sales",
+          "provider": "NRF Foundation",
+          "delivery": "External",
+          "hours": 15
+        },
+        {
+          "name": "NRF Business of Retail",
+          "provider": "NRF Foundation",
+          "delivery": "External",
+          "hours": 15
+        },
+        {
+          "name": "OSHA 10-Hour General Industry",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        }
       ]
     },
     {
@@ -87,12 +252,79 @@
       "name": "Barber Apprenticeship",
       "duration": "12-18 months",
       "certifications": [
-        {"name": "JRI Badges (6)", "provider": "EmployIndy", "delivery": "SCORM in LMS", "hours": 8},
-        {"name": "Milady RISE Safety", "provider": "Milady/Cengage", "delivery": "External (code: efhcti-rise295)", "hours": 10},
-        {"name": "OSHA 10-Hour General Industry", "provider": "CareerSafe", "delivery": "careersafeonline.com", "hours": 10},
-        {"name": "CPR/AED", "provider": "HSI", "delivery": "In-person or RSV", "hours": 4},
-        {"name": "Bloodborne Pathogens", "provider": "HSI", "delivery": "Online", "hours": 2},
-        {"name": "Barber Theory & Practice", "provider": "Milady", "delivery": "External", "hours": 1500}
+        {
+          "name": "JRI Badges (6)",
+          "provider": "EmployIndy",
+          "delivery": "SCORM in LMS",
+          "hours": 8
+        },
+        {
+          "name": "Milady RISE Safety",
+          "provider": "Milady/Cengage",
+          "delivery": "External (code: efhcti-rise295)",
+          "hours": 10
+        },
+        {
+          "name": "OSHA 10-Hour General Industry",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        },
+        {
+          "name": "CPR/AED",
+          "provider": "HSI",
+          "delivery": "In-person or RSV",
+          "hours": 4
+        },
+        {
+          "name": "Bloodborne Pathogens",
+          "provider": "HSI",
+          "delivery": "Online",
+          "hours": 2
+        },
+        {
+          "name": "Barber Theory & Practice",
+          "provider": "Milady",
+          "delivery": "External",
+          "hours": 1500
+        }
+      ]
+    },
+    {
+      "id": "hvac-technician",
+      "name": "HVAC Technician",
+      "duration": "12 weeks",
+      "certifications": [
+        {
+          "name": "EPA 608 Universal",
+          "provider": "ESCO/Mainstream Engineering",
+          "delivery": "Proctored exam",
+          "hours": 480
+        },
+        {
+          "name": "OSHA 10-Hour Construction",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 10
+        },
+        {
+          "name": "CPR/AED/First Aid",
+          "provider": "CareerSafe",
+          "delivery": "careersafeonline.com",
+          "hours": 4
+        },
+        {
+          "name": "Residential HVAC Certification 1",
+          "provider": "Elevate for Humanity",
+          "delivery": "LMS + Hands-on",
+          "hours": 240
+        },
+        {
+          "name": "Residential HVAC Certification 2",
+          "provider": "Elevate for Humanity",
+          "delivery": "LMS + Hands-on",
+          "hours": 240
+        }
       ]
     }
   ],
@@ -103,6 +335,7 @@
     "Certiport": "https://certiport.pearsonvue.com",
     "IRS VITA": "https://www.irs.gov/individuals/link-learn-taxes",
     "Milady": "https://www.milady.cengage.com",
-    "NationalDrugScreening": "https://www.mydrugtraining.com"
+    "NationalDrugScreening": "https://www.mydrugtraining.com",
+    "ESCO": "https://www.escogroup.org"
   }
 }

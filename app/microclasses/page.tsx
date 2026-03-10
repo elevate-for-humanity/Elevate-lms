@@ -18,7 +18,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'HSI CPR/AED/First Aid',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/micro-programs.jpg',
   },
   {
     title: 'Food Handler Certification',
@@ -27,7 +27,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'Indiana Food Handler Card',
     href: '/programs/food-handler',
-    image: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/micro-programs.jpg',
   },
   {
     title: 'OSHA 10-Hour Safety',
@@ -63,7 +63,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'BBP Certificate',
     href: '/programs/bloodborne-pathogens',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/micro-programs.jpg',
   },
 ];
 

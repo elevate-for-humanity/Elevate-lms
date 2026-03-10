@@ -7,10 +7,11 @@ export const CDL_TRAINING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Transportation',
 
-  heroImage: '/images/pages/comp-pathway-trades.jpg',
-  heroImageAlt: 'CDL student training with a semi-truck on a driving course',
+  heroImage: '/images/pages/cdl-truck-highway.jpg',
+  heroImageAlt: 'CDL student behind the wheel of a commercial truck',
+  videoSrc: '/videos/cdl-hero.mp4',
 
-  deliveryMode: 'in-person',
+  deliveryMode: 'hybrid',
   durationWeeks: 6,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
@@ -22,7 +23,7 @@ export const CDL_TRAINING: ProgramSchema = {
   },
   schedule: 'Mon–Fri, 30–40 hours per week (accelerated format)',
   cohortSize: '8–12 participants per cohort',
-  fundingStatement: '$0 with WIOA funding. Covers tuition, DOT physical, drug screen, and CDL exam fees.',
+  fundingStatement: 'WIOA funding available for eligible Indiana residents. Covers tuition, DOT physical, drug screen, and CDL exam fees when approved. Eligibility not guaranteed. Self-pay: $4,500.',
   selfPayCost: '$4,500',
   badge: 'Funding Available',
   badgeColor: 'green',
@@ -152,11 +153,11 @@ export const CDL_TRAINING: ProgramSchema = {
     'Clean driving record (no DUI/DWI in past 10 years)',
   ],
   equipmentIncluded: 'Training vehicle provided. CDL exam fees, DOT physical, and drug screen included with funding.',
-  modality: 'In-person — classroom instruction and behind-the-wheel training at Indianapolis training facility',
+  modality: 'Hybrid — Online theory via LMS, in-person behind-the-wheel training at Indianapolis facility',
   facilityInfo: 'Elevate training center and driving range, Indianapolis',
   employerPartners: ['Werner Enterprises', 'Schneider National', 'FedEx Freight', 'Indianapolis-area trucking companies'],
   pricingIncludes: ['CDL Class A exam fees', 'DOT physical exam', 'Drug screen', 'Training vehicle and fuel', 'Career placement support'],
-  paymentTerms: '$0 with WIOA funding. Self-pay: $4,500 or payment plan available.',
+  paymentTerms: 'WIOA funding available for eligible Indiana residents. Self-pay: $4,500 with payment plans available. Eligibility is determined through WorkOne.',
 
   faqs: [
     { question: 'Is CDL training really free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, DOT physical, drug screen, and CDL exam fees.' },
@@ -167,5 +168,5 @@ export const CDL_TRAINING: ProgramSchema = {
 
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'CDL Training' }],
   metaTitle: 'CDL Training | Class A License | Indianapolis',
-  metaDescription: 'Earn your CDL Class A license in 3–6 weeks. Behind-the-wheel training. Truck drivers earn $62,000/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Earn your CDL Class A license in 3–6 weeks. Behind-the-wheel training. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

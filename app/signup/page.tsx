@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
   title: 'Create Account',
   description:
-    'Create your account to apply, track progress, upload documents, and manage your training pathway.',
+    'Create your Elevate account. Students, staff, program partners, and employers all sign up here.',
 };
 
 export default async function SignupPage() {
@@ -48,19 +48,19 @@ export default async function SignupPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-3xl px-4 py-10">
         <h1 className="text-3xl font-bold text-black">
-          Create Your Secure Student Account
+          Create Your Account
         </h1>
         <p className="mt-2 text-black">
-          To protect your application and documents, you'll create a secure account. This lets you save progress, upload required documents, and get status updates without calling or waiting.
+          Create a secure account to access the Elevate platform. Students, staff, program partners, and employers all use this page — select your role below when signing up.
         </p>
 
         <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-black">Your account includes</h2>
+          <h2 className="text-lg font-semibold text-black">Your account gives you access to</h2>
           <ul className="mt-3 list-disc pl-5 text-black space-y-2">
-            <li>Save and resume your application anytime</li>
-            <li>Upload required documents securely</li>
-            <li>Track your application status in real-time</li>
-            <li>Access your Student Portal once enrolled</li>
+            <li><strong>Students</strong> — apply, track progress, upload documents, access your learning portal</li>
+            <li><strong>Staff &amp; Employees</strong> — complete onboarding, set up payroll, access staff tools</li>
+            <li><strong>Program Partners &amp; Instructors</strong> — manage cohorts, track students, access partner portal</li>
+            <li><strong>Employers</strong> — post jobs, hire graduates, access WOTC and OJT tools</li>
           </ul>
         </div>
 

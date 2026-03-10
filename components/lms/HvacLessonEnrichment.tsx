@@ -36,7 +36,7 @@ import { SequenceOrder } from '@/components/lms/activities/SequenceOrder';
 import { Pretest } from '@/components/lms/activities/Pretest';
 
 // Diagrams are large SVG components — load lazily so they don't block the lesson
-const HVACSystemOverview      = dynamic(() => import('@/components/hvac-diagrams/HVACSystemOverview'),      { ssr: false });
+const HVACSystemOverview        = dynamic(() => import('@/components/hvac-diagrams/HVACSystemOverview'),        { ssr: false });
 const RefrigerationCycleDiagram = dynamic(() => import('@/components/hvac-diagrams/RefrigerationCycleDiagram'), { ssr: false });
 const CondenserBreakdownDiagram = dynamic(() => import('@/components/hvac-diagrams/CondenserBreakdownDiagram'), { ssr: false });
 const FurnaceBreakdownDiagram   = dynamic(() => import('@/components/hvac-diagrams/FurnaceBreakdownDiagram'),   { ssr: false });
@@ -44,6 +44,14 @@ const ElectricalCircuitDiagram  = dynamic(() => import('@/components/hvac-diagra
 const ThermostatWiringDiagram   = dynamic(() => import('@/components/hvac-diagrams/ThermostatWiringDiagram'),   { ssr: false });
 const DuctDistributionDiagram   = dynamic(() => import('@/components/hvac-diagrams/DuctDistributionDiagram'),   { ssr: false });
 const TroubleshootingFlowchart  = dynamic(() => import('@/components/hvac-diagrams/TroubleshootingFlowchart'),  { ssr: false });
+const EPA608Overview            = dynamic(() => import('@/components/hvac-diagrams/EPA608Overview'),            { ssr: false });
+const OzoneDepletion            = dynamic(() => import('@/components/hvac-diagrams/OzoneDepletion'),            { ssr: false });
+const ThreeRsDiagram            = dynamic(() => import('@/components/hvac-diagrams/ThreeRsDiagram'),            { ssr: false });
+const RefrigerantTypesDiagram   = dynamic(() => import('@/components/hvac-diagrams/RefrigerantTypesDiagram'),   { ssr: false });
+const EPA608PTChart             = dynamic(() => import('@/components/hvac-diagrams/EPA608PTChart'),             { ssr: false });
+const TypeIRecoveryDiagram      = dynamic(() => import('@/components/hvac-diagrams/TypeIRecoveryDiagram'),      { ssr: false });
+const TypeIILeakRepairDiagram   = dynamic(() => import('@/components/hvac-diagrams/TypeIILeakRepairDiagram'),   { ssr: false });
+const TypeIIIChillerDiagram     = dynamic(() => import('@/components/hvac-diagrams/TypeIIIChillerDiagram'),     { ssr: false });
 
 interface Props {
   lessonNumber: number;
@@ -524,7 +532,8 @@ type DiagramMode = 'explore' | 'quiz' | 'review';
 const MODULE_DIAGRAMS: Record<string, {
   title: string;
   description: string;
-  component: React.ComponentType<{ mode?: DiagramMode }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: React.ComponentType<any>;
 }> = {
   'hvac-02': {
     title: 'HVAC System Overview',
@@ -565,6 +574,46 @@ const MODULE_DIAGRAMS: Record<string, {
     title: 'Troubleshooting Flowchart',
     description: 'Work through a no-cool call step by step. Click each decision point to see the diagnostic logic.',
     component: TroubleshootingFlowchart,
+  },
+  'hvac-06': {
+    title: 'EPA 608 Certification Structure',
+    description: 'Tap each section to learn what it covers, how many questions, and what equipment it applies to.',
+    component: EPA608Overview,
+  },
+  'hvac-06-02': {
+    title: 'How Chlorine Destroys Ozone',
+    description: 'Step through the chain reaction that led to the Montreal Protocol and the CFC ban.',
+    component: OzoneDepletion,
+  },
+  'hvac-06-03': {
+    title: 'Refrigerant Families — CFC, HCFC, HFC, HFO',
+    description: 'Compare ODP, GWP, phase-out status, and common refrigerants across all four families.',
+    component: RefrigerantTypesDiagram,
+  },
+  'hvac-06-04': {
+    title: 'The Three R\'s — Recover, Recycle, Reclaim',
+    description: 'Tap each R to see the exact legal definition, equipment used, and what you can and cannot do.',
+    component: ThreeRsDiagram,
+  },
+  'hvac-06-07': {
+    title: 'P/T Chart Drill',
+    description: 'Enter a pressure reading, get the saturation temperature, and calculate superheat or subcooling.',
+    component: EPA608PTChart,
+  },
+  'hvac-07': {
+    title: 'Type I Recovery Decision Tree',
+    description: 'Work through the decision tree for any small appliance recovery scenario.',
+    component: TypeIRecoveryDiagram,
+  },
+  'hvac-08': {
+    title: 'Type II — Leak Repair, Evacuation, Charging',
+    description: 'The three most tested Type II topics with interactive tabs and quiz questions.',
+    component: TypeIILeakRepairDiagram,
+  },
+  'hvac-09': {
+    title: 'Type III — Centrifugal Chillers',
+    description: 'Low-pressure systems, purge units, pressurization leak testing, and ASHRAE 15.',
+    component: TypeIIIChillerDiagram,
   },
   'hvac-16': {
     title: 'Full System Review',

@@ -40,6 +40,7 @@ const enrollCheckoutSchema = z.object({
   email: z.string().email().toLowerCase(),
   phone: z.string().regex(/^[\d\s\-()+ ]+$/).min(10).optional(),
   programSlug: z.string().min(1).max(100),
+  fundingSource: z.enum(['self_pay', 'wioa', 'wrg', 'other_funded']).optional(),
 });
 
 async function _POST(req: Request) {
@@ -63,7 +64,7 @@ async function _POST(req: Request) {
         { status: 400 }
       );
     }
-    const { firstName, lastName, email, phone, programSlug } = parsed.data;
+    const { firstName, lastName, email, phone, programSlug, fundingSource } = parsed.data;
 
     const supabase = createAdminClient();
     if (!supabase) {
@@ -73,7 +74,7 @@ async function _POST(req: Request) {
     // Get program details
     const { data: program, error: programError } = await supabase
       .from('programs')
-      .select('id, name, slug, total_cost')
+      .select('id, name, slug, total_cost, credentialing_cost')
       .eq('slug', programSlug)
       .single();
 
@@ -81,10 +82,13 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
-    // Get or create Stripe price for this program
-    const amount = program.total_cost
-      ? Math.round(Number(program.total_cost) * 100)
-      : 498000; // Default $4,980
+    // Funded students (WIOA, WRG) only pay for external credentials (OSHA 10 + CPR).
+    // Self-pay students pay the full program cost.
+    const isFunded = fundingSource && fundingSource !== 'self_pay';
+    const chargeAmount = isFunded && program.credentialing_cost
+      ? Number(program.credentialing_cost)
+      : Number(program.total_cost) || 4980;
+    const amount = Math.round(chargeAmount * 100); // cents
 
     // Create or get user profile
     let userId: string | null = null;
@@ -164,8 +168,12 @@ async function _POST(req: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: program.name,
-              description: `Enrollment in ${program.name} program`,
+              name: isFunded
+                ? `${program.name} — Credential Fees (OSHA 10 + CPR/First Aid)`
+                : program.name,
+              description: isFunded
+                ? `CareerSafe OSHA 10-Hour Construction + CPR/AED/First Aid credentials. Program tuition covered by ${(fundingSource || '').toUpperCase()} funding.`
+                : `Enrollment in ${program.name} program`,
             },
             unit_amount: amount,
           },
@@ -181,7 +189,8 @@ async function _POST(req: Request) {
       metadata: {
         // Standardized metadata for grant/license compliance
         payment_type: 'enrollment',
-        funding_source: 'self_pay',
+        kind: 'program_enrollment',
+        funding_source: fundingSource || 'self_pay',
         student_id: userId || application.id,
         program_id: program.id,
         program_slug: program.slug,

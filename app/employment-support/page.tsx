@@ -60,32 +60,32 @@ export default function EmploymentSupportPage() {
               {
                 title: 'One-on-One Career Coaching',
                 desc: 'Work directly with a career advisor to set goals, identify strengths, and build a personalized employment plan.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
               {
                 title: 'Resume & Application Assistance',
                 desc: 'Get help building a professional resume, completing job applications, and creating cover letters tailored to your target industry.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
               {
                 title: 'Interview Preparation',
                 desc: 'Practice with mock interviews, receive feedback, and learn how to present yourself confidently to employers.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
               {
                 title: 'Employer Connections',
                 desc: 'We connect you directly with employer partners who are actively hiring in your field through our partner network.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
               {
                 title: 'Barrier-to-Employment Support',
                 desc: 'Transportation coordination, referral support, and assistance addressing challenges that impact your ability to work.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
               {
                 title: 'Post-Placement Retention',
                 desc: 'Follow-up support after you start working to help you stay employed, resolve workplace issues, and advance in your career.',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/employment-support-page-1.jpg',
               },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">

@@ -48,7 +48,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'legal',
     action: 'upload',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
     downloadHref: 'https://www.irs.gov/pub/irs-pdf/fw9.pdf',
   },
   {
@@ -58,7 +58,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'compliance',
     action: 'upload',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
   },
   {
     id: 'workers-comp',
@@ -67,7 +67,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'insurance',
     action: 'upload',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
   },
   {
     id: 'liability-insurance',
@@ -76,7 +76,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'insurance',
     action: 'upload',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
   },
   {
     id: 'supervisor-license',
@@ -85,7 +85,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'compliance',
     action: 'upload',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
   },
   {
     id: 'safety-checklist',
@@ -94,7 +94,7 @@ const REQUIRED_FORMS: FormItem[] = [
     required: true,
     category: 'training',
     action: 'complete',
-    href: '/partners/barbershop-apprenticeship/apply',
+    href: '/programs/barber-apprenticeship/apply?type=partner_shop',
   },
   {
     id: 'compensation-agreement',
@@ -335,7 +335,7 @@ export default function RequiredFormsPage() {
             <p className="text-sm text-gray-600">Submit your partner application to get started.</p>
           </div>
           <Link
-            href="/partners/barbershop-apprenticeship/apply"
+            href="/programs/barber-apprenticeship/apply?type=partner_shop"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 whitespace-nowrap"
           >
             Apply Now <ArrowRight className="w-4 h-4" />

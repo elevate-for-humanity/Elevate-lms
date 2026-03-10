@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { getHeroImage, isVideoHero, shouldPrioritizeHero } from '@/lib/hero-config';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface PageHeroProps {
   title?: string;
@@ -13,6 +15,7 @@ interface PageHeroProps {
 export default function PageHero({ title, description, forceHero }: PageHeroProps) {
   const pathname = usePathname();
   const heroSrc = forceHero ?? getHeroImage(pathname);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
 
   // No hero for this page
   if (!heroSrc) {
@@ -32,15 +35,20 @@ export default function PageHero({ title, description, forceHero }: PageHeroProp
   return (
     <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
       {isVideo ? (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src={heroSrc} type="video/mp4" />
-        </video>
+        <>
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src={heroSrc} type="video/mp4" />
+          </video>
+          {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+        </>
       ) : (
         <Image
           src={heroSrc}

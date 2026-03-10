@@ -7,10 +7,11 @@ export const WELDING: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Welding & Fabrication',
 
-  heroImage: '/images/pages/comp-highlights-welding.jpg',
-  heroImageAlt: 'Welding student practicing MIG welding with protective equipment',
+  heroImage: '/images/pages/welding-sparks.jpg',
+  heroImageAlt: 'Welding student practicing MIG welding in a training lab',
+  videoSrc: '/videos/welding-trades.mp4',
 
-  deliveryMode: 'in-person',
+  deliveryMode: 'hybrid',
   durationWeeks: 10,
   hoursPerWeekMin: 20,
   hoursPerWeekMax: 25,
@@ -96,7 +97,7 @@ export const WELDING: ProgramSchema = {
   cta: { applyHref: '/programs/welding/apply', advisorHref: '/contact', courseHref: '/programs/welding' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Ability to lift 50 lbs', 'No prior welding experience required'],
   equipmentIncluded: 'Welding helmet, gloves, and all consumables provided. Certification exam fees included.',
-  modality: 'In-person — hands-on welding lab at Elevate training facility',
+  modality: 'Hybrid — Online theory via LMS, hands-on welding lab at Elevate training facility',
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Indianapolis-area fabrication shops', 'Construction contractors', 'Manufacturing employers'],
   pricingIncludes: ['AWS certification exam fees', 'OSHA 10 certification', 'Welding helmet and gloves', 'All consumables and materials', 'Career placement support'],

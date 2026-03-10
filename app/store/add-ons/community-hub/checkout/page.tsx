@@ -5,7 +5,7 @@ export default function CommunityHubCheckoutPage() {
     <AddOnCheckout
       productId="community-hub"
       productName="Community Hub"
-      productImage="/images/pages/comp-cta-training.jpg"
+      productImage="/images/pages/about-partners-hero.jpg"
       backHref="/store/add-ons/community-hub"
       oneTimePrice={1997}
       monthlyPrice={549}

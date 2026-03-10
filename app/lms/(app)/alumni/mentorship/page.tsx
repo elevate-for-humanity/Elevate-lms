@@ -93,12 +93,12 @@ export default async function MentorshipPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentorList.map((mentor: any, idx: number) => {
               const images = [
-                '/images/pages/comp-cta-career.jpg',
-                '/images/pages/comp-cta-training.jpg',
-                '/images/pages/comp-cta-training.jpg',
-                '/images/pages/comp-cta-training.jpg',
-                '/images/pages/comp-cta-training.jpg',
-                '/images/pages/comp-cta-training.jpg',
+                '/images/pages/career-services-page-6.jpg',
+                '/images/pages/career-services-page-6.jpg',
+                '/images/pages/career-services-page-6.jpg',
+                '/images/pages/career-services-page-6.jpg',
+                '/images/pages/career-services-page-6.jpg',
+                '/images/pages/career-services-page-6.jpg',
               ];
               return (
               <div key={mentor.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">

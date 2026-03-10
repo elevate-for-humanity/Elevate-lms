@@ -56,17 +56,17 @@ const useCases = [
   {
     title: 'Workforce Boards',
     description: 'Track WIOA performance metrics, generate compliance reports, and monitor provider outcomes.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/admin-analytics-hero.jpg',
   },
   {
     title: 'Training Providers',
     description: 'Monitor student progress, identify at-risk learners, and optimize program delivery.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/admin-analytics-hero.jpg',
   },
   {
     title: 'Employers',
     description: 'Track apprentice performance, measure ROI on training investments, and forecast hiring needs.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/admin-analytics-hero.jpg',
   },
 ];
 

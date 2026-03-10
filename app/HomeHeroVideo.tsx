@@ -1,61 +1,74 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
+import { Volume2, VolumeX } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function HomeHeroVideo() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const hasPlayedVoiceover = useRef(false);
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
-  // Autoplay silent video on load
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const play = async () => {
-      try { await video.play(); setIsPlaying(true); } catch { /* poster visible */ }
-    };
-    if (video.readyState >= 2) play();
-    else video.addEventListener('loadeddata', play, { once: true });
-    return () => video.removeEventListener('loadeddata', play);
-  }, []);
-
-  // Play voiceover on first user interaction (scroll, click, touch, or keypress)
-  useEffect(() => {
+  const toggleVoiceover = () => {
     const audio = voiceoverRef.current;
     if (!audio) return;
-
-    const tryPlay = () => {
-      if (hasPlayedVoiceover.current) return;
-      hasPlayedVoiceover.current = true;
-      audio.play().catch(() => {
-        // If still blocked, reset so next gesture can try
-        hasPlayedVoiceover.current = false;
-      });
-    };
-
-    window.addEventListener('scroll', tryPlay, { once: true, passive: true });
-    window.addEventListener('click', tryPlay, { once: true, passive: true });
-    window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-    window.addEventListener('keydown', tryPlay, { once: true, passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', tryPlay);
-      window.removeEventListener('click', tryPlay);
-      window.removeEventListener('touchstart', tryPlay);
-      window.removeEventListener('keydown', tryPlay);
-    };
-  }, []);
+    audio.volume = 1.0;
+    if (!voiceActive) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+      setVoiceActive(true);
+    } else {
+      audio.pause();
+      setVoiceActive(false);
+    }
+  };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden">
-      <Image src="/images/pages/home-hero-video.jpg" alt="Elevate for Humanity career training" fill priority sizes="100vw" className="object-cover object-center z-0" />
-      <video ref={videoRef} className={`absolute inset-0 w-full h-full object-cover object-center z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`} loop muted playsInline autoPlay preload="metadata">
+    <div className="relative w-full h-full overflow-hidden">
+      {/* Poster — shown until video loads */}
+      <Image
+        src="/images/pages/home-hero-video.jpg"
+        alt="Elevate for Humanity career training"
+        fill priority sizes="100vw"
+        className="object-cover object-center"
+      />
+      {/* Looping video — plays and unmutes on load */}
+      <video
+        ref={videoRef}
+        autoPlay muted loop playsInline
+        onCanPlay={() => setVideoReady(true)}
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+        poster="/images/pages/home-hero-video.jpg"
+        preload="auto"
+      >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" />
+
+      {/* Separate voiceover audio track */}
+      <audio
+        ref={voiceoverRef}
+        src="/audio/welcome-voiceover.mp3"
+        preload="auto"
+        onEnded={() => setVoiceActive(false)}
+      />
+
+      {/* Narration toggle */}
+      <button
+        onClick={toggleVoiceover}
+        className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all
+          ${voiceActive
+            ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
+            : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
+          }`}
+        aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+      >
+        {voiceActive
+          ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
+          : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>
+        }
+      </button>
     </div>
   );
 }

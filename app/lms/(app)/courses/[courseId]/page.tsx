@@ -366,9 +366,9 @@ export default async function CoursePage({ params }: { params: Params }) {
                             <Image
                               src={
                                 lesson.content_type === 'quiz'
-                                  ? '/images/pages/comp-cta-career.jpg'
+                                  ? '/images/pages/training-classroom.jpg'
                                   : lesson.content_type === 'reading'
-                                  ? '/images/pages/about-career-training.jpg'
+                                  ? '/images/pages/adult-learner.jpg'
                                   : '/images/pages/hvac-technician.jpg'
                               }
                               alt={lesson.title}

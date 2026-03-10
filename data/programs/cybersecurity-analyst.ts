@@ -7,8 +7,9 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   sector: 'technology',
   category: 'Cybersecurity',
 
-  heroImage: '/images/pages/comp-universal-hero.jpg',
-  heroImageAlt: 'Cybersecurity analyst monitoring network security dashboards',
+  heroImage: '/images/pages/cybersecurity-screen.jpg',
+  heroImageAlt: 'Cybersecurity student analyzing network security',
+  videoSrc: '/videos/it-technology.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 12,
@@ -23,7 +24,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   schedule: 'Mon–Fri, 18–22 hours per week (flexible scheduling)',
   eveningSchedule: 'Evening cohorts available for working adults.',
   cohortSize: '10–14 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$4,200',
   badge: '5-Star Top Job — DWD',
   badgeColor: 'purple',
@@ -199,7 +200,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
     'Laptop loaner for duration of program',
     'Career placement support',
   ],
-  paymentTerms: 'Self-pay: $4,200 or 4-month payment plan. WIOA/NLJ: $0 out-of-pocket with approved funding.',
+  paymentTerms: 'Self-pay: $4,200 with payment plans. WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed.',
 
   faqs: [
     { question: 'Do I need prior cybersecurity experience?', answer: 'No. We start with networking fundamentals and build to Security+ level. CompTIA A+ is recommended but not required.' },
@@ -215,5 +216,5 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   ],
 
   metaTitle: 'Cybersecurity Analyst | CompTIA Security+ | Indianapolis',
-  metaDescription: 'Earn CompTIA Security+ and Network+ certifications. 12-week program. Cybersecurity analysts earn $112,000/year. WIOA funding available.',
+  metaDescription: 'Earn CompTIA Security+ and Network+ certifications. 12-week program. Cybersecurity analysts earn $112,000/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

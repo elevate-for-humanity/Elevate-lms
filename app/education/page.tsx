@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail } from 'lucide-react';
+import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 
 const NAV = [
   { label: 'Programs', href: '/programs' },
@@ -19,8 +19,8 @@ const PROGRAMS = [
   {
     title: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/pages/comp-cta-training.jpg',
-    icon: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/workforce-training.jpg',
+    icon: '/images/pages/workforce-training.jpg',
     desc: 'CNA, Medical Assistant, Phlebotomy, and more. Hands-on clinical training for in-demand healthcare careers.',
     tags: ['CNA', 'Medical Assistant', 'Phlebotomy', 'CPR & First Aid'],
   },
@@ -35,8 +35,8 @@ const PROGRAMS = [
   {
     title: 'Technology',
     href: '/programs/technology',
-    image: '/images/pages/comp-cta-training.jpg',
-    icon: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/workforce-training.jpg',
+    icon: '/images/pages/workforce-training.jpg',
     desc: 'Cybersecurity, IT Support, Software Development, and Networking. Launch a career in tech.',
     tags: ['Cybersecurity', 'IT Help Desk', 'Software Dev'],
   },
@@ -51,34 +51,34 @@ const PROGRAMS = [
   {
     title: 'Beauty & Barbering',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/comp-cta-programs.jpg',
-    icon: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/workforce-training.jpg',
+    icon: '/images/pages/workforce-training.jpg',
     desc: 'Barber apprenticeships and cosmetology training. Learn from licensed professionals in real shop settings.',
     tags: ['Barber Apprenticeship', 'Cosmetology', 'Nail Tech'],
   },
   {
     title: 'Business & Finance',
     href: '/programs/business',
-    image: '/images/pages/comp-cta-programs.jpg',
-    icon: '/images/pages/comp-cta-programs.jpg',
+    image: '/images/pages/workforce-training.jpg',
+    icon: '/images/pages/workforce-training.jpg',
     desc: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship programs.',
     tags: ['Bookkeeping', 'Tax Prep', 'Entrepreneurship'],
   },
 ];
 
 const LOCATIONS = [
-  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/comp-cta-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
-  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/comp-cta-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
+  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/workforce-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
+  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/workforce-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
   { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Career training aligned with Ohio industry demand.' },
   { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Expanding workforce development across Tennessee.' },
-  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/comp-cta-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
+  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/workforce-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
 ];
 
 const STATS = [
-  { icon: '/images/icons/book.png', value: '30+', label: 'Training Programs' },
-  { icon: '/images/icons/users.png', value: '5', label: 'States Served' },
-  { icon: '/images/icons/award.png', value: '15+', label: 'Industry Certifications' },
-  { icon: '/images/icons/check-circle.png', value: '100%', label: 'Job Placement Support' },
+  { Icon: BookOpen, value: '30+', label: 'Training Programs' },
+  { Icon: Users, value: '5', label: 'States Served' },
+  { Icon: Award, value: '15+', label: 'Industry Certifications' },
+  { Icon: CheckCircle, value: '100%', label: 'Job Placement Support' },
 ];
 
 export default function EducationLandingPage() {
@@ -138,7 +138,7 @@ export default function EducationLandingPage() {
       {/* VIDEO HERO — no overlay, text below video */}
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '360px' }}>
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/comp-cta-career.jpg">
+          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/workforce-training.jpg">
             <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
@@ -169,7 +169,7 @@ export default function EducationLandingPage() {
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="flex items-center gap-3 justify-center">
-              <Image src={s.icon} alt={s.label} width={36} height={36} className="w-9 h-9 rounded" />
+              <s.Icon className="w-9 h-9 text-brand-red-600 flex-shrink-0" />
               <div>
                 <div className="text-2xl font-bold text-gray-900">{s.value}</div>
                 <div className="text-sm text-gray-500">{s.label}</div>

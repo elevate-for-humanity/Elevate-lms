@@ -150,19 +150,19 @@ async function _GET(request: NextRequest) {
       shopId: site.shop_id,
     }));
 
-    // Check for active shift from timeclock_shifts table
+    // Check for active shift from progress_entries (the table timeclock/action writes to)
     let activeShift = null;
     if (apprentice) {
       try {
         const { data: shift } = await db
-          .from('timeclock_shifts')
+          .from('progress_entries')
           .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
           .eq('apprentice_id', apprentice.id)
           .is('clock_out_at', null)
           .order('clock_in_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        
+
         if (shift) {
           activeShift = {
             entryId: shift.id,
@@ -173,8 +173,8 @@ async function _GET(request: NextRequest) {
           };
         }
       } catch (err) {
-          logger.error("Unhandled error", err instanceof Error ? err : undefined);
-        }
+        logger.error('Timeclock context: active shift lookup failed', err instanceof Error ? err : undefined);
+      }
     }
 
     return NextResponse.json({

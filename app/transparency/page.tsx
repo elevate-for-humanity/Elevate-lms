@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 export default function TransparencyPage() {
   const outcomes = [
     { label: 'Programs Available', value: '10+', image: '/images/pages/comp-home-pathways-support.jpg' },
-    { label: 'Placement Goal', value: '85%', image: '/images/pages/comp-cta-career.jpg' },
-    { label: 'Training Cost', value: '$0', image: '/images/pages/comp-cta-career.jpg' },
+    { label: 'Placement Goal', value: '85%', image: '/images/pages/about-hero.jpg' },
+    { label: 'Training Cost', value: '$0', image: '/images/pages/about-hero.jpg' },
     { label: 'Support', value: '24/7', image: '/images/pages/comp-highlights-success.jpg' },
-    { label: 'Funding Sources', value: '5+', image: '/images/pages/comp-cta-career.jpg' },
+    { label: 'Funding Sources', value: '5+', image: '/images/pages/about-hero.jpg' },
     { label: 'Indiana Locations', value: '3+', image: '/images/pages/comp-highlights-success.jpg' },
   ];
 

@@ -57,6 +57,7 @@ const NAV_SECTIONS = [
       { name: 'Employers', href: '/admin/employers' },
       { name: 'Program Holders', href: '/admin/program-holders' },
       { name: 'Shops', href: '/admin/shops' },
+      { name: 'Barber Shop Applications', href: '/admin/barber-shop-applications' },
     ],
   },
   {

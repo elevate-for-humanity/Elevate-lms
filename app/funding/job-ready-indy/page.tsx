@@ -21,15 +21,15 @@ export default function JobReadyIndyPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/jri-hero.jpg" alt="Job Ready Indy workforce training" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-black/40 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 pb-10 w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Job Ready Indy</h1>
-            <p className="text-xl text-white/90 font-medium">Indianapolis Workforce Initiative — Funded Career Training for Marion County Residents</p>
-          </div>
-        </div>
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Job Ready Indy</h1>
+          <p className="text-slate-600 mt-2">Indianapolis workforce initiative — funded career training for Marion County residents.</p>
+        </div>
+      </div>
 
       {/* What Is Job Ready Indy */}
       <section className="py-14 sm:py-20">

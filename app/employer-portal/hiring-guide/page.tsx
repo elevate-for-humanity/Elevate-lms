@@ -23,7 +23,7 @@ const steps = [
     number: 2,
     title: 'Review Candidates',
     description: 'Browse pre-screened candidates with verified WOTC eligibility. Each profile shows certifications, skills, and potential tax credits.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Check WOTC eligibility status', 'Review completed certifications', 'Look at work history'],
   },
   {
@@ -37,21 +37,21 @@ const steps = [
     number: 4,
     title: 'Complete WOTC Forms',
     description: 'We handle IRS Form 8850 and state forms. Just verify hire date and we submit within the 28-day deadline.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/employer-handshake.jpg',
     tips: ['Sign forms within 28 days', 'Verify start date accuracy', 'Keep copies for records'],
   },
   {
     number: 5,
     title: 'Onboard & Train',
     description: 'Use our onboarding checklists and training resources. Track progress and certifications in one place.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Complete I-9 and W-4', 'Assign training modules', 'Set 90-day goals'],
   },
   {
     number: 6,
     title: 'Claim Tax Credits',
     description: 'After 120+ hours worked, we process your WOTC certification. Credits appear on your next tax filing.',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     tips: ['Track hours worked', 'Maintain employment records', 'File with annual taxes'],
   },
 ];

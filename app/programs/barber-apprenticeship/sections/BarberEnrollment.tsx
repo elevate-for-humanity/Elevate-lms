@@ -19,7 +19,7 @@ export function BarberEnrollment() {
               <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Pay in Full</h3>
               <p className="text-slate-600 text-sm mb-3">Visa, Mastercard, Amex, Discover via Stripe</p>
-              <Link href="/apply/student?program=barber-apprenticeship" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+              <Link href="/programs/barber-apprenticeship/apply?type=apprentice" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
                 Apply Now &rarr;
               </Link>
             </div>
@@ -49,7 +49,7 @@ export function BarberEnrollment() {
               <Building2 className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Employer Sponsorship</h3>
               <p className="text-slate-600 text-sm mb-3">Invoice or sponsorship agreement available</p>
-              <Link href="/partners/barbershop-apprenticeship/apply" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+              <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
                 Partner Info &rarr;
               </Link>
             </div>
@@ -79,7 +79,7 @@ export function BarberEnrollment() {
                 <li>&#x2022; Recognition as an approved training site</li>
               </ul>
               <div className="flex flex-wrap gap-3">
-                <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors">
                   Apply as Partner Shop <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-white/20 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/30 transition-colors border border-white/40">
@@ -196,7 +196,7 @@ export function BarberEnrollment() {
             <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Join Waitlist <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               <Building2 className="w-5 h-5" /> Apply as Partner Shop
             </Link>
           </div>

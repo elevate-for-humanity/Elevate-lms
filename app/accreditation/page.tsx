@@ -29,12 +29,16 @@ export default function AccreditationPage() {
       description:
         'Listed on the Indiana Eligible Training Provider List (ETPL) under the Workforce Innovation and Opportunity Act (WIOA). Eligible participants may receive funded training through their local WorkOne office.',
       id_number: 'INTraining Location ID: 10004621 · Program: Emergency Health & Safety Technician',
+      verifyUrl: 'https://intraining.dwd.in.gov/ProviderSearch/ProviderSearch.aspx',
+      verifyLabel: 'Search ETPL (search "2Exclusive")',
       icon: FileCheck,
     },
     {
       name: 'Indiana DWD Approved Training Provider',
       description:
         'Recognized by the Indiana Department of Workforce Development as an approved training provider for WIOA, Workforce Ready Grant (WRG), and Next Level Jobs.',
+      verifyUrl: 'https://www.in.gov/dwd/',
+      verifyLabel: 'Indiana DWD',
       icon: Building2,
     },
     {
@@ -42,6 +46,8 @@ export default function AccreditationPage() {
       description:
         'Registered with the U.S. Department of Labor as an apprenticeship sponsor for structured earn-and-learn programs.',
       id_number: 'RAPIDS Program ID: 2025-IN-132301 · Program: Emergency Health & Safety Technician',
+      verifyUrl: 'https://www.apprenticeship.gov/employers/registered-apprenticeship-program',
+      verifyLabel: 'DOL Apprenticeship.gov',
       icon: Award,
     },
     {
@@ -49,30 +55,40 @@ export default function AccreditationPage() {
       description:
         'Registered in the System for Award Management (SAM.gov) for federal contracting eligibility.',
       id_number: 'UEI: VX2GK5S8SZH8 · CAGE: 0Q856 · Entity: Selfish Inc',
+      verifyUrl: 'https://sam.gov/search/?keywords=VX2GK5S8SZH8',
+      verifyLabel: 'Verify on SAM.gov (UEI: VX2GK5S8SZH8)',
       icon: Building2,
     },
     {
       name: 'EPA Section 608 Approved Testing Site',
       description:
-        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering).',
+        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations on-site through ESCO Institute and Mainstream Engineering — both EPA-approved certifying organizations.',
+      verifyUrl: 'https://www.epa.gov/section608/section-608-technician-certification',
+      verifyLabel: 'EPA Section 608 Program',
       icon: Shield,
     },
     {
       name: '501(c)(3) Nonprofit — Selfish Inc',
       description:
         'IRS-recognized tax-exempt charitable organization. Candid/GuideStar registered nonprofit.',
+      verifyUrl: 'https://www.guidestar.org/',
+      verifyLabel: 'Search GuideStar (search "Selfish Inc")',
       icon: CheckCircle,
     },
     {
       name: 'ITAP / INDOT Registration',
       description:
         '2Exclusive LLC-S registered with INDOT\'s Indiana Transportation Advancement Program for transportation and construction-aligned workforce services.',
+      verifyUrl: 'https://www.in.gov/dot/',
+      verifyLabel: 'INDOT',
       icon: Building2,
     },
     {
       name: 'CareerSafe / OSHA-Aligned Safety Training',
       description:
         'OSHA 10-Hour and OSHA 30-Hour safety certification preparation integrated into trades and safety pathways.',
+      verifyUrl: 'https://www.osha.gov/training/outreach',
+      verifyLabel: 'OSHA Outreach Training Program',
       icon: Shield,
     },
     {
@@ -93,28 +109,15 @@ export default function AccreditationPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image
-            src="/images/pages/accreditation-hero.jpg"
-            alt="Workforce training classroom"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-5xl mx-auto px-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
-                Accreditation &amp; Compliance
-              </h1>
-              <p className="text-lg text-white/85 max-w-2xl drop-shadow">
-                ETPL-listed, DWD-approved workforce training with verifiable credentials and compliance documentation
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-[200px] sm:h-[260px] w-full overflow-hidden">
+        <Image src="/images/pages/accreditation-hero.jpg" alt="Workforce training classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Accreditation &amp; Compliance</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl">ETPL-listed, DWD-approved workforce training with verifiable credentials and compliance documentation.</p>
+        </div>
+      </div>
 
       {/* Credentials Grid */}
       <section className="py-16 bg-gray-50">
@@ -139,13 +142,95 @@ export default function AccreditationPage() {
                   <h3 className="font-bold text-lg mb-2">{cred.name}</h3>
                   <p className="text-gray-600 mb-2">{cred.description}</p>
                   {cred.id_number && (
-                    <p className="text-sm text-brand-blue-600 font-mono">
+                    <p className="text-xs text-slate-500 font-mono mb-2 leading-relaxed">
                       {cred.id_number}
                     </p>
+                  )}
+                  {(cred as any).verifyUrl && (
+                    <a
+                      href={(cred as any).verifyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-800 mt-1"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      {(cred as any).verifyLabel || 'Verify'}
+                    </a>
                   )}
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Certification Testing Partners */}
+      <section className="py-12 bg-white border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Certification Testing Partners</h2>
+          <p className="text-slate-500 text-sm mb-8 max-w-2xl">
+            Elevate is an authorized proctored testing site for the following certifying organizations. Students earn credentials directly from these bodies — not from Elevate.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                org: 'ESCO Institute',
+                cert: 'EPA Section 608 Universal',
+                detail: 'Federal refrigerant handling certification required by the Clean Air Act. Proctored on-site at Elevate.',
+                verifyUrl: 'https://www.escogroup.org/esco/certifications/epa608.aspx',
+                verifyLabel: 'ESCO Institute — EPA 608',
+              },
+              {
+                org: 'Mainstream Engineering',
+                cert: 'EPA Section 608 Universal',
+                detail: 'Second EPA-approved certifying organization. Elevate is authorized to proctor exams for both ESCO and Mainstream.',
+                verifyUrl: 'https://www.mainstream-engr.com/certification/',
+                verifyLabel: 'Mainstream Engineering Certification',
+              },
+              {
+                org: 'Certiport',
+                cert: 'IT Specialist, MOS, Adobe, QuickBooks',
+                detail: 'Authorized Certiport testing center for Microsoft Office Specialist, IT Specialist, Adobe Certified Professional, and Intuit QuickBooks certifications.',
+                verifyUrl: 'https://certiport.pearsonvue.com/Locator',
+                verifyLabel: 'Find Certiport Testing Centers',
+              },
+              {
+                org: 'CompTIA',
+                cert: 'A+, Network+, Security+',
+                detail: 'CompTIA certification preparation integrated into IT and cybersecurity programs. Exam vouchers provided to eligible students.',
+                verifyUrl: 'https://www.comptia.org/certifications',
+                verifyLabel: 'CompTIA Certifications',
+              },
+              {
+                org: 'American Heart Association',
+                cert: 'CPR/AED/First Aid',
+                detail: 'AHA-certified CPR, AED, and First Aid training included with healthcare and trades programs.',
+                verifyUrl: 'https://www.heart.org/en/cpr',
+                verifyLabel: 'AHA CPR Certification',
+              },
+              {
+                org: 'OSHA / CareerSafe',
+                cert: 'OSHA 10-Hour & 30-Hour',
+                detail: 'OSHA Outreach Training Program. DOL wallet card issued upon completion. Integrated into all trades programs.',
+                verifyUrl: 'https://www.osha.gov/training/outreach',
+                verifyLabel: 'OSHA Outreach Training',
+              },
+            ].map((p) => (
+              <div key={p.org} className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+                <p className="text-xs font-bold text-brand-blue-600 uppercase tracking-wider mb-1">{p.org}</p>
+                <p className="font-bold text-slate-900 text-sm mb-2">{p.cert}</p>
+                <p className="text-xs text-slate-500 leading-relaxed mb-3">{p.detail}</p>
+                <a
+                  href={p.verifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-800"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  {p.verifyLabel}
+                </a>
+              </div>
+            ))}
           </div>
         </div>
       </section>

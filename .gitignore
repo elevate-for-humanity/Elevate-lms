@@ -169,3 +169,4 @@ lighthouse-*.json
 marketing-audit-report.json
 broken-links-report.json
 r2-url-mapping.json
+output/

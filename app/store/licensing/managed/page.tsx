@@ -149,8 +149,8 @@ export default function ManagedPlatformPage() {
             {[
               { icon: Users, title: 'Your Branding', desc: 'Your logo, colors, and domain. Students and employers see your organization — the platform is invisible.', img: '/images/pages/demos-hero.jpg' },
               { icon: BarChart3, title: 'Your Data', desc: 'Your learners, your programs, your reports. Full data export anytime. You own everything.', img: '/images/pages/demos-hero.jpg' },
-              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance. 99.9% uptime SLA.', img: '/images/pages/comp-cta-career.jpg' },
-              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/pages/comp-cta-career.jpg' },
+              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance. 99.9% uptime SLA.', img: '/images/pages/program-holder-page-1.jpg' },
+              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/pages/program-holder-page-1.jpg' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div className="relative h-36 overflow-hidden">

@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Scholarships & Financial Aid | Training Funding',
     description: 'Explore scholarships, grants, and funding options for career training.',
-    images: [`${SITE_URL}/images/pages/comp-cta-career.jpg`],
+    images: [`${SITE_URL}/images/pages/funding-page-1.jpg`],
   },
 };
 

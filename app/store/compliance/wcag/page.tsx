@@ -18,25 +18,25 @@ const features = [
   {
     title: 'Screen Reader Support',
     description: 'Full compatibility with JAWS, NVDA, VoiceOver, and other assistive technologies.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/accessibility-hero.jpg',
     items: ['ARIA labels', 'Semantic HTML', 'Alt text automation', 'Focus management'],
   },
   {
     title: 'Keyboard Navigation',
     description: 'Complete keyboard accessibility for all interactive elements.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/accessibility-hero.jpg',
     items: ['Tab order optimization', 'Skip links', 'Focus indicators', 'Shortcut keys'],
   },
   {
     title: 'Visual Accessibility',
     description: 'Color contrast, text sizing, and visual presentation compliance.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/tech-classroom.jpg',
     items: ['4.5:1 contrast ratio', 'Resizable text', 'No color-only info', 'Reduced motion'],
   },
   {
     title: 'Multimedia Accessibility',
     description: 'Captions, transcripts, and audio descriptions for all media.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/tech-classroom.jpg',
     items: ['Closed captions', 'Transcripts', 'Audio descriptions', 'Sign language'],
   },
 ];

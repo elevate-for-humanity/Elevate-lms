@@ -208,6 +208,17 @@ async function _POST(
     // which enforces quiz pass verification and competency evidence.
     // This endpoint only tracks lesson-level progress.
 
+    // HVAC workflow: advance credential sequence when all lessons complete
+    if (courseCompleted && lesson.course_id === 'f0593164-55be-5867-98e7-8a86770a8dd0') {
+      try {
+        const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
+        const wfResult = await advanceHvacWorkflow(user.id);
+        logger.info('[hvac-workflow] Auto-advanced on course completion', { userId: user.id, ...wfResult });
+      } catch (wfErr) {
+        logger.error('[hvac-workflow] Auto-advance failed (non-fatal):', wfErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       lessonId,

@@ -43,8 +43,8 @@ export default function FAQPage() {
     { id: '18', question: 'Do I need a background check?', answer: 'Some programs require background checks, particularly healthcare and CDL. Having a record does not automatically disqualify you — many of our programs are designed for justice-involved individuals. We review each situation individually and help you understand which programs are the best fit.', category: 'Eligibility', display_order: 15 },
     { id: '19', question: 'Can non-U.S. citizens enroll?', answer: 'WIOA-funded programs require U.S. citizenship or eligible immigration status with work authorization. Self-pay programs may have different requirements. Contact us to discuss your specific situation.', category: 'Eligibility', display_order: 16 },
     // Career Services
-    { id: '7', question: 'Do you help with job placement?', answer: 'Yes! Every program includes career services: resume writing, interview preparation, and direct connections to 50+ employer partners actively hiring our graduates.', category: 'Career Services', display_order: 17 },
-    { id: '20', question: 'What is the job placement rate?', answer: 'Our placement goal is 85% within 90 days of program completion. Actual rates vary by program, cohort size, and market conditions. We provide career services including resume support, interview prep, and employer introductions to every graduate.', category: 'Career Services', display_order: 18 },
+    { id: '7', question: 'Do you help with job placement?', answer: 'Yes. Every program includes career services: resume writing, interview preparation, and direct connections to employer partners actively hiring in your field.', category: 'Career Services', display_order: 17 },
+    { id: '20', question: 'What is the job placement rate?', answer: 'We provide career services to every graduate including resume support, interview prep, and employer introductions. Placement outcomes vary by program, cohort, and market conditions.', category: 'Career Services', display_order: 18 },
     { id: '21', question: 'What salary can I expect after training?', answer: 'Starting salaries vary by field. CNA: $15-$20/hr. Medical Assistant: $16-$22/hr. CDL Driver: $50,000-$75,000/yr. HVAC Technician: $18-$28/hr. Barber: $30,000-$60,000/yr depending on clientele. See individual program pages for detailed salary ranges.', category: 'Career Services', display_order: 19 },
     // General / Logistics
     { id: '8', question: 'Where are you located?', answer: 'We are based in Indianapolis, Indiana (Marion County). Training locations vary by program. Some programs offer hybrid or online options.', category: 'General', display_order: 20 },
@@ -72,21 +72,15 @@ export default function FAQPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] flex items-center overflow-hidden">
-        <Image
-          src="/images/pages/faq-page-1.jpg"
-          alt="Students in a workforce training classroom"
-          fill
-          quality={90}
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
-            Frequently Asked Questions
-          </h1>
-        </div>
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
+        <Image src="/images/pages/faq-page-1.jpg" alt="Students in a workforce training classroom" fill quality={90} className="object-cover" priority />
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Frequently Asked Questions</h1>
+          <p className="text-slate-600 mt-2">Answers about programs, funding, enrollment, and credentials.</p>
+        </div>
+      </div>
 
       {/* Quick Links */}
       <section className="py-8 bg-white border-b">

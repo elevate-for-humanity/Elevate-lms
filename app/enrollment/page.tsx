@@ -36,7 +36,7 @@ export default async function EnrollmentPage() {
     { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '20', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
     { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/comp-pathway-trades.jpg' },
     { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/comp-pathway-trades.jpg' },
-    { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/comp-cta-training.jpg' },
+    { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/apply-page-1.jpg' },
   ];
 
   return (

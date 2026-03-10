@@ -30,18 +30,24 @@ export default async function ApprenticeSkillsPage() {
     .eq('user_id', user.id)
     .single();
 
-  // Get skill categories and skills
-  const { data: skillCategories } = await db
+  // Get skill categories (flat — apprentice_skills join omitted until migration runs)
+  const { data: rawCategories } = await db
     .from('skill_categories')
-    .select(`
-      *,
-      skills:apprentice_skills(
-        *,
-        progress:apprentice_skill_progress(*)
-      )
-    `)
+    .select('*')
     .eq('program_id', apprentice?.program_id)
     .order('order', { ascending: true });
+
+  // Get skills separately (table may not exist yet; errors are non-fatal)
+  const { data: rawSkills } = await db
+    .from('apprentice_skills')
+    .select('*, progress:apprentice_skill_progress(*)')
+    .eq('program_id', apprentice?.program_id);
+
+  // Attach skills to their categories
+  const skillCategories = (rawCategories || []).map((cat: any) => ({
+    ...cat,
+    skills: (rawSkills || []).filter((s: any) => s.category_id === cat.id),
+  }));
 
   // Get overall progress
   const { data: progressSummary } = await db

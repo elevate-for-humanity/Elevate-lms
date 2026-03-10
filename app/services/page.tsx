@@ -17,7 +17,7 @@ const services = [
     title: 'Tax Services',
     description: 'Professional tax preparation and maximum refund guarantee',
     href: '/tax-services',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-services.jpg',
   },
   {
     title: 'Supersonic Fast Cash',
@@ -59,13 +59,13 @@ const services = [
     title: 'Support Services',
     description: 'Transportation, childcare, barrier removal',
     href: '/support',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-services.jpg',
   },
   {
     title: 'Help Center',
     description: 'FAQs, guides, and support resources',
     href: '/help',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-services.jpg',
   },
 ];
 

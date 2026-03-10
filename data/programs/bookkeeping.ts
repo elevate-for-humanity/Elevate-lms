@@ -7,10 +7,11 @@ export const BOOKKEEPING: ProgramSchema = {
   sector: 'business',
   category: 'Accounting & Finance',
 
-  heroImage: '/images/pages/comp-cta-training.jpg',
-  heroImageAlt: 'Bookkeeper working with financial documents and QuickBooks software',
+  heroImage: '/images/pages/bookkeeping-ledger.jpg',
+  heroImageAlt: 'Bookkeeping and accounting training program',
+  videoSrc: '/videos/business-finance.mp4',
 
-  deliveryMode: 'in-person',
+  deliveryMode: 'hybrid',
   durationWeeks: 5,
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
@@ -162,7 +163,7 @@ export const BOOKKEEPING: ProgramSchema = {
     'No prior accounting experience required',
   ],
   equipmentIncluded: 'QuickBooks Online subscription (program duration), all training materials, and certification exam voucher included',
-  modality: 'In-person instruction at Elevate training center with hands-on QuickBooks labs',
+  modality: 'Hybrid — Online coursework via LMS, in-person computer labs at Elevate training center',
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Katz Sapper & Miller', 'Blue & Co.', 'Somerset CPAs', 'Small Business Development Center (SBDC)'],
   pricingIncludes: [

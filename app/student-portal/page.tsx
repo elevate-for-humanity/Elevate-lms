@@ -53,7 +53,7 @@ export default function StudentPortalPage() {
       description: 'Access course materials, lectures, and assignments',
       href: '/lms/courses',
       color: 'blue',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
     {
       icon: Calendar,
@@ -61,7 +61,7 @@ export default function StudentPortalPage() {
       description: 'View class schedule, deadlines, and upcoming events',
       href: '/student-portal/schedule',
       color: 'green',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
     {
       icon: BarChart3,
@@ -69,7 +69,7 @@ export default function StudentPortalPage() {
       description: 'Track your academic performance and completion status',
       href: '/student-portal/grades',
       color: 'blue',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
     {
       icon: Users,
@@ -77,7 +77,7 @@ export default function StudentPortalPage() {
       description: 'Connect with instructors and get support',
       href: '/lms/support',
       color: 'orange',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
     {
       icon: Briefcase,
@@ -85,7 +85,7 @@ export default function StudentPortalPage() {
       description: 'Resume help, job placement, and interview prep',
       href: '/career-services',
       color: 'teal',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
     {
       icon: FileText,
@@ -93,7 +93,7 @@ export default function StudentPortalPage() {
       description: 'Transcripts, certificates, and important forms',
       href: '/lms/files',
       color: 'indigo',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/staff-portal-page-1.jpg',
     },
   ];
 

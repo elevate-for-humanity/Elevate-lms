@@ -1,165 +1,98 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Downloads real workforce photos from Pexels for all program pages and site sections.
+# Pexels free license — no attribution required for web use.
 
-# Download Artlist Images - Aggressive Approach
-# This script attempts multiple methods to bypass Cloudflare
+DEST="public/images/pages"
+mkdir -p "$DEST"
 
-set -e
-
-echo "🖼️  Artlist Image Downloader"
-echo ""
-
-# Create directories
-mkdir -p public/images/supersonic-fast-cash
-mkdir -p public/images/career-services
-mkdir -p public/images/programs
-
-# Function to download with multiple fallbacks
-download_image() {
-    local name="$1"
-    local url="$2"
-    local output="$3"
-    
-    echo "📥 Downloading: $name"
-    echo "   URL: $url"
-    echo "   Output: $output"
-    
-    # Method 1: Try with curl and realistic headers
-    if curl -L \
-        -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-        -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" \
-        -H "Accept-Language: en-US,en;q=0.9" \
-        -H "Accept-Encoding: gzip, deflate, br" \
-        -H "Connection: keep-alive" \
-        -H "Upgrade-Insecure-Requests: 1" \
-        -H "Sec-Fetch-Dest: document" \
-        -H "Sec-Fetch-Mode: navigate" \
-        -H "Sec-Fetch-Site: none" \
-        -H "Cache-Control: max-age=0" \
-        --compressed \
-        -o "$output" \
-        "$url" 2>/dev/null; then
-        
-        # Check if we got HTML (Cloudflare challenge) or actual image
-        if file "$output" | grep -q "HTML"; then
-            echo "   ⚠️  Got Cloudflare challenge page, trying alternative..."
-            rm -f "$output"
-            
-            # Method 2: Try wget with different approach
-            if wget \
-                --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-                --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-                --header="Accept-Language: en-US,en;q=0.9" \
-                --no-check-certificate \
-                -O "$output" \
-                "$url" 2>/dev/null; then
-                
-                if file "$output" | grep -q "HTML"; then
-                    echo "   ❌ Still getting Cloudflare challenge"
-                    rm -f "$output"
-                    return 1
-                else
-                    echo "   ✅ Success with wget!"
-                    return 0
-                fi
-            else
-                echo "   ❌ wget failed"
-                return 1
-            fi
-        else
-            echo "   ✅ Success with curl!"
-            return 0
-        fi
-    else
-        echo "   ❌ curl failed"
-        return 1
-    fi
+dl() {
+  local name="$1"
+  local url="$2"
+  if [ -f "$DEST/$name" ]; then
+    echo "skip: $name"
+  else
+    curl -sL "$url" -o "$DEST/$name" && echo "✅ $name" || echo "❌ FAILED: $name"
+  fi
 }
 
-# Download each image
+echo "=== HEALTHCARE ==="
+dl "cna-patient-care.jpg"       "https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cna-vitals.jpg"             "https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cna-clinical.jpg"           "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "medical-assistant-lab.jpg"  "https://images.pexels.com/photos/4226119/pexels-photo-4226119.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "medical-assistant-desk.jpg" "https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "phlebotomy-draw.jpg"        "https://images.pexels.com/photos/4047186/pexels-photo-4047186.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "phlebotomy-lab.jpg"         "https://images.pexels.com/photos/3938023/pexels-photo-3938023.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cpr-mannequin.jpg"          "https://images.pexels.com/photos/6823601/pexels-photo-6823601.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cpr-aed.jpg"                "https://images.pexels.com/photos/6823568/pexels-photo-6823568.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "pharmacy-tech.jpg"          "https://images.pexels.com/photos/5910955/pexels-photo-5910955.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "healthcare-classroom.jpg"   "https://images.pexels.com/photos/8376277/pexels-photo-8376277.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "healthcare-grad.jpg"        "https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== HVAC / TRADES ==="
+dl "hvac-unit.jpg"              "https://images.pexels.com/photos/5691659/pexels-photo-8486944.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "hvac-ductwork.jpg"          "https://images.pexels.com/photos/5691658/pexels-photo-8486945.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "hvac-tools.jpg"             "https://images.pexels.com/photos/8486972/pexels-photo-8486972.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "electrical-wiring.jpg"      "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "electrical-panel.jpg"       "https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "electrical-conduit.jpg"     "https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "welding-sparks.jpg"         "https://images.pexels.com/photos/1474993/pexels-photo-1474993.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "welding-mask.jpg"           "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "welding-torch.jpg"          "https://images.pexels.com/photos/2760243/pexels-photo-2760243.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "plumbing-pipes.jpg"         "https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "plumbing-tools.jpg"         "https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "trades-classroom.jpg"       "https://images.pexels.com/photos/8005401/pexels-photo-8005401.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== CDL / TRUCKING ==="
+dl "cdl-truck-highway.jpg"      "https://images.pexels.com/photos/1427107/pexels-photo-1427107.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cdl-cab-interior.jpg"       "https://images.pexels.com/photos/2199293/pexels-photo-2199293.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cdl-pretrip.jpg"            "https://images.pexels.com/photos/906982/pexels-photo-906982.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cdl-loading-dock.jpg"       "https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cdl-driver-seat.jpg"        "https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== BARBER ==="
+dl "barber-fade.jpg"            "https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "barber-shop-interior.jpg"   "https://images.pexels.com/photos/3992874/pexels-photo-3992874.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "barber-clippers.jpg"        "https://images.pexels.com/photos/2076930/pexels-photo-2076930.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "barber-lineup.jpg"          "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "barber-student.jpg"         "https://images.pexels.com/photos/3998429/pexels-photo-3998429.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== TECHNOLOGY ==="
+dl "it-helpdesk-desk.jpg"       "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "it-hardware.jpg"            "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "it-networking.jpg"          "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cybersecurity-screen.jpg"   "https://images.pexels.com/photos/5380664/pexels-photo-5380664.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "cybersecurity-code.jpg"     "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "tech-classroom.jpg"         "https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== BUSINESS / TAX ==="
+dl "tax-prep-desk.jpg"          "https://images.pexels.com/photos/6863183/pexels-photo-6863183.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "tax-forms.jpg"              "https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "bookkeeping-ledger.jpg"     "https://images.pexels.com/photos/6693661/pexels-photo-6693661.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "office-admin-desk.jpg"      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== WORKFORCE / FUNDING ==="
+dl "workforce-training.jpg"     "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "job-placement.jpg"          "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "career-counseling.jpg"      "https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "wioa-meeting.jpg"           "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "employer-handshake.jpg"     "https://images.pexels.com/photos/3184317/pexels-photo-3184317.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "graduation-ceremony.jpg"    "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "adult-learner.jpg"          "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1280"
+dl "training-cohort.jpg"        "https://images.pexels.com/photos/3184396/pexels-photo-3184396.jpeg?auto=compress&cs=tinysrgb&w=1280"
+
+echo "=== HOMEPAGE AUDIENCE CARDS ==="
+dl "hp-train-real.jpg"          "https://images.pexels.com/photos/8199562/pexels-photo-8199562.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-funding-real.jpg"        "https://images.pexels.com/photos/6863254/pexels-photo-6863254.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-employer-real.jpg"       "https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-school-real.jpg"         "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-candidates-real.jpg"     "https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-wioa-real.jpg"           "https://images.pexels.com/photos/5668858/pexels-photo-5668858.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-grants-real.jpg"         "https://images.pexels.com/photos/6863255/pexels-photo-6863255.jpeg?auto=compress&cs=tinysrgb&w=800"
+dl "hp-government-real.jpg"     "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800"
+
 echo ""
-echo "Starting downloads..."
-echo ""
-
-# Image 1: Supersonic Fast Cash - Hero Banner
-download_image \
-    "Supersonic Fast Cash - Hero Banner" \
-    "https://artlist.io/text-to-image-ai/creations/ae1fd783-34c7-4468-81a3-aba4e1e87813" \
-    "public/images/supersonic-fast-cash/hero-banner.jpg" || echo "   ⚠️  Manual download required"
-
-echo ""
-
-# Image 2: Supersonic Fast Cash - CTA Instant Cash
-download_image \
-    "Supersonic Fast Cash - CTA Instant Cash" \
-    "https://artlist.io/text-to-image-ai/creations/a6fb219d-6fb7-401d-9da9-d40a6819f204" \
-    "public/images/supersonic-fast-cash/cta-instant-cash.jpg" || echo "   ⚠️  Manual download required"
-
-echo ""
-
-# Image 3: Supersonic Fast Cash - Subpage Hero
-download_image \
-    "Supersonic Fast Cash - Subpage Hero" \
-    "https://artlist.io/text-to-image-ai/creations/a34be5f8-316c-47ed-925d-c65e14bcba67" \
-    "public/images/supersonic-fast-cash/subpage-hero.jpg" || echo "   ⚠️  Manual download required"
-
-echo ""
-
-# Image 4: Career Services - Hero Banner (same URL as #3)
-if [ -f "public/images/supersonic-fast-cash/subpage-hero.jpg" ]; then
-    echo "📥 Copying: Career Services - Hero Banner"
-    cp "public/images/supersonic-fast-cash/subpage-hero.jpg" "public/images/career-services/hero-banner.jpg"
-    echo "   ✅ Copied from subpage-hero.jpg"
-else
-    download_image \
-        "Career Services - Hero Banner" \
-        "https://artlist.io/text-to-image-ai/creations/a34be5f8-316c-47ed-925d-c65e14bcba67" \
-        "public/images/career-services/hero-banner.jpg" || echo "   ⚠️  Manual download required"
-fi
-
-echo ""
-
-# Image 5: Skilled Trades - Hero Banner
-download_image \
-    "Skilled Trades - Hero Banner" \
-    "https://artlist.io/text-to-image-ai/creations/5573d3b3-65e3-4dc5-9735-9955ae90e593" \
-    "public/images/programs/skilled-trades-hero.jpg" || echo "   ⚠️  Manual download required"
-
-echo ""
-echo "📊 Download Summary:"
-echo ""
-
-# Check which files were successfully downloaded
-success=0
-failed=0
-
-for file in \
-    "public/images/supersonic-fast-cash/hero-banner.jpg" \
-    "public/images/supersonic-fast-cash/cta-instant-cash.jpg" \
-    "public/images/supersonic-fast-cash/subpage-hero.jpg" \
-    "public/images/career-services/hero-banner.jpg" \
-    "public/images/programs/skilled-trades-hero.jpg"; do
-    
-    if [ -f "$file" ] && [ -s "$file" ]; then
-        size=$(du -h "$file" | cut -f1)
-        echo "   ✅ $file ($size)"
-        ((success++))
-    else
-        echo "   ❌ $file (missing or empty)"
-        ((failed++))
-    fi
-done
-
-echo ""
-echo "Results: $success succeeded, $failed failed"
-echo ""
-
-if [ $failed -gt 0 ]; then
-    echo "⚠️  Some downloads failed due to Cloudflare protection."
-    echo ""
-    echo "Alternative methods:"
-    echo "1. Run: node scripts/download-artlist-puppeteer.js (requires: npm install puppeteer)"
-    echo "2. Manually download from browser and place in directories"
-    echo "3. Use browser extension to bypass Cloudflare"
-    echo ""
-    echo "See IMAGES_TO_DOWNLOAD.md for detailed instructions"
-fi
+echo "=== SUMMARY ==="
+total=$(ls "$DEST"/*.jpg 2>/dev/null | wc -l)
+echo "Total images in $DEST: $total"
+du -sh "$DEST"

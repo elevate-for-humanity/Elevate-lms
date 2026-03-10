@@ -1,43 +1,14 @@
 "use client";
 
 import React from 'react';
-
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
 import type { Program } from '@/app/data/programs';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export function ProgramHero({ program }: { program: Program }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ pauseOffScreen: false });
 
-  // Attempt to play video and audio with sound on mount
-  useEffect(() => {
-    const playMedia = async () => {
-      try {
-        // Try to play video with sound
-        if (videoRef.current) {
-          videoRef.current.muted = false;
-          await videoRef.current.play().catch(() => {});
-        }
-        // Try to play voiceover
-        if (audioRef.current) {
-          await audioRef.current.play().catch(() => {});
-        }
-      } catch (error) { /* Error handled silently */ 
-        // If blocked, try muted
-        try {
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            await videoRef.current.play().catch(() => {});
-          }
-        } catch (error) { /* Error handled silently */ 
-    // Error handled
-  }
-      }
-    };
-
-    playMedia();
-  }, []);
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const isHVACProgram = program.slug === 'hvac-technician';
   const isCDLProgram = program.slug === 'cdl';
@@ -46,33 +17,23 @@ export function ProgramHero({ program }: { program: Program }) {
   const isMedicalAssistant = program.slug === 'medical-assistant';
   const isBuildingTech = program.slug === 'building-technician';
   const hasVideo =
-    isBarberProgram ||
-    isHVACProgram ||
-    isCDLProgram ||
-    isCNAProgram ||
-    isWorkforceProgram ||
-    isMedicalAssistant ||
-    isBuildingTech;
+    isBarberProgram || isHVACProgram || isCDLProgram || isCNAProgram ||
+    isWorkforceProgram || isMedicalAssistant || isBuildingTech;
 
-  // Get icon for program
   const getIcon = () => {
     if (program.slug.includes('barber')) return '✂️';
-    if (program.slug.includes('cna') || program.slug.includes('health'))
-      return '🏥';
+    if (program.slug.includes('cna') || program.slug.includes('health')) return '🏥';
     if (program.slug.includes('medical')) return '🩺';
     if (program.slug.includes('hvac')) return '🛠️';
     if (program.slug.includes('cdl')) return '🚚';
-    if (program.slug.includes('tax') || program.slug.includes('business'))
-      return '💼';
-    if (program.slug.includes('beauty') || program.slug.includes('esthetician'))
-      return '💅';
+    if (program.slug.includes('tax') || program.slug.includes('business')) return '💼';
+    if (program.slug.includes('beauty') || program.slug.includes('esthetician')) return '💅';
     if (program.slug.includes('building')) return '🏗️';
     return '📚';
   };
 
   return (
     <>
-      {/* Hero with Image/Video Background - Top Hero Banner */}
       <section className="relative bg-slate-900">
         <div className="relative w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px] overflow-hidden">
           {hasVideo ? (
@@ -81,43 +42,32 @@ export function ProgramHero({ program }: { program: Program }) {
                 ref={videoRef}
                 autoPlay
                 loop
+                muted
                 playsInline
-                preload="none"
+                preload="metadata"
                 className="absolute inset-0 w-full h-full object-cover"
               >
-                <source
-                  src="/videos/hero-home.mp4"
-                  type="video/mp4"
-                />
+                <source src="/videos/hero-home.mp4" type="video/mp4" />
               </video>
-              <audio
-                ref={audioRef}
-                autoPlay
-                loop
-                src="/videos/voiceover.mp3"
-                className="hidden"
-              />
+              {showUnmuteButton && <UnmuteButton onClick={unmute} />}
             </>
           ) : (
             <Image
               src={program.heroImage}
               alt={program.heroImageAlt}
               fill
-          sizes="100vw"
+              sizes="100vw"
               quality={70}
               className="object-cover"
               priority
             />
           )}
 
-          {/* Overlay Content */}
           <div className="absolute inset-0 bg-black/50 flex items-end">
             <div className="container mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
               <div className="max-w-4xl">
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                  <span className="text-3xl sm:text-4xl md:text-5xl">
-                    {getIcon()}
-                  </span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl">{getIcon()}</span>
                   <p className="text-xs sm:text-sm uppercase tracking-wide text-brand-orange-400 font-semibold">
                     Elevate Workforce Pathway
                   </p>
@@ -150,16 +100,13 @@ export function ProgramHero({ program }: { program: Program }) {
         </div>
       </section>
 
-      {/* Quick Facts Bar */}
       <section className="py-8 bg-slate-50 border-b border-slate-200">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Duration</div>
-                <div className="text-3xl font-bold text-brand-orange-500">
-                  {program.duration}
-                </div>
+                <div className="text-3xl font-bold text-brand-orange-500">{program.duration}</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Cost</div>
@@ -167,9 +114,7 @@ export function ProgramHero({ program }: { program: Program }) {
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Format</div>
-                <div className="text-lg font-bold text-brand-orange-500">
-                  {program.delivery}
-                </div>
+                <div className="text-lg font-bold text-brand-orange-500">{program.delivery}</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Credential</div>

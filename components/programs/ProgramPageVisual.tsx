@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export interface VisualProgramData {
   title: string;
@@ -37,21 +39,28 @@ interface Props {
 }
 
 export function ProgramPageVisual({ program }: Props) {
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+
   return (
     <div className="min-h-screen bg-white">
       {/* HERO - Full width, visual-first */}
       <section className="relative h-[70vh] min-h-[500px] flex items-end">
         {program.heroVideo ? (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={program.heroImage}
-          >
-            <source src={program.heroVideo} type="video/mp4" />
-          </video>
+          <>
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster={program.heroImage}
+            >
+              <source src={program.heroVideo} type="video/mp4" />
+            </video>
+            {showUnmuteButton && <UnmuteButton onClick={unmute} />}
+          </>
         ) : (
           <Image
             src={program.heroImage}

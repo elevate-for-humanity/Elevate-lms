@@ -7,7 +7,7 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding', selfPayCost: '$4,000',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.', selfPayCost: '$4,000',
   badge: 'Funding Available', badgeColor: 'green',
   credentials: [
     { name: 'Adobe Certified Professional — Photoshop', issuer: 'Adobe / Certiport', description: 'Certification in Adobe Photoshop for image editing and compositing.', validity: 'Lifetime (version-specific)' },
@@ -61,12 +61,12 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Indianapolis-area marketing agencies and design studios'],
   pricingIncludes: ['220 instructional hours', '3 Adobe certification exams', 'Adobe Creative Cloud license', 'Portfolio hosting', 'Career placement support'],
-  paymentTerms: 'WIOA and Next Level Jobs funding accepted. Self-pay: $4,000.',
+  paymentTerms: 'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $4,000 with payment plans.',
   faqs: [
     { question: 'Do I need art experience?', answer: 'No. The program teaches design principles and software skills from scratch. Creativity helps, but technical skills are learned.' },
     { question: 'Will I have a portfolio?', answer: 'Yes. You will complete 5+ projects that form a professional portfolio for job applications.' },
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Graphic Design' }],
   metaTitle: 'Graphic Design | Adobe Certified Professional | Indianapolis',
-  metaDescription: 'Learn Photoshop, Illustrator, and InDesign in 10 weeks. Earn 3 Adobe certifications. Designers earn $57,990/year. WIOA funding available.',
+  metaDescription: 'Learn Photoshop, Illustrator, and InDesign in 10 weeks. Earn 3 Adobe certifications. Designers earn $57,990/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

@@ -115,11 +115,6 @@ export const HVAC_LESSON_NUMBER_TO_DEF_ID: Record<number, string> = {
   89: 'hvac-16-03',
   90: 'hvac-16-04',
   91: 'hvac-16-05',
-  // Career readiness lessons seeded in DB beyond module 16 definition
-  92: 'hvac-16-03', // Employer Partner Introductions → interview skills def
-  93: 'hvac-16-04', // OJT Internship Orientation → mock interview def
-  94: 'hvac-16-05', // Program Completion Checklist
-  95: 'hvac-16-05', // Career Readiness Quiz → completion checklist def
 };
 
 /** Returns the module ID (e.g. 'hvac-05') for a given lesson_number */

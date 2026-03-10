@@ -68,6 +68,7 @@ export default async function HvacCoursePage() {
       course={course}
       completedLessonIds={completedLessonIds}
       progressPercent={progressPercent}
+      userId={user?.id || null}
       lastLessonId={lastLessonId}
       lastLessonTitle={lastLessonTitle}
       totalTimeSeconds={totalTimeSeconds}

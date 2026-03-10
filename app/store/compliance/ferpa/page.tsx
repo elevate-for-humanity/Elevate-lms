@@ -18,25 +18,25 @@ const features = [
   {
     title: 'Data Encryption',
     description: 'AES-256 encryption for all student data at rest and in transit.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/admin-ferpa-training-hero.jpg',
     items: ['AES-256 encryption', 'TLS 1.3 in transit', 'Encrypted backups', 'Key rotation'],
   },
   {
     title: 'Access Controls',
     description: 'Role-based access control ensures only authorized users see student data.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/admin-ferpa-training-hero.jpg',
     items: ['Role-based permissions', 'Multi-factor authentication', 'Session management', 'IP restrictions'],
   },
   {
     title: 'Audit Logging',
     description: 'Complete audit trail of all data access and modifications.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/adult-learner.jpg',
     items: ['Access logging', 'Change tracking', 'Export history', 'Compliance reports'],
   },
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/adult-learner.jpg',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];

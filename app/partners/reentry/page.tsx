@@ -14,7 +14,7 @@ export default function ReentryPartnerPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Reentry' }],
       hero: {
-        image: '/images/pages/comp-cta-career.jpg',
+        image: '/images/pages/career-services-page-1.jpg',
         tag: 'Reentry Programs',
         tagColor: 'text-brand-green-300',
         title: 'Reentry Workforce Partnership',

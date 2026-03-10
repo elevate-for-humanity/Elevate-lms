@@ -41,7 +41,7 @@ export default function HeroSlideshow() {
         autoPlay
         playsInline
         preload="none"
-        poster="/images/pages/comp-cta-career.jpg"
+        poster="/images/pages/training-classroom.jpg"
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           objectFit: 'cover',

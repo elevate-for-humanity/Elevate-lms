@@ -14,7 +14,7 @@ export default function MOUPage() {
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'MOU' }],
       hero: {
-        image: '/images/pages/comp-cta-career.jpg',
+        image: '/images/pages/about-partners-hero.jpg',
         tag: 'Partnership Framework',
         title: 'Memorandum of Understanding',
         subtitle: 'Formalize your partnership with Elevate for Humanity through a structured MOU agreement.',

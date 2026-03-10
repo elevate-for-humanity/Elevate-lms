@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Mic, Volume2 } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 type HeroBannerProps = {
   title: string;
@@ -31,30 +33,10 @@ export default function HeroBanner({
   heroImageSrc = '/images/pages/comp-cta-career.jpg',
   heroImageAlt = 'Elevate for Humanity hero banner',
 }: HeroBannerProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ pauseOffScreen: type === 'video' });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
   const [voiceActive, setVoiceActive] = useState(false);
-
-  // Video: autoplay muted, pause off-screen
-  useEffect(() => {
-    if (type !== 'video') return;
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const v = videoRef.current;
-        if (!v) return;
-        if (entry.isIntersecting) v.play().catch(() => {});
-        else v.pause();
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [type]);
 
   const toggleVoiceover = () => {
     const a = audioRef.current;
@@ -77,12 +59,14 @@ export default function HeroBanner({
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               src={videoSrc}
+              autoPlay
               muted
               loop
               playsInline
               preload="metadata"
               poster={posterSrc}
             />
+            {showUnmuteButton && !voiceoverSrc && <UnmuteButton onClick={unmute} />}
             {voiceoverSrc && (
               <>
                 <audio ref={audioRef} src={voiceoverSrc} preload="auto" onEnded={() => setVoiceActive(false)} />

@@ -1,10 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getProgramConfig, type ProgramConfig } from '@/lib/partners/program-config';
+
+// Programs that have dedicated regulated application flows.
+// This generic page must not accept them — it writes to the wrong table.
+const REGULATED_SLUGS: Record<string, string> = {
+  'barbershop-apprenticeship': '/programs/barber-apprenticeship/apply?type=partner_shop',
+};
 
 const CALENDLY_URL = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu/30min';
 
@@ -13,6 +19,16 @@ export default function UniversalPartnerApplyPage() {
   const router = useRouter();
   const slug = params.program as string;
   const config = getProgramConfig(slug);
+
+  // Redirect regulated programs to their dedicated application page immediately.
+  useEffect(() => {
+    if (REGULATED_SLUGS[slug]) {
+      router.replace(REGULATED_SLUGS[slug]);
+    }
+  }, [slug, router]);
+
+  // Render nothing while redirect is in flight.
+  if (REGULATED_SLUGS[slug]) return null;
 
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);

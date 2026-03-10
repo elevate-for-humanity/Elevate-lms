@@ -42,7 +42,7 @@ const instantTests = [
     ],
     turnaround: '5-10 minutes (negative)',
     labConfirm: '24-48 hours (if positive)',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
   {
     name: 'Instant 5-Panel + Alcohol',
@@ -57,7 +57,7 @@ const instantTests = [
       'Combined reporting',
     ],
     turnaround: '5-10 minutes',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/testing-page-1.jpg',
   },
 ];
 

@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 
 export default function CertificationsPage() {
   const certifications = [
-    { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/pages/comp-cta-training.jpg' },
+    { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/pages/programs-medical-apply-hero.jpg' },
     { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/pages/comp-pathway-healthcare.jpg' },
-    { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/pages/comp-cta-career.jpg' },
+    { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/pages/hvac-technician.jpg' },
     { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/pages/comp-pathway-trades.jpg' },
-    { name: 'Certiport IT Specialist', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/pages/comp-cta-training.jpg' },
+    { name: 'Certiport IT Specialist', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/pages/it-help-desk.jpg' },
     { name: 'Barber License', industry: 'Beauty', duration: '2000 hours', demand: 'Required', image: '/images/pages/barber-gallery-1.jpg' },
   ];
 

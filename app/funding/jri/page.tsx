@@ -22,15 +22,15 @@ export default function JRIFundingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/funding-page-2.jpg" alt="Justice Reinvestment Initiative career training" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-black/40 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 pb-10 w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Justice Reinvestment Initiative (JRI)</h1>
-            <p className="text-xl text-white/90 font-medium">Funded Career Training for Justice-Involved Individuals</p>
-          </div>
-        </div>
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Justice Reinvestment Initiative (JRI)</h1>
+          <p className="text-slate-600 mt-2">Funded career training for justice-involved individuals through Indiana DWD.</p>
+        </div>
+      </div>
 
       {/* What Is JRI */}
       <section className="py-14 sm:py-20">

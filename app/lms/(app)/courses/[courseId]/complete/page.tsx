@@ -41,7 +41,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
 
   const { data: course } = await db
     .from('training_courses')
-    .select('id, title, delivery_mode')
+    .select('id, course_name, delivery_mode')
     .eq('id', courseId)
     .single();
 

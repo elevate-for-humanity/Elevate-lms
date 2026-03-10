@@ -1,17 +1,23 @@
 /**
  * Generate D-ID talking-head videos for all 94 HVAC lessons.
  *
- * Uses D-ID /clips endpoint with Joseph (lab presenter) — no custom photo needed.
- * Two-step per lesson:
- *   1. Upload MP3 to D-ID /audios → get S3 audio URL
- *   2. POST /clips with presenter_id + audio URL → poll → download MP4
- *
+ * Uses the existing instructor-trades.jpg photo + pre-generated lesson MP3s.
+ * D-ID lip-syncs Marcus Johnson's face to each lesson's audio track.
  * Output: public/generated/videos/lesson-{uuid}.mp4
  *
- * Run: npx tsx scripts/generate-hvac-videos-did.ts <did-api-key>
+ * Run: npx tsx scripts/generate-hvac-videos-did.ts
  *
  * Requirements:
- *   - All 94 MP3s in public/generated/lessons/ (run generate-hvac-audio.ts first)
+ *   - DID_API_KEY in .env.local
+ *   - All 94 MP3s already in public/generated/lessons/ (run generate-hvac-audio.ts first)
+ *   - Site must be deployed so D-ID can fetch the audio via public URL
+ *     OR pass --local to upload audio directly as base64
+ *
+ * D-ID processes videos asynchronously. This script:
+ *   1. Submits all pending lessons to D-ID (up to 5 at a time)
+ *   2. Polls until each completes
+ *   3. Downloads the MP4 and saves it locally
+ *   4. Skips lessons that already have a video
  */
 
 import * as dotenv from 'dotenv';
@@ -23,95 +29,61 @@ import * as path from 'path';
 import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 
 const DID_API_BASE = 'https://api.d-id.com';
-
-// Accept key as CLI arg
-const argKey = process.argv[2];
-if (argKey && !argKey.startsWith('--')) process.env.DID_API_KEY = argKey;
-
 const DID_KEY = process.env.DID_API_KEY;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace('localhost:3000', 'www.elevateforhumanity.org') || 'https://www.elevateforhumanity.org';
 
-const AUDIO_DIR = path.join(process.cwd(), 'public', 'generated', 'lessons');
-const VIDEO_DIR = path.join(process.cwd(), 'public', 'generated', 'videos');
-
-// Joseph in a lab setting — appropriate for trades/HVAC instructor
-const PRESENTER_ID = 'v2_public_Joseph_NoHands_OrangeShirt_Lab@hfdqirrsX9';
-
-// Sequential — D-ID clips are slow to process, no benefit to concurrency
-const CONCURRENCY = 1;
+const AUDIO_DIR  = path.join(process.cwd(), 'public', 'generated', 'lessons');
+const VIDEO_DIR  = path.join(process.cwd(), 'public', 'generated', 'videos');
+const PHOTO_URL  = `${SITE_URL}/images/team/instructors/instructor-trades.jpg`;
+const CONCURRENCY = 3; // D-ID free tier allows ~3 concurrent
 
 if (!DID_KEY) {
-  console.log('DID_API_KEY not set.');
-  console.log('Usage: npx tsx scripts/generate-hvac-videos-did.ts <your-d-id-key>');
+  console.log('DID_API_KEY not set — skipping video generation.');
   process.exit(0);
 }
 
-function authHeader() {
-  return `Basic ${DID_KEY}`;
+function didHeaders() {
+  return {
+    Authorization: `Basic ${DID_KEY}`,
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
 }
 
-/** Upload local MP3 to D-ID /audios, return the S3 URL */
-async function uploadAudio(audioPath: string): Promise<string> {
-  const filename = path.basename(audioPath);
-  const audioBytes = fs.readFileSync(audioPath);
-  const form = new FormData();
-  form.append('audio', new Blob([audioBytes], { type: 'audio/mpeg' }), filename);
-
-  const res = await fetch(`${DID_API_BASE}/audios`, {
+async function submitTalk(audioUrl: string): Promise<string> {
+  const res = await fetch(`${DID_API_BASE}/talks`, {
     method: 'POST',
-    headers: { Authorization: authHeader(), Accept: 'application/json' },
-    body: form,
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`/audios upload ${res.status}: ${err}`);
-  }
-  const data = await res.json();
-  return data.url as string;
-}
-
-/** Submit a clip job, return clip ID */
-async function submitClip(audioUrl: string): Promise<string> {
-  const res = await fetch(`${DID_API_BASE}/clips`, {
-    method: 'POST',
-    headers: {
-      Authorization: authHeader(),
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+    headers: didHeaders(),
     body: JSON.stringify({
-      presenter_id: PRESENTER_ID,
+      source_url: PHOTO_URL,
       script: { type: 'audio', audio_url: audioUrl },
-      config: { result_format: 'mp4' },
+      config: { stitch: true, result_format: 'mp4' },
     }),
   });
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`/clips submit ${res.status}: ${err}`);
+    throw new Error(`D-ID submit error ${res.status}: ${err}`);
   }
   const data = await res.json();
   return data.id as string;
 }
 
-/** Poll until done, return result URL */
-async function pollClip(clipId: string, maxWaitMs = 600_000): Promise<string> {
+async function pollTalk(talkId: string, maxWaitMs = 300000): Promise<string> {
   const start = Date.now();
   while (Date.now() - start < maxWaitMs) {
-    await new Promise(r => setTimeout(r, 8000));
-    const res = await fetch(`${DID_API_BASE}/clips/${clipId}`, {
-      headers: { Authorization: authHeader(), Accept: 'application/json' },
-    });
-    if (!res.ok) throw new Error(`poll ${res.status}`);
+    await new Promise(r => setTimeout(r, 5000));
+    const res = await fetch(`${DID_API_BASE}/talks/${talkId}`, { headers: didHeaders() });
+    if (!res.ok) throw new Error(`D-ID poll error ${res.status}`);
     const data = await res.json();
     if (data.status === 'done') return data.result_url as string;
-    if (data.status === 'error') throw new Error(`clip failed: ${data.error?.description ?? 'unknown'}`);
-    process.stdout.write('.');
+    if (data.status === 'error') throw new Error(`D-ID failed: ${data.error?.description || 'unknown'}`);
   }
-  throw new Error(`timed out after ${maxWaitMs / 1000}s`);
+  throw new Error(`D-ID timed out after ${maxWaitMs / 1000}s`);
 }
 
 async function downloadMp4(url: string, outPath: string): Promise<void> {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`download ${res.status}`);
+  if (!res.ok) throw new Error(`Download failed: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
   fs.writeFileSync(outPath, buf);
 }
@@ -122,28 +94,19 @@ async function processOne(defId: string, uuid: string): Promise<'skipped' | 'don
 
   const audioPath = path.join(AUDIO_DIR, `lesson-${uuid}.mp3`);
   if (!fs.existsSync(audioPath)) {
-    console.error(`  SKIP ${defId} — no audio (run generate-hvac-audio.ts first)`);
+    console.error(`  SKIP ${defId} — no audio file (run generate-hvac-audio.ts first)`);
     return 'skipped';
   }
 
+  const audioUrl = `${SITE_URL}/generated/lessons/lesson-${uuid}.mp3`;
+
   try {
-    process.stdout.write(`  ${defId} upload...`);
-    const audioUrl = await uploadAudio(audioPath);
-
-    process.stdout.write(` submit...`);
-    const clipId = await submitClip(audioUrl);
-
-    process.stdout.write(` poll`);
-    const resultUrl = await pollClip(clipId);
-
-    process.stdout.write(` download...`);
+    const talkId = await submitTalk(audioUrl);
+    const resultUrl = await pollTalk(talkId);
     await downloadMp4(resultUrl, videoPath);
-
-    const sizeMb = (fs.statSync(videoPath).size / 1_048_576).toFixed(1);
-    console.log(` done (${sizeMb} MB)`);
     return 'done';
   } catch (e: any) {
-    console.error(`\n  FAIL ${defId}: ${e.message}`);
+    console.error(`  FAIL ${defId}: ${e.message}`);
     return 'failed';
   }
 }
@@ -155,24 +118,34 @@ async function main() {
   const pending = all.filter(([, uuid]) => !fs.existsSync(path.join(VIDEO_DIR, `lesson-${uuid}.mp4`)));
 
   if (pending.length === 0) {
-    console.log('All HVAC lessons already have video.');
+    console.log('All 94 HVAC lessons already have video.');
     return;
   }
 
-  console.log(`Generating ${pending.length} D-ID clips (${all.length - pending.length} already done)...`);
-  console.log(`Presenter: ${PRESENTER_ID}`);
+  console.log(`Generating ${pending.length} D-ID videos...`);
+  console.log(`Photo: ${PHOTO_URL}`);
+  console.log(`Audio base URL: ${SITE_URL}/generated/lessons/`);
   console.log(`Concurrency: ${CONCURRENCY}\n`);
 
   let done = 0, failed = 0, skipped = 0;
 
   for (let i = 0; i < pending.length; i += CONCURRENCY) {
     const batch = pending.slice(i, i + CONCURRENCY);
+    const labels = batch.map(([id]) => id).join(', ');
+    process.stdout.write(`  [${i + 1}-${Math.min(i + CONCURRENCY, pending.length)}/${pending.length}] ${labels} ... `);
+
     const results = await Promise.all(batch.map(([defId, uuid]) => processOne(defId, uuid)));
     for (const r of results) {
       if (r === 'done')    done++;
       if (r === 'failed')  failed++;
       if (r === 'skipped') skipped++;
     }
+
+    const parts = [];
+    if (results.filter(r => r === 'done').length)    parts.push(`${results.filter(r => r === 'done').length} done`);
+    if (results.filter(r => r === 'skipped').length) parts.push(`${results.filter(r => r === 'skipped').length} skipped`);
+    if (results.filter(r => r === 'failed').length)  parts.push(`${results.filter(r => r === 'failed').length} failed`);
+    console.log(parts.join(', '));
   }
 
   console.log(`\nDone: ${done} generated, ${skipped} skipped, ${failed} failed.`);

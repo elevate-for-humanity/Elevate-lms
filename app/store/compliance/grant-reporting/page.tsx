@@ -17,25 +17,25 @@ const features = [
   {
     title: 'Automated Data Collection',
     description: 'Automatically capture participant data, outcomes, and metrics as they happen.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/funding-page-1.jpg',
     items: ['Real-time data capture', 'Automatic calculations', 'Data validation', 'Error prevention'],
   },
   {
     title: 'Custom Report Templates',
     description: 'Pre-built templates for DOL, state agencies, and foundation reporting.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/workforce-training.jpg',
     items: ['DOL ETA reports', 'State-specific formats', 'Foundation templates', 'Custom builders'],
   },
   {
     title: 'Outcome Tracking',
     description: 'Track employment, wages, credentials, and other grant outcomes.',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/workforce-training.jpg',
     items: ['Employment tracking', 'Wage verification', 'Credential attainment', 'Follow-up automation'],
   },
   {
     title: 'One-Click Exports',
     description: 'Export reports in any format required by your funders.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/funding-page-1.jpg',
     items: ['Excel exports', 'PDF reports', 'CSV data files', 'API integrations'],
   },
 ];

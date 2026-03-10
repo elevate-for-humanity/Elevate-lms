@@ -23,6 +23,13 @@ export default async function StaffOnboardingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/staff');
 
+  // Ensure role is set correctly — DB trigger defaults to 'student'
+  // If user signed up as staff, fix it here before rendering
+  const metaRole = user.user_metadata?.role;
+  if (metaRole === 'staff') {
+    await db.from('profiles').upsert({ id: user.id, role: 'staff' }, { onConflict: 'id' });
+  }
+
   const { data: profile } = await db
     .from('profiles')
     .select('full_name, role')

@@ -1,5 +1,9 @@
+'use client';
+
 import { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface VideoHeroProps {
   videoSrc: string;
@@ -30,18 +34,22 @@ export function VideoHero({
   secondaryCTA,
   overlayColor = 'from-black/60 via-black/50 to-black/70',
 }: VideoHeroProps) {
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+
   return (
     <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
-        preload="none"
+        preload="metadata"
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
+      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
       <div className="absolute inset-0 flex items-center justify-center text-center px-4">
         <div className="max-w-4xl w-full bg-black/50 backdrop-blur-sm p-8 rounded-2xl">
           {badge && (

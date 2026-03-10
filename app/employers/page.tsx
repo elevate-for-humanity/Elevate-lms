@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: 'OJT wage reimbursement, WOTC tax credits, and pre-trained talent at no recruiting cost.',
     url: 'https://www.elevateforhumanity.org/employers',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
+    images: [{ url: '/images/pages/for-employers-page-1.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
     type: 'website',
   },
 };

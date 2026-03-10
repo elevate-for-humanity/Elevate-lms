@@ -101,7 +101,7 @@ export default async function MyCoursesPage() {
                 >
                   <div className="relative h-40 overflow-hidden">
                     <Image
-                      src={purchase.course?.image_url || '/images/pages/comp-cta-career.jpg'}
+                      src={purchase.course?.image_url || '/images/pages/career-services-page-5.jpg'}
                       alt={purchase.course?.title}
                       fill
                       className="object-cover"

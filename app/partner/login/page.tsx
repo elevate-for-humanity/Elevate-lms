@@ -206,7 +206,7 @@ export default function PartnerLoginPage() {
           <div className="mt-6 pt-6 border-t text-center">
             <p className="text-gray-600">
               Not a partner yet?{' '}
-              <Link href="/partner/apply" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
+              <Link href="/partner/onboarding" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
                 Apply here
               </Link>
             </p>

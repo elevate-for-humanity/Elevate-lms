@@ -54,9 +54,6 @@ const nextConfig = {
     buildActivityPosition: 'bottom-right',
   },
   
-  // Empty turbopack config to silence the warning about webpack config
-  turbopack: {},
-
   // Force cache bust - build timestamp + deployment marker
   generateBuildId: async () => {
     return `build-${Date.now()}-production`;
@@ -136,11 +133,11 @@ const nextConfig = {
       '@hookform/resolvers',
       'swr',
     ],
-    webpackBuildWorker: true,
+    webpackBuildWorker: false,
     optimizeCss: true,
     // Parallel routes for faster builds
-    parallelServerCompiles: true,
-    parallelServerBuildTraces: true,
+    parallelServerCompiles: false,
+    parallelServerBuildTraces: false,
   },
   
   // Suppress middleware deprecation warning (middleware.ts is still correct for our use case)

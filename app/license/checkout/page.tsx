@@ -22,7 +22,7 @@ const plans: Record<string, {
     priceDisplay: '$750',
     interval: 'month',
     description: 'For solo operators, small nonprofits, and pilot programs.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/program-holder-page-1.jpg',
   },
   institutional: {
     id: 'institutional',
@@ -31,7 +31,7 @@ const plans: Record<string, {
     priceDisplay: '$2,500',
     interval: 'month',
     description: 'For schools, training providers, and nonprofits running multiple programs.',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/program-holder-page-1.jpg',
   },
   enterprise: {
     id: 'enterprise',

@@ -20,29 +20,20 @@ export default function ProgramCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
-        <Image
-          src="/images/pages/programs-page-hero.jpg"
-          alt="Students in a workforce training classroom"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 pb-8 w-full">
-            <nav className="flex items-center gap-1.5 text-xs text-white/70 mb-3">
-              <Link href="/" className="hover:text-white">Home</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white font-medium">Programs</span>
-            </nav>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">Credential Pathways</h1>
-            <p className="text-white/80 mt-2 max-w-2xl">
-              Industry-recognized credentials. Competency-based training. Workforce-funded pathways to employment.
-            </p>
-          </div>
-        </div>
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
+        <Image src="/images/pages/training-cohort.jpg" alt="Students in a workforce training classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
+      <div className="bg-white border-b border-slate-200 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+            <Link href="/" className="hover:text-slate-900">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-900 font-medium">Programs</span>
+          </nav>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Credential Pathways</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl">Industry-recognized credentials. Competency-based training. Workforce-funded pathways to employment.</p>
+        </div>
+      </div>
 
       {/* Institutional Stats Bar */}
       <section className="bg-slate-900 py-5">

@@ -67,21 +67,23 @@ Elevate for Humanity operates a vertically integrated Workforce Operating System
 
 ## Codebase (Verified Counts)
 
+> Run `bash scripts/count-codebase.sh` to regenerate these numbers.
+
 | Metric | Count |
 |--------|-------|
-| Pages (app/**/page.tsx) | 1,371 |
-| API routes (app/api/**/route.ts) | 973 |
-| React components | 800 |
-| Library modules (lib/) | 664 |
-| SQL migrations | 630 |
-| Scripts | 860 |
-| Static images | 1,032 |
-| Video files (.mp4) | 143 |
-| Documentation files (docs/) | 50 |
-| Netlify serverless functions | 6 |
-| LMS app sections | 50 |
-| Program pages | 98 |
-| Admin sections | 145 |
+| Pages (app/**/page.tsx) | 1,421 |
+| API routes (app/api/**/route.ts) | 998 |
+| React components (components/) | 845 |
+| Library modules (lib/) | 715 |
+| SQL migrations | 192 |
+| Scripts | 586 |
+| Static images | 1,092 |
+| Video files (.mp4) | 543 |
+| Documentation files (docs/) | 62 |
+| Netlify serverless functions | 7 |
+| Admin sections | 280 |
+| LMS app sections | 81 |
+| Program pages | 87 |
 | Course definitions (with full lesson data) | 5 (Barber, HVAC, CDL, Medical Assistant, Workforce Readiness) |
 
 ---
@@ -138,7 +140,7 @@ Stripe (payments, subscriptions, webhooks), Affirm (BNPL), Resend (transactional
 - Attendance tracking (clock-in, instructor record, export)
 - AI tutoring and adaptive learning
 - Student dashboard with progress analytics
-- 50 LMS app sections (achievements, assignments, calendar, certificates, chat, community, courses, etc.)
+- 81 LMS app sections (achievements, assignments, calendar, certificates, chat, community, courses, etc.)
 
 ### Enrollment
 
@@ -239,8 +241,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ```
 Elevate-lms/
-├── app/                          # Next.js App Router (1,371 pages + 973 API routes)
-│   ├── admin/                    # Admin panel (145 sections)
+├── app/                          # Next.js App Router (1,421 pages + 998 API routes)
+│   ├── admin/                    # Admin panel (280 sections)
 │   ├── api/                      # API routes
 │   ├── apprenticeships/          # Apprenticeship landing
 │   ├── courses/                  # Course catalog

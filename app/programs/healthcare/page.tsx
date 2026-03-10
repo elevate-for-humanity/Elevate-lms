@@ -40,13 +40,13 @@ const config: ProgramPageConfig = {
   format: 'In-person, Indianapolis',
   credential: 'State & National Certifications',
 
-  overview: 'Our healthcare programs prepare you for in-demand careers in nursing, medical assisting, phlebotomy, and emergency care. Each program includes classroom instruction, hands-on skills labs, and supervised clinical rotations at healthcare facilities. Graduates earn industry-recognized certifications and receive job placement assistance with our network of 50+ healthcare employer partners.',
+  overview: 'Our healthcare programs prepare you for in-demand careers in nursing, medical assisting, phlebotomy, and emergency care. Each program includes classroom instruction, hands-on skills labs, and supervised clinical rotations at healthcare facilities. Graduates earn industry-recognized certifications and receive career placement assistance.',
   highlights: [
     'State-approved curricula meeting Indiana licensing requirements',
     'Supervised clinical rotations at healthcare facilities',
     'National and state certification exam prep included',
     'CPR/First Aid and BLS certification included in every program',
-    'Job placement assistance with 50+ healthcare employers',
+    'Job placement assistance through our employer network',
     'Scrubs, textbooks, and supplies provided with WIOA funding',
   ],
   overviewImage: '/images/pages/comp-program-template.jpg',
@@ -120,7 +120,7 @@ const healthcarePrograms = [
     duration: '1 day',
     desc: 'American Heart Association CPR, First Aid, and AED certification.',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/healthcare-sector.jpg',
   },
 ];
 

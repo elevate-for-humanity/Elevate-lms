@@ -7,8 +7,9 @@ export const IT_HELP_DESK: ProgramSchema = {
   sector: 'technology',
   category: 'Information Technology',
 
-  heroImage: '/images/pages/comp-universal-hero.jpg',
-  heroImageAlt: 'IT help desk technician troubleshooting a workstation',
+  heroImage: '/images/pages/it-helpdesk-desk.jpg',
+  heroImageAlt: 'IT support student troubleshooting hardware in a lab',
+  videoSrc: '/videos/it-technology.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 8,
@@ -23,7 +24,7 @@ export const IT_HELP_DESK: ProgramSchema = {
   schedule: 'Mon–Fri, 18–22 hours per week (flexible scheduling)',
   eveningSchedule: 'Evening cohorts available. Contact us for schedule options.',
   cohortSize: '12–16 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$2,800',
   badge: '4-Star Top Job — DWD',
   badgeColor: 'blue',
@@ -189,7 +190,7 @@ export const IT_HELP_DESK: ProgramSchema = {
     'Laptop loaner for duration of program',
     'Career placement support',
   ],
-  paymentTerms: 'Self-pay: $2,800 or 3-month payment plan. WIOA/NLJ: $0 out-of-pocket with approved funding.',
+  paymentTerms: 'Self-pay: $2,800 with payment plans. WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed.',
 
   faqs: [
     { question: 'Do I need prior IT experience?', answer: 'No. This program starts from the fundamentals and builds to certification-level competency.' },

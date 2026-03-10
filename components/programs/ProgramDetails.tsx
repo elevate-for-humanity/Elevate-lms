@@ -7,8 +7,11 @@ import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { ProgramAppointmentBanner } from '@/components/programs/ProgramAppointmentBanner';
 import ProgramHowItWorks from '@/components/program/ProgramHowItWorks';
 import ProgramFAQ from '@/components/program/ProgramFAQ';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export function ProgramDetails({ program }: { program: Program }) {
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const programPrice = program.price || 0; // Use program price from data
 
@@ -324,18 +327,17 @@ export function ProgramDetails({ program }: { program: Program }) {
         <div className="mx-auto max-w-5xl px-4">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
-              preload="none"
+              preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source
-                src="/videos/hero-home.mp4"
-                type="video/mp4"
-              />
+              <source src="/videos/hero-home.mp4" type="video/mp4" />
             </video>
+            {showUnmuteButton && <UnmuteButton onClick={unmute} />}
           </div>
         </div>
       </section>

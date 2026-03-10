@@ -7,8 +7,9 @@ export const ELECTRICAL: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Electrical',
 
-  heroImage: '/images/pages/comp-highlights-electrical.jpg',
-  heroImageAlt: 'Electrical technician student wiring a panel',
+  heroImage: '/images/pages/electrical-wiring.jpg',
+  heroImageAlt: 'Electrical student working on wiring in a training lab',
+  videoSrc: '/videos/electrician-trades.mp4',
 
   deliveryMode: 'hybrid',
   durationWeeks: 12,
@@ -18,7 +19,7 @@ export const ELECTRICAL: ProgramSchema = {
   schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$5,000',
   badge: 'Funding Available',
   badgeColor: 'orange',
@@ -108,7 +109,7 @@ export const ELECTRICAL: ProgramSchema = {
   bilingualSupport: 'Bilingual (English/Spanish) instruction available.',
   employerPartners: ['Jesse J. Wilkerson & Associates — Architecture & Construction'],
   pricingIncludes: ['240 instructional hours', 'OSHA 30-Hour certification', 'NCCER Core Curriculum certification', 'CPR/First Aid certification', 'All PPE, tools, and materials', 'LMS access', 'Career placement support'],
-  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
+  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay pricing available — contact us.',
 
   faqs: [
     { question: 'Do I need any electrical experience?', answer: 'No. This program starts from zero. You will learn electrical theory, safety, and hands-on wiring from the ground up.' },
@@ -119,5 +120,5 @@ export const ELECTRICAL: ProgramSchema = {
 
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Electrical Technician' }],
   metaTitle: 'Electrical Technician Training | OSHA 30 + NCCER | Indianapolis',
-  metaDescription: 'Learn residential and commercial wiring in 12 weeks. Earn OSHA 30 and NCCER certifications. Electricians earn $60,240/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Learn residential and commercial wiring in 12 weeks. Earn OSHA 30 and NCCER certifications. Electricians earn $60,240/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

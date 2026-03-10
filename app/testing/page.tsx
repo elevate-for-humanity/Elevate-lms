@@ -18,7 +18,7 @@ const examCategories = [
     id: 'certiport',
     name: 'Certiport Authorized Testing',
     provider: 'Certiport (Pearson VUE)',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/testing-page-1.jpg',
     description: 'Proctor-supervised exams administered on-site through our Certiport Authorized Testing Center designation.',
     exams: [
       'Microsoft Office Specialist (Word, Excel, PowerPoint, Outlook, Access)',

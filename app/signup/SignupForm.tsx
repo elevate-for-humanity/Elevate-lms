@@ -21,6 +21,7 @@ function SignupFormContent() {
     confirmPassword: '',
     firstName: '',
     lastName: '',
+    role: 'student',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +67,7 @@ function SignupFormContent() {
             first_name: formData.firstName,
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
+            role: formData.role,
           },
           emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/auth/callback`,
         },
@@ -130,15 +132,17 @@ function SignupFormContent() {
           <h2 className="text-2xl font-bold text-black mb-2">
             Account Created!
           </h2>
-          <p className="text-black mb-4">
-            Check your email to verify your account, or you'll be redirected
-            shortly.
+          <p className="text-black mb-2">
+            Check your email for a verification link and click it to activate your account.
+          </p>
+          <p className="text-sm text-gray-600 mb-6">
+            Once verified, you will be taken directly to your onboarding portal based on your selected role.
           </p>
           <Link
             href="/login"
-            className="inline-block px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
+            className="inline-block px-6 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
           >
-            Go to Login
+            Already verified? Go to Login
           </Link>
         </div>
       </div>
@@ -270,6 +274,27 @@ function SignupFormContent() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="••••••••"
           />
+        </div>
+
+        <div>
+          <label htmlFor="role" className="block text-sm font-medium text-black mb-2">
+            I am signing up as a
+          </label>
+          <select
+            id="role"
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent bg-white"
+          >
+            <option value="student">Student / Learner</option>
+            <option value="staff">Staff / Employee</option>
+            <option value="partner">Program Partner / Instructor</option>
+            <option value="employer">Employer</option>
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            Select the role that best describes why you are creating this account.
+          </p>
         </div>
 
         <div className="flex items-start">

@@ -165,9 +165,9 @@ export default function StorePage() {
           </p>
           <div className="space-y-6">
             {[
-              { title: 'Workforce Boards', desc: 'WIOA eligibility determination, ITA management, PIRL reporting, provider network oversight, quarterly performance metrics. Replace your current patchwork of systems with one platform that does it all.', img: '/images/pages/homepage-why-elevate.jpg' },
+              { title: 'Workforce Boards', desc: 'WIOA eligibility determination, ITA management, PIRL reporting, provider network oversight, quarterly performance metrics. Replace your current patchwork of systems with one platform that does it all.', img: '/images/pages/wioa-meeting.jpg' },
               { title: 'Training Providers', desc: 'Student enrollment, attendance tracking, course delivery, credential issuance, outcome reporting to funders. Stop emailing spreadsheets to your workforce board.', img: '/images/pages/comp-home-highlight-health.jpg' },
-              { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/pages/comp-cta-training.jpg' },
+              { title: 'Apprenticeship Sponsors', desc: 'DOL-registered program management. Apprentice hour logging, wage progression tracking, OJT reimbursement processing, completion documentation. All in one place.', img: '/images/pages/employer-handshake.jpg' },
             ].map((item) => (
               <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
                 <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0 overflow-hidden">
@@ -208,6 +208,64 @@ export default function StorePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FEATURED COURSE: HVAC TECHNICIAN ============ */}
+      <section className="py-14 sm:py-20 bg-slate-900">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2 text-center">Licensable Course Content</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white text-center mb-3">HVAC Technician — Full Course License</h2>
+          <p className="text-slate-400 text-center mb-10 max-w-2xl mx-auto">
+            License our complete 640-hour HVAC Technician course for your workforce program, community college, or training center. Includes all 16 modules, interactive diagrams, EPA 608 prep, OSHA 10, and CPR/AED.
+          </p>
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            {/* Video preview */}
+            <div>
+              <StoreDemoVideo />
+              <p className="text-slate-500 text-xs text-center mt-2">Module 1, Lesson 1 — live sample from the course</p>
+            </div>
+            {/* Course details + CTA */}
+            <div className="bg-white rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="bg-brand-red-100 text-brand-red-700 text-xs font-bold px-3 py-1 rounded-full">16 Modules · 94 Lessons</span>
+                <span className="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">640 Hours</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">HVAC Technician Course</h3>
+              <div className="mb-4">
+                <span className="text-3xl font-black text-slate-900">$4,500</span>
+                <span className="text-slate-500 text-sm ml-1">/ annual license</span>
+              </div>
+              <p className="text-slate-600 text-sm mb-5">Per-organization license. Minimum 10 students. Volume pricing available for workforce networks and state agencies.</p>
+              <ul className="space-y-2 mb-6">
+                {[
+                  'EPA 608 Core, Type I, Type II, Type III prep',
+                  'Interactive refrigeration cycle & wiring diagrams',
+                  'OSHA 10-Hour and CPR/AED content',
+                  'SCORM/xAPI export for your existing LMS',
+                  'Instructor guide + 400-question assessment bank',
+                  'Annual content updates included',
+                ].map(f => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
+                    <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/store/courses/hvac-technician-course-license"
+                className="block text-center bg-brand-red-600 text-white font-bold py-3 rounded-lg hover:bg-brand-red-700 transition mb-2"
+              >
+                License This Course
+              </Link>
+              <Link
+                href="/course-preview/hvac-technician"
+                className="block text-center border border-slate-300 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-50 transition text-sm"
+              >
+                Preview Full Course Demo →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

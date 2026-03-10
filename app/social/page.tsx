@@ -127,7 +127,7 @@ const defaultVideos = [
   {
     id: 'video1',
     title: 'Welcome to Elevate for Humanity',
-    thumbnail: '/images/pages/comp-cta-career.jpg',
+    thumbnail: '/images/pages/social-page-1.jpg',
     duration: '2:45',
     views: '1.2K',
     youtubeId: 'dQw4w9WgXcQ',

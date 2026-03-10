@@ -335,10 +335,10 @@ export default async function RiseFoundationPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Calm Blend Herbal Tea', price: '$18.99', desc: 'Chamomile, lavender, and lemon balm loose-leaf blend. Caffeine-free. Promotes relaxation and restful sleep.', image: '/images/pages/comp-cta-career.jpg' },
-              { name: 'Shea Body Butter — Lavender', price: '$24.99', desc: 'Whipped shea butter with lavender essential oil and vitamin E. Deep moisture for dry skin. 8 oz jar.', image: '/images/pages/comp-cta-career.jpg' },
-              { name: 'Essential Oil Collection', price: '$44.99', desc: '6-oil starter set: lavender, peppermint, eucalyptus, tea tree, lemon, and frankincense. 10ml bottles.', image: '/images/pages/comp-cta-training.jpg' },
-              { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/pages/comp-cta-career.jpg' },
+              { name: 'Calm Blend Herbal Tea', price: '$18.99', desc: 'Chamomile, lavender, and lemon balm loose-leaf blend. Caffeine-free. Promotes relaxation and restful sleep.', image: '/images/pages/rise-foundation-page-2.jpg' },
+              { name: 'Shea Body Butter — Lavender', price: '$24.99', desc: 'Whipped shea butter with lavender essential oil and vitamin E. Deep moisture for dry skin. 8 oz jar.', image: '/images/pages/rise-foundation-page-2.jpg' },
+              { name: 'Essential Oil Collection', price: '$44.99', desc: '6-oil starter set: lavender, peppermint, eucalyptus, tea tree, lemon, and frankincense. 10ml bottles.', image: '/images/pages/rise-foundation-page-2.jpg' },
+              { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/pages/rise-foundation-page-2.jpg' },
             ].map((product) => (
               <div key={product.name} className="bg-white rounded-xl overflow-hidden border shadow-sm hover:shadow-lg transition">
                 <div className="relative h-40 overflow-hidden">

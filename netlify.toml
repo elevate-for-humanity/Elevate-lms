@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "npm install -g pnpm@10.28.2 && pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
+  command = "node --version && pnpm --version && echo 'ENV OK' && pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
@@ -13,10 +13,9 @@
   # headroom for the OS, pnpm, and the @netlify/plugin-nextjs post-processor.
   # Setting this higher than available RAM causes OOM → exit code 2.
   NODE_OPTIONS = "--max-old-space-size=2560"
-  # Disable Netlify's auto pnpm install — our build command handles it explicitly
-  # with --no-frozen-lockfile. Netlify's auto-install runs in CI frozen mode
-  # which fails with exit code 2 when the lockfile drifts between commits.
-  NETLIFY_USE_PNPM = "false"
+  NETLIFY_USE_PNPM = "true"
+  PNPM_VERSION = "10.28.2"
+  PNPM_FLAGS = "--no-frozen-lockfile"
   # Prevent corepack from enforcing the packageManager field version.
   COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

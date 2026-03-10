@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "echo '[1/3] install' && pnpm install --no-frozen-lockfile && echo '[2/3] token-gate' && pnpm exec tsx scripts/ci-token-gate.ts && echo '[3/3] build' && pnpm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 

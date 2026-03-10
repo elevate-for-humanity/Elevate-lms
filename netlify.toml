@@ -9,7 +9,10 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NODE_OPTIONS = "--max-old-space-size=8192"
+  # Netlify Pro build machines have 3GB RAM. Cap heap at 2.5GB to leave
+  # headroom for the OS, pnpm, and the @netlify/plugin-nextjs post-processor.
+  # Setting this higher than available RAM causes OOM → exit code 2.
+  NODE_OPTIONS = "--max-old-space-size=2560"
   NETLIFY_USE_PNPM = "true"
   PNPM_VERSION = "10.28.2"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

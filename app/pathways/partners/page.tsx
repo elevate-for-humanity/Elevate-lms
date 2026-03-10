@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Partners & Cohort Training | Career Pathways | Elevate for Humanity',
   description: 'How workforce boards, community organizations, and employers partner with Elevate for custom cohort training, progress reporting, and credentialed placement.',

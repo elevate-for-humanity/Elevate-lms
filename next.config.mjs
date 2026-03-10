@@ -54,9 +54,6 @@ const nextConfig = {
     buildActivityPosition: 'bottom-right',
   },
   
-  // Empty turbopack config to silence the warning about webpack config
-  turbopack: {},
-
   // Force cache bust - build timestamp + deployment marker
   generateBuildId: async () => {
     return `build-${Date.now()}-production`;

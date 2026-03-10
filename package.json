@@ -22,7 +22,7 @@
     "@hookform/resolvers": "5.2.2",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@monaco-editor/react": "4.7.0",
-    "@netlify/plugin-nextjs": "^5.15.8",
+    "@netlify/plugin-nextjs": "5.15.8",
     "@node-saml/passport-saml": "5.1.0",
     "@octokit/auth-oauth-app": "9.0.3",
     "@octokit/rest": "22.0.1",

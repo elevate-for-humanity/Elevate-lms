@@ -67,6 +67,13 @@ const GlobalAvatar = dynamic(
   { ssr: false, loading: () => null }
 );
 
+// Toast notifications — react-hot-toast uses CommonJS require('react') which
+// Turbopack resolves to null on the server. Must be client-only.
+const Toaster = dynamic(
+  () => import('react-hot-toast').then(m => m.Toaster),
+  { ssr: false, loading: () => null }
+);
+
 // Avatar is now added to each page individually via PageAvatar component
 // This ensures proper positioning under hero banners
 
@@ -128,6 +135,20 @@ export default function ClientWidgets() {
 
   return (
     <>
+      {/* Toast notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            borderRadius: '12px',
+            fontSize: '0.875rem',
+            padding: '12px 16px',
+          },
+          success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        }}
+      />
+
       {/* Immediate: scroll unlock + version guard + sentry */}
       <ScrollUnlocker />
       <VersionGuard />

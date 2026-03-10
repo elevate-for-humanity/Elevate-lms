@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
-import { Toaster } from 'react-hot-toast';
+
 import CookieConsent from '@/components/CookieConsent';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
@@ -227,28 +227,7 @@ export default function RootLayout({
         <CookieConsent />
         <DMCATrackingPixel />
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              borderRadius: '12px',
-              fontSize: '0.875rem',
-              padding: '12px 16px',
-            },
-            success: {
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
+
       </body>
     </html>
   );

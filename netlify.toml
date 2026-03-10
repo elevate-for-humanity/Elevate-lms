@@ -15,6 +15,10 @@
   NODE_OPTIONS = "--max-old-space-size=2560"
   NETLIFY_USE_PNPM = "true"
   PNPM_VERSION = "10.28.2"
+  # Prevent corepack from enforcing the packageManager field version.
+  # Netlify installs pnpm via npm (not corepack), so strict version matching
+  # can cause corepack to intercept and fail with exit code 2.
+  COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXTAUTH_URL"

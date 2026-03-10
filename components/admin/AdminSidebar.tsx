@@ -140,6 +140,7 @@ const NAV: NavSection[] = [
       { name: 'JRI', href: '/admin/jri' },
       { name: 'MOU', href: '/admin/mou' },
       { name: 'Shops', href: '/admin/shops' },
+      { name: 'Barber Shop Applications', href: '/admin/barber-shop-applications' },
       { name: 'Affiliates', href: '/admin/affiliates' },
       { name: 'Jobs Board', href: '/admin/jobs' },
     ],

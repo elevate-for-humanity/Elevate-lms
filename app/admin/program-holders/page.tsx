@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Building2, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react';
+import ResendOnboardingButton from './ResendOnboardingButton';
 
 export const metadata: Metadata = {
   title: 'Program Holders | Admin | Elevate For Humanity',
@@ -151,13 +152,16 @@ export default async function AdminProgramHoldersPage() {
                         {new Date(h.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <Link
-                          href={`/admin/program-holders/${h.id}`}
-                          className="inline-flex items-center gap-1 text-brand-blue-600 hover:underline text-sm font-medium"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          Review
-                        </Link>
+                        <div className="flex items-center justify-center gap-3">
+                          <Link
+                            href={`/admin/program-holders/${h.id}`}
+                            className="inline-flex items-center gap-1 text-brand-blue-600 hover:underline text-sm font-medium"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            Review
+                          </Link>
+                          <ResendOnboardingButton holderId={h.id} />
+                        </div>
                       </td>
                     </tr>
                   ))}

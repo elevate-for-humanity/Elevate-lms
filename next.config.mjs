@@ -136,11 +136,14 @@ const nextConfig = {
       '@hookform/resolvers',
       'swr',
     ],
-    webpackBuildWorker: true,
+    // webpackBuildWorker spawns a separate Node.js process for webpack compilation.
+    // On Netlify's 3GB build machines this pushes total memory over the limit.
+    // Disabled to keep compilation in-process and within the memory budget.
+    webpackBuildWorker: false,
     optimizeCss: true,
-    // Parallel routes for faster builds
-    parallelServerCompiles: true,
-    parallelServerBuildTraces: true,
+    // Parallel compilation uses more memory. Disabled for Netlify's 3GB build machines.
+    parallelServerCompiles: false,
+    parallelServerBuildTraces: false,
   },
   
   // Suppress middleware deprecation warning (middleware.ts is still correct for our use case)

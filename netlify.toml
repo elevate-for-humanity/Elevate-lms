@@ -8,7 +8,7 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "20.19.2"
   # Netlify Pro build machines have 3GB RAM. Cap heap at 2.5GB to leave
   # headroom for the OS, pnpm, and the @netlify/plugin-nextjs post-processor.
   # Setting this higher than available RAM causes OOM → exit code 2.

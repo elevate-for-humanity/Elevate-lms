@@ -338,6 +338,9 @@ importers:
       tesseract.js:
         specifier: 7.0.0
         version: 7.0.0
+      tsx:
+        specifier: 4.21.0
+        version: 4.21.0
       uuid:
         specifier: 13.0.0
         version: 13.0.0
@@ -513,9 +516,6 @@ importers:
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@swc/core@1.15.8(@swc/helpers@0.5.18))(@types/node@24.10.1)(typescript@5.9.3)
-      tsx:
-        specifier: 4.21.0
-        version: 4.21.0
       typescript:
         specifier: 5.9.3
         version: 5.9.3

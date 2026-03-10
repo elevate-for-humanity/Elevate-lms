@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 // /pwa/shop-owner/dashboard is the login redirect target.
 // The actual dashboard lives at /pwa/shop-owner — redirect there.
 export default async function ShopOwnerDashboardRedirect() {

@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Outcomes & What You Can Expect | Career Pathways | Elevate for Humanity',
   description: 'What each Elevate training program leads to: credentials, salaries, employers, day-to-day training, and funding coverage. Real data from real programs.',

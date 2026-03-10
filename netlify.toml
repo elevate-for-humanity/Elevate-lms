@@ -3,21 +3,14 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "pnpm install --frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
+  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20.19.2"
-  # 8GB heap ceiling for next build. Netlify Pro has 3GB RAM but Node.js
-  # doesn't reserve the full heap upfront — it's a GC ceiling. Static
-  # generation of 882 pages peaks at ~2.5-3GB working set; a 2.5GB limit
-  # causes the GC to thrash and the process to OOM before completion.
+  NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=8192"
   NETLIFY_USE_PNPM = "true"
-  PNPM_VERSION = "10.28.2"
-  # Prevent corepack from enforcing the packageManager field version.
-  COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXTAUTH_URL"

@@ -38,9 +38,6 @@ importers:
       '@monaco-editor/react':
         specifier: 4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@netlify/plugin-nextjs':
-        specifier: 5.15.8
-        version: 5.15.8
       '@node-saml/passport-saml':
         specifier: 5.1.0
         version: 5.1.0
@@ -122,12 +119,6 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.89.0
         version: 2.89.0
-      '@tailwindcss/forms':
-        specifier: 0.5.10
-        version: 0.5.10(tailwindcss@3.4.18(tsx@4.21.0)(yaml@2.8.2))
-      '@tailwindcss/typography':
-        specifier: 0.5.19
-        version: 0.5.19(tailwindcss@3.4.18(tsx@4.21.0)(yaml@2.8.2))
       '@types/pdfkit':
         specifier: 0.17.3
         version: 0.17.3
@@ -149,9 +140,6 @@ importers:
       '@xmldom/xmldom':
         specifier: ^0.8.11
         version: 0.8.11
-      autoprefixer:
-        specifier: 10.4.22
-        version: 10.4.22(postcss@8.4.49)
       bcryptjs:
         specifier: 3.0.3
         version: 3.0.3
@@ -173,9 +161,6 @@ importers:
       cors:
         specifier: 2.8.5
         version: 2.8.5
-      critters:
-        specifier: ^0.0.25
-        version: 0.0.25
       docx:
         specifier: 9.5.1
         version: 9.5.1
@@ -284,9 +269,6 @@ importers:
       playwright:
         specifier: ^1.57.0
         version: 1.57.0
-      postcss:
-        specifier: 8.4.49
-        version: 8.4.49
       qrcode:
         specifier: 1.5.4
         version: 1.5.4
@@ -323,9 +305,6 @@ importers:
       sanitize-html:
         specifier: ^2.17.1
         version: 2.17.1
-      sharp:
-        specifier: 0.34.5
-        version: 0.34.5
       signature_pad:
         specifier: 5.1.1
         version: 5.1.1
@@ -353,18 +332,12 @@ importers:
       tailwind-merge:
         specifier: 3.4.0
         version: 3.4.0
-      tailwindcss:
-        specifier: 3.4.18
-        version: 3.4.18(tsx@4.21.0)(yaml@2.8.2)
       tailwindcss-animate:
         specifier: 1.0.7
         version: 1.0.7(tailwindcss@3.4.18(tsx@4.21.0)(yaml@2.8.2))
       tesseract.js:
         specifier: 7.0.0
         version: 7.0.0
-      tsx:
-        specifier: 4.21.0
-        version: 4.21.0
       uuid:
         specifier: 13.0.0
         version: 13.0.0
@@ -408,12 +381,21 @@ importers:
       '@netlify/functions':
         specifier: ^5.1.2
         version: 5.1.2
+      '@netlify/plugin-nextjs':
+        specifier: ^5.15.7
+        version: 5.15.8
       '@next/bundle-analyzer':
         specifier: 16.1.1
         version: 16.1.1
       '@playwright/test':
         specifier: 1.57.0
         version: 1.57.0
+      '@tailwindcss/forms':
+        specifier: 0.5.10
+        version: 0.5.10(tailwindcss@3.4.18(tsx@4.21.0)(yaml@2.8.2))
+      '@tailwindcss/typography':
+        specifier: 0.5.19
+        version: 0.5.19(tailwindcss@3.4.18(tsx@4.21.0)(yaml@2.8.2))
       '@testing-library/jest-dom':
         specifier: 6.9.1
         version: 6.9.1
@@ -459,9 +441,15 @@ importers:
       '@vitest/ui':
         specifier: ^4.0.17
         version: 4.0.17(vitest@4.0.17)
+      autoprefixer:
+        specifier: 10.4.22
+        version: 10.4.22(postcss@8.4.49)
       axe-core:
         specifier: ^4.11.1
         version: 4.11.1
+      critters:
+        specifier: ^0.0.25
+        version: 0.0.25
       dotenv:
         specifier: 17.2.3
         version: 17.2.3
@@ -498,6 +486,9 @@ importers:
       pg:
         specifier: ^8.18.0
         version: 8.18.0
+      postcss:
+        specifier: 8.4.49
+        version: 8.4.49
       prettier:
         specifier: 3.7.4
         version: 3.7.4
@@ -510,12 +501,21 @@ importers:
       serve:
         specifier: 14.2.5
         version: 14.2.5
+      sharp:
+        specifier: 0.34.5
+        version: 0.34.5
       stylelint:
         specifier: 16.25.0
         version: 16.25.0(typescript@5.9.3)
+      tailwindcss:
+        specifier: 3.4.18
+        version: 3.4.18(tsx@4.21.0)(yaml@2.8.2)
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@swc/core@1.15.8(@swc/helpers@0.5.18))(@types/node@24.10.1)(typescript@5.9.3)
+      tsx:
+        specifier: 4.21.0
+        version: 4.21.0
       typescript:
         specifier: 5.9.3
         version: 5.9.3

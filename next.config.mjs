@@ -138,6 +138,7 @@ const nextConfig = {
     ],
     webpackBuildWorker: true,
     optimizeCss: true,
+    // Parallel routes for faster builds
     parallelServerCompiles: true,
     parallelServerBuildTraces: true,
   },
@@ -212,11 +213,6 @@ const nextConfig = {
   typescript: {
     // OOMs during type-check on 4,450+ files in CI — keep enabled until project is split or memory increased
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    // ESLint plugins are devDependencies and not installed in production builds.
-    // Linting runs locally and in pre-commit hooks — not needed at deploy time.
-    ignoreDuringBuilds: true,
   },
   // Removed staticPageGenerationTimeout - use route segment config instead
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config

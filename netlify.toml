@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "node --version && pnpm --version && echo 'ENV OK' && pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
@@ -16,6 +16,10 @@
   NETLIFY_USE_PNPM = "true"
   PNPM_VERSION = "10.28.2"
   PNPM_FLAGS = "--no-frozen-lockfile"
+  # @netlify/plugin-nextjs sets this in onPreBuild, but the env var may not
+  # propagate to the build command subprocess on remote builds. Set it explicitly
+  # so Next.js generates .next/standalone/ which the plugin requires.
+  NEXT_PRIVATE_STANDALONE = "true"
   # Prevent corepack from enforcing the packageManager field version.
   COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

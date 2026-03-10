@@ -3,7 +3,7 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "corepack enable && pnpm install --no-frozen-lockfile --include=dev && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 

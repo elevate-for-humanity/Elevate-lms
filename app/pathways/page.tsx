@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Career Pathways & Workforce Infrastructure | Elevate for Humanity',
   description:

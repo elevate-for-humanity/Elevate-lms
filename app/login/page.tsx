@@ -82,13 +82,19 @@ function LoginForm() {
           router.push('/admin/dashboard');
           break;
         case 'program_holder':
-          router.push('/program-holder/dashboard');
+          router.push('/program-holder/onboarding');
           break;
         case 'partner':
-          router.push('/partner');
+          router.push('/partner/onboarding');
+          break;
+        case 'instructor':
+          router.push('/instructor/dashboard');
+          break;
+        case 'staff':
+          router.push('/onboarding/staff');
           break;
         case 'employer':
-          router.push('/employer/dashboard');
+          router.push('/employer-portal');
           break;
         case 'workforce_board':
           router.push('/workforce-board');

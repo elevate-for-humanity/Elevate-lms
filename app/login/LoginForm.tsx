@@ -42,12 +42,20 @@ export default function LoginForm() {
         .single();
 
       // Redirect based on role
-      if (profile?.role === 'admin' || profile?.role === 'super_admin') {
-        router.push('/admin');
+      if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'org_admin') {
+        router.push('/admin/dashboard');
+      } else if (profile?.role === 'employer') {
+        router.push('/employer-portal');
+      } else if (profile?.role === 'staff') {
+        router.push('/onboarding/staff');
+      } else if (profile?.role === 'program_holder') {
+        router.push('/program-holder/onboarding');
+      } else if (profile?.role === 'partner') {
+        router.push('/partner/onboarding');
       } else if (profile?.role === 'instructor') {
         router.push('/instructor/dashboard');
       } else {
-        router.push('/learner/dashboard');
+        router.push('/lms/dashboard');
       }
       router.refresh();
     } catch (err: any) {

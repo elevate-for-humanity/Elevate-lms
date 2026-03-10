@@ -37,7 +37,7 @@ export default async function FERPATrainingPage() {
     .eq('id', user.id)
     .single();
 
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'hr'];
+  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'hr', 'staff', 'instructor', 'partner', 'program_holder'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }

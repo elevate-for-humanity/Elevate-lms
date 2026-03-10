@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   FileText, Mail, ClipboardList, Copy, Check, ChevronDown, ChevronRight,
-  Handshake, BarChart3, Send, Users, Building2, Calendar,
+  Handshake, BarChart3, Send, Users, Building2, Calendar, Save, Loader2,
 } from 'lucide-react';
 import {
   MOU_TEMPLATE_DEFAULT, generateMOUMarkdown,
@@ -12,6 +12,8 @@ import {
   EMAIL_TEMPLATES,
   type MOUTemplate, type ReportTemplate,
 } from '@/data/document-templates';
+
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 // ─── MOU Builder ────────────────────────────────────────────────
 
@@ -26,6 +28,47 @@ function MOUBuilder() {
     partnerSigner: { name: '', title: '' },
   });
   const [copied, setCopied] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [savedVersion, setSavedVersion] = useState<string | null>(null);
+
+  // Load the latest saved MOU template on mount
+  useEffect(() => {
+    fetch('/api/admin/documents/templates?type=mou')
+      .then(r => r.json())
+      .then(({ template }) => {
+        if (template?.content) {
+          try {
+            const parsed = JSON.parse(template.content) as MOUTemplate;
+            setMou(parsed);
+            setSavedVersion(template.version);
+          } catch {
+            // legacy plain-text content — leave defaults
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/admin/documents/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'mou',
+          title: `MOU Template — ${mou.partnerOrganization || 'Generic'}`,
+          content: JSON.stringify(mou),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.version) setSavedVersion(data.version);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch {
+      setSaveStatus('idle');
+    }
+  };
 
   const update = (field: keyof MOUTemplate, value: any) => setMou(prev => ({ ...prev, [field]: value }));
   const updateList = (field: keyof MOUTemplate, index: number, value: string) => {
@@ -126,12 +169,37 @@ function MOUBuilder() {
       {/* Preview */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-gray-900">Preview</h3>
-          <button onClick={copyToClipboard}
-            className="flex items-center gap-2 px-3 py-1.5 bg-brand-blue-600 text-white rounded-lg text-sm hover:bg-brand-blue-700">
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            {copied ? 'Copied' : 'Copy'}
-          </button>
+          <div>
+            <h3 className="font-bold text-gray-900">Preview</h3>
+            {savedVersion && (
+              <p className="text-xs text-gray-400 mt-0.5">Saved v{savedVersion}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSave}
+              disabled={saveStatus === 'saving'}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                saveStatus === 'saved'
+                  ? 'bg-brand-green-600 text-white'
+                  : 'bg-gray-800 text-white hover:bg-gray-900'
+              } disabled:opacity-60`}
+            >
+              {saveStatus === 'saving' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : saveStatus === 'saved' ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : 'Save'}
+            </button>
+            <button onClick={copyToClipboard}
+              className="flex items-center gap-2 px-3 py-1.5 bg-brand-blue-600 text-white rounded-lg text-sm hover:bg-brand-blue-700">
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
         </div>
         <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-4 max-h-[600px] overflow-y-auto">
           {markdown}
@@ -155,6 +223,47 @@ function ReportBuilder() {
     summary: 'The program is on track with participant engagement and credential preparation proceeding as planned.',
   });
   const [copied, setCopied] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [savedVersion, setSavedVersion] = useState<string | null>(null);
+
+  // Load the latest saved report template on mount
+  useEffect(() => {
+    fetch('/api/admin/documents/templates?type=report')
+      .then(r => r.json())
+      .then(({ template }) => {
+        if (template?.content) {
+          try {
+            const parsed = JSON.parse(template.content) as ReportTemplate;
+            setReport(parsed);
+            setSavedVersion(template.version);
+          } catch {
+            // legacy plain-text content — leave defaults
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/admin/documents/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'report',
+          title: `Report Template — ${report.programName || 'Generic'}`,
+          content: JSON.stringify(report),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.version) setSavedVersion(data.version);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch {
+      setSaveStatus('idle');
+    }
+  };
 
   const update = (field: keyof ReportTemplate, value: any) => setReport(prev => ({ ...prev, [field]: value }));
   const updateList = (field: keyof ReportTemplate, index: number, value: string) => {
@@ -257,12 +366,37 @@ function ReportBuilder() {
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-gray-900">Preview</h3>
-          <button onClick={copyToClipboard}
-            className="flex items-center gap-2 px-3 py-1.5 bg-brand-blue-600 text-white rounded-lg text-sm hover:bg-brand-blue-700">
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            {copied ? 'Copied' : 'Copy'}
-          </button>
+          <div>
+            <h3 className="font-bold text-gray-900">Preview</h3>
+            {savedVersion && (
+              <p className="text-xs text-gray-400 mt-0.5">Saved v{savedVersion}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSave}
+              disabled={saveStatus === 'saving'}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                saveStatus === 'saved'
+                  ? 'bg-brand-green-600 text-white'
+                  : 'bg-gray-800 text-white hover:bg-gray-900'
+              } disabled:opacity-60`}
+            >
+              {saveStatus === 'saving' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : saveStatus === 'saved' ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : 'Save'}
+            </button>
+            <button onClick={copyToClipboard}
+              className="flex items-center gap-2 px-3 py-1.5 bg-brand-blue-600 text-white rounded-lg text-sm hover:bg-brand-blue-700">
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
         </div>
         <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-4 max-h-[600px] overflow-y-auto">
           {markdown}

@@ -81,23 +81,36 @@ function LoginForm() {
         case 'org_admin':
           router.push('/admin/dashboard');
           break;
+        case 'staff':
+          router.push('/staff-portal/dashboard');
+          break;
+        case 'instructor':
+          router.push('/instructor/dashboard');
+          break;
+        case 'mentor':
+          router.push('/mentor/dashboard');
+          break;
+        case 'creator':
+          router.push('/creator/dashboard');
+          break;
         case 'program_holder':
+        case 'delegate':
           router.push('/program-holder/dashboard');
           break;
         case 'partner':
-          router.push('/partner');
+        case 'sponsor':
+          router.push('/partner-portal');
           break;
         case 'employer':
           router.push('/employer/dashboard');
           break;
         case 'workforce_board':
-          router.push('/workforce-board');
+          router.push('/workforce-board/dashboard');
           break;
         case 'student':
           router.push('/lms/dashboard');
           break;
         default:
-          // Unknown or null role — safe default
           router.push('/lms/dashboard');
           break;
       }

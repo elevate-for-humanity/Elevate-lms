@@ -36,12 +36,13 @@ async function _POST(req: Request) {
       .eq('user_id', user.id)
       .is('documents_submitted_at', null);
 
-    // Also update program_enrollments state machine if exists
+    // Advance state machine: orientation_complete → active
+    // (documents_complete is not a distinct state in this flow)
     await db
       .from('program_enrollments')
       .update({ enrollment_state: 'active', updated_at: new Date().toISOString() })
       .eq('user_id', user.id)
-      .eq('enrollment_state', 'documents_complete');
+      .in('enrollment_state', ['orientation_complete', 'documents_complete']);
 
     if (error) {
       logger.error('Error updating enrollment:', error);

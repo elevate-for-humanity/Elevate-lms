@@ -17,6 +17,8 @@ export interface ApproveApplicationInput {
   applicationId: string;
   programId?: string | null;
   fundingType?: string | null;
+  /** Role to assign to the created/updated profile. Defaults to 'student'. */
+  role?: string;
 }
 
 export interface ApproveApplicationResult {
@@ -30,7 +32,7 @@ export async function approveApplication(
   db: SupabaseClient,
   input: ApproveApplicationInput,
 ): Promise<ApproveApplicationResult> {
-  const { applicationId, programId, fundingType } = input;
+  const { applicationId, programId, fundingType, role: assignedRole = 'student' } = input;
 
   // Load application
   const { data: app, error: appError } = await db
@@ -93,7 +95,7 @@ export async function approveApplication(
       userId = newUser.user.id;
     }
 
-    // Ensure profile exists
+    // Ensure profile exists for newly created user
     await db.from('profiles').upsert({
       id: userId,
       email,
@@ -101,15 +103,20 @@ export async function approveApplication(
       last_name: app.last_name,
       full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
       phone: app.phone,
-      role: 'student',
+      role: assignedRole,
     }, { onConflict: 'id' });
   }
 
-  // Step 2: Create program_enrollments
+  // Profile already existed — update role if a non-default role was assigned
+  if (existingProfile && assignedRole !== 'student') {
+    await db.from('profiles').update({ role: assignedRole }).eq('id', userId);
+  }
+
+  // Step 2: Create program_enrollments (students only)
   const resolvedProgramId = programId || app.program_id || null;
   let enrollmentId: string | null = null;
 
-  if (resolvedProgramId) {
+  if (assignedRole === 'student' && resolvedProgramId) {
     const { data: pe } = await db
       .from('program_enrollments')
       .upsert({
@@ -159,11 +166,13 @@ export async function approveApplication(
     })
     .eq('id', applicationId);
 
-  // Step 5: Update profile enrollment_status
-  await db
-    .from('profiles')
-    .update({ enrollment_status: 'active' })
-    .eq('id', userId);
+  // Step 5: Update profile enrollment_status (students only)
+  if (assignedRole === 'student') {
+    await db
+      .from('profiles')
+      .update({ enrollment_status: 'active' })
+      .eq('id', userId);
+  }
 
   logger.info('[approve] Application approved', {
     applicationId,

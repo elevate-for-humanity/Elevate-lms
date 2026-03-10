@@ -135,15 +135,28 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
               {/* CTA card */}
               <div className="sm:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-2xl p-5">
-                  <p className="text-xs font-bold text-brand-green-600 uppercase tracking-wider mb-1">Grant Funded Available</p>
+                  <p className="text-xs font-bold text-brand-green-600 uppercase tracking-wider mb-1">Grant Funding Available</p>
                   <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
                   <p className="text-xs text-slate-500 mb-4">self-pay · funding may cover 100%</p>
+
+                  {/* NEW APPLICANT path */}
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">New Applicant</p>
                   <Link
                     href={p.cta.applyHref}
-                    className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-2"
+                    className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
                   >
-                    Enroll Now
+                    Apply to This Program
                   </Link>
+
+                  {/* ENROLLED STUDENT path */}
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
+                  <Link
+                    href={p.cta.enrollHref || '/lms/dashboard'}
+                    className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
+                  >
+                    Go to My Courses
+                  </Link>
+
                   <Link
                     href={p.cta.advisorHref || '/contact'}
                     className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
@@ -208,20 +221,40 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
             Ready to Start Your {p.title} Career?
           </h2>
           <p className="text-white/80 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href={p.cta.applyHref}
-              className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl"
-            >
-              Enroll Now — It&apos;s Free to Apply
-            </Link>
-            <Link
-              href={p.cta.advisorHref || '/contact'}
-              className="border-2 border-white/60 text-white px-8 py-4 rounded-2xl font-bold text-base hover:bg-white/10 transition-colors"
-            >
-              Talk to an Advisor
-            </Link>
+
+          {/* Two distinct paths — applicant vs enrolled */}
+          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
+            {/* New applicant */}
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">New Applicant</span>
+              <Link
+                href={p.cta.applyHref}
+                className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl whitespace-nowrap"
+              >
+                Apply to This Program
+              </Link>
+              <span className="text-white/60 text-xs">Free to apply · takes 5 min</span>
+            </div>
+
+            {/* Already enrolled */}
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Already Enrolled</span>
+              <Link
+                href={p.cta.enrollHref || '/lms/dashboard'}
+                className="bg-brand-blue-500 hover:bg-brand-blue-400 text-white px-10 py-4 rounded-2xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap border-2 border-white/30"
+              >
+                Go to My Courses
+              </Link>
+              <span className="text-white/60 text-xs">Log in to access your training</span>
+            </div>
           </div>
+
+          <Link
+            href={p.cta.advisorHref || '/contact'}
+            className="inline-block border-2 border-white/40 text-white/80 px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors mt-2"
+          >
+            Questions? Talk to an Advisor
+          </Link>
         </div>
       </section>
 

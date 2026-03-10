@@ -88,7 +88,7 @@ async function _GET(request: NextRequest) {
 
   // Use context's program slug for redirects from here on
   const programSlug = context.program_slug || 'barber-apprenticeship';
-  const programPath = `/programs/${programSlug}/apply`;
+  const programPath = `/programs/${programSlug}`;
 
   // Check expiration
   if (new Date(context.expires_at) < new Date()) {
@@ -123,8 +123,8 @@ async function _GET(request: NextRequest) {
       })
       .eq('id', context.id);
 
-    // Redirect to success page — enrollment will be activated by webhook
-    const successUrl = new URL(`${siteUrl}${programPath}/success`);
+    // Redirect to public success page (no auth required)
+    const successUrl = new URL(`${siteUrl}${programPath}/apply/success`);
     successUrl.searchParams.set('provider', 'affirm');
     successUrl.searchParams.set('ref', context.id);
 

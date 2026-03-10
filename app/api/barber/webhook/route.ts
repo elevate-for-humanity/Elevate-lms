@@ -268,6 +268,115 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           break;
         }
 
+        // Public (unauthenticated) enrollment — payment_plan or pay_in_full
+        if (checkoutType === 'barber_enrollment') {
+          const paymentType = session.metadata?.payment_type || 'payment_plan';
+          const amountPaidCents = session.amount_total || 0;
+          const weeksRemaining = parseInt(session.metadata?.weeks_remaining || '50');
+          const hoursPerWeek = parseInt(session.metadata?.hours_per_week || '40');
+          const transferredHours = parseInt(session.metadata?.transferHours || session.metadata?.transferredHours || '0');
+          const weeklyPaymentCents = parseInt(session.metadata?.weekly_payment_cents || '0');
+          const adjustedPriceCents = parseInt(session.metadata?.adjusted_price_cents || '498000');
+          const fullyPaid = paymentType === 'pay_in_full' || amountPaidCents >= adjustedPriceCents;
+          const remainingBalanceCents = Math.max(0, adjustedPriceCents - amountPaidCents);
+
+          // Schedule weekly invoices if setup-fee only
+          if (!fullyPaid && weeklyPaymentCents > 0 && weeksRemaining > 0) {
+            await scheduleWeeklyInvoices(stripe, {
+              customerId,
+              customerEmail,
+              weeksRemaining,
+              weeklyPaymentCents,
+              hoursPerWeek,
+              transferredHours,
+              applicationId,
+            });
+          }
+
+          const { data: subRecord } = await db.from('barber_subscriptions').insert({
+            stripe_customer_id: customerId,
+            customer_email: customerEmail,
+            customer_name: customerName,
+            customer_phone: customerPhone,
+            status: 'active',
+            full_tuition_amount: BARBER_PRICING.fullPrice,
+            amount_paid_at_checkout: amountPaidCents / 100,
+            remaining_balance: remainingBalanceCents / 100,
+            payment_method: 'card',
+            fully_paid: fullyPaid,
+            weekly_payment_cents: fullyPaid ? 0 : weeklyPaymentCents,
+            weeks_remaining: fullyPaid ? 0 : weeksRemaining,
+            hours_per_week: hoursPerWeek,
+            transferred_hours_verified: transferredHours,
+            payment_model: fullyPaid ? 'paid_in_full' : 'invoices',
+            created_at: new Date().toISOString(),
+          }).select('id').single().catch((err: any) => {
+            logger.error('barber_subscriptions insert error:', err);
+            return { data: null };
+          });
+
+          // Normalize email so the account-linking query in auth/confirm matches
+          // regardless of how Stripe or the user cased it at checkout.
+          const normalizedEmail = customerEmail.toLowerCase().trim();
+
+          // Create program_enrollments row. user_id is null — public checkout has no
+          // Supabase account yet. enrollment-success links it by email on first login.
+          await db.from('program_enrollments').insert({
+            user_id: null,
+            email: normalizedEmail,
+            full_name: customerName,
+            phone: customerPhone,
+            amount_paid_cents: amountPaidCents,
+            funding_source: 'self-pay',
+            stripe_session_id: session.id,
+            stripe_customer_id: customerId,
+            program_slug: 'barber-apprenticeship',
+            status: 'paid',
+            enrollment_state: 'confirmed',
+            enrolled_at: new Date().toISOString(),
+            confirmed_at: new Date().toISOString(),
+            payment_status: fullyPaid ? 'paid_in_full' : 'setup_fee_paid',
+            barber_sub_id: subRecord?.id || null,
+          }).catch((err: any) => logger.error('program_enrollments insert error:', err));
+
+          // Send enrollment confirmation email
+          try {
+            const { sendEmail } = await import('@/lib/email/sendgrid');
+            const paymentSummary = fullyPaid
+              ? `Paid in full: $${(amountPaidCents / 100).toLocaleString()}`
+              : `Setup fee paid: $${(amountPaidCents / 100).toFixed(2)} — $${(weeklyPaymentCents / 100).toFixed(2)}/week for ~${weeksRemaining} weeks`;
+
+            await sendEmail({
+              to: customerEmail,
+              subject: 'Enrollment Confirmed — Barber Apprenticeship',
+              html: `<p>Hi ${customerName || 'there'},</p>
+<p>Your enrollment in the Barber Apprenticeship program is confirmed.</p>
+<p><strong>Payment:</strong> ${paymentSummary}</p>
+<p><strong>Next steps:</strong><br>
+• Complete orientation at <a href="${process.env.NEXT_PUBLIC_SITE_URL}/programs/barber-apprenticeship/orientation">your orientation page</a><br>
+• Log hours weekly in your apprentice dashboard<br>
+${!fullyPaid ? '• Weekly invoices will arrive every Friday<br>' : ''}</p>
+<p>Questions? Call (317) 314-3757 or reply to this email.</p>
+<p>— Elevate for Humanity</p>`,
+            });
+
+            // Admin notification
+            await sendEmail({
+              to: 'elevate4humanityedu@gmail.com',
+              subject: `New Barber Apprentice — ${customerName || customerEmail}`,
+              html: `<p>New enrollment via public checkout:</p>
+<p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>
+Transfer Hours: ${transferredHours}<br>Payment: ${paymentType}<br>
+Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
+            });
+          } catch (emailErr) {
+            logger.error('Enrollment email error:', emailErr);
+          }
+
+          logger.info(`Barber public enrollment complete: ${customerEmail}, fullyPaid: ${fullyPaid}`);
+          break;
+        }
+
         // Legacy subscription-based flow (for existing enrollments)
         const subscriptionId = session.subscription as string;
         const userId = session.metadata?.user_id;

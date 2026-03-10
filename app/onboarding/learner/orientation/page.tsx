@@ -22,10 +22,21 @@ async function completeOrientation() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  await db.from('profiles').update({
-    orientation_completed: true,
-    orientation_completed_at: new Date().toISOString(),
-  }).eq('id', user.id);
+  const now = new Date().toISOString();
+
+  await Promise.all([
+    // Mark profile flag (read by onboarding page completion check)
+    db.from('profiles').update({
+      orientation_completed: true,
+      orientation_completed_at: now,
+    }).eq('id', user.id),
+    // Write to orientation_completions table (also read by onboarding page)
+    db.from('orientation_completions').upsert({
+      user_id: user.id,
+      completed_at: now,
+      orientation_type: 'learner',
+    }, { onConflict: 'user_id', ignoreDuplicates: true }),
+  ]);
 
   redirect('/onboarding/learner');
 }

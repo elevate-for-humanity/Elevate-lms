@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { approveApplication } from '@/lib/enrollment/approve';
 
 // info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
 // but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
@@ -329,7 +330,7 @@ async function insertApplication(payload: {
     const adminHtml = [
         emailHeader,
         `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
+        `<p style="color:#16a34a"><strong>Status: APPROVED — applicant account created and enrolled automatically</strong></p>`,
         `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
         `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
         `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
@@ -339,7 +340,6 @@ async function insertApplication(payload: {
         `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
         payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
         `</table>`,
-        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
         supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
         emailFooter,
       ].filter(Boolean).join('');
@@ -478,7 +478,9 @@ async function insertApplication(payload: {
       if (error) {
         logger.error(`[Application] DB insert failed for ${payload.email}`, new Error(error.message));
       } else {
-        // Auto-enroll: create account + enroll in courses
+        // Create auth account so the applicant can log in immediately.
+        // For student applications this also resolves the program/course IDs
+        // needed by approveApplication below.
         const accountResult = await createStudentAccount(
           supabase,
           data.id,
@@ -489,27 +491,35 @@ async function insertApplication(payload: {
           payload.password,
         );
 
-        // Create program_enrollments row — links student to their program
-        if (accountResult.userId && accountResult.programId) {
-          const programSlug = payload.programInterest.toLowerCase().replace(/\s+/g, '-').trim();
-          await supabase
-            .from('program_enrollments')
-            .upsert({
-              user_id: accountResult.userId,
-              program_id: accountResult.programId,
-              program_slug: programSlug,
-              email: payload.email,
-              full_name: `${payload.firstName} ${payload.lastName}`.trim(),
-              phone: payload.phone || null,
-              status: 'active',
-              enrollment_state: 'active',
-              funding_source: 'pending',
-              amount_paid_cents: 0,
-            }, { onConflict: 'user_id,program_id', ignoreDuplicates: true })
-            .then(({ error: peError }) => {
-              if (peError) logger.error('[Apply] program_enrollments insert failed:', peError.message);
-              else logger.info('[Apply] program_enrollments created', { userId: accountResult.userId, programId: accountResult.programId });
-            });
+        // Derive the profile role from the application source.
+        const roleBySource: Record<string, string> = {
+          'student-application': 'student',
+          'employer-application': 'employer',
+          'staff-application': 'staff',
+          'program-holder-application': 'program_holder',
+        };
+        const profileRole = roleBySource[payload.source] ?? 'student';
+
+        // Auto-approve: all steps passed on submit — no admin action required.
+        const approvalResult = await approveApplication(supabase, {
+          applicationId: data.id,
+          programId: accountResult.programId ?? null,
+          fundingType: null,
+          role: profileRole,
+        });
+
+        if (!approvalResult.success) {
+          // Non-fatal: application is saved, approval can be retried from admin.
+          logger.warn('[Apply] Auto-approval failed after insert', {
+            applicationId: data.id,
+            error: approvalResult.error,
+          });
+        } else {
+          logger.info('[Apply] Application auto-approved on submit', {
+            applicationId: data.id,
+            userId: approvalResult.userId,
+            enrollmentId: approvalResult.enrollmentId,
+          });
         }
 
         await sendEnrollmentEmails(accountResult.magicLink);
@@ -599,11 +609,9 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
   });
 
   if (result.success) {
-    // Create program_holders row (pending) and link profile.
-    // Role stays as-is until admin approval via approve_and_provision RPC.
+    // Create program_holders row and set role immediately — no admin approval needed.
     const adminDb = createAdminClient();
     if (adminDb) {
-      // Look up the user by email to get their auth ID
       const normalizedEmail = data.email.toLowerCase().trim();
       const { data: profile } = await adminDb
         .from('profiles')
@@ -612,7 +620,6 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
         .single();
 
       if (profile?.id) {
-        // Create program_holders row (pending admin approval)
         const { data: holderRow } = await adminDb
           .from('program_holders')
           .upsert({
@@ -621,26 +628,26 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
             contact_name: `${data.firstName} ${data.lastName}`,
             contact_email: normalizedEmail,
             contact_phone: data.phone || null,
-            status: 'pending',
+            status: 'active',
             name: data.organizationName || `${data.firstName} ${data.lastName}`,
-          }, { onConflict: 'user_id', ignoreDuplicates: true })
+          }, { onConflict: 'user_id', ignoreDuplicates: false })
           .select('id')
           .single();
 
-        // Link profile to program_holders row but do NOT set role yet.
-        // Role is set to 'program_holder' during admin approval (via RPC).
+        // Set role and link profile to program_holders row immediately.
         await adminDb
           .from('profiles')
           .update({
+            role: 'program_holder',
             program_holder_id: holderRow?.id || null,
           })
           .eq('id', profile.id);
 
-        logger.info('[Apply] Program holder profile and row created', { userId: profile.id, holderId: holderRow?.id, org: data.organizationName });
+        logger.info('[Apply] Program holder approved on submit', { userId: profile.id, holderId: holderRow?.id, org: data.organizationName });
       }
     }
 
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=program-holder&ref=${result.referenceNumber}` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/program-holder/onboarding` };
   }
   return result;
 }
@@ -666,7 +673,7 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
   });
 
   if (result.success) {
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=employer&ref=${result.referenceNumber}` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/onboarding/employer` };
   }
   return result;
 }
@@ -693,7 +700,7 @@ export async function submitStaffApplication(data: StaffApplicationData) {
   });
 
   if (result.success) {
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=staff&ref=${result.referenceNumber}` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/onboarding/staff` };
   }
   return result;
 }

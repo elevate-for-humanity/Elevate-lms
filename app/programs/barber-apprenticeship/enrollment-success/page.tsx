@@ -26,16 +26,37 @@ export default async function EnrollmentSuccessPage() {
     redirect('/login?redirect=/programs/barber-apprenticeship/enrollment-success');
   }
 
-  // Get enrollment to verify and get start date
-  const { data: enrollment } = await db
+  // Get enrollment — first by user_id, then by email for public-checkout users
+  // who paid before creating an account (user_id is null on those rows)
+  let { data: enrollment } = await db
     .from('program_enrollments')
-    .select('id, enrolled_at, status, program_id, programs(name, slug)')
+    .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
-  // Redirect if no enrollment or already completed orientation
+  if (!enrollment && user.email) {
+    const normalizedEmail = user.email.toLowerCase().trim();
+    const { data: emailMatch } = await db
+      .from('program_enrollments')
+      .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
+      .ilike('email', normalizedEmail)
+      .is('user_id', null)
+      .order('enrolled_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (emailMatch) {
+      // Link this enrollment to the now-created account
+      await db
+        .from('program_enrollments')
+        .update({ user_id: user.id })
+        .eq('id', emailMatch.id);
+      enrollment = { ...emailMatch, user_id: user.id };
+    }
+  }
+
   if (!enrollment) {
     redirect('/programs/barber-apprenticeship');
   }

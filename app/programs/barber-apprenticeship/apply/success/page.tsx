@@ -1,83 +1,104 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Phone, Mail, ArrowRight } from 'lucide-react';
+import { CheckCircle, Phone, Mail, UserPlus } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Application Submitted | Barber Apprenticeship',
+  title: 'Enrollment Confirmed | Barber Apprenticeship',
   robots: 'noindex',
 };
 
-export default function ApplicationSuccessPage() {
-
+export default function BarberApplySuccessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-          {/* Success Icon */}
-          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+        <div className="text-center mb-8">
+          <div className="w-24 h-24 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <CheckCircle className="w-12 h-12 text-white" />
           </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">
-            Application Submitted
-          </h1>
-          
-          <p className="text-gray-600 mb-8">
-            Thank you for applying to the Barber Apprenticeship program. 
-            We've received your application and will be in touch soon.
+          <h1 className="text-4xl font-black text-white mb-3">Payment Received</h1>
+          <p className="text-slate-300 text-lg">
+            Your enrollment in the Barber Apprenticeship program is confirmed.
           </p>
+        </div>
 
-          {/* What happens next */}
-          <div className="bg-gray-50 rounded-xl p-6 text-left mb-8">
-            <h2 className="font-semibold text-gray-900 mb-4">What Happens Next</h2>
+        {/* Account creation CTA — required to access orientation and dashboard */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
+          <div className="bg-brand-blue-600 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <UserPlus className="w-6 h-6 text-white flex-shrink-0" />
+              <div>
+                <h2 className="font-bold text-white text-lg leading-tight">Create your account</h2>
+                <p className="text-brand-blue-100 text-sm">Required to access orientation and your apprentice dashboard</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <p className="text-slate-600 text-sm mb-4">
+              Use the same email address you used at checkout. Your enrollment will be linked automatically.
+            </p>
+            <Link
+              href="/signup?role=apprentice&redirect=/programs/barber-apprenticeship/enrollment-success"
+              className="block w-full text-center py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
+            >
+              Create Account &amp; Continue
+            </Link>
+            <p className="text-center text-xs text-slate-400 mt-3">
+              Already have an account?{' '}
+              <Link href="/login?redirect=/programs/barber-apprenticeship/enrollment-success" className="text-brand-blue-600 hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+          <div className="p-6 space-y-4">
+            <h2 className="font-bold text-slate-900 text-lg">What happens next</h2>
             <div className="space-y-3">
               {[
-                'We review your application within 5-10 business days',
-                'You will receive an email or call to discuss next steps',
-                'We will provide program fee details and payment options',
-                'If you need a host shop, we will discuss placement options',
-              ].map((text, i) => (
+                'Create your account above using the same email you used at checkout.',
+                'Complete orientation — takes about 10 minutes.',
+                'Upload your ID to verify your identity.',
+                'Weekly payments (if applicable) will begin the following Friday.',
+              ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-5 h-5 bg-brand-orange-100 text-brand-orange-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium mt-0.5">
+                  <div className="w-6 h-6 bg-brand-blue-100 text-brand-blue-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">
                     {i + 1}
                   </div>
-                  <p className="text-sm text-gray-600">{text}</p>
+                  <p className="text-sm text-slate-600">{step}</p>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Contact */}
-          <div className="border-t border-gray-200 pt-6">
-            <p className="text-sm text-gray-500 mb-4">Questions in the meantime?</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
-              >
-                <Phone className="w-4 h-4" />
-                Get Help Online
-              </a>
-              <a
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
-              >
-                <Mail className="w-4 h-4" />
-                Email Us
-              </a>
-            </div>
+        <div className="bg-slate-800 rounded-xl p-5 mb-6">
+          <p className="text-slate-300 text-sm text-center mb-4">Questions? We're here to help.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="tel:3173143757"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm font-medium"
+            >
+              <Phone className="w-4 h-4" />
+              (317) 314-3757
+            </a>
+            <a
+              href="mailto:elevate4humanityedu@gmail.com"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm font-medium"
+            >
+              <Mail className="w-4 h-4" />
+              Email Us
+            </a>
           </div>
         </div>
 
-        {/* Back to program */}
-        <div className="text-center mt-6">
+        <div className="text-center">
           <Link
             href="/programs/barber-apprenticeship"
-            className="inline-flex items-center gap-2 text-brand-orange-600 hover:text-brand-orange-700 font-medium"
+            className="text-slate-400 hover:text-white transition text-sm"
           >
             Back to Program Details
-            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

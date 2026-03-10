@@ -100,7 +100,7 @@ async function _POST(request: NextRequest) {
 
     // Build success/cancel URLs
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-    const finalSuccessUrl = success_url || `${baseUrl}/programs/barber-apprenticeship/enrollment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const finalSuccessUrl = success_url || `${baseUrl}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancel_url || `${baseUrl}/programs/barber-apprenticeship/apply?canceled=true`;
 
     const firstBillingDate = formatFirstBillingDate();
@@ -177,8 +177,7 @@ async function _POST(request: NextRequest) {
       metadata: {
         program: 'barber-apprenticeship',
         programSlug: 'barber-apprenticeship',
-        checkout_type: payment_type === 'pay_in_full' ? 'barber_pay_in_full' : 
-                       payment_type === 'bnpl' ? 'barber_bnpl' : 'barber_setup_fee',
+        checkout_type: 'barber_enrollment',
         payment_type: payment_type,
         checkout_amount_cents: (checkoutAmount * 100).toString(),
         // Original and adjusted pricing

@@ -5,56 +5,14 @@ import { useRouter } from 'next/navigation';
 import { submitStudentApplication } from '../actions';
 import { getActiveProgramsByCategory } from '@/lib/program-registry';
 import { trackEvent } from '@/components/analytics/google-analytics';
-import { CheckCircle, Mail } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 const programGroups = getActiveProgramsByCategory();
-
-interface SuccessData {
-  email: string;
-  referenceNumber: string;
-}
-
-function SuccessPanel({ data }: { data: SuccessData }) {
-  return (
-    <div className="text-center py-8">
-      <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
-        <CheckCircle className="w-10 h-10 text-brand-green-600" />
-      </div>
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Application Submitted!</h2>
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <Mail className="w-5 h-5 text-brand-blue-600" />
-        <p className="text-lg text-gray-700">Check your email for next steps.</p>
-      </div>
-      <p className="text-gray-600 max-w-md mx-auto mb-6">
-        We sent a confirmation to <strong>{data.email}</strong> with your login
-        credentials and instructions. Our team will review your application and
-        follow up within 1–2 business days.
-      </p>
-      <a
-        href="/login"
-        className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3 rounded-lg transition-colors mb-4"
-      >
-        Log In to Your Account
-      </a>
-      <p className="text-sm text-gray-500 mb-6">
-        Don&apos;t see the email? Check your spam folder or contact us at{' '}
-        <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
-        {' '}or call <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
-      </p>
-      {data.referenceNumber && (
-        <p className="text-sm text-gray-500">
-          Reference: <span className="font-mono font-bold">{data.referenceNumber}</span>
-        </p>
-      )}
-    </div>
-  );
-}
 
 export default function StudentApplicationForm({ initialProgram = '' }: { initialProgram?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successData, setSuccessData] = useState<SuccessData | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,9 +21,9 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
     const formData = new FormData(e.currentTarget);
 
-    // Honeypot — hidden field bots fill in
+    // Honeypot — hidden field bots fill in; silently redirect home
     if (formData.get('website_url')) {
-      setSuccessData({ email: '', referenceNumber: '' }); // Silent success for bots
+      router.push('/');
       return;
     }
 
@@ -107,10 +65,9 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
       if (result.success) {
         trackEvent('application_complete', 'conversion', data.programInterest);
-        setSuccessData({
-          email: result.email || data.email,
-          referenceNumber: result.referenceNumber || '',
-        });
+        // Account created and approved — send straight to onboarding.
+        router.push('/onboarding/learner');
+        return;
       } else {
         setError(
           result.error ||
@@ -124,10 +81,6 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       );
       setLoading(false);
     }
-  }
-
-  if (successData) {
-    return <SuccessPanel data={successData} />;
   }
 
   return (

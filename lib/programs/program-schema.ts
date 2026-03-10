@@ -109,7 +109,10 @@ export interface CredentialPipeline {
 
 // ─── CTA Links ───────────────────────────────────────────────────────
 export interface CTALinks {
+  /** Link for new applicants — goes to the application form */
   applyHref: string;
+  /** Link for enrolled students — goes to their LMS dashboard or course */
+  enrollHref?: string;
   advisorHref?: string;
   courseHref?: string;
 }

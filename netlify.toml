@@ -472,11 +472,6 @@
   status = 410
   force = true
 
-[[redirects]]
-  from = "/wp-content/wp-conflg.php"
-  to = "/410.html"
-  status = 410
-  force = true
 # /student, /student/dashboard → /student-portal handled by next.config.mjs (auth/app route, Rule B)
 
 [[headers]]

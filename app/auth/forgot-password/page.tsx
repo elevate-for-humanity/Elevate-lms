@@ -1,13 +1,11 @@
-
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Mail, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
-import { sendRecoveryEmail } from '@/app/auth/forgot-password/actions';
+import { sendRecoveryEmail } from './actions';
 
-export default function ResetPasswordPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -41,11 +39,18 @@ export default function ResetPasswordPage() {
           </div>
           <h1 className="text-2xl font-bold text-black mb-4">Check Your Email</h1>
           <p className="text-gray-600 mb-6">
-            We've sent a password reset link to <strong>{email}</strong>. 
-            Click the link in the email to reset your password.
+            We sent a password reset link to <strong>{email}</strong>.
+            Click the link in the email to set a new password.
           </p>
           <p className="text-sm text-gray-500 mb-8">
-            Didn't receive the email? Check your spam folder or try again.
+            Didn't receive it? Check your spam folder or{' '}
+            <button
+              onClick={() => { setSuccess(false); setEmail(''); }}
+              className="text-brand-blue-600 hover:underline font-semibold"
+            >
+              try again
+            </button>
+            .
           </p>
           <Link
             href="/login"
@@ -63,18 +68,9 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/">
-            <Image
-              src="/images/pages/reset-password-page-1.jpg"
-              alt="Elevate for Humanity"
-              width={180}
-              height={60}
-              className="mx-auto mb-6"
-            />
-          </Link>
-          <h1 className="text-3xl font-bold text-black mb-2">Reset Password</h1>
+          <h1 className="text-3xl font-bold text-black mb-2">Forgot Password?</h1>
           <p className="text-gray-600">
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email and we'll send you a reset link.
           </p>
         </div>
 
@@ -100,6 +96,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black"
                   placeholder="you@example.com"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -107,7 +104,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
@@ -123,13 +120,6 @@ export default function ResetPasswordPage() {
             </Link>
           </div>
         </div>
-
-        <p className="text-center text-sm text-gray-500 mt-8">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-brand-blue-600 hover:underline font-semibold">
-            Sign up for free
-          </Link>
-        </p>
       </div>
     </div>
   );

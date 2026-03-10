@@ -9,6 +9,22 @@ import { PATHWAYS } from "@/lib/pathways/data";
 
 export const dynamic = 'force-dynamic';
 
+const SLUG_IMAGES: Record<string, string> = {
+  'cna':                   '/images/pages/cna-nursing.jpg',
+  'cdl':                   '/images/pages/cdl-training.jpg',
+  'barber-apprenticeship': '/images/pages/barber-training.jpg',
+  'hvac':                  '/images/pages/hvac-technician.jpg',
+  'electrical':            '/images/pages/electrical.jpg',
+  'welding':               '/images/pages/welding.jpg',
+  'it-help-desk':          '/images/pages/it-help-desk.jpg',
+  'cybersecurity-analyst': '/images/pages/cybersecurity.jpg',
+  'medical-assistant':     '/images/pages/medical-assistant.jpg',
+  'phlebotomy':            '/images/pages/phlebotomy.jpg',
+  'plumbing':              '/images/pages/plumbing.jpg',
+  'healthcare':            '/images/pages/healthcare-sector.jpg',
+  'technology':            '/images/pages/technology-sector.jpg',
+};
+
 
 export const metadata: Metadata = {
   title: 'pathway.title',
@@ -41,6 +57,8 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
   const pathway = dbPathway || PATHWAYS.find((p) => p.slug === slug);
   if (!pathway) return notFound();
 
+  const heroImage = SLUG_IMAGES[slug] ?? '/images/pages/programs-hero.jpg';
+
   return (
     <main className="w-full">
       {/* Breadcrumbs */}
@@ -52,7 +70,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
 
       <header className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/comp-home-highlight-biz.jpg"
+          src={heroImage}
           alt={pathway.title}
           fill
           className="object-cover"
@@ -64,7 +82,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto max-w-6xl px-6 py-12 grid gap-10 md:grid-cols-2">
           <div className="relative h-[320px] w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
             <Image
-              src="/images/pages/comp-home-highlight-biz.jpg"
+              src={heroImage}
               alt={pathway.title}
               fill
               className="object-cover"

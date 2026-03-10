@@ -37,7 +37,7 @@ const PROTECTED_ROUTES: Record<string, string[]> = {
   '/program-holder/dashboard': ['program_holder', 'admin', 'super_admin'],
   '/program-holder/programs': ['program_holder', 'admin', 'super_admin'],
   '/workforce-board/dashboard': ['workforce_board', 'admin', 'super_admin'],
-  '/employer-portal/dashboard': ['employer', 'admin', 'super_admin'],
+  '/employer-portal': ['employer', 'admin', 'super_admin'],
   '/employer/dashboard': ['employer', 'admin', 'super_admin'],
   '/employer/candidates': ['employer', 'admin', 'super_admin'],
   '/employer/jobs': ['employer', 'admin', 'super_admin'],
@@ -45,11 +45,10 @@ const PROTECTED_ROUTES: Record<string, string[]> = {
   '/employer/settings': ['employer', 'admin', 'super_admin'],
   // LMS and dashboard routes - require any authenticated user
   '/lms/courses': ['student', 'instructor', 'admin', 'super_admin'],
-  '/lms/my-courses': ['student', 'instructor', 'admin', 'super_admin'],
+  '/lms/courses': ['student', 'instructor', 'admin', 'super_admin'],
   '/lms/progress': ['student', 'instructor', 'admin', 'super_admin'],
-  '/dashboard/courses': ['student', 'instructor', 'admin', 'super_admin'],
-  '/dashboard/certificates': ['student', 'instructor', 'admin', 'super_admin'],
-  '/client-portal/dashboard': ['client', 'admin', 'super_admin'],
+  '/lms/certificates': ['student', 'instructor', 'admin', 'super_admin'],
+  '/client-portal': ['admin', 'super_admin'],
 };
 
 // Dashboard landing pages that are PUBLIC (for marketing/preview)
@@ -87,7 +86,7 @@ const AUTH_REQUIRED_ROUTES = [
   '/onboarding/learner', '/onboarding/employer', '/onboarding/partner',
   '/onboarding/staff', '/onboarding/school',
   '/employer-portal', '/franchise', '/program-holder',
-  '/tax-self-prep', '/supersonic-fast-cash/dashboard',
+  '/tax-self-prep', '/supersonic-fast-cash/portal',
   '/supersonic-fast-cash/diy-taxes',
 ];
 
@@ -98,7 +97,7 @@ const ONBOARDING_REQUIRED_ROUTES = ['/hub', '/lms', '/student-portal', '/my-cour
 const ENROLLMENT_REQUIRED_ROUTES = ['/dashboard', '/courses', '/learn', '/lms/courses'];
 
 // Enrollment flow routes (don't redirect these)
-const ENROLLMENT_FLOW_ROUTES = ['/enrollment/confirmed', '/enrollment/orientation', '/enrollment/documents', '/enrollment/placement'];
+const ENROLLMENT_FLOW_ROUTES = ['/enrollment/confirmed', '/enrollment/orientation', '/enrollment/documents'];
 
 // Super admin emails - full platform access (platform owner)
 const SUPER_ADMIN_EMAILS = ['elizabethpowell6262@gmail.com'];
@@ -618,7 +617,7 @@ export async function proxy(request: NextRequest) {
 
     if (!partnerApp) {
       // No partner application - redirect to apply
-      return NextResponse.redirect(new URL('/partners/apply', request.url), { status: 307 });
+      return NextResponse.redirect(new URL('/partner/apply', request.url), { status: 307 });
     }
 
     // For main partner routes, require active status
@@ -628,7 +627,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/partner/documents', request.url), { status: 307 });
       }
       // Rejected or other status
-      return NextResponse.redirect(new URL('/partners/status', request.url), { status: 307 });
+      return NextResponse.redirect(new URL('/partner/onboarding', request.url), { status: 307 });
     }
 
     // Inject partner status for downstream handlers

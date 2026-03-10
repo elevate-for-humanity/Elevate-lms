@@ -140,7 +140,9 @@ const nextConfig = {
     // On Netlify's 3GB build machines this pushes total memory over the limit.
     // Disabled to keep compilation in-process and within the memory budget.
     webpackBuildWorker: false,
-    optimizeCss: true,
+    // optimizeCss uses critters/lightningcss which loads a WASM module.
+    // On Netlify's 3GB build machines this WASM allocation fails with OOM.
+    optimizeCss: false,
     // Parallel compilation uses more memory. Disabled for Netlify's 3GB build machines.
     parallelServerCompiles: false,
     parallelServerBuildTraces: false,

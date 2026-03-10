@@ -579,70 +579,192 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
     return { success: false, error: 'Please provide a valid email address.' };
   }
 
-  const result = await insertApplication({
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    city: 'Not provided',
-    zip: '00000',
-    programInterest: 'Program Holder',
-    supportNotes: [
-      `Organization: ${data.organizationName}`,
-      data.organizationType ? `Type: ${data.organizationType}` : '',
-      data.website ? `Website: ${data.website}` : '',
-      data.numberOfStudents ? `Students: ${data.numberOfStudents}` : '',
-      data.programsOffered ? `Programs: ${data.programsOffered}` : '',
-      data.partnershipGoals ? `Goals: ${data.partnershipGoals}` : '',
-    ].filter(Boolean).join(' | '),
-    source: 'program-holder-application',
-  });
+  const adminDb = createAdminClient();
+  if (!adminDb) {
+    return { success: false, error: 'Service temporarily unavailable. Please try again later.' };
+  }
 
-  if (result.success) {
-    // Create program_holders row (pending) and link profile.
-    // Role stays as-is until admin approval via approve_and_provision RPC.
-    const adminDb = createAdminClient();
-    if (adminDb) {
-      // Look up the user by email to get their auth ID
-      const normalizedEmail = data.email.toLowerCase().trim();
-      const { data: profile } = await adminDb
-        .from('profiles')
-        .select('id')
-        .eq('email', normalizedEmail)
-        .single();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 
-      if (profile?.id) {
-        // Create program_holders row (pending admin approval)
-        const { data: holderRow } = await adminDb
-          .from('program_holders')
-          .upsert({
-            user_id: profile.id,
-            organization_name: data.organizationName || `${data.firstName} ${data.lastName}`,
-            contact_name: `${data.firstName} ${data.lastName}`,
-            contact_email: normalizedEmail,
-            contact_phone: data.phone || null,
-            status: 'pending',
-            name: data.organizationName || `${data.firstName} ${data.lastName}`,
-          }, { onConflict: 'user_id', ignoreDuplicates: true })
-          .select('id')
-          .single();
+  // Step 1: Create or retrieve the auth account.
+  // The applicant fills out the form first — we create their account automatically
+  // so they don't have to sign up separately before applying.
+  let userId: string | null = null;
+  let magicLink: string | null = null;
 
-        // Link profile to program_holders row but do NOT set role yet.
-        // Role is set to 'program_holder' during admin approval (via RPC).
-        await adminDb
-          .from('profiles')
-          .update({
-            program_holder_id: holderRow?.id || null,
-          })
-          .eq('id', profile.id);
+  // Track whether we created the auth user in this request.
+  // If the RPC subsequently fails, we delete only users we just created —
+  // never an existing user's account.
+  let userCreatedInThisRequest = false;
 
-        logger.info('[Apply] Program holder profile and row created', { userId: profile.id, holderId: holderRow?.id, org: data.organizationName });
-      }
+  // Check if account already exists
+  const { data: existingProfile } = await adminDb
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .single();
+
+  if (existingProfile?.id) {
+    userId = existingProfile.id;
+  } else {
+    // Generate a temporary password — applicant will use the magic link to log in
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const tempPassword = `Efh-${Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')}!`;
+
+    const { data: newUser, error: createError } = await adminDb.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: {
+        full_name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        role: 'program_holder',
+      },
+    });
+
+    if (createError || !newUser?.user) {
+      logger.error('[Apply] Program holder account creation failed', createError);
+      return { success: false, error: 'Could not create your account. Please contact us at info@elevateforhumanity.org.' };
     }
 
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=program-holder&ref=${result.referenceNumber}` };
+    userId = newUser.user.id;
+    userCreatedInThisRequest = true;
+
+    // Upsert profile with program_holder role
+    await adminDb.from('profiles').upsert({
+      id: userId,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+      full_name: `${firstName} ${lastName}`,
+      role: 'program_holder',
+    }, { onConflict: 'id' });
   }
-  return result;
+
+  // Generate magic link so they can log straight into onboarding
+  const linkResult = await adminDb.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+    options: { redirectTo: `${siteUrl}/program-holder/onboarding` },
+  }).catch((err: any) => { logger.warn('[Apply] Magic link generation failed', err); return null; });
+
+  magicLink = (linkResult as any)?.data?.properties?.action_link || null;
+
+  // Step 2: Atomic DB write — both applications + program_holders in one transaction.
+  const { data: rpcResult, error: rpcError } = await adminDb.rpc(
+    'submit_program_holder_application',
+    {
+      p_first_name:         firstName,
+      p_last_name:          lastName,
+      p_email:              email,
+      p_phone:              phone,
+      p_organization_name:  organizationName,
+      p_user_id:            userId,
+      p_organization_type:  data.organizationType || null,
+      p_website:            data.website || null,
+      p_programs_offered:   data.programsOffered || null,
+      p_partnership_goals:  data.partnershipGoals || null,
+      p_number_of_students: data.numberOfStudents || null,
+      p_reference_number:   referenceNumber,
+    }
+  );
+
+  if (rpcError) {
+    logger.error('[Apply] Program holder RPC failed', rpcError);
+    // Clean up the auth user we just created so the applicant can retry cleanly.
+    // Do not delete pre-existing accounts.
+    if (userCreatedInThisRequest && userId) {
+      await adminDb.auth.admin.deleteUser(userId).catch((err: any) =>
+        logger.error('[Apply] Failed to clean up orphaned auth user after RPC failure', err)
+      );
+    }
+    return { success: false, error: 'We could not save your application. Please try again or call 317-314-3757.' };
+  }
+
+  const applicationId = (rpcResult as any)?.application_id as string;
+  logger.info('[Apply] Program holder application submitted', {
+    applicationId,
+    holderId: (rpcResult as any)?.holder_id,
+    userId,
+    org: organizationName,
+  });
+
+  // Step 3: Send onboarding email to applicant + internal notification.
+  // Non-blocking — email failure does not fail the submission.
+  try {
+    const loginUrl = magicLink || `${siteUrl}/login`;
+
+    await sendEmailDirect(
+      email,
+      `Welcome to Elevate for Humanity — Complete Your Program Holder Onboarding [Ref: ${referenceNumber}]`,
+      `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f8fafc">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 20px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <tr><td style="background:linear-gradient(135deg,#ea580c 0%,#dc2626 100%);padding:30px;text-align:center">
+          <h1 style="color:#fff;margin:0;font-size:22px">Application Received</h1>
+          <p style="color:#fecaca;margin:8px 0 0;font-size:14px">Program Holder — Elevate for Humanity</p>
+        </td></tr>
+        <tr><td style="padding:32px">
+          <p style="color:#334155;font-size:16px;line-height:1.7;margin:0 0 16px">Hi ${firstName},</p>
+          <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 16px">
+            We received your program holder application for <strong>${organizationName}</strong>.
+            Your account has been created — click the button below to access your onboarding portal.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:24px 0">
+              <a href="${loginUrl}" style="display:inline-block;background:#dc2626;color:#fff;text-decoration:none;padding:14px 32px;border-radius:6px;font-weight:bold;font-size:16px">
+                Complete Onboarding →
+              </a>
+            </td></tr>
+          </table>
+          <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 8px">
+            <strong>Reference number:</strong> ${referenceNumber}
+          </p>
+          <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0">
+            Our team will review your application and follow up within 1–3 business days.
+            Questions? Call <a href="tel:3173143757" style="color:#dc2626">317-314-3757</a> or
+            email <a href="mailto:info@elevateforhumanity.org" style="color:#dc2626">info@elevateforhumanity.org</a>.
+          </p>
+        </td></tr>
+        <tr><td style="background:#f8fafc;padding:20px;text-align:center;border-top:1px solid #e2e8f0">
+          <p style="color:#64748b;font-size:13px;margin:0">Elevate for Humanity | Indianapolis, IN |
+            <a href="${siteUrl}" style="color:#ea580c;text-decoration:none">elevateforhumanity.org</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+    );
+
+    await sendEmailDirect(
+      'elevate4humanityedu@gmail.com',
+      `New Program Holder Application [${referenceNumber}]: ${firstName} ${lastName} — ${organizationName}`,
+      `<p><strong>Name:</strong> ${firstName} ${lastName}</p>
+       <p><strong>Email:</strong> ${email}</p>
+       <p><strong>Phone:</strong> ${phone}</p>
+       <p><strong>Organization:</strong> ${organizationName}</p>
+       <p><strong>Type:</strong> ${data.organizationType || '—'}</p>
+       <p><strong>Programs Offered:</strong> ${data.programsOffered || '—'}</p>
+       <p><strong>Goals:</strong> ${data.partnershipGoals || '—'}</p>
+       <p><strong>Reference:</strong> ${referenceNumber}</p>
+       <p><strong>Account created:</strong> ${userId}</p>`
+    );
+  } catch (emailErr) {
+    logger.error('[Apply] Program holder onboarding email failed', emailErr as Error);
+  }
+
+  return {
+    success: true,
+    applicationId,
+    referenceNumber,
+    redirectTo: `/apply/success?role=program-holder&ref=${referenceNumber}`,
+  };
 }
 
 export async function submitEmployerApplication(data: EmployerApplicationData) {

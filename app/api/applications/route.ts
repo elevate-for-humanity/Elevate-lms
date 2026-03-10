@@ -93,6 +93,25 @@ async function _POST(req: Request) {
       );
     }
 
+    // Dedup: block same email + program within 24 hours.
+    // Allows re-application after the window (e.g. student applies months later).
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recentApp } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('email', body.email.toLowerCase().trim())
+      .eq('program_interest', program)
+      .gte('created_at', oneDayAgo)
+      .limit(1)
+      .maybeSingle();
+
+    if (recentApp) {
+      return NextResponse.json(
+        { error: 'An application for this program was already submitted with this email in the last 24 hours. Please call 317-314-3757 if you need to make changes.' },
+        { status: 409 }
+      );
+    }
+
     // Generate reference number
     const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 

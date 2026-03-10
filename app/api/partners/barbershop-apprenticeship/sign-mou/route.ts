@@ -71,13 +71,33 @@ async function _POST(req: NextRequest) {
 
     const now = new Date().toISOString();
 
-    // Insert MOU signature
+    // Upload signature image to Supabase Storage (agreements bucket)
+    // Store path reference instead of raw base64 blob in DB
+    let signaturePath: string | null = null;
+    try {
+      const base64Data = signature_data.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      const fileName = `barber-mou/${Date.now()}-${signer_name.trim().replace(/\s+/g, '-').toLowerCase()}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('agreements')
+        .upload(fileName, buffer, { contentType: 'image/png', upsert: false });
+      if (!uploadError && uploadData) {
+        signaturePath = uploadData.path;
+      } else {
+        logger.warn('[sign-mou] Storage upload failed, falling back to DB blob:', uploadError);
+      }
+    } catch (uploadErr) {
+      logger.warn('[sign-mou] Storage upload exception, falling back to DB blob:', uploadErr);
+    }
+
+    // Insert MOU signature — use storage path if available, else fall back to data URL
     const { data: mouRecord, error: insertError } = await supabase
       .from('mou_signatures')
       .insert({
         signer_name: signer_name.trim(),
         signer_title: signer_title.trim(),
-        signature_data,
+        signature_data: signaturePath ? null : signature_data,
+        signature_path: signaturePath,
         signed_at: signed_at || now,
         ip_address: ipAddress,
         user_agent: userAgent,

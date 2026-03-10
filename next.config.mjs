@@ -136,16 +136,10 @@ const nextConfig = {
       '@hookform/resolvers',
       'swr',
     ],
-    // webpackBuildWorker spawns a separate Node.js process for webpack compilation.
-    // On Netlify's 3GB build machines this pushes total memory over the limit.
-    // Disabled to keep compilation in-process and within the memory budget.
-    webpackBuildWorker: false,
-    // optimizeCss uses critters/lightningcss which loads a WASM module.
-    // On Netlify's 3GB build machines this WASM allocation fails with OOM.
-    optimizeCss: false,
-    // Parallel compilation uses more memory. Disabled for Netlify's 3GB build machines.
-    parallelServerCompiles: false,
-    parallelServerBuildTraces: false,
+    webpackBuildWorker: true,
+    optimizeCss: true,
+    parallelServerCompiles: true,
+    parallelServerBuildTraces: true,
   },
   
   // Suppress middleware deprecation warning (middleware.ts is still correct for our use case)

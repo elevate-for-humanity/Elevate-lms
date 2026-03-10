@@ -136,11 +136,11 @@ const nextConfig = {
       '@hookform/resolvers',
       'swr',
     ],
-    webpackBuildWorker: true,
+    webpackBuildWorker: false,
     optimizeCss: true,
     // Parallel routes for faster builds
-    parallelServerCompiles: true,
-    parallelServerBuildTraces: true,
+    parallelServerCompiles: false,
+    parallelServerBuildTraces: false,
   },
   
   // Suppress middleware deprecation warning (middleware.ts is still correct for our use case)

@@ -3,23 +3,19 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "bash -c 'set -e; echo \"[build] node=$(node -v) pnpm=$(pnpm -v 2>/dev/null || echo N/A)\"; pnpm install --no-frozen-lockfile; pnpm exec tsx scripts/ci-token-gate.ts; pnpm run build'"
+  command = "pnpm install --frozen-lockfile && pnpm exec tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20.19.2"
-  # Netlify Pro build machines have 3GB RAM. Cap heap at 2.5GB to leave
-  # headroom for the OS, pnpm, and the @netlify/plugin-nextjs post-processor.
-  # Setting this higher than available RAM causes OOM → exit code 2.
-  NODE_OPTIONS = "--max-old-space-size=2560"
+  # 8GB heap ceiling for next build. Netlify Pro has 3GB RAM but Node.js
+  # doesn't reserve the full heap upfront — it's a GC ceiling. Static
+  # generation of 882 pages peaks at ~2.5-3GB working set; a 2.5GB limit
+  # causes the GC to thrash and the process to OOM before completion.
+  NODE_OPTIONS = "--max-old-space-size=8192"
   NETLIFY_USE_PNPM = "true"
   PNPM_VERSION = "10.28.2"
-  PNPM_FLAGS = "--no-frozen-lockfile"
-  # @netlify/plugin-nextjs sets this in onPreBuild, but the env var may not
-  # propagate to the build command subprocess on remote builds. Set it explicitly
-  # so Next.js generates .next/standalone/ which the plugin requires.
-  NEXT_PRIVATE_STANDALONE = "true"
   # Prevent corepack from enforcing the packageManager field version.
   COREPACK_ENABLE_STRICT = "0"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public

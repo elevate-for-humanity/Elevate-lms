@@ -17,6 +17,18 @@ export async function POST(
 ) {
   try {
     const { program } = await params;
+
+    // Regulated programs have dedicated endpoints with compliance-specific fields.
+    // Accepting them here would write to partner_applications, bypassing required
+    // regulatory fields (shop license, supervisor license, workers comp, MOU).
+    const REGULATED_SLUGS = ['barbershop-apprenticeship'];
+    if (REGULATED_SLUGS.includes(program)) {
+      return NextResponse.json(
+        { error: 'This program requires a dedicated application. Please use /programs/barber-apprenticeship/apply.' },
+        { status: 400 }
+      );
+    }
+
     const config = getProgramConfig(program);
 
     if (!config) {

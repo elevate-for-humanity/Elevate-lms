@@ -334,7 +334,7 @@ export default function PolicyAcknowledgmentPage() {
               Sign MOU
             </Link>
             <Link
-              href="/partners/barbershop-apprenticeship/apply"
+              href="/programs/barber-apprenticeship/apply?type=partner_shop"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 text-sm whitespace-nowrap"
             >
               Apply Now

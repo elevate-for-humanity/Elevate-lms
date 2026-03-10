@@ -153,7 +153,7 @@ export default function ApprenticeshipSponsorPage() {
               <Link href="/partners/barbershop-apprenticeship" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2">
                 Barbershop Partner Program <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/partners/barbershop-apprenticeship/apply" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+              <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
                 Apply as Partner Site
               </Link>
             </div>

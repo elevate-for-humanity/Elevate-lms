@@ -12,6 +12,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export default function ProgramOwnerCampaignsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [templates, setTemplates] = useState<any[]>([]);
   const [myStudents, setMyStudents] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
@@ -61,11 +62,12 @@ export default function ProgramOwnerCampaignsPage() {
 
   const handleSend = async () => {
     if (selectedStudents.length === 0) {
-      alert('Please select at least one student');
+      setFeedback({ type: 'error', message: 'Please select at least one student.' });
       return;
     }
 
     setLoading(true);
+    setFeedback(null);
 
     try {
       const response = await fetch('/api/program-owner/campaigns/send', {
@@ -80,15 +82,15 @@ export default function ProgramOwnerCampaignsPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert(`Email sent to ${data.sent_count} students!`);
+        setFeedback({ type: 'success', message: `Email sent to ${data.sent_count} student${data.sent_count !== 1 ? 's' : ''}.` });
         setSelectedStudents([]);
         setFormData({ subject: '', html_content: '' });
         setSelectedTemplate(null);
       } else {
-        alert(`Error: ${data.error}`);
+        setFeedback({ type: 'error', message: data.error || 'Failed to send emails.' });
       }
-    } catch (error) { /* Error handled silently */ 
-      alert('Failed to send emails');
+    } catch {
+      setFeedback({ type: 'error', message: 'Failed to send emails. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -240,6 +242,11 @@ export default function ProgramOwnerCampaignsPage() {
                   </p>
                 </div>
 
+                {feedback && (
+                  <div className={`p-3 rounded-lg text-sm ${feedback.type === 'success' ? 'bg-brand-green-50 border border-brand-green-200 text-brand-green-800' : 'bg-brand-red-50 border border-brand-red-200 text-brand-red-800'}`}>
+                    {feedback.message}
+                  </div>
+                )}
                 <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSend}

@@ -36,13 +36,7 @@ export default function ProgramHolderForm() {
     if (result.success) {
       router.push(result.redirectTo!);
     } else {
-      const subject = encodeURIComponent(`Program Holder Application: ${data.firstName} ${data.lastName} - ${data.organizationName}`);
-      const body = encodeURIComponent(
-        `Name: ${data.firstName} ${data.lastName}\nOrganization: ${data.organizationName}\n` +
-        `Email: ${data.email}\nPhone: ${data.phone}\n` +
-        `Programs Offered: ${data.programsOffered || 'N/A'}\nGoals: ${data.partnershipGoals || 'N/A'}\n`
-      );
-      window.location.href = "/contact";
+      setError(result.error || 'Submission failed. Please try again or call (317) 314-3757.');
       setLoading(false);
     }
   }

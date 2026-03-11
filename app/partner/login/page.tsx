@@ -14,6 +14,7 @@ export default function PartnerLoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,9 +106,9 @@ export default function PartnerLoginPage() {
       }
 
       setError('');
-      alert('Check your email for a login link!');
+      setMagicLinkSent(true);
     } catch (err: any) {
-      setError('An error occurred');
+      setError('An error occurred sending the magic link. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -193,14 +194,20 @@ export default function PartnerLoginPage() {
           </form>
 
           <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleMagicLink}
-              disabled={isLoading}
-              className="w-full text-brand-blue-600 hover:text-brand-blue-700 py-2 text-sm font-medium disabled:opacity-50"
-            >
-              Send me a magic link instead
-            </button>
+            {magicLinkSent ? (
+              <div className="p-3 bg-brand-green-50 border border-brand-green-200 rounded-lg text-brand-green-800 text-sm text-center">
+                Magic link sent to <strong>{email}</strong>. Check your inbox.
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleMagicLink}
+                disabled={isLoading}
+                className="w-full text-brand-blue-600 hover:text-brand-blue-700 py-2 text-sm font-medium disabled:opacity-50"
+              >
+                Send me a magic link instead
+              </button>
+            )}
           </div>
 
           <div className="mt-6 pt-6 border-t text-center">

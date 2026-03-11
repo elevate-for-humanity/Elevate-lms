@@ -57,11 +57,26 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to record signature' }, { status: 500 });
     }
 
-    // Update program holder onboarding status
+    const now = new Date().toISOString();
+
+    // Update profiles table
     await supabase
       .from('profiles')
-      .update({ mou_signed: true, mou_signed_at: new Date().toISOString() })
+      .update({ mou_signed: true, mou_signed_at: now })
       .eq('id', user.id);
+
+    // Update program_holders so admin queries reflect the signed state
+    const admin = createAdminClient();
+    if (admin) {
+      await admin
+        .from('program_holders')
+        .update({
+          mou_signed: true,
+          mou_signed_at: now,
+          mou_status: 'holder_signed',
+        })
+        .eq('user_id', user.id);
+    }
 
     return NextResponse.json({ success: true, signature_id: signature.id });
   } catch (error) {

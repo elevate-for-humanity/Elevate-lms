@@ -23,6 +23,8 @@ interface Props {
   lessonDefId: string;
   brollVideoUrl: string;
   lessonTitle: string;
+  /** Assembled lesson video from DB — checked first before local paths */
+  dbVideoUrl?: string;
   onProgress?: (percent: number) => void;
   onComplete?: () => void;
 }
@@ -33,6 +35,7 @@ export default function HvacLessonVideo({
   lessonDefId,
   brollVideoUrl,
   lessonTitle,
+  dbVideoUrl,
   onProgress,
   onComplete,
 }: Props) {
@@ -51,46 +54,64 @@ export default function HvacLessonVideo({
   const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
-    const uuid = HVAC_LESSON_UUID[lessonDefId];
-    if (!uuid) {
-      setMode('broll');
+    // Priority 1: assembled V16 video from DB (mobile-safe H.264 baseline)
+    if (dbVideoUrl) {
+      fetch(dbVideoUrl, { method: 'HEAD' })
+        .then(r => {
+          if (r.ok) {
+            setMp4Url(dbVideoUrl);
+            setMode('mp4');
+          } else {
+            checkLocalPaths();
+          }
+        })
+        .catch(() => checkLocalPaths());
       return;
     }
+    checkLocalPaths();
 
-    const videoPath = `/generated/videos/lesson-${uuid}.mp4`;
-    const audioPath = `/generated/lessons/lesson-${uuid}.mp3`;
+    function checkLocalPaths() {
+      const uuid = HVAC_LESSON_UUID[lessonDefId];
+      if (!uuid) {
+        setMode('broll');
+        return;
+      }
 
-    fetch(videoPath, { method: 'HEAD' })
-      .then(r => {
-        if (r.ok) {
-          setMp4Url(videoPath);
-          setMode('mp4');
-          return;
-        }
-        return fetch(audioPath, { method: 'HEAD' })
-          .then(r2 => {
-            if (r2.ok) {
-              setMp3Url(audioPath);
-              setMode('mp3+avatar');
-            } else {
-              setMode('broll');
-            }
-          })
-          .catch(() => setMode('broll'));
-      })
-      .catch(() => {
-        fetch(audioPath, { method: 'HEAD' })
-          .then(r => {
-            if (r.ok) {
-              setMp3Url(audioPath);
-              setMode('mp3+avatar');
-            } else {
-              setMode('broll');
-            }
-          })
-          .catch(() => setMode('broll'));
-      });
-  }, [lessonDefId]);
+      const videoPath = `/generated/videos/lesson-${uuid}.mp4`;
+      const audioPath = `/generated/lessons/lesson-${uuid}.mp3`;
+
+      fetch(videoPath, { method: 'HEAD' })
+        .then(r => {
+          if (r.ok) {
+            setMp4Url(videoPath);
+            setMode('mp4');
+            return;
+          }
+          return fetch(audioPath, { method: 'HEAD' })
+            .then(r2 => {
+              if (r2.ok) {
+                setMp3Url(audioPath);
+                setMode('mp3+avatar');
+              } else {
+                setMode('broll');
+              }
+            })
+            .catch(() => setMode('broll'));
+        })
+        .catch(() => {
+          fetch(audioPath, { method: 'HEAD' })
+            .then(r => {
+              if (r.ok) {
+                setMp3Url(audioPath);
+                setMode('mp3+avatar');
+              } else {
+                setMode('broll');
+              }
+            })
+            .catch(() => setMode('broll'));
+        });
+    }
+  }, [lessonDefId, dbVideoUrl]);
 
   const togglePlay = useCallback(() => {
     const vid = videoRef.current;

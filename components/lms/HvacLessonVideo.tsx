@@ -4,9 +4,10 @@
  * HvacLessonVideo
  *
  * Plays HVAC lesson media in priority order:
- *   1. /generated/videos/lesson-{uuid}.mp4  — D-ID talking-head (mouth moves, lesson audio)
- *   2. /generated/lessons/lesson-{uuid}.mp3 — lesson voiceover synced to muted avatar video
- *   3. brollVideoUrl                         — b-roll fallback (no lesson audio)
+ *   0. /hvac/videos/lesson-{uuid}.mp4 — assembled lesson video (instructor+diagram layout)
+ *   1. /hvac/audio/lesson-{uuid}.mp3  — lesson voiceover synced to muted avatar video
+ *   2. brollVideoUrl                   — b-roll fallback (no lesson audio)
+ *   3. brollVideoUrl                          — b-roll fallback (no lesson audio)
  *
  * For case 2, the avatar video (/videos/avatars/trades-guide.mp4) plays muted
  * and loops while the lesson-specific MP3 plays on top. The instructor is
@@ -71,30 +72,41 @@ export default function HvacLessonVideo({
     checkLocalPaths();
 
     function checkLocalPaths() {
-      const uuid = HVAC_LESSON_UUID[lessonDefId];
-      if (!uuid) {
-        setMode('broll');
-        return;
-      }
-
-      const videoPath = `/generated/videos/lesson-${uuid}.mp4`;
-      const audioPath = `/generated/lessons/lesson-${uuid}.mp3`;
-
-      fetch(videoPath, { method: 'HEAD' })
+      // Priority 0: assembled lesson video by UUID — canonical path /hvac/videos/
+      const uuid0 = HVAC_LESSON_UUID[lessonDefId];
+      const assembledPath = uuid0 ? `/hvac/videos/lesson-${uuid0}.mp4` : null;
+      if (!assembledPath) { checkUuidPaths(); return; }
+      fetch(assembledPath, { method: 'HEAD' })
         .then(r => {
           if (r.ok) {
-            setMp4Url(videoPath);
+            setMp4Url(assembledPath);
             setMode('mp4');
+          } else {
+            checkUuidPaths();
+          }
+        })
+        .catch(() => checkUuidPaths());
+
+      function checkUuidPaths() {
+        const uuid = HVAC_LESSON_UUID[lessonDefId];
+        if (!uuid) {
+          setMode('broll');
+          return;
+        }
+
+        // Canonical audio path
+        const audioPath = `/hvac/audio/lesson-${uuid}.mp3`;
+
+      fetch(audioPath, { method: 'HEAD' })
+        .then(r => {
+          if (r.ok) {
+            setMp3Url(audioPath);
+            setMode('mp3+avatar');
             return;
           }
-          return fetch(audioPath, { method: 'HEAD' })
-            .then(r2 => {
-              if (r2.ok) {
-                setMp3Url(audioPath);
-                setMode('mp3+avatar');
-              } else {
+          return Promise.resolve()
+            .then(() => {
                 setMode('broll');
-              }
             })
             .catch(() => setMode('broll'));
         })
@@ -110,7 +122,8 @@ export default function HvacLessonVideo({
             })
             .catch(() => setMode('broll'));
         });
-    }
+      } // end checkUuidPaths
+    } // end checkLocalPaths
   }, [lessonDefId, dbVideoUrl]);
 
   const togglePlay = useCallback(() => {

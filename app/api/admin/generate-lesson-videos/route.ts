@@ -153,7 +153,7 @@ async function generateForLesson(
     const outputPath = path.join(outputDir, filename);
 
     await generateNaturalVoiceover(script, voice, instructor.id, outputPath);
-    const audioUrl = `/generated/lessons/${filename}`;
+    const audioUrl = `/hvac/audio/${filename}`;
 
     await db.from('training_lessons')
       .update({ video_url: audioUrl, updated_at: new Date().toISOString() })
@@ -174,7 +174,7 @@ async function generateForLesson(
     const outputPath = path.join(outputDir, filename);
 
     await generateVoiceover(script, voice as any, outputPath);
-    const audioUrl = `/generated/lessons/${filename}`;
+    const audioUrl = `/hvac/audio/${filename}`;
 
     await db.from('training_lessons')
       .update({ video_url: audioUrl, updated_at: new Date().toISOString() })

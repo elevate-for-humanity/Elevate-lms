@@ -901,30 +901,154 @@ export const OSHA_30_QUIZ: QuizQuestion[] = [
 // ── Master Quiz Map ─────────────────────────────────────────────────────
 // Maps lesson IDs from definitions.ts to their quiz question arrays
 
+import {
+  QUIZ_01_01, QUIZ_01_02, QUIZ_01_03,
+  QUIZ_02_01, QUIZ_02_02, QUIZ_02_03, QUIZ_02_04,
+  QUIZ_03_01, QUIZ_03_02, QUIZ_03_03, QUIZ_03_04,
+  QUIZ_04_01, QUIZ_04_02, QUIZ_04_03, QUIZ_04_04, QUIZ_04_05,
+  QUIZ_05_01, QUIZ_05_02, QUIZ_05_03, QUIZ_05_04, QUIZ_05_05, QUIZ_05_06,
+  QUIZ_06_01, QUIZ_06_02, QUIZ_06_03, QUIZ_06_04, QUIZ_06_05,
+  QUIZ_06_06, QUIZ_06_07, QUIZ_06_09, QUIZ_06_10, QUIZ_06_11, QUIZ_06_12,
+  QUIZ_07_01, QUIZ_07_02, QUIZ_07_03, QUIZ_07_04,
+  QUIZ_08_01, QUIZ_08_02, QUIZ_08_03, QUIZ_08_04, QUIZ_08_05, QUIZ_08_06,
+  QUIZ_09_01, QUIZ_09_02, QUIZ_09_03, QUIZ_09_04, QUIZ_09_05,
+  QUIZ_10_01, QUIZ_10_02, QUIZ_10_03, QUIZ_10_04, QUIZ_10_05, QUIZ_10_06,
+  QUIZ_11_01, QUIZ_11_02, QUIZ_11_03, QUIZ_11_04,
+  QUIZ_12_01, QUIZ_12_02, QUIZ_12_03, QUIZ_12_04, QUIZ_12_05,
+  QUIZ_13_01, QUIZ_13_02, QUIZ_13_03, QUIZ_13_04, QUIZ_13_05,
+  QUIZ_14_01, QUIZ_14_02, QUIZ_14_03, QUIZ_14_04, QUIZ_14_05, QUIZ_14_06, QUIZ_14_07,
+  QUIZ_15_01, QUIZ_15_02, QUIZ_15_03, QUIZ_15_04, QUIZ_15_05,
+  QUIZ_16_03, QUIZ_16_04, QUIZ_16_05,
+} from './hvac-lesson-quizzes';
+
 export const HVAC_QUIZ_MAP: Record<string, QuizQuestion[]> = {
-  // Module quizzes
-  "hvac-01-04": ORIENTATION_QUIZ,
-  "hvac-02-05": HVAC_FUNDAMENTALS_QUIZ,
-  "hvac-03-05": ELECTRICAL_BASICS_QUIZ,
-  "hvac-04-06": HEATING_SYSTEMS_QUIZ,
-  "hvac-05-06": COOLING_SYSTEMS_QUIZ,
-  "hvac-11-05": REFRIGERATION_DIAGNOSTICS_QUIZ,
-  "hvac-12-06": INSTALLATION_QUIZ,
-  "hvac-13-06": TROUBLESHOOTING_QUIZ,
-  "hvac-14-08": OSHA_30_QUIZ,
+  // ── Module 1: Program Orientation ──
+  "hvac-01-01": QUIZ_01_01,
+  "hvac-01-02": QUIZ_01_02,
+  "hvac-01-03": QUIZ_01_03,
+  "hvac-01-04": ORIENTATION_QUIZ,        // module exam
 
-  // EPA 608 practice exams
-  "hvac-06-08": EPA_608_CORE,
-  "hvac-07-05": EPA_608_TYPE_I,
-  "hvac-08-07": EPA_608_TYPE_II,
-  "hvac-09-06": EPA_608_TYPE_III,
+  // ── Module 2: HVAC Fundamentals ──
+  "hvac-02-01": QUIZ_02_01,
+  "hvac-02-02": QUIZ_02_02,
+  "hvac-02-03": QUIZ_02_03,
+  "hvac-02-04": QUIZ_02_04,
+  "hvac-02-05": HVAC_FUNDAMENTALS_QUIZ,  // module exam
 
-  // EPA 608 Universal final exam prep (full-length practice exams)
-  "hvac-10-03": EPA_608_CORE,       // Full-length Core
-  "hvac-10-04": EPA_608_TYPE_I,     // Full-length Type I
-  "hvac-10-05": EPA_608_TYPE_II,    // Full-length Type II
-  "hvac-10-06": EPA_608_TYPE_III,   // Full-length Type III
-  // hvac-10-07 (Universal) combines all four — handled at runtime
+  // ── Module 3: Electrical Basics ──
+  "hvac-03-01": QUIZ_03_01,
+  "hvac-03-02": QUIZ_03_02,
+  "hvac-03-03": QUIZ_03_03,
+  "hvac-03-04": QUIZ_03_04,
+  "hvac-03-05": ELECTRICAL_BASICS_QUIZ,  // module exam
+
+  // ── Module 4: Heating Systems ──
+  "hvac-04-01": QUIZ_04_01,
+  "hvac-04-02": QUIZ_04_02,
+  "hvac-04-03": QUIZ_04_03,
+  "hvac-04-04": QUIZ_04_04,
+  "hvac-04-05": QUIZ_04_05,
+  "hvac-04-06": HEATING_SYSTEMS_QUIZ,    // module exam
+
+  // ── Module 5: Refrigeration Cycle ──
+  "hvac-05-01": QUIZ_05_01,
+  "hvac-05-02": QUIZ_05_02,
+  "hvac-05-03": QUIZ_05_03,
+  "hvac-05-04": QUIZ_05_04,
+  "hvac-05-05": QUIZ_05_05,
+  "hvac-05-06": QUIZ_05_06,
+
+  // ── Module 6: EPA 608 Core ──
+  "hvac-06-01": QUIZ_06_01,
+  "hvac-06-02": QUIZ_06_02,
+  "hvac-06-03": QUIZ_06_03,
+  "hvac-06-04": QUIZ_06_04,
+  "hvac-06-05": QUIZ_06_05,
+  "hvac-06-06": QUIZ_06_06,
+  "hvac-06-07": QUIZ_06_07,
+  "hvac-06-08": EPA_608_CORE,            // practice exam
+  "hvac-06-09": QUIZ_06_09,
+  "hvac-06-10": QUIZ_06_10,
+  "hvac-06-11": QUIZ_06_11,
+  "hvac-06-12": QUIZ_06_12,
+
+  // ── Module 7: EPA 608 Type I ──
+  "hvac-07-01": QUIZ_07_01,
+  "hvac-07-02": QUIZ_07_02,
+  "hvac-07-03": QUIZ_07_03,
+  "hvac-07-04": QUIZ_07_04,
+  "hvac-07-05": EPA_608_TYPE_I,          // practice exam
+
+  // ── Module 8: EPA 608 Type II ──
+  "hvac-08-01": QUIZ_08_01,
+  "hvac-08-02": QUIZ_08_02,
+  "hvac-08-03": QUIZ_08_03,
+  "hvac-08-04": QUIZ_08_04,
+  "hvac-08-05": QUIZ_08_05,
+  "hvac-08-06": QUIZ_08_06,
+  "hvac-08-07": EPA_608_TYPE_II,         // practice exam
+
+  // ── Module 9: EPA 608 Type III ──
+  "hvac-09-01": QUIZ_09_01,
+  "hvac-09-02": QUIZ_09_02,
+  "hvac-09-03": QUIZ_09_03,
+  "hvac-09-04": QUIZ_09_04,
+  "hvac-09-05": QUIZ_09_05,
+  "hvac-09-06": EPA_608_TYPE_III,        // practice exam
+
+  // ── Module 10: Airflow and Duct Systems ──
+  "hvac-10-01": QUIZ_10_01,
+  "hvac-10-02": QUIZ_10_02,
+  "hvac-10-03": QUIZ_10_03,
+  "hvac-10-04": QUIZ_10_04,
+  "hvac-10-05": QUIZ_10_05,
+  "hvac-10-06": QUIZ_10_06,
+  "hvac-10-07": COOLING_SYSTEMS_QUIZ,    // module exam
+
+  // ── Module 11: Controls and Thermostats ──
+  "hvac-11-01": QUIZ_11_01,
+  "hvac-11-02": QUIZ_11_02,
+  "hvac-11-03": QUIZ_11_03,
+  "hvac-11-04": QUIZ_11_04,
+  "hvac-11-05": REFRIGERATION_DIAGNOSTICS_QUIZ, // module exam
+
+  // ── Module 12: Heat Pumps ──
+  "hvac-12-01": QUIZ_12_01,
+  "hvac-12-02": QUIZ_12_02,
+  "hvac-12-03": QUIZ_12_03,
+  "hvac-12-04": QUIZ_12_04,
+  "hvac-12-05": QUIZ_12_05,
+  "hvac-12-06": INSTALLATION_QUIZ,       // module exam
+
+  // ── Module 13: Troubleshooting ──
+  "hvac-13-01": QUIZ_13_01,
+  "hvac-13-02": QUIZ_13_02,
+  "hvac-13-03": QUIZ_13_03,
+  "hvac-13-04": QUIZ_13_04,
+  "hvac-13-05": QUIZ_13_05,
+  "hvac-13-06": TROUBLESHOOTING_QUIZ,    // module exam
+
+  // ── Module 14: OSHA 10-Hour Safety ──
+  "hvac-14-01": QUIZ_14_01,
+  "hvac-14-02": QUIZ_14_02,
+  "hvac-14-03": QUIZ_14_03,
+  "hvac-14-04": QUIZ_14_04,
+  "hvac-14-05": QUIZ_14_05,
+  "hvac-14-06": QUIZ_14_06,
+  "hvac-14-07": QUIZ_14_07,
+  "hvac-14-08": OSHA_30_QUIZ,            // module exam
+
+  // ── Module 15: Career Readiness ──
+  "hvac-15-01": QUIZ_15_01,
+  "hvac-15-02": QUIZ_15_02,
+  "hvac-15-03": QUIZ_15_03,
+  "hvac-15-04": QUIZ_15_04,
+  "hvac-15-05": QUIZ_15_05,
+
+  // ── Module 16: Capstone ──
+  "hvac-16-03": QUIZ_16_03,
+  "hvac-16-04": QUIZ_16_04,
+  "hvac-16-05": QUIZ_16_05,
 };
 
 // Helper: get combined Universal exam (all 100 questions)

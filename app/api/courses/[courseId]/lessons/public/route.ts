@@ -64,7 +64,7 @@ function buildLocalFallback(courseId: string, slug: string) {
       // Auto-resolve audio URL for video/lab lessons when no explicit contentUrl
       const resolvedVideoUrl = lesson.contentUrl
         || (lesson.type === 'video' || lesson.type === 'lab'
-          ? `/generated/lessons/lesson-${lessonUuid}.mp3`
+          ? `/hvac/audio/lesson-${lessonUuid}.mp3`
           : null);
       // Use rich generated content instead of one-line description
       const richContent = slug === 'hvac-technician' ? buildLessonContent(lesson.id) : (lesson.description || '');

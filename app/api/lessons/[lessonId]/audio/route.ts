@@ -19,8 +19,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 const BASE_DIR = () => path.join(process.cwd(), 'public', 'generated', 'lessons');
 const scriptFilePath = (id: string) => path.join(BASE_DIR(), `lesson-full-${id}.txt`);
 const audioFilePath = (id: string) => path.join(BASE_DIR(), `lesson-full-${id}.mp3`);
-const publicAudioUrl = (id: string) => `/generated/lessons/lesson-full-${id}.mp3`;
-const publicScriptUrl = (id: string) => `/generated/lessons/lesson-full-${id}.txt`;
+const publicAudioUrl = (id: string) => `/hvac/audio/lesson-${id}.mp3`;
+const publicScriptUrl = (id: string) => `/hvac/audio/lesson-${id}.txt`;
 
 /* ── Lesson lookup ──────────────────────────────────────────── */
 

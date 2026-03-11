@@ -208,6 +208,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
           {prevLesson ? (
             <Link
               href={`/hvac/lesson/${prevLesson.lessonId}`}
+              aria-label={`Previous lesson: ${prevLesson.lessonTitle}`}
               className="flex flex-col items-start gap-1 bg-slate-800 hover:bg-slate-700 px-5 py-3 rounded-xl transition-colors max-w-[45%]"
             >
               <span className="text-slate-500 text-xs">← Previous</span>
@@ -218,6 +219,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
           {nextLesson ? (
             <Link
               href={`/hvac/lesson/${nextLesson.lessonId}`}
+              aria-label={`Next lesson: ${nextLesson.lessonTitle}`}
               className="flex flex-col items-end gap-1 bg-sky-700 hover:bg-sky-600 px-5 py-3 rounded-xl transition-colors max-w-[45%]"
             >
               <span className="text-sky-200 text-xs">Next →</span>

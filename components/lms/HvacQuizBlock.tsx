@@ -37,12 +37,12 @@ export default function HvacQuizBlock({ questions }: Props) {
         const isCorrect = selected === q.correctAnswer
 
         return (
-          <div key={q.id} className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-            <p className="text-white font-semibold mb-4 leading-snug">
+          <div key={q.id} className="bg-slate-800 border border-slate-700 rounded-2xl p-5" role="group" aria-labelledby={`qlabel-${q.id}`}>
+            <p id={`qlabel-${q.id}`} className="text-white font-semibold mb-4 leading-snug">
               <span className="text-sky-500 font-bold mr-2">{qi + 1}.</span>
               {q.question}
             </p>
-            <div className="space-y-2">
+            <div className="space-y-2" role="radiogroup" aria-labelledby={`qlabel-${q.id}`}>
               {q.options.map((opt, oi) => {
                 const isSelected = selected === oi
                 const isAnswer   = oi === q.correctAnswer
@@ -57,6 +57,9 @@ export default function HvacQuizBlock({ questions }: Props) {
                   <button
                     key={oi}
                     onClick={() => select(q.id, oi)}
+                    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && select(q.id, oi)}
+                    aria-pressed={selected === oi}
+                    aria-label={`Option ${String.fromCharCode(65 + oi)}: ${opt}${submitted && oi === q.correctAnswer ? ' (correct answer)' : ''}`}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm text-left transition-all ${style}`}
                   >
                     <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${

@@ -42,18 +42,14 @@ export default function HvacVideoPlayer({ videoUrl, audioUrl, posterUrl, title }
           playsInline
           className="w-full aspect-video"
           poster={posterUrl}
+          aria-label={title ? `Lesson video: ${title}` : 'Lesson video'}
           onLoadedMetadata={() => setLoaded(true)}
-          onError={() => {
-            // If video fails, try audio-only fallback
-            if (!loaded && audioUrl) {
-              setError(true)
-            } else {
-              setError(true)
-            }
-          }}
+          onError={() => setError(true)}
         >
           <source src={videoUrl} type="video/mp4" />
           {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
+          {/* VTT captions served from /hvac/captions/ when generated */}
+          <track kind="captions" srcLang="en" label="English" default />
           Your browser does not support the video element.
         </video>
       )}

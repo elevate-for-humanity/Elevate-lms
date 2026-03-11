@@ -268,6 +268,11 @@ export async function proxy(request: NextRequest) {
   // DOMAIN-BASED ROUTING
   // ============================================
 
+  // Dead legacy path — /student-portal/education never existed, redirect to student portal
+  if (pathname === '/student-portal/education' || pathname.startsWith('/student-portal/education/')) {
+    return NextResponse.redirect(new URL('/student-portal', request.url), 301);
+  }
+
   // Education domain routing (elevateforhumanityeducation.com)
   // Root -> /admin dashboard; all other routes pass through to the full site
   if (host.includes(EDUCATION_DOMAIN)) {

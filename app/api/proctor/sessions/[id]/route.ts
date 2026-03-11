@@ -8,7 +8,8 @@ const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
 async function getProctor() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const admin = createAdminClient();
+  const db = admin || supabase;
   if (!supabase) return null;
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -21,7 +22,7 @@ async function getProctor() {
     .single();
 
   if (!profile || !ALLOWED_ROLES.includes(profile.role)) return null;
-  return { supabase, user, profile };
+  return { db, user, profile };
 }
 
 // GET /api/proctor/sessions/[id]
@@ -34,7 +35,7 @@ async function _GET(
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;
-    const { supabase } = ctx;
+    const { db } = ctx;
 
     const { data, error } = await db
       .from('exam_sessions')
@@ -63,11 +64,56 @@ async function _PATCH(
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;
-    const { supabase } = ctx;
+    const { db } = ctx;
     const body = await req.json();
 
-    // Only allow specific fields to be updated
-    const allowed = ['status', 'result', 'score', 'started_at', 'completed_at', 'proctor_notes'];
+    // Fetch current session to enforce compliance rules
+    const { data: current, error: fetchError } = await db
+      .from('exam_sessions')
+      .select('id, status, result, id_verified, delivery_method, evidence_url')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !current) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    // Voided sessions are immutable
+    if (current.status === 'voided') {
+      return NextResponse.json({ error: 'Voided sessions cannot be modified' }, { status: 409 });
+    }
+
+    // Setting a final result (pass/fail/incomplete) requires identity verified
+    const finalResults = ['pass', 'fail', 'incomplete'];
+    const incomingResult = body.result ?? current.result;
+    const incomingIdVerified = body.id_verified ?? current.id_verified;
+    if (finalResults.includes(incomingResult) && !incomingIdVerified) {
+      return NextResponse.json(
+        { error: 'id_verified must be true before recording a final exam result' },
+        { status: 422 }
+      );
+    }
+
+    // Online proctored sessions must have evidence before a final result is recorded
+    const effectiveDelivery = body.delivery_method ?? current.delivery_method;
+    const effectiveEvidence = body.evidence_url ?? current.evidence_url;
+    if (
+      effectiveDelivery === 'online_proctored' &&
+      finalResults.includes(incomingResult) &&
+      !effectiveEvidence
+    ) {
+      return NextResponse.json(
+        { error: 'evidence_url is required before recording a result for online proctored sessions' },
+        { status: 422 }
+      );
+    }
+
+    // Only allow specific fields to be updated (no overwriting provider, student, proctor identity)
+    const allowed = [
+      'status', 'result', 'score', 'started_at', 'completed_at',
+      'proctor_notes', 'id_verified', 'id_type', 'id_notes',
+      'evidence_url', 'delivery_method',
+    ];
     const updates: Record<string, unknown> = {};
     for (const key of allowed) {
       if (key in body) updates[key] = body[key];
@@ -89,7 +135,7 @@ async function _PATCH(
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
     }
 
-    logger.info(`[Proctor] Session ${id} updated: ${JSON.stringify(updates)}`);
+    logger.info(`[Proctor] Session ${id} updated: result=${incomingResult}, id_verified=${incomingIdVerified}`);
     return NextResponse.json({ session: data });
   } catch (err) {
     logger.error('[Proctor] PATCH error:', err);

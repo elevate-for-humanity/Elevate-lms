@@ -75,9 +75,10 @@ async function _POST(req: NextRequest) {
 
     const {
       provider, exam_name, exam_code, duration_min,
-      student_name, student_email, program_slug,
+      student_name, student_email, student_id, program_slug,
       id_verified, id_type, id_notes,
       start_code, start_key, proctor_notes,
+      delivery_method, evidence_url,
     } = body;
 
     if (!provider || !exam_name || !student_name) {
@@ -85,6 +86,34 @@ async function _POST(req: NextRequest) {
         { error: 'Missing required fields: provider, exam_name, student_name' },
         { status: 400 }
       );
+    }
+
+    // Online proctored sessions must include evidence (recording/screenshot URL)
+    const effectiveDelivery = delivery_method || 'in_person';
+    if (effectiveDelivery === 'online_proctored' && !evidence_url) {
+      return NextResponse.json(
+        { error: 'evidence_url is required for online proctored sessions' },
+        { status: 400 }
+      );
+    }
+
+    // Detect retest: check for any prior attempt for this student + provider
+    let isRetest = false;
+    if (student_email || student_id) {
+      let priorQuery = db
+        .from('exam_sessions')
+        .select('id')
+        .eq('provider', provider)
+        .limit(1);
+
+      if (student_id) {
+        priorQuery = priorQuery.eq('student_id', student_id);
+      } else {
+        priorQuery = priorQuery.ilike('student_email', student_email.toLowerCase());
+      }
+
+      const { data: prior } = await priorQuery;
+      isRetest = (prior?.length ?? 0) > 0;
     }
 
     const { data, error } = await db
@@ -95,6 +124,7 @@ async function _POST(req: NextRequest) {
         exam_name,
         exam_code: exam_code || null,
         duration_min: duration_min || 180,
+        student_id: student_id || null,
         student_name: student_name.trim(),
         student_email: student_email || null,
         program_slug: program_slug || null,
@@ -106,6 +136,9 @@ async function _POST(req: NextRequest) {
         proctor_id: profile.id,
         proctor_name: profile.full_name || 'Unknown Proctor',
         proctor_notes: proctor_notes || null,
+        delivery_method: effectiveDelivery,
+        evidence_url: evidence_url || null,
+        is_retest: isRetest,
         status: 'checked_in',
         result: 'pending',
       })
@@ -117,7 +150,7 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
     }
 
-    logger.info(`[Proctor] Session created: ${data.id} for ${student_name} — ${exam_name}`);
+    logger.info(`[Proctor] Session created: ${data.id} for ${student_name} — ${exam_name}${isRetest ? ' (retest)' : ''}`);
     return NextResponse.json({ session: data }, { status: 201 });
   } catch (err) {
     logger.error('[Proctor] POST error:', err);

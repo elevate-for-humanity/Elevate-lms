@@ -1,12 +1,6 @@
 {
 	"name": "Elevate LMS",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm",
-	"hostRequirements": {
-		"memory": "16gb"
-	},
-	"containerEnv": {
-		"ENABLE_ADMIN_DEVTOOLS": "true"
-	},
 	"forwardPorts": [3000],
 	"portsAttributes": {
 		"3000": {

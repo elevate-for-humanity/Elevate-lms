@@ -260,7 +260,7 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
               <div className={`bg-white rounded-2xl border-2 shadow-sm p-7 flex flex-col ${p.enrollmentTracks.selfPay.available ? 'border-brand-blue-400' : 'border-slate-200'}`}>
                 <div className="flex items-center gap-2 mb-4">
                   <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${p.enrollmentTracks.selfPay.available ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-500'}`}>
-                    {p.enrollmentTracks.selfPay.available ? 'Self-Pay' : 'Coming Soon'}
+                    {p.enrollmentTracks.selfPay.available ? 'Self-Pay' : 'Enrollment Pending'}
                   </span>
                 </div>
                 <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.selfPay.label}</h3>

@@ -9,8 +9,8 @@ const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
 async function getProctor() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return null;
+  const db = createAdminClient() || supabase;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -22,7 +22,7 @@ async function getProctor() {
     .single();
 
   if (!profile || !ALLOWED_ROLES.includes(profile.role)) return null;
-  return { supabase, user, profile };
+  return { supabase, db, user, profile };
 }
 
 // GET /api/proctor/sessions — list sessions
@@ -31,7 +31,7 @@ async function _GET(req: NextRequest) {
     const ctx = await getProctor();
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { supabase, profile } = ctx;
+    const { db, profile } = ctx;
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
     const status = searchParams.get('status');
@@ -71,7 +71,7 @@ async function _POST(req: NextRequest) {
     const ctx = await getProctor();
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { supabase, profile } = ctx;
+    const { db, profile } = ctx;
     const body = await req.json();
 
     const {

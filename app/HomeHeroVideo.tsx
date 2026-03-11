@@ -41,7 +41,7 @@ export default function HomeHeroVideo() {
         onCanPlay={() => setVideoReady(true)}
         className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         poster="/images/pages/home-hero-video.jpg"
-        preload="auto"
+        preload="metadata"
       >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
@@ -50,7 +50,7 @@ export default function HomeHeroVideo() {
       <audio
         ref={voiceoverRef}
         src="/audio/welcome-voiceover.mp3"
-        preload="auto"
+        preload="metadata"
         onEnded={() => setVoiceActive(false)}
       />
 

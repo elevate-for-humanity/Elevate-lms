@@ -4,26 +4,18 @@ import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import StateLicensingDropdown from '@/components/programs/StateLicensingDropdown';
-import { CNA } from '@/data/programs/cna';
-import { CNA_STATE_LICENSING } from '@/data/state-licensing';
-import { validateProgram } from '@/lib/programs/program-schema';
+import { PHLEBOTOMY } from '@/data/programs/phlebotomy';
+import { PHLEBOTOMY_STATE_LICENSING } from '@/data/state-licensing';
 
-const p = CNA;
-
-const errors = validateProgram(p);
-if (errors.length > 0) {
-  throw new Error(
-    `CNA program schema validation failed:\n${errors.map((e) => `  ${e.field}: ${e.message}`).join('\n')}`
-  );
-}
+const p = PHLEBOTOMY;
 
 export const metadata: Metadata = {
   title: p.metaTitle,
   description: p.metaDescription,
-  alternates: { canonical: '/programs/cna' },
+  alternates: { canonical: '/programs/phlebotomy' },
 };
 
-export default function CnaPage() {
+export default function PhlebotomyPage() {
   return (
     <>
       <ProgramStructuredData
@@ -45,13 +37,13 @@ export default function CnaPage() {
       <section className="py-14 bg-white border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Can You Work as a CNA in Your State?</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Can You Work as a Phlebotomist in Your State?</h2>
             <p className="text-slate-500 text-base max-w-xl mx-auto">
-              CNA certification is state-specific. Indiana training qualifies you for the Indiana CNA exam.
-              Check your state below to understand what additional steps may be required.
+              Most states accept national certification (NHA CPT) without additional state licensure.
+              A few states require their own license. Check yours below.
             </p>
           </div>
-          <StateLicensingDropdown states={CNA_STATE_LICENSING} programName="CNA" />
+          <StateLicensingDropdown states={PHLEBOTOMY_STATE_LICENSING} programName="Phlebotomy Technician" />
         </div>
       </section>
     </>

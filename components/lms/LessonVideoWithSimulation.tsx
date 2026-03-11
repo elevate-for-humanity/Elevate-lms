@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import HVACSimulation from '@/components/lms/HVACSimulation'
+import dynamic from 'next/dynamic'
+const HVACSimulation = dynamic(() => import('@/components/lms/HVACSimulation'), { ssr: false, loading: () => null })
 import { hvacLessonSimulations } from '@/lib/lms/hvac-simulations'
 
 type LessonVideoWithSimulationProps = {

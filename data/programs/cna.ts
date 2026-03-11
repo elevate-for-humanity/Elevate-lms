@@ -282,4 +282,23 @@ export const CNA: ProgramSchema = {
 
   metaTitle: 'CNA Training | Indiana Certified Nursing Assistant | Indianapolis',
   metaDescription: '6-week CNA program in Indianapolis, Indiana. State certification, CPR/BLS, and 5 credentials. 150–180 hours. Self-pay $2,800 with flexible payment plans.',
+
+  enrollmentTracks: {
+    funded: {
+      label: 'Indiana Residents — Workforce Funded',
+      requirement: 'Must reside in Indiana',
+      description:
+        'Indiana residents may qualify for tuition assistance through WorkOne, WIOA, or other state workforce programs. Eligibility is verified before a seat is confirmed. The CNA program is not currently on the Indiana ETPL — check with your WorkOne case manager for available options.',
+      applyHref: '/apply?program=cna&track=funded',
+      available: true,
+    },
+    selfPay: {
+      label: 'All States — Self-Pay',
+      cost: '$2,800',
+      description:
+        'Students from any state may enroll through the self-pay option. Note: CNA certification is state-specific. Indiana training qualifies you for the Indiana CNA exam. Other states may require additional steps — use the state licensing tool below to check your state.',
+      applyHref: '/apply?program=cna&track=self-pay',
+      available: true,
+    },
+  },
 };

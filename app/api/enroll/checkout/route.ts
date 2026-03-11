@@ -160,6 +160,16 @@ async function _POST(req: Request) {
     }
 
     // Create Stripe Checkout session
+    // BNPL methods (afterpay_clearpay, klarna) are enabled for self-pay enrollments.
+    // Afterpay: splits into 4 interest-free payments, min $1, max $4,000 per transaction.
+    // Klarna: pay later / pay in installments, available for US customers.
+    // Both require currency=usd and shipping_address_collection or explicit address.
+    const isBnplEligible = !isFunded && amount >= 100; // BNPL min $1.00
+    const paymentMethods: string[] = ['card'];
+    if (isBnplEligible) {
+      paymentMethods.push('afterpay_clearpay', 'klarna');
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer_email: email.toLowerCase(),
@@ -173,7 +183,7 @@ async function _POST(req: Request) {
                 : program.name,
               description: isFunded
                 ? `CareerSafe OSHA 10-Hour Construction + CPR/AED/First Aid credentials. Program tuition covered by ${(fundingSource || '').toUpperCase()} funding.`
-                : `Enrollment in ${program.name} program`,
+                : `Enrollment in ${program.name} — self-pay. Includes EPA 608 prep, OSHA 10-Hour, and ACT WorkKeys.`,
             },
             unit_amount: amount,
           },
@@ -187,7 +197,6 @@ async function _POST(req: Request) {
         ? `${siteUrl}/programs/${programSlug}/apply?canceled=true&provider=stripe`
         : `${siteUrl}/apply?program=${programSlug}`,
       metadata: {
-        // Standardized metadata for grant/license compliance
         payment_type: 'enrollment',
         kind: 'program_enrollment',
         funding_source: fundingSource || 'self_pay',
@@ -201,8 +210,9 @@ async function _POST(req: Request) {
         email: email.toLowerCase(),
         phone: phone || '',
       },
-      // Use whatever payment methods are enabled in the Stripe dashboard
-      payment_method_types: ['card'],
+      payment_method_types: paymentMethods as any,
+      // Required for Afterpay/Klarna — collect billing address
+      billing_address_collection: isBnplEligible ? 'required' : 'auto',
     });
 
     if (!session.url) {

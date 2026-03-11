@@ -50,7 +50,7 @@ export default function ApplyAvatarGuide() {
             className="w-full aspect-video object-cover"
             playsInline
             autoPlay
-            preload="auto"
+            preload="metadata"
           >
             <source src="/videos/avatars/home-welcome.mp4" type="video/mp4" />
           </video>

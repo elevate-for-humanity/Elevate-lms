@@ -8,14 +8,19 @@ import { ArrowLeft, Loader2, CreditCard, Info, Shield } from 'lucide-react';
 const PRICING = {
   totalWeeks: 20,
   fullPrice: 5000,
-  depositAmount: 1750,
-  remainingBalance: 3250,
+  depositPct: 0.20, // 20% down — constant
+  get depositAmount() { return Math.round(this.fullPrice * this.depositPct); },
+  get remainingBalance() { return this.fullPrice - this.depositAmount; },
 };
 
-function calculateWeeklyPayment(depositPaid: number) {
-  const remaining = PRICING.fullPrice - depositPaid;
-  const weeks = PRICING.totalWeeks;
-  return { weeklyDollars: Math.round((remaining / weeks) * 100) / 100, weeks, remaining };
+// Minimum weekly payment = remaining balance ÷ program weeks
+const MIN_WEEKLY = Math.ceil((PRICING.remainingBalance / PRICING.totalWeeks) * 100) / 100;
+
+function calcWeekly(customWeekly: number) {
+  const weekly = Math.max(MIN_WEEKLY, customWeekly);
+  const weeksNeeded = Math.ceil(PRICING.remainingBalance / weekly);
+  const lastPayment = PRICING.remainingBalance - weekly * (weeksNeeded - 1);
+  return { weekly, weeksNeeded, lastPayment };
 }
 
 export default function HvacApplyPage() {
@@ -23,8 +28,14 @@ export default function HvacApplyPage() {
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
 
-  const [paymentOption, setPaymentOption] = useState<'weekly' | 'full' | 'sezzle' | 'affirm'>('weekly');
+  const [paymentOption, setPaymentOption] = useState<'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm' | 'stripe-bnpl'>('weekly');
+  // customWeekly: user-entered weekly amount (must be >= MIN_WEEKLY)
+  const [customWeekly, setCustomWeekly] = useState(MIN_WEEKLY);
+  // customAmount: used by Affirm/Sezzle for their amount input
   const [customAmount, setCustomAmount] = useState(PRICING.depositAmount);
+
+  const { weekly: structuredWeekly, weeksNeeded } = calcWeekly(MIN_WEEKLY);
+  const { weekly: userWeekly, weeksNeeded: userWeeks, lastPayment } = calcWeekly(customWeekly);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -34,10 +45,6 @@ export default function HvacApplyPage() {
     experience: '',
     fundingInterest: '',
   });
-
-  const { weeklyDollars, weeks, remaining } = calculateWeeklyPayment(
-    paymentOption === 'full' ? PRICING.fullPrice : PRICING.depositAmount
-  );
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -178,6 +185,33 @@ export default function HvacApplyPage() {
         return;
       }
 
+      // Stripe BNPL (Afterpay/Klarna) — routes through same Stripe Checkout endpoint
+      // with BNPL payment methods enabled on the session
+      if (paymentOption === 'stripe-bnpl') {
+        const bnplResponse = await fetch('/api/enroll/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            programSlug: 'hvac-technician',
+            fundingSource: 'self_pay',
+            paymentMethod: 'bnpl',
+          }),
+        });
+        const bnplData = await bnplResponse.json();
+        if (bnplResponse.ok && (bnplData.checkoutUrl || bnplData.url)) {
+          window.location.href = bnplData.checkoutUrl || bnplData.url;
+        } else {
+          setError(bnplData.error || bnplData.err || 'Afterpay/Klarna checkout unavailable. Please select another option.');
+          setErrorSeverity('info');
+          setLoading(false);
+        }
+        return;
+      }
+
       // Stripe checkout (full or weekly)
       const checkoutResponse = await fetch('/api/enroll/checkout', {
         method: 'POST',
@@ -283,11 +317,12 @@ export default function HvacApplyPage() {
                   <div className="bg-brand-green-500/20 rounded-xl p-4">
                     <div className="text-center">
                       <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
-                      <div className="text-sm text-white mt-2 space-y-1">
-                        <p><strong>Pay in Full:</strong> Card, Apple Pay, Google Pay</p>
-                        <p><strong>Weekly Plan:</strong> ${PRICING.depositAmount.toLocaleString()} deposit + ${weeklyDollars}/wk</p>
-                        <p><strong>Affirm:</strong> Split into monthly payments</p>
-                        <p><strong>Sezzle:</strong> 4 payments over 6 weeks</p>
+                      <div className="text-sm text-white mt-2 space-y-1 text-left">
+                        <p><strong>20% down:</strong> ${PRICING.depositAmount.toLocaleString()} today</p>
+                        <p><strong>Structured weekly:</strong> ${structuredWeekly}/wk × {weeksNeeded} wks</p>
+                        <p><strong>Custom weekly:</strong> any amount ≥ ${MIN_WEEKLY}/wk</p>
+                        <p><strong>Pay in full:</strong> ${PRICING.fullPrice.toLocaleString()}</p>
+                        <p><strong>BNPL:</strong> Affirm · Sezzle · Afterpay · Klarna</p>
                       </div>
                     </div>
                   </div>
@@ -475,32 +510,70 @@ export default function HvacApplyPage() {
                   <>
                     <h3 className="text-lg font-bold text-black pt-4">Select Payment Method</h3>
 
+                    {/* Deposit notice — always shown */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-2">
+                      <p className="text-sm font-semibold text-amber-800">
+                        All plans require a <strong>20% deposit (${PRICING.depositAmount.toLocaleString()})</strong> at enrollment.
+                        The remaining ${PRICING.remainingBalance.toLocaleString()} is paid per your chosen schedule.
+                      </p>
+                    </div>
+
                     <div className="space-y-3">
-                      {/* Option 1: Weekly Plan */}
+
+                      {/* Option 1: Structured weekly */}
                       <button
                         type="button"
                         onClick={() => setPaymentOption('weekly')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                          paymentOption === 'weekly'
-                            ? 'border-brand-blue-600 bg-brand-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'weekly' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                       >
-                        <p className="font-bold text-black text-lg">Weekly Payment Plan</p>
+                        <p className="font-bold text-black text-lg">Structured Weekly Plan</p>
                         <p className="text-sm text-gray-600 mt-1">
-                          ${PRICING.depositAmount.toLocaleString()} deposit today, then ~${weeklyDollars}/week for {weeks} weeks
+                          ${PRICING.depositAmount.toLocaleString()} down today, then <strong>${structuredWeekly.toFixed(2)}/week</strong> for {weeksNeeded} weeks
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">Minimum weekly payment — balance paid in full by program end</p>
+                      </button>
+
+                      {/* Option 2: Custom weekly */}
+                      <button
+                        type="button"
+                        onClick={() => setPaymentOption('custom')}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'custom' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      >
+                        <p className="font-bold text-black text-lg">Custom Weekly Amount</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Pay more per week to finish faster. Minimum ${structuredWeekly.toFixed(2)}/week.
                         </p>
                       </button>
 
-                      {/* Option 2: Pay in Full */}
+                      {paymentOption === 'custom' && (
+                        <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Weekly payment amount (min ${structuredWeekly.toFixed(2)})
+                            </label>
+                            <input
+                              type="number"
+                              min={structuredWeekly}
+                              max={PRICING.remainingBalance}
+                              step={5}
+                              value={customWeekly}
+                              onChange={(e) => setCustomWeekly(Math.max(MIN_WEEKLY, parseFloat(e.target.value) || MIN_WEEKLY))}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                            />
+                          </div>
+                          <div className="bg-white rounded-lg p-3 border border-gray-200 text-sm space-y-1">
+                            <p className="text-gray-700"><strong>${userWeekly.toFixed(2)}/week</strong> × {userWeeks - 1} weeks</p>
+                            <p className="text-gray-500">Final payment: ${lastPayment.toFixed(2)}</p>
+                            <p className="text-brand-green-700 font-semibold">Total: ${PRICING.fullPrice.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Option 3: Pay in full */}
                       <button
                         type="button"
                         onClick={() => setPaymentOption('full')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                          paymentOption === 'full'
-                            ? 'border-brand-blue-600 bg-brand-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'full' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Pay in Full</p>
                         <p className="text-sm text-gray-600 mt-1">
@@ -508,27 +581,20 @@ export default function HvacApplyPage() {
                         </p>
                       </button>
 
-                      {/* Option 3: Affirm */}
+                      {/* Option 4: Affirm */}
                       <button
                         type="button"
                         onClick={() => setPaymentOption('affirm')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                          paymentOption === 'affirm'
-                            ? 'border-brand-blue-600 bg-brand-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'affirm' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Affirm</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Split into monthly payments. 0% APR available for qualifying applicants.
-                        </p>
+                        <p className="text-sm text-gray-600 mt-1">Monthly installments. 0% APR available for qualifying applicants.</p>
                       </button>
 
-                      {/* Affirm Amount Input */}
                       {paymentOption === 'affirm' && (
                         <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            How much do you want to finance with Affirm? (min ${PRICING.depositAmount.toLocaleString()})
+                            Amount to finance with Affirm (min ${PRICING.depositAmount.toLocaleString()})
                           </label>
                           <input
                             type="number"
@@ -539,33 +605,24 @@ export default function HvacApplyPage() {
                             onChange={(e) => setCustomAmount(Math.max(PRICING.depositAmount, parseInt(e.target.value) || PRICING.depositAmount))}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                           />
-                          <p className="text-xs text-gray-500 mt-2">
-                            Affirm will check your eligibility and show payment options at checkout
-                          </p>
+                          <p className="text-xs text-gray-500 mt-2">Affirm checks eligibility and shows payment options at checkout</p>
                         </div>
                       )}
 
-                      {/* Option 4: Sezzle */}
+                      {/* Option 5: Sezzle */}
                       <button
                         type="button"
                         onClick={() => setPaymentOption('sezzle')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                          paymentOption === 'sezzle'
-                            ? 'border-brand-blue-600 bg-brand-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'sezzle' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Sezzle</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          4 interest-free payments over 6 weeks (up to $2,500)
-                        </p>
+                        <p className="text-sm text-gray-600 mt-1">4 interest-free payments over 6 weeks (up to $2,500)</p>
                       </button>
 
-                      {/* Sezzle Amount Input */}
                       {paymentOption === 'sezzle' && (
                         <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            How much do you want to pay with Sezzle? (${PRICING.depositAmount.toLocaleString()} - $2,500)
+                            Amount to pay with Sezzle (${PRICING.depositAmount.toLocaleString()} – $2,500)
                           </label>
                           <input
                             type="number"
@@ -577,22 +634,47 @@ export default function HvacApplyPage() {
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                           />
                           <p className="text-xs text-gray-500 mt-2">
-                            Sezzle will check your eligibility — 4 payments of ${Math.round((customAmount || 0) / 4).toLocaleString()} every 2 weeks
+                            4 payments of ${Math.round((customAmount || 0) / 4).toLocaleString()} every 2 weeks
                           </p>
                         </div>
                       )}
+
+                      {/* Option 6: Afterpay / Klarna via Stripe */}
+                      <button
+                        type="button"
+                        onClick={() => setPaymentOption('stripe-bnpl')}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'stripe-bnpl' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="font-bold text-black text-lg">Afterpay / Klarna</p>
+                          <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full">via Stripe</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          4 interest-free payments with Afterpay, or flexible monthly payments with Klarna.
+                        </p>
+                      </button>
+
+                      {paymentOption === 'stripe-bnpl' && (
+                        <div className="ml-4 p-4 bg-brand-blue-50 rounded-lg border border-brand-blue-200 text-sm text-brand-blue-800 space-y-1">
+                          <p className="font-semibold">How it works:</p>
+                          <p>• <strong>Afterpay</strong> — 4 payments of ~${(PRICING.fullPrice / 4).toLocaleString()} every 2 weeks, 0% interest</p>
+                          <p>• <strong>Klarna</strong> — pay later or monthly installments at checkout</p>
+                          <p className="text-xs text-brand-blue-600 mt-2">Eligibility determined at checkout. Billing address required.</p>
+                        </div>
+                      )}
+
                     </div>
 
                     {/* Payment methods accepted */}
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                       <p className="text-sm text-black font-medium mb-3">Payment methods accepted at checkout:</p>
                       <div className="flex flex-wrap gap-2">
-                        {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay', 'PayPal', 'Venmo', 'Cash App'].map(m => (
+                        {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay', 'Afterpay', 'Klarna', 'Affirm', 'Sezzle'].map(m => (
                           <span key={m} className="px-2 py-1 bg-white border border-gray-200 rounded text-xs text-gray-600">{m}</span>
                         ))}
                       </div>
                       <p className="text-xs text-gray-500 mt-3">
-                        Secure payment via Stripe. Card, Apple Pay, Google Pay, PayPal, Venmo, Cash App accepted.
+                        Secure payment via Stripe. BNPL options (Afterpay, Klarna, Affirm, Sezzle) available for self-pay enrollments.
                       </p>
                     </div>
                   </>

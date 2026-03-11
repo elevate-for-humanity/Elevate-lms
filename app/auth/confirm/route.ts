@@ -127,7 +127,10 @@ export async function GET(request: NextRequest) {
         redirectTo = '/lms/dashboard?invited=true';
       }
 
-      return NextResponse.redirect(new URL(redirectTo, request.url));
+      // Always redirect to canonical domain — request.url may be a Netlify
+      // deploy-preview URL which breaks email links clicked from outside.
+      const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+      return NextResponse.redirect(new URL(redirectTo, CANONICAL));
     }
 
     // Log error for debugging
@@ -135,7 +138,8 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to error page if verification fails
+  const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   return NextResponse.redirect(
-    new URL('/login?error=verification_failed', request.url)
+    new URL('/login?error=verification_failed', CANONICAL)
   );
 }

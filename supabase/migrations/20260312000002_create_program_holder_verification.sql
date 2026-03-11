@@ -2,7 +2,7 @@
 -- This ensures the table exists before those ALTERs run (idempotent).
 CREATE TABLE IF NOT EXISTS public.program_holder_verification (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  program_holder_id UUID,
+  program_holder_id UUID REFERENCES public.program_holders(id) ON DELETE CASCADE,
   verification_type TEXT,
   status TEXT DEFAULT 'pending',
   stripe_verification_session_id TEXT,

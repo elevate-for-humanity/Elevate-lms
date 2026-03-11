@@ -122,6 +122,51 @@ export async function createOrUpdateEnrollment(
 }
 
 /**
+ * Link any program_enrollments rows that have user_id = null but match
+ * a verified profile by email. Called after payment webhooks to close
+ * the gap where a user pays after their account is already verified
+ * (so auth/confirm never fires again).
+ *
+ * Safe to call multiple times — only touches null user_id rows.
+ */
+export async function linkOrphanedEnrollments(
+  supabase: SupabaseClient,
+  email: string
+): Promise<{ linked: number }> {
+  if (!email) return { linked: 0 };
+
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Find verified profile for this email
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (!profile?.id) return { linked: 0 };
+
+  // Link any orphaned rows for this email
+  const { data, error } = await supabase
+    .from('program_enrollments')
+    .update({ user_id: profile.id })
+    .ilike('email', normalizedEmail)
+    .is('user_id', null)
+    .select('id');
+
+  if (error) {
+    logger.error('[enrollment-service] linkOrphanedEnrollments failed:', error.message);
+    return { linked: 0 };
+  }
+
+  const linked = data?.length ?? 0;
+  if (linked > 0) {
+    logger.info(`[enrollment-service] Linked ${linked} orphaned enrollment(s) for ${normalizedEmail}`);
+  }
+  return { linked };
+}
+
+/**
  * Integrity check: returns counts of any duplicate enrollments.
  * All counts should be 0 in a healthy system.
  */

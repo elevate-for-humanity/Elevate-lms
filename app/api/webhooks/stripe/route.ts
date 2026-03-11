@@ -41,7 +41,7 @@ import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
-import { createOrUpdateEnrollment } from '@/lib/enrollment-service';
+import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollment-service';
 import { 
   getBillingAuthority, 
   getUpdatableFields,
@@ -548,6 +548,12 @@ async function _POST(request: NextRequest) {
             .eq('stripe_session_id', session.id);
 
           logger.info(`✅ Apprenticeship enrollment created (pending approval): ${program} for student ${studentId}`);
+
+          // Link any other orphaned enrollments for this customer
+          const customerEmail = session.customer_email || session.customer_details?.email;
+          if (customerEmail) {
+            await linkOrphanedEnrollments(supabase, customerEmail).catch(() => {});
+          }
         } catch (err: any) {
           Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing apprenticeship_enrollment:', err);
@@ -1542,6 +1548,13 @@ async function _POST(request: NextRequest) {
         logger.info(
           `✅ Payment processed (legacy): user ${userId}, course ${courseId}`
         );
+
+        // Link any other orphaned enrollments for this customer in case
+        // they paid for multiple programs before verifying their account.
+        const customerEmail = session.customer_email || session.customer_details?.email;
+        if (customerEmail) {
+          await linkOrphanedEnrollments(supabase, customerEmail).catch(() => {});
+        }
         break;
       }
 

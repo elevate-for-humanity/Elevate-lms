@@ -277,25 +277,6 @@
   to = "https://www.elevateforhumanity.org/:splat"
   status = 200
   force = true
-  force = true
-
-[[redirects]]
-  from = "https://www.elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/student-portal/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/student-portal/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://www.elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/student-portal/:splat"
-  status = 301
-  force = true
 
 # ============================================
 # SUPERSONIC DOMAIN (supersonicfastermoney.com)

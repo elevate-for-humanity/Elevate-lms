@@ -125,8 +125,9 @@ async function _POST(request: NextRequest) {
         const customerId = session.customer as string;
         const customerEmail = session.customer_details?.email || session.customer_email || '';
         const customerName = session.customer_details?.name || session.metadata?.customer_name || '';
-        const customerPhone = session.metadata?.customer_phone || '';
-        const applicationId = session.metadata?.application_id;
+        // Public checkout stores as customerPhone; auth checkout as customer_phone
+        const customerPhone = session.metadata?.customerPhone || session.metadata?.customer_phone || '';
+        const applicationId = session.metadata?.application_id || session.metadata?.applicationId;
         const checkoutType = session.metadata?.checkout_type;
 
         // Handle full tuition payment (with BNPL support)
@@ -624,6 +625,17 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             logger.error('Milady email failed:', emailErr);
             // Don't fail webhook - email can be retried
           }
+        }
+
+        // Admin SMS alert via email-to-SMS gateway (non-blocking)
+        const adminSmsGateway = process.env.ADMIN_SMS_GATEWAY;
+        if (adminSmsGateway) {
+          const { sendEmail } = await import('@/lib/email/sendgrid');
+          sendEmail({
+            to: adminSmsGateway,
+            subject: 'New Barber Enrollment',
+            html: `${customerName || customerEmail} enrolled. Sub: ${subscriptionId}`,
+          }).catch((err: unknown) => logger.error('Admin enrollment SMS failed (non-fatal):', err));
         }
 
         logger.info(`Barber subscription created: ${subscriptionId} for user ${userId}, apprentice ${apprenticeId}`);

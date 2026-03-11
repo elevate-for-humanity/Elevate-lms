@@ -55,6 +55,7 @@ export default function ApprenticeForm() {
     hasHostShop: '',
     hostShopName: '',
   });
+  const [smsConsent, setSmsConsent] = useState(false);
 
   // Calculate next Friday on client only to avoid hydration mismatch
   useEffect(() => {
@@ -102,6 +103,7 @@ export default function ApprenticeForm() {
         customer_email: formData.email,
         customer_name: `${formData.firstName} ${formData.lastName}`,
         customer_phone: formData.phone,
+        sms_consent: smsConsent,
         application_id: applicationId,
         transferred_hours: transferHours,
         transferred_hours_verified: transferHours,
@@ -476,6 +478,20 @@ export default function ApprenticeForm() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="(317) 314-3757"
                   />
+                </div>
+
+                {/* SMS Consent */}
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="smsConsent"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-brand-blue-600 border-gray-300 rounded"
+                  />
+                  <label htmlFor="smsConsent" className="text-sm text-gray-600">
+                    I agree to receive text messages from Elevate for Humanity about my enrollment, program updates, and important notices. Message and data rates may apply. Reply STOP to opt out.
+                  </label>
                 </div>
 
                 {/* Transfer Hours Question */}

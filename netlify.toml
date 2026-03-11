@@ -250,14 +250,33 @@
 
 # ============================================
 # LMS DOMAIN (elevateforhumanityeducation.com)
-# 301 to canonical domain to prevent duplicate content indexing.
-# Student portal is accessible at www.elevateforhumanity.org/student-portal
+# Root -> /lms (student learning management system)
+# All sub-routes pass through to the full site
 # ============================================
 
 [[redirects]]
+  from = "https://elevateforhumanityeducation.com"
+  to = "https://www.elevateforhumanity.org/lms"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://www.elevateforhumanityeducation.com"
+  to = "https://www.elevateforhumanity.org/lms"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "https://elevateforhumanityeducation.com/*"
-  to = "https://www.elevateforhumanity.org/student-portal/:splat"
-  status = 301
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://www.elevateforhumanityeducation.com/*"
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 200
+  force = true
   force = true
 
 [[redirects]]

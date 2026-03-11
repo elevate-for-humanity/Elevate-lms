@@ -153,7 +153,7 @@ export const POST = withRateLimit(
         `,
       });
 
-      // SMS alert via AT&T email-to-SMS gateway (only if configured)
+      // SMS alert via email-to-SMS gateway (only if configured)
       if (ADMIN_SMS) {
         await sendEmail({
           to: ADMIN_SMS,

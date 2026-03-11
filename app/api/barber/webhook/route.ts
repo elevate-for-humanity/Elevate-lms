@@ -328,13 +328,13 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             phone: customerPhone,
             amount_paid_cents: amountPaidCents,
             funding_source: 'self-pay',
-            stripe_session_id: session.id,
+            stripe_checkout_session_id: session.id,   // DB col name
             stripe_customer_id: customerId,
             program_slug: 'barber-apprenticeship',
             status: 'paid',
             enrollment_state: 'confirmed',
             enrolled_at: new Date().toISOString(),
-            confirmed_at: new Date().toISOString(),
+            enrollment_confirmed_at: new Date().toISOString(), // DB col name
             payment_status: fullyPaid ? 'paid_in_full' : 'setup_fee_paid',
             barber_sub_id: subRecord?.id || null,
           }).catch((err: any) => logger.error('program_enrollments insert error:', err));
@@ -605,7 +605,20 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               .from('barber_subscriptions')
               .update({ milady_email_sent_at: new Date().toISOString() })
               .eq('stripe_subscription_id', subscriptionId);
-              
+
+            // Queue Milady provisioning so admins have an in-app record.
+            // Email alone is fragile — if missed, student waits with no visibility.
+            await db
+              .from('milady_provisioning_queue')
+              .insert({
+                student_id: userId || null,
+                student_email: customerEmail,
+                student_name: customerName || null,
+                program_slug: 'barber-apprenticeship',
+                status: 'pending',
+              })
+              .catch((err: unknown) => logger.error('milady_provisioning_queue insert failed:', err));
+
             logger.info(`Milady email sent to ${customerEmail}`);
           } catch (emailErr) {
             logger.error('Milady email failed:', emailErr);

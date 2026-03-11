@@ -90,12 +90,11 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id);
 
     // Create initial progress record
+    // Note: apprentice_progress has no partner_id or program_id column
     await db
       .from('apprentice_progress')
       .insert({
         user_id: user.id,
-        partner_id: partnerId,
-        program_id: programId || 'BARBER',
         total_hours: 0,
         status: 'active',
       });

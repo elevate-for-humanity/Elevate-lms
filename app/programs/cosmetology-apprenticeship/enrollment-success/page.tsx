@@ -41,7 +41,7 @@ export default async function EnrollmentSuccessPage() {
   if (enrollment.status === 'paid' || enrollment.status === 'approved') {
     await db
       .from('program_enrollments')
-      .update({ status: 'confirmed', confirmed_at: new Date().toISOString() })
+      .update({ status: 'confirmed', enrollment_confirmed_at: new Date().toISOString() })
       .eq('id', enrollment.id);
   }
 

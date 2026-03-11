@@ -481,6 +481,31 @@
   status = 301
   force = true
 
+# Dead legacy paths — redirect to correct destinations
+[[redirects]]
+  from = "/student-portal/education"
+  to = "/student-portal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/student-portal/education/*"
+  to = "/student-portal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/store/licenses/managed"
+  to = "/admin/licenses"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/store/licenses/managed/*"
+  to = "/admin/licenses"
+  status = 301
+  force = true
+
 # /student, /student/dashboard → /student-portal handled by next.config.mjs (auth/app route, Rule B)
 
 [[headers]]

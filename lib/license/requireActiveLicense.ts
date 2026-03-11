@@ -161,7 +161,7 @@ export async function checkLicense(): Promise<License | null> {
  * Get the appropriate redirect URL for a license error
  */
 export function getLicenseErrorRedirect(error: LicenseError, licenseId?: string): string {
-  const baseUrl = '/store/licenses/managed';
+  const baseUrl = '/admin/licenses';
   const params = new URLSearchParams();
   
   params.set('reason', error.licenseStatus);

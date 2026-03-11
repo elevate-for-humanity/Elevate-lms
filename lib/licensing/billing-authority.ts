@@ -445,14 +445,22 @@ export function getLicenseAccessMode(
     };
   }
 
-  // No license at all
+  // No license at all — super_admin always gets full access regardless
   if (!license || accessResult.reason === 'no_license') {
+    if (isAdmin) {
+      return {
+        mode: 'full',
+        canRead: true,
+        canMutate: true,
+        reason: 'no_license_admin_bypass',
+      };
+    }
     return {
       mode: 'blocked',
       canRead: false,
       canMutate: false,
       reason: 'no_license',
-      redirectTo: '/store/licenses/managed?reason=missing',
+      redirectTo: '/admin/licenses?reason=missing',
       message: 'No active license found. Please purchase a license to continue.',
     };
   }
@@ -482,7 +490,7 @@ export function getLicenseAccessMode(
       canRead: false,
       canMutate: false,
       reason: accessResult.reason,
-      redirectTo: `/store/licenses/managed?reason=${isCanceled ? 'canceled' : 'suspended'}&license_id=${license.id}`,
+      redirectTo: `/admin/licenses?reason=${isCanceled ? 'canceled' : 'suspended'}&license_id=${license.id}`,
       message: isCanceled 
         ? 'Your subscription has been canceled. Please resubscribe to restore access.'
         : 'Your license is suspended due to a billing issue. Please update your payment method.',
@@ -522,7 +530,7 @@ export function getLicenseAccessMode(
     canRead: false,
     canMutate: false,
     reason: accessResult.reason,
-    redirectTo: '/store/licenses/managed?reason=unknown',
+    redirectTo: '/admin/licenses?reason=unknown',
     message: 'Access denied. Please contact support.',
   };
 }

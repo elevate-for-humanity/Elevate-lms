@@ -275,7 +275,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: '/images/pages/comp-highlights-success.jpg',
     variant: 'illustration',
     height: 'medium',
-    ctaPrimary: { label: 'View Plans', href: '/store/licenses/managed' },
+    ctaPrimary: { label: 'View Plans', href: '/admin/licenses' },
     ctaSecondary: { label: 'Contact Sales', href: '/contact' },
   },
   

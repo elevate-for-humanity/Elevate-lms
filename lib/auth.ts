@@ -231,7 +231,7 @@ export async function requireStudent() {
 }
 
 export async function requireAdmin() {
-  return requireRole(['admin', 'super_admin', 'staff'], '/admin/dashboard');
+  return requireRole(['admin', 'super_admin', 'org_admin', 'staff'], '/admin/dashboard');
 }
 
 export async function requireProgramHolder() {

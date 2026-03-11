@@ -21,13 +21,13 @@ const PLATFORM_SUBDOMAIN = 'platform.elevateforhumanity.org';
 // NOTE: Landing pages (exact match) are PUBLIC for marketing/preview
 // Only sub-routes require authentication
 const PROTECTED_ROUTES: Record<string, string[]> = {
-  '/admin/dashboard': ['admin', 'super_admin'],
-  '/admin/users': ['admin', 'super_admin'],
-  '/admin/programs': ['admin', 'super_admin'],
-  '/admin/settings': ['admin', 'super_admin'],
-  '/admin/reports': ['admin', 'super_admin'],
-  '/admin/crm': ['admin', 'super_admin'],
-  '/admin/enrollments': ['admin', 'super_admin'],
+  '/admin/dashboard': ['admin', 'super_admin', 'org_admin', 'staff'],
+  '/admin/users': ['admin', 'super_admin', 'org_admin'],
+  '/admin/programs': ['admin', 'super_admin', 'org_admin', 'staff'],
+  '/admin/settings': ['admin', 'super_admin', 'org_admin'],
+  '/admin/reports': ['admin', 'super_admin', 'org_admin', 'staff'],
+  '/admin/crm': ['admin', 'super_admin', 'org_admin'],
+  '/admin/enrollments': ['admin', 'super_admin', 'org_admin', 'staff'],
   '/staff-portal/dashboard': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/students': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/courses': ['staff', 'admin', 'super_admin', 'advisor'],
@@ -472,8 +472,8 @@ export async function proxy(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    // License holders with admin/super_admin role can access their tenant's admin
-    if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+    // License holders with admin/super_admin/org_admin/staff role can access their tenant's admin
+    if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'org_admin' || profile?.role === 'staff') {
       // They can only access admin for their own tenant
       // Inject tenant context for downstream handlers
       if (profile.tenant_id) {

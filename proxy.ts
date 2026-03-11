@@ -100,10 +100,16 @@ const ENROLLMENT_REQUIRED_ROUTES = ['/dashboard', '/courses', '/learn', '/lms/co
 const ENROLLMENT_FLOW_ROUTES = ['/enrollment/confirmed', '/enrollment/orientation', '/enrollment/documents'];
 
 // Super admin emails - full platform access (platform owner)
-const SUPER_ADMIN_EMAILS = ['elizabethpowell6262@gmail.com'];
+const SUPER_ADMIN_EMAILS = [
+  'elizabethpowell6262@gmail.com',
+  'elevate4humanityedu@gmail.com',
+];
 
 // Admin emails that bypass onboarding requirement (includes super admins)
-const ADMIN_EMAILS = ['elizabethpowell6262@gmail.com'];
+const ADMIN_EMAILS = [
+  'elizabethpowell6262@gmail.com',
+  'elevate4humanityedu@gmail.com',
+];
 
 // Webhook paths that bypass auth entirely (Stripe signature verification handles security)
 // CANONICAL WEBHOOK PATHS (bypass auth)

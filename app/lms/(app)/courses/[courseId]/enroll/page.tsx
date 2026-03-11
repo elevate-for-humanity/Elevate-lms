@@ -74,7 +74,7 @@ export default async function CourseEnrollPage({ params }: Props) {
     notFound();
   }
 
-  // Check if already enrolled
+  // Check if already enrolled — training_enrollments is the canonical LMS enrollment table
   const { data: existingEnrollment } = await db
     .from('training_enrollments')
     .select('id, status')
@@ -101,7 +101,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Get enrolled student count
   const { count: studentCount } = await db
-    .from('program_enrollments')
+    .from('training_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);
 

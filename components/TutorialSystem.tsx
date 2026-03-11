@@ -11,7 +11,7 @@ import {
 } from '@/lib/onboarding-types';
 
 interface TutorialSystemProps {
-  tutorial: Tutorial;
+  tutorial?: Tutorial | null;
   userId: string;
   onComplete?: () => void;
   onClose?: () => void;
@@ -26,6 +26,8 @@ export function TutorialSystem({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(true);
+
+  if (!tutorial?.steps?.length) return null;
 
   const currentStep = tutorial.steps[currentStepIndex];
   const isLastStep = currentStepIndex === tutorial.steps.length - 1;

@@ -102,16 +102,19 @@ export default function CoursePreviewPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
+    // Support both UUID and slug lookups
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseId);
     const { data: courseData } = await supabase
       .from('training_courses')
       .select('*')
-      .eq('id', courseId)
+      .eq(isUUID ? 'id' : 'slug', courseId)
       .single();
 
+    const resolvedId = courseData?.id || courseId;
     const { data: lessonsData } = await supabase
       .from('training_lessons')
       .select('*')
-      .eq('course_id', courseId)
+      .eq('course_id', resolvedId)
       .order('order_number');
 
     if (courseData) setCourse(courseData);

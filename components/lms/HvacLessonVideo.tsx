@@ -32,6 +32,8 @@ interface Props {
   lessonDefId: string;
   brollVideoUrl: string;
   lessonTitle: string;
+  /** Database video_url — takes priority over generated files when set */
+  dbVideoUrl?: string | null;
   onProgress?: (percent: number) => void;
   onComplete?: () => void;
 }
@@ -40,12 +42,20 @@ export default function HvacLessonVideo({
   lessonDefId,
   brollVideoUrl,
   lessonTitle,
+  dbVideoUrl,
   onProgress,
   onComplete,
 }: Props) {
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    // If the lesson has a video_url set in the database, use it directly.
+    // This is where HeyGen-composed videos (V14 etc.) are stored.
+    if (dbVideoUrl) {
+      setMediaUrl(dbVideoUrl);
+      return;
+    }
+
     const uuid = HVAC_LESSON_UUID[lessonDefId];
     if (!uuid) {
       setMediaUrl(brollVideoUrl);
@@ -55,8 +65,7 @@ export default function HvacLessonVideo({
     const videoPath = `/generated/videos/lesson-${uuid}.mp4`;
     const audioPath = `/generated/lessons/lesson-${uuid}.mp3`;
 
-    // Check MP4 first, then MP3, then fall back to b-roll.
-    // HEAD requests are instant — no download, no API call.
+    // Check local MP4 first, then MP3, then fall back to b-roll.
     fetch(videoPath, { method: 'HEAD' })
       .then(r => {
         if (r.ok) { setMediaUrl(videoPath); return; }
@@ -69,7 +78,7 @@ export default function HvacLessonVideo({
           .then(r => setMediaUrl(r.ok ? audioPath : brollVideoUrl))
           .catch(() => setMediaUrl(brollVideoUrl));
       });
-  }, [lessonDefId, brollVideoUrl]);
+  }, [lessonDefId, brollVideoUrl, dbVideoUrl]);
 
   if (!mediaUrl) return null;
 

@@ -5,7 +5,11 @@
 import { COURSE_DEFINITIONS } from './definitions';
 import type { CourseModule, CourseLesson } from './definitions';
 
-const HVAC_DEF = COURSE_DEFINITIONS.find(c => c.slug === 'hvac-technician')!;
+const HVAC_DEF = COURSE_DEFINITIONS.find(c => c.slug === 'hvac-technician');
+
+if (!HVAC_DEF) {
+  throw new Error('HVAC course definition not found in COURSE_DEFINITIONS');
+}
 
 /** Build a reverse map: lesson ID → { module, lessonIndex } */
 function buildLessonModuleMap() {
@@ -28,7 +32,8 @@ export function buildLessonContent(lessonId: string): string {
   if (!entry) return '<p>Lesson content not found.</p>';
 
   const { module: mod } = entry;
-  const lesson = mod.lessons.find(l => l.id === lessonId)!;
+  const lesson = mod.lessons.find(l => l.id === lessonId);
+  if (!lesson) return '<p>Lesson not found.</p>';
   const weekNum = mod.weekAssignment?.week;
 
   switch (lesson.type) {

@@ -18,20 +18,21 @@ import {
   ClipboardList,
 CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
+import QuizPlayer from '@/components/lms/QuizPlayer';
 import LessonPlayer from '@/components/lms/LessonPlayer';
 import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quiz-map';
-import { HVAC_COURSE_ID, HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
+import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
 import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
-import { HVAC_VIDEO_MAP } from '@/lib/courses/hvac-video-map';
-import { HVAC_LESSON_NUMBER_TO_DEF_ID } from '@/lib/courses/hvac-lesson-number-map';
 import dynamic from 'next/dynamic';
+import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
+import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
 
-const HvacLessonVideo = dynamic(
-  () => import('@/components/lms/HvacLessonVideo'),
+const LessonVideoWithSimulation = dynamic(
+  () => import('@/components/lms/LessonVideoWithSimulation'),
   { ssr: false }
 );
 
@@ -51,10 +52,11 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
-  const lessonOpenedAt = React.useRef<number>(Date.now());
+  const [completionError, setCompletionError] = useState<string | null>(null);
+  const lessonStartTime = React.useRef(Date.now());
 
   useEffect(() => {
-    lessonOpenedAt.current = Date.now();
+    lessonStartTime.current = Date.now();
     fetchLessonData();
   }, [lessonId]);
 
@@ -62,19 +64,19 @@ export default function LessonPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
-    // Check enrollment approval status first
+    // Check enrollment via server API (bypasses RLS — no student SELECT policy on training_enrollments)
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: enrollment } = await supabase
-        .from('training_enrollments')
-        .select('status, approved_at')
-        .eq('user_id', user.id)
-        .eq('course_id', courseId)
-        .maybeSingle();
+      try {
+        const enrollRes = await fetch(`/api/lms/enrollment-status?courseId=${courseId}`);
+        const enrollData = enrollRes.ok ? await enrollRes.json() : null;
 
-      if (!enrollment || (!enrollment.approved_at && enrollment.status === 'pending_approval')) {
-        setEnrollmentBlocked(true);
-        return;
+        if (!enrollData?.enrolled || enrollData.status === 'pending_approval') {
+          setEnrollmentBlocked(true);
+          return;
+        }
+      } catch {
+        // Network error — don't block, let lesson load attempt continue
       }
     }
 
@@ -166,11 +168,11 @@ export default function LessonPage() {
   const markComplete = async () => {
     const newStatus = !isCompleted;
     setIsCompleted(newStatus);
+    setCompletionError(null);
 
     try {
       if (newStatus) {
-        // Send real elapsed time so the API minimum-seat-time check passes
-        const elapsedSeconds = Math.floor((Date.now() - lessonOpenedAt.current) / 1000);
+        const elapsedSeconds = Math.round((Date.now() - lessonStartTime.current) / 1000);
         const response = await fetch(`/api/lessons/${lessonId}/complete`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -179,6 +181,17 @@ export default function LessonPage() {
 
         if (!response.ok) {
           setIsCompleted(false);
+          try {
+            const err = await response.json();
+            if (err.required && err.actual != null) {
+              const remaining = Math.ceil((err.required - err.actual) / 60);
+              setCompletionError(`Please spend at least ${remaining} more minute${remaining !== 1 ? 's' : ''} on this lesson before marking it complete.`);
+            } else {
+              setCompletionError(err.message || err.error || 'Unable to mark complete. Please try again.');
+            }
+          } catch {
+            setCompletionError('Unable to mark complete. Please try again.');
+          }
           return;
         }
 
@@ -463,9 +476,10 @@ export default function LessonPage() {
             />
           </div>
         ) : lesson.content_type === 'quiz' && (lesson.quiz_questions?.length > 0 || lesson.quiz_id) ? (
-          <div className="max-w-4xl mx-auto p-8">
-            <QuizSystem
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <QuizPlayer
               questions={lesson.quiz_questions || []}
+              title={lesson.title}
               onComplete={async (score) => {
                 if (score >= (lesson.passing_score || 70)) {
                   markComplete();
@@ -474,39 +488,87 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
-        ) : (lesson.video_url && !lesson.video_url.includes('/generated/lessons/')) || (courseId === HVAC_COURSE_ID && lesson.lesson_number && HVAC_VIDEO_MAP[HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number]]) ? (
+        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') && lessonUuidToSimulationKey[lessonId] ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
-            {(() => {
-              const defId = lesson.lesson_number ? HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number] : undefined;
-              const hvacVideo = defId ? HVAC_VIDEO_MAP[defId] : undefined;
-
-              const completeHandler = () => { if (!isCompleted) { setIsCompleted(true); markComplete(); } };
-
-              if (courseId === HVAC_COURSE_ID && defId && hvacVideo) {
-                return (
-                  <HvacLessonVideo
-                    lessonDefId={defId}
-                    brollVideoUrl={hvacVideo.videoUrl}
-                    lessonTitle={lesson.title}
-                    onProgress={(pct) => { if (pct >= 90) completeHandler(); }}
-                    onComplete={completeHandler}
-                  />
-                );
-              }
-
-              return (
-                <InteractiveVideoPlayer
-                  videoUrl={lesson.video_url}
-                  title={lesson.title}
-                  onComplete={completeHandler}
-                />
-              );
-            })()}
+            {/* Video + 3D simulation lesson */}
+            <LessonVideoWithSimulation
+              lessonKey={lessonUuidToSimulationKey[lessonId]}
+              videoUrl={lesson.video_url}
+              minimumTimeSeconds={120}
+              onMinimumTimeReached={() => {
+                // Simulation unlocked — no action needed yet
+              }}
+              onSimulationComplete={() => {
+                if (!isCompleted) {
+                  setIsCompleted(true);
+                  markComplete();
+                }
+              }}
+            />
+            {/* Show lesson content below simulation */}
             {lesson.content && (
               <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
                 <div
                   className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            )}
+            {/* Quick Check quiz below simulation lessons */}
+            {HVAC_QUICK_CHECKS[lessonId] && (
+              <div className="mt-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <ClipboardList className="w-6 h-6 text-brand-blue-600" />
+                  Quick Check — Test Your Understanding
+                </h3>
+                <QuizPlayer
+                  questions={HVAC_QUICK_CHECKS[lessonId]}
+                  title="Quick Check"
+                  passingScore={60}
+                  onComplete={(score) => {
+                    console.log('Quick check score:', score);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : lesson.video_url && !lesson.video_url.includes('/generated/lessons/') ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            {/* Video/audio lesson with real media file */}
+            <InteractiveVideoPlayer
+              videoUrl={lesson.video_url}
+              title={lesson.title}
+              onComplete={() => {
+                if (!isCompleted) {
+                  setIsCompleted(true);
+                  markComplete();
+                }
+              }}
+            />
+            {/* Show lesson content below video */}
+            {lesson.content && (
+              <div className="mt-6 bg-white rounded-xl p-8 shadow-sm">
+                <div
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                />
+              </div>
+            )}
+            {/* Quick Check quiz below video lessons */}
+            {HVAC_QUICK_CHECKS[lessonId] && (
+              <div className="mt-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <ClipboardList className="w-6 h-6 text-brand-blue-600" />
+                  Quick Check — Test Your Understanding
+                </h3>
+                <QuizPlayer
+                  questions={HVAC_QUICK_CHECKS[lessonId]}
+                  title="Quick Check"
+                  passingScore={60}
+                  onComplete={(score) => {
+                    // Quick checks don't block progress — just reinforcement
+                    console.log('Quick check score:', score);
+                  }}
                 />
               </div>
             )}
@@ -550,6 +612,11 @@ export default function LessonPage() {
               {isCompleted ? '• Completed' : 'Mark as Complete'}
             </button>
           </div>
+          {completionError && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+              {completionError}
+            </div>
+          )}
 
           {/* Tabs */}
           <div className="border-b border-slate-200 mb-6">

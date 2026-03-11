@@ -111,7 +111,8 @@ export default async function CoursePage({ params }: { params: Params }) {
     .eq('course_id', courseId)
     .maybeSingle();
 
-  const isPendingApproval = enrollment?.status === 'pending_approval' || (enrollment && !enrollment.approved_at);
+  // Only block if explicitly pending_approval — self-enrolled students get status 'active' with no approved_at
+  const isPendingApproval = enrollment?.status === 'pending_approval';
 
   // Fetch lessons
   const { data: lessons } = await db

@@ -263,10 +263,10 @@ export async function proxy(request: NextRequest) {
   // ============================================
 
   // Education domain routing (elevateforhumanityeducation.com)
-  // Root -> /education landing page; all other routes pass through to the full site
+  // Root -> /admin dashboard; all other routes pass through to the full site
   if (host.includes(EDUCATION_DOMAIN)) {
     if (pathname === '/' || pathname === '') {
-      return NextResponse.rewrite(new URL('/education', request.url));
+      return NextResponse.rewrite(new URL('/admin', request.url));
     }
     return NextResponse.next();
   }

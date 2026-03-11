@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { appendSessionEvent } from '@/lib/proctor/session-events';
 
 const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
@@ -138,6 +139,9 @@ async function _POST(req: NextRequest) {
         proctor_notes: proctor_notes || null,
         delivery_method: effectiveDelivery,
         evidence_url: evidence_url || null,
+        evidence_storage_key: body.evidence_storage_key || null,
+        evidence_hash: body.evidence_hash || null,
+        evidence_uploaded_at: evidence_url ? new Date().toISOString() : null,
         is_retest: isRetest,
         status: 'checked_in',
         result: 'pending',
@@ -148,6 +152,19 @@ async function _POST(req: NextRequest) {
     if (error) {
       logger.error('[Proctor] Failed to create session:', error.message);
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
+    }
+
+    // Append immutable chain-of-custody events
+    await appendSessionEvent(db, data.id, 'session_created', profile.id, profile.role, {
+      provider, exam_name, delivery_method: effectiveDelivery, student_name,
+    });
+    if (isRetest) {
+      await appendSessionEvent(db, data.id, 'retest_detected', profile.id, profile.role, { provider });
+    }
+    if (evidence_url) {
+      await appendSessionEvent(db, data.id, 'recording_uploaded', profile.id, profile.role, {
+        evidence_url, evidence_storage_key: body.evidence_storage_key || null,
+      });
     }
 
     logger.info(`[Proctor] Session created: ${data.id} for ${student_name} — ${exam_name}${isRetest ? ' (retest)' : ''}`);

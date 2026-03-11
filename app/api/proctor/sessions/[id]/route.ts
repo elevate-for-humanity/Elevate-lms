@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { appendSessionEvent } from '@/lib/proctor/session-events';
 
 const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
@@ -112,11 +113,16 @@ async function _PATCH(
     const allowed = [
       'status', 'result', 'score', 'started_at', 'completed_at',
       'proctor_notes', 'id_verified', 'id_type', 'id_notes',
-      'evidence_url', 'delivery_method',
+      'evidence_url', 'evidence_storage_key', 'evidence_hash', 'delivery_method',
     ];
     const updates: Record<string, unknown> = {};
     for (const key of allowed) {
       if (key in body) updates[key] = body[key];
+    }
+
+    // Stamp evidence_uploaded_at when evidence_url is first set
+    if (body.evidence_url && !current.evidence_url) {
+      updates.evidence_uploaded_at = new Date().toISOString();
     }
 
     if (Object.keys(updates).length === 0) {
@@ -133,6 +139,33 @@ async function _PATCH(
     if (error) {
       logger.error('[Proctor] Failed to update session:', error.message);
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+    }
+
+    // Append chain-of-custody events for significant state changes
+    const { profile } = ctx;
+    if (body.id_verified === true && !current.id_verified) {
+      await appendSessionEvent(db, id, 'id_verified', profile.id, profile.role, {
+        id_type: body.id_type ?? current.id_type,
+      });
+    }
+    if (body.started_at && !current.started_at) {
+      await appendSessionEvent(db, id, 'exam_started', profile.id, profile.role, {});
+    }
+    if (body.evidence_url && !current.evidence_url) {
+      await appendSessionEvent(db, id, 'recording_uploaded', profile.id, profile.role, {
+        evidence_url: body.evidence_url,
+        evidence_storage_key: body.evidence_storage_key ?? null,
+      });
+    }
+    if (body.result && body.result !== 'pending' && current.result === 'pending') {
+      await appendSessionEvent(db, id, 'result_recorded', profile.id, profile.role, {
+        result: body.result, score: body.score ?? null,
+      });
+    }
+    if (body.status === 'voided' && current.status !== 'voided') {
+      await appendSessionEvent(db, id, 'session_voided', profile.id, profile.role, {
+        reason: body.proctor_notes ?? null,
+      });
     }
 
     logger.info(`[Proctor] Session ${id} updated: result=${incomingResult}, id_verified=${incomingIdVerified}`);

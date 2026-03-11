@@ -23,19 +23,28 @@ export interface HvacLesson {
   durationMin:    number;
 }
 
-function parseCSVRow(line: string): string[] {
-  const cols: string[] = [];
-  let cur = '', inQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"' && !inQuote)                        { inQuote = true;  continue; }
-    if (c === '"' && inQuote && line[i + 1] === '"')  { cur += '"'; i++; continue; }
-    if (c === '"' && inQuote)                         { inQuote = false; continue; }
-    if (c === ',' && !inQuote)                        { cols.push(cur); cur = ''; continue; }
-    cur += c;
+/** RFC 4180-compliant CSV parser — handles quoted fields with embedded commas and newlines. */
+function parseCSV(raw: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cur = '';
+  let inQuote = false;
+  let i = 0;
+  while (i < raw.length) {
+    const c = raw[i];
+    if (inQuote) {
+      if (c === '"' && raw[i + 1] === '"') { cur += '"'; i += 2; continue; }
+      if (c === '"')                        { inQuote = false; i++; continue; }
+      cur += c; i++; continue;
+    }
+    if (c === '"')  { inQuote = true; i++; continue; }
+    if (c === ',')  { row.push(cur); cur = ''; i++; continue; }
+    if (c === '\r' && raw[i + 1] === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; i += 2; continue; }
+    if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; i++; continue; }
+    cur += c; i++;
   }
-  cols.push(cur);
-  return cols;
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
 }
 
 let _cache: HvacLesson[] | null = null;
@@ -44,21 +53,12 @@ export function getAllHvacLessons(): HvacLesson[] {
   if (_cache) return _cache;
 
   const csvPath = path.join(process.cwd(), 'data', 'hvac-master-curriculum.csv');
-
-  // Use Python for reliable CSV parsing — handles quoted fields with embedded
-  // commas and newlines that the hand-rolled JS parser breaks on.
-  const { execSync } = require('child_process') as typeof import('child_process');
-  const jsonStr = execSync(
-    `python3 -c "
-import csv, json, sys
-with open('${csvPath.replace(/\\/g, '/')}') as f:
-    rows = list(csv.DictReader(f))
-sys.stdout.write(json.dumps(rows))
-"`,
-    { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
-  );
-
-  const rows: Record<string, string>[] = JSON.parse(jsonStr);
+  const raw = readFileSync(csvPath, 'utf8');
+  const parsed = parseCSV(raw);
+  const headers = parsed[0];
+  const rows: Record<string, string>[] = parsed.slice(1)
+    .filter(r => r.length === headers.length && r[0])
+    .map(r => Object.fromEntries(headers.map((h, i) => [h, r[i] ?? ''])));
 
   _cache = rows.map(row => ({
     lessonId:      row['Lesson_ID']          ?? '',

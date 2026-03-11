@@ -31,9 +31,10 @@ export async function generateStaticParams() {
 
 // ── Metadata ─────────────────────────────────────────────────────────────────
 export async function generateMetadata(
-  { params }: { params: { lessonId: string } }
+  { params }: { params: Promise<{ lessonId: string }> }
 ): Promise<Metadata> {
-  const lesson = getHvacLesson(params.lessonId);
+  const { lessonId } = await params;
+  const lesson = getHvacLesson(lessonId);
   if (!lesson) return { title: 'Lesson Not Found' };
   return {
     title: `${lesson.lessonTitle} | HVAC Training | Elevate for Humanity`,
@@ -42,8 +43,9 @@ export async function generateMetadata(
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────
-export default function HvacLessonPage({ params }: { params: { lessonId: string } }) {
-  const lesson = getHvacLesson(params.lessonId);
+export default async function HvacLessonPage({ params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
+  const lesson = getHvacLesson(lessonId);
   if (!lesson) notFound();
 
   const allLessons = getAllHvacLessons();
@@ -155,7 +157,6 @@ export default function HvacLessonPage({ params }: { params: { lessonId: string 
                 alt={`${lesson.lessonTitle} diagram`}
                 fill
                 className="object-contain p-2"
-                onError={() => {/* fallback handled by CSS */}}
               />
             </div>
           </div>

@@ -163,6 +163,26 @@ export interface ProgramSchema {
   badge?: string;
   badgeColor?: 'red' | 'green' | 'blue' | 'orange' | 'purple';
 
+  // ─── Enrollment Tracks ───────────────────────────────────────────
+  /** Two-track enrollment: funded (Indiana) vs self-pay (national) */
+  enrollmentTracks?: {
+    funded: {
+      label: string;           // e.g. "Indiana Residents — Workforce Funded"
+      requirement: string;     // e.g. "Must reside in Indiana"
+      description: string;
+      applyHref: string;
+      available: true;
+    };
+    selfPay: {
+      label: string;           // e.g. "All States — Self-Pay"
+      cost: string;            // e.g. "$5,000"
+      description: string;
+      applyHref: string;
+      available: boolean;      // false = coming soon
+      comingSoonMessage?: string;
+    };
+  };
+
   // ─── B. Credentials Earned (3–6) ────────────────────────────────
   credentials: ProgramCredential[];
 

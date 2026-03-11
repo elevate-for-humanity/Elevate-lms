@@ -212,6 +212,105 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
         </div>
       </section>
 
+      {/* ═══ ENROLLMENT TRACKS ══════════════════════════════════════ */}
+      {p.enrollmentTracks && (
+        <section className="py-14 bg-slate-50 border-y border-slate-200">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-2">How to Enroll</h2>
+              <p className="text-slate-500 text-base max-w-2xl mx-auto">
+                Workforce funding is available for Indiana residents. Students from other states can enroll through the self-pay option.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+
+              {/* Track 1: Indiana funded */}
+              <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Workforce Funded
+                  </span>
+                </div>
+                <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.funded.label}</h3>
+                <p className="text-xs font-semibold text-brand-green-700 mb-3">
+                  ✓ {p.enrollmentTracks.funded.requirement}
+                </p>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
+                  {p.enrollmentTracks.funded.description}
+                </p>
+                <div className="space-y-2">
+                  <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Eligible programs include</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map(prog => (
+                      <span key={prog} className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg">{prog}</span>
+                    ))}
+                  </div>
+                  <Link
+                    href={p.enrollmentTracks.funded.applyHref}
+                    className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                  >
+                    Apply — Check My Eligibility
+                  </Link>
+                  <p className="text-center text-xs text-slate-400 mt-1">Free to apply · eligibility verified before enrollment</p>
+                </div>
+              </div>
+
+              {/* Track 2: Self-pay national */}
+              <div className={`bg-white rounded-2xl border-2 shadow-sm p-7 flex flex-col ${p.enrollmentTracks.selfPay.available ? 'border-brand-blue-400' : 'border-slate-200'}`}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${p.enrollmentTracks.selfPay.available ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-500'}`}>
+                    {p.enrollmentTracks.selfPay.available ? 'Self-Pay' : 'Coming Soon'}
+                  </span>
+                </div>
+                <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.selfPay.label}</h3>
+                <p className="text-2xl font-extrabold text-slate-900 mb-3">
+                  {p.enrollmentTracks.selfPay.cost}
+                  <span className="text-sm font-normal text-slate-400 ml-1">tuition</span>
+                </p>
+                <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">
+                  {p.enrollmentTracks.selfPay.description}
+                </p>
+                <div className="bg-slate-50 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1.5">
+                  <p className="font-semibold text-slate-700 text-xs uppercase tracking-wider mb-2">What you get</p>
+                  <p>✓ Full online HVAC training curriculum</p>
+                  <p>✓ Prepares for EPA Section 608 Universal certification</p>
+                  <p>✓ OSHA 10-Hour included</p>
+                  <p>✓ Exam proctored on-site at Elevate (Indianapolis)</p>
+                </div>
+                {p.enrollmentTracks.selfPay.available ? (
+                  <Link
+                    href={p.enrollmentTracks.selfPay.applyHref}
+                    className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                  >
+                    Enroll — Self-Pay
+                  </Link>
+                ) : (
+                  <div>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3 text-sm text-amber-800">
+                      {p.enrollmentTracks.selfPay.comingSoonMessage}
+                    </div>
+                    <Link
+                      href="/contact?subject=hvac-self-pay-waitlist"
+                      className="block w-full text-center border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 hover:text-brand-blue-700 font-bold py-3.5 rounded-xl transition-colors text-sm"
+                    >
+                      Join the Waitlist
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* Expansion note */}
+            <p className="text-center text-slate-400 text-sm mt-8">
+              Workforce-funded training currently available for Indiana residents.
+              Additional states will be added as partnerships develop.
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* ═══ CTA ════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden py-16" style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #dc2626 100%)' }}>
         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10" />

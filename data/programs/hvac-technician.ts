@@ -42,6 +42,27 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   badge: 'Grant Funded',
   badgeColor: 'green',
 
+  enrollmentTracks: {
+    funded: {
+      label: 'Indiana Residents — Workforce Funded',
+      requirement: 'Must reside in Indiana',
+      description:
+        'Indiana residents may qualify for full tuition coverage through WorkOne, WIOA, or other state workforce development programs. Enrollment requires eligibility verification before a seat is confirmed.',
+      applyHref: '/apply?program=hvac-technician&track=funded',
+      available: true,
+    },
+    selfPay: {
+      label: 'All States — Self-Pay',
+      cost: '$5,000',
+      description:
+        'This training is currently funded for Indiana residents. Students from other states are welcome to enroll through the self-pay option. The program prepares you for the EPA Section 608 Technician Certification — a federal requirement for anyone handling refrigerants.',
+      applyHref: '/apply?program=hvac-technician&track=self-pay',
+      available: false,
+      comingSoonMessage:
+        'Self-pay enrollment is coming soon. Leave your contact info and we will notify you when your state becomes available.',
+    },
+  },
+
   // ─── B. Credentials Earned ───────────────────────────────────────
   credentials: [
     {

@@ -106,6 +106,7 @@ async function _POST(request: NextRequest) {
         programs_requested: programsRequested,
         agreed_to_terms: true,
         status: 'pending',
+        intake: {},
       })
       .select()
       .single();

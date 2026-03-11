@@ -48,7 +48,10 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    logger.error('[Testing] Failed to update booking:', error.message);
+    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+  }
 
   // Send confirmation email when status changes to 'confirmed'
   if (status === 'confirmed' && booking) {

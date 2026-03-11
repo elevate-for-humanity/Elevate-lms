@@ -24,6 +24,26 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    // Verify shared secret — set MILADY_WEBHOOK_SECRET and append as ?secret=<value>
+    // in the SendGrid/Resend inbound parse URL configuration.
+    const webhookSecret = process.env.MILADY_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const url = new URL((request as any).url || 'http://localhost');
+      const provided = url.searchParams.get('secret')
+        || (request.headers as any).get?.('x-webhook-secret')
+        || '';
+      const { timingSafeEqual } = await import('crypto');
+      const match = provided.length === webhookSecret.length &&
+        timingSafeEqual(Buffer.from(provided), Buffer.from(webhookSecret));
+      if (!match) {
+        logger.error('[milady-email] Unauthorized request — secret mismatch');
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    } else {
+      logger.warn('[milady-email] MILADY_WEBHOOK_SECRET not set — endpoint is unauthenticated');
+    }
+
   try {
     const formData = await request.formData();
     

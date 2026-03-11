@@ -238,11 +238,40 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    // Verify webhook signature (Calendly uses a signing key)
-    const signature = request.headers.get('calendly-webhook-signature');
-    // In production, verify this signature against CALENDLY_WEBHOOK_SECRET
-    
-    const event: CalendlyEvent = await request.json();
+    // Verify Calendly webhook signature (HMAC-SHA256, t=timestamp.v1=sig format)
+    const sigHeader = request.headers.get('calendly-webhook-signature');
+    const webhookSecret = process.env.CALENDLY_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      logger.error('[Calendly Webhook] CALENDLY_WEBHOOK_SECRET not configured — rejecting request');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+    }
+    if (!sigHeader) {
+      logger.warn('[Calendly Webhook] Missing signature header');
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+    // Parse "t=<timestamp>,v1=<signature>"
+    const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
+    const timestamp = parts['t'];
+    const receivedSig = parts['v1'];
+    if (!timestamp || !receivedSig) {
+      logger.warn('[Calendly Webhook] Malformed signature header');
+      return NextResponse.json({ error: 'Invalid signature format' }, { status: 401 });
+    }
+    // Reject stale webhooks (>5 min)
+    if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {
+      logger.warn('[Calendly Webhook] Stale timestamp rejected');
+      return NextResponse.json({ error: 'Request too old' }, { status: 401 });
+    }
+    const rawBody = await request.text();
+    const { createHmac, timingSafeEqual } = await import('crypto');
+    const expected = createHmac('sha256', webhookSecret)
+      .update(`${timestamp}.${rawBody}`)
+      .digest('hex');
+    if (!timingSafeEqual(Buffer.from(receivedSig, 'hex'), Buffer.from(expected, 'hex'))) {
+      logger.error('[Calendly Webhook] Signature mismatch — rejecting');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+    const event: CalendlyEvent = JSON.parse(rawBody);
     
     logger.info('[Calendly Webhook] Received event:', event.event);
     

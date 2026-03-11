@@ -26,7 +26,49 @@ const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
  */
 async function _POST(request: NextRequest) {
   try {
-    const event = await request.json();
+    // Resend delivers webhooks via Svix — verify HMAC-SHA256 signature.
+    // Set RESEND_WEBHOOK_SECRET from Resend Dashboard → Webhooks → Signing Secret.
+    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      logger.error('[Resend Inbound] RESEND_WEBHOOK_SECRET not configured — rejecting request');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+    }
+
+    const svixId = request.headers.get('svix-id');
+    const svixTimestamp = request.headers.get('svix-timestamp');
+    const svixSignature = request.headers.get('svix-signature');
+
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      logger.warn('[Resend Inbound] Missing Svix signature headers');
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+
+    // Reject stale webhooks (>5 min)
+    if (Math.abs(Date.now() / 1000 - Number(svixTimestamp)) > 300) {
+      logger.warn('[Resend Inbound] Stale timestamp rejected');
+      return NextResponse.json({ error: 'Request too old' }, { status: 401 });
+    }
+
+    const rawBody = await request.text();
+    const { createHmac, timingSafeEqual } = await import('crypto');
+    // Svix signs: "<svix-id>.<svix-timestamp>.<body>"
+    const toSign = `${svixId}.${svixTimestamp}.${rawBody}`;
+    // Secret is base64-encoded after the "whsec_" prefix
+    const secretBytes = Buffer.from(webhookSecret.replace(/^whsec_/, ''), 'base64');
+    const expected = createHmac('sha256', secretBytes).update(toSign).digest('base64');
+    // svix-signature may contain multiple space-separated "v1,<sig>" values
+    const signatures = svixSignature.split(' ').map(s => s.replace(/^v1,/, ''));
+    const valid = signatures.some(sig => {
+      try {
+        return timingSafeEqual(Buffer.from(sig, 'base64'), Buffer.from(expected, 'base64'));
+      } catch { return false; }
+    });
+    if (!valid) {
+      logger.error('[Resend Inbound] Signature mismatch — rejecting');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const event = JSON.parse(rawBody);
 
     if (event.type !== 'email.received') {
       return NextResponse.json({ ok: true, skipped: true });

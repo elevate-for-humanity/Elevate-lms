@@ -250,19 +250,19 @@
 
 # ============================================
 # LMS DOMAIN (elevateforhumanityeducation.com)
-# Root -> /lms (student learning management system)
+# Root -> /admin dashboard
 # All sub-routes pass through to the full site
 # ============================================
 
 [[redirects]]
   from = "https://elevateforhumanityeducation.com"
-  to = "https://www.elevateforhumanity.org/lms"
+  to = "https://www.elevateforhumanity.org/admin"
   status = 200
   force = true
 
 [[redirects]]
   from = "https://www.elevateforhumanityeducation.com"
-  to = "https://www.elevateforhumanity.org/lms"
+  to = "https://www.elevateforhumanity.org/admin"
   status = 200
   force = true
 

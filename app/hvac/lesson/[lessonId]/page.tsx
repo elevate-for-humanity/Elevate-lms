@@ -1,17 +1,6 @@
 /**
- * Dynamic HVAC lesson template.
- * Loads ALL lesson data from data/hvac-master-curriculum.csv.
- * One template serves all 95 lessons — no hardcoded lesson pages.
- *
- * Columns read from CSV:
- *   Lesson_ID, Module, Lesson_Order, Lesson_Title, Script_Text,
- *   Diagram_File, Video_File, Audio_File, Quiz_Question, Quiz_Answer,
- *   Key_Concept, Lesson_Duration_Min
- *
- * Media paths (canonical):
- *   Video:   /hvac/videos/lesson-{uuid}.mp4
- *   Audio:   /hvac/audio/lesson-{uuid}.mp3
- *   Diagram: /hvac/diagrams/{Diagram_File}
+ * HVAC Lesson Page — visual-first learning layout.
+ * Full-width video hero → key concept callout → diagram → script → interactive quiz → nav.
  */
 
 import { notFound } from 'next/navigation';
@@ -22,14 +11,13 @@ import { getAllHvacLessons, getHvacLesson } from '@/lib/courses/hvac-csv-loader'
 import { HVAC_LESSON_UUID } from '@/lib/courses/hvac-uuids';
 import { HVAC_QUIZ_MAP } from '@/lib/courses/hvac-quizzes';
 import { EPA_608_LESSON_TAGS } from '@/lib/courses/hvac-epa-tags';
+import HvacVideoPlayer from '@/components/lms/HvacVideoPlayer';
+import HvacQuizBlock from '@/components/lms/HvacQuizBlock';
 
-// ── Static params — pre-render all 95 lesson pages ───────────────────────────
 export async function generateStaticParams() {
-  const lessons = getAllHvacLessons();
-  return lessons.map(l => ({ lessonId: l.lessonId }));
+  return getAllHvacLessons().map(l => ({ lessonId: l.lessonId }));
 }
 
-// ── Metadata ─────────────────────────────────────────────────────────────────
 export async function generateMetadata(
   { params }: { params: Promise<{ lessonId: string }> }
 ): Promise<Metadata> {
@@ -37,227 +25,207 @@ export async function generateMetadata(
   const lesson = getHvacLesson(lessonId);
   if (!lesson) return { title: 'Lesson Not Found' };
   return {
-    title: `${lesson.lessonTitle} | HVAC Training | Elevate for Humanity`,
+    title: `${lesson.lessonTitle} | HVAC Training`,
     description: lesson.keyConcept,
   };
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default async function HvacLessonPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
   const lesson = getHvacLesson(lessonId);
   if (!lesson) notFound();
 
-  const allLessons = getAllHvacLessons();
-  const currentIdx = allLessons.findIndex(l => l.lessonId === lesson.lessonId);
-  const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
-  const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
-
-  // Resolve UUID → canonical media paths
-  const uuid = HVAC_LESSON_UUID[lesson.lessonId];
-  const videoUrl  = uuid ? `/hvac/videos/lesson-${uuid}.mp4`  : null;
-  const audioUrl  = uuid ? `/hvac/audio/lesson-${uuid}.mp3`   : null;
-  const diagramUrl = `/hvac/diagrams/${lesson.diagramFile}`;
-
-  // Quiz questions from HVAC_QUIZ_MAP (keyed by lessonId)
-  const quizQuestions = HVAC_QUIZ_MAP[lesson.lessonId] ?? null;
-
-  // EPA 608 tags for this lesson
-  const epaTags = EPA_608_LESSON_TAGS[lesson.lessonId] ?? [];
-
-  // Module progress
+  const allLessons    = getAllHvacLessons();
+  const currentIdx    = allLessons.findIndex(l => l.lessonId === lesson.lessonId);
+  const prevLesson    = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
+  const nextLesson    = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
   const moduleLessons = allLessons.filter(l => l.module === lesson.module);
-  const moduleIdx = moduleLessons.findIndex(l => l.lessonId === lesson.lessonId);
+  const moduleIdx     = moduleLessons.findIndex(l => l.lessonId === lesson.lessonId);
+
+  const uuid       = HVAC_LESSON_UUID[lesson.lessonId];
+  const videoUrl   = lesson.videoFile ? `/${lesson.videoFile}` : uuid ? `/hvac/videos/lesson-${uuid}.mp4` : null;
+  const audioUrl   = lesson.audioFile ? `/${lesson.audioFile}` : uuid ? `/hvac/audio/lesson-${uuid}.mp3` : null;
+  const diagramUrl = lesson.diagramFile ? `/hvac/diagrams/${lesson.diagramFile}` : null;
+
+  const quizQuestions = HVAC_QUIZ_MAP[lesson.lessonId] ?? null;
+  const epaTags       = EPA_608_LESSON_TAGS[lesson.lessonId] ?? [];
+
+  // Break script into readable paragraphs
+  const scriptParagraphs = lesson.scriptText
+    ? lesson.scriptText.split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
+    : [];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-slate-950 text-white">
 
-      {/* ── Top nav ── */}
-      <div className="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3 text-sm">
-          <Link href="/hvac" className="text-slate-400 hover:text-white">← HVAC Course</Link>
-          <span className="text-slate-600">/</span>
-          <span className="text-sky-400 font-semibold">{lesson.module}</span>
+      {/* ── Slim top nav ── */}
+      <nav className="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-sm">
+        <div className="flex items-center gap-2 text-slate-400">
+          <Link href="/hvac" className="hover:text-white transition-colors">← HVAC Course</Link>
+          <span className="text-slate-700">/</span>
+          <span className="text-sky-400 truncate max-w-[200px]">{lesson.module}</span>
         </div>
-        <span className="text-slate-400 text-sm">
-          Lesson {lesson.lessonOrder} · {lesson.durationMin} min
-        </span>
+        <div className="flex items-center gap-3">
+          {epaTags.map(tag => (
+            <span key={tag} className="bg-amber-900/50 border border-amber-600/50 text-amber-300 text-xs font-bold px-2 py-0.5 rounded">
+              EPA {tag}
+            </span>
+          ))}
+          <span className="text-slate-500 text-xs">{lesson.durationMin} min</span>
+        </div>
+      </nav>
+
+      {/* ── HERO: Full-width video ── */}
+      <div className="w-full bg-black">
+        {videoUrl ? (
+          <HvacVideoPlayer
+            videoUrl={videoUrl}
+            audioUrl={audioUrl}
+            posterUrl={diagramUrl ?? ''}
+            title={lesson.lessonTitle}
+          />
+        ) : audioUrl ? (
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <audio controls preload="metadata" className="w-full">
+              <source src={audioUrl} type="audio/mpeg" />
+            </audio>
+          </div>
+        ) : diagramUrl ? (
+          <div className="relative w-full aspect-video bg-slate-900">
+            <Image src={diagramUrl} alt={lesson.lessonTitle} fill className="object-contain" />
+          </div>
+        ) : null}
       </div>
 
-      {/* ── Lesson title bar ── */}
-      <div className="bg-slate-800 border-b border-slate-700 px-6 py-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-white">{lesson.lessonTitle}</h1>
-            <p className="text-slate-400 text-sm mt-1">{lesson.module}</p>
+      {/* ── Title + progress ── */}
+      <div className="bg-slate-900 border-b border-slate-800 px-4 py-4">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold text-white">{lesson.lessonTitle}</h1>
+          <div className="flex items-center gap-4 mt-1">
+            <span className="text-slate-400 text-sm">{lesson.module}</span>
+            <span className="text-slate-600 text-xs">Lesson {lesson.lessonOrder} of {moduleLessons.length}</span>
           </div>
-          {/* EPA 608 tags */}
-          {epaTags.length > 0 && (
-            <div className="flex gap-2 flex-wrap">
-              {epaTags.map(tag => (
-                <span key={tag} className="bg-amber-900/40 border border-amber-600/50 text-amber-300 text-xs font-semibold px-2 py-1 rounded">
-                  EPA 608 {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-        {/* Module progress bar */}
-        <div className="mt-3">
-          <div className="flex justify-between text-xs text-slate-500 mb-1">
-            <span>Module progress</span>
-            <span>{moduleIdx + 1} / {moduleLessons.length}</span>
-          </div>
-          <div className="h-1.5 bg-slate-700 rounded-full">
+          <div className="mt-3 h-1 bg-slate-800 rounded-full">
             <div
-              className="h-1.5 bg-sky-500 rounded-full transition-all"
+              className="h-1 bg-sky-500 rounded-full"
               style={{ width: `${((moduleIdx + 1) / moduleLessons.length) * 100}%` }}
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
 
-        {/* ── SPEC LAYOUT: instructor left | diagram right | concept bottom ── */}
-        {videoUrl ? (
-          <div className="rounded-xl overflow-hidden shadow-2xl bg-black">
-            <video
-              controls
-              className="w-full aspect-video"
-              poster={diagramUrl}
-            >
-              <source src={videoUrl} type="video/mp4" />
-              {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
-            </video>
-          </div>
-        ) : (
-          <div className="rounded-xl bg-slate-800 border border-slate-700 aspect-video flex items-center justify-center">
-            <p className="text-slate-500">Video not yet available for this lesson</p>
+        {/* ── KEY CONCEPT — first thing they read ── */}
+        {lesson.keyConcept && (
+          <div className="bg-sky-950 border-l-4 border-sky-400 rounded-r-2xl px-6 py-5">
+            <p className="text-sky-400 text-xs font-bold uppercase tracking-widest mb-2">Key Concept</p>
+            <p className="text-white text-xl font-semibold leading-snug">{lesson.keyConcept}</p>
           </div>
         )}
 
-        {/* ── Two-column: Script_Text left | Diagram right ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-          {/* LEFT: Script_Text from CSV — real teaching content */}
-          <div className="bg-slate-800 rounded-xl p-6">
-            <h2 className="text-sky-400 font-bold text-lg mb-4">Lesson Content</h2>
-            <div className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">
-              {lesson.scriptText}
-            </div>
-          </div>
-
-          {/* RIGHT: Diagram from /hvac/diagrams/ */}
-          <div className="bg-slate-800 rounded-xl p-6">
-            <h2 className="text-sky-400 font-bold text-lg mb-4">System Diagram</h2>
-            <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-slate-700">
+        {/* ── DIAGRAM ── */}
+        {diagramUrl && (
+          <div>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">System Diagram</p>
+            <div className="rounded-2xl overflow-hidden bg-slate-800 border border-slate-700">
               <Image
                 src={diagramUrl}
                 alt={`${lesson.lessonTitle} diagram`}
-                fill
-                className="object-contain p-2"
+                width={1200}
+                height={675}
+                className="w-full h-auto object-contain"
               />
             </div>
           </div>
-        </div>
+        )}
 
-        {/* ── BOTTOM: Key Concept from CSV ── */}
-        <div className="bg-slate-700 rounded-xl p-5 border-l-4 border-sky-500">
-          <p className="text-sky-400 font-bold text-xs uppercase tracking-widest mb-2">Key Concept</p>
-          <p className="text-white text-base leading-relaxed">{lesson.keyConcept}</p>
-        </div>
+        {/* ── LESSON CONTENT — scannable, not a wall of text ── */}
+        {scriptParagraphs.length > 0 && (
+          <div>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Lesson Content</p>
+            <div className="space-y-4">
+              {scriptParagraphs.map((para, i) => {
+                const isHeader = para.endsWith(':') && para.length < 80;
+                if (isHeader) {
+                  return <h3 key={i} className="text-sky-300 font-bold text-base mt-6 first:mt-0">{para}</h3>;
+                }
+                if (para.includes('\n-') || para.startsWith('-') || para.startsWith('•')) {
+                  return (
+                    <ul key={i} className="space-y-2">
+                      {para.split('\n').filter(Boolean).map((item, j) => (
+                        <li key={j} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
+                          <span className="text-sky-500 mt-1 flex-shrink-0">▸</span>
+                          <span>{item.replace(/^[-•]\s*/, '')}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                }
+                return <p key={i} className="text-slate-300 text-sm leading-relaxed">{para}</p>;
+              })}
+            </div>
+          </div>
+        )}
 
-        {/* ── EPA 608 content block (when tagged) ── */}
+        {/* ── EPA 608 CALLOUT ── */}
         {epaTags.length > 0 && (
-          <div className="bg-amber-900/20 border border-amber-600/40 rounded-xl p-5">
-            <p className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-2">
-              EPA 608 — {epaTags.join(' · ')}
+          <div className="bg-amber-950/40 border border-amber-700/40 rounded-2xl px-6 py-5">
+            <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-2">
+              EPA 608 Exam Content — {epaTags.join(' · ')}
             </p>
             <p className="text-amber-100 text-sm leading-relaxed">
-              This lesson covers content tested on the EPA Section 608 Technician Certification exam.
-              {epaTags.includes('Type I') && ' Type I covers small appliances with 5 lbs or less of refrigerant.'}
-              {epaTags.includes('Type II') && ' Type II covers high-pressure systems including R-22 and R-410A residential equipment.'}
-              {epaTags.includes('Type III') && ' Type III covers low-pressure chillers using R-11 and R-123.'}
-              {epaTags.includes('Universal') && ' Universal certification requires passing Core, Type I, Type II, and Type III.'}
+              This lesson covers material tested on the EPA Section 608 exam.
+              {epaTags.includes('Type I') && ' Type I: small appliances ≤5 lbs.'}
+              {epaTags.includes('Type II') && ' Type II: high-pressure systems (R-22, R-410A).'}
+              {epaTags.includes('Type III') && ' Type III: low-pressure chillers (R-11, R-123).'}
+              {epaTags.includes('Universal') && ' Universal: Core + all three Type exams.'}
             </p>
           </div>
         )}
 
-        {/* ── Quiz: 5 questions from HVAC_QUIZ_MAP or CSV fallback ── */}
-        <div className="bg-slate-800 rounded-xl p-6">
-          <p className="text-amber-400 font-bold text-xs uppercase tracking-widest mb-4">Knowledge Check</p>
-
-          {quizQuestions && quizQuestions.length > 0 ? (
-            <div className="space-y-6">
-              {quizQuestions.slice(0, 5).map((q, qi) => (
-                <div key={q.id} className="border border-slate-700 rounded-lg p-4">
-                  <p className="text-white font-semibold mb-3">
-                    {qi + 1}. {q.question}
-                  </p>
-                  <div className="space-y-2">
-                    {q.options.map((opt, oi) => (
-                      <div
-                        key={oi}
-                        className={`flex items-center gap-3 p-3 rounded-lg border text-sm ${
-                          oi === q.correctAnswer
-                            ? 'border-green-500 bg-green-900/20 text-green-300'
-                            : 'border-slate-600 bg-slate-700 text-slate-300'
-                        }`}
-                      >
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                          oi === q.correctAnswer ? 'bg-green-600 text-white' : 'bg-slate-600 text-slate-300'
-                        }`}>
-                          {String.fromCharCode(65 + oi)}
-                        </span>
-                        {opt}
-                        {oi === q.correctAnswer && (
-                          <span className="ml-auto text-green-400 text-xs font-semibold">✓</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {q.explanation && (
-                    <p className="text-slate-400 text-xs mt-3 italic">{q.explanation}</p>
-                  )}
-                </div>
-              ))}
+        {/* ── KNOWLEDGE CHECK — interactive ── */}
+        {quizQuestions && quizQuestions.length > 0 ? (
+          <div>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
+            <HvacQuizBlock questions={quizQuestions.slice(0, 5)} />
+          </div>
+        ) : lesson.quizQuestion ? (
+          <div>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+              <p className="text-white font-semibold mb-3">{lesson.quizQuestion}</p>
+              <details className="cursor-pointer">
+                <summary className="text-sky-400 text-sm font-medium select-none">Show answer</summary>
+                <p className="text-green-300 text-sm mt-2">{lesson.quizAnswer}</p>
+              </details>
             </div>
-          ) : (
-            /* CSV fallback — single Q&A when quiz bank not yet expanded */
-            <div className="border border-slate-700 rounded-lg p-4">
-              <p className="text-white font-semibold mb-2">{lesson.quizQuestion}</p>
-              <p className="text-green-300 text-sm">
-                <span className="text-slate-400">Answer: </span>{lesson.quizAnswer}
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
-        {/* ── Prev / Next navigation ── */}
-        <div className="flex justify-between items-center pt-2">
+        {/* ── PREV / NEXT ── */}
+        <div className="flex justify-between items-center pt-4 border-t border-slate-800">
           {prevLesson ? (
             <Link
               href={`/hvac/lesson/${prevLesson.lessonId}`}
-              className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors"
+              className="flex flex-col items-start gap-1 bg-slate-800 hover:bg-slate-700 px-5 py-3 rounded-xl transition-colors max-w-[45%]"
             >
-              ← {prevLesson.lessonTitle}
+              <span className="text-slate-500 text-xs">← Previous</span>
+              <span className="text-white text-sm font-semibold truncate">{prevLesson.lessonTitle}</span>
             </Link>
           ) : <div />}
 
           {nextLesson ? (
             <Link
               href={`/hvac/lesson/${nextLesson.lessonId}`}
-              className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors"
+              className="flex flex-col items-end gap-1 bg-sky-700 hover:bg-sky-600 px-5 py-3 rounded-xl transition-colors max-w-[45%]"
             >
-              {nextLesson.lessonTitle} →
+              <span className="text-sky-200 text-xs">Next →</span>
+              <span className="text-white text-sm font-semibold truncate">{nextLesson.lessonTitle}</span>
             </Link>
           ) : (
-            <Link
-              href="/hvac"
-              className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors"
-            >
-              Course Complete ✓
+            <Link href="/hvac" className="bg-green-700 hover:bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold transition-colors">
+              Module Complete ✓
             </Link>
           )}
         </div>

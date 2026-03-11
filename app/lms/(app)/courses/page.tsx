@@ -42,10 +42,12 @@ export default async function InteractiveCoursesPage() {
     redirect('/login');
   }
 
-  // Get all courses
+  // Get active, published courses only
   const { data: courses } = await db
     .from('training_courses')
     .select('*')
+    .eq('is_active', true)
+    .eq('is_published', true)
     .order('created_at', { ascending: false });
 
   // Get student's enrollments

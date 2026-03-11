@@ -105,17 +105,20 @@ export default function LegalOnboardingPage() {
         .eq('id', user.id)
         .single();
 
-      // Insert agreement acceptance
-      const { error: insertError } = await supabase
-        .from('license_agreement_acceptances')
-        .insert({
-          user_id: user.id,
+      // Insert agreement acceptance via API to bypass RLS
+      const res = await fetch('/api/onboarding/accept-agreement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           agreement_type: agreement.type,
           document_version: agreement.version,
-          document_url: agreement.documentUrl,
-          role_at_signing: profile?.role || 'student',
-          email_at_signing: user.email,
-        });
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to accept agreement');
+      }
+      const insertError = null;
 
       if (insertError) throw insertError;
 
@@ -138,27 +141,19 @@ export default function LegalOnboardingPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
+      const res = await fetch('/api/onboarding/complete', {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to complete onboarding');
+      }
 
-      // Update or create onboarding status
-      const { error: upsertError } = await supabase
-        .from('user_onboarding_status')
-        .upsert({
-          user_id: user.id,
-          status: 'complete',
-          agreements_signed: true,
-          completed_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id',
-        });
-
-      if (upsertError) throw upsertError;
-
-      // Redirect to dashboard
-      router.push('/student-portal');
+      // Redirect to LMS
+      router.push('/lms/dashboard');
 
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err.message || 'An error occurred');
     } finally {
       setSigning(false);
     }

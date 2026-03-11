@@ -57,9 +57,9 @@ export default async function EnrollPage({ searchParams }: Props) {
     redirect(`/lms/courses/${params.course}/enroll`);
   }
 
-  // Get user's existing enrollments
+  // Get user's existing enrollments — training_enrollments is the canonical LMS table
   const { data: enrollments } = await db
-    .from('program_enrollments')
+    .from('training_enrollments')
     .select('course_id')
     .eq('user_id', user.id);
 

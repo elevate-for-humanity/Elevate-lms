@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
-
+import ToasterClient from '@/components/ui/ToasterClient';
 import CookieConsent from '@/components/CookieConsent';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
@@ -227,7 +227,7 @@ export default function RootLayout({
         <CookieConsent />
         <DMCATrackingPixel />
 
-
+        <ToasterClient />
       </body>
     </html>
   );

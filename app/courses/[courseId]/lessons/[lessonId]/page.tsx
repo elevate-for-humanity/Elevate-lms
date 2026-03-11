@@ -22,6 +22,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
+import QuizPlayer from '@/components/lms/QuizPlayer';
 import LessonPlayer from '@/components/lms/LessonPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
@@ -34,6 +35,23 @@ import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-con
 import { HVAC_VIDEO_MAP } from '@/lib/courses/hvac-video-map';
 import { HVAC_LESSON_NUMBER_TO_DEF_ID } from '@/lib/courses/hvac-lesson-number-map';
 import dynamic from 'next/dynamic';
+// Lazy-loaded to avoid 800KB bundle on every page load
+import { HVAC_LABS } from '@/lib/courses/hvac-labs';
+
+const DragDropLab = dynamic(
+  () => import('@/components/lms/DragDropLab'),
+  { ssr: false }
+);
+
+const LessonRecap = dynamic(
+  () => import('@/components/lms/LessonRecap'),
+  { ssr: false }
+);
+
+const VideoCaptions = dynamic(
+  () => import('@/components/lms/VideoCaptions'),
+  { ssr: false }
+);
 
 const HvacLessonEnrichment = dynamic(
   () => import('@/components/lms/HvacLessonEnrichment'),
@@ -80,6 +98,28 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [videoWatchPercent, setVideoWatchPercent] = useState(0);
+  const [lessonCaptions, setLessonCaptions] = useState<any[] | null>(null);
+  const [lessonQuiz, setLessonQuiz] = useState<any[] | null>(null);
+  const [lessonRecap, setLessonRecap] = useState<any[] | null>(null);
+
+  // Load captions, quiz, and recap data lazily for the current lesson
+  useEffect(() => {
+    setLessonCaptions(null);
+    setLessonQuiz(null);
+    setLessonRecap(null);
+
+    import('@/lib/courses/hvac-captions').then(m => {
+      setLessonCaptions(m.HVAC_CAPTIONS[lessonId] || null);
+    }).catch(() => {});
+
+    import('@/lib/courses/hvac-quick-checks').then(m => {
+      setLessonQuiz(m.HVAC_QUICK_CHECKS[lessonId] || null);
+    }).catch(() => {});
+
+    import('@/lib/courses/hvac-recaps').then(m => {
+      setLessonRecap(m.HVAC_RECAPS[lessonId] || null);
+    }).catch(() => {});
+  }, [lessonId]);
 
   const lessonStartTime = useRef(Date.now());
 
@@ -544,12 +584,31 @@ export default function LessonPage() {
               </div>
             )}
 
+            {/* Lesson Recap — shown for all lessons with recap data */}
+            {lessonRecap && (
+              <LessonRecap topics={lessonRecap} lessonTitle={lesson.title} />
+            )}
+
+            {/* Interactive Lab — shown for hands-on lessons */}
+            {HVAC_LABS[lessonId] && (
+              <div className="mt-8">
+                <DragDropLab config={HVAC_LABS[lessonId]} />
+              </div>
+            )}
+
             {/* Quiz */}
+            {(() => {
+              const dbQuestions = lesson.quiz_questions || [];
+              const quickCheck = lessonQuiz || [];
+              const quizQuestions = dbQuestions.length > 0 ? dbQuestions : quickCheck;
+              if (quizQuestions.length === 0) return null;
+              return (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Assessment</h2>
-              <p className="text-sm text-slate-500 mb-6">Passing score: 80% — You must pass to continue to the next lesson.</p>
-              <QuizSystem
-                questions={lesson.quiz_questions || []}
+              <h2 className="text-2xl font-bold text-slate-900 mb-1">Lesson Quiz</h2>
+              <p className="text-base text-slate-600 mb-6">Answer each question to test what you learned. You need 80% to continue.</p>
+              <QuizPlayer
+                questions={quizQuestions}
+                title={lesson.title}
                 onComplete={async (score) => {
                   try {
                     if (score >= 80) {
@@ -568,6 +627,8 @@ export default function LessonPage() {
                 passingScore={80}
               />
             </div>
+              );
+            })()}
           </div>
         ) : (lesson.video_url || (courseId === HVAC_COURSE_ID && lesson.lesson_number && HVAC_VIDEO_MAP[HVAC_LESSON_NUMBER_TO_DEF_ID[lesson.lesson_number]])) ? (
           <div className="max-w-5xl mx-auto p-3 sm:p-6 lg:p-8">
@@ -602,30 +663,41 @@ export default function LessonPage() {
               // no API key required, works with zero external dependencies.
               if (courseId === HVAC_COURSE_ID && defId && hvacVideo) {
                 return (
-                  <HvacLessonVideo
-                    lessonDefId={defId}
-                    brollVideoUrl={hvacVideo.videoUrl}
-                    lessonTitle={lesson.title}
-                    onProgress={progressHandler}
-                    onComplete={completeHandler}
-                  />
+                  <>
+                    {/* Sticky video on mobile so it stays visible while scrolling */}
+                    <div className="sticky top-0 z-30 bg-white -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 pb-2 sm:static sm:mx-0 sm:px-0 sm:pb-0 sm:z-auto">
+                      <HvacLessonVideo
+                        lessonDefId={defId}
+                        brollVideoUrl={hvacVideo.videoUrl}
+                        dbVideoUrl={lesson.video_url}
+                        lessonTitle={lesson.title}
+                        onProgress={progressHandler}
+                        onComplete={completeHandler}
+                      />
+                    </div>
+                    {lessonCaptions && (
+                      <VideoCaptions segments={lessonCaptions} />
+                    )}
+                  </>
                 );
               }
 
               return (
-                <LessonPlayer
-                  videoUrl={lesson.video_url!}
-                  lessonTitle={lesson.title}
-                  moduleTitle={currentModule?.title}
-                  transcript={lesson.transcript ?? null}
-                  lessonContent={lesson.content ?? null}
-                  lessonNumber={currentIndex + 1}
-                  totalLessons={lessons.length}
-                  durationMinutes={lesson.duration_minutes ?? undefined}
-                  captionUrl={captionUrl}
-                  onProgress={progressHandler}
-                  onComplete={completeHandler}
-                />
+                <div className="sticky top-0 z-30 bg-white -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 pb-2 sm:static sm:mx-0 sm:px-0 sm:pb-0 sm:z-auto">
+                  <LessonPlayer
+                    videoUrl={lesson.video_url!}
+                    lessonTitle={lesson.title}
+                    moduleTitle={currentModule?.title}
+                    transcript={lesson.transcript ?? null}
+                    lessonContent={lesson.content ?? null}
+                    lessonNumber={currentIndex + 1}
+                    totalLessons={lessons.length}
+                    durationMinutes={lesson.duration_minutes ?? undefined}
+                    captionUrl={captionUrl}
+                    onProgress={progressHandler}
+                    onComplete={completeHandler}
+                  />
+                </div>
               );
             })()}
             {/* Watch progress indicator */}

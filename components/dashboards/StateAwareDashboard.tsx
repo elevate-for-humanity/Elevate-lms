@@ -261,6 +261,7 @@ interface ProgressIndicatorProps {
 }
 
 export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
+  if (!steps || !Array.isArray(steps)) return null;
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
       <h3 className="text-lg font-bold text-black mb-6">Your Journey</h3>

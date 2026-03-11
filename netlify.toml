@@ -211,12 +211,14 @@
   ]
 
 # SFC: File return function
+# @supabase/supabase-js bundled by esbuild — Lambda has no node_modules at runtime
 [functions."file-return"]
-  external_node_modules = ["@supabase/supabase-js"]
+  node_bundler = "esbuild"
 
 # SFC: Refund tracking function (public, anon key only)
+# @supabase/supabase-js bundled by esbuild — Lambda has no node_modules at runtime
 [functions."refund-tracking"]
-  external_node_modules = ["@supabase/supabase-js"]
+  node_bundler = "esbuild"
 
 # Social Media Scheduler - can be re-enabled now that env vars are in
 # Supabase app_secrets (no longer hits Lambda 4KB limit).
@@ -470,6 +472,13 @@
   from = "/xmrlpc.php"
   to = "/410.html"
   status = 410
+  force = true
+
+# /signin → /login (canonical auth route)
+[[redirects]]
+  from = "/signin"
+  to = "/login"
+  status = 301
   force = true
 
 # /student, /student/dashboard → /student-portal handled by next.config.mjs (auth/app route, Rule B)

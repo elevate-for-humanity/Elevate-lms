@@ -1,6 +1,7 @@
 // Server Component - NO 'use client'
 // Layout for public marketing pages - renders header/footer server-side
 
+import { Suspense } from 'react';
 import Header from '@/components/site/Header';
 import ServerFooter from '@/components/site/ServerFooter';
 import ClientWidgets from './ClientWidgets';
@@ -18,9 +19,11 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       <Header />
       
       {/* Main content */}
-      <main id="main-content" className="pt-[70px]" role="main" tabIndex={-1}>
-        {children}
-      </main>
+      <Suspense>
+        <main id="main-content" className="pt-[70px]" role="main" tabIndex={-1}>
+          {children}
+        </main>
+      </Suspense>
       
       {/* Server-rendered footer - always visible */}
       <ServerFooter />

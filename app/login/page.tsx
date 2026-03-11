@@ -68,12 +68,8 @@ function LoginForm() {
       const onboardingDone = profile.onboarding_completed === true;
       const isActiveStudent = profile.enrollment_status === 'active';
 
-      // Students who haven't completed onboarding and aren't already active
-      // get sent to onboarding. Active students bypass this gate.
-      if (role === 'student' && !onboardingDone && !isActiveStudent) {
-        router.push('/onboarding/learner');
-        return;
-      }
+      // Students go to LMS — onboarding is optional and separate.
+      // No gate blocking course access.
 
       switch (role) {
         case 'admin':

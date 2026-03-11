@@ -10,6 +10,11 @@ export interface CaptionSegment {
 
 interface Props {
   segments: CaptionSegment[];
+  /**
+   * CSS selector used to locate the video element. Defaults to 'video' which
+   * finds the first video in the document. On pages with multiple video elements
+   * pass a scoped selector (e.g. '[data-lesson-video]') to target the correct one.
+   */
   videoSelector?: string;
 }
 

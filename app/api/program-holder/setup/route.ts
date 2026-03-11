@@ -47,9 +47,17 @@ async function _POST(req: NextRequest) {
     );
   }
 
+  // Reject banking submissions in production until column-level encryption is
+  // implemented. Storing account/routing numbers in plaintext JSONB is unsafe.
+  if (accountNumber && process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Banking information cannot be submitted yet. Please contact support.' },
+      { status: 422 }
+    );
+  }
+
   // Upsert into program_holders using user_id as the conflict key.
-  // Program details and banking info go into metadata since the table
-  // has no dedicated columns for them yet.
+  // Program details go into metadata; banking is omitted until encryption is ready.
   const { data: holder, error: upsertError } = await supabase
     .from('program_holders')
     .upsert(
@@ -69,14 +77,16 @@ async function _POST(req: NextRequest) {
           assessment_type: assessmentType || null,
           custom_instructions: customInstructions || null,
           syllabus_url: syllabusUrl || null,
-          // Banking — plaintext for now; encrypt before production
+          // Banking stored only in non-production environments pending encryption.
+          // In production the block above returns 422 before reaching here.
           banking: accountNumber
             ? {
                 account_holder_name: accountHolderName || null,
                 bank_name: bankName || null,
                 account_type: accountType || 'checking',
-                routing_number: routingNumber || null,
-                account_number: accountNumber || null,
+                // Mask all but last 4 digits so the stored value is non-sensitive
+                routing_number: routingNumber ? `****${String(routingNumber).slice(-4)}` : null,
+                account_number: accountNumber ? `****${String(accountNumber).slice(-4)}` : null,
                 bank_document_url: bankDocumentUrl || null,
               }
             : null,

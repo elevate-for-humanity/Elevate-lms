@@ -50,6 +50,14 @@ export default function DragDropLab({ config, onComplete }: Props) {
   const [score, setScore] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Reset all interaction state when the lab config changes (e.g. navigating between lessons)
+  useEffect(() => {
+    setPlacements({});
+    setRevealed(false);
+    setScore(null);
+    setDragItem(null);
+  }, [config.id]);
+
   // Which draggables are already placed
   const placedItemIds = new Set(Object.values(placements).filter(Boolean));
 

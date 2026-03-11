@@ -116,8 +116,10 @@ export default function QuizPlayer({
 
   const handleNext = useCallback(() => {
     if (isLastQuestion) {
-      // Finish quiz
-      const finalCorrect = correctCount;
+      // Derive score from answeredQuestions rather than correctCount to avoid
+      // reading a stale closure value when the last answer was correct (setState
+      // is async so correctCount hasn't incremented yet at this point).
+      const finalCorrect = answeredQuestions.filter((q) => q.correct).length;
       const finalScore = Math.round((finalCorrect / questions.length) * 100);
       setFinished(true);
       onComplete(finalScore);
@@ -126,7 +128,7 @@ export default function QuizPlayer({
       setSelectedAnswer(null);
       setIsRevealed(false);
     }
-  }, [isLastQuestion, correctCount, questions.length, onComplete]);
+  }, [isLastQuestion, answeredQuestions, questions.length, onComplete]);
 
   const handleRetake = useCallback(() => {
     setCurrentIndex(0);

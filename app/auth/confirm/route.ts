@@ -53,6 +53,9 @@ export async function GET(request: NextRequest) {
                 userId: user.id,
                 error: fetchError.message,
               });
+              // unlinked is null when fetchError is set — skip linking rather than
+              // proceeding with a non-null assertion that would throw.
+              return;
             }
 
             const pendingCount = unlinked?.length ?? 0;
@@ -122,6 +125,8 @@ export async function GET(request: NextRequest) {
       } else if (type === 'recovery') {
         // Use the next param set by sendRecoveryEmail's redirectTo option.
         // Fall back to /auth/reset-password if next wasn't passed or was stripped.
+        // `next` is already validated by validateRedirect() above — it only accepts
+        // same-origin paths (must start with /, no protocol-relative or external URLs).
         redirectTo = next !== '/' ? next : '/auth/reset-password';
       } else if (type === 'invite') {
         redirectTo = '/lms/dashboard?invited=true';

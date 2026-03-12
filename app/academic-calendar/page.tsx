@@ -140,7 +140,7 @@ export default function AcademicCalendarPage() {
             Start your career training journey today. Most programs are FREE through WIOA funding.
           </p>
           <Link
-            href="/apply"
+            href="/start"
             className="inline-block px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             Apply Now

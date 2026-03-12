@@ -38,7 +38,7 @@ export default function InquirySuccessPage() {
           <p className="text-gray-600">While you wait, explore more:</p>
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Link
-              href="/apply"
+              href="/start"
               className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
             >
               Ready to Apply? Start Now

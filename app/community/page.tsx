@@ -360,7 +360,7 @@ export default async function CommunityPage() {
               Join Free <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors"
             >
               Start Training

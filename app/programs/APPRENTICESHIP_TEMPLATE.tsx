@@ -68,7 +68,7 @@ export default function ApprenticeshipPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
-                    href="/apply"
+                    href="/start"
                     className="inline-flex items-center justify-center gap-3 bg-brand-orange-600 text-white px-10 py-5 rounded-xl text-lg font-bold hover:bg-brand-orange-700 transition shadow-2xl"
                   >
                     Start Your Journey
@@ -483,7 +483,7 @@ export default function ApprenticeshipPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center gap-3 bg-white text-brand-orange-600 px-12 py-6 rounded-xl text-xl font-bold hover:bg-slate-100 transition shadow-2xl"
             >
               Apply Now

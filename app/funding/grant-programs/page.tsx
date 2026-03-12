@@ -260,7 +260,7 @@ export default function GrantProgramsPage() {
 
           <div className="text-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Apply Now
@@ -290,7 +290,7 @@ export default function GrantProgramsPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply/student"
+              href="/start"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
             >
               Check Eligibility

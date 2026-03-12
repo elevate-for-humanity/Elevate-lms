@@ -273,7 +273,7 @@ export default function TrainingModelPage() {
             it takes about 5 minutes. If you qualify for funding, your training can be free.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">
+            <Link href="/start" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
             <Link href="/pathways" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-bold transition border-2 border-white/30">

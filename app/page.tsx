@@ -28,8 +28,8 @@ export default function HomePage() {
       <div className="bg-brand-green-600 text-white py-2.5 text-center text-sm font-semibold tracking-wide">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3 flex-wrap">
           <span>Now Enrolling — Funded Credential Programs in Healthcare, Trades, CDL &amp; Technology</span>
-          <Link href="/apply" className="inline-flex items-center gap-1 bg-white text-brand-green-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-brand-green-50 transition-colors">
-            Check Eligibility →
+          <Link href="/start" className="inline-flex items-center gap-1 bg-white text-brand-green-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-brand-green-50 transition-colors">
+            Start Here →
           </Link>
         </div>
       </div>

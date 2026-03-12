@@ -165,7 +165,7 @@ export default async function SuccessStoriesPage() {
             Students across Indiana have transformed their lives through
             our training programs.
           </p>
-          <Link href="/apply">
+          <Link href="/start">
             <Button size="lg" variant="secondary">
               Apply Now
               <ArrowRight className="ml-2 h-5 w-5" />

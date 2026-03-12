@@ -125,7 +125,7 @@ export default async function EnrollmentPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
           <p className="text-brand-blue-100 text-sm mb-6">Applications are reviewed within 1-2 business days. No application fee.</p>
-          <Link href="/apply/student" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-50 transition-colors">
+          <Link href="/start" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-50 transition-colors">
             Apply Now <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

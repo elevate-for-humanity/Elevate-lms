@@ -43,7 +43,7 @@ export default function JobReadyIndyPage() {
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is an approved Job Ready Indy training provider. Our credential pathway programs in healthcare, skilled trades, technology, and CDL are aligned with the employment outcomes Job Ready Indy is designed to achieve.
               </p>
-              <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -107,7 +107,7 @@ export default function JobReadyIndyPage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-white/90 mb-10">Job Ready Indy funding may be available for your career training. Apply today and our team will confirm your eligibility.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-blue-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/start" className="bg-white text-brand-blue-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
             <Link href="/contact" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
           </div>
         </div>

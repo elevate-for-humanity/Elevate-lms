@@ -262,7 +262,7 @@ export default async function LocationsPage() {
               Schedule a Visit
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="px-6 py-3 bg-brand-blue-500 text-white font-semibold rounded-lg hover:bg-brand-blue-400 transition"
             >
               Apply Now

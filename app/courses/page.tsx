@@ -246,7 +246,7 @@ export default async function CoursesPage() {
                     {course.duration}
                   </div>
                   <Link
-                    href="/apply"
+                    href="/start"
                     className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700"
                   >
                     Enroll Now →
@@ -258,7 +258,7 @@ export default async function CoursesPage() {
 
           <div className="text-center mt-10">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition-all"
             >
               Apply for Free Training <ArrowRight className="w-5 h-5" />
@@ -326,7 +326,7 @@ export default async function CoursesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-50 transition-all"
             >
               Apply Now <ArrowRight className="w-5 h-5" />

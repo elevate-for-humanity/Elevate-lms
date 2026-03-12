@@ -386,7 +386,7 @@ export default async function DrugTestingLandingPage() {
               </div>
             )}
             <div className="text-center mt-8">
-              <Link href="/apply/student" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
                 Apply for This Program <ArrowRight className="w-5 h-5" />
               </Link>
               {program.tuition && (

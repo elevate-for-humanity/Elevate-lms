@@ -98,7 +98,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
               <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Check Eligibility <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/apply" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
                 Apply Now
               </Link>
             </div>
@@ -326,7 +326,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
             <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Check Eligibility <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
+            <Link href="/start" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
               Apply Now
             </Link>
           </div>

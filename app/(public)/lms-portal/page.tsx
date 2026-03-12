@@ -87,7 +87,7 @@ export default function LMSPortalPublicPage() {
           <p className="text-brand-blue-100 mb-6">Enroll in a program today and begin your career transformation.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors"
             >
               Apply Now

@@ -31,7 +31,7 @@ export default function GetStartedPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
-            <Link href="/apply" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
+            <Link href="/start" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
               <GraduationCap className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600">Enroll in a Program</h3>
               <p className="text-gray-600 mb-4">Apply online in minutes. Pick your program, check eligibility, and start training in as little as 2 weeks.</p>

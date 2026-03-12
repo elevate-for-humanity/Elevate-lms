@@ -255,7 +255,7 @@ export default function EmploymentSupportPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center"
             >
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />

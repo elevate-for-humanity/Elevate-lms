@@ -212,7 +212,7 @@ export default function CredentialsPage() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
           <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-slate-50 transition-colors shadow-lg">
+            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-slate-50 transition-colors shadow-lg">
               Apply Now
             </Link>
             <Link href="/programs" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-bold text-base hover:bg-white/10 transition-colors">

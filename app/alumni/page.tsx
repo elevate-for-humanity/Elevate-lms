@@ -150,7 +150,7 @@ export default function AlumniPage() {
                 Be part of our founding class of graduates.
               </p>
               <Link
-                href="/apply"
+                href="/start"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
               >
                 Start Your Journey

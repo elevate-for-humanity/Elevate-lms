@@ -57,7 +57,7 @@ const programs = (dbRows as any[]) || [];
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is a DOL Registered Apprenticeship Sponsor for select programs (currently Barber Apprenticeship), meaning these programs meet federal standards for quality, safety, and outcomes.
               </p>
-              <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -119,7 +119,7 @@ const programs = (dbRows as any[]) || [];
               </div>
             ))}
           </div>
-          <Link href="/apply/student" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
+          <Link href="/start" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
             Apply Now
           </Link>
         </div>

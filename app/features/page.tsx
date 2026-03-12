@@ -100,7 +100,7 @@ export default function FeaturesPage() {
                 Employers can post jobs, browse certified candidates, and manage apprenticeship placements through the employer portal.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                <Link href="/start" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-semibold transition">
                   Student Application <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href="/employer" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:border-slate-400 transition">
@@ -117,7 +117,7 @@ export default function FeaturesPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-slate-300 mb-10">Apply online in minutes. No appointment needed.</p>
-          <Link href="/apply/student" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-xl transition hover:scale-105 shadow-lg">
+          <Link href="/start" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-xl transition hover:scale-105 shadow-lg">
             Apply Now
           </Link>
         </div>

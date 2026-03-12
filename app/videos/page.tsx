@@ -129,7 +129,7 @@ export default async function VideosPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
             >
               Apply Now

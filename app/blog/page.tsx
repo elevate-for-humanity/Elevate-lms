@@ -159,7 +159,7 @@ export default async function BlogPage() {
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">Ready to Start Your Career?</h2>
           <p className="text-slate-400 mb-7">Check your eligibility for funded career training programs in Indiana.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors">
               Apply Now
             </Link>
             <Link href="/programs" className="border border-slate-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-slate-800 transition-colors">

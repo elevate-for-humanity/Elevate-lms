@@ -47,7 +47,7 @@ export default function FundingImpactPage() {
               Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
+              <Link href="/start" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
               <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors border-2 border-white/30">Check Your Eligibility</Link>
             </div>
           </div>
@@ -510,7 +510,7 @@ export default function FundingImpactPage() {
               Check Eligibility
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-800 transition-colors border-2 border-white/30"
             >
               Apply Now

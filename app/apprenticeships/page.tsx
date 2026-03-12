@@ -69,7 +69,7 @@ const apprenticeships = (dbRows as any[]) || [];
             <p className="text-sm text-white/70 max-w-xl mb-6">
               Tuition and funding eligibility vary by program. See individual program pages for details.
             </p>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/start" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -264,7 +264,7 @@ const apprenticeships = (dbRows as any[]) || [];
             Real pay. Industry credentials. Funding options available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/start" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

@@ -88,7 +88,7 @@ export default async function ShopPage() {
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now

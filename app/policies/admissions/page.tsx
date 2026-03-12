@@ -297,7 +297,7 @@ export default function AdmissionsPage() {
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
               <li><strong>Location:</strong> 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</li>
-              <li><strong>Apply Online:</strong> <a href="/apply" className="text-brand-blue-600 hover:underline">www.elevateforhumanity.org/apply</a></li>
+              <li><strong>Apply Online:</strong> <a href="/start" className="text-brand-blue-600 hover:underline">www.elevateforhumanity.org/apply</a></li>
             </ul>
 
             <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">

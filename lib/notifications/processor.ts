@@ -45,29 +45,31 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
     errors: [],
   };
 
-  // Fetch queued notifications
-  const { data: notifications, error: fetchError } = await supabase
+  // Claim a batch: atomically move queued → processing to prevent double-pickup
+  const now = new Date().toISOString();
+  const { data: claimed, error: claimError } = await supabase
     .from('notification_outbox')
-    .select('*')
+    .update({ status: 'processing', processed_at: now })
     .eq('status', 'queued')
-    .lte('scheduled_for', new Date().toISOString())
+    .lte('scheduled_for', now)
     .lt('attempts', MAX_RETRIES)
     .order('created_at', { ascending: true })
-    .limit(MAX_BATCH_SIZE);
+    .limit(MAX_BATCH_SIZE)
+    .select('*');
 
-  if (fetchError) {
-    logger.error('Failed to fetch notifications:', fetchError);
-    return { ...result, errors: [{ id: 'fetch', error: fetchError.message }] };
+  if (claimError) {
+    logger.error('Failed to claim notifications:', claimError);
+    return { ...result, errors: [{ id: 'claim', error: claimError.message }] };
   }
 
-  if (!notifications || notifications.length === 0) {
+  if (!claimed || claimed.length === 0) {
     return result;
   }
 
-  result.processed = notifications.length;
+  result.processed = claimed.length;
 
-  // Process each notification
-  for (const notification of notifications as QueuedNotification[]) {
+  // Process each claimed notification
+  for (const notification of claimed as QueuedNotification[]) {
     try {
       // Get email template
       const template = getTemplate(notification.template_key, notification.template_data);
@@ -81,7 +83,6 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
       });
 
       if (sendResult.success) {
-        // Mark as sent
         await supabase
           .from('notification_outbox')
           .update({
@@ -96,18 +97,18 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
         throw new Error(sendResult.error || 'Send failed');
       }
     } catch (error: any) {
-      // Mark as failed or increment attempts
       const newAttempts = notification.attempts + 1;
-      const newStatus = newAttempts >= notification.max_attempts ? 'failed' : 'queued';
+      const exhausted = newAttempts >= notification.max_attempts;
 
       await supabase
         .from('notification_outbox')
         .update({
-          status: newStatus,
+          status: exhausted ? 'failed' : 'queued',
           attempts: newAttempts,
           last_error: 'Operation failed',
-          // Exponential backoff for retries
-          scheduled_for: newStatus === 'queued'
+          dead_letter: exhausted ? true : undefined,
+          // Exponential backoff: 2^n minutes (2m, 4m, 8m, 16m, 32m)
+          scheduled_for: !exhausted
             ? new Date(Date.now() + Math.pow(2, newAttempts) * 60000).toISOString()
             : undefined,
         })
@@ -150,20 +151,26 @@ async function sendEmailViaProvider(params: {
  */
 export async function getQueueStats(): Promise<{
   queued: number;
+  processing: number;
   sent: number;
   failed: number;
+  dead_letter: number;
   oldest_queued?: string;
 }> {
   const supabase = createAdminClient();
   if (!supabase) {
-    return { queued: 0, sent: 0, failed: 0 };
+    return { queued: 0, processing: 0, sent: 0, failed: 0, dead_letter: 0 };
   }
 
-  const [queuedResult, sentResult, failedResult, oldestResult] = await Promise.all([
+  const [queuedResult, processingResult, sentResult, failedResult, deadLetterResult, oldestResult] = await Promise.all([
     supabase
       .from('notification_outbox')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'queued'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'processing'),
     supabase
       .from('notification_outbox')
       .select('id', { count: 'exact', head: true })
@@ -172,6 +179,10 @@ export async function getQueueStats(): Promise<{
       .from('notification_outbox')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'failed'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('dead_letter', true),
     supabase
       .from('notification_outbox')
       .select('created_at')
@@ -183,8 +194,10 @@ export async function getQueueStats(): Promise<{
 
   return {
     queued: queuedResult.count || 0,
+    processing: processingResult.count || 0,
     sent: sentResult.count || 0,
     failed: failedResult.count || 0,
+    dead_letter: deadLetterResult.count || 0,
     oldest_queued: oldestResult.data?.created_at,
   };
 }

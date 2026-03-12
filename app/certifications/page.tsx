@@ -115,7 +115,7 @@ export default function CertificationsPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply Now <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

@@ -142,7 +142,7 @@ export default function CheckEligibilityPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/apply"
+                href="/start"
                 className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Start Eligibility Review

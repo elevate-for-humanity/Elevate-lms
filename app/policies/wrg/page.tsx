@@ -111,7 +111,7 @@ export default function WRGPage() {
             <h2>Application Process</h2>
             <ol>
               <li>Complete the WRG eligibility application</li>
-              <li>Apply to Elevate for Humanity at <Link href="/apply" className="text-brand-blue-600">elevateforhumanity.org/apply</Link></li>
+              <li>Apply to Elevate for Humanity at <Link href="/start" className="text-brand-blue-600">elevateforhumanity.org/apply</Link></li>
               <li>Select an eligible certificate program</li>
               <li>Meet with an enrollment counselor to confirm WRG eligibility</li>
               <li>Enroll and begin training</li>
@@ -144,7 +144,7 @@ export default function WRGPage() {
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <Link href="/apply" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
+              <Link href="/start" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

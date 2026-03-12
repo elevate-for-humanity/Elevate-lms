@@ -94,7 +94,7 @@ export default function ProgramCatalogPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
             <Link
-              href="/apply"
+              href="/start"
               className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors"
             >
               Apply Now

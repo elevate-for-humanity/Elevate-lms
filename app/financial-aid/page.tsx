@@ -209,7 +209,7 @@ export default function FinancialAidPage() {
             Apply today and find out if you qualify for funded training. No obligation, no credit check.
           </p>
           <Link
-            href="/apply"
+            href="/start"
             className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
           >
             Apply Now

@@ -232,7 +232,7 @@ export default function ConnectsLandingPage() {
           </Link>
           <div className="mt-4 text-sm text-gray-500">
             Don&apos;t have an account?{' '}
-            <Link href="/apply" className="text-cyan-600 hover:underline font-semibold">Apply for a program</Link>
+            <Link href="/start" className="text-cyan-600 hover:underline font-semibold">Apply for a program</Link>
             {' '}or{' '}
             <Link href="/contact" className="text-cyan-600 hover:underline font-semibold">contact us</Link>
           </div>
@@ -260,7 +260,7 @@ export default function ConnectsLandingPage() {
               <div className="text-white font-semibold mb-3">Quick Links</div>
               <div className="space-y-2 text-sm">
                 <Link href="/login" className="block hover:text-white">Sign In</Link>
-                <Link href="/apply" className="block hover:text-white">Apply for a Program</Link>
+                <Link href="/start" className="block hover:text-white">Apply for a Program</Link>
                 <Link href="/support" className="block hover:text-white">Support</Link>
                 <Link href="/contact" className="block hover:text-white">Contact</Link>
                 <Link href="/privacy-policy" className="block hover:text-white">Privacy Policy</Link>

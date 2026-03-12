@@ -167,7 +167,7 @@ export default async function OrientationPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply/student"
+              href="/start"
               className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition"
             >
               Apply Now

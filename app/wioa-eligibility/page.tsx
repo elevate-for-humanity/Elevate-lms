@@ -226,7 +226,7 @@ export default function WIOAEligibilityPage() {
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors">
               Register at Indiana Career Connect
             </a>
-            <Link href="/apply"
+            <Link href="/start"
               className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors">
               Apply for Training
             </Link>

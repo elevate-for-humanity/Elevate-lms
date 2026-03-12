@@ -120,7 +120,7 @@ export default function HowItWorksPage() {
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Register Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </a>
-            <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+            <Link href="/start" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
               Apply for Training
             </Link>
             <Link href="/booking/enrollment" className="border-2 border-white/60 text-white/90 font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

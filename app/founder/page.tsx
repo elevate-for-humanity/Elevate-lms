@@ -197,7 +197,7 @@ export default function FounderPage() {
             <Link href="/programs" className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
               Explore Programs
             </Link>
-            <Link href="/apply" className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition">
+            <Link href="/start" className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition">
               Apply Now <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </div>

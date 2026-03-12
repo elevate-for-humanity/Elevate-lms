@@ -418,7 +418,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="Eligibility Check"
                     description="Verify you qualify for free training"
-                    href="/apply"
+                    href="/start"
                     image={LMS_SECTION_CARDS.eligibility}
                     badge={
                       !profile.eligibility_verified ? 'Required' : undefined

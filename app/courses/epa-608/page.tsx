@@ -161,7 +161,7 @@ export default function EPA608CoursePage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              href="/apply/student"
+              href="/start"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors"
             >
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />

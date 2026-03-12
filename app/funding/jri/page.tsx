@@ -44,7 +44,7 @@ export default function JRIFundingPage() {
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is an approved JRI credential pathway provider. Our programs are designed to get participants certified with nationally recognized credentials and employed in high-demand fields within weeks, not years.
               </p>
-              <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
                 Apply for JRI Funding <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -108,7 +108,7 @@ export default function JRIFundingPage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Your Past Doesn&apos;t Define Your Future</h2>
           <p className="text-xl text-white/90 mb-10">JRI funding may give you a fresh start with funded career training. Check your eligibility today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/start" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
             <Link href="/partners/jri" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">JRI Partner Courses</Link>
             <Link href="/contact" className="border-2 border-white/60 text-white/90 px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
           </div>

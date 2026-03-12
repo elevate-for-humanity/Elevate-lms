@@ -488,7 +488,7 @@ export default function CoursesCatalogPage() {
             Talk to an advisor. We will look at your goals, your schedule, and what funding you qualify for — then help you pick the right path.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/apply/student"
+            <Link href="/start"
               className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl">
               Apply Free — Takes 5 Minutes
             </Link>

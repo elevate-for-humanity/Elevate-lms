@@ -80,7 +80,7 @@ export default function IndustryInsightsPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Industry Knowledge</h2>
           <p className="text-xl text-indigo-100 mb-8">Connect with mentors who have been where you want to go.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-indigo-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-gray-100 text-indigo-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

@@ -267,10 +267,26 @@ export default async function ProgramDetailPage({
     cost: program.total_cost,
     salaryMin: program.salary_min,
     salaryMax: program.salary_max,
-    whatYouLearn: program.what_you_learn || program.whatYouLearn,
-    careerOutcomes: dbOutcomes.length > 0 
-      ? dbOutcomes.map(o => o.outcome) 
-      : (program.career_outcomes || program.careerOutcomes || program.outcomes),
+    whatYouLearn: (() => {
+      const raw = program.what_you_learn || program.whatYouLearn;
+      if (!raw) return null;
+      if (!Array.isArray(raw)) return [String(raw)];
+      return raw.map((item: any) => {
+        if (typeof item === 'string') return item;
+        return item?.topic || item?.title || item?.statement || String(item);
+      });
+    })(),
+    careerOutcomes: (() => {
+      const raw = dbOutcomes.length > 0
+        ? dbOutcomes.map(o => o.outcome)
+        : (program.career_outcomes || program.careerOutcomes || program.outcomes);
+      if (!Array.isArray(raw)) return raw ? [String(raw)] : [];
+      // Flatten objects to strings — DB may return {outcome:string} or {statement:string}
+      return raw.map((item: any) => {
+        if (typeof item === 'string') return item;
+        return item?.outcome || item?.statement || item?.title || JSON.stringify(item);
+      });
+    })(),
     prerequisites: dbRequirements.length > 0
       ? dbRequirements.map(r => r.requirement).join(', ')
       : program.prerequisites,

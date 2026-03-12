@@ -6,7 +6,7 @@ export const PEER_RECOVERY: ProgramSchema = {
   subtitle: 'Earn Indiana Certified Peer Recovery Specialist (CPRS) credentials. 46-hour training for individuals with lived recovery experience.',
   sector: 'healthcare',
   category: 'Behavioral Health',
-  heroImage: '/images/pages/admin-counseling-hero.jpg',
+  heroImage: '/images/pages/peer-recovery.jpg',
   heroImageAlt: 'Peer recovery specialist in a support group setting',
   deliveryMode: 'hybrid',
   durationWeeks: 4,

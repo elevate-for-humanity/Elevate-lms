@@ -3,7 +3,7 @@ export const NETWORK_SUPPORT: ProgramSchema = {
   slug: 'network-support-technician', title: 'Network Support Technician',
   subtitle: 'Earn IT Specialist certification in networking. Entry-level network support and help desk skills in 6 weeks.',
   sector: 'technology', category: 'IT Support',
-  heroImage: '/images/pages/admin-support-hero.jpg', heroImageAlt: 'Network support technician troubleshooting a connection',
+  heroImage: '/images/pages/networking-hero.jpg', heroImageAlt: 'Network support technician troubleshooting a connection',
   deliveryMode: 'hybrid', durationWeeks: 6, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 80, examPrep: 10, careerPlacement: 10 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '12–16 participants per cohort',

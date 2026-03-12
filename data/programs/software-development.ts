@@ -3,7 +3,7 @@ export const SOFTWARE_DEV: ProgramSchema = {
   slug: 'software-development', title: 'Software Development Foundations',
   subtitle: 'Learn Python, databases, and software engineering fundamentals. Earn IT Specialist certifications in 12 weeks.',
   sector: 'technology', category: 'Software Development',
-  heroImage: '/images/pages/admin-dev-hero.jpg', heroImageAlt: 'Software development student writing code',
+  heroImage: '/images/pages/software-development.jpg', heroImageAlt: 'Software development student writing code',
   deliveryMode: 'hybrid', durationWeeks: 12, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 80, handsOnLab: 140, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',

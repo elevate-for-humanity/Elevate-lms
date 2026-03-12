@@ -6,7 +6,7 @@ export const SANITATION: ProgramSchema = {
   subtitle: 'Earn infection control and sanitation certifications for healthcare, food service, and personal services industries in 2 weeks.',
   sector: 'healthcare',
   category: 'Infection Control',
-  heroImage: '/images/pages/admin-compliance-hero.jpg',
+  heroImage: '/images/pages/sanitation.jpg',
   heroImageAlt: 'Sanitation and infection control training in a clinical setting',
   deliveryMode: 'hybrid',
   durationWeeks: 2,

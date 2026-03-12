@@ -60,10 +60,10 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ═══ A. VIBRANT HERO ════════════════════════════════════════ */}
-      <section className="relative overflow-hidden">
-        {/* Full-bleed hero image */}
-        <div className="relative h-[420px] sm:h-[520px]">
+      {/* ═══ A. HERO ════════════════════════════════════════════════ */}
+      <section>
+        {/* Full-bleed hero image — no overlay, no text on image */}
+        <div className="relative h-[320px] sm:h-[440px] w-full overflow-hidden">
           <Image
             src={p.heroImage}
             alt={p.heroImageAlt}
@@ -72,29 +72,26 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
             priority
             sizes="100vw"
           />
-          {/* Strong gradient so text is always readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 via-brand-blue-800/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         </div>
 
-        {/* Hero content — overlaid on image */}
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10 w-full">
+        {/* Hero content panel — below image, no overlay */}
+        <div className="bg-slate-900">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-white/70 mb-4">
+            <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-5">
               {p.breadcrumbs.map((b, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <ChevronRight className="w-3 h-3" />}
                   {b.href ? (
-                    <Link href={b.href} className="hover:text-white transition-colors">{b.label}</Link>
+                    <Link href={b.href} className="hover:text-white/80 transition-colors">{b.label}</Link>
                   ) : (
-                    <span className="text-white font-medium">{b.label}</span>
+                    <span className="text-white/80 font-medium">{b.label}</span>
                   )}
                 </span>
               ))}
             </nav>
 
-            <div className="flex flex-col sm:flex-row sm:items-end gap-6">
+            <div className="flex flex-col lg:flex-row lg:items-start gap-8">
               <div className="flex-1">
                 {/* Badge */}
                 {p.badge && (
@@ -107,48 +104,43 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
                     {p.badge}
                   </span>
                 )}
-                <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-3 drop-shadow-lg">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-3">
                   {p.title}
                 </h1>
-                <p className="text-white/85 text-base sm:text-lg max-w-2xl leading-relaxed">
+                <p className="text-white/75 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
                   {p.subtitle}
                 </p>
 
-                {/* Quick stat pills — photo thumbnails */}
-                <div className="flex flex-wrap gap-2 mt-5">
+                {/* Quick fact chips */}
+                <div className="flex flex-wrap gap-2">
                   {[
-                    { img: '/images/hp/complete-training.jpg', val: `${p.durationWeeks} weeks` },
-                    { img: '/images/hp/train.jpg',             val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week` },
-                    { img: '/images/hp/school.jpg',            val: `${p.credentials.length} credentials` },
-                    { img: '/images/hp/candidates.jpg',        val: p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person' },
-                  ].map(({ img, val }) => (
-                    <span key={val} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold pl-1 pr-3 py-1 rounded-full border border-white/30">
-                      <span className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/40">
-                        <Image src={img} alt="" width={24} height={24} className="object-cover w-full h-full" />
-                      </span>
-                      {val}
+                    { icon: <Clock className="w-3.5 h-3.5" />, val: `${p.durationWeeks} weeks` },
+                    { icon: <BookOpen className="w-3.5 h-3.5" />, val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week` },
+                    { icon: <Award className="w-3.5 h-3.5" />, val: `${p.credentials.length} credential${p.credentials.length !== 1 ? 's' : ''}` },
+                    { icon: <MapPin className="w-3.5 h-3.5" />, val: p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person' },
+                  ].map(({ icon, val }) => (
+                    <span key={val} className="inline-flex items-center gap-1.5 bg-white/10 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
+                      {icon}{val}
                     </span>
                   ))}
                 </div>
               </div>
 
               {/* CTA card */}
-              <div className="sm:w-64 flex-shrink-0">
-                <div className="bg-white rounded-2xl shadow-2xl p-5">
+              <div className="lg:w-64 flex-shrink-0">
+                <div className="bg-white rounded-2xl shadow-xl p-5">
                   <p className="text-xs font-bold text-brand-green-600 uppercase tracking-wider mb-1">Grant Funding Available</p>
                   <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
                   <p className="text-xs text-slate-500 mb-4">self-pay · funding may cover 100%</p>
 
-                  {/* NEW APPLICANT path */}
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">New Applicant</p>
                   <Link
                     href={p.cta.applyHref}
                     className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
                   >
-                    Apply to This Program
+                    Apply Now
                   </Link>
 
-                  {/* ENROLLED STUDENT path */}
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
                   <Link
                     href={p.cta.enrollHref || '/lms/dashboard'}

@@ -3,7 +3,7 @@ export const NAIL_TECH: ProgramSchema = {
   slug: 'nail-technician-apprenticeship', title: 'Nail Technician Apprenticeship',
   subtitle: 'Earn your Indiana nail technician license through a registered apprenticeship. 600 hours of supervised training.',
   sector: 'personal-services', category: 'Nail Technology',
-  heroImage: '/images/pages/barber-gallery-2.jpg', heroImageAlt: 'Nail technician apprentice performing a manicure',
+  heroImage: '/images/pages/nail-technician.jpg', heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person', durationWeeks: 20, hoursPerWeekMin: 25, hoursPerWeekMax: 30,
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 450, examPrep: 40, careerPlacement: 50 },
   schedule: 'Mon–Fri, varies by salon (25–30 hrs/week)', cohortSize: '1–3 apprentices per salon',

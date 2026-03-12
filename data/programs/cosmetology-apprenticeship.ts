@@ -6,7 +6,7 @@ export const COSMETOLOGY: ProgramSchema = {
   subtitle: 'Earn your Indiana cosmetology license through a registered apprenticeship. 2,000 hours of supervised training in a licensed salon.',
   sector: 'personal-services',
   category: 'Cosmetology',
-  heroImage: '/images/pages/barber-gallery-1.jpg',
+  heroImage: '/images/pages/cosmetology.jpg',
   heroImageAlt: 'Cosmetology apprentice styling hair in a salon',
   deliveryMode: 'in-person',
   durationWeeks: 52,

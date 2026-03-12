@@ -1,39 +1,27 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:10.000
-EPA 608 is not optional. You cannot legally touch refrigerant without it. Let's
-make sure you pass.
+00:00:00.000 --> 00:00:15.000
+EPA 608 is not optional. You cannot legally touch refrigerant without it.
 
-00:00:10.000 --> 00:00:20.000
+00:00:15.000 --> 00:00:30.000
 ASHRAE Standard 15 is the Safety Standard for Refrigeration Systems. It governs
 equipment room requirements, refrigerant detector placement, ventilation rates,
-and emergency shutoffs. ASHRAE Standard 34 assigns safety group designations to
+and emergency shutoffs.
 
-00:00:20.000 --> 00:00:30.000
-Here are the key terms. Write these down.
+00:00:30.000 --> 00:00:45.000
+ASHRAE Standard 34 assigns safety group designations to refrigerants based on
+toxicity and flammability. A equals lower toxicity. B equals higher toxicity. 1
+equals no flame propagation. 2L equals mildly flammable. 2 equals flammable. 3
 
-00:00:30.000 --> 00:00:40.000
-ASHRAE 15: Safety Standard for Refrigeration Systems. Covers equipment rooms,
-ventilation, and emergency shutoffs.
+00:00:45.000 --> 00:01:00.000
+R-410A is A1. R-32 is A2L. R-290 propane is A3. R-123 is B1. Knowing these
+classifications tells you what PPE, ventilation, and equipment is required.
 
-00:00:40.000 --> 00:00:50.000
-ASHRAE 34: Refrigerant designation and safety classification standard. Assigns
-A/B toxicity and 1/2L/2/3 flammability ratings.
+00:01:00.000 --> 00:01:15.000
+When you see a new refrigerant on a system nameplate, the ASHRAE 34 safety group
+tells you immediately what precautions to take before you open anything.
 
-00:00:50.000 --> 00:01:00.000
-A2L: Low toxicity, mildly flammable. Burning velocity 10 cm/s or less. Includes
-R-32, R-454B, R-466A.
-
-00:01:00.000 --> 00:01:10.000
-Here's why this matters on the job: When you see a new refrigerant on a system
-nameplate, the ASHRAE 34 safety group tells you immediately what precautions to
-take before you open anything.
-
-00:01:10.000 --> 00:01:20.000
-Watch out for these: A2L refrigerants require A2L-rated equipment — you cannot
-retrofit. And B-class refrigerants like R-123 require more ventilation and PPE.
-
-00:01:20.000 --> 00:01:30.000
-Quick check: what is the maximum fine for knowingly venting refrigerant? If you
-don't know that number, go back and read it again.
+00:01:15.000 --> 00:01:30.000
+A2L refrigerants require A2L-rated equipment. You cannot retrofit. B-class
+refrigerants like R-123 require more ventilation and PPE.
 

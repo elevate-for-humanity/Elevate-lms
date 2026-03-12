@@ -6,9 +6,7 @@ export function createAdminClient(): SupabaseClient<any> | null {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
-    if (process.env.NODE_ENV === 'development') {
-      logger.warn('[Supabase Admin] Missing credentials. Admin features disabled.');
-    }
+    logger.warn('[Supabase Admin] SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL missing — admin queries will use anon client and may be blocked by RLS.');
     return null;
   }
 

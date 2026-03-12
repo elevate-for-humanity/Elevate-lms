@@ -57,7 +57,7 @@ async function _POST(req: Request) {
   // Send notification email
   try {
     await sendEmail({
-      to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
+      to: process.env.NOTIFY_EMAIL_TO || 'admin@elevateforhumanity.org',
       subject: `New License Request: ${payload.full_name} (${payload.desired_tier})`,
       html:
         `<p>New License Request</p>` +

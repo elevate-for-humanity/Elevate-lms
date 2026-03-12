@@ -165,7 +165,7 @@ async function _POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        to: 'elevate4humanityedu@gmail.com',
+        to: 'admin@elevateforhumanity.org',
         subject: 'New Identity Verification Pending Review',
         html: `
           <h2>New Identity Verification Submission</h2>

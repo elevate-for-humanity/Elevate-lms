@@ -249,7 +249,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
             await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
+              to: 'admin@elevateforhumanity.org',
               subject: `New Barber Apprentice - ${customerName || customerEmail}`,
               html: `
 <p>New barber apprentice enrolled:</p>
@@ -363,7 +363,7 @@ ${!fullyPaid ? '• Weekly invoices will arrive every Friday<br>' : ''}</p>
 
             // Admin notification
             await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
+              to: 'admin@elevateforhumanity.org',
               subject: `New Barber Apprentice — ${customerName || customerEmail}`,
               html: `<p>New enrollment via public checkout:</p>
 <p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>
@@ -536,7 +536,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             // Also send internal notification
             try {
               await sendEmail({
-                to: process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com',
+                to: process.env.REPLY_TO_EMAIL || 'admin@elevateforhumanity.org',
                 subject: `New Barber Enrollment: ${customerName || customerEmail}`,
                 html: `
                   <h2>New Barber Apprenticeship Enrollment</h2>

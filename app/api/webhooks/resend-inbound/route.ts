@@ -9,12 +9,12 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
 const FORWARD_MAP: Record<string, string> = {
-  'info': 'elevate4humanityedu@gmail.com',
-  'support': 'elevate4humanityedu@gmail.com',
-  'admissions': 'elevate4humanityedu@gmail.com',
-  'enrollment': 'elevate4humanityedu@gmail.com',
+  'info': 'admin@elevateforhumanity.org',
+  'support': 'admin@elevateforhumanity.org',
+  'admissions': 'admin@elevateforhumanity.org',
+  'enrollment': 'admin@elevateforhumanity.org',
 };
-const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
+const DEFAULT_FORWARD = 'admin@elevateforhumanity.org';
 
 /**
  * Resend inbound webhook — receives email.received events and forwards

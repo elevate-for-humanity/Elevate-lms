@@ -11,7 +11,7 @@ import { workoneOnboardingEmail } from './templates/workone-onboarding';
 import { barberOnboardingEmail } from './templates/barber-onboarding';
 import { logger } from '@/lib/logger';
 
-const ADMIN_BCC = 'elevate4humanityedu@gmail.com';
+const ADMIN_BCC = 'admin@elevateforhumanity.org';
 
 const BARBER_KEYWORDS = ['barber', 'nail', 'beauty', 'cosmet'];
 

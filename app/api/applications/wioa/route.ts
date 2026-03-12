@@ -161,7 +161,7 @@ async function _POST(req: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'admin@elevateforhumanity.org',
           subject: `New WIOA Application [${referenceNumber}]: ${body.firstName} ${body.lastName}`,
           html: `
             <h2>New WIOA Application Received</h2>

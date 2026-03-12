@@ -8,7 +8,7 @@
 import { sendEmail as coreSendEmail } from './sendgrid';
 import type { EmailOptions as CoreEmailOptions } from './sendgrid';
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
 
 export type EmailOptions = CoreEmailOptions;
 

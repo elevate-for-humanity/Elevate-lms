@@ -158,7 +158,7 @@ export default function CosmetologyApplyPage() {
               Questions?{' '}
               <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
               {' '}or{' '}
-              <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">email us</a>
+              <a href="mailto:admin@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">email us</a>
             </p>
           </form>
         </div>

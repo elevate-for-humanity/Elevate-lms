@@ -247,7 +247,7 @@ async function _POST(req: Request) {
     `;
 
     await sendEmail({
-      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
+      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org',
       subject: `New Barbershop Partner Application: ${body.shopLegalName}`,
       html: internalEmailHtml,
     }).catch(err => logger.error('Failed to send internal notification', err));
@@ -351,7 +351,7 @@ async function _POST(req: Request) {
 
     // Send copy to admin
     await sendEmail({
-      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
+      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org',
       subject: `[Copy] Welcome to the Barbershop Partner Program — ${shopDisplayName}`,
       html: partnerWelcomeHtml,
     }).catch(err => logger.error('Failed to send admin copy of partner welcome email', err));

@@ -50,7 +50,7 @@ async function _POST(request: Request) {
 
     try {
       await sendEmail({
-        to: 'elevate4humanityedu@gmail.com',
+        to: 'admin@elevateforhumanity.org',
         subject: `New Advising Request from ${name}`,
         html: `
           <h2>New Advising Request</h2>

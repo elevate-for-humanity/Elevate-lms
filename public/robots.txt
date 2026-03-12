@@ -1,0 +1,39 @@
+User-agent: *
+
+# Public marketing pages — allow indexing
+Allow: /$
+Allow: /programs/
+Allow: /about/
+Allow: /funding/
+Allow: /credentials/
+Allow: /features/
+Allow: /resources/
+Allow: /search/
+Allow: /partners/
+Allow: /philanthropy/
+Allow: /directory/
+Allow: /contact/
+Allow: /privacy-policy/
+Allow: /terms/
+
+# Internal platform routes — do not index
+Disallow: /admin/
+Disallow: /lms/
+Disallow: /student-portal/
+Disallow: /staff-portal/
+Disallow: /instructor/
+Disallow: /employer-portal/
+Disallow: /partner-portal/
+Disallow: /workforce-board/
+Disallow: /program-holder/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /login
+Disallow: /signup
+Disallow: /onboarding/
+Disallow: /settings/
+Disallow: /connects/
+Disallow: /education/
+
+Sitemap: https://www.elevateforhumanity.org/sitemap.xml

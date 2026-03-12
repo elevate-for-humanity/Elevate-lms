@@ -8,6 +8,9 @@ const EDUCATION_DOMAIN = 'elevateforhumanityeducation.com';
 // Connects domain - landing page at /connects, sub-routes pass through
 const CONNECTS_DOMAIN = 'elevateconnects.org';
 
+// LMS subdomain — learn.elevateforhumanity.org → /lms
+const LEARN_SUBDOMAIN = 'learn.elevateforhumanity.org';
+
 // LMS domain (legacy alias — now uses EDUCATION_DOMAIN)
 const LMS_DOMAIN = 'elevateforhumanityeducation.com';
 
@@ -271,6 +274,18 @@ export async function proxy(request: NextRequest) {
   // Dead legacy path — /student-portal/education never existed, redirect to student portal
   if (pathname === '/student-portal/education' || pathname.startsWith('/student-portal/education/')) {
     return NextResponse.redirect(new URL('/student-portal', request.url), 301);
+  }
+
+  // learn.elevateforhumanity.org → /lms
+  if (host === LEARN_SUBDOMAIN) {
+    if (pathname === '/' || pathname === '') {
+      return NextResponse.rewrite(new URL('/lms/dashboard', request.url));
+    }
+    // Pass sub-routes through (e.g. learn.elevateforhumanity.org/courses → /lms/courses)
+    if (!pathname.startsWith('/lms')) {
+      return NextResponse.rewrite(new URL(`/lms${pathname}`, request.url));
+    }
+    return NextResponse.next();
   }
 
   // Education domain routing (elevateforhumanityeducation.com)

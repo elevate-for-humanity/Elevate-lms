@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
 
 async function sendEnrollmentConfirmationEmail({
   to,
@@ -60,7 +60,7 @@ async function sendEnrollmentConfirmationEmail({
           <div style="border-top:1px solid #e0e0e0;margin-top:12px;padding-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#555">
             <p style="margin:0 0 8px">Questions? We're here to help:</p>
             <p style="margin:0 0 4px">📞 <a href="tel:3173143757" style="color:#555">(317) 314-3757</a></p>
-            <p style="margin:0">✉️ <a href="mailto:elevate4humanityedu@gmail.com" style="color:#555">elevate4humanityedu@gmail.com</a></p>
+            <p style="margin:0">✉️ <a href="mailto:admin@elevateforhumanity.org" style="color:#555">admin@elevateforhumanity.org</a></p>
           </div>
           <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
             <p style="margin:0 0 4px">Elevate for Humanity Career &amp; Technical Institute</p>

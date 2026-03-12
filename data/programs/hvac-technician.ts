@@ -36,7 +36,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   },
   schedule: '6–8 weeks classroom instruction + 2–4 weeks hands-on/OJT (flexible scheduling based on cohort)',
   eveningSchedule: 'Evening/weekend cohorts available for working adults.',
-  cohortSize: '10–15 participants per cohort',
+  cohortSize: 'Up to 30 participants per cohort',
   fundingStatement: 'WIOA, Next Level Jobs, and Workforce Ready Grant funding available for eligible Indiana residents. Eligibility is not guaranteed — you must qualify through WorkOne. Self-pay: $5,000 with payment plans available.',
   selfPayCost: '$5,000 (payment plans available)',
   badge: 'Grant Funded',
@@ -292,7 +292,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     'No prior HVAC experience required',
   ],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',
-  modality: 'Hybrid — Online Related Technical Instruction via LMS, hands-on labs at training facility, On-the-Job Training at employer sites',
+  modality: 'Hybrid — Online Related Technical Instruction via LMS + hands-on training at employer partner sites',
   facilityInfo: 'Elevate training center, Indianapolis',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available. LMS supports Spanish language accessibility.',
   employerPartners: [
@@ -313,8 +313,8 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
   // ─── Facility & Delivery Details ─────────────────────────────────
   facilityDetails: {
-    address: '3901 N Meridian St, Suite 300, Indianapolis, IN 46208',
-    classSize: 'Up to 20 students per cohort',
+    address: '8888 Keystone Crossing, Suite 1309, Indianapolis, IN 46240',
+    classSize: 'Up to 30 participants per cohort',
     labEquipment: 'HVAC training rigs (split systems, package units, heat pumps), EPA 608 exam station, refrigerant recovery equipment, electrical diagnostic tools',
     instructors: [
       {
@@ -329,7 +329,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   programDescription: [
     'The HVAC Technician program at Elevate for Humanity prepares students to install, maintain, and repair residential and light commercial heating, ventilation, air conditioning, and refrigeration systems. Training combines classroom instruction with hands-on lab work at our Indianapolis facility.',
     'Students earn the EPA Section 608 Universal certification — the federal credential required by law to purchase and handle refrigerants — proctored on-site at our EPA-approved testing facility. Additional credentials include OSHA 10-Hour safety certification and ACT WorkKeys / NCRC.',
-    'The program runs 12 weeks: 6–8 weeks of Related Technical Instruction (RTI) covering refrigeration theory, electrical systems, load calculations, and system diagnostics, followed by 2–4 weeks of hands-on training at employer partner sites. Graduates are job-ready for entry-level HVAC service technician roles.',
+    'The program runs 12 weeks: 6–8 weeks of Related Technical Instruction (RTI) delivered online via the Elevate LMS, followed by 2–4 weeks of hands-on training at employer partner sites. Graduates are job-ready for entry-level HVAC service technician roles.',
   ],
 
   // ─── BNPL / Payment Options ──────────────────────────────────────

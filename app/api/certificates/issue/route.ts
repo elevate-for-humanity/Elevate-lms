@@ -35,7 +35,7 @@ async function _POST(request: NextRequest) {
     }
 
     const body = await parseBody<Record<string, any>>(request);
-    const { studentId, programId, studentName, programName, programHours } = body;
+    const { studentId, programId, studentName, programName, programHours, courseId, skipCompletionCheck } = body;
 
     // Validate required fields
     if (!studentId || !programId || !studentName || !programName) {
@@ -50,6 +50,22 @@ async function _POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // Check completion rules (admin can override with skipCompletionCheck)
+    if (!skipCompletionCheck && courseId) {
+      const { evaluateCompletion } = await import('@/lib/lms/completion-rules');
+      const completionStatus = await evaluateCompletion(studentId, programId, courseId);
+      if (!completionStatus.isComplete) {
+        const unmet = completionStatus.ruleResults
+          .filter(r => !r.passed)
+          .map(r => r.detail)
+          .join('; ');
+        return NextResponse.json(
+          { error: `Completion requirements not met: ${unmet}`, completionStatus },
+          { status: 422 }
+        );
+      }
+    }
 
     // Prevent duplicate issuance for same student + program
     const { data: existing } = await supabase

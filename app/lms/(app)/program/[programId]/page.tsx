@@ -13,7 +13,9 @@ import {
   CheckCircle,
   Play,
   GraduationCap,
+  Circle,
 } from 'lucide-react';
+import { evaluateCompletion } from '@/lib/lms/completion-rules';
 
 type Params = Promise<{ programId: string }>;
 
@@ -117,6 +119,12 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
     .select('id, title, issued_at')
     .eq('user_id', user.id)
     .eq('program_id', program.id);
+
+  // Evaluate completion rules
+  const firstCourseId = courseStats[0]?.id;
+  const completionStatus = firstCourseId
+    ? await evaluateCompletion(user.id, program.id, firstCourseId)
+    : null;
 
   const statusLabel: Record<string, { text: string; color: string }> = {
     active: { text: 'Active', color: 'bg-brand-green-100 text-brand-green-700' },
@@ -273,6 +281,36 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Completion Requirements */}
+        {completionStatus && completionStatus.ruleResults.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Completion Requirements</h2>
+            <div className="bg-white rounded-xl border p-6">
+              <div className="space-y-3">
+                {completionStatus.ruleResults.map((r, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    {r.passed ? (
+                      <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                    )}
+                    <span className={`text-sm ${r.passed ? 'text-gray-900' : 'text-gray-500'}`}>
+                      {r.detail}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {completionStatus.isComplete && (
+                <div className="mt-4 pt-4 border-t">
+                  <p className="text-sm font-medium text-brand-green-600">
+                    All requirements met — you are eligible for your certificate.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}

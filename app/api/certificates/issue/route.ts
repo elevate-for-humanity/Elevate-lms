@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { generateCertificateNumber, generateCertificatePDF } from "@/lib/certificates/generator";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -50,8 +51,25 @@ async function _POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Generate certificate number
+    // Prevent duplicate issuance for same student + program
+    const { data: existing } = await supabase
+      .from("certificates")
+      .select("id, certificate_number")
+      .eq("student_id", studentId)
+      .eq("program_id", programId)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Certificate already issued for this student and program", certificateNumber: existing.certificate_number },
+        { status: 409 }
+      );
+    }
+
+    // Generate certificate number and verification token
     const certificateNumber = generateCertificateNumber();
+    const verificationToken = randomUUID();
     const completionDate = new Date().toISOString().split("T")[0];
 
     // Generate certificate PDF
@@ -97,11 +115,13 @@ async function _POST(request: NextRequest) {
         student_id: studentId,
         program_id: programId,
         certificate_number: certificateNumber,
+        verification_token: verificationToken,
         student_name: studentName,
         program_name: programName,
         completion_date: completionDate,
         program_hours: programHours,
         pdf_url: urlData.publicUrl,
+        issued_by: session.user.id,
         issued_at: new Date().toISOString(),
         status: "active",
       })
@@ -120,6 +140,8 @@ async function _POST(request: NextRequest) {
       certificate: {
         id: certRecord.id,
         certificateNumber,
+        verificationToken,
+        verifyUrl: `/verify/${verificationToken}`,
         pdfUrl: urlData.publicUrl,
         issuedAt: certRecord.issued_at,
       },

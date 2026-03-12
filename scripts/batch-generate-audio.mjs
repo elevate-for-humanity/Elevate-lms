@@ -52,16 +52,13 @@ async function generateAudio(lesson) {
   }
 
   return new Promise((resolve) => {
-    const tryModel = (model, retries = 2) => {
+    const tryModel = (model = 'gpt-4o-mini-tts', retries = 2) => {
       const bodyObj = {
-        model,
-        voice: 'onyx',
+        model: 'gpt-4o-mini-tts',
+        voice: 'echo',
         input: lesson.script,   // lesson script ONLY
-        speed: 0.95,
+        instructions: MARCUS_INSTRUCTION, // voice style, never read aloud
       };
-      if (model === 'gpt-4o-mini-tts') {
-        bodyObj.instructions = MARCUS_INSTRUCTION; // voice style, never read aloud
-      }
       const body = JSON.stringify(bodyObj);
 
       const req = https.request({
@@ -85,9 +82,7 @@ async function generateAudio(lesson) {
           let err = '';
           res.on('data', d => err += d);
           res.on('end', () => {
-            if ((res.statusCode === 404 || res.statusCode === 400) && model === 'gpt-4o-mini-tts') {
-              tryModel('tts-1-hd', retries);
-            } else if (retries > 0) {
+            if (retries > 0) {
               setTimeout(() => tryModel(model, retries - 1), 5000);
             } else {
               console.error(`  ❌ ${lesson.defId} failed: ${res.statusCode}`);
@@ -117,7 +112,7 @@ async function generateAudio(lesson) {
       req.end();
     };
 
-    tryModel('gpt-4o-mini-tts');
+    tryModel();
   });
 }
 

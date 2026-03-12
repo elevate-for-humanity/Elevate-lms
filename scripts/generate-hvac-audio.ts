@@ -120,27 +120,14 @@ async function generateOne(defId: string, uuid: string): Promise<'skipped' | 'ge
   const openai = getOpenAIClient();
 
   try {
-    // Try gpt-4o-mini-tts first (personality-aware)
-    let buffer: Buffer;
-    try {
-      const res = await (openai.audio.speech as any).create({
-        model: 'gpt-4o-mini-tts',
-        voice: 'onyx',
-        input: script,
-        instructions: MARCUS_INSTRUCTION,
-        response_format: 'mp3',
-      });
-      buffer = Buffer.from(await res.arrayBuffer());
-    } catch {
-      // Fall back to tts-1-hd
-      const res = await openai.audio.speech.create({
-        model: 'tts-1-hd',
-        voice: 'onyx',
-        input: script,
-        response_format: 'mp3',
-      });
-      buffer = Buffer.from(await res.arrayBuffer());
-    }
+    const res = await (openai.audio.speech as any).create({
+      model: 'gpt-4o-mini-tts',
+      voice: 'echo',
+      input: script,
+      instructions: MARCUS_INSTRUCTION,
+      response_format: 'mp3',
+    });
+    const buffer = Buffer.from(await res.arrayBuffer());
 
     fs.writeFileSync(outputPath, buffer);
     return 'generated';

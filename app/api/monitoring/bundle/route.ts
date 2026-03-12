@@ -9,39 +9,32 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-/**
- * Support Bundle — GET /api/monitoring/bundle
- *
- * Aggregates operational data from production tables for admin diagnostics.
- * Requires admin or super_admin role.
- */
+// Per-query timeout — prevents one slow table from hanging the whole bundle
+const QUERY_TIMEOUT_MS = 8000;
 
-async function guardAdmin() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  return null;
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Query timed out after ${ms}ms`)), ms)
+    ),
+  ]);
 }
 
-async function safeQuery(db: any, table: string, select = '*', options?: { limit?: number; order?: string }) {
+async function safeQuery(
+  db: any,
+  table: string,
+  select = '*',
+  options?: { limit?: number; order?: string }
+) {
   try {
     let query = db.from(table).select(select, { count: 'exact' });
     if (options?.order) query = query.order(options.order, { ascending: false });
     if (options?.limit) query = query.limit(options.limit);
-    const { data, error, count } = await query;
+    const { data, error, count } = await withTimeout(query, QUERY_TIMEOUT_MS);
     return { data: data || [], count: count || 0, error: error ? 'Query failed' : null };
-  } catch {
-    return { data: [], count: 0, error: `Table "${table}" not accessible` };
+  } catch (e) {
+    return { data: [], count: 0, error: `"${table}" unavailable` };
   }
 }
 
@@ -50,17 +43,23 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const denied = await guardAdmin();
-    if (denied) return denied;
-
+    // Auth check
     const supabase = await createClient();
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-    }
-    const _admin = createAdminClient();
-    const db = _admin || supabase;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Only query tables verified to exist in production DB
+    const db = createAdminClient() ?? supabase;
+
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Run all queries in parallel with individual timeouts
     const [
       courses,
       lessons,
@@ -96,26 +95,6 @@ async function _GET(req: Request) {
     const lessonsWithMp3 = lessons.data.filter((l: any) => l.video_url?.includes('.mp3') && !l.video_url?.includes('.mp4')).length;
     const lessonsNoMedia = lessons.count - lessonsWithMp4 - lessonsWithMp3;
 
-    // Content quality — detect template filler vs real content
-    const courseLessonMap: Record<string, string[]> = {};
-    for (const l of lessons.data) {
-      const cid = (l as any).course_id;
-      if (!courseLessonMap[cid]) courseLessonMap[cid] = [];
-      courseLessonMap[cid].push((l as any).title);
-    }
-    const templateFirstTitles = new Set([
-      'Program Introduction', 'Industry Overview & Safety', 'Introduction to Healthcare'
-    ]);
-    let coursesWithRealContent = 0;
-    let coursesWithTemplateFiller = 0;
-    for (const titles of Object.values(courseLessonMap)) {
-      if (titles.some(t => templateFirstTitles.has(t))) {
-        coursesWithTemplateFiller++;
-      } else {
-        coursesWithRealContent++;
-      }
-    }
-
     // Enrollment breakdown by status
     const enrollmentsByStatus: Record<string, number> = {};
     for (const e of enrollments.data) {
@@ -123,16 +102,33 @@ async function _GET(req: Request) {
       enrollmentsByStatus[s] = (enrollmentsByStatus[s] || 0) + 1;
     }
 
-    // Courses with enrollments
     const enrolledCourseIds = new Set(enrollments.data.map((e: any) => e.course_id));
+
+    // Surface any query errors in the bundle for transparency
+    const queryErrors: Record<string, string | null> = {
+      training_courses: courses.error,
+      training_lessons: lessons.error,
+      enrollments: enrollments.error,
+      profiles: profiles.error,
+      lesson_progress: lessonProgress.error,
+      course_progress: courseProgress.error,
+      certificates: certificates.error,
+      credentials: credentials.error,
+      partner_lms_enrollments: partnerEnrollments.error,
+      partner_lms_providers: partnerProviders.error,
+      rapids_tracking: rapidsTracking.error,
+      funding_cases: fundingCases.error,
+      rapids_submissions: rapidsSubmissions.error,
+    };
+    const activeErrors = Object.fromEntries(
+      Object.entries(queryErrors).filter(([, v]) => v !== null)
+    );
 
     const bundle = {
       generated_at: new Date().toISOString(),
       summary: {
         total_courses: courses.count,
         active_courses: courses.data.filter((c: any) => c.is_active).length,
-        courses_with_real_content: coursesWithRealContent,
-        courses_with_template_filler: coursesWithTemplateFiller,
         total_lessons: lessons.count,
         lessons_with_mp4: lessonsWithMp4,
         lessons_with_mp3_only: lessonsWithMp3,
@@ -156,21 +152,7 @@ async function _GET(req: Request) {
       credentials: credentials.data,
       partner_providers: partnerProviders.data,
       recent_enrollments: enrollments.data.slice(0, 20),
-      errors: {
-        training_courses: courses.error,
-        training_lessons: lessons.error,
-        enrollments: enrollments.error,
-        profiles: profiles.error,
-        lesson_progress: lessonProgress.error,
-        course_progress: courseProgress.error,
-        certificates: certificates.error,
-        credentials: credentials.error,
-        partner_lms_enrollments: partnerEnrollments.error,
-        partner_lms_providers: partnerProviders.error,
-        rapids_tracking: rapidsTracking.error,
-        funding_cases: fundingCases.error,
-        rapids_submissions: rapidsSubmissions.error,
-      },
+      ...(Object.keys(activeErrors).length > 0 && { errors: activeErrors }),
     };
 
     return NextResponse.json(bundle);
@@ -182,4 +164,5 @@ async function _GET(req: Request) {
     );
   }
 }
+
 export const GET = withApiAudit('/api/monitoring/bundle', _GET);

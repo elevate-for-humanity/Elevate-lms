@@ -48,7 +48,6 @@ export default function HvacVideoPlayer({ videoUrl, audioUrl, posterUrl, title, 
           onError={() => setError(true)}
         >
           <source src={videoUrl} type="video/mp4" />
-          {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
           {captionUrl && (
             <track kind="captions" src={captionUrl} srcLang="en" label="English" default />
           )}

@@ -35,7 +35,7 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <LazyVideo src="/videos/store-marketplace.mp4" poster="/images/heroes-hq/programs-hero.jpg"
+          <LazyVideo src="/videos/store-marketplace.mp4" poster="/images/pages/programs-hero.jpg"
             className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-slate-900 py-10">

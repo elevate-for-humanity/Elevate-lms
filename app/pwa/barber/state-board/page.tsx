@@ -97,7 +97,7 @@ export default function StateBoardPrepPage() {
   const avgScore = attempts.length > 0
     ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length)
     : 0;
-  const isEligible = totalHours >= 1500;
+  const isEligible = totalHours >= 2000;
 
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
@@ -125,7 +125,7 @@ export default function StateBoardPrepPage() {
                 {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 2,000 hours`}
               </p>
               <p className="text-xs text-white/60">
-                {isEligible ? 'You meet the hour requirement' : `${(1500 - totalHours).toLocaleString()} hours remaining`}
+                {isEligible ? 'You meet the hour requirement' : `${(2000 - totalHours).toLocaleString()} hours remaining`}
               </p>
             </div>
           </div>

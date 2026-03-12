@@ -111,7 +111,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                 By program completion, apprentices perform six standard haircut styles — fade, taper, buzz, scissor-over-comb,
                 flat top, and shape-up — to client satisfaction. You will execute straight razor shaves following Indiana
                 sanitation protocols, identify and treat common scalp conditions, and demonstrate proper disinfection procedures
-                per Indiana Board standards. Each apprentice completes 1,000 hours of on-the-job training at a licensed shop,
+                per Indiana Board standards. Each apprentice completes 1,500 hours of on-the-job training at a licensed shop,
                 builds a client portfolio of 50+ documented services, and passes the Indiana Barber License written and practical exams.
               </p>
             </div>

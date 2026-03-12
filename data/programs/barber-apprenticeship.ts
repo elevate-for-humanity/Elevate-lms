@@ -65,7 +65,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { statement: 'Execute straight razor shaves following Indiana sanitation and safety protocols', assessedAt: 'Month 4' },
     { statement: 'Identify and treat 5 common scalp conditions using appropriate products', assessedAt: 'Month 3' },
     { statement: 'Demonstrate proper sanitation and disinfection procedures per Indiana Board standards', assessedAt: 'Month 1' },
-    { statement: 'Complete 1,000 hours of on-the-job training at a licensed barbershop', assessedAt: 'Month 12' },
+    { statement: 'Complete 1,500 hours of on-the-job training at a licensed barbershop', assessedAt: 'Month 12' },
     { statement: 'Pass the Indiana Barber License written and practical exams', assessedAt: 'Month 12' },
     { statement: 'Build a client portfolio of 50+ documented services', assessedAt: 'Month 9' },
   ],
@@ -105,7 +105,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { week: 'Month 7–8', title: 'Advanced Techniques', competencyMilestone: 'Hair design, texturizing, chemical services (relaxers, color). Build client portfolio to 25+ services.' },
     { week: 'Month 9–10', title: 'Business & Client Management', competencyMilestone: 'Manage booking system, build pricing strategy, reach 50+ documented client services.' },
     { week: 'Month 11', title: 'License Exam Prep', competencyMilestone: 'Pass practice written exam (80%+), complete practical exam rehearsals.' },
-    { week: 'Month 12', title: 'Certification & Licensing', competencyMilestone: 'Take Indiana Barber License exam (written + practical), complete 1,500 total hours.' },
+    { week: 'Month 12', title: 'Certification & Licensing', competencyMilestone: 'Take Indiana Barber License exam (written + practical), complete 2,000 total hours.' },
   ],
 
   curriculum: [
@@ -187,7 +187,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       weeks: 'Weeks 41–52',
       focus: 'Supervised shop floor hours, client management, and Indiana state board exam preparation.',
       labCompetencies: [
-        'Complete 1,500 supervised apprenticeship hours',
+        'Complete 2,000 supervised apprenticeship hours (1,500 OJT + 500 RTI)',
         'Manage a personal client book of 20+ regular clients',
         'Pass practical exam simulation (4 required skills)',
         'Pass written exam practice test with 75%+ score',
@@ -262,7 +262,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
 
   faqs: [
     { question: 'Do I get paid during the apprenticeship?', answer: 'Yes. As a DOL Registered Apprentice, you earn wages while training at your host barbershop. Starting pay is typically $12–$15/hour, increasing as you gain skills.' },
-    { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 1,500 total hours: 1,000 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },
+    { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },
     { question: 'Do I need my own barbershop?', answer: 'No. We match you with a licensed host barbershop in the Indianapolis area. The host shop provides your on-the-job training environment.' },
     { question: 'What license do I earn?', answer: 'The Indiana Barber License, issued by the Indiana State Board of Cosmetology and Barber Examiners. You also earn a DOL Registered Apprenticeship certificate, which is recognized in all 50 states.' },
   ],

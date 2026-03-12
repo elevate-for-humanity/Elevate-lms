@@ -1,0 +1,41 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.000
+Electricity runs everything in an HVAC system. If you don't understand it, you
+can't diagnose anything.
+
+00:00:20.000 --> 00:00:40.000
+Wiring diagrams are the roadmaps of HVAC systems. There are two types: schematic
+diagrams (show the electrical logic — which components connect to which) and
+pictorial diagrams (show the physical location of components and wire routing).
+
+00:00:40.000 --> 00:01:00.000
+Here are the key terms. Write these down.
+
+00:01:00.000 --> 00:01:20.000
+Schematic Diagram: Shows electrical connections logically — which components are
+in series or parallel. Used for troubleshooting circuit logic.
+
+00:01:20.000 --> 00:01:40.000
+Pictorial Diagram: Shows physical wire routing and component locations. Used for
+finding components and tracing wires on the actual equipment.
+
+00:01:40.000 --> 00:02:00.000
+Series Circuit: Components connected end-to-end. Current flows through each one.
+If any component opens, the entire circuit stops. Safety switches are wired in
+series.
+
+00:02:00.000 --> 00:02:20.000
+Here's why this matters on the job: On a no-cooling call, you trace the 24V
+circuit: transformer → thermostat → safety switches → contactor coil. If you
+find 24V at the thermostat but 0V at the contactor, the problem is between those
+
+00:02:20.000 --> 00:02:40.000
+Watch out for these: Always check the wiring diagram on the equipment — do not
+assume all systems are wired the same. And — A broken wire in a series circuit
+stops everything downstream
+
+00:02:40.000 --> 00:03:00.000
+Take a minute before you move on. What's the one thing from this lesson you need
+to remember on a service call?
+

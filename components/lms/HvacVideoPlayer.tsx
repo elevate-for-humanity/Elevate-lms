@@ -7,9 +7,10 @@ interface HvacVideoPlayerProps {
   audioUrl: string | null
   posterUrl: string
   title: string
+  captionUrl?: string | null
 }
 
-export default function HvacVideoPlayer({ videoUrl, audioUrl, posterUrl, title }: HvacVideoPlayerProps) {
+export default function HvacVideoPlayer({ videoUrl, audioUrl, posterUrl, title, captionUrl }: HvacVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [error, setError] = useState(false)
   const [loaded, setLoaded] = useState(false)
@@ -48,8 +49,9 @@ export default function HvacVideoPlayer({ videoUrl, audioUrl, posterUrl, title }
         >
           <source src={videoUrl} type="video/mp4" />
           {audioUrl && <source src={audioUrl} type="audio/mpeg" />}
-          {/* VTT captions served from /hvac/captions/ when generated */}
-          <track kind="captions" srcLang="en" label="English" default />
+          {captionUrl && (
+            <track kind="captions" src={captionUrl} srcLang="en" label="English" default />
+          )}
           Your browser does not support the video element.
         </video>
       )}

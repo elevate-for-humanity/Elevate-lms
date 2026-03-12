@@ -47,6 +47,11 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
   const audioUrl   = lesson.audioFile ? `/${lesson.audioFile}` : uuid ? `/hvac/audio/lesson-${uuid}.mp3` : null;
   const diagramUrl = lesson.diagramFile ? `/hvac/diagrams/${lesson.diagramFile}` : null;
 
+  // Derive caption URL from video path (same UUID, .vtt extension)
+  const captionUrl = videoUrl
+    ? videoUrl.replace('/hvac/videos/', '/hvac/captions/').replace('.mp4', '.vtt')
+    : null;
+
   const quizQuestions = HVAC_QUIZ_MAP[lesson.lessonId] ?? null;
   const epaTags       = EPA_608_LESSON_TAGS[lesson.lessonId] ?? [];
 
@@ -83,6 +88,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
             audioUrl={audioUrl}
             posterUrl={diagramUrl ?? ''}
             title={lesson.lessonTitle}
+            captionUrl={captionUrl}
           />
         ) : audioUrl ? (
           <div className="max-w-4xl mx-auto px-4 py-8">

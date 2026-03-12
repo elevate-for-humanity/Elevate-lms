@@ -1,0 +1,40 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.000
+Electricity runs everything in an HVAC system. If you don't understand it, you
+can't diagnose anything.
+
+00:00:20.000 --> 00:00:40.000
+In this lab, you will use a digital multimeter to measure AC voltage (at the
+disconnect, contactor, and transformer), DC voltage (at the control board),
+resistance (across motor windings and capacitors), continuity (through switches
+
+00:00:40.000 --> 00:01:00.000
+Here are the key terms. Write these down.
+
+00:01:00.000 --> 00:01:20.000
+Continuity: A complete electrical path. Your meter beeps when continuity exists
+(near-zero ohms). No beep = open circuit (broken wire, blown fuse, open switch).
+
+00:01:20.000 --> 00:01:40.000
+Capacitance: The ability to store electrical charge, measured in microfarads
+(µF). A capacitor must be within ±6% of its rated value to work properly.
+
+00:01:40.000 --> 00:02:00.000
+Common (C) Terminal: On a compressor, the terminal connected to both the start
+and run windings. Used as a reference point for winding resistance measurements.
+
+00:02:00.000 --> 00:02:20.000
+Here's why this matters on the job: Every service call requires meter readings.
+Measuring voltage confirms power. Measuring amps confirms motor health.
+Measuring capacitance confirms capacitor condition. These three measurements
+
+00:02:20.000 --> 00:02:40.000
+Watch out for these: Set your meter to the correct function BEFORE connecting
+probes — wrong setting can damage the meter or shock you. And — Discharge
+capacitors before measuring capacitance — stored charge gives false readings and
+
+00:02:40.000 --> 00:03:00.000
+Take a minute before you move on. What's the one thing from this lesson you need
+to remember on a service call?
+

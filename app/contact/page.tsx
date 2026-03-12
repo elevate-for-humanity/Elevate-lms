@@ -417,6 +417,22 @@ export default function ContactPage() {
       </div>
 
       {/* Feedback Widget */}
+      {/* Calendly inline widget */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">Schedule a Meeting</h2>
+        <p className="text-slate-500 mb-6">Pick a time that works for you and we'll connect directly.</p>
+        <div
+          className="calendly-inline-widget"
+          data-url="https://calendly.com/elevate4humanityedu"
+          style={{ minWidth: '320px', height: '700px' }}
+        />
+        <script
+          type="text/javascript"
+          src="https://assets.calendly.com/assets/external/widget.js"
+          async
+        />
+      </div>
+
       <div className="max-w-4xl mx-auto px-4 py-8">
         <FeedbackWidget userId="" />
       </div>

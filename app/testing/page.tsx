@@ -15,7 +15,7 @@ const ACCREDITATIONS = [
   { label: 'WIOA Title I', sub: 'Approved Provider' },
   { label: 'DOL Apprenticeship', sub: 'Registered Sponsor' },
   { label: 'WorkOne Partner', sub: 'Central Indiana' },
-  { label: 'EPA 608', sub: 'Authorized Proctor Site' },
+  { label: 'EPA 608', sub: 'ESCO Group & Mainstream Engineering — Nationally Authorized Proctor' },
 ];
 
 const PIPELINE = [

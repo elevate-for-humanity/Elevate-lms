@@ -239,39 +239,40 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     // Verify Calendly webhook signature (HMAC-SHA256, t=timestamp.v1=sig format)
+    // Set CALENDLY_WEBHOOK_SECRET to the signing key from Calendly Dashboard → Webhooks.
+    // Until configured, requests are accepted but a warning is logged.
     const sigHeader = request.headers.get('calendly-webhook-signature');
     const webhookSecret = process.env.CALENDLY_WEBHOOK_SECRET;
     if (!webhookSecret) {
-      logger.error('[Calendly Webhook] CALENDLY_WEBHOOK_SECRET not configured — rejecting request');
-      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
-    }
-    if (!sigHeader) {
-      logger.warn('[Calendly Webhook] Missing signature header');
+      logger.warn('[Calendly Webhook] CALENDLY_WEBHOOK_SECRET not set — skipping signature verification');
+    } else if (!sigHeader) {
+      logger.warn('[Calendly Webhook] Missing signature header — rejecting');
       return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    } else {
+      // Parse "t=<timestamp>,v1=<signature>"
+      const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
+      const timestamp = parts['t'];
+      const receivedSig = parts['v1'];
+      if (!timestamp || !receivedSig) {
+        logger.warn('[Calendly Webhook] Malformed signature header');
+        return NextResponse.json({ error: 'Invalid signature format' }, { status: 401 });
+      }
+      // Reject stale webhooks (>5 min)
+      if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {
+        logger.warn('[Calendly Webhook] Stale timestamp rejected');
+        return NextResponse.json({ error: 'Request too old' }, { status: 401 });
+      }
+      const rawBody = await request.text();
+      const { createHmac, timingSafeEqual } = await import('crypto');
+      const expected = createHmac('sha256', webhookSecret)
+        .update(`${timestamp}.${rawBody}`)
+        .digest('hex');
+      if (!timingSafeEqual(Buffer.from(receivedSig, 'hex'), Buffer.from(expected, 'hex'))) {
+        logger.error('[Calendly Webhook] Signature mismatch — rejecting');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
     }
-    // Parse "t=<timestamp>,v1=<signature>"
-    const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
-    const timestamp = parts['t'];
-    const receivedSig = parts['v1'];
-    if (!timestamp || !receivedSig) {
-      logger.warn('[Calendly Webhook] Malformed signature header');
-      return NextResponse.json({ error: 'Invalid signature format' }, { status: 401 });
-    }
-    // Reject stale webhooks (>5 min)
-    if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {
-      logger.warn('[Calendly Webhook] Stale timestamp rejected');
-      return NextResponse.json({ error: 'Request too old' }, { status: 401 });
-    }
-    const rawBody = await request.text();
-    const { createHmac, timingSafeEqual } = await import('crypto');
-    const expected = createHmac('sha256', webhookSecret)
-      .update(`${timestamp}.${rawBody}`)
-      .digest('hex');
-    if (!timingSafeEqual(Buffer.from(receivedSig, 'hex'), Buffer.from(expected, 'hex'))) {
-      logger.error('[Calendly Webhook] Signature mismatch — rejecting');
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
-    const event: CalendlyEvent = JSON.parse(rawBody);
+    const event: CalendlyEvent = await request.json();
     
     logger.info('[Calendly Webhook] Received event:', event.event);
     

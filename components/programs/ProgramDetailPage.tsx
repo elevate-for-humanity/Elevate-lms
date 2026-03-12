@@ -114,7 +114,7 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
                 {/* Quick fact chips */}
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { icon: <Clock className="w-3.5 h-3.5" />, val: `${p.durationWeeks} weeks` },
+                    { icon: <Clock className="w-3.5 h-3.5" />, val: `${p.durationWeeks} ${p.durationWeeks === 1 ? 'week' : 'weeks'}` },
                     { icon: <BookOpen className="w-3.5 h-3.5" />, val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week` },
                     { icon: <Award className="w-3.5 h-3.5" />, val: `${p.credentials.length} credential${p.credentials.length !== 1 ? 's' : ''}` },
                     { icon: <MapPin className="w-3.5 h-3.5" />, val: p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person' },

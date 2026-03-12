@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 export type ExamEventType =
   | 'exam_started'
   | 'exam_submitted'
@@ -36,6 +37,6 @@ export async function logExamEvent(params: {
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    console.error('Failed to log exam event:', res.status, text)
+    logger.error('Failed to log exam event', undefined, { status: res.status, body: text })
   }
 }

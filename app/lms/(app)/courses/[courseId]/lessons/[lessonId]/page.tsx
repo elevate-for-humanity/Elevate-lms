@@ -526,7 +526,6 @@ export default function LessonPage() {
                   title="Quick Check"
                   passingScore={60}
                   onComplete={(score) => {
-                    console.log('Quick check score:', score);
                   }}
                 />
               </div>
@@ -567,7 +566,6 @@ export default function LessonPage() {
                   passingScore={60}
                   onComplete={(score) => {
                     // Quick checks don't block progress — just reinforcement
-                    console.log('Quick check score:', score);
                   }}
                 />
               </div>

@@ -69,7 +69,7 @@ async function _POST(req: NextRequest) {
 
   if (uploadError) {
     logger.error('Upload error:', uploadError);
-    return new Response(uploadError.message, { status: 500 });
+    logger.error('MOU upload failed', undefined, { detail: uploadError.message }); return new Response('Upload failed', { status: 500 });
   }
 
   const sigUrl = path; // store path; you can build public URL when needed

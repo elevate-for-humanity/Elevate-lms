@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 /**
  * Canonical Agreement Acceptance Recording
  * 
@@ -157,7 +158,7 @@ export async function recordAgreementAcceptance(
       }
     }
 
-    console.error('Agreement acceptance insert error:', error);
+    logger.error('Agreement acceptance insert error', error instanceof Error ? error : undefined);
     return {
       success: false,
       error: error.message,

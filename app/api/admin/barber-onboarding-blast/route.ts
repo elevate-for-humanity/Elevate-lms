@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('[BarberBlast] Query error:', error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      logger.error('Request failed', error instanceof Error ? error : undefined); return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     if (!applicants?.length) {

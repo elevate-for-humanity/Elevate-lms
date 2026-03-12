@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 /**
  * Runtime secrets fetched from Supabase `app_secrets` table and merged
  * into process.env so existing code continues to work unchanged.
@@ -55,7 +56,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
     .eq('scope', 'runtime');
 
   if (error) {
-    console.error('[secrets] Failed to load from app_secrets:', error.message);
+    logger.error('Failed to load from app_secrets', error instanceof Error ? error : undefined);
     return cache ?? {};
   }
 

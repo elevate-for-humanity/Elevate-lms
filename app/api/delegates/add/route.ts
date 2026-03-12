@@ -53,7 +53,7 @@ async function _POST(req: NextRequest) {
     });
 
     if (delError) {
-      return new Response(delError.message, { status: 500 });
+      logger.error('Delegate add failed', undefined, { detail: delError.message }); return new Response('Internal server error', { status: 500 });
     }
 
     // Update user profile with program holder and partner role

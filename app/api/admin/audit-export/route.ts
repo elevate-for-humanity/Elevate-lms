@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth/require-admin';
@@ -90,8 +91,9 @@ async function _POST(request: Request) {
       to: snapshot.to,
     });
   } catch (e) {
+    logger.error('Audit export failed', e instanceof Error ? e : undefined);
     return NextResponse.json(
-      { error: 'Export failed', detail: e instanceof Error ? e.message : 'Unknown error' },
+      { error: 'Export failed' },
       { status: 500 }
     );
   }

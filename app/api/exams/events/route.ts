@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
@@ -34,12 +35,12 @@ export async function POST(req: Request) {
     })
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      logger.error('Request failed', error instanceof Error ? error : undefined); return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true })
   } catch (error) {
-    console.error('POST /api/exams/events failed', error)
+    logger.error('POST /api/exams/events failed', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

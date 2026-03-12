@@ -403,6 +403,19 @@ async function main() {
       // 9. Update DB
       await supabase.from('training_lessons').update({ video_url: url }).eq('id', lesson.id);
 
+      // 10. Write URL back to CSV so the lesson page picks it up without a DB call
+      const csvPath = path.join(process.cwd(), 'data', 'hvac-master-curriculum.csv');
+      let csv = fs.readFileSync(csvPath, 'utf8');
+      // Match by lesson_number (1-based index = order_index + 1 or lesson_number field)
+      // lesson.lesson_number is the canonical ID like "hvac-01-01"
+      const lessonId = lesson.lesson_number || `hvac-${String(num).padStart(2, '0')}-01`;
+      const re = new RegExp(`("${lessonId}","[^"]*","[^"]*","[^"]*","[^"]*","[^"]*","[^"]*"),"[^"]*","[^"]*"`);
+      if (re.test(csv)) {
+        csv = csv.replace(re, `$1,"${url}",""`);
+        fs.writeFileSync(csvPath, csv, 'utf8');
+        console.log(`  CSV updated: ${lessonId} → ${url.slice(0, 60)}...`);
+      }
+
       const mb = fs.statSync(finalPath).size / 1024 / 1024;
       console.log(`  ✅ ${totalDur.toFixed(0)}s | ${mb.toFixed(1)}MB | ${soraOk} clips`);
       ok++;

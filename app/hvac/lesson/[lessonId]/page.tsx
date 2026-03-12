@@ -43,8 +43,13 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
   const moduleIdx     = moduleLessons.findIndex(l => l.lessonId === lesson.lessonId);
 
   const uuid       = HVAC_LESSON_UUID[lesson.lessonId];
-  const videoUrl   = lesson.videoFile ? `/${lesson.videoFile}` : uuid ? `/hvac/videos/lesson-${uuid}.mp4` : null;
-  const audioUrl   = lesson.audioFile ? `/${lesson.audioFile}` : uuid ? `/hvac/audio/lesson-${uuid}.mp3` : null;
+  // videoFile may be a full CDN URL (from rebuild-hvac-videos-v4.ts) or a relative path
+  const videoUrl   = lesson.videoFile
+    ? (lesson.videoFile.startsWith('http') ? lesson.videoFile : `/${lesson.videoFile}`)
+    : uuid ? `/hvac/videos/lesson-${uuid}.mp4` : null;
+  const audioUrl   = lesson.audioFile
+    ? (lesson.audioFile.startsWith('http') ? lesson.audioFile : `/${lesson.audioFile}`)
+    : uuid ? `/hvac/audio/lesson-${uuid}.mp3` : null;
   const diagramUrl = lesson.diagramFile ? `/hvac/diagrams/${lesson.diagramFile}` : null;
 
   // Derive caption URL from video path (same UUID, .vtt extension)

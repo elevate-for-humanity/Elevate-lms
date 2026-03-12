@@ -85,10 +85,9 @@ async function _POST(
     });
 
     if (approveError) {
-      logger.error('Phase 1 RPC error:', approveError);
+      logger.error('Phase 1 RPC error', undefined, { detail: approveError.message });
       return NextResponse.json({ 
-        error: 'Approval failed', 
-        details: approveError.message 
+        error: 'Approval failed' 
       }, { status: 500 });
     }
 

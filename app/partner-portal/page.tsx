@@ -38,16 +38,17 @@ export default async function PartnerPortalPage() {
   let recentActivity: any[] = [];
 
   try {
-    // Partner user record
+    // Partner user record — join partners table (primary) and partner_organizations (legacy)
     const { data: partnerUser } = await db
       .from('partner_users')
-      .select('*, partner_organizations(*)')
+      .select('*, partners:partner_id(*), partner_organizations:organization_id(*)')
       .eq('user_id', user.id)
       .single();
 
     if (partnerUser) {
-      org = partnerUser.partner_organizations;
-      const orgId = org?.id;
+      // Use partners table first, fall back to partner_organizations
+      org = partnerUser.partners || partnerUser.partner_organizations;
+      const orgId = partnerUser.partner_id || org?.id;
 
       if (orgId) {
         // Active apprentices

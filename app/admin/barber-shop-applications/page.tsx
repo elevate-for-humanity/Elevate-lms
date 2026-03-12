@@ -8,6 +8,7 @@ import {
   Building2, CheckCircle, Clock, XCircle,
   Phone, Mail, MapPin, User, ShieldCheck, AlertTriangle,
 } from 'lucide-react';
+import ApproveButton from './ApproveButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -248,7 +249,8 @@ export default async function BarberShopApplicationsPage() {
               )}
 
               {/* Actions */}
-              <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                <ApproveButton applicationId={app.id} status={app.status} />
                 <a
                   href={`mailto:${app.contact_email}?subject=Your Barbershop Partner Application — Elevate for Humanity`}
                   className="text-sm px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"

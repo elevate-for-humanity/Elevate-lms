@@ -81,7 +81,7 @@ export default function FundingImpactPage() {
                 <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
                   <Users className="w-7 h-7 text-indigo-600" />
                 </div>
-                <div className="text-4xl font-bold text-indigo-600 mb-2">2,500+</div>
+                <div className="text-4xl font-bold text-indigo-600 mb-2">Active</div>
                 <div className="text-gray-700 font-medium">Participants Served</div>
                 <div className="text-sm text-gray-500 mt-1">Since 2020</div>
               </div>

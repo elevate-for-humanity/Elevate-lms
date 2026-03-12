@@ -245,7 +245,7 @@ A WorkOne career advisor is now on-site at Elevate every Tuesday and Thursday:
 3. Apply at /apply
 
 **Option 2: In Person**
-Visit us at 3737 N Meridian St, Indianapolis
+Visit us at 8888 Keystone Crossing, Suite 1300, Indianapolis
 - Tuesdays and Thursdays for on-site WIOA eligibility
 
 **Option 3: Call**

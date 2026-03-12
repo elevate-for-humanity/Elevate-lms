@@ -318,7 +318,7 @@ export default function HvacCourseHome({
               },
               {
                 name: 'CPR / First Aid / AED',
-                issuer: 'Nationally Accredited Provider',
+                issuer: 'ETPL Listed Training Provider',
                 desc: 'Emergency response certification valid for 2 years. Required by most HVAC employers for field positions.',
                 bg: 'bg-slate-50', border: 'border-slate-200', accent: 'text-slate-700', check: 'text-slate-500',
               },

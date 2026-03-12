@@ -81,7 +81,7 @@ const PROGRAMS = [
     duration: '12–16 weeks',
     examDay: 'You take the EPA 608 exam (Universal certification covering all refrigerant types) and the OSHA 30-hour safety exam. Both are administered during the program.',
     whoHires: [
-      { employer: 'HVAC contractors (50+ local partners)', pay: '$18–$22/hr starting' },
+      { employer: 'HVAC contractors (employer partners)', pay: '$18–$22/hr starting' },
       { employer: 'Property management companies', pay: '$17–$21/hr starting' },
       { employer: 'Commercial maintenance firms', pay: '$19–$24/hr starting' },
       { employer: 'Self-employment (after experience)', pay: '$60K–$80K+/year' },

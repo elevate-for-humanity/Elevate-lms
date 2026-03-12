@@ -142,7 +142,7 @@ export default function MissionPage() {
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="bg-brand-orange-50 p-4 rounded-lg">
-                  <div className="text-3xl font-bold text-brand-orange-600">1,000+</div>
+                  <div className="text-3xl font-bold text-brand-orange-600">ETPL Listed</div>
                   <div className="text-sm text-gray-600">Students Trained</div>
                 </div>
                 <div className="bg-brand-orange-50 p-4 rounded-lg">

@@ -148,7 +148,7 @@ export default function TestingCenterPage() {
       {/* ── Page header — below hero ── */}
       <div className="bg-white border-b border-slate-100 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Indianapolis · 8888 Keystone Crossing, Suite 1309</p>
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Indianapolis · 8888 Keystone Crossing, Suite 1300</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 leading-tight mb-3">
             Indiana&apos;s Workforce<br className="hidden sm:block" /> Credential Hub
           </h1>

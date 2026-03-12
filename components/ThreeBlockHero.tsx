@@ -27,7 +27,7 @@ const heroBlocks = [
     description: "Our staffing team connects you with employers before graduation",
     cta: "Learn About Job Support",
     href: "/career-services",
-    badge: "85% Placement Rate",
+    badge: "ETPL Listed — Indiana DWD",
     color: " ",
   },
 ];

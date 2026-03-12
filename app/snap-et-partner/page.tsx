@@ -366,7 +366,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-brand-green-600 mb-2">500+</div>
+              <div className="text-4xl font-bold text-brand-green-600 mb-2">Growing</div>
               <p className="font-bold mb-2">Students Trained</p>
               <p className="text-sm text-black">
                 Proven track record of outcomes

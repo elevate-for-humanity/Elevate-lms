@@ -313,7 +313,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
   // ─── Facility & Delivery Details ─────────────────────────────────
   facilityDetails: {
-    address: '8888 Keystone Crossing, Suite 1309, Indianapolis, IN 46240',
+    address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
     classSize: 'Up to 30 participants per cohort',
     labEquipment: 'HVAC training rigs (split systems, package units, heat pumps), EPA 608 exam station, refrigerant recovery equipment, electrical diagnostic tools',
     instructors: [

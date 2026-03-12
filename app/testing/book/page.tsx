@@ -190,7 +190,7 @@ function BookingForm() {
                       <div>
                         <span className="font-semibold text-sm text-slate-900">{label}</span>
                         {mode === 'inPerson' && (
-                          <p className="text-xs text-slate-400 mt-0.5">8888 Keystone Crossing, Suite 1309, Indianapolis, IN 46240</p>
+                          <p className="text-xs text-slate-400 mt-0.5">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
                         )}
                         {mode === 'remoteProvider' && (
                           <p className="text-xs text-slate-400 mt-0.5">The certifying organization controls the remote testing system. We facilitate access.</p>

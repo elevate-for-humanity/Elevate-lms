@@ -83,7 +83,7 @@ export default function HiringGuidePage() {
           {[
             { icon: DollarSign, label: 'Avg. Tax Credit', value: '$4,800', color: 'green' },
             { icon: Clock, label: 'Time to Hire', value: '2-3 weeks', color: 'blue' },
-            { icon: Users, label: 'Candidates Available', value: '2,500+', color: 'blue' },
+            { icon: Users, label: 'Candidates Available', value: 'Active', color: 'blue' },
             { icon: Award, label: 'Success Rate', value: '94%', color: 'orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm text-center">

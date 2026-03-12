@@ -58,8 +58,8 @@ export default function HomePage() {
                 We are not a college. We are not a staffing agency. We are a training institute that takes you from where you are today to a nationally recognized credential and a job offer — with funding, hands-on instruction, and employer connections built into every program.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
-                  Apply Now — It&apos;s Free
+                <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
+                  Start Here — It&apos;s Free
                 </Link>
                 <Link href="/programs" className="bg-white/10 border border-white/25 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/20 transition-all text-base">
                   See All Programs
@@ -411,8 +411,8 @@ export default function HomePage() {
             Apply online in minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
-              Apply Now
+            <Link href="/start" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+              Start Here — It&apos;s Free
             </Link>
             <Link href="/programs" className="border-2 border-white/40 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
               View Programs

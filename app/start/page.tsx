@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { 
   ArrowRight, 
-  
   Briefcase, 
   GraduationCap,
   Heart,
@@ -14,6 +13,7 @@ import {
   Phone,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import StartHereForm from './StartHereForm';
 
 export const metadata: Metadata = {
   title: 'Find Your Pathway | Start Your Career Training Journey',
@@ -271,29 +271,34 @@ export default async function StartPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-12 md:py-16 bg-brand-blue-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Ready to Get Started?
-          </h2>
-          <p className="text-brand-blue-100 mb-8">
-            Apply today and take the first step toward your new career.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
-            >
-              Apply Now
-            </Link>
-            <a
-              href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
-            >
-              <Phone className="w-5 h-5" />
-              Get Help Online
-            </a>
+      {/* Lead capture */}
+      <section className="py-12 md:py-16 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10 items-start">
+            <div>
+              <span className="inline-block text-xs font-bold text-brand-red-600 uppercase tracking-wider mb-3">Free to Apply</span>
+              <h2 className="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">
+                Ready to start?<br />We'll handle the rest.
+              </h2>
+              <p className="text-slate-600 mb-6">
+                Most Indiana residents qualify for free career training through WIOA or state workforce grants. Fill out this form and a career advisor will contact you — no paperwork, no commitment yet.
+              </p>
+              <div className="space-y-3 text-sm text-slate-700">
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                  <p><span className="font-semibold">Advisor contacts you</span> within 1 business day</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                  <p><span className="font-semibold">We check your eligibility</span> for free training funding</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                  <p><span className="font-semibold">You enroll</span> — we handle the paperwork</p>
+                </div>
+              </div>
+            </div>
+            <StartHereForm />
           </div>
         </div>
       </section>

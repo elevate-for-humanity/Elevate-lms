@@ -111,14 +111,59 @@ async function processOne(defId: string, uuid: string): Promise<'skipped' | 'don
   }
 }
 
+function getArg(name: string): string | undefined {
+  const idx = process.argv.indexOf(name);
+  return idx >= 0 ? process.argv[idx + 1] : undefined;
+}
+
 async function main() {
   fs.mkdirSync(VIDEO_DIR, { recursive: true });
 
+  // Single-lesson mode: --lesson-id hvac-06-09 --audio /path/audio.mp3 --out /path/video.mp4
+  const singleLessonId = getArg('--lesson-id');
+  const singleAudioPath = getArg('--audio');
+  const singleOutPath   = getArg('--out');
+
+  if (singleLessonId) {
+    if (!singleAudioPath || !singleOutPath) {
+      console.error('--audio and --out are required when --lesson-id is specified');
+      process.exit(1);
+    }
+    if (!fs.existsSync(singleAudioPath)) {
+      console.error(`Audio file not found: ${singleAudioPath}`);
+      process.exit(1);
+    }
+
+    const uuid = HVAC_LESSON_UUID[singleLessonId];
+    if (!uuid) {
+      console.error(`No UUID found for lesson ${singleLessonId} in HVAC_LESSON_UUID`);
+      process.exit(1);
+    }
+
+    // D-ID needs a public URL — use the canonical path derived from uuid
+    const audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
+    console.log(`Generating video for ${singleLessonId}...`);
+    console.log(`  Audio URL: ${audioUrl}`);
+    console.log(`  Out: ${singleOutPath}`);
+
+    try {
+      const talkId = await submitTalk(audioUrl);
+      const resultUrl = await pollTalk(talkId);
+      await downloadMp4(resultUrl, singleOutPath);
+      console.log(`Done: ${singleOutPath}`);
+    } catch (e: any) {
+      console.error(`Failed: ${e.message}`);
+      process.exit(1);
+    }
+    return;
+  }
+
+  // Batch mode — all lessons
   const all = Object.entries(HVAC_LESSON_UUID) as [string, string][];
   const pending = all.filter(([, uuid]) => !fs.existsSync(path.join(VIDEO_DIR, `lesson-${uuid}.mp4`)));
 
   if (pending.length === 0) {
-    console.log('All 94 HVAC lessons already have video.');
+    console.log('All HVAC lessons already have video.');
     return;
   }
 

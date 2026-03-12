@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { adminRedirects } from './lib/admin-redirects.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -290,6 +291,8 @@ const nextConfig = {
   // Redirects for consolidated routes
   async redirects() {
     return [
+      // Admin domain consolidation — see lib/admin-redirects.ts
+      ...adminRedirects,
       // ============================================
       // DELETED PAGE REDIRECTS
       // ============================================

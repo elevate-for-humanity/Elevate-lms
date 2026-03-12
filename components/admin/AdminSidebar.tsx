@@ -309,8 +309,13 @@ const NAV: NavSection[] = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
-    // Auto-open the section containing the current path
-    const initial = new Set<string>();
+    // Always open these sections by default
+    const initial = new Set<string>([
+      'Users & Access',
+      'Programs & Courses',
+      'Enrollment & Ops',
+    ]);
+    // Also open the section containing the current path
     for (const section of NAV) {
       if (section.items?.some((item) => pathname.startsWith(item.href))) {
         initial.add(section.name);

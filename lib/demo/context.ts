@@ -59,7 +59,7 @@ export type DemoRole = 'demo_admin' | 'demo_staff' | 'demo_partner' | 'demo_lear
  */
 export const DEMO_USERS = {
   demo_admin: {
-    email: 'demo-admin@elevateforhumanity.org',
+    email: 'demo-elevate4humanityedu@gmail.com',
     name: 'Demo Admin',
     role: 'demo_admin' as DemoRole,
     description: 'Full administrative access to manage programs, students, and settings',

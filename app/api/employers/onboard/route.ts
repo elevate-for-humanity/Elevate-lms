@@ -80,7 +80,7 @@ async function _POST(req: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: 'admin@elevateforhumanity.org',
+          to: 'elevate4humanityedu@gmail.com',
           subject: `New Employer Application: ${business_name}`,
           html: `
             <h2>New Employer Application</h2>

@@ -93,7 +93,7 @@ async function _POST(req: Request) {
       const { sendEmail } = await import('@/lib/email/sendgrid');
 
       await sendEmail({
-        to: 'admin@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `Meeting Request from ${data.name}`,
         html: `
           <h2>New Meeting Request</h2>

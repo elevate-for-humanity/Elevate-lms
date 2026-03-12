@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // Initialize Resend only if API key is available (prevents build errors)
 
 // Internal notification email address
-const INTERNAL_EMAIL = process.env.LEAD_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org';
+const INTERNAL_EMAIL = process.env.LEAD_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
 
 interface LeadData {
   // Contact info

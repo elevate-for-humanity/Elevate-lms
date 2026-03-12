@@ -10,7 +10,7 @@ async function sendCriticalAlert(data: {
   userId?: string;
 }): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
-  const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'admin@elevateforhumanity.org';
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'elevate4humanityedu@gmail.com';
   
   if (!resendKey) {
     logger.error('RESEND_API_KEY not configured for alerts');

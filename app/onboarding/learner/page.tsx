@@ -298,7 +298,7 @@ export default async function LearnerOnboardingPage() {
                 </div>
                 <div style="border-top:1px solid #e0e0e0;margin-top:12px;padding-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#555">
                   <p style="margin:0 0 4px">📞 <a href="tel:3173143757" style="color:#555">(317) 314-3757</a></p>
-                  <p style="margin:0">✉️ <a href="mailto:admin@elevateforhumanity.org" style="color:#555">admin@elevateforhumanity.org</a></p>
+                  <p style="margin:0">✉️ <a href="mailto:elevate4humanityedu@gmail.com" style="color:#555">elevate4humanityedu@gmail.com</a></p>
                 </div>
                 <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
                   <p style="margin:0 0 4px">Elevate for Humanity Career &amp; Technical Institute</p>
@@ -310,7 +310,7 @@ export default async function LearnerOnboardingPage() {
         }).catch(() => {});
 
         sendEmail({
-          to: 'admin@elevateforhumanity.org',
+          to: 'elevate4humanityedu@gmail.com',
           subject: `[ENROLLED] ${profile?.full_name || firstName} — ${resolvedProgramName}`,
           html: `<p><strong>${profile?.full_name || firstName}</strong> completed onboarding and is now enrolled in <strong>${resolvedProgramName}</strong>.</p><p>Email: <a href="mailto:${emailAddr}">${emailAddr}</a></p><p><a href="${siteUrlInner}/admin/enrollments">View in Admin</a></p>`,
         }).catch(() => {});

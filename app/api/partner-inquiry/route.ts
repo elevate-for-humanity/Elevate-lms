@@ -44,7 +44,7 @@ async function _POST(request: NextRequest) {
     // Send notification email
     try {
       await sendEmail({
-        to: process.env.NOTIFY_EMAIL_TO || 'admin@elevateforhumanity.org',
+        to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
         subject: `New Partner Inquiry: ${data.fullName} (${data.relationshipType})`,
         html:
           `<p><strong>Name:</strong> ${data.fullName}<br>` +

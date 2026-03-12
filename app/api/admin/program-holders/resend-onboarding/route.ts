@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
 
   const emailPayload = {
     from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-    reply_to: { email: 'admin@elevateforhumanity.org', name: 'Elizabeth Greene' },
+    reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
     personalizations: [{ to: [{ email: authEmail, name: holder.contact_name }] }],
     subject: 'Your Onboarding Link — Elevate for Humanity',
     content: [{

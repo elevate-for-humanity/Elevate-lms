@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const STUCK_THRESHOLD_HOURS = 24;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
 
 /**
  * Cron endpoint to detect partners stuck in approved_pending_user state.

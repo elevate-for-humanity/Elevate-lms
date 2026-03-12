@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
                 required
                 autoComplete="email"
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                placeholder="admin@elevateforhumanity.org"
+                placeholder="elevate4humanityedu@gmail.com"
               />
             </div>
 

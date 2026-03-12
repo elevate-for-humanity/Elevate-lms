@@ -69,7 +69,7 @@ async function _POST(request: NextRequest) {
           },
           body: JSON.stringify({
             from: 'Elevate Platform <info@elevateforhumanity.org>',
-            to: ['admin@elevateforhumanity.org'],
+            to: ['elevate4humanityedu@gmail.com'],
             subject: `New Platform Licensing Request: ${organization}`,
             html: `
               <h2>New Licensing Request</h2>

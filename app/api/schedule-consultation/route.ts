@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 async function _POST(request: Request) {
   try {

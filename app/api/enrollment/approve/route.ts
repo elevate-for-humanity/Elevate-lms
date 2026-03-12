@@ -6,7 +6,7 @@ import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
 
-const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 /**

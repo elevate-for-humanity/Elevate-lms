@@ -149,7 +149,7 @@ async function _POST(req: NextRequest) {
 
     // Send admin notification email
     try {
-      const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org';
+      const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
       const sgKey = process.env.SENDGRID_API_KEY;
       if (sgKey) {
         await fetch('https://api.sendgrid.com/v3/mail/send', {

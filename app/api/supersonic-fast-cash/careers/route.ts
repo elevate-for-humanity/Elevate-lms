@@ -121,7 +121,7 @@ async function _POST(request: NextRequest) {
     try {
       await resend.emails.send({
         from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
-        to: 'admin@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `New Career Application: ${body.firstName} ${body.lastName} - ${body.position || 'Tax Preparer'}`,
         html: `
           <h2>New Career Application</h2>

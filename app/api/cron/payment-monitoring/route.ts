@@ -208,7 +208,7 @@ async function sendPastDueAlert(
   // Also notify admin
   await resend.emails.send({
     from: 'Elevate for Humanity <billing@elevateforhumanity.org>',
-    to: 'admin@elevateforhumanity.org',
+    to: 'elevate4humanityedu@gmail.com',
     subject: `Past Due Alert: ${student.full_name || student.email}`,
     html: `
       <h2>Student Payment Past Due</h2>

@@ -8,7 +8,7 @@ import { sendEmail } from '@/lib/email/resend';
 import { logger } from '@/lib/logger';
 import { getProgramConfig } from '@/lib/partners/program-config';
 
-const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
 const CALENDLY_URL = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu/30min';
 
 export async function POST(

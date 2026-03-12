@@ -7,7 +7,7 @@ import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 async function _POST(request: Request) {
   try {

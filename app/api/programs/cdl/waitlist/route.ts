@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
 import { logger } from '@/lib/logger';
 
-const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
 
 export async function POST(request: NextRequest) {
   try {

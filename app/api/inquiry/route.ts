@@ -10,7 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 async function _POST(req: Request) {

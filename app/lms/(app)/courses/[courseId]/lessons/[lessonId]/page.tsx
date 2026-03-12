@@ -187,7 +187,7 @@ export default function LessonPage() {
               const remaining = Math.ceil((err.required - err.actual) / 60);
               setCompletionError(`Please spend at least ${remaining} more minute${remaining !== 1 ? 's' : ''} on this lesson before marking it complete.`);
             } else {
-              setCompletionError(err.message || err.error || 'Unable to mark complete. Please try again.');
+              setCompletionError('Unable to mark complete. Please try again.');
             }
           } catch {
             setCompletionError('Unable to mark complete. Please try again.');

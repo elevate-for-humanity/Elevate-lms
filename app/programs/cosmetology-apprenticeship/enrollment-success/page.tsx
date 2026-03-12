@@ -106,14 +106,14 @@ export default async function EnrollmentSuccessPage() {
         </div>
 
         <Link
-          href="/programs/cosmetology-apprenticeship/orientation"
+          href={`/lms/program/${enrollment.program_id}`}
           className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center py-5 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg"
         >
-          Start Orientation
+          Go to My Program Dashboard
         </Link>
 
         <p className="text-slate-400 text-sm text-center mt-4">
-          Complete orientation to access your program dashboard.
+          View your courses, track progress, and start learning.
         </p>
       </div>
     </div>

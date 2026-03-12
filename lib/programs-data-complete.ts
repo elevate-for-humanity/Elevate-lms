@@ -42,7 +42,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '5 Weeks • 32 Hours',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: true,
   },
   {
@@ -88,7 +88,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '50 Weeks • 125 Hours RTI',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     etplApproved: true,
   },
   {
@@ -177,7 +177,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '45 Days • 180 Hours',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-counseling.jpg',
     etplApproved: true,
   },
   {
@@ -223,7 +223,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '12 Weeks',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: true,
   },
   {
@@ -338,7 +338,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '4-6 Weeks',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
     etplApproved: true,
   },
   {
@@ -361,7 +361,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '10 Hours • 2 Days',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     etplApproved: true,
   },
   {
@@ -430,7 +430,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Carrier Sponsorship'],
     duration: '4-6 Weeks • 160+ Hours',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: true,
   },
   {
@@ -453,7 +453,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Free through partnership'],
     duration: '4-6 Weeks • 40-60 Hours',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
     etplApproved: true,
     partnerName: 'NRF Foundation',
     partnerUrl: 'https://riseup.nrf.com',
@@ -534,7 +534,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Employer Sponsored'],
     duration: '30 Hours • 1-2 Weeks',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     etplApproved: true,
     partnerName: 'CareerSafe',
     partnerUrl: 'https://careersafeonline.com',
@@ -585,7 +585,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 120 Hours',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: true,
   },
   {

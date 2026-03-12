@@ -28,7 +28,7 @@ const benefits = [
 
 const steps = [
   { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/pages/apply-employer-hero.jpg' },
-  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/pages/comp-highlights-success.jpg' },
+  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/pages/healthcare-grad.jpg' },
   { num: 3, title: 'Train', desc: 'Learn on the job', image: '/images/pages/apply-employer-hero.jpg' },
   { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/pages/philanthropy-hero.jpg' },
 ];

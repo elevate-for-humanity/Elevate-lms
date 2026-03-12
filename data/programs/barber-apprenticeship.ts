@@ -4,12 +4,12 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
  * Barber Apprenticeship — Program Detail Template v1
  * Indiana DOL Registered Apprenticeship
  * Hours math: 52 weeks × 15–20 hrs/week = 780–1040 hours
- * (Indiana requires 1,500 hours total: 1,000 OJT + 500 RTI — this covers the RTI portion)
+ * (Indiana requires 2,000 hours total: 1,500 OJT + 500 RTI — this covers the RTI portion)
  */
 export const BARBER_APPRENTICESHIP: ProgramSchema = {
   slug: 'barber-apprenticeship',
   title: 'Barber Apprenticeship',
-  subtitle: 'DOL Registered Apprenticeship in barbering. Complete 1,500 hours of training (1,000 OJT + 500 RTI) to earn your Indiana Barber License.',
+  subtitle: 'DOL Registered Apprenticeship in barbering. Complete 2,000 hours of training (1,500 OJT + 500 RTI) to earn your Indiana Barber License.',
   sector: 'personal-services',
   category: 'Personal Services',
 
@@ -38,7 +38,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       name: 'Indiana Barber License',
       issuer: 'Indiana State Board of Cosmetology and Barber Examiners',
-      description: 'State license required to practice barbering in Indiana. Earned after completing 1,500 apprenticeship hours and passing the state exam.',
+      description: 'State license required to practice barbering in Indiana. Earned after completing 2,000 apprenticeship hours and passing the state exam.',
       validity: 'Renewable every 4 years',
     },
     {
@@ -80,7 +80,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       title: 'Licensed Barber',
       timeframe: '1–3 years',
-      requirements: 'Indiana Barber License + 1,500 hours completed',
+      requirements: 'Indiana Barber License + 2,000 hours completed',
       salaryRange: '$30,000–$45,000',
     },
     {
@@ -137,7 +137,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
 
   complianceAlignment: [
     { standard: 'DOL Registered Apprenticeship', description: 'Program registered with the U.S. Department of Labor. Apprentices earn a nationally portable credential.' },
-    { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (1,500 hours: 1,000 OJT + 500 RTI).' },
+    { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 500 RTI).' },
     { standard: 'Indiana Board of Cosmetology and Barber Examiners', description: 'Curriculum aligned to state licensing exam content and sanitation standards.' },
     { standard: 'WIOA Title I', description: 'Apprenticeship eligible for WIOA supportive services and on-the-job training reimbursement.' },
     { standard: 'ETPL Listed', description: 'Eligible Training Provider List — approved for workforce board funding.' },
@@ -274,5 +274,5 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   metaTitle: 'Barber Apprenticeship | DOL Registered | Indianapolis',
-  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 1,500 hours. Earn while you learn. Indianapolis.',
+  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 2,000 hours. Earn while you learn. Indianapolis.',
 };

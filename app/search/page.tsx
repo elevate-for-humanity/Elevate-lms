@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/search',
     images: [
       {
-        url: '/images/pages/comp-highlights-success.jpg',
+        url: '/images/pages/healthcare-grad.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate for Humanity — Workforce Training Programs',

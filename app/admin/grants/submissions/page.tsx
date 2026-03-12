@@ -6,7 +6,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';

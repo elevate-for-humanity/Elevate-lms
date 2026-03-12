@@ -59,7 +59,7 @@ export const PATHWAYS: Pathway[] = [
     ctaHref: '/programs/barber-apprenticeship',
     stages: [
       { stage: 1, title: 'Application & Intake', description: 'Apprentice application, background check, shop placement matching. Elevate handles USDOL and RAPIDS registration.', duration: '1–2 weeks' },
-      { stage: 2, title: 'On-the-Job Training', description: '1,500 hours of supervised training at a host barbershop. Apprentices are paid during training. Classroom instruction hours included.', duration: '~18 months' },
+      { stage: 2, title: 'On-the-Job Training', description: '2,000 hours of supervised training at a host barbershop (1,500 OJT + 500 RTI). Apprentices are paid during training.', duration: '~18 months' },
       { stage: 3, title: 'State Board Exam', description: 'Indiana PLA barber exam. Exam prep materials and practice tests provided.', duration: 'Exam day' },
       { stage: 4, title: 'Licensure & Employment', description: 'Indiana barber license issued. Work independently, join a shop, or open your own business.' },
       { stage: 5, title: 'Advancement', description: 'Shop ownership pathway, instructor certification, cosmetology cross-licensing.' },

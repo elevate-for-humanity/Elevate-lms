@@ -23,7 +23,7 @@ export default function URLHealthPage() {
       if (!res.ok) throw new Error(data.error || 'Check failed');
       setResults(data.result);
     } catch (err: any) {
-      setError(err.message || 'URL health check failed');
+      setError('URL health check failed. Please try again.');
     } finally {
       setRunning(false);
     }

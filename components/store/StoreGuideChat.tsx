@@ -15,7 +15,7 @@ interface StoreGuideChatProps {
 const choiceImages: Record<string, string> = {
   'shop': '/images/pages/shop-hero.jpg',
   'courses': '/images/pages/shop-hero.jpg',
-  'workbooks': '/images/pages/comp-highlights-success.jpg',
+  'workbooks': '/images/pages/training-classroom.jpg',
   'licensing': '/images/pages/shop-hero.jpg',
   'not-sure': '/images/pages/store-recommendations.jpg',
 };

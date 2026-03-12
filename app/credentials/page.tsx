@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Award, FileCheck, Briefcase, ChevronRight } from 'lucide-react';
+import LazyVideo from '@/components/ui/LazyVideo';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -38,7 +39,7 @@ const industryCerts = [
 ];
 
 const apprenticeshipCreds = [
-  { name: 'Barber License', issuer: 'Indiana Professional Licensing Agency', field: 'Cosmetology', desc: 'State barber license earned through DOL Registered Apprenticeship. Requires 1,500 OJT hours under employer supervision, competency verification, and state board exam. RAPIDS: 2025-IN-132301.', img: '/images/pages/barber-hero-main.jpg' },
+  { name: 'Barber License', issuer: 'Indiana Professional Licensing Agency', field: 'Cosmetology', desc: 'State barber license earned through DOL Registered Apprenticeship. Requires 2,000 total hours (1,500 OJT + 500 RTI) under employer supervision, competency verification, and state board exam. RAPIDS: 2025-IN-132301.', img: '/images/pages/barber-hero-main.jpg' },
 ];
 
 export default function CredentialsPage() {
@@ -52,10 +53,8 @@ export default function CredentialsPage() {
 
       {/* Video hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
-        <video autoPlay muted loop playsInline poster="/images/pages/credentials-page-1.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-60">
-          <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
-        </video>
+        <LazyVideo src="/videos/career-services-hero.mp4" poster="/images/pages/credentials-page-1.jpg"
+          className="absolute inset-0 w-full h-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
       </section>
 

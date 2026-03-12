@@ -30,7 +30,7 @@ export default function HeroBanner({
   videoSrc = '/video/hero-home-dec12.mp4',
   voiceoverSrc,
   posterSrc = '/images/pages/comp-home-hero-programs.jpg',
-  heroImageSrc = '/images/pages/comp-cta-career.jpg',
+  heroImageSrc = '/images/pages/workforce-training.jpg',
   heroImageAlt = 'Elevate for Humanity hero banner',
 }: HeroBannerProps) {
   const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ pauseOffScreen: type === 'video' });

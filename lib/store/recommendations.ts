@@ -35,7 +35,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 4999,
     priceDisplay: '$4,999',
     href: '/store/licenses/core-license',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'license',
     tier: 'starter',
     valueProps: [
@@ -53,7 +53,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 15000,
     priceDisplay: '$15,000',
     href: '/store/licenses/school-license',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'license',
     tier: 'professional',
     valueProps: [
@@ -94,7 +94,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 1999,
     priceDisplay: '$1,999',
     href: '/store/compliance/wioa',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-counseling.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -112,7 +112,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/compliance/ferpa',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -130,7 +130,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/compliance/grant-reporting',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -149,7 +149,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 999,
     priceDisplay: '$999',
     href: '/store/ai-studio',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'tool',
     tier: 'standalone',
     valueProps: [
@@ -168,7 +168,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 0,
     priceDisplay: 'WIOA Funded',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'program',
     tier: 'standalone',
     valueProps: [
@@ -186,7 +186,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 0,
     priceDisplay: 'WIOA Funded',
     href: '/programs/cna',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     category: 'program',
     tier: 'standalone',
     valueProps: [

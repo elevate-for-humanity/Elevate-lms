@@ -42,7 +42,7 @@ const AUDIENCES = [
     ctaHref: '/employer',
     secondaryCta: 'View Hiring Programs',
     secondaryHref: '/ojt-and-funding',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/for-employers-page-1.jpg',
     color: 'from-emerald-600 to-emerald-800',
     accent: 'bg-emerald-500',
     stats: [
@@ -67,7 +67,7 @@ const AUDIENCES = [
     ctaHref: '/compliance',
     secondaryCta: 'Partnership Inquiry',
     secondaryHref: '/contact',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/how-it-works-hero.jpg',
     color: 'from-slate-700 to-slate-900',
     accent: 'bg-slate-600',
     stats: [

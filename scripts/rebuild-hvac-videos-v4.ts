@@ -38,7 +38,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 const HVAC_COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
 const TEMP_DIR = path.join(process.cwd(), 'temp', 'hvac-v4');
-const SEGMENTS = 10;
+const SEGMENTS = 7;
 const SORA_BATCH = 5;
 const VOICE: 'onyx' = 'onyx';
 const W = 1280;
@@ -89,24 +89,24 @@ async function planSegments(title: string, content: string, lessonNum: number): 
     max_tokens: 6000,
     messages: [{
       role: 'user',
-      content: `You are the narrator for Elevate for Humanity's HVAC Technician Training Program (EPA 608 certification).
+      content: `You are the narrator for Elevate for Humanity's HVAC Technician Training Program (EPA 608 certification). You speak like a calm, experienced instructor in a classroom — unhurried, clear, and thorough. Students are adult learners in a workforce training program.
 
 LESSON ${lessonNum}: ${title}
 
 CONTENT:
 ${plain}
 
-Plan exactly 10 video segments. Each segment is ONE topic — the narrator talks about it while a matching video clip plays on screen. The clip stays visible for the ENTIRE narration of that segment. When the narrator moves to the next topic, the clip changes.
+Plan exactly 7 video segments. Each segment covers ONE topic. The narrator explains it in depth while a single matching video clip plays on screen. The clip stays visible for the ENTIRE narration. When the narrator moves to the next topic, the clip changes.
 
-Segment 1: Hook/introduction — what this lesson covers and why it matters
-Segments 2-9: Core content — one concept per segment, building logically
-Segment 10: Summary — key takeaways, what to remember for the EPA 608 exam
+Segment 1: Introduction — what this lesson covers, why it matters for the student's career, and what they'll be able to do after completing it.
+Segments 2-6: Core content — one concept per segment, building logically. Go deep. Explain the WHY, not just the what. Give examples. Mention what could go wrong if done incorrectly. Reference EPA 608 exam topics where relevant.
+Segment 7: Summary and exam prep — recap the key points, what to remember for the EPA 608 certification exam, and a brief transition to the next lesson.
 
 For each segment:
-- narration: 35-50 words. Professional instructor tone. Speak naturally and slowly — this is educational content for workforce training students. No brackets or stage directions. Each segment should flow naturally from the previous one.
-- soraPrompt: Exactly what the viewer sees during this narration. Be VERY specific: what equipment, what the technician is doing, what tools are visible, what angle. The video MUST match what the narrator is describing. Include "professional HVAC technician" or "HVAC training workshop". No text in the video.
+- narration: 80-120 words. This is the most important field. Write like a real instructor talking to students face-to-face. Use natural transitions between sentences. Pause points with commas. Explain concepts thoroughly — do not rush. A student watching this video should be able to understand the concept WITHOUT reading the textbook.
+- soraPrompt: Exactly what the viewer sees during this narration. Be VERY specific: what equipment, what the technician is doing, what tools are visible, camera angle, lighting. The video MUST visually match what the narrator is describing. Always include "professional HVAC technician" or "HVAC training workshop" or "HVAC equipment close-up". No text or words in the video.
 - label: Component or concept name shown on screen (2-5 words, e.g., "Compressor", "Manifold Gauge Set")
-- definition: One-line definition (8-15 words, e.g., "Pumps refrigerant through the system under high pressure")
+- definition: One-line plain-English definition (10-18 words, e.g., "Pumps refrigerant through the system under high pressure to transfer heat")
 
 Return JSON array only — no markdown, no explanation:
 [{"narration":"...","soraPrompt":"...","label":"...","definition":"..."}]`
@@ -122,7 +122,7 @@ Return JSON array only — no markdown, no explanation:
 
 async function generateTTS(text: string, outPath: string): Promise<number> {
   const resp = await openai.audio.speech.create({
-    model: 'tts-1-hd', voice: VOICE, input: text.slice(0, 4096), speed: 0.90,
+    model: 'tts-1-hd', voice: VOICE, input: text.slice(0, 4096), speed: 0.80,
     response_format: 'mp3',
   });
   fs.writeFileSync(outPath, Buffer.from(await resp.arrayBuffer()));
@@ -310,7 +310,7 @@ async function main() {
   const { data: lessons, error } = await supabase
     .from('training_lessons')
     .select('id, title, content, content_type, order_index, lesson_number')
-    .eq('course_id_uuid', HVAC_COURSE_ID)
+    .eq('course_id', HVAC_COURSE_ID)
     .order('order_index');
 
   if (error || !lessons) { console.error('DB:', error?.message); process.exit(1); }

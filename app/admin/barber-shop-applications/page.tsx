@@ -156,7 +156,7 @@ export default async function BarberShopApplicationsPage() {
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-            Error loading applications: {error.message}
+            Error loading applications. Please refresh the page.
           </div>
         )}
 

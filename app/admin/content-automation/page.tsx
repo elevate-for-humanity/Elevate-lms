@@ -24,7 +24,7 @@ export default function ContentAutomationPage() {
       if (!res.ok) throw new Error(data.error || 'Automation failed');
       setResults(data.result);
     } catch (err: any) {
-      setError(err.message || 'Content automation failed');
+      setError('Content automation failed. Please try again.');
     } finally {
       setRunning(false);
     }

@@ -78,6 +78,7 @@ export default async function QuizPage({ params }: Props) {
       max_attempts,
       shuffle_questions,
       show_correct_answers,
+      requires_proctoring,
       created_at,
       courses (
         id,
@@ -134,12 +135,25 @@ export default async function QuizPage({ params }: Props) {
 
   // If there's an in-progress attempt, show the quiz interface
   if (inProgressAttempt && questions && questions.length > 0) {
+    // Look up the exam session for proctored quizzes
+    let examSessionId: string | undefined;
+    if (quiz.requires_proctoring) {
+      const { data: examSession } = await db
+        .from('exam_sessions')
+        .select('id')
+        .eq('quiz_attempt_id', inProgressAttempt.id)
+        .single();
+
+      examSessionId = examSession?.id;
+    }
+
     return (
       <QuizTakingInterface 
         quiz={quiz}
         questions={questions}
         attemptId={inProgressAttempt.id}
         visitorId={user.id}
+        examSessionId={examSessionId}
       />
     );
   }

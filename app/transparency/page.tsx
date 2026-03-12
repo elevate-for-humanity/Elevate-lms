@@ -17,9 +17,9 @@ export default function TransparencyPage() {
     { label: 'Programs Available', value: '10+', image: '/images/pages/comp-home-pathways-support.jpg' },
     { label: 'Placement Goal', value: '85%', image: '/images/pages/about-hero.jpg' },
     { label: 'Training Cost', value: '$0', image: '/images/pages/about-hero.jpg' },
-    { label: 'Support', value: '24/7', image: '/images/pages/comp-highlights-success.jpg' },
+    { label: 'Support', value: '24/7', image: '/images/pages/healthcare-grad.jpg' },
     { label: 'Funding Sources', value: '5+', image: '/images/pages/about-hero.jpg' },
-    { label: 'Indiana Locations', value: '3+', image: '/images/pages/comp-highlights-success.jpg' },
+    { label: 'Indiana Locations', value: '3+', image: '/images/pages/healthcare-grad.jpg' },
   ];
 
   const financials = [

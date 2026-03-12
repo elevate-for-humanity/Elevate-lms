@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { createClient } from '@/lib/supabase/server';

@@ -19,6 +19,20 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    // Auth: require admin or super_admin to issue certificates
+    const { createClient: createServerClient } = await import('@/lib/supabase/server');
+    const authClient = await createServerClient();
+    const { data: { session } } = await authClient.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const adminDb = createAdminClient();
+    const authDb = adminDb || authClient;
+    const { data: profile } = await authDb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden — admin role required' }, { status: 403 });
+    }
+
     const body = await parseBody<Record<string, any>>(request);
     const { studentId, programId, studentName, programName, programHours } = body;
 

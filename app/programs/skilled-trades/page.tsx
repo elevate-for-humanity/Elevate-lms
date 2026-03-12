@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
+  { title: 'HVAC Technician', duration: '12 weeks', salary: '$52,000', href: '/programs/hvac-technician', image: '/images/pages/hvac-technician.jpg' },
   { title: 'Electrical Technician', duration: '12 weeks', salary: '$60,240', href: '/programs/electrical', image: '/images/pages/electrical-wiring.jpg' },
   { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/pages/welding-sparks.jpg' },
   { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/programs-plumbing-apply-hero.jpg' },

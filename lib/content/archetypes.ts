@@ -31,7 +31,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Your Learning Dashboard',
       description:
         'Track your program progress, view assignments, access course materials, and manage your career development pathway.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/cna-clinical.jpg',
       imageAlt: 'Student reviewing course materials and tracking progress',
       actions: [
         { label: 'View My Courses', href: '/lms/courses', variant: 'primary' },
@@ -46,7 +46,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Administrative Control Panel',
       description:
         'Manage applications, review enrollments, oversee program compliance, and generate reports for state workforce agencies.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/hvac-technician.jpg',
       imageAlt: 'Administrator reviewing applications and compliance reports',
       actions: [
         {
@@ -61,7 +61,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Staff Operations Dashboard',
       description:
         'Process student applications, coordinate with training providers, track participant outcomes, and maintain program documentation.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/cdl-truck-highway.jpg',
       imageAlt: 'Staff member coordinating with training providers',
       actions: [
         {
@@ -80,7 +80,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Employer Partnership Portal',
       description:
         'Post job opportunities, review qualified candidates, coordinate work-based learning placements, and track apprentice progress.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/barber-hero-main.jpg',
       imageAlt: 'Employer reviewing candidate profiles',
       actions: [
         {
@@ -99,7 +99,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Training Provider Dashboard',
       description:
         'Manage program enrollments, submit progress reports, coordinate with employers, and maintain compliance with state requirements.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/it-helpdesk-desk.jpg',
       imageAlt: 'Training provider managing program enrollments',
       actions: [
         {
@@ -118,7 +118,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Program Holder Portal',
       description:
         'Manage apprentice enrollments, submit weekly reports, track compliance requirements, and coordinate with state workforce agencies.',
-      imageSrc: '/images/pages/comp-cta-training.jpg',
+      imageSrc: '/images/pages/welding-sparks.jpg',
       imageAlt: 'Program holder reviewing apprentice progress reports',
       actions: [
         {
@@ -149,7 +149,7 @@ export function getProgramContent(programSlug: string): PageContent {
     title: 'Registered Apprenticeship Program',
     description:
       'Earn while you learn through our DOL-registered apprenticeship program. Receive hands-on training, industry credentials, and job placement support.',
-    imageSrc: '/images/pages/comp-cta-programs.jpg',
+    imageSrc: '/images/pages/training-classroom.jpg',
     imageAlt:
       'Apprentice receiving hands-on training from experienced instructor',
     actions: [
@@ -181,7 +181,7 @@ export function getPolicyContent(policyType: string): PageContent {
       title: 'Privacy Policy',
       description:
         'How we collect, use, and protect your personal information in compliance with federal and state privacy regulations.',
-      imageSrc: '/images/pages/comp-cta-career.jpg',
+      imageSrc: '/images/pages/for-employers-page-1.jpg',
       imageAlt: 'Secure data protection and privacy compliance',
       breadcrumbs: [
         { label: 'Home', href: '/' },
@@ -192,7 +192,7 @@ export function getPolicyContent(policyType: string): PageContent {
       title: 'Terms of Service',
       description:
         'Terms and conditions governing your use of Elevate for Humanity services, programs, and digital platforms.',
-      imageSrc: '/images/pages/comp-cta-career.jpg',
+      imageSrc: '/images/pages/business-sector.jpg',
       imageAlt: 'Legal agreement and terms documentation',
       breadcrumbs: [
         { label: 'Home', href: '/' },

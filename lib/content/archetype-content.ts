@@ -45,7 +45,7 @@ export const programTrainingContent: LocalizedContent = {
       title: 'Program Overview',
       purpose:
         'This page explains who this program is for, what you will learn, and how to apply.',
-      image: '/images/pages/comp-cta-programs.jpg',
+      image: '/images/pages/training-classroom.jpg',
       imageAlt: 'Students in training program',
     },
     sections: {
@@ -82,7 +82,7 @@ export const programTrainingContent: LocalizedContent = {
       title: 'Resumen del programa',
       purpose:
         'Esta página explica para quién es el programa, qué aprenderás y cómo aplicar.',
-      image: '/images/pages/comp-cta-programs.jpg',
+      image: '/images/pages/healthcare-classroom.jpg',
       imageAlt: 'Estudiantes en programa de capacitación',
     },
     sections: {
@@ -172,7 +172,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'My Dashboard',
       purpose: 'This page shows your current status and next required steps.',
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/hvac-technician.jpg',
       imageAlt: 'Student dashboard',
     },
     sections: {
@@ -211,7 +211,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'Mi panel',
       purpose: 'Este panel muestra tu estado actual y los siguientes pasos.',
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/cdl-truck-highway.jpg',
       imageAlt: 'Panel del estudiante',
     },
     sections: {
@@ -299,7 +299,7 @@ export const policyComplianceContent: LocalizedContent = {
       title: 'Policy Information',
       purpose:
         'This page explains policies that apply to your use of this platform.',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/for-employers-page-1.jpg',
       imageAlt: 'Policy documentation',
     },
     sections: {
@@ -328,7 +328,7 @@ export const policyComplianceContent: LocalizedContent = {
       title: 'Información de políticas',
       purpose:
         'Esta página explica las políticas que aplican al uso de la plataforma.',
-      image: '/images/pages/comp-cta-career.jpg',
+      image: '/images/pages/business-sector.jpg',
       imageAlt: 'Documentación de políticas',
     },
     cta: {
@@ -400,7 +400,7 @@ export const authAccountContent: LocalizedContent = {
       title: 'Account Access',
       purpose:
         'Use this page to log in, create an account, or manage your profile.',
-      image: '/images/pages/comp-highlights-success.jpg',
+      image: '/images/pages/healthcare-grad.jpg',
       imageAlt: 'Account login',
     },
     sections: {
@@ -429,7 +429,7 @@ export const authAccountContent: LocalizedContent = {
       title: 'Acceso a cuenta',
       purpose:
         'Usa esta página para iniciar sesión, crear una cuenta o administrar tu perfil.',
-      image: '/images/pages/comp-highlights-success.jpg',
+      image: '/images/pages/career-counseling.jpg',
       imageAlt: 'Inicio de sesión',
     },
     cta: {
@@ -450,7 +450,7 @@ export const reportingAdminContent: LocalizedContent = {
       title: 'Administrative Dashboard',
       purpose:
         'This page provides tools for reporting, management, and operations.',
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/technology-sector.jpg',
       imageAlt: 'Administrative dashboard',
     },
     sections: {
@@ -479,7 +479,7 @@ export const reportingAdminContent: LocalizedContent = {
       title: 'Panel administrativo',
       purpose:
         'Esta página proporciona herramientas para informes, gestión y operaciones.',
-      image: '/images/pages/comp-cta-training.jpg',
+      image: '/images/pages/cybersecurity-screen.jpg',
       imageAlt: 'Panel administrativo',
     },
     cta: {
@@ -549,7 +549,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Page Not Found',
       purpose: "The page you're looking for doesn't exist or has been moved.",
-      image: '/images/pages/comp-highlights-success.jpg',
+      image: '/images/pages/training-cohort.jpg',
       imageAlt: 'Page not found',
     },
     sections: {
@@ -575,7 +575,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Página no encontrada',
       purpose: 'La página que buscas no existe o ha sido movida.',
-      image: '/images/pages/comp-highlights-success.jpg',
+      image: '/images/pages/workforce-training.jpg',
       imageAlt: 'Página no encontrada',
     },
     cta: {

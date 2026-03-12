@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 /**
  * Admin-only diagnostic endpoint — checks BNPL provider configuration status.
  * Returns which env vars are present (not their values).

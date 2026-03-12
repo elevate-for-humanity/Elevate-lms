@@ -73,6 +73,13 @@ export default async function StudentDashboardOrchestrated() {
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
+  // Get program-level enrollments (multi-program architecture)
+  const { data: programEnrollments } = await db
+    .from('program_enrollments')
+    .select('id, status, enrolled_at, progress_percent, program_id, programs(id, title, slug, code)')
+    .eq('user_id', user.id)
+    .order('enrolled_at', { ascending: false });
+
   // Get partner enrollments (external providers like HSI)
   const { data: partnerEnrollments } = await db
     .from('partner_lms_enrollments')
@@ -301,6 +308,47 @@ export default async function StudentDashboardOrchestrated() {
           <StreakTracker userId={user.id} />
           <BadgeShowcase userId={user.id} limit={3} />
         </div>
+
+        {/* My Programs — program-level enrollment cards */}
+        {(programEnrollments?.length || 0) > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-black mb-4">My Programs</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {programEnrollments!.map((pe: any) => {
+                const prog = pe.programs as { id: string; title: string; slug: string; code: string } | null;
+                const progPercent = pe.progress_percent || 0;
+                const isActive = pe.status === 'active' || pe.status === 'confirmed';
+                return (
+                  <Link
+                    key={pe.id}
+                    href={`/lms/program/${prog?.slug || prog?.code || prog?.id || pe.program_id}`}
+                    className="bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition p-6 group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
+                        {prog?.title || 'Program'}
+                      </h4>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        isActive ? 'bg-brand-green-100 text-brand-green-700' :
+                        pe.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {isActive ? 'Active' : pe.status === 'completed' ? 'Completed' : 'Pending'}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2 mb-1">
+                      <div
+                        className={`h-2 rounded-full transition-all ${progPercent === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`}
+                        style={{ width: `${progPercent}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500">{progPercent}% complete</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Certification Progress & Requirements */}
         {activeEnrollment && (

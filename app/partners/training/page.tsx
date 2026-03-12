@@ -25,7 +25,7 @@ export default function TrainingPartnerPage() {
           'Elevate for Humanity partners with training providers to co-deliver programs in healthcare, skilled trades, CDL, technology, and cosmetology. We bring the students, funding, and support services — you bring the expertise.',
           'Our partnerships are structured to maximize enrollment, improve completion rates, and ensure graduates are job-ready.',
         ],
-        image: '/images/pages/comp-pathway-trades.jpg',
+        image: '/images/pages/hvac-technician.jpg',
       },
       features: {
         heading: 'What We Bring to the Partnership',

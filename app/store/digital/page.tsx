@@ -1,8 +1,8 @@
-
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
+import LazyVideo from '@/components/ui/LazyVideo';
 import { 
   Download, FileText, Video, BookOpen, Check, ArrowRight, Zap, 
   Shield, MessageCircle, Play, Sparkles, Users, Building2, DollarSign 
@@ -35,9 +35,8 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" >
-            <source src="/videos/hero-home.mp4" type="video/mp4" />
-          </video>
+          <LazyVideo src="/videos/store-marketplace.mp4" poster="/images/heroes-hq/programs-hero.jpg"
+            className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

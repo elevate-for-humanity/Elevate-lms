@@ -33,7 +33,7 @@ export default function TutoringPage() {
     {
       title: "Skilled Trades",
       description: "Electrical theory, NEC code review, welding technique coaching, HVAC system troubleshooting, plumbing calculations, and blueprint reading.",
-      image: "/images/pages/comp-pathway-trades.jpg"
+      image: "/images/pages/hvac-technician.jpg"
     },
     {
       title: "Technology & IT",

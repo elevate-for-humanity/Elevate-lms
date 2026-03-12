@@ -181,7 +181,7 @@ export default function BarberProgramPage() {
               <CardContent>
                 <ul className="space-y-2 list-disc list-inside">
                   <li>State-approved curriculum aligned with Indiana licensing requirements</li>
-                  <li>1,500 hours of hands-on training in a working barbershop</li>
+                  <li>2,000 hours of hands-on training in a working barbershop</li>
                   <li>Learn classic and modern cutting techniques</li>
                   <li>Business management and customer service skills</li>
                   <li>Preparation for state licensing exam</li>
@@ -229,7 +229,7 @@ export default function BarberProgramPage() {
                   <li>Apply and complete intake process</li>
                   <li>Match with a licensed master barber and approved shop</li>
                   <li>Begin apprenticeship with structured training plan</li>
-                  <li>Complete 1,500 hours of documented training</li>
+                  <li>Complete 2,000 hours of documented training</li>
                   <li>Pass state licensing exam</li>
                   <li>Launch your career as a licensed barber</li>
                 </ol>
@@ -245,7 +245,7 @@ export default function BarberProgramPage() {
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Duration</h4>
-                  <p className="text-sm text-muted-foreground">12-18 months (1,500 hours)</p>
+                  <p className="text-sm text-muted-foreground">12-18 months (2,000 hours)</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Format</h4>

@@ -4,6 +4,7 @@ import Turnstile from '@/components/Turnstile';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, CreditCard, Calculator, Info } from 'lucide-react';
+import LazyVideo from '@/components/ui/LazyVideo';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 
 // Pricing constants - matches lib/programs/pricing.ts
@@ -282,9 +283,8 @@ export default function ApprenticeForm() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
-            <source src="/videos/barber-hero-final.mp4" type="video/mp4" />
-          </video>
+          <LazyVideo src="/videos/barber-hero-final.mp4" poster="/images/pages/barber-hero-main.jpg"
+            className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

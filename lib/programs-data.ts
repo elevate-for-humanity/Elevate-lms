@@ -32,7 +32,7 @@ export const PROGRAMS: ProgramData[] = [
     blurb: 'Become a licensed beauty instructor! This program prepares experienced cosmetologists and barbers to teach the next generation. Learn curriculum development, classroom management, and state licensing requirements. Perfect for those with 3+ years industry experience.',
     funding: 'WIOA • WRG',
     duration: '12-16 Weeks',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: false,
   },
   {
@@ -50,7 +50,7 @@ export const PROGRAMS: ProgramData[] = [
     blurb: 'Life-saving skills for everyone! Earn American Heart Association CPR/AED and First Aid certifications. Perfect for healthcare workers, teachers, childcare providers, and anyone who wants to be prepared for emergencies. Classes available day, evening, and weekend.',
     funding: 'Self-Pay • Employer Sponsored',
     duration: '1 Day • 4-8 Hours',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: false,
   },
   {
@@ -95,7 +95,7 @@ export const PROGRAMS: ProgramData[] = [
     blurb: 'Get your Commercial Driver\'s License in just 4-6 weeks! Our 160-hour program includes classroom instruction, range practice, and real road experience. Learn pre-trip inspections, backing maneuvers, highway driving, and DOT regulations. Graduate with your CDL Class A and immediate job placement assistance with trucking companies offering $50K+ starting salaries.',
     funding: 'Workforce Grants • Employer Sponsors • WIOA',
     duration: '4–6 Weeks (160 Hours) • Range + Road',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: false,
   },
   {
@@ -104,7 +104,7 @@ export const PROGRAMS: ProgramData[] = [
     blurb: 'Rebuild your career with confidence! Whether you\'re re-entering after incarceration, overcoming gaps in work history, or starting fresh, this 4-12 week program provides resume building, interview coaching, workplace skills, and direct connections to employers who hire second-chance candidates. Includes support with transportation, childcare, and work clothing.',
     funding: 'Support Services • Referrals • Case Management',
     duration: '4–12 Weeks • Flexible Coaching + Workshops',
-    image: '/images/pages/comp-cta-career.jpg',
+    image: '/images/pages/career-counseling.jpg',
     etplApproved: false,
   },
   {
@@ -113,7 +113,7 @@ export const PROGRAMS: ProgramData[] = [
     blurb: 'Launch your healthcare career in just 4-8 weeks! Learn proper blood draw techniques, patient interaction, lab safety, and specimen handling. Our hands-on program includes clinical rotations at real healthcare facilities. Graduate ready for immediate employment in hospitals, clinics, blood banks, and diagnostic labs with national certification.',
     funding: 'WRG • WIOA • Workforce Grants',
     duration: '4–8 Weeks • Clinical Rotations Included',
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     etplApproved: false,
   },
   {

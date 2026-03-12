@@ -39,11 +39,11 @@ const steps: QuizStep[] = [
     subtitle: 'Pick the field that feels right — you can always explore others later.',
     options: [
       { id: 'healthcare', label: 'Healthcare', image: '/images/pages/comp-home-hero.jpg', description: 'Help people heal and stay healthy' },
-      { id: 'trades', label: 'Skilled Trades', image: '/images/pages/comp-pathway-trades.jpg', description: 'Build, fix, and create with your hands' },
-      { id: 'cdl', label: 'CDL / Trucking', image: '/images/pages/comp-pathway-trades.jpg', description: 'Hit the road and earn $50K+' },
-      { id: 'tech', label: 'Technology', image: '/images/pages/comp-cta-training.jpg', description: 'IT support, cybersecurity, web dev' },
+      { id: 'trades', label: 'Skilled Trades', image: '/images/pages/hvac-technician.jpg', description: 'Build, fix, and create with your hands' },
+      { id: 'cdl', label: 'CDL / Trucking', image: '/images/pages/hvac-technician.jpg', description: 'Hit the road and earn $50K+' },
+      { id: 'tech', label: 'Technology', image: '/images/pages/training-classroom.jpg', description: 'IT support, cybersecurity, web dev' },
       { id: 'barber', label: 'Barbering', image: '/images/pages/barber-gallery-1.jpg', description: 'Earn while you learn a creative trade' },
-      { id: 'safety', label: 'CPR & First Aid', image: '/images/pages/comp-cta-training.jpg', description: 'Same-day HSI certification' },
+      { id: 'safety', label: 'CPR & First Aid', image: '/images/pages/training-classroom.jpg', description: 'Same-day HSI certification' },
     ],
   },
   {
@@ -100,7 +100,7 @@ const programResults: Record<string, ProgramResult[]> = {
     { title: 'Cybersecurity Analyst', description: 'Certiport IT Specialist — Cybersecurity certification. Protect networks and data for organizations.', href: '/programs/cybersecurity-analyst', duration: '12 weeks', salary: '$55K-$100K', funding: 'WIOA / WRG' },
   ],
   barber: [
-    { title: 'Barber Apprenticeship', description: 'Earn while you learn in a licensed barbershop. 1,500 hours toward your Indiana barber license.', href: '/programs/barber-apprenticeship', duration: '12-18 months', salary: '$30K-$60K+', funding: 'JRI / WIOA' },
+    { title: 'Barber Apprenticeship', description: 'Earn while you learn in a licensed barbershop. 2,000 hours toward your Indiana barber license.', href: '/programs/barber-apprenticeship', duration: '12-18 months', salary: '$30K-$60K+', funding: 'JRI / WIOA' },
   ],
   safety: [
     { title: 'CPR & First Aid (HSI)', description: 'Same-day certification. American Heart Association equivalent through HSI.', href: '/programs/cpr-first-aid', duration: '1 day', salary: 'Required for many jobs', funding: 'Self-pay ($65)' },

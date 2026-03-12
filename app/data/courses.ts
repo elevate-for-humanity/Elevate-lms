@@ -591,7 +591,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 27,
     duration: 'Same day',
     hours: 2,
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     features: [
       'All four exam sections included (Core + Type I + II + III)',
       'Online proctored exam — no travel required',
@@ -623,7 +623,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 45,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/pages/comp-cta-training.jpg',
+    image: '/images/pages/training-classroom.jpg',
     features: [
       '12-week structured certification prep curriculum',
       'Study kit provided free to every student',
@@ -656,7 +656,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 55,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     features: [
       'Complete 12-week EPA 608 prep curriculum',
       'Physical study kit shipped to your address',

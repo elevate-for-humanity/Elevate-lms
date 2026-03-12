@@ -145,7 +145,7 @@ export default function ConnectsLandingPage() {
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '340px' }}>
           <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/career-services-page-1.jpg">
-            <source src="/videos/dashboard-admin-narrated.mp4" type="video/mp4" />
+            <source src="/videos/career-services-hero.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/videos/elevate-overview-with-narration.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
           {isPlaying && (

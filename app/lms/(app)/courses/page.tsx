@@ -76,7 +76,7 @@ export default async function InteractiveCoursesPage() {
       href: '/lms/courses?category=healthcare',
     },
     {
-      image: '/images/pages/comp-pathway-trades.jpg',
+      image: '/images/pages/hvac-technician.jpg',
       title: 'Skilled Trades',
       count: courses?.filter(c => c.category === 'trades').length || 0,
       href: '/lms/courses?category=trades',

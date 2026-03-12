@@ -122,7 +122,7 @@ export default function StateBoardPrepPage() {
             )}
             <div>
               <p className={`font-medium ${isEligible ? 'text-brand-green-300' : 'text-amber-300'}`}>
-                {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 1,500 hours`}
+                {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 2,000 hours`}
               </p>
               <p className="text-xs text-white/60">
                 {isEligible ? 'You meet the hour requirement' : `${(1500 - totalHours).toLocaleString()} hours remaining`}

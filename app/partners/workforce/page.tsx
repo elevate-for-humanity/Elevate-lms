@@ -26,7 +26,7 @@ export default function WorkforcePage() {
           'Elevate for Humanity partners with workforce development boards, WorkOne offices, and state agencies to deliver WIOA-funded training in high-demand fields. Our programs are ETPL-approved and produce industry-certified graduates ready for employment.',
           'We handle enrollment, training delivery, certification testing, and job placement — giving your agency a turnkey training partner with measurable outcomes.',
         ],
-        image: '/images/pages/comp-pathway-trades.jpg',
+        image: '/images/pages/hvac-technician.jpg',
       },
       features: {
         heading: 'Partnership Benefits',

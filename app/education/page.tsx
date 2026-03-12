@@ -27,8 +27,8 @@ const PROGRAMS = [
   {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/pages/comp-pathway-trades.jpg',
-    icon: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
+    icon: '/images/pages/hvac-technician.jpg',
     desc: 'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
     tags: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
   },
@@ -43,8 +43,8 @@ const PROGRAMS = [
   {
     title: 'CDL & Transportation',
     href: '/programs/cdl-training',
-    image: '/images/pages/comp-pathway-trades.jpg',
-    icon: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
+    icon: '/images/pages/hvac-technician.jpg',
     desc: 'Commercial Driving License training with job placement. Class A and Class B CDL programs.',
     tags: ['CDL Class A', 'CDL Class B', 'Diesel Mechanic'],
   },
@@ -69,8 +69,8 @@ const PROGRAMS = [
 const LOCATIONS = [
   { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/workforce-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
   { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/workforce-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
-  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Career training aligned with Ohio industry demand.' },
-  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Expanding workforce development across Tennessee.' },
+  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/hvac-technician.jpg', desc: 'Career training aligned with Ohio industry demand.' },
+  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/hvac-technician.jpg', desc: 'Expanding workforce development across Tennessee.' },
   { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/workforce-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
 ];
 
@@ -139,7 +139,7 @@ export default function EducationLandingPage() {
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '360px' }}>
           <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/workforce-training.jpg">
-            <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
+            <source src="/videos/career-services-hero.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
           {isPlaying && (

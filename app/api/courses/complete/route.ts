@@ -16,10 +16,22 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+    // Auth: require authenticated user
+    const supabase = await createClient();
+    const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { courseId, userId, enrollmentId, completionData } = await req.json();
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    // Verify the authenticated user matches the userId or is admin
+    const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+    const isAdmin = profile && ['admin', 'super_admin'].includes(profile.role);
+    if (session.user.id !== userId && !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Update enrollment status
     const { error: updateError } = await db

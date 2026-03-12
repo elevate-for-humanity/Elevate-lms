@@ -34,7 +34,7 @@ const examCategories = [
     id: 'epa-608',
     name: 'EPA Section 608 Certification',
     provider: 'ESCO Institute (Authorized Proctor Site)',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     description: 'Elevate for Humanity is an authorized EPA 608 proctor testing site through the ESCO Institute. Universal certification covering Core, Type I, II, and III refrigerant handling — required by federal law for HVAC technicians. All sections available on-site.',
     exams: [
       'EPA 608 Core',
@@ -79,7 +79,7 @@ const examCategories = [
     id: 'careersafe',
     name: 'CareerSafe Safety Training',
     provider: 'CareerSafe',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     description: 'Online safety training courses with certification upon completion. Accepted by employers in construction, manufacturing, and general industry.',
     exams: [
       'Bloodborne Pathogens',

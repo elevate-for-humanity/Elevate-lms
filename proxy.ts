@@ -24,13 +24,8 @@ const PLATFORM_SUBDOMAIN = 'platform.elevateforhumanity.org';
 // NOTE: Landing pages (exact match) are PUBLIC for marketing/preview
 // Only sub-routes require authentication
 const PROTECTED_ROUTES: Record<string, string[]> = {
-  '/admin/dashboard': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/users': ['admin', 'super_admin', 'org_admin'],
-  '/admin/programs': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/settings': ['admin', 'super_admin', 'org_admin'],
-  '/admin/reports': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/crm': ['admin', 'super_admin', 'org_admin'],
-  '/admin/enrollments': ['admin', 'super_admin', 'org_admin', 'staff'],
+  // Catch-all: every /admin/* sub-route requires admin/super_admin/org_admin/staff
+  '/admin/': ['admin', 'super_admin', 'org_admin', 'staff'],
   '/staff-portal/dashboard': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/students': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/courses': ['staff', 'admin', 'super_admin', 'advisor'],
@@ -56,7 +51,8 @@ const PROTECTED_ROUTES: Record<string, string[]> = {
 
 // Dashboard landing pages that are PUBLIC (for marketing/preview)
 const PUBLIC_DASHBOARD_LANDINGS = [
-  '/admin',
+  // '/admin' removed — admin landing is a redirect, not a marketing page.
+  // Layout guard (requireAdmin) protects it, but proxy should too.
   '/staff-portal', 
   '/instructor',
   '/program-holder',

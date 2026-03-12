@@ -87,7 +87,7 @@ const urineTests = [
       'Same fast turnaround',
     ],
     turnaround: '24-48 hours',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
   },
   {
     name: '5-Panel + Alcohol',
@@ -102,7 +102,7 @@ const urineTests = [
       'Combined results report',
     ],
     turnaround: '24-48 hours',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
   },
 ];
 

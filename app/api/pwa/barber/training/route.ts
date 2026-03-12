@@ -65,7 +65,7 @@ async function _GET(request: Request) {
       'ba-05': 500,    // Shaving - after 500 hours
       'ba-06': 750,    // Chemical Services - after 750 hours
       'ba-07': 1000,   // Business & Client Relations - after 1000 hours
-      'ba-08': 1500,   // State Board Prep - after 1500 hours
+      'ba-08': 2000,   // State Board Prep - after 2000 hours
     };
 
     // Transform modules with progress data

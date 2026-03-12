@@ -219,7 +219,7 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
 
     setSaving(false);
     if (err) {
-      setError(err.message);
+      setError('Failed to create session. Please try again.');
     } else {
       onSaved();
     }

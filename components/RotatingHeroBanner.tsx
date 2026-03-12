@@ -25,7 +25,7 @@ const slides = [
     cta2: "See Programs",
   },
   {
-    image: "/images/pages/comp-cta-training.jpg",
+    image: "/images/pages/training-classroom.jpg",
     title: "Earn $35K-$65K After Training",
     subtitle: "High-Demand Careers in Healthcare, Trades & Tech",
     description: "Job placement support • Industry credentials • Soft skills training",

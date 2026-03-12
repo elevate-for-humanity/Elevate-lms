@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: 'Structured workforce pathways: screening, training, credentialing, apprenticeship, placement, and advancement.',
     url: 'https://www.elevateforhumanity.org/pathways',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/pages/comp-cta-career.jpg', width: 1200, height: 630, alt: 'Elevate career pathways' }],
+    images: [{ url: '/images/pages/career-counseling.jpg', width: 1200, height: 630, alt: 'Elevate career pathways' }],
     type: 'website',
   },
 };

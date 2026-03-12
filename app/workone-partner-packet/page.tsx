@@ -290,7 +290,7 @@ export default function WorkOnePartnerPacketPage() {
               { title: 'Healthcare Certifications', duration: '4-12 weeks', credential: 'CNA, Medical Assistant, Home Health Aide', funding: 'WIOA, WRG', image: '/images/pages/comp-pathway-healthcare.jpg' },
               { title: 'IT & Cybersecurity', duration: '8-12 weeks', credential: 'Certiport IT Specialist, Cisco CCST', funding: 'WIOA, WRG', image: '/images/pages/workone-partner-packet-page-1.jpg' },
               { title: 'CDL Training', duration: '4-6 weeks', credential: 'Class A CDL', funding: 'WIOA, WRG', image: '/images/pages/workone-partner-packet-page-1.jpg' },
-              { title: 'Skilled Trades', duration: '8-24 weeks', credential: 'OSHA, NCCER, Industry Certs', funding: 'WIOA, WRG, Apprenticeship', image: '/images/pages/comp-pathway-trades.jpg' },
+              { title: 'Skilled Trades', duration: '8-24 weeks', credential: 'OSHA, NCCER, Industry Certs', funding: 'WIOA, WRG, Apprenticeship', image: '/images/pages/hvac-technician.jpg' },
               { title: 'Business & Office', duration: '4-8 weeks', credential: 'Microsoft Office, QuickBooks', funding: 'WIOA, WRG', image: '/images/pages/workone-partner-packet-page-1.jpg' },
             ].map((program, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">

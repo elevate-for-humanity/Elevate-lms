@@ -36,7 +36,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'OSHA 10 Card',
     href: '/programs/osha-safety',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
   },
   {
     title: 'OSHA 30-Hour Safety',
@@ -45,7 +45,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'OSHA 30 Card',
     href: '/programs/osha-30',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
   },
   {
     title: 'Forklift Certification',

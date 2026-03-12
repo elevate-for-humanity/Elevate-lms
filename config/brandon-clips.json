@@ -1,0 +1,46 @@
+{
+  "description": "Moving Brandon presenter clips from HeyGen (Brandon_expressive2_public). These are full motion video with body movement, gestures, and speech. NOT static images.",
+  "source_dir": "temp/lesson5-v10",
+  "roles": {
+    "intro": {
+      "description": "Lesson opener — Brandon welcomes and introduces the topic",
+      "clips": [
+        { "file": "v15-intro.mp4", "duration": 20.3, "notes": "General welcome, sets up HVAC overview" }
+      ]
+    },
+    "explanation": {
+      "description": "Brandon explains a concept with gestures — used between diagram segments",
+      "clips": [
+        { "file": "v15-heat-combustion.mp4", "duration": 23.2, "notes": "Explains combustion process" },
+        { "file": "v15-heat-exchanger.mp4", "duration": 34.5, "notes": "Explains heat transfer" },
+        { "file": "v15-heat-blower.mp4", "duration": 17.5, "notes": "Explains airflow mechanics" },
+        { "file": "v15-heat-pump.mp4", "duration": 18.5, "notes": "Explains reverse cycle" },
+        { "file": "v15-cool-compressor.mp4", "duration": 26.8, "notes": "Explains compression" },
+        { "file": "v15-cool-condenser.mp4", "duration": 28.3, "notes": "Explains heat rejection" },
+        { "file": "v15-cool-txv.mp4", "duration": 23.7, "notes": "Explains metering" },
+        { "file": "v15-cool-evaporator.mp4", "duration": 36.7, "notes": "Explains evaporation" },
+        { "file": "v15-vent-ducts.mp4", "duration": 22.1, "notes": "Explains ductwork" },
+        { "file": "v15-vent-fresh.mp4", "duration": 24.7, "notes": "Explains ventilation" }
+      ]
+    },
+    "transition": {
+      "description": "Short Brandon segment between sections — keeps instructor presence",
+      "clips": [
+        { "file": "v15-cool-overview.mp4", "duration": 15.1, "notes": "Short overview, good transition" },
+        { "file": "v15-vent-exhaust.mp4", "duration": 12.4, "notes": "Shortest clip, quick transition" }
+      ]
+    },
+    "recap": {
+      "description": "Brandon reviews key terms and summarizes — used before quiz prompt",
+      "clips": [
+        { "file": "v15-keyterms.mp4", "duration": 38.0, "notes": "Reviews key terminology" }
+      ]
+    },
+    "outro": {
+      "description": "Lesson closer — Brandon wraps up and prompts quiz",
+      "clips": [
+        { "file": "v15-outro.mp4", "duration": 20.1, "notes": "Closing, next steps" }
+      ]
+    }
+  }
+}

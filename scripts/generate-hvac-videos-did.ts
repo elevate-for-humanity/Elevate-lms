@@ -30,11 +30,15 @@ import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 
 const DID_API_BASE = 'https://api.d-id.com';
 const DID_KEY = process.env.DID_API_KEY;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace('localhost:3000', 'www.elevateforhumanity.org') || 'https://www.elevateforhumanity.org';
+const SITE_URL = 'https://www.elevateforhumanity.org';
+const SUPABASE_URL        = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 const AUDIO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'audio');
 const VIDEO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'videos');
-const PHOTO_URL  = `${SITE_URL}/images/team/instructors/instructor-trades.jpg`;
+// elizabeth-greene-headshot.jpg: 800x1080 portrait — passes D-ID face detection
+const PHOTO_LOCAL = path.join(process.cwd(), 'public', 'images', 'team', 'elizabeth-greene-headshot.jpg');
+const PHOTO_URL   = `${SITE_URL}/images/team/elizabeth-greene-headshot.jpg`;
 const CONCURRENCY = 3; // D-ID free tier allows ~3 concurrent
 
 if (!DID_KEY) {
@@ -50,12 +54,34 @@ function didHeaders() {
   };
 }
 
-async function submitTalk(audioUrl: string): Promise<string> {
+/** Upload a local file to Supabase Storage and return its public https URL. */
+async function uploadToSupabase(localPath: string, storagePath: string): Promise<string> {
+  const buf = fs.readFileSync(localPath);
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/lesson-audio/${storagePath}`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'audio/mpeg',
+        'x-upsert': 'true',
+      },
+      body: buf,
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase upload failed: ${err}`);
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/lesson-audio/${storagePath}`;
+}
+
+async function submitTalk(audioUrl: string, photoUrl: string = PHOTO_URL): Promise<string> {
   const res = await fetch(`${DID_API_BASE}/talks`, {
     method: 'POST',
     headers: didHeaders(),
     body: JSON.stringify({
-      source_url: PHOTO_URL,
+      source_url: photoUrl,
       script: { type: 'audio', audio_url: audioUrl },
       config: { stitch: true, result_format: 'mp4' },
     }),
@@ -140,14 +166,45 @@ async function main() {
       process.exit(1);
     }
 
-    // D-ID needs a public URL — use the canonical path derived from uuid
-    const audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
+    // Upload instructor photo to Supabase so D-ID can fetch it via https://
+    let photoUrl = PHOTO_URL;
+    try {
+      const photoBuf = fs.readFileSync(PHOTO_LOCAL);
+      const photoRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/avatars/hvac-instructor.jpg`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+            'Content-Type': 'image/jpeg',
+            'x-upsert': 'true',
+          },
+          body: photoBuf,
+        }
+      );
+      if (photoRes.ok) {
+        photoUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/hvac-instructor.jpg`;
+        console.log(`  Photo URL: ${photoUrl}`);
+      }
+    } catch { /* fall back to site URL */ }
+
+    // D-ID requires a public https:// URL — upload audio to Supabase Storage first
+    const storagePath = `hvac/audio/lesson-${uuid}.mp3`;
     console.log(`Generating video for ${singleLessonId}...`);
+    console.log(`  Uploading audio to Supabase Storage...`);
+    let audioUrl: string;
+    try {
+      audioUrl = await uploadToSupabase(singleAudioPath, storagePath);
+    } catch (e: any) {
+      // Fallback: try production site URL directly (works if already deployed)
+      audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
+      console.log(`  Upload failed (${e.message}), trying site URL: ${audioUrl}`);
+    }
     console.log(`  Audio URL: ${audioUrl}`);
     console.log(`  Out: ${singleOutPath}`);
 
     try {
-      const talkId = await submitTalk(audioUrl);
+      const talkId = await submitTalk(audioUrl, photoUrl);
       const resultUrl = await pollTalk(talkId);
       await downloadMp4(resultUrl, singleOutPath);
       console.log(`Done: ${singleOutPath}`);

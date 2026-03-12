@@ -32,7 +32,7 @@ tasks:
     name: Generate HVAC lesson audio
     description: >
       Generate Marcus Johnson voiceover MP3s for all 94 HVAC lessons.
-      Skips lessons that already have audio in public/generated/lessons/.
+      Skips lessons that already have audio in public/hvac/audio/.
       Exits cleanly if OPENAI_API_KEY is not set — lessons use b-roll video.
       Once generated, MP3s are committed to the repo and never regenerated.
     command: |
@@ -47,7 +47,7 @@ tasks:
     description: >
       Generate D-ID talking-head videos for all 94 HVAC lessons.
       Uses instructor-trades.jpg + pre-generated lesson MP3s.
-      Skips lessons that already have video in public/generated/videos/.
+      Skips lessons that already have video in public/hvac/videos/.
       Exits cleanly if DID_API_KEY is not set.
       Once generated, MP4s are committed to the repo permanently.
     command: |

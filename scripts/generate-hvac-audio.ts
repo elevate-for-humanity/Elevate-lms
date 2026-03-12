@@ -3,12 +3,12 @@
  *
  * Run:  npx tsx scripts/generate-hvac-audio.ts
  *
- * - Skips lessons that already have audio in public/generated/lessons/
+ * - Skips lessons that already have audio in public/hvac/audio/
  * - Processes 5 lessons concurrently to stay within OpenAI rate limits
  * - Falls back from gpt-4o-mini-tts to tts-1-hd automatically
  * - Exits 0 on success, 1 if OpenAI is not configured
  *
- * Output: public/generated/lessons/lesson-{uuid}.mp3
+ * Output: public/hvac/audio/lesson-{uuid}.mp3
  *
  * Once generated, files are served as static assets — no API key needed
  * at runtime. HvacLessonVideo checks for the file with a HEAD request
@@ -29,7 +29,7 @@ import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 import { HVAC_LESSON_CONTENT } from '../lib/courses/hvac-lesson-content';
 import { isOpenAIConfigured, getOpenAIClient } from '../lib/openai-client';
 
-const OUTPUT_DIR = path.join(process.cwd(), 'public', 'generated', 'lessons');
+const OUTPUT_DIR = path.join(process.cwd(), 'public', 'hvac', 'audio');
 const CONCURRENCY = 5;
 
 // Marcus personality instruction — same voice across all lessons

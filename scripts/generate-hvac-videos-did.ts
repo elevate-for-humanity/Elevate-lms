@@ -3,13 +3,13 @@
  *
  * Uses the existing instructor-trades.jpg photo + pre-generated lesson MP3s.
  * D-ID lip-syncs Marcus Johnson's face to each lesson's audio track.
- * Output: public/generated/videos/lesson-{uuid}.mp4
+ * Output: public/hvac/videos/lesson-{uuid}.mp4
  *
  * Run: npx tsx scripts/generate-hvac-videos-did.ts
  *
  * Requirements:
  *   - DID_API_KEY in .env.local
- *   - All 94 MP3s already in public/generated/lessons/ (run generate-hvac-audio.ts first)
+ *   - All 94 MP3s already in public/hvac/audio/ (run generate-hvac-audio.ts first)
  *   - Site must be deployed so D-ID can fetch the audio via public URL
  *     OR pass --local to upload audio directly as base64
  *
@@ -32,8 +32,8 @@ const DID_API_BASE = 'https://api.d-id.com';
 const DID_KEY = process.env.DID_API_KEY;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace('localhost:3000', 'www.elevateforhumanity.org') || 'https://www.elevateforhumanity.org';
 
-const AUDIO_DIR  = path.join(process.cwd(), 'public', 'generated', 'lessons');
-const VIDEO_DIR  = path.join(process.cwd(), 'public', 'generated', 'videos');
+const AUDIO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'audio');
+const VIDEO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'videos');
 const PHOTO_URL  = `${SITE_URL}/images/team/instructors/instructor-trades.jpg`;
 const CONCURRENCY = 3; // D-ID free tier allows ~3 concurrent
 
@@ -98,7 +98,7 @@ async function processOne(defId: string, uuid: string): Promise<'skipped' | 'don
     return 'skipped';
   }
 
-  const audioUrl = `${SITE_URL}/generated/lessons/lesson-${uuid}.mp3`;
+  const audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
 
   try {
     const talkId = await submitTalk(audioUrl);
@@ -124,7 +124,7 @@ async function main() {
 
   console.log(`Generating ${pending.length} D-ID videos...`);
   console.log(`Photo: ${PHOTO_URL}`);
-  console.log(`Audio base URL: ${SITE_URL}/generated/lessons/`);
+  console.log(`Audio base URL: ${SITE_URL}/hvac/audio/`);
   console.log(`Concurrency: ${CONCURRENCY}\n`);
 
   let done = 0, failed = 0, skipped = 0;

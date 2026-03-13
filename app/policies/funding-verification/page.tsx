@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const fundingSources = [
   { title: 'WIOA Voucher', description: 'Workforce Innovation and Opportunity Act Individual Training Account (ITA) voucher from your local WorkOne office.' },
   { title: 'Workforce Ready Grant', description: 'Indiana state grant covering up to $7,500/year for eligible certificate programs.' },
-  { title: 'JRI Funding', description: 'Justice Reinvestment Initiative funding for justice-involved individuals.' },
+  { title: 'JRI Funding', description: 'Job Ready Indy funding for justice-involved individuals.' },
   { title: 'SNAP E&T', description: 'Supplemental Nutrition Assistance Program Employment & Training funding.' },
   { title: 'Employer Sponsorship', description: 'Employer-paid tuition with a signed sponsorship agreement.' },
   { title: 'Self-Pay', description: 'Direct payment via credit card, payment plan, or bank transfer.' },

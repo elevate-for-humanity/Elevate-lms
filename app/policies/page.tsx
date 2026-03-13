@@ -76,7 +76,7 @@ const policies = [
     items: [
       { name: 'Federal Compliance', href: '/policies/federal-compliance', icon: Building, description: 'Federal regulatory compliance' },
       { name: 'WIOA Policy', href: '/policies/wioa', icon: Scale, description: 'Workforce Innovation and Opportunity Act' },
-      { name: 'JRI Policy', href: '/policies/jri', icon: Scale, description: 'Justice Reinvestment Initiative program policy' },
+      { name: 'JRI Policy', href: '/policies/jri', icon: Scale, description: 'Job Ready Indy program policy' },
       { name: 'SAM.gov Eligibility', href: '/policies/sam-gov-eligibility', icon: Building, description: 'Federal contractor registration criteria' },
       { name: 'Editorial Policy', href: '/policies/editorial', icon: FileText, description: 'Standards for content and communications' },
       { name: 'AI Usage Policy', href: '/policies/ai-usage', icon: Shield, description: 'How we use AI responsibly' },

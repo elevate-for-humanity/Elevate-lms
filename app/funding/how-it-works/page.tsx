@@ -22,7 +22,7 @@ const FUNDING_SOURCES = [
   { name: 'WIOA (Workforce Innovation and Opportunity Act)', desc: 'Federal funding administered through local WorkOne offices. Covers tuition, books, supplies, and supportive services for eligible adults and dislocated workers.', href: '/funding/federal-programs' },
   { name: 'DOL Registered Apprenticeship', desc: 'Earn while you learn through Department of Labor registered apprenticeship programs. Employer-sponsored with structured on-the-job training.', href: '/funding/dol' },
   { name: 'State Grant Programs', desc: 'Indiana state workforce development grants including Next Level Jobs Workforce Ready Grant and employer training grants.', href: '/funding/state-programs' },
-  { name: 'Justice Reinvestment Initiative (JRI)', desc: 'Funding for justice-involved individuals re-entering the workforce. Covers training, certifications, and supportive services.', href: '/funding/jri' },
+  { name: 'Job Ready Indy (JRI)', desc: 'Funding for justice-involved individuals re-entering the workforce. Covers training, certifications, and supportive services.', href: '/funding/jri' },
 ];
 
 export default function FundingHowItWorksPage() {

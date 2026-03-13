@@ -168,7 +168,7 @@ export default function GrantsPage() {
                   <GraduationCap className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Justice Reinvestment Initiative)</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Job Ready Indy)</h3>
                   <p className="text-slate-600 mb-4">
                     Everyone deserves a second chance. JRI funding helps justice-involved individuals get career training and support services to build a stable future. We believe in your potential.
                   </p>

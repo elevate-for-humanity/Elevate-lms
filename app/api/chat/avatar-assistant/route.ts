@@ -63,7 +63,7 @@ function buildSystemPrompt(req: ChatRequest): string {
     const fundingLabels: Record<string, string> = {
       wioa: 'WIOA (federal workforce funding)',
       wrg: 'Workforce Ready Grant (Indiana state)',
-      jri: 'Justice Reinvestment Initiative',
+      jri: 'Job Ready Indy',
       self_pay: 'Self-pay',
       employer_sponsored: 'Employer-sponsored',
     };

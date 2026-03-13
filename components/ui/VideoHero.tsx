@@ -26,11 +26,10 @@ export default function VideoHero({
   posterAlt,
   heightClass = 'h-[50vh] md:h-[60vh]',
 }: VideoHeroProps) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
 
   return (
     <div className={`relative w-full overflow-hidden ${heightClass}`}>
-      {/* Poster shown until video plays */}
       <Image
         src={posterSrc}
         alt={posterAlt}
@@ -48,17 +47,6 @@ export default function VideoHero({
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
-
-      {showUnmuteButton && (
-        <button
-          onClick={unmute}
-          aria-label="Tap to unmute video"
-          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
-        >
-          <span aria-hidden="true">🔇</span>
-          Tap to unmute
-        </button>
-      )}
     </div>
   );
 }

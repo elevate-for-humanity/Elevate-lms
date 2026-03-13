@@ -8,7 +8,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/jri' },
   title: 'JRI Management | Elevate For Humanity',
-  description: 'Manage Justice Reinvestment Initiative programs and participants.',
+  description: 'Manage Job Ready Indy programs and participants.',
 };
 
 export default async function JRIPage() {
@@ -30,7 +30,7 @@ export default async function JRIPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li className="text-gray-900 font-medium">JRI</li></ol></nav>
-          <h1 className="text-3xl font-bold text-gray-900">Justice Reinvestment Initiative</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Job Ready Indy</h1>
           <p className="text-gray-600 mt-2">Manage JRI program participants and outcomes</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

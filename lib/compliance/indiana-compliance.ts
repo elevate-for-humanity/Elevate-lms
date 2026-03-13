@@ -14,7 +14,7 @@ export type IndianaCredential =
   | 'WorkOne' // Indiana's American Job Center network
   | 'WRG' // Workforce Ready Grant
   | 'SNAP_ET' // SNAP Employment & Training
-  | 'JRI' // Justice Reinvestment Initiative
+  | 'JRI' // Job Ready Indy
   | 'DOL_RAPIDS'; // Department of Labor Registered Apprenticeship
 
 export type IndianaReportType =

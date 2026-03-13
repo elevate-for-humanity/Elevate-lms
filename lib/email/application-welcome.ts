@@ -263,7 +263,7 @@ function buildFundingHtml(p: ProgramInfo): string {
   if (hasFunding(p, 'jri')) {
     html += `
 <div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
-<h3 style="margin-top:0;color:#374151">JRI Funding (Justice Reinvestment Initiative)</h3>
+<h3 style="margin-top:0;color:#374151">JRI Funding (Job Ready Indy)</h3>
 <p>JRI is an Indiana state program specifically for people who have been involved in the criminal justice system.</p>
 <p><strong>What JRI covers:</strong> 100% of training costs, tools, transportation, and supportive services.</p>
 <p><strong>Who qualifies:</strong></p>

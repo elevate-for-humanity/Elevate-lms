@@ -38,7 +38,7 @@ const governmentPartners = [
     type: 'Corrections',
   },
   {
-    name: 'Justice Reinvestment Initiative (JRI)',
+    name: 'Job Ready Indy (JRI)',
     description: 'Funding partner for reentry and second-chance employment programs.',
     type: 'Funding Partner',
   },

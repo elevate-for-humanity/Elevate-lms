@@ -88,7 +88,7 @@ export default function GrantProgramsPage() {
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-3 text-brand-blue-900">JRI</h3>
               <p className="text-sm text-black mb-2">
-                Justice Reinvestment Initiative
+                Job Ready Indy
               </p>
               <p className="text-black">
                 Programs for individuals with criminal justice involvement

@@ -255,7 +255,7 @@ export default function HomePage() {
                 image: '/images/pages/job-placement.jpg',
               },
               {
-                label: 'JRI — Justice Reinvestment Initiative',
+                label: 'JRI — Job Ready Indy',
                 tag: 'Indiana State',
                 tagColor: 'bg-brand-green-700',
                 desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD. Many Elevate employer partners hire regardless of background.',

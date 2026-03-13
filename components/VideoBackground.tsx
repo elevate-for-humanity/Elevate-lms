@@ -35,7 +35,7 @@ export function VideoBackground({
         <source src={videoUrl} type="video/mp4" />
       </video>
 
-      {overlay && <div className="absolute inset-0 bg-black/40 z-[1]" />}
+      {/* overlay removed — no dark scrim on video backgrounds */}
 
       <div className="relative z-10">{children}</div>    </div>
   );

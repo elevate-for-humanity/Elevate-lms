@@ -3,20 +3,19 @@
 /**
  * useHeroVideo
  *
- * Handles the autoplay + unmute lifecycle for hero background videos.
+ * Autoplay + unmute lifecycle for hero background videos.
  *
- * Browser policy: unmuted autoplay is blocked by default. The only reliable
- * way to autoplay is to start muted, then immediately attempt to unmute.
- * On desktop Chrome/Firefox this succeeds silently. On mobile/Safari the
- * unmute is blocked and we surface a "Tap to unmute" button.
+ * Browser autoplay policy requires videos to start muted. We unmute on the
+ * first user gesture anywhere on the page (scroll, click, keydown, touchstart)
+ * — this satisfies the policy on all browsers without requiring the user to
+ * find and click a mute button. No mute button is shown.
  *
  * Usage:
- *   const { videoRef, muted, unmute, showUnmuteButton } = useHeroVideo();
+ *   const { videoRef } = useHeroVideo();
  *   <video ref={videoRef} ... />
- *   {showUnmuteButton && <button onClick={unmute}>Tap to unmute</button>}
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface UseHeroVideoOptions {
   /** Pause when scrolled out of view (default: true) */
@@ -27,12 +26,28 @@ interface UseHeroVideoOptions {
 
 interface UseHeroVideoReturn {
   videoRef: React.RefObject<HTMLVideoElement>;
-  /** Whether the video is currently muted */
-  muted: boolean;
-  /** Whether to show the tap-to-unmute overlay (browser blocked unmuted autoplay) */
-  showUnmuteButton: boolean;
-  /** Call this when the user taps the unmute button */
-  unmute: () => void;
+}
+
+// Module-level flag: once any user gesture fires, all videos on the page unmute.
+const gestureListeners: Set<() => void> = new Set();
+let gestureReceived = false;
+
+function onFirstGesture() {
+  if (gestureReceived) return;
+  gestureReceived = true;
+  gestureListeners.forEach((fn) => fn());
+  gestureListeners.clear();
+  // Clean up page-level listeners
+  ['click', 'keydown', 'scroll', 'touchstart'].forEach((evt) =>
+    window.removeEventListener(evt, onFirstGesture, { capture: true } as EventListenerOptions)
+  );
+}
+
+// Attach page-level gesture listeners once
+if (typeof window !== 'undefined') {
+  ['click', 'keydown', 'scroll', 'touchstart'].forEach((evt) =>
+    window.addEventListener(evt, onFirstGesture, { capture: true, passive: true })
+  );
 }
 
 export function useHeroVideo({
@@ -40,70 +55,42 @@ export function useHeroVideo({
   threshold = 0.2,
 }: UseHeroVideoOptions = {}): UseHeroVideoReturn {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
-  const [showUnmuteButton, setShowUnmuteButton] = useState(false);
-
-  const tryUnmute = useCallback((el: HTMLVideoElement) => {
-    el.muted = false;
-    // If the browser silently re-mutes (some mobile browsers do this),
-    // detect it on the next tick and show the button.
-    setTimeout(() => {
-      if (el.muted) {
-        setShowUnmuteButton(true);
-      } else {
-        setMuted(false);
-        setShowUnmuteButton(false);
-      }
-    }, 100);
-  }, []);
-
-  const unmute = useCallback(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    el.muted = false;
-    el.volume = 1;
-    setMuted(false);
-    setShowUnmuteButton(false);
-  }, []);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
 
-    // Always start muted so autoplay is permitted
+    // Must start muted — browsers block unmuted autoplay
     el.muted = true;
+    el.volume = 1;
 
-    const startPlay = () => {
-      el.play()
-        .then(() => {
-          // Play succeeded — now try to unmute
-          tryUnmute(el);
-        })
-        .catch(() => {
-          // Autoplay fully blocked (very rare) — show unmute button as play button
-          setShowUnmuteButton(true);
-        });
-    };
+    function doUnmute() {
+      if (!el) return;
+      el.muted = false;
+    }
+
+    function startPlay() {
+      if (!el) return;
+      el.play().catch(() => {
+        // Autoplay blocked entirely — nothing to do, poster shows
+      });
+      // Unmute immediately if gesture already received, otherwise queue
+      if (gestureReceived) {
+        doUnmute();
+      } else {
+        gestureListeners.add(doUnmute);
+      }
+    }
 
     if (!pauseOffScreen) {
       startPlay();
-      return;
+      return () => { gestureListeners.delete(doUnmute); };
     }
 
-    // If already in viewport on mount (e.g. top-of-page hero), start immediately
+    // If already in viewport on mount, start immediately
     const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      startPlay();
-      // Still observe so we pause when scrolled away
-      const observer = new IntersectionObserver(
-        ([entry]) => { if (!entry.isIntersecting) el.pause(); else el.play().catch(() => {}); },
-        { threshold: 0 }
-      );
-      observer.observe(el);
-      return () => observer.disconnect();
-    }
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
 
-    // Play when scrolled into view, pause when scrolled away
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -112,12 +99,17 @@ export function useHeroVideo({
           el.pause();
         }
       },
-      { threshold }
+      { threshold: inView ? 0 : threshold }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [pauseOffScreen, threshold, tryUnmute]);
+    if (inView) startPlay();
 
-  return { videoRef, muted, showUnmuteButton, unmute };
+    return () => {
+      observer.disconnect();
+      gestureListeners.delete(doUnmute);
+    };
+  }, [pauseOffScreen, threshold]);
+
+  return { videoRef };
 }

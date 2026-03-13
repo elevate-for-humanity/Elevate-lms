@@ -78,7 +78,7 @@ What would you like to know more about?`,
 **Funding Options:**
 - WIOA (Workforce Innovation and Opportunity Act) - Free for eligible low-income individuals
 - WRG (Workforce Ready Grant) - Indiana state funding
-- JRI (Justice Reinvestment Initiative) - For justice-involved individuals
+- JRI (Job Ready Indy) - For justice-involved individuals
 - Self-pay options with payment plans available
 
 **Eligibility (General):**

@@ -30,7 +30,7 @@ interface FunderMetrics {
 const funderDescriptions: Record<string, string> = {
   WIOA: 'Workforce Innovation and Opportunity Act - Federal workforce development funding',
   WRG: 'Workforce Readiness Grant - State-level workforce training grants',
-  JRI: 'Justice Reinvestment Initiative - Reentry and justice-involved populations',
+  JRI: 'Job Ready Indy - Reentry and justice-involved populations',
   SEAL: 'Skills Enhancement and Lifelong Learning - Adult education and upskilling',
   Apprenticeship: 'Registered Apprenticeship Programs - DOL-approved apprenticeships',
   Other: 'Other funding sources including private grants and partnerships',

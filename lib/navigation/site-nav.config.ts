@@ -239,7 +239,7 @@ export const headerNavigation: NavGroup[] = [
       {
         label: 'JRI Partners',
         href: '/partners/jri',
-        description: 'Justice Reinvestment Initiative',
+        description: 'Job Ready Indy',
       },
       {
         label: 'NRF Partners',

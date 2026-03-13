@@ -232,7 +232,7 @@ export default function FundingImpactPage() {
                     { name: 'WIOA Title I', desc: 'Adult, Dislocated Worker, Youth programs', amount: 'Up to $10,000' },
                     { name: 'Workforce Ready Grant', desc: 'Indiana state funding for high-demand training', amount: 'Up to $5,500' },
                     { name: 'SNAP E&T', desc: 'Training for SNAP recipients', amount: 'Varies' },
-                    { name: 'JRI Funding', desc: 'Justice Reinvestment Initiative', amount: 'Up to $8,000' },
+                    { name: 'JRI Funding', desc: 'Job Ready Indy', amount: 'Up to $8,000' },
                     { name: 'TAA', desc: 'Trade Adjustment Assistance', amount: 'Up to $10,000' },
                     { name: 'Veterans Benefits', desc: 'GI Bill and VR&E', amount: 'Full tuition' },
                   ].map((source, index) => (

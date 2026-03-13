@@ -131,7 +131,7 @@ export function BarberEnrollment() {
             <h3 className="font-bold text-slate-900 mb-3">Funding Sources</h3>
             <div className="space-y-3">
               <p className="text-sm text-slate-700">
-                <strong>JRI (Justice Reinvestment Initiative):</strong> If you are justice-involved (currently on probation, parole, or recently released), JRI funding may cover your entire apprenticeship at no cost. JRI also provides supportive services like transportation assistance and work supplies.
+                <strong>JRI (Job Ready Indy):</strong> If you are justice-involved (currently on probation, parole, or recently released), JRI funding may cover your entire apprenticeship at no cost. JRI also provides supportive services like transportation assistance and work supplies.
               </p>
               <p className="text-sm text-slate-700">
                 <strong>WIOA:</strong> Adults and dislocated workers who meet income guidelines or are receiving public assistance may qualify for WIOA funding, which covers tuition, books, supplies, and in some cases transportation and childcare.

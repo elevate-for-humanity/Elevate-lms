@@ -28,7 +28,7 @@ const STAGES = [
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
-    funding: 'WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), JRI (Justice Reinvestment Initiative). Eligibility is determined through WorkOne. Qualifying participants pay nothing.',
+    funding: 'WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), JRI (Job Ready Indy). Eligibility is determined through WorkOne. Qualifying participants pay nothing.',
     timeline: '1–2 weeks from first contact to enrollment.',
   },
   {
@@ -364,7 +364,7 @@ export default function PathwaysPage() {
             {[
               { title: 'Career changers', desc: 'You are working a job that does not pay enough or does not have a future. You want a credential that leads to a real career with benefits and growth.' },
               { title: 'Unemployed or underemployed', desc: 'You are out of work or working part-time. You may qualify for WIOA funding that covers 100% of your training, including materials and certification exams.' },
-              { title: 'Justice-impacted individuals', desc: 'You have a record and need a fresh start. JRI (Justice Reinvestment Initiative) funding may cover your training. Many of our employer partners hire regardless of background.' },
+              { title: 'Justice-impacted individuals', desc: 'You have a record and need a fresh start. JRI (Job Ready Indy) funding may cover your training. Many of our employer partners hire regardless of background.' },
               { title: 'Young adults (16–24)', desc: 'You are not sure what to do after high school. WIOA Youth funding can cover career training that leads to a credential and a job in weeks, not years.' },
               { title: 'Veterans', desc: 'You have skills from military service. Our programs help you translate those skills into civilian credentials that employers recognize.' },
               { title: 'Employers and workforce partners', desc: 'You need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.' },

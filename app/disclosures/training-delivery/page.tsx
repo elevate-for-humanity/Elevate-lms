@@ -195,7 +195,7 @@ export default function TrainingDeliveryDisclosure() {
               <strong>Important:</strong> Many Elevate programs may be available at no cost to eligible
               participants through federal and state workforce funding programs including WIOA
               (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and JRI
-              (Justice Reinvestment Initiative). Eligibility is determined by your local WorkOne
+              (Job Ready Indy). Eligibility is determined by your local WorkOne
               career center, not by Elevate. Not all applicants will qualify for funded training.
               Self-pay options and payment plans are available for participants who do not qualify
               for workforce funding. See{' '}

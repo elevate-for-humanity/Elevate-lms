@@ -43,7 +43,7 @@ add({
 
 add({
   lessonId: 'hvac-01-02',
-  concept: 'WIOA (Workforce Innovation and Opportunity Act) is the primary funding source for most students in this program. This lesson explains exactly what WIOA covers: tuition, tools, transportation, childcare, work clothing, and certification exam fees. You will learn the eligibility requirements, how to work with your WorkOne case manager, and what documentation you need. Other funding options include the Workforce Ready Grant (WRG) for Indiana residents, Justice Reinvestment Initiative (JRI) for justice-involved individuals, and self-pay with flexible payment plans.',
+  concept: 'WIOA (Workforce Innovation and Opportunity Act) is the primary funding source for most students in this program. This lesson explains exactly what WIOA covers: tuition, tools, transportation, childcare, work clothing, and certification exam fees. You will learn the eligibility requirements, how to work with your WorkOne case manager, and what documentation you need. Other funding options include the Workforce Ready Grant (WRG) for Indiana residents, Job Ready Indy (JRI) for justice-involved individuals, and self-pay with flexible payment plans.',
   keyTerms: [
     { term: 'WIOA', definition: 'Workforce Innovation and Opportunity Act — federal funding for job training administered through local WorkOne offices.' },
     { term: 'WRG', definition: 'Workforce Ready Grant — Indiana state funding for high-demand certifications, no income requirements.' },

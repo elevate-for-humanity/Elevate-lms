@@ -19,7 +19,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Justice Reinvestment Initiative (JRI) | Funded Career Training | Elevate for Humanity',
+  title: 'Job Ready Indy (JRI) | Funded Career Training | Elevate for Humanity',
   description: 'Indiana JRI program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/jri',
@@ -158,7 +158,7 @@ export default function JRIPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              What is the Justice Reinvestment Initiative?
+              What is the Job Ready Indy?
             </h2>
             <p className="text-lg text-gray-600">
               JRI is an Indiana state-funded program designed to reduce recidivism by investing in 
@@ -289,7 +289,7 @@ export default function JRIPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">JRI Program FAQ</h2>
           <div className="space-y-4">
             {[
-              { q: 'What is JRI funding?', a: 'Justice Reinvestment Initiative (JRI) is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
+              { q: 'What is JRI funding?', a: 'Job Ready Indy (JRI) is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.' },
               { q: 'Do I qualify if I have a felony?', a: 'Yes. JRI is specifically designed for people with criminal records, including felonies. Your conviction type does not automatically disqualify you.' },
               { q: 'How recent does my involvement need to be?', a: 'Generally, you should have been released from incarceration or supervision within the past 3 years. Contact us to discuss your specific situation.' },
               { q: 'What programs can I use JRI for?', a: 'JRI covers approved training programs including healthcare (CNA), skilled trades (HVAC, welding), technology, CDL, and more. See the list above for current options.' },

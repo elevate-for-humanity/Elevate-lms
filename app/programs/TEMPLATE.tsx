@@ -194,7 +194,7 @@ export default function ProgramTemplate() {
             <div className="bg-white rounded-xl p-6">
               <h3 className="font-bold text-black mb-2">JRI Funding</h3>
               <p className="text-black text-sm">
-                Justice Reinvestment Initiative for individuals with criminal
+                Job Ready Indy for individuals with criminal
                 justice involvement.
               </p>
             </div>

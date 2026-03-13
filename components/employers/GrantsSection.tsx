@@ -77,7 +77,7 @@ export default function GrantsSection() {
               bond at regular rates.
             </p>
             <p className="text-sm text-slate-600">
-              Many of our JRI (Justice Reinvestment Initiative) graduates qualify. This removes
+              Many of our JRI (Job Ready Indy) graduates qualify. This removes
               the financial risk of hiring from reentry populations while giving people a real
               second chance.
             </p>

@@ -194,7 +194,7 @@ export default async function ApplyPage({
                 image: '/images/pages/apply-page-1.jpg',
                 alt: 'Funding assistance',
                 title: 'Funding & Grants',
-                desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Justice Reinvestment Initiative) supports individuals with justice involvement.',
+                desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Job Ready Indy) supports individuals with justice involvement.',
                 link: '/funding',
                 linkLabel: 'View Funding Options',
               },

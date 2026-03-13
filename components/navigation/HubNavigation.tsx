@@ -105,7 +105,7 @@ const DEFAULT_NAVIGATION: NavCategory[] = [
       { id: '30', name: 'SNAP-ET', href: '/snap-et-partner', description: 'SNAP Employment & Training', order_index: 2 },
       { id: '31', name: 'FSSA Partnership', href: '/fssa-partnership-request', description: 'Family & Social Services', order_index: 3 },
       { id: '32', name: 'WorkOne', href: '/workone-partner-packet', description: 'WorkOne partnership', order_index: 4 },
-      { id: '33', name: 'JRI', href: '/jri', description: 'Justice Reinvestment Initiative', order_index: 5 },
+      { id: '33', name: 'JRI', href: '/jri', description: 'Job Ready Indy', order_index: 5 },
       { id: '34', name: 'Franchise', href: '/franchise', description: 'Franchise opportunities', order_index: 6 },
       { id: '35', name: 'White Label', href: '/white-label', description: 'White-label licensing', order_index: 7 },
     ],

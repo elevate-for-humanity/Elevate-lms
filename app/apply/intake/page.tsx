@@ -75,7 +75,7 @@ function IntakeForm() {
           </p>
           {fundingTag === 'jri' && (
             <p className="text-base text-slate-700 mb-6">
-              Based on your responses, you may qualify for Justice Reinvestment Initiative (JRI) funding.
+              Based on your responses, you may qualify for Job Ready Indy (JRI) funding.
               Our team will review your eligibility and contact you within 2 business days.
             </p>
           )}

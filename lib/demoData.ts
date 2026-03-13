@@ -170,7 +170,7 @@ export const fundingOptions = [
     eligibility: 'Varies by state and program',
   },
   {
-    name: 'JRI (Justice Reinvestment Initiative)',
+    name: 'JRI (Job Ready Indy)',
     description: 'Funding for reentry and justice-impacted populations',
     eligibility: 'Justice system involvement required',
   },

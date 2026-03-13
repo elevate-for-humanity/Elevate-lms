@@ -92,7 +92,7 @@ export default function PartnershipsPage() {
               { label: 'ETPL Provider', value: '2Exclusive LLC-S — listed on Indiana INTraining system' },
               { label: 'DOL Registered Apprenticeship', value: 'Barber and Building Technician programs registered with USDOL/RAPIDS' },
               { label: 'WIOA Eligible', value: 'Programs approved for Adult, Dislocated Worker, and Youth funding' },
-              { label: 'JRI Approved', value: 'Approved provider for Justice Reinvestment Initiative participants' },
+              { label: 'JRI Approved', value: 'Approved provider for Job Ready Indy participants' },
               { label: 'Workforce Ready Grant', value: 'High-demand certification programs qualify for WRG through Next Level Jobs' },
               { label: 'Certificate Verification', value: 'All completions verifiable at elevateforhumanity.org/cert/verify' },
             ].map((item) => (

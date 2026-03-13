@@ -111,7 +111,7 @@ export default function FundingPage() {
                 <div className="absolute top-3 left-3 bg-brand-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Justice Reinvestment Initiative</h3>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Job Ready Indy</h3>
                 <p className="text-slate-600 text-sm leading-relaxed mb-3">
                   State funding for justice-involved individuals. Covers training, certifications, and wraparound support services to help build a new career.
                 </p>

@@ -33,7 +33,7 @@ export const POLICIES = {
     description: 'Indiana Workforce Ready Grant eligibility and compliance',
   },
   JRI: {
-    name: 'Justice Reinvestment Initiative Policy',
+    name: 'Job Ready Indy Policy',
     url: '/policies/jri',
     description: 'JRI funding eligibility and requirements',
   },

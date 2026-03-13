@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Justice Reinvestment Initiative Policy | Elevate for Humanity',
+  title: 'Job Ready Indy Policy | Elevate for Humanity',
   description: 'JRI funding policy for workforce training for justice-involved individuals. Eligibility, covered services, and application process.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/policies/jri' },
 };
@@ -26,11 +26,11 @@ export default function JRIPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/hero-images/jri-hero.jpg" alt="Justice Reinvestment Initiative" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/hero-images/jri-hero.jpg" alt="Job Ready Indy" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Justice Reinvestment Initiative</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Job Ready Indy</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Workforce training and career support for justice-involved individuals</p>
           </div>
         </div>
@@ -44,7 +44,7 @@ export default function JRIPage() {
           <div className="prose prose-lg max-w-none">
             <h2>Overview</h2>
             <p>
-              The Justice Reinvestment Initiative (JRI) provides funding for workforce training programs
+              The Job Ready Indy (JRI) provides funding for workforce training programs
               designed to reduce recidivism and support successful reentry into the community. Through JRI,
               eligible individuals can access career training, job placement assistance, and supportive
               services at no cost.

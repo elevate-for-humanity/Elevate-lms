@@ -225,7 +225,7 @@ export default function TestPaymentsPage() {
             <div className="p-3 border border-gray-200 rounded">
               <div className="font-medium text-black">JRI</div>
               <div className="text-xs text-black">
-                Justice Reinvestment Initiative
+                Job Ready Indy
               </div>
             </div>
             <div className="p-3 border border-gray-200 rounded">

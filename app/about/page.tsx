@@ -63,7 +63,7 @@ export default function AboutPage() {
             <p>
               Many of our programs are available at no cost to eligible participants through
               WIOA (Workforce Innovation and Opportunity Act), the Workforce Ready Grant, and
-              JRI (Justice Reinvestment Initiative) funding. Eligibility is determined through
+              JRI (Job Ready Indy) funding. Eligibility is determined through
               Indiana WorkOne career centers. We assist with the screening and paperwork —
               participants focus on training.
             </p>
@@ -351,7 +351,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             {[
               { name: 'WIOA', role: 'Eligible Training Provider', desc: 'Programs approved for WIOA Adult, Dislocated Worker, and Youth funding.' },
-              { name: 'JRI', role: 'Approved Provider', desc: 'Approved for Justice Reinvestment Initiative funding for justice-involved participants.' },
+              { name: 'JRI', role: 'Approved Provider', desc: 'Approved for Job Ready Indy funding for justice-involved participants.' },
               { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
               { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
             ].map((cred) => (

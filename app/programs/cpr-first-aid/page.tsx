@@ -3,6 +3,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import CprHero from '@/components/programs/CprHero';
 import { CPR_FIRST_AID } from '@/data/programs/cpr-first-aid';
 import { validateProgram } from '@/lib/programs/program-schema';
 
@@ -37,7 +38,7 @@ export default function Page() {
           outcomes: p.outcomes.map((o) => o.statement),
         }}
       />
-      <ProgramDetailPage program={p} />
+      <ProgramDetailPage program={p} heroOverride={<CprHero />} />
     </>
   );
 }

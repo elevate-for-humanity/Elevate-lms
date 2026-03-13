@@ -21,10 +21,12 @@ import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown } from 
 
 interface Props {
   program: ProgramSchema;
+  /** Replaces the default video/image hero entirely. */
+  heroOverride?: React.ReactNode;
   children?: React.ReactNode;
 }
 
-export default function ProgramDetailPage({ program: p, children }: Props) {
+export default function ProgramDetailPage({ program: p, heroOverride, children }: Props) {
   // Dev-time validation
   if (process.env.NODE_ENV === 'development') {
     const errors = validateProgram(p);
@@ -63,7 +65,7 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
     <div className="min-h-screen bg-white">
       {/* ═══ A. HERO ════════════════════════════════════════════════ */}
       <section>
-        {p.videoSrc ? (
+        {heroOverride ?? (p.videoSrc ? (
           <PageVideoHero
             videoSrc={p.videoSrc}
             posterSrc={p.heroImage}
@@ -81,7 +83,7 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
               sizes="100vw"
             />
           </div>
-        )}
+        ))}
 
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-slate-900">

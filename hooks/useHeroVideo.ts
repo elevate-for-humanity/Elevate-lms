@@ -56,6 +56,14 @@ export function useHeroVideo({
     const el = videoRef.current;
     if (!el) return;
 
+    // Hoist doUnmute to effect scope so cleanup can remove it from pendingUnmute
+    // if the component unmounts before the first gesture fires.
+    const doUnmute = () => {
+      if (!el) return;
+      el.muted = false;
+      el.volume = 1;
+    };
+
     async function startPlay() {
       if (!el) return;
 
@@ -78,12 +86,6 @@ export function useHeroVideo({
       }
 
       // Queue unmute for first user gesture
-      const doUnmute = () => {
-        if (!el) return;
-        el.muted = false;
-        el.volume = 1;
-      };
-
       if (gestureReceived) {
         doUnmute();
       } else {
@@ -93,7 +95,9 @@ export function useHeroVideo({
 
     if (!pauseOffScreen) {
       startPlay();
-      return;
+      return () => {
+        pendingUnmute.delete(doUnmute);
+      };
     }
 
     const rect = el.getBoundingClientRect();
@@ -115,6 +119,7 @@ export function useHeroVideo({
 
     return () => {
       observer.disconnect();
+      pendingUnmute.delete(doUnmute);
     };
   }, [pauseOffScreen, threshold]);
 

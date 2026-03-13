@@ -17,6 +17,10 @@ export default function AuthResetPasswordPage() {
   useEffect(() => {
     const supabase = createClient();
 
+    // Hoist cleanup handles so the useEffect return can always reach them.
+    let subscription: { unsubscribe: () => void } | null = null;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+
     // First check for an existing session (set by /auth/confirm via cookie).
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
@@ -28,22 +32,24 @@ export default function AuthResetPasswordPage() {
       // PASSWORD_RECOVERY fires when the user arrives via a hash-fragment link.
       // SIGNED_IN fires when the browser picks up the session cookie set by
       // /auth/confirm after a short propagation delay.
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      const { data: { subscription: sub } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
           setSessionReady(true);
         }
       });
+      subscription = sub;
 
       // After 3 s with no auth event, declare the session invalid.
-      const timeout = setTimeout(() => {
+      timeout = setTimeout(() => {
         setSessionReady(prev => prev === null ? false : prev);
       }, 3000);
-
-      return () => {
-        subscription.unsubscribe();
-        clearTimeout(timeout);
-      };
     });
+
+    // Cleanup is returned from useEffect directly so React always runs it.
+    return () => {
+      subscription?.unsubscribe();
+      if (timeout !== null) clearTimeout(timeout);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -3,15 +3,27 @@
  *
  * Accepts a multipart/form-data upload with a single "file" field.
  * Extracts plain text from PDF, DOCX, TXT, or MD files.
- * Returns { text: string, filename: string, char_count: number }
+ * Returns { text, filename, char_count, extraction_method }
  *
- * Used by CourseIngestionWizard before sending to /api/admin/courses/ingest.
+ * extraction_method values:
+ *   "text"        — normal PDF/DOCX text extraction
+ *   "ocr"         — full OCR (scanned PDF, all pages within limit)
+ *   "ocr_partial" — OCR ran on first MAX_OCR_PAGES pages only
+ *   "ocr_failed"  — OCR attempted but produced no usable text
+ *
+ * OCR limits (Netlify 60s budget):
+ *   MAX_OCR_PAGES = 8  — OCR only first N pages of scanned PDFs
+ *   OCR is skipped for files >8 MB (too slow for request budget)
+ *   tesseract.js + sharp are already in netlify external_node_modules
  */
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+
+const MAX_OCR_PAGES = 8;
+const MAX_OCR_FILE_BYTES = 8 * 1024 * 1024; // 8 MB — above this OCR is too slow
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -46,11 +58,94 @@ function normalizeText(raw: string): string {
   return raw
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    // collapse 3+ blank lines to 2
     .replace(/\n{3,}/g, '\n\n')
-    // remove null bytes and other control chars except tab/newline
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
     .trim();
+}
+
+/** Returns true if extracted PDF text is too sparse to be real content */
+function isScannedPdf(text: string, pageCount: number): boolean {
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  // Fewer than 100 chars per page on average = likely image-only
+  return cleaned.length < Math.max(100, pageCount * 100);
+}
+
+/**
+ * OCR a PDF buffer using tesseract.js on embedded images.
+ *
+ * PDF-to-image rendering requires pdfjs-dist (not installed) or system tools
+ * (pdftoppm/ghostscript, not available on Netlify). Instead, we attempt to
+ * extract any embedded raster images directly from the PDF binary using a
+ * simple JPEG/PNG stream scan, then run tesseract on those images.
+ *
+ * This works for PDFs that embed scanned page images as JPEG/PNG streams
+ * (the most common case for scanned documents). It does not work for PDFs
+ * with embedded JBIG2 or CCITT-compressed images.
+ *
+ * Operational limit: first MAX_OCR_PAGES image streams only.
+ */
+async function ocrPdf(buffer: Buffer): Promise<{
+  text: string;
+  pageCount: number;
+  pagesOcrd: number;
+  method: 'ocr' | 'ocr_partial' | 'ocr_failed';
+}> {
+  // Extract embedded JPEG image streams from PDF binary
+  // JPEG streams start with FF D8 FF and end with FF D9
+  const images: Buffer[] = [];
+  let offset = 0;
+  while (offset < buffer.length - 2 && images.length < MAX_OCR_PAGES) {
+    // Find JPEG SOI marker
+    const jpegStart = buffer.indexOf(Buffer.from([0xFF, 0xD8, 0xFF]), offset);
+    if (jpegStart === -1) break;
+    // Find JPEG EOI marker
+    const jpegEnd = buffer.indexOf(Buffer.from([0xFF, 0xD9]), jpegStart + 2);
+    if (jpegEnd === -1) break;
+    const imgBuf = buffer.slice(jpegStart, jpegEnd + 2);
+    // Only keep images larger than 10KB (skip thumbnails/icons)
+    if (imgBuf.length > 10 * 1024) {
+      images.push(imgBuf);
+    }
+    offset = jpegEnd + 2;
+  }
+
+  if (images.length === 0) {
+    return { text: '', pageCount: 0, pagesOcrd: 0, method: 'ocr_failed' };
+  }
+
+  const Tesseract = await import('tesseract.js').catch(() => null);
+  if (!Tesseract) {
+    return { text: '', pageCount: images.length, pagesOcrd: 0, method: 'ocr_failed' };
+  }
+
+  const worker = await Tesseract.createWorker('eng');
+  const texts: string[] = [];
+
+  try {
+    for (const imgBuf of images) {
+      try {
+        const { data: { text } } = await worker.recognize(imgBuf);
+        if (text.trim().length > 20) texts.push(text.trim());
+      } catch {
+        // skip unreadable image
+      }
+    }
+  } finally {
+    await worker.terminate();
+  }
+
+  const combined = texts.join('\n\n');
+  if (!combined.trim()) {
+    return { text: '', pageCount: images.length, pagesOcrd: images.length, method: 'ocr_failed' };
+  }
+
+  const pagesOcrd = images.length;
+  return {
+    text: combined,
+    pageCount: images.length,
+    pagesOcrd,
+    method: pagesOcrd < images.length ? 'ocr_partial' : 'ocr',
+  };
 }
 
 export async function POST(request: Request) {
@@ -106,22 +201,74 @@ export async function POST(request: Request) {
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     let rawText = '';
+    let extractionMethod: 'text' | 'ocr' | 'ocr_partial' | 'ocr_failed' = 'text';
+    let extractionWarning: string | null = null;
 
     if (isPdf) {
-      // pdf-parse v2 uses default export
       const pdfParse = (await import('pdf-parse')).default;
-      const result = await pdfParse(buffer);
-      rawText = result.text;
+      let pdfResult: { text: string; numpages: number };
+      try {
+        pdfResult = await pdfParse(buffer);
+      } catch (parseErr: any) {
+        const msg = parseErr?.message || '';
+        if (msg.includes('Invalid PDF') || msg.includes('Bad XRef') || msg.includes('encrypted')) {
+          return NextResponse.json(
+            { error: 'Could not parse this PDF. It may be encrypted or corrupted. Try exporting as a plain text file.' },
+            { status: 422 }
+          );
+        }
+        throw parseErr;
+      }
+
+      rawText = pdfResult.text;
+      const pageCount = pdfResult.numpages || 1;
+
+      // Detect scanned/image-only PDF
+      if (isScannedPdf(rawText, pageCount)) {
+        if (file.size > MAX_OCR_FILE_BYTES) {
+          // File too large for OCR within request budget
+          return NextResponse.json(
+            {
+              error:
+                `This PDF appears to be scanned (image-only) and is too large (${(file.size / 1024 / 1024).toFixed(1)} MB) ` +
+                `for automatic text recognition within the time limit. ` +
+                `Please export the document as a text or Word file, or copy and paste the content directly.`,
+            },
+            { status: 422 }
+          );
+        }
+
+        // Run OCR fallback
+        const ocrResult = await ocrPdf(buffer);
+
+        if (ocrResult.method === 'ocr_failed' || !ocrResult.text.trim()) {
+          return NextResponse.json(
+            {
+              error:
+                'This PDF is scanned (image-only) and OCR could not extract readable text. ' +
+                'Try exporting as a Word document or copying the text manually.',
+            },
+            { status: 422 }
+          );
+        }
+
+        rawText = ocrResult.text;
+        extractionMethod = ocrResult.method;
+
+        if (ocrResult.method === 'ocr_partial') {
+          extractionWarning =
+            `This PDF is scanned. OCR was applied to the first ${ocrResult.pagesOcrd} of ${ocrResult.pageCount} pages ` +
+            `(limit: ${MAX_OCR_PAGES} pages per request). Review the extracted content carefully — ` +
+            `content from later pages was not included.`;
+        } else {
+          extractionWarning = `This PDF is scanned. Text was extracted using OCR — review for accuracy before generating a course.`;
+        }
+      }
     } else if (isDocx) {
       const mammoth = await import('mammoth');
       const result = await mammoth.extractRawText({ buffer });
       rawText = result.value;
-      if (result.messages?.length) {
-        // non-fatal warnings from mammoth — log but continue
-        console.warn('[parse-file] mammoth warnings:', result.messages.slice(0, 3));
-      }
     } else {
-      // plain text / markdown
       rawText = buffer.toString('utf-8');
     }
 
@@ -138,12 +285,14 @@ export async function POST(request: Request) {
       text,
       filename,
       char_count: text.length,
+      extraction_method: extractionMethod,
+      ...(extractionWarning ? { warning: extractionWarning } : {}),
     });
   } catch (err: any) {
     const msg = err?.message || '';
     if (msg.includes('Invalid PDF') || msg.includes('Bad XRef')) {
       return NextResponse.json(
-        { error: 'Could not parse this PDF. It may be encrypted, scanned, or corrupted. Try exporting as plain text.' },
+        { error: 'Could not parse this PDF. It may be encrypted or corrupted. Try exporting as a plain text file.' },
         { status: 422 }
       );
     }

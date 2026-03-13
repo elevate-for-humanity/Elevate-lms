@@ -56,7 +56,7 @@ export default function StartPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-slate-800 text-white">
         <Image
-          src="/images/pages/heroes-hq/how-it-works-hero.jpg"
+          src="/images/pages/how-it-works-hero.jpg"
           alt="Career training students"
           fill
           sizes="100vw"

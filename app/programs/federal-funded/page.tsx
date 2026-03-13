@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  heroImage: '/images/heroes-hq/funding-hero.jpg',
+  heroImage: '/images/pages/funding-hero.jpg',
   title: 'Federal-Funded Programs', subtitle: 'No-cost career training for eligible participants through WIOA, WRG, and JRI. Tuition, books, supplies, and certifications covered.',
   badge: 'Funded Training', badgeColor: 'green',
   duration: '3–16 weeks', cost: '$0 for eligible participants', format: 'In-person, Indianapolis', credential: 'Varies by program',

@@ -20,7 +20,7 @@ export default function FounderPage() {
 
       {/* Hero */}
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-slate-900">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover opacity-55" priority />
+        <Image src="/images/pages/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover opacity-55" priority />
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
             <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Founder &amp; CEO</p>

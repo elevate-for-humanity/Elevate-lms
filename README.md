@@ -1,8 +1,9 @@
 # Elevate for Humanity — Workforce Operating System
 
 > **Repository Notice**
-> This is a public transparency repository. It does not contain the complete production system.
-> Access to the live platform is provided under formal managed access or enterprise source-use agreements.
+> This repository is published for transparency, security review, and platform documentation.
+> It does not contain the complete production system. External contributions are not accepted.
+> Access to the live platform requires a formal managed access or enterprise source-use agreement.
 > See [docs/repository-scope.md](docs/repository-scope.md) for what is and is not included here.
 
 ---

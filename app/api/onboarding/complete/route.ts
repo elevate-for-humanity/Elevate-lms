@@ -107,6 +107,11 @@ async function _POST(request: NextRequest) {
         .maybeSingle(),
     ]);
 
+    if (profileResult.error) {
+      logger.error('[onboarding/complete] Failed to fetch profile', { userId, error: profileResult.error.message });
+      return NextResponse.json({ error: 'Failed to load user profile' }, { status: 500 });
+    }
+
     const profile = profileResult.data;
     const application = appResult.data;
     const enrollment = enrollmentResult.data;
@@ -127,7 +132,7 @@ async function _POST(request: NextRequest) {
     }).eq('id', userId);
 
     // Run approval pipeline if application not yet approved
-    let programId = enrollment?.program_id || application?.program_id || null;
+    const programId = enrollment?.program_id || application?.program_id || null;
     if (application?.id && application.status !== 'approved') {
       const approvalResult = await approveApplication(db, {
         applicationId: application.id,

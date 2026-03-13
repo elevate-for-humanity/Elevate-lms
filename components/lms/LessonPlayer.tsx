@@ -395,6 +395,7 @@ export default function LessonPlayer({
         <div className="relative aspect-video">
           <video
             ref={videoRef}
+            data-lesson-video
             preload="metadata"
             playsInline
             crossOrigin="anonymous"

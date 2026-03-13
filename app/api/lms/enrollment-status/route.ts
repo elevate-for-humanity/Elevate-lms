@@ -16,10 +16,6 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  if (!supabase) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

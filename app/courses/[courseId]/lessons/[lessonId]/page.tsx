@@ -676,7 +676,7 @@ export default function LessonPage() {
                       />
                     </div>
                     {lessonCaptions && (
-                      <VideoCaptions segments={lessonCaptions} />
+                      <VideoCaptions segments={lessonCaptions} videoSelector="[data-lesson-video]" />
                     )}
                   </>
                 );

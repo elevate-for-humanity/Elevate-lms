@@ -241,7 +241,7 @@ export default function HvacCourseHome({
           ═══════════════════════════════════════════════════════════ */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-brand-blue-900">
-          <Image src="/images/pages/programs-hvac-course-hero.jpg" alt="HVAC technician working" fill className="object-cover opacity-20" priority />
+          <Image src="/images/pages/programs-hvac-course-hero.jpg" alt="HVAC technician working" fill className="object-cover" priority />
         </div>
         {/* Red accent stripe */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-brand-red-600" />

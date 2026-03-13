@@ -103,7 +103,6 @@ export default function RiseFoundationPage() {
           sizes="100vw"
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-3">
             501(c)(3) Nonprofit · Indianapolis, Indiana

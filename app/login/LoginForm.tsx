@@ -37,21 +37,22 @@ export default function LoginForm() {
       // Get user profile to determine redirect
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, onboarding_completed')
         .eq('id', data.user.id)
         .single();
 
-      // Redirect based on role
+      // Redirect based on role + onboarding status
+      const onboardingDone = profile?.onboarding_completed === true;
       if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'org_admin') {
         router.push('/admin/dashboard');
       } else if (profile?.role === 'employer') {
-        router.push('/employer-portal');
+        router.push(onboardingDone ? '/employer/dashboard' : '/onboarding/employer');
       } else if (profile?.role === 'staff') {
         router.push('/onboarding/staff');
       } else if (profile?.role === 'program_holder') {
-        router.push('/program-holder/onboarding');
+        router.push(onboardingDone ? '/program-holder/dashboard' : '/program-holder/onboarding');
       } else if (profile?.role === 'partner') {
-        router.push('/partner/onboarding');
+        router.push(onboardingDone ? '/partner/dashboard' : '/onboarding/partner');
       } else if (profile?.role === 'instructor') {
         router.push('/instructor/dashboard');
       } else {

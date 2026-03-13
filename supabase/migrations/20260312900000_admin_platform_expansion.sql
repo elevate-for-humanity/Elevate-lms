@@ -4,9 +4,12 @@
 --        partner_programs, and links courses to programs.
 -- ═══════════════════════════════════════════════════════════
 
--- 1. Add program_id to courses if missing
+-- 1. Add program_id to courses if missing (only if courses is a base table, not a view)
 DO $$ BEGIN
-  IF NOT EXISTS (
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_name = 'courses' AND table_type = 'BASE TABLE'
+  ) AND NOT EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'courses' AND column_name = 'program_id'
   ) THEN
@@ -146,14 +149,23 @@ ALTER TABLE partner_verifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE partner_programs ENABLE ROW LEVEL SECURITY;
 
 -- Service role can do everything (admin operations)
+DROP POLICY IF EXISTS "service_role_all" ON curriculum_lessons;
 CREATE POLICY "service_role_all" ON curriculum_lessons FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "service_role_all" ON curriculum_quizzes;
 CREATE POLICY "service_role_all" ON curriculum_quizzes FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "service_role_all" ON curriculum_recaps;
 CREATE POLICY "service_role_all" ON curriculum_recaps FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "service_role_all" ON media_jobs;
 CREATE POLICY "service_role_all" ON media_jobs FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "service_role_all" ON partner_verifications;
 CREATE POLICY "service_role_all" ON partner_verifications FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "service_role_all" ON partner_programs;
 CREATE POLICY "service_role_all" ON partner_programs FOR ALL USING (true) WITH CHECK (true);
 
 -- Authenticated users can read curriculum
+DROP POLICY IF EXISTS "authenticated_read" ON curriculum_lessons;
 CREATE POLICY "authenticated_read" ON curriculum_lessons FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "authenticated_read" ON curriculum_quizzes;
 CREATE POLICY "authenticated_read" ON curriculum_quizzes FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "authenticated_read" ON curriculum_recaps;
 CREATE POLICY "authenticated_read" ON curriculum_recaps FOR SELECT TO authenticated USING (true);

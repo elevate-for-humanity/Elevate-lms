@@ -87,23 +87,23 @@ async function _POST(request: NextRequest) {
     `;
 
     // Send email using Resend (if configured) or log it
-    if (process.env.RESEND_API_KEY) {
-      const response = await fetch('https://api.resend.com/emails', {
+    if (process.env.SENDGRID_API_KEY) {
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Elevate for Humanity <onboarding@elevateforhumanity.org>',
-          to: [to],
+          personalizations: [{ to: [{ email: to }] }],
+          from: { name: 'Elevate for Humanity', email: 'onboarding@elevateforhumanity.org' },
           subject: '🎉 Welcome! Your LMS Access is Ready',
-          html: emailHTML,
+          content: [{ type: 'text/html', value: emailHTML }],
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send email via Resend');
+        throw new Error('Failed to send email via SendGrid');
       }
 
       return NextResponse.json({

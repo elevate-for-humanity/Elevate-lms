@@ -247,7 +247,7 @@ async function getEnvStatus(): Promise<Record<string, boolean>> {
     STRIPE_SECRET: !!process.env.STRIPE_SECRET_KEY,
     STRIPE_PUBLISHABLE: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
-    RESEND_API_KEY: !!process.env.RESEND_API_KEY,
+    SENDGRID_API_KEY: !!process.env.SENDGRID_API_KEY,
     SALESFORCE_CLIENT_ID: !!process.env.SALESFORCE_CLIENT_ID,
   };
 }

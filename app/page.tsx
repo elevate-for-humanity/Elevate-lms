@@ -13,7 +13,7 @@ const PROGRAMS = [
   { name: 'CNA Certification',            image: '/images/pages/cna-patient-care.jpg',    href: '/programs/cna',                   duration: '4–6 weeks',   sector: 'Healthcare',      salary: '$30K–$42K' },
   { name: 'CDL Commercial Driving',       image: '/images/pages/cdl-truck-highway.jpg',   href: '/programs/cdl-training',          duration: '4–6 weeks',   sector: 'Transportation',  salary: '$50K+' },
   { name: 'Barber Apprenticeship',        image: '/images/pages/barber-fade.jpg',          href: '/programs/barber-apprenticeship', duration: '~18 months',  sector: 'Barbering',       salary: '$30K–$60K+' },
-  { name: 'HVAC / Building Technician',   image: '/images/pages/hvac-unit.jpg',            href: '/programs/hvac-technician',       duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$48K–$80K' },
+  { name: 'HVAC / Building Technician',   image: '/images/pages/hvac-unit.jpg',            href: '/programs/hvac-technician',       duration: '12 weeks', sector: 'Skilled Trades',  salary: '$48K–$80K' },
   { name: 'Electrical',                   image: '/images/pages/electrical-wiring.jpg',    href: '/programs/electrical',            duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$56K–$100K+' },
   { name: 'Welding',                      image: '/images/pages/welding-sparks.jpg',        href: '/programs/welding',               duration: '12–16 weeks', sector: 'Skilled Trades',  salary: '$54K–$150K+' },
   { name: 'IT Support',                   image: '/images/pages/it-helpdesk-desk.jpg',     href: '/programs/it-help-desk',          duration: '8–12 weeks',  sector: 'Technology',      salary: '$35K–$60K' },

@@ -86,19 +86,19 @@ This request was submitted via the Platform Licensing page.
     `.trim();
 
     // Send via Resend if configured
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.SENDGRID_API_KEY) {
       try {
-        await fetch('https://api.resend.com/emails', {
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
-            to: process.env.LICENSE_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
+            personalizations: [{ to: [{ email: process.env.LICENSE_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com' }] }],
+            from: { name: 'Elevate for Humanity', email: 'noreply@elevateforhumanity.org' },
             subject: `[License Request] ${licenseType === 'source_use' ? 'Enterprise Source-Use' : 'Managed LMS'} - ${organizationName}`,
-            text: emailBody,
+            content: [{ type: 'text/plain', value: emailBody }],
           }),
         });
       } catch (emailError) {

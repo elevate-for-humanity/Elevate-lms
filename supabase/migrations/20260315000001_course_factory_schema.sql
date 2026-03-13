@@ -67,6 +67,7 @@ CREATE INDEX IF NOT EXISTS course_audit_log_created_at_idx ON course_audit_log (
 -- RLS: admins and staff can read audit log; only service role writes
 ALTER TABLE course_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "course_audit_log_admin_read" ON course_audit_log;
 CREATE POLICY "course_audit_log_admin_read" ON course_audit_log
   FOR SELECT USING (
     EXISTS (

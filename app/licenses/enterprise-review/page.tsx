@@ -52,7 +52,7 @@ export default function EnterpriseReviewPage() {
             and contact you within 5 business days. Source-use licenses require approval and a 
             signed agreement before any access is granted.
           </p>
-          <Link href="/licenses" className="text-brand-blue-400 font-semibold hover:underline">
+          <Link href="/store/licensing" className="text-brand-blue-400 font-semibold hover:underline">
             Return to Platform Licensing
           </Link>
         </div>

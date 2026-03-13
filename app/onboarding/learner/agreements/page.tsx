@@ -153,7 +153,7 @@ export default function AgreementsPage() {
                 documentVersion={AGREEMENT.version}
                 documentUrl={AGREEMENT.documentUrl}
                 acceptanceContext="learner-onboarding"
-                onSuccess={() => setSigned(true)}
+                onSuccess={() => { setSigned(true); router.push('/onboarding/learner'); }}
               />
             </div>
           </div>

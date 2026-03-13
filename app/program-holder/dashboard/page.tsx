@@ -60,7 +60,7 @@ export default async function ProgramHolderDashboardPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-slate-900/50 flex items-center">
+        <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">Elevate For Humanity</p>

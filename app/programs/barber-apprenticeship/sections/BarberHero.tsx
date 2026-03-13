@@ -12,7 +12,7 @@ export function BarberHero() {
           src="/images/pages/programs-barber-hero-new.jpg"
           alt="Barber apprentice cutting hair in a licensed barbershop"
           fill sizes="100vw"
-          className="object-cover opacity-75"
+          className="object-cover"
           priority
         />
         <div className="absolute inset-0 flex items-end">

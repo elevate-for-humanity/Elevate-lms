@@ -155,7 +155,7 @@ export default function BarberSettingsPage() {
         <div>
           <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SUPPORT</h2>
           <div className="bg-slate-800 rounded-xl overflow-hidden divide-y divide-slate-700">
-            <Link href="/help" className="flex items-center justify-between p-4 active:bg-slate-700">
+            <Link href="/support/help" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
                 <HelpCircle className="w-5 h-5 text-slate-400" />
                 <p className="text-white font-medium">Help Center</p>

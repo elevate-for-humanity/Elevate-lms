@@ -303,10 +303,10 @@ async function _POST(request: NextRequest) {
     }
 
     try {
-      if (!process.env.RESEND_API_KEY) {
-        logger.warn('[Calendly Webhook] RESEND_API_KEY not configured');
-        await finalizeWebhookEvent('calendly', eventId, 'skipped', 'RESEND_API_KEY not configured');
-        return NextResponse.json({ success: true, warning: 'Email not sent - RESEND_API_KEY not configured' });
+      if (!process.env.SENDGRID_API_KEY) {
+        logger.warn('[Calendly Webhook] SENDGRID_API_KEY not configured');
+        await finalizeWebhookEvent('calendly', eventId, 'skipped', 'SENDGRID_API_KEY not configured');
+        return NextResponse.json({ success: true, warning: 'Email not sent - SENDGRID_API_KEY not configured' });
       }
 
       switch (event.event) {

@@ -385,7 +385,7 @@ export default async function LearnerDashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Link
-                  href="/lms"
+                  href="/lms/dashboard"
                   className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                 >
                   <Video className="w-8 h-8 text-brand-blue-600 mb-2" />

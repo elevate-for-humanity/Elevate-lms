@@ -80,7 +80,7 @@ export default async function ProgramHolderPayrollPage() {
             <h1 className="text-2xl font-bold text-slate-900">Payroll &amp; Payouts</h1>
             <p className="text-slate-500 text-sm mt-1">Manage your pay method, view earnings, and run payroll for your staff</p>
           </div>
-          <Link href="/program-holder/payroll/setup"
+          <Link href="/program-holder/payroll"
             className="flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm font-medium">
             <Settings className="w-4 h-4" /> Payout Settings
           </Link>
@@ -96,7 +96,7 @@ export default async function ProgramHolderPayrollPage() {
                 Connect your bank account or choose a pay card to receive program revenue and payroll deposits.
               </p>
             </div>
-            <Link href="/program-holder/payroll/setup"
+            <Link href="/program-holder/payroll"
               className="flex-shrink-0 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-700">
               Set Up Now
             </Link>

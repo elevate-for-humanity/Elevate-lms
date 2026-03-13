@@ -73,7 +73,6 @@ export default async function StaffPortalLanding() {
       {/* Hero */}
       <section className="relative h-[220px] sm:h-[260px]">
         <Image src="/images/pages/staff-portal-page-1.jpg" alt="Staff Portal" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/60" />
         <div className="absolute inset-0 flex flex-col justify-end pb-8 px-6 max-w-6xl mx-auto w-full">
           <h1 className="text-3xl font-bold text-white mb-1">
             {user && profile?.full_name ? `Welcome, ${profile.full_name.split(' ')[0]}` : 'Staff Portal'}

@@ -174,7 +174,6 @@ export default async function CoursePage({ params }: { params: Params }) {
             autoPlay
             preload="auto"
           />
-          <div className="absolute inset-0 bg-black/55" />
         </div>
 
         {/* Content over image */}
@@ -381,7 +380,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                               </div>
                             )}
                             {!isCompleted && lesson.content_type === 'video' && (
-                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                              <div className="absolute inset-0 flex items-center justify-center">
                                 <Play className="w-5 h-5 text-white" />
                               </div>
                             )}

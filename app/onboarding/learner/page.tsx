@@ -522,7 +522,7 @@ export default async function LearnerOnboardingPage() {
                   (317) 314-3757
                 </a>
                 <Link
-                  href="/help"
+                  href="/support/help"
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 font-semibold transition backdrop-blur-sm"
                 >
                   <HelpCircle className="w-4 h-4" />

@@ -11,23 +11,22 @@ interface EmailAlert {
 }
 
 export async function sendAdminAlert(alert: EmailAlert) {
-  // If Resend API key not configured, log to console
-  if (!process.env.RESEND_API_KEY) {
+  if (!process.env.SENDGRID_API_KEY) {
     return { success: true, provider: 'console' };
   }
 
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Elevate for Humanity <alerts@www.elevateforhumanity.org>',
-        to: alert.to,
+        personalizations: [{ to: [{ email: alert.to }] }],
+        from: { name: 'Elevate for Humanity', email: 'noreply@elevateforhumanity.org' },
         subject: alert.subject,
-        html: alert.html,
+        content: [{ type: 'text/html', value: alert.html }],
       }),
     });
 
@@ -35,10 +34,9 @@ export async function sendAdminAlert(alert: EmailAlert) {
       throw new Error(`Email API error: ${response.statusText}`);
     }
 
-    return { success: true, provider: 'resend' };
-  } catch (error) { /* Error handled silently */ 
+    return { success: true, provider: 'sendgrid' };
+  } catch (error) {
     logger.error('Email alert error:', error);
-    // Fallback to console logging
     return { success: false, error };
   }
 }

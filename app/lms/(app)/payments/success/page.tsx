@@ -56,7 +56,7 @@ function SuccessContent() {
 
           <div className="space-y-3">
             <Link
-              href="/lms"
+              href="/lms/dashboard"
               className="block w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
             >
               Go to Student Portal

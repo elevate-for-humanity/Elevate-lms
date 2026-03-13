@@ -49,7 +49,7 @@ export default async function ProgramHolderLicensePage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Program Holders" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licenses" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero */}
       <section className="bg-zinc-900    text-white py-20">

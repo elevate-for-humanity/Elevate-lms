@@ -63,7 +63,7 @@ export default function ProgramHolderLanding() {
           src="/images/pages/program-holder-page-2.jpg"
           alt="Program Holder Portal"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           priority
         />
       </section>

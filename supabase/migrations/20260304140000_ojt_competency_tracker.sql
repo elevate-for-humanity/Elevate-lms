@@ -43,17 +43,25 @@ GROUP BY student_id, program_id;
 ALTER TABLE ojt_competency_signoffs ENABLE ROW LEVEL SECURITY;
 
 -- Students can view their own sign-offs
-CREATE POLICY "Students view own OJT signoffs"
-  ON ojt_competency_signoffs FOR SELECT
-  USING (auth.uid() = student_id);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'ojt_competency_signoffs' AND policyname = 'Students view own OJT signoffs') THEN
+    CREATE POLICY "Students view own OJT signoffs"
+      ON ojt_competency_signoffs FOR SELECT
+      USING (auth.uid() = student_id);
+  END IF;
+END $$;
 
 -- Admins can manage all sign-offs
-CREATE POLICY "Admins manage OJT signoffs"
-  ON ojt_competency_signoffs FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'super_admin')
-    )
-  );
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'ojt_competency_signoffs' AND policyname = 'Admins manage OJT signoffs') THEN
+    CREATE POLICY "Admins manage OJT signoffs"
+      ON ojt_competency_signoffs FOR ALL
+      USING (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = auth.uid()
+          AND profiles.role IN ('admin', 'super_admin')
+        )
+      );
+  END IF;
+END $$;

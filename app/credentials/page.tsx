@@ -54,7 +54,7 @@ export default function CredentialsPage() {
       {/* Video hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
         <LazyVideo src="/videos/career-services-hero.mp4" poster="/images/pages/credentials-page-1.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-60" />
+          className="absolute inset-0 w-full h-full object-cover" />
       </section>
 
       {/* Page header */}

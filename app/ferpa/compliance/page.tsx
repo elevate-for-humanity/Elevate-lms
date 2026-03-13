@@ -202,7 +202,7 @@ export default async function FerpaCompliancePage() {
 
         {/* Quick Links */}
         <div className="mt-8 grid sm:grid-cols-3 gap-4">
-          <Link href="/ferpa/training" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+          <Link href="/training/certifications" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
             <FileText className="w-6 h-6 text-brand-blue-600 mb-2" />
             <h3 className="font-semibold text-gray-900">FERPA Training</h3>
             <p className="text-sm text-gray-500">Complete required training</p>

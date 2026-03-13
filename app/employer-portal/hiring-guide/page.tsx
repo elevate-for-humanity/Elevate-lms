@@ -73,7 +73,7 @@ export default function HiringGuidePage() {
           src="/images/pages/employer-portal-page-2.jpg"
           alt="Hiring guide"
           fill
-          className="object-cover opacity-20"
+          className="object-cover"
         />
         
       </div>

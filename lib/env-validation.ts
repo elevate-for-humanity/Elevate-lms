@@ -15,7 +15,7 @@ export interface EnvConfig {
   SUPABASE_SERVICE_ROLE_KEY?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_PUBLISHABLE_KEY?: string;
-  RESEND_API_KEY?: string;
+  SENDGRID_API_KEY?: string;
   OPENAI_API_KEY?: string;
   SUPERSONIC_API_KEY?: string;
   JOTFORM_API_KEY?: string;
@@ -69,7 +69,7 @@ export function getEnvOrFallback(key: string, fallback: string = ''): string {
  */
 export const services = {
   stripe: () => isServiceAvailable('STRIPE_SECRET_KEY'),
-  resend: () => isServiceAvailable('RESEND_API_KEY'),
+  resend: () => isServiceAvailable('SENDGRID_API_KEY'),
   openai: () => isServiceAvailable('OPENAI_API_KEY'),
   supersonic: () => isServiceAvailable('SUPERSONIC_API_KEY'),
   jotform: () => isServiceAvailable('JOTFORM_API_KEY'),

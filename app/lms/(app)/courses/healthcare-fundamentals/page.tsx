@@ -376,7 +376,7 @@ export default function HealthcareFundamentalsCoursePage() {
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link
-              href="/lms"
+              href="/lms/dashboard"
               className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-10 py-5 rounded-xl text-lg font-black hover:bg-white/10 transition-all"
             >
               View All Courses

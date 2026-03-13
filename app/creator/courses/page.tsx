@@ -52,7 +52,7 @@ export default function CreatorCoursesPage() {
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/creator" className="hover:text-brand-orange-600">Creator</Link>
+          <Link href="/creator/dashboard" className="hover:text-brand-orange-600">Creator</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">My Courses</span>
         </nav>

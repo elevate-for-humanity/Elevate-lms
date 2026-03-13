@@ -65,8 +65,8 @@ async function sendTrialWelcomeEmail(
   dashboardUrl: string,
   correlationId: string
 ) {
-  const resendKey = process.env.SENDGRID_API_KEY;
-  if (!resendKey) {
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) {
     logger.warn(`[trial] ${correlationId} — SENDGRID_API_KEY not configured, skipping welcome email`);
     return;
   }

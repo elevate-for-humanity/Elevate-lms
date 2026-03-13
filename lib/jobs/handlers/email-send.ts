@@ -92,29 +92,34 @@ async function sendEmail(payload: EmailPayload): Promise<void> {
   // Get template content
   const template = getEmailTemplate(emailType, templateData);
   
-  // Check for Resend API key
-  const resendApiKey = process.env.RESEND_API_KEY;
-  
-  if (resendApiKey) {
-    const response = await fetch('https://api.resend.com/emails', {
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
+
+  if (sendgridApiKey) {
+    const fromRaw = process.env.EMAIL_FROM || 'Elevate for Humanity <noreply@elevateforhumanity.org>';
+    const fromMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
+    const from = fromMatch
+      ? { name: fromMatch[1].trim(), email: fromMatch[2].trim() }
+      : { email: fromRaw.trim() };
+
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
+        'Authorization': `Bearer ${sendgridApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM || 'info@elevateforhumanity.org',
-        to: [to],
+        personalizations: [{ to: [{ email: to }] }],
+        from,
         subject: template.subject,
-        html: template.html,
+        content: [{ type: 'text/html', value: template.html }],
       }),
     });
-    
+
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Resend API error: ${error}`);
+      throw new Error(`SendGrid API error: ${error}`);
     }
-    
+
     return;
   }
   

@@ -178,7 +178,7 @@ export default function AdminLoginPage() {
 
           <div className="mt-6 text-center space-y-3">
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors block"
             >
               Forgot your password?

@@ -196,7 +196,7 @@ export default function LicenseCheckoutPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link
-          href="/store/licenses"
+          href="/store/licensing"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8"
         >
           <ArrowLeft size={20} />

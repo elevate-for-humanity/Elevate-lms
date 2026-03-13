@@ -126,8 +126,8 @@ async function _POST(req: NextRequest) {
 
     const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/accept-invite?token=${token}`;
 
-    // Send email if RESEND_API_KEY is configured
-    if (process.env.RESEND_API_KEY) {
+    // Send email if SENDGRID_API_KEY is configured
+    if (process.env.SENDGRID_API_KEY) {
       const { data: inviterProfile } = await db
         .from('profiles')
         .select('full_name')
@@ -146,7 +146,7 @@ async function _POST(req: NextRequest) {
       invite,
       message: 'Invite created successfully',
       invite_url: inviteUrl,
-      email_sent: !!process.env.RESEND_API_KEY,
+      email_sent: !!process.env.SENDGRID_API_KEY,
     });
   } catch (err: any) {
     return NextResponse.json(

@@ -215,6 +215,7 @@ export default function HandbookPage() {
 
     if (result.success) {
       setAlreadyAcknowledged(true);
+      router.push('/onboarding/learner');
     } else {
       setError(result.error || 'Failed to record acknowledgment');
     }

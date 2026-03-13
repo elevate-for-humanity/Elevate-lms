@@ -40,7 +40,7 @@ async function _POST(req: Request) {
       to: emailTo,
       subject: emailSubject,
       status: result.success ? 'sent' : 'failed',
-      provider: 'resend',
+      provider: 'sendgrid',
       ...(result.success ? { sent_at: new Date().toISOString() } : {}),
       ...(result.error ? { error_message: result.error } : {}),
     });
@@ -56,7 +56,7 @@ async function _POST(req: Request) {
         to: emailTo,
         subject: emailSubject,
         status: 'failed',
-        provider: 'resend',
+        provider: 'sendgrid',
         error_message: 'Unexpected error',
       });
     }

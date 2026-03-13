@@ -110,7 +110,6 @@ export default function TestingPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-slate-900/60" />
       </section>
 
       {/* Disclosure */}

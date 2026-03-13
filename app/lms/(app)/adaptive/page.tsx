@@ -22,7 +22,7 @@ export default async function AdaptivePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Adaptive Learning</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Adaptive Learning</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Adaptive Learning</h1>
           <p className="text-gray-600 mt-2">Personalized learning path based on your progress</p>
         </div>

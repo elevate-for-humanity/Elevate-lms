@@ -32,7 +32,6 @@ export default function Page() {
             <source src="/videos/getting-started-hero.mp4" type="video/mp4" />
           </video>
         </div>
-        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-4xl text-white">

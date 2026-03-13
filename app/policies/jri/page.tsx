@@ -18,7 +18,7 @@ export default function JRIPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Policies', href: '/policies' }, { label: 'JRI' }]} />
+          <Breadcrumbs items={[{ label: 'Policies', href: '/policies' }, { label: 'Job Ready Indy' }]} />
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export default function JRIPage() {
             <p>JRI-funded participants may enroll in any of our approved training programs, including:</p>
             <ul>
               <li>Barber Apprenticeship (2,000 hours)</li>
-              <li>HVAC Technician Training (12-16 weeks)</li>
+              <li>HVAC Technician Training (12 weeks)</li>
               <li>CDL Commercial Driving (4-8 weeks)</li>
               <li>IT Help Desk / Certiport IT Specialist (8 weeks)</li>
               <li>Healthcare certifications (CNA, Medical Assistant)</li>

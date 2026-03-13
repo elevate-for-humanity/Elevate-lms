@@ -119,7 +119,7 @@ export default function JRIPage() {
     <div className="bg-white">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'JRI Program' }]} />
+          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Job Ready Indy' }]} />
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export default function JRIPage() {
           src="/images/pages/jri-page-1.jpg"
           alt="JRI Program participants"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           priority
         />
         

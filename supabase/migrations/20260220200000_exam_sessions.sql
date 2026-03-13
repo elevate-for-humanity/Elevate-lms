@@ -1,12 +1,12 @@
 -- Proctor portal: exam session tracking for Certiport, EPA 608 (ESCO), and other proctored exams.
 -- Provides audit trail for WIOA/DOL workforce board compliance.
 
-CREATE TYPE exam_provider AS ENUM ('certiport', 'esco_epa608', 'mainstream_epa608', 'careersafe_osha', 'other');
-CREATE TYPE exam_session_status AS ENUM ('checked_in', 'in_progress', 'completed', 'voided', 'no_show');
-CREATE TYPE exam_result AS ENUM ('pass', 'fail', 'incomplete', 'pending');
-CREATE TYPE id_type AS ENUM ('drivers_license', 'state_id', 'passport', 'military_id', 'other');
+CREATE TYPE IF NOT EXISTS exam_provider AS ENUM ('certiport', 'esco_epa608', 'mainstream_epa608', 'careersafe_osha', 'other');
+CREATE TYPE IF NOT EXISTS exam_session_status AS ENUM ('checked_in', 'in_progress', 'completed', 'voided', 'no_show');
+CREATE TYPE IF NOT EXISTS exam_result AS ENUM ('pass', 'fail', 'incomplete', 'pending');
+CREATE TYPE IF NOT EXISTS id_type AS ENUM ('drivers_license', 'state_id', 'passport', 'military_id', 'other');
 
-CREATE TABLE exam_sessions (
+CREATE TABLE IF NOT EXISTS exam_sessions (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id     UUID REFERENCES tenants(id) ON DELETE CASCADE,
 

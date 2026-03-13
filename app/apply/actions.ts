@@ -224,6 +224,7 @@ export interface ProgramHolderApplicationData extends BaseApplicationData {
 
 export interface EmployerApplicationData extends BaseApplicationData {
   role: 'employer';
+  password: string;
   companyName: string;
   industry?: string;
   companySize?: string;
@@ -658,6 +659,7 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    password: data.password,
     city: 'Not provided',
     zip: '00000',
     programInterest: 'Employer Partnership',

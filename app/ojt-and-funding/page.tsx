@@ -30,7 +30,7 @@ export default function OjtAndFundingPage() {
       {/* Video hero */}
       <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-slate-900">
         <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/ojt-and-funding-page-1.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-65" />
+          className="absolute inset-0 w-full h-full object-cover" />
       </section>
 
       {/* Header */}

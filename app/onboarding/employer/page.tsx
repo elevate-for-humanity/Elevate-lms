@@ -46,14 +46,36 @@ export default async function EmployerOnboardingPage() {
     // Non-fatal
   }
 
-  // Get onboarding record
-  const { data: onboarding } = await db
+  // Get or create onboarding record
+  let { data: onboarding } = await db
     .from('employer_onboarding')
     .select('*')
     .eq('employer_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
+
+  if (!onboarding) {
+    // First visit after application — seed the row so subsequent updates work
+    const { data: profile } = await db
+      .from('profiles')
+      .select('first_name, last_name, email')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const { data: newRow } = await db
+      .from('employer_onboarding')
+      .insert({
+        employer_id: user.id,
+        contact_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : '',
+        contact_email: profile?.email || user.email || '',
+        status: 'pending_review',
+      })
+      .select()
+      .maybeSingle();
+
+    onboarding = newRow;
+  }
 
   // Get uploaded documents
   const { data: documents } = await db
@@ -76,7 +98,7 @@ export default async function EmployerOnboardingPage() {
 
   // Compute step statuses
   const hasHiringNeeds = !!onboarding?.hiring_needs;
-  const hasMOU = signedAgreements.has('employer_agreement');
+  const hasMOU = signedAgreements.has('employer_agreement') || signedAgreements.has('mou');
   const hasCOI = docTypes.has('other'); // Will be refined when DB supports coi_general_liability
   const hasBusinessDocs = docTypes.size >= 2; // At least business license + EIN
   const hasInsurance = hasCOI;

@@ -27,7 +27,7 @@ export default function WorkKeysPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
-        <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover opacity-60" priority />
+        <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Header */}

@@ -55,7 +55,7 @@ export default async function TuitionPage() {
           src="/images/pages/tuition-hero.jpg"
           alt="Tuition and Payment Options"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
         />
       </section>
 

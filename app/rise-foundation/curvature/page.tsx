@@ -68,7 +68,7 @@ export default function CurvaturePage() {
           src="/images/pages/rise-foundation-page-1.jpg"
           alt="CurvatureBody Sculpting non-invasive body contouring Indianapolis"
           fill sizes="100vw"
-          className="object-cover opacity-50"
+          className="object-cover"
           priority
         />
         <div className="absolute inset-0 flex items-end pb-10 px-6">

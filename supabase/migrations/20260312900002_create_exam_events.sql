@@ -17,14 +17,17 @@ CREATE INDEX IF NOT EXISTS idx_exam_events_type ON exam_events(event_type);
 -- RLS: users can insert their own events, admins can read all
 ALTER TABLE exam_events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can insert own exam events" ON exam_events;
 CREATE POLICY "Users can insert own exam events"
   ON exam_events FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own exam events" ON exam_events;
 CREATE POLICY "Users can view own exam events"
   ON exam_events FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access" ON exam_events;
 CREATE POLICY "Service role full access"
   ON exam_events FOR ALL
   USING (auth.role() = 'service_role');

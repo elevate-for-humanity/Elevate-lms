@@ -38,8 +38,8 @@ export class EmailService {
    * Throws on misconfiguration - no silent failures
    */
   async send(notification: EmailNotification): Promise<boolean> {
-    if (!process.env.RESEND_API_KEY) {
-      const error = new Error('RESEND_API_KEY is not configured. Email cannot be sent.');
+    if (!process.env.SENDGRID_API_KEY) {
+      const error = new Error('SENDGRID_API_KEY is not configured. Email cannot be sent.');
       logger.error('Email configuration error', error);
       throw error;
     }

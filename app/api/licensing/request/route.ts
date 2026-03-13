@@ -59,19 +59,19 @@ async function _POST(request: NextRequest) {
     }
 
     // Send notification email (if Resend is configured)
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.SENDGRID_API_KEY) {
       try {
-        await fetch('https://api.resend.com/emails', {
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Elevate Platform <info@elevateforhumanity.org>',
-            to: ['elevate4humanityedu@gmail.com'],
+            personalizations: [{ to: [{ email: 'elevate4humanityedu@gmail.com' }] }],
+            from: { name: 'Elevate Platform', email: 'info@elevateforhumanity.org' },
             subject: `New Platform Licensing Request: ${organization}`,
-            html: `
+            content: [{ type: 'text/html', value: `
               <h2>New Licensing Request</h2>
               <p><strong>Organization:</strong> ${organization}</p>
               <p><strong>Contact:</strong> ${name}</p>
@@ -81,7 +81,7 @@ async function _POST(request: NextRequest) {
               <p><strong>Student Volume:</strong> ${students}</p>
               <p><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
               <p><strong>Details:</strong> ${details || 'None provided'}</p>
-            `,
+            ` }],
           }),
         });
       } catch (emailError) {

@@ -76,7 +76,7 @@ export default function FinancePathwayPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
-        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover opacity-60">
+        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
           <source src="/videos/business-finance.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 flex items-center px-6">

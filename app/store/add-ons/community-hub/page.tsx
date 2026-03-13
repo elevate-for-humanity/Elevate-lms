@@ -318,7 +318,7 @@ export default function CommunityHubPage() {
           <div className="text-center">
             <p className="text-slate-600 mb-4">Already using Community Hub? Share your experience.</p>
             <Link
-              href="/store/add-ons/community-hub/review"
+              href="/store/add-ons/community-hub"
               className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition"
             >
               Write a Review

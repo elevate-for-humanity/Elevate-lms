@@ -98,7 +98,7 @@ function LoginForm() {
           router.push('/partner-portal');
           break;
         case 'employer':
-          router.push('/employer/dashboard');
+          router.push(onboardingDone ? '/employer/dashboard' : '/onboarding/employer');
           break;
         case 'workforce_board':
           router.push('/workforce-board/dashboard');

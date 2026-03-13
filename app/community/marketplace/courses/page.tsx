@@ -190,7 +190,7 @@ export default function CommunityCoursesPage() {
             Have expertise to share? Create a course and help others succeed while earning income.
           </p>
           <Link
-            href="/creator"
+            href="/creator/dashboard"
             className="bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block"
           >
             Become an Instructor

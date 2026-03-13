@@ -29,7 +29,7 @@ const programs = (dbRows as any[]) || [];
           src="/images/pages/employer-portal-page-3.jpg"
           alt="Employer programs"
           fill
-          className="object-cover opacity-20"
+          className="object-cover"
         />
         
       </div>

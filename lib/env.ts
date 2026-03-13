@@ -23,7 +23,7 @@ export const env = {
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: safeEnv('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'),
   
   // Email
-  RESEND_API_KEY: safeEnv('RESEND_API_KEY'),
+  SENDGRID_API_KEY: safeEnv('SENDGRID_API_KEY'),
   
   // OpenAI
   OPENAI_API_KEY: safeEnv('OPENAI_API_KEY'),
@@ -39,7 +39,7 @@ export function hasServiceRoleKey(): boolean {
 }
 
 export function hasEmailConfigured(): boolean {
-  return Boolean(env.RESEND_API_KEY);
+  return Boolean(env.SENDGRID_API_KEY);
 }
 
 export function hasStripeConfigured(): boolean {

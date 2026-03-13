@@ -2,10 +2,10 @@ import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 
 function getResendClient() {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
     logger.warn(
-      'RESEND_API_KEY not configured - email notifications will be skipped'
+      'SENDGRID_API_KEY not configured - email notifications will be skipped'
     );
     return null;
   }

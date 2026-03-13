@@ -81,7 +81,7 @@ export default function CDLWaitlistPage() {
               <li>4. You&apos;ll get priority enrollment as a waitlist member</li>
             </ul>
           </div>
-          <Link href="/programs/cdl" className="text-orange-600 hover:text-orange-700 font-medium">
+          <Link href="/programs/cdl-training" className="text-orange-600 hover:text-orange-700 font-medium">
             ← Back to CDL Program Info
           </Link>
         </div>
@@ -98,7 +98,7 @@ export default function CDLWaitlistPage() {
       {/* Hero */}
       <section className="relative bg-slate-900 text-white py-16 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/pages/programs-cdl-waitlist-hero.jpg" alt="CDL truck training" fill className="object-cover opacity-30" priority />
+          <Image src="/images/pages/programs-cdl-waitlist-hero.jpg" alt="CDL truck training" fill className="object-cover" priority />
         </div>
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-3">CDL Training — October 2026 Cohort</h1>

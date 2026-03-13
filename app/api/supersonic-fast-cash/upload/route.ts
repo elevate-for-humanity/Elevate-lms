@@ -54,17 +54,17 @@ export async function POST(request: Request) {
 
     // Send email notification
     try {
-      await fetch('https://api.resend.com/emails', {
+      await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'Supersonic Fast Cash <noreply@supersonicfastcash.com>',
-          to: 'elevate4humanityedu@gmail.com',
+          personalizations: [{ to: [{ email: 'elevate4humanityedu@gmail.com' }] }],
+          from: { name: 'Supersonic Fast Cash', email: 'noreply@elevateforhumanity.org' },
           subject: `New Tax Document Upload from ${firstName} ${lastName}`,
-          html: `
+          content: [{ type: 'text/html', value: `
             <h2>New Tax Document Upload</h2>
             <p><strong>Name:</strong> ${firstName} ${lastName}</p>
             <p><strong>Email:</strong> ${email}</p>
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
             <p>${notes || 'None provided'}</p>
             <hr>
             <p><em>Documents uploaded via Supersonic Fast Cash portal</em></p>
-          `,
+          ` }],
         }),
       });
     } catch (emailError) {

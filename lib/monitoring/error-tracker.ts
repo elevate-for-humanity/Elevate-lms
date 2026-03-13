@@ -9,11 +9,11 @@ async function sendCriticalAlert(data: {
   severity: string;
   userId?: string;
 }): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
+  const sendgridKey = process.env.SENDGRID_API_KEY;
   const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'elevate4humanityedu@gmail.com';
   
-  if (!resendKey) {
-    logger.error('RESEND_API_KEY not configured for alerts');
+  if (!sendgridKey) {
+    logger.error('SENDGRID_API_KEY not configured for alerts');
     return;
   }
 

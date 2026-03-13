@@ -60,7 +60,7 @@ export default function MarketplaceLanding() {
               icon={<CreditCard className="w-12 h-12 text-brand-green-600" />}
               title="Secure Payments"
               description="Safe and secure payment processing with buyer protection"
-              href="/checkout"
+              href="/store"
             />
             <FeatureCard
               icon={<TrendingUp className="w-12 h-12 text-brand-orange-600" />}

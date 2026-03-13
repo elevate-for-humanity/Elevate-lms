@@ -85,14 +85,14 @@ export default function HiringNeedsPage() {
         return;
       }
 
-      // Save hiring needs to employer_onboarding
+      // Save hiring needs — upsert in case the row doesn't exist yet
       await supabase
         .from('employer_onboarding')
-        .update({
+        .upsert({
+          employer_id: user.id,
           hiring_needs: formData,
           updated_at: new Date().toISOString(),
-        })
-        .eq('employer_id', user.id);
+        }, { onConflict: 'employer_id' });
 
       // Also update onboarding step status
       await supabase

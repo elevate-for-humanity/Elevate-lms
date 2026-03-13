@@ -2,6 +2,10 @@
 -- These were previously created manually in Supabase and not tracked in migrations.
 -- Signatures must match exactly what app/api/partner/applications/[id]/approve/route.ts calls.
 
+-- Drop existing versions regardless of signature so CREATE OR REPLACE succeeds
+DROP FUNCTION IF EXISTS public.rpc_approve_partner CASCADE;
+DROP FUNCTION IF EXISTS public.rpc_link_partner_user CASCADE;
+
 -- ============================================================
 -- PHASE 1: DB-only approval (atomic)
 -- Creates partner entity, program access, updates application.

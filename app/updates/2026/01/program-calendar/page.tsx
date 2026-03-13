@@ -38,7 +38,7 @@ export default function ProgramCalendar() {
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">Skilled Trades</h2>
         <ul className="list-disc pl-6 space-y-2 text-black">
-          <li>HVAC Technician - 16 weeks</li>
+          <li>HVAC Technician - 12 weeks</li>
           <li>Electrical Apprenticeship - 24 weeks</li>
           <li>Welding Certification - 12 weeks</li>
         </ul>

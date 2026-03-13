@@ -20,7 +20,7 @@ export default async function CreateCoursePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/program-holder" className="hover:text-primary">Program Holder</Link></li><li>/</li><li><Link href="/program-holder/courses" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">Create</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/program-holder" className="hover:text-primary">Program Holder</Link></li><li>/</li><li><Link href="/program-holder/courses/create" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">Create</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
           <p className="text-gray-600 mt-2">Add a course to your program offerings</p>
         </div>
@@ -34,7 +34,7 @@ export default async function CreateCoursePage() {
             </div>
             <div className="flex gap-4 pt-4 border-t">
               <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Create Course</button>
-              <Link href="/program-holder/courses" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
+              <Link href="/program-holder/courses/create" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
             </div>
           </form>
         </div>

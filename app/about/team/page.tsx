@@ -124,7 +124,7 @@ export default async function TeamPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
-        <Image src="/images/pages/team-hero.jpg" alt="Elevate for Humanity team" fill sizes="100vw" className="object-cover opacity-60" priority />
+        <Image src="/images/pages/team-hero.jpg" alt="Elevate for Humanity team" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex items-center justify-center text-center px-4">
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Our Team</h1>

@@ -92,7 +92,7 @@ export default async function ShoppingCartPage() {
                     </div>
                   </div>
                 </div>
-                <Link href="/checkout" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium">
+                <Link href="/store" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium">
                   <CreditCard className="w-5 h-5" /> Proceed to Checkout
                 </Link>
                 <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">

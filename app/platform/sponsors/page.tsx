@@ -51,7 +51,7 @@ export default async function SponsorLicensingPage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Sponsors" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licenses" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero Banner */}
       <ModernLandingHero
@@ -154,7 +154,7 @@ export default async function SponsorLicensingPage() {
               </div>
 
               <Link
-                href="/store/licenses"
+                href="/store/licensing"
                 className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Get Started
@@ -243,7 +243,7 @@ export default async function SponsorLicensingPage() {
               </div>
 
               <Link
-                href="/store/licenses"
+                href="/store/licensing"
                 className="block w-full bg-white text-indigo-600 hover:bg-slate-100 text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Get Started
@@ -536,7 +536,7 @@ export default async function SponsorLicensingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/store/licenses"
+              href="/store/licensing"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-slate-100 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
             >
               Get Started <ArrowRight className="w-5 h-5" />

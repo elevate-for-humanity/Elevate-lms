@@ -57,7 +57,7 @@ export function PortalPageLayout({
         </video>
         
         <div className="relative max-w-6xl mx-auto px-6 text-center">
-          <div className="bg-black/50 backdrop-blur-sm p-8 rounded-2xl inline-block">
+          <div className="p-8 rounded-2xl inline-block">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">{subtitle}</p>
           </div>

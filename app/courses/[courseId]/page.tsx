@@ -181,7 +181,7 @@ export default async function CourseDetailPage({
             src={heroImage}
             alt={`${course.course_name} training program`}
             fill
-            className="object-cover opacity-30"
+            className="object-cover"
             priority
           />
         </div>

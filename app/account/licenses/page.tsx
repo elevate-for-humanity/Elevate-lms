@@ -49,7 +49,7 @@ export default async function AccountLicensesPage() {
               You don&apos;t have any active licenses. Browse our store to get started.
             </p>
             <Link
-              href="/store/licenses"
+              href="/store/licensing"
               className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Browse Licenses

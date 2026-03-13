@@ -288,7 +288,7 @@ const adminRoutes: AdminRoute[] = [
         status: 'active',
       },
       {
-        name: 'JRI',
+        name: 'Job Ready Indy',
         href: '/admin/jri',
         description: 'JRI partner management',
         status: 'active',

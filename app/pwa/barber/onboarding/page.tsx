@@ -243,7 +243,7 @@ export default function OnboardingPage() {
             Contact your supervisor or program coordinator if you have questions about your apprenticeship.
           </p>
           <Link 
-            href="/help"
+            href="/support/help"
             className="text-brand-blue-400 text-sm font-medium"
           >
             Visit Help Center →

@@ -215,7 +215,7 @@ function ReportBuilder() {
   const [report, setReport] = useState<ReportTemplate>({
     ...REPORT_TEMPLATE_DEFAULT,
     programName: 'HVAC Technician Training',
-    programOverview: 'The HVAC Technician Training Program is a 20-week workforce development program preparing participants for entry-level HVAC technician positions. The program includes classroom instruction, hands-on lab exercises, and industry credential preparation.',
+    programOverview: 'The HVAC Technician Training Program is a 12-week workforce development program preparing participants for entry-level HVAC technician positions. The program includes classroom instruction, hands-on lab exercises, and industry credential preparation.',
     keyActivities: ['Completed Module 1-4 classroom instruction', 'Administered EPA 608 practice exams', 'Conducted employer site visits'],
     operationalUpdates: ['Updated curriculum to include new refrigerant handling procedures'],
     challengesOrRisks: [],

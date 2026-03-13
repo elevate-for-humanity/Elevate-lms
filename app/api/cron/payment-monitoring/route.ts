@@ -163,7 +163,7 @@ async function sendUpcomingPaymentReminder(
   subscription: any,
   paymentDate: Date
 ) {
-  if (!student?.email || !process.env.RESEND_API_KEY) return;
+  if (!student?.email || !process.env.SENDGRID_API_KEY) return;
 
   
   await resend.emails.send({
@@ -187,7 +187,7 @@ async function sendPastDueAlert(
   student: { email: string; full_name: string } | null,
   subscription: any
 ) {
-  if (!student?.email || !process.env.RESEND_API_KEY) return;
+  if (!student?.email || !process.env.SENDGRID_API_KEY) return;
 
   
   await resend.emails.send({

@@ -47,7 +47,6 @@ export function HeroVideo({
       </video>
 
       {/* Overlay - Design Policy: 30-40% max */}
-      <div className={`absolute inset-0 bg-black/${overlayOpacity}`} />
 
       {/* Content */}
       <div className="relative">{children}</div>

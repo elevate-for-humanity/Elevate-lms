@@ -27,9 +27,9 @@ import { INSTALLMENT_RULES } from './tuition-config';
  * Email 2: Welcome Letter - Instructions to complete enrollment
  */
 async function sendWelcomeLetterEmail(studentId: string, programId: string): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) {
-    logger.info('RESEND_API_KEY not configured, skipping emails');
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) {
+    logger.info('SENDGRID_API_KEY not configured, skipping emails');
     return;
   }
 
@@ -258,8 +258,8 @@ async function sendAdminEnrollmentNotification(
   studentEmail: string,
   programName: string
 ): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) return;
 
   const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
 
@@ -365,8 +365,8 @@ async function createRAPIDSPendingRecord(
 }
 
 async function sendPaymentFailedEmail(studentId: string, programId: string): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) return;
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -646,8 +646,8 @@ async function sendPaymentConfirmationEmail(
   totalPayments: number,
   interval: string
 ): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) return;
 
   const { data: student } = await supabase
     .from('profiles')
@@ -678,8 +678,8 @@ async function sendPaymentConfirmationEmail(
  * Send payment completion email
  */
 async function sendPaymentCompletionEmail(studentId: string, programId: string): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) return;
 
   const { data: student } = await supabase
     .from('profiles')

@@ -204,7 +204,7 @@ async function _GET(request: Request) {
     STRIPE_SECRET: !!process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: !!process.env.STRIPE_WEBHOOK_SECRET,
     OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
-    RESEND_API_KEY: !!process.env.RESEND_API_KEY,
+    SENDGRID_API_KEY: !!process.env.SENDGRID_API_KEY,
   };
   
   // Summary

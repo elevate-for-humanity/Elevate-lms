@@ -89,18 +89,17 @@ Last verified: 882/882 pages, zero errors
 
 ---
 
-# FUTURE TASKS (after stock images)
+# FUTURE TASKS
 
-1. **Fix "Access your dashboard" placeholder text** in 12 files
-2. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
-3. **Navigation streamlining** — audience-based quick links
-4. **Mobile optimization** — touch targets, responsive spacing
-5. **Visual hierarchy improvements**
-6. **Performance optimization**
-7. **JotForm webhook security** — add IP allowlist or HMAC check
-8. **Error message leaks** — 394 routes expose `error.message`
-9. **Run SQL migrations** in Supabase Dashboard
-10. **Commit and push** all accumulated changes
+1. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
+2. **Navigation streamlining** — audience-based quick links
+3. **Mobile optimization** — touch targets, responsive spacing
+4. **Visual hierarchy improvements**
+5. **Performance optimization**
+6. **JotForm webhook security** — add IP allowlist or HMAC check
+7. **Error message leaks** — 394 routes expose `error.message`
+8. **Run SQL migrations** in Supabase Dashboard
+9. **Commit and push** all accumulated changes
 
 ---
 
@@ -142,6 +141,84 @@ Semantic colors (indigo, teal, purple, emerald, cyan) are intentionally kept for
 
 When adding new UI, always use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, or `brand-green-*` for brand elements.
 
+# Canonical Portals by Role
+
+When adding new pages for a specific role, use the canonical portal path. Non-canonical paths are legacy redirects — do not add new pages there.
+
+| Role | Canonical path | Legacy (redirect-only) |
+|------|---------------|------------------------|
+| Learner / Student | `/learner/dashboard` | `/student-portal`, `/student` |
+| Admin | `/admin/dashboard` | — |
+| Instructor | `/instructor/dashboard` | — |
+| Employer | `/employer/dashboard` | `/employer-portal` |
+| Partner | `/partner/dashboard` | `/partner-portal` |
+| Program Holder | `/program-holder/dashboard` | — |
+| Staff | `/staff-portal/dashboard` | — |
+| Mentor | `/mentor/dashboard` | — |
+
+# API Conventions
+
+## Auth Pattern
+
+Use these helpers for new API routes. Do not use `getUser()` directly — it does not enforce role.
+
+```ts
+// Any authenticated user
+import { apiAuthGuard } from '@/lib/admin/guards';
+const auth = await apiAuthGuard(request);
+if (auth.error) return auth.error;
+
+// Admin or super_admin only
+import { apiRequireAdmin } from '@/lib/admin/guards';
+const auth = await apiRequireAdmin(request);
+if (auth.error) return auth.error;
+```
+
+There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.
+
+## Rate Limiting
+
+Use `applyRateLimit` from `lib/api/withRateLimit.ts`. Choose the tier that matches the route's risk level.
+
+```ts
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+const rateLimited = await applyRateLimit(request, 'api');
+if (rateLimited) return rateLimited;
+```
+
+| Tier | Limit | Use for |
+|------|-------|---------|
+| `strict` | 3 req / 5 min | Sensitive admin actions |
+| `auth` | 5 req / 1 min | Login, signup, password reset |
+| `payment` | 10 req / 1 min | Checkout, Stripe webhooks |
+| `contact` | 3 req / 1 min | Contact forms, enrollment forms |
+| `api` | 100 req / 1 min | General authenticated API |
+| `public` | 10 req / 1 min | Public AI tutor, unauthenticated reads |
+
+Do not use `lib/rateLimit.ts` (in-memory, broken in serverless) or `lib/rateLimiter.ts` (different Redis client). Canonical rate limit logic is in `lib/rate-limit.ts`.
+
+## Error Response Shape
+
+All API error responses must use `{ error: string }`. Never use `{ message: string }` for errors, and never return `error.message` directly (leaks internal details).
+
+```ts
+// Correct
+return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+
+// Wrong — do not do this
+return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+return NextResponse.json({ error: error.message }, { status: 500 });
+```
+
+## Auth Redirect Parameter
+
+Use `?redirect=<path>` (not `?next=`) when redirecting unauthenticated users to login. The login form reads `redirect`.
+
+```ts
+redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
+```
+
 # Document Generation (Partnership Proposals)
 
 Elevate uses Node.js + `docx` (npm package) to generate `.docx` partnership proposals programmatically, then emails them via SendGrid.
@@ -182,7 +259,6 @@ Program table (Section 2):
 Key decisions made:
 - OJT Placements row removed (employer agreements still pending)
 - Hands-On Training row removed (redundant with Classroom Instruction)
-- Program length set to 10 weeks
 - Cohort size: up to 30 participants
 
 ---

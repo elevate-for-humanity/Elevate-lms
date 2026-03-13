@@ -171,7 +171,7 @@ async function checkEnvironment() {
 
   const notes: string[] = [];
   if (process.env.STRIPE_SECRET_KEY) notes.push('Stripe configured');
-  if (process.env.RESEND_API_KEY) notes.push('Resend email configured');
+  if (process.env.SENDGRID_API_KEY) notes.push('SendGrid email configured');
   if (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) notes.push('Google Analytics configured');
   if (process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID) notes.push('Facebook Pixel configured');
 
@@ -295,7 +295,7 @@ async function checkSecurity() {
 
 async function checkFeatures() {
   const hasStripe = !!process.env.STRIPE_SECRET_KEY;
-  const hasEmail = !!process.env.RESEND_API_KEY;
+  const hasEmail = !!process.env.SENDGRID_API_KEY;
   const hasAnalytics = !!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return {

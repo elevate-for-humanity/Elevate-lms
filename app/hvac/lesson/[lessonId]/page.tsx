@@ -71,7 +71,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
       {/* ── Slim top nav ── */}
       <nav className="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-sm">
         <div className="flex items-center gap-2 text-slate-400">
-          <Link href="/hvac" className="hover:text-white transition-colors">← HVAC Course</Link>
+          <Link href="/programs/hvac-technician" className="hover:text-white transition-colors">← HVAC Course</Link>
           <span className="text-slate-700">/</span>
           <span className="text-sky-400 truncate max-w-[200px]">{lesson.module}</span>
         </div>
@@ -237,7 +237,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
               <span className="text-white text-sm font-semibold truncate">{nextLesson.lessonTitle}</span>
             </Link>
           ) : (
-            <Link href="/hvac" className="bg-green-700 hover:bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold transition-colors">
+            <Link href="/programs/hvac-technician" className="bg-green-700 hover:bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold transition-colors">
               Module Complete ✓
             </Link>
           )}

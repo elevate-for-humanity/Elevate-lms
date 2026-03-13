@@ -180,7 +180,7 @@ export default async function SupportPage() {
                 ))}
               </div>
               <div className="p-6 bg-slate-50 border-t border-slate-200">
-                <Link href="/help" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
+                <Link href="/support/help" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
                   View All Help Articles →
                 </Link>
               </div>

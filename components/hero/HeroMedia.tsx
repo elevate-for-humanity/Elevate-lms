@@ -123,7 +123,6 @@ export default function HeroMedia({
       )}
 
       {overlay && (
-        <div className="pointer-events-none absolute inset-0 bg-black/40" />
       )}
 
       {hasVoice && (

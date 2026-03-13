@@ -81,7 +81,7 @@ export default async function PaymentPage() {
                   </li>
                 </ul>
                 <Link
-                  href="/checkout"
+                  href="/store"
                   className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
                   Pay Now

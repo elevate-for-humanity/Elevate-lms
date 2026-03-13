@@ -108,15 +108,15 @@ const checks: Record<string, any> = {
   // Check 5: Resend (optional)
   if (process.env.SENDGRID_API_KEY) {
     try {
-      const response = await fetch('https://api.resend.com/emails', {
+      const response = await fetch('https://api.sendgrid.com/v3/scopes', {
         headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
       });
-      checks.checks.resend = {
-        ok: response.ok || response.status === 401,
-        status: response.ok || response.status === 401 ? 'pass' : 'warn',
+      checks.checks.sendgrid = {
+        ok: response.ok || response.status === 403,
+        status: response.ok || response.status === 403 ? 'pass' : 'warn',
       };
     } catch (error) {
-      checks.checks.resend = {
+      checks.checks.sendgrid = {
         ok: false,
         status: 'warn',
         error: toErrorMessage(error),

@@ -17,45 +17,54 @@ export interface EmailOptions {
 }
 
 /**
- * Send email via Resend HTTP API (no SDK — direct fetch).
+ * Send email via SendGrid HTTP API.
  * All email in the app routes through this single function.
  */
 export async function sendEmail(options: EmailOptions) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
-    logger.warn('[Email] RESEND_API_KEY not configured — email not sent');
-    return { success: false, error: 'Email service not configured (RESEND_API_KEY missing)' };
+    logger.warn('[Email] SENDGRID_API_KEY not configured — email not sent');
+    return { success: false, error: 'Email service not configured (SENDGRID_API_KEY missing)' };
   }
 
   const from = options.from || FROM_EMAIL;
   const replyTo = options.replyTo ?? REPLY_TO_EMAIL;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
 
+  // Parse "Name <email>" format into SendGrid's { name, email } shape
+  const parseAddress = (addr: string) => {
+    const m = addr.match(/^(.+?)\s*<(.+?)>$/);
+    return m ? { name: m[1].trim(), email: m[2].trim() } : { email: addr.trim() };
+  };
+
   try {
-    const resp = await fetch('https://api.resend.com/emails', {
+    const body: Record<string, unknown> = {
+      personalizations: [{ to: toArr.map(a => parseAddress(a)) }],
+      from: parseAddress(from),
+      subject: options.subject,
+      content: [{ type: 'text/html', value: options.html }],
+      reply_to: parseAddress(replyTo),
+    };
+    if (options.text) {
+      (body.content as unknown[]).unshift({ type: 'text/plain', value: options.text });
+    }
+
+    const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from,
-        to: toArr,
-        subject: options.subject,
-        html: options.html,
-        reply_to: replyTo,
-        ...(options.text ? { text: options.text } : {}),
-      }),
+      body: JSON.stringify(body),
     });
 
-    const data = await resp.json().catch(() => ({}));
-
     if (!resp.ok) {
-      logger.error(`[Email] Resend ${resp.status}:`, data);
-      return { success: false, error: `Resend error ${resp.status}: ${data?.message || data?.error || JSON.stringify(data)}`, from };
+      const data = await resp.json().catch(() => ({}));
+      logger.error(`[Email] SendGrid ${resp.status}:`, data);
+      return { success: false, error: `SendGrid error ${resp.status}: ${JSON.stringify(data)}`, from };
     }
 
-    return { success: true, data };
+    return { success: true };
   } catch (error) {
     logger.error('[Email] Send error:', error);
     return { success: false, error: 'Operation failed' };

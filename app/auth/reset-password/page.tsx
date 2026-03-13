@@ -14,13 +14,35 @@ export default function AuthResetPasswordPage() {
   const [error, setError] = useState('');
   const [sessionReady, setSessionReady] = useState<boolean | null>(null);
 
-  // Verify the user arrived here with a valid recovery session.
-  // /auth/confirm exchanges the token_hash and sets the session before
-  // redirecting here, so a missing session means a direct/invalid visit.
   useEffect(() => {
     const supabase = createClient();
+
+    // First check for an existing session (set by /auth/confirm via cookie).
     supabase.auth.getSession().then(({ data }) => {
-      setSessionReady(!!data.session);
+      if (data.session) {
+        setSessionReady(true);
+        return;
+      }
+
+      // No cookie session yet — listen for auth state events.
+      // PASSWORD_RECOVERY fires when the user arrives via a hash-fragment link.
+      // SIGNED_IN fires when the browser picks up the session cookie set by
+      // /auth/confirm after a short propagation delay.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+          setSessionReady(true);
+        }
+      });
+
+      // After 3 s with no auth event, declare the session invalid.
+      const timeout = setTimeout(() => {
+        setSessionReady(prev => prev === null ? false : prev);
+      }, 3000);
+
+      return () => {
+        subscription.unsubscribe();
+        clearTimeout(timeout);
+      };
     });
   }, []);
 
@@ -90,7 +112,7 @@ export default function AuthResetPasswordPage() {
             This password reset link is invalid or has expired. Request a new one.
           </p>
           <Link
-            href="/reset-password"
+            href="/auth/forgot-password"
             className="inline-block bg-brand-red-600 text-white font-bold px-10 py-4 rounded-lg text-lg hover:bg-brand-red-700 transition"
           >
             Request New Link

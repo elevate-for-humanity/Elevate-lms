@@ -795,7 +795,7 @@ export default function LessonPage() {
 
             {isAuthenticated === false && (
               <p className="text-xs text-slate-500 mt-1">
-                <a href="/signin" className="text-brand-blue-600 hover:underline font-medium">Sign in</a> to save your progress.
+                <a href="/login" className="text-brand-blue-600 hover:underline font-medium">Sign in</a> to save your progress.
               </p>
             )}
 

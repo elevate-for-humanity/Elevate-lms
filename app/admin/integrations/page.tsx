@@ -75,14 +75,14 @@ const INTEGRATIONS: Integration[] = [
     status: 'not_configured',
   },
   {
-    name: 'Resend (Email)',
-    slug: 'resend',
+    name: 'SendGrid (Email)',
+    slug: 'sendgrid',
     description: 'Transactional email for confirmations, approvals, notifications, and password resets.',
     icon: Mail,
     category: 'communication',
-    envVars: ['RESEND_API_KEY'],
+    envVars: ['SENDGRID_API_KEY'],
     status: 'not_configured',
-    docsUrl: 'https://resend.com/api-keys',
+    docsUrl: 'https://app.sendgrid.com/settings/api_keys',
   },
   {
     name: 'Stripe',

@@ -60,7 +60,7 @@ export default function StartPage() {
           alt="Career training students"
           fill
           sizes="100vw"
-          className="object-cover opacity-20"
+          className="object-cover"
           priority
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">

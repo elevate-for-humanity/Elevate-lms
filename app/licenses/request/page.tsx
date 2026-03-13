@@ -49,7 +49,7 @@ export default function LicenseRequestPage() {
           <p className="text-gray-600 mb-8">
             We will review your license request and contact you within 2 business days to discuss setup and onboarding.
           </p>
-          <Link href="/licenses" className="text-brand-blue-600 font-semibold hover:underline">
+          <Link href="/store/licensing" className="text-brand-blue-600 font-semibold hover:underline">
             Return to Platform Licensing
           </Link>
         </div>

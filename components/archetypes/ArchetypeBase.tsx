@@ -37,7 +37,7 @@ export function ArchetypeBase({
             src={finalContent.hero.image}
             alt={finalContent.hero.imageAlt || ''}
             fill
-            className="object-cover opacity-60"
+            className="object-cover"
             priority
           />
         )}

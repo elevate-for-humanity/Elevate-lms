@@ -60,7 +60,7 @@ export function ProgramHero({ program }: { program: Program }) {
             />
           )}
 
-          <div className="absolute inset-0 bg-black/50 flex items-end">
+          <div className="absolute inset-0 flex items-end">
             <div className="container mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
               <div className="max-w-4xl">
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">

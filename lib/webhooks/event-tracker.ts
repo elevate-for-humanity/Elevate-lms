@@ -9,7 +9,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
-type WebhookProvider = 'stripe' | 'sezzle' | 'affirm';
+export type WebhookProvider = 'stripe' | 'sezzle' | 'affirm' | 'jotform' | 'calendly' | 'resend';
 type EventStatus = 'processing' | 'processed' | 'skipped' | 'errored';
 
 interface TrackEventResult {

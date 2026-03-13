@@ -18,12 +18,12 @@ ALTER TABLE webhook_events_processed
   ADD CONSTRAINT webhook_events_processed_status_check
   CHECK (status IN ('received', 'validated', 'processing', 'processed', 'failed', 'skipped', 'errored'));
 
--- Update provider constraint to include jotform
+-- Provider constraint — all 6 active providers
 ALTER TABLE webhook_events_processed
   DROP CONSTRAINT IF EXISTS webhook_events_processed_provider_check;
 ALTER TABLE webhook_events_processed
   ADD CONSTRAINT webhook_events_processed_provider_check
-  CHECK (provider IN ('stripe', 'sezzle', 'affirm', 'jotform'));
+  CHECK (provider IN ('stripe', 'sezzle', 'affirm', 'jotform', 'calendly', 'resend'));
 
 -- Index for health monitor volume queries
 CREATE INDEX IF NOT EXISTS idx_webhook_events_provider_received
@@ -43,7 +43,10 @@ RETURNS TRIGGER AS $fn$
 DECLARE
   valid_transitions text[][] := ARRAY[
     ['received','validated'],
+    ['received','processing'],
+    ['received','processed'],
     ['received','errored'],
+    ['received','skipped'],
     ['validated','processing'],
     ['validated','processed'],
     ['validated','errored'],

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 // AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
@@ -273,40 +274,67 @@ async function _POST(request: NextRequest) {
       }
     }
     const event: CalendlyEvent = await request.json();
-    
+
     logger.info('[Calendly Webhook] Received event:', event.event);
-    
-    if (!process.env.RESEND_API_KEY) {
-      logger.warn('[Calendly Webhook] RESEND_API_KEY not configured');
-      return NextResponse.json({ 
-        success: true, 
-        warning: 'Email not sent - RESEND_API_KEY not configured' 
-      });
+
+    // Use scheduled_event URI as the stable dedup key; fall back to invitee email + type
+    const eventId: string =
+      (event.payload as Record<string, unknown>)['uri'] as string ||
+      `${event.event}:${event.payload.invitee.email}:${event.payload.scheduled_event.start_time}`;
+
+    const { shouldProcess, confident } = await claimWebhookEvent(
+      'calendly',
+      eventId,
+      event.event,
+      {
+        invitee_email: event.payload.invitee.email,
+        event_type_slug: event.payload.event_type.slug,
+        start_time: event.payload.scheduled_event.start_time,
+      },
+    );
+
+    if (!shouldProcess) {
+      return NextResponse.json({ received: true, idempotent: true });
     }
-    
-    switch (event.event) {
-      case 'invitee.created':
-        // New booking created
-        await Promise.all([
-          sendBookingConfirmation(event.payload.invitee),
-          notifyInternal(event.payload),
-          sendReminder(event.payload.invitee, event.payload.scheduled_event.start_time),
-        ]);
-        
-        logger.info('[Calendly Webhook] Booking confirmation sent to:', event.payload.invitee.email);
-        break;
-        
-      case 'invitee.canceled':
-        // Booking canceled - could send cancellation email or update CRM
-        logger.info('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
-        break;
-        
-      default:
-        logger.info('[Calendly Webhook] Unhandled event type:', event.event);
+
+    if (!confident) {
+      logger.error('[Calendly Webhook] Cannot verify idempotency — rejecting for retry', { eventId });
+      return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
     }
-    
-    return NextResponse.json({ success: true });
-    
+
+    try {
+      if (!process.env.RESEND_API_KEY) {
+        logger.warn('[Calendly Webhook] RESEND_API_KEY not configured');
+        await finalizeWebhookEvent('calendly', eventId, 'skipped', 'RESEND_API_KEY not configured');
+        return NextResponse.json({ success: true, warning: 'Email not sent - RESEND_API_KEY not configured' });
+      }
+
+      switch (event.event) {
+        case 'invitee.created':
+          await Promise.all([
+            sendBookingConfirmation(event.payload.invitee),
+            notifyInternal(event.payload),
+            sendReminder(event.payload.invitee, event.payload.scheduled_event.start_time),
+          ]);
+          logger.info('[Calendly Webhook] Booking confirmation sent to:', event.payload.invitee.email);
+          break;
+
+        case 'invitee.canceled':
+          logger.info('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
+          break;
+
+        default:
+          logger.info('[Calendly Webhook] Unhandled event type:', event.event);
+      }
+
+      await finalizeWebhookEvent('calendly', eventId, 'processed');
+      return NextResponse.json({ success: true });
+
+    } catch (error) {
+      await finalizeWebhookEvent('calendly', eventId, 'errored', String(error));
+      throw error;
+    }
+
   } catch (error) {
     logger.error('[Calendly Webhook] Error:', error);
     return NextResponse.json(

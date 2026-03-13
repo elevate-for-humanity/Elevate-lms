@@ -98,6 +98,7 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [videoWatchPercent, setVideoWatchPercent] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = unknown
   const [lessonCaptions, setLessonCaptions] = useState<any[] | null>(null);
   const [lessonQuiz, setLessonQuiz] = useState<any[] | null>(null);
   const [lessonRecap, setLessonRecap] = useState<any[] | null>(null);
@@ -203,6 +204,7 @@ export default function LessonPage() {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
       if (user && lessonsData) {
         const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
         const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
@@ -217,6 +219,7 @@ export default function LessonPage() {
       }
     } catch {
       // Auth/progress fetch failed — lesson still renders
+      setIsAuthenticated(false);
     }
   };
 
@@ -788,6 +791,12 @@ export default function LessonPage() {
                 <CheckCircle className="w-4 h-4" />
                 {isCompleted ? 'Completed' : 'Watch 90% of the video to complete'}
               </div>
+            )}
+
+            {isAuthenticated === false && (
+              <p className="text-xs text-slate-500 mt-1">
+                <a href="/signin" className="text-brand-blue-600 hover:underline font-medium">Sign in</a> to save your progress.
+              </p>
             )}
 
             <div className="flex gap-2">

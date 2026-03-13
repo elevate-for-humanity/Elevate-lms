@@ -1,21 +1,313 @@
 /**
  * POST /api/admin/courses/generate/publish
  *
- * Writes a reviewed GeneratedCourse into production tables:
- *   training_courses  — course record
- *   training_lessons  — one row per lesson
- *   completion_rules  — one rule per course
- *   program_courses   — if program_id provided
+ * Writes a reviewed course draft into production tables.
+ * Accepts two body shapes:
+ *   { course, program_id?, is_published? }  — legacy GeneratedCourse from /generate
+ *   { draft, program_id?, is_published? }   — compiled draft from v2 course compiler
  *
- * Returns { courseId, lessonCount }
+ * Insert order: training_courses → training_lessons → completion_rules → program_courses
+ *
+ * Schema verified against live DB (cuxzzpsyufcewtmicszk):
+ *   completion_rules  — entity_type/entity_id (no direct course_id column)
+ *   program_courses   — order_index (not sort_order)
+ *   training_courses  — created_by, certificate_enabled, summary present
+ *   training_lessons  — narration_script not a column; stored in metadata
+ *
+ * Returns { ok: true, courseId, lessonCount }
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { GeneratedCourse } from '../route';
+
+// ── Compiled draft schema (v2 course compiler) ────────────────────────────────
+
+const QuizQuestionSchema = z.object({
+  question: z.string().min(1),
+  options: z.array(z.string().min(1)).length(4),
+  correct_answer: z.string().min(1),
+  explanation: z.string().min(1),
+});
+
+const SlideSectionSchema = z.object({
+  slide_number: z.number().int().positive(),
+  title: z.string().min(1),
+  bullets: z.array(z.string().min(1)).min(1),
+  speaker_notes: z.string().min(1),
+  visual_suggestion: z.string().optional(),
+});
+
+const CompiledLessonSchema = z.object({
+  lesson_title: z.string().min(1),
+  lesson_objectives: z.array(z.string().min(1)).min(1),
+  estimated_minutes: z.number().int().min(1),
+  narration_script: z.string().min(1),
+  slide_outline: z.array(SlideSectionSchema).min(1),
+  practice_exercise: z.object({
+    title: z.string().min(1),
+    instructions: z.string().min(1),
+    expected_outcome: z.string().min(1),
+  }),
+  knowledge_check: z.array(QuizQuestionSchema).min(1),
+  instructor_notes: z.array(z.string().min(1)).min(1),
+});
+
+const CompiledModuleSchema = z.object({
+  module_title: z.string().min(1),
+  module_order: z.number().int().positive(),
+  module_objectives: z.array(z.string().min(1)).min(1),
+  lessons: z.array(CompiledLessonSchema).min(1),
+});
+
+const PublishDraftSchema = z.object({
+  course_title: z.string().min(1),
+  course_name: z.string().min(1),
+  description: z.string().default(''),
+  summary: z.string().default(''),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
+  learning_objectives: z.array(z.string().min(1)).min(1),
+  target_audience: z.array(z.string().min(1)).default([]),
+  estimated_total_minutes: z.number().int().min(1),
+  certificate_enabled: z.boolean().default(true),
+  completion_rule: z.object({
+    type: z.enum(['lesson_completion', 'quiz_threshold', 'hybrid', 'all_lessons', 'required_lessons']),
+    quiz_threshold_percent: z.number().int().min(0).max(100).optional(),
+  }),
+  modules: z.array(CompiledModuleSchema).min(1),
+  source_type: z.string().optional(),
+  source_prompt: z.string().optional(),
+  program_id: z.string().uuid().optional(),
+  auto_publish: z.boolean().default(false),
+});
+
+type PublishDraft = z.infer<typeof PublishDraftSchema>;
+type CompiledLesson = z.infer<typeof CompiledLessonSchema>;
+type CompiledModule = z.infer<typeof CompiledModuleSchema>;
+
+// ── Pre-publish validators ────────────────────────────────────────────────────
+
+function ensureUniqueLessonTitles(draft: PublishDraft): void {
+  const seen = new Set<string>();
+  for (const mod of draft.modules) {
+    for (const lesson of mod.lessons) {
+      const key = lesson.lesson_title.trim().toLowerCase();
+      if (seen.has(key)) throw new Error(`Duplicate lesson title: "${lesson.lesson_title}"`);
+      seen.add(key);
+    }
+  }
+}
+
+function validateQuizAnswers(draft: PublishDraft): void {
+  for (const mod of draft.modules) {
+    for (const lesson of mod.lessons) {
+      for (const q of lesson.knowledge_check) {
+        if (!q.options.includes(q.correct_answer)) {
+          throw new Error(
+            `Quiz answer mismatch in "${lesson.lesson_title}": ` +
+            `"${q.correct_answer}" not found in options`
+          );
+        }
+      }
+    }
+  }
+}
+
+function validateDurations(draft: PublishDraft): void {
+  for (const mod of draft.modules) {
+    for (const lesson of mod.lessons) {
+      if (lesson.estimated_minutes < 3)
+        throw new Error(`Lesson too short: "${lesson.lesson_title}" (${lesson.estimated_minutes} min)`);
+      if (lesson.narration_script.trim().length < 400)
+        throw new Error(`Narration too short: "${lesson.lesson_title}" (${lesson.narration_script.trim().length} chars)`);
+    }
+  }
+}
+
+// ── Compiled draft content renderer ──────────────────────────────────────────
+
+function renderCompiledLessonContent(lesson: CompiledLesson): string {
+  const slides = lesson.slide_outline
+    .map((slide) => {
+      const bullets = slide.bullets.map((b) => `- ${b}`).join('\n');
+      const parts = [
+        `## Slide ${slide.slide_number}: ${slide.title}`,
+        bullets,
+        '',
+        `**Speaker Notes**`,
+        slide.speaker_notes,
+      ];
+      if (slide.visual_suggestion) parts.push('', `*Visual: ${slide.visual_suggestion}*`);
+      return parts.join('\n');
+    })
+    .join('\n\n');
+
+  const quiz = lesson.knowledge_check
+    .map((q, idx) =>
+      [
+        `### Question ${idx + 1}`,
+        q.question,
+        q.options.map((o) => `- ${o}`).join('\n'),
+        '',
+        `**Correct Answer:** ${q.correct_answer}`,
+        '',
+        `**Explanation:** ${q.explanation}`,
+      ].join('\n')
+    )
+    .join('\n\n');
+
+  return [
+    `# ${lesson.lesson_title}`,
+    '',
+    `## Learning Objectives`,
+    ...lesson.lesson_objectives.map((o) => `- ${o}`),
+    '',
+    `## Narration Script`,
+    lesson.narration_script.trim(),
+    '',
+    `## Slide Outline`,
+    slides,
+    '',
+    `## Practice Exercise`,
+    `**${lesson.practice_exercise.title}**`,
+    '',
+    lesson.practice_exercise.instructions,
+    '',
+    `**Expected Outcome:** ${lesson.practice_exercise.expected_outcome}`,
+    '',
+    `## Knowledge Check`,
+    quiz,
+  ].join('\n');
+}
+
+// ── Compiled draft publish path ───────────────────────────────────────────────
+
+async function publishCompiledDraft(
+  draft: PublishDraft,
+  userId: string,
+  db: ReturnType<typeof createAdminClient>
+): Promise<{ courseId: string; slug: string; lessonCount: number }> {
+  ensureUniqueLessonTitles(draft);
+  validateQuizAnswers(draft);
+  validateDurations(draft);
+
+  const slugBase = draft.course_name
+    .toLowerCase().trim()
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 74);
+  const slug = `${slugBase}-${Date.now().toString().slice(-6)}`;
+  const durationHours = Number((draft.estimated_total_minutes / 60).toFixed(1));
+  const passingScore = draft.completion_rule.quiz_threshold_percent ?? 70;
+
+  // 1. training_courses
+  const { data: courseRow, error: courseErr } = await db
+    .from('training_courses')
+    .insert({
+      course_name:         draft.course_name,
+      title:               draft.course_title,
+      description:         draft.description,
+      summary:             draft.summary,
+      difficulty:          draft.difficulty,
+      duration_hours:      durationHours,
+      slug,
+      is_published:        draft.auto_publish,
+      is_active:           draft.auto_publish,
+      status:              draft.auto_publish ? 'published' : 'draft',
+      passing_score:       passingScore,
+      certificate_enabled: draft.certificate_enabled,
+      created_by:          userId,
+      metadata: {
+        ai_generated:           true,
+        generation_version:     'v2-course-compiler',
+        source_type:            draft.source_type ?? 'unknown',
+        source_prompt:          draft.source_prompt ?? null,
+        target_audience:        draft.target_audience,
+        learning_objectives:    draft.learning_objectives,
+        estimated_total_minutes: draft.estimated_total_minutes,
+        module_count:           draft.modules.length,
+        lesson_count:           draft.modules.reduce((s, m) => s + m.lessons.length, 0),
+      },
+    })
+    .select('id, slug')
+    .single();
+
+  if (courseErr || !courseRow)
+    throw new Error(`training_courses insert: ${courseErr?.message ?? 'no row returned'}`);
+
+  const courseId = courseRow.id;
+
+  // 2. training_lessons
+  let lessonNumber = 1;
+  const lessonRows: Record<string, unknown>[] = [];
+
+  for (const mod of draft.modules) {
+    for (const lesson of mod.lessons) {
+      lessonRows.push({
+        course_id:        courseId,
+        lesson_number:    lessonNumber,
+        title:            lesson.lesson_title,
+        description:      lesson.lesson_objectives[0] ?? '',
+        content:          renderCompiledLessonContent(lesson),
+        content_type:     'text',
+        duration_minutes: lesson.estimated_minutes,
+        is_required:      true,
+        is_published:     draft.auto_publish,
+        order_index:      lessonNumber - 1,
+        quiz_questions:   lesson.knowledge_check,
+        metadata: {
+          ai_generated:      true,
+          module_title:      mod.module_title,
+          module_order:      mod.module_order,
+          module_objectives: mod.module_objectives,
+          lesson_objectives: lesson.lesson_objectives,
+          narration_script:  lesson.narration_script,
+          slide_outline:     lesson.slide_outline,
+          practice_exercise: lesson.practice_exercise,
+          instructor_notes:  lesson.instructor_notes,
+          estimated_minutes: lesson.estimated_minutes,
+        },
+      });
+      lessonNumber++;
+    }
+  }
+
+  const { error: lessonsErr } = await db.from('training_lessons').insert(lessonRows);
+  if (lessonsErr) throw new Error(`training_lessons insert: ${lessonsErr.message}`);
+
+  // 3. completion_rules — entity_type/entity_id pattern (no direct course_id column)
+  const { error: ruleErr } = await db.from('completion_rules').insert({
+    entity_type: 'course',
+    entity_id:   courseId,
+    rule_type:   draft.completion_rule.type,
+    config: {
+      quiz_threshold_percent: draft.completion_rule.quiz_threshold_percent ?? null,
+      certificate_enabled:    draft.certificate_enabled,
+      passing_score:          passingScore,
+      ai_generated:           true,
+    },
+    is_active: true,
+  });
+  if (ruleErr) logger.warn('completion_rules insert failed (non-fatal)', { courseId, error: ruleErr.message });
+
+  // 4. program_courses — order_index column (not sort_order)
+  if (draft.program_id) {
+    const { error: pcErr } = await db
+      .from('program_courses')
+      .upsert(
+        { program_id: draft.program_id, course_id: courseId, is_required: true, order_index: 999 },
+        { onConflict: 'program_id,course_id', ignoreDuplicates: true }
+      );
+    if (pcErr) logger.warn('program_courses upsert failed (non-fatal)', { courseId, error: pcErr.message });
+  }
+
+  return { courseId, slug: courseRow.slug, lessonCount: lessonRows.length };
+}
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,6 +318,21 @@ async function _POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
+    const db = createAdminClient();
+
+    // ── v2 compiled draft path ──────────────────────────────────────────────
+    if (body.draft) {
+      const parsed = PublishDraftSchema.safeParse(body.draft);
+      if (!parsed.success) {
+        const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
+        return NextResponse.json({ error: `Invalid draft: ${issues}` }, { status: 422 });
+      }
+      const result = await publishCompiledDraft(parsed.data, user.id, db);
+      logger.info('AI course published (v2)', { userId: user.id, ...result });
+      return NextResponse.json({ ok: true, ...result });
+    }
+
+    // ── Legacy GeneratedCourse path ─────────────────────────────────────────
     const { course, program_id, is_published = false }
       : { course: GeneratedCourse; program_id?: string; is_published?: boolean } = body;
 
@@ -33,15 +340,15 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid course data' }, { status: 400 });
     }
 
-    const db = createAdminClient();
-
     // ── 1. Course record ────────────────────────────────────────────────────
-    const slug = course.title
+    // slug with timestamp suffix prevents collisions on repeated generation
+    const slugBase = course.title
       .toLowerCase().trim()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
-      .slice(0, 80);
+      .slice(0, 74);
+    const slug = `${slugBase}-${Date.now().toString().slice(-6)}`;
 
     const durationHours = course.duration_hours ||
       Math.ceil(
@@ -63,6 +370,7 @@ async function _POST(req: NextRequest) {
         is_active:      is_published,
         status:         is_published ? 'published' : 'draft',
         passing_score:  course.passing_score ?? 70,
+        created_by:     user.id,
         metadata: {
           subtitle:     course.subtitle,
           audience:     course.audience,
@@ -71,7 +379,7 @@ async function _POST(req: NextRequest) {
           generated_by: user.id,
         },
       })
-      .select('id')
+      .select('id, slug')
       .single();
 
     if (courseErr) throw new Error(`Course insert: ${courseErr.message}`);
@@ -103,35 +411,37 @@ async function _POST(req: NextRequest) {
     if (lessonsErr) throw new Error(`Lessons insert: ${lessonsErr.message}`);
 
     // ── 3. Completion rule ──────────────────────────────────────────────────
-    await db.from('completion_rules').insert({
+    // entity_type/entity_id pattern — no direct course_id column on this table
+    const { error: ruleErr } = await db.from('completion_rules').insert({
       entity_type: 'course',
       entity_id:   courseId,
       rule_type:   course.completion_rule ?? 'all_lessons',
       config:      { passing_score: course.passing_score ?? 70 },
       is_active:   true,
     });
-    // Non-fatal if this fails — evaluator has a default fallback
+    if (ruleErr) logger.warn('completion_rules insert (non-fatal):', ruleErr.message);
 
     // ── 4. Program mapping ──────────────────────────────────────────────────
+    // order_index is the real column name (not sort_order)
     if (program_id) {
       const { error: pcErr } = await db
         .from('program_courses')
         .upsert(
-          { program_id, course_id: courseId, is_required: true, sort_order: 0 },
+          { program_id, course_id: courseId, is_required: true, order_index: 0 },
           { onConflict: 'program_id,course_id', ignoreDuplicates: true }
         );
       if (pcErr) logger.warn('program_courses upsert (non-fatal):', pcErr.message);
     }
 
     logger.info('Course published from generator', {
-      userId: user.id, courseId, title: course.title,
-      lessons: lessonRows.length, programId: program_id,
+      userId: user.id, courseId, slug: courseRow.slug,
+      title: course.title, lessons: lessonRows.length, programId: program_id,
     });
 
-    return NextResponse.json({ courseId, lessonCount: lessonRows.length });
+    return NextResponse.json({ ok: true, courseId, slug: courseRow.slug, lessonCount: lessonRows.length });
   } catch (err: any) {
     logger.error('Course publish error:', err);
-    return NextResponse.json({ error: err.message || 'Publish failed' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: err.message || 'Publish failed' }, { status: 500 });
   }
 }
 

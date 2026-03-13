@@ -15,6 +15,8 @@
  */
 
 import { getOpenAIClient } from '@/lib/openai-client';
+import { compileAllLessons } from '@/lib/ai/lesson-compiler';
+import type { CompiledLesson } from '@/lib/ai/lesson-compiler';
 
 export type SourceType = 'prompt' | 'syllabus' | 'script' | 'transcript' | 'document';
 
@@ -24,6 +26,8 @@ export interface IngestInput {
   course_mode: 'standalone' | 'program-linked';
   program_id?: string | null;
   certificate_enabled?: boolean;
+  /** Run lesson compiler second pass to generate narration, slides, quiz bank per lesson */
+  compile_lessons?: boolean;
 }
 
 export interface QuizQuestionBlueprint {
@@ -41,6 +45,8 @@ export interface LessonBlueprint {
   order_index: number;
   duration_minutes: number;
   content_type: 'text' | 'video' | 'mixed';
+  // Compiled assets — populated by lesson-compiler second pass
+  compiled?: CompiledLesson;
 }
 
 export interface ModuleBlueprint {
@@ -359,6 +365,75 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
 
   // Step 4: validate and populate warnings
   validateAndWarn(blueprint);
+
+  // Step 5 (optional): lesson compiler second pass
+  // Generates narration script, slide outline, examples, and per-lesson quiz bank.
+  // Skipped when compile_lessons is false (e.g. preview_only calls).
+  if (input.compile_lessons) {
+    try {
+      const compiled = await compileAllLessons({
+        courseTitle:       blueprint.title,
+        courseDescription: blueprint.description || '',
+        audience:          blueprint.target_audience
+          ? [blueprint.target_audience]
+          : ['adult workforce learners'],
+        difficulty: (blueprint.skill_level as 'beginner' | 'intermediate' | 'advanced') || 'beginner',
+        modules: blueprint.modules.map((m, mi) => ({
+          module_title:      m.title,
+          module_order:      mi + 1,
+          module_objectives: [],
+          lessons: m.lessons.map((l, li) => ({
+            lesson_title:      l.title,
+            lesson_order:      li + 1,
+            lesson_objectives: [],
+            lesson_summary:    l.description || l.content?.slice(0, 200) || '',
+          })),
+        })),
+      });
+
+      // Attach compiled assets to each lesson
+      // compiled is CompiledModule[] — index by module/lesson position
+      let compiledCount = 0;
+      blueprint.modules = blueprint.modules.map((mod, mi) => {
+        const compiledMod = compiled[mi];
+        return {
+          ...mod,
+          lessons: mod.lessons.map((lesson, li) => {
+            const assets = compiledMod?.lessons[li];
+            if (assets) {
+              compiledCount++;
+              return {
+                ...lesson,
+                duration_minutes: assets.estimated_minutes || lesson.duration_minutes,
+                compiled: assets,
+              };
+            }
+            return lesson;
+          }),
+        };
+      });
+
+      // Recalculate total duration from compiled estimates
+      const totalMinutes = blueprint.modules
+        .flatMap((m) => m.lessons)
+        .reduce((sum, l) => sum + (l.duration_minutes || 20), 0);
+      blueprint.estimated_duration_hours = Math.round((totalMinutes / 60) * 2) / 2;
+
+      if (compiledCount === 0) {
+        blueprint.warnings.push('Lesson compilation ran but produced no output. Lessons contain structure only.');
+      } else {
+        const totalLessons = blueprint.modules.flatMap((m) => m.lessons).length;
+        if (compiledCount < totalLessons) {
+          blueprint.warnings.push(
+            `${totalLessons - compiledCount} of ${totalLessons} lessons could not be fully compiled. Review those lessons before publishing.`
+          );
+        }
+      }
+    } catch {
+      // Compilation failure is non-fatal — blueprint still usable as structure
+      blueprint.warnings.push('Lesson compilation encountered an error. Course structure is intact; lesson content may need manual expansion.');
+    }
+  }
 
   return blueprint;
 }

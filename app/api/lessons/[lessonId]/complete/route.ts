@@ -208,6 +208,33 @@ async function _POST(
     // which enforces quiz pass verification and competency evidence.
     // This endpoint only tracks lesson-level progress.
 
+    // When a course completes, check if it satisfies all required courses
+    // for any program the learner is enrolled in. If so, mark the program
+    // complete and issue the program credential.
+    if (courseCompleted) {
+      try {
+        const { checkProgramCompletion, completeProgramEnrollment } =
+          await import('@/lib/lms/completion-evaluator');
+        const completedPrograms = await checkProgramCompletion(user.id, lesson.course_id);
+        for (const prog of completedPrograms) {
+          await completeProgramEnrollment(
+            prog.program_enrollment_id,
+            prog.user_id,
+            prog.program_id
+          );
+          logger.info('[program-completion] Program completed via course', {
+            userId:              user.id,
+            courseId:            lesson.course_id,
+            programId:           prog.program_id,
+            programEnrollmentId: prog.program_enrollment_id,
+          });
+        }
+      } catch (progErr) {
+        // Non-fatal — lesson completion is already recorded
+        logger.error('[program-completion] Check failed (non-fatal):', progErr);
+      }
+    }
+
     // HVAC workflow: advance credential sequence when all lessons complete
     if (courseCompleted && lesson.course_id === 'f0593164-55be-5867-98e7-8a86770a8dd0') {
       try {

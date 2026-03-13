@@ -70,6 +70,7 @@ const PRIMARY_NAV: NavSection[] = [
     icon: BookOpen,
     items: [
       { name: 'Courses', href: '/admin/courses' },
+      { name: 'AI Course Builder', href: '/admin/courses/generate' },
       { name: 'Course Builder', href: '/admin/course-builder' },
       { name: 'Curriculum', href: '/admin/curriculum' },
       { name: 'Modules', href: '/admin/modules' },

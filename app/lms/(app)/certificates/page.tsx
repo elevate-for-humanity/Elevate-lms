@@ -58,6 +58,13 @@ export default async function CertificatesPage() {
     .eq('user_id', user.id)
     .order('issued_at', { ascending: false });
 
+  // Fetch transcripts (program completions)
+  const { data: transcripts } = await db
+    .from('transcripts')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('completed_at', { ascending: false });
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -118,6 +125,47 @@ export default async function CertificatesPage() {
             >
               View My Courses
             </Link>
+          </div>
+        )}
+
+        {/* Transcripts */}
+        {transcripts && transcripts.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Program Transcripts</h2>
+            <div className="space-y-3">
+              {transcripts.map((t: any) => (
+                <div key={t.id} className="bg-white rounded-xl border border-slate-200 p-5 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-800">{t.program_name}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">
+                      Completed {new Date(t.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {t.courses_completed > 0 && ` · ${t.courses_completed} course${t.courses_completed !== 1 ? 's' : ''}`}
+                      {t.total_hours && ` · ${t.total_hours} hours`}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    {t.pdf_url && (
+                      <a
+                        href={t.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+                      >
+                        Download Certificate
+                      </a>
+                    )}
+                    {!t.pdf_url && t.certificate_id && (
+                      <Link
+                        href={`/certificates/${t.certificate_id}`}
+                        className="inline-flex items-center gap-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition"
+                      >
+                        View Certificate
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

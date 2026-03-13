@@ -11,7 +11,7 @@
  *   - /api/lessons/[lessonId]/complete  (program completion check after course done)
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, createAuditedAdminClient } from '@/lib/supabase/admin';
 
 export type EntityType = 'course' | 'program';
 
@@ -42,7 +42,7 @@ export async function evaluateCourseCompletion(
   courseId: string,
   context: CourseCompletionContext
 ): Promise<boolean> {
-  const db = createAdminClient();
+  const db = await createAuditedAdminClient({ systemActor: 'course_completion_eval' });
   const { data: rules } = await db
     .from('completion_rules')
     .select('rule_type, config')
@@ -95,7 +95,10 @@ export async function checkProgramCompletion(
   userId: string,
   courseId: string
 ): Promise<Array<{ program_enrollment_id: string; program_id: string; user_id: string }>> {
-  const db = createAdminClient();
+  const db = await createAuditedAdminClient({
+    actorUserId: userId,
+    systemActor: 'program_completion_check',
+  });
   const { data, error } = await db.rpc('check_program_completion', {
     p_user_id:   userId,
     p_course_id: courseId,
@@ -110,7 +113,8 @@ export async function checkProgramCompletion(
 }
 
 /**
- * Mark a program enrollment as completed and issue the program credential.
+ * Mark a program enrollment as completed, write a transcript entry,
+ * generate the certificate PDF, store it, and issue the credential.
  * Idempotent — safe to call multiple times.
  */
 export async function completeProgramEnrollment(
@@ -118,43 +122,115 @@ export async function completeProgramEnrollment(
   userId: string,
   programId: string
 ): Promise<void> {
-  const db = createAdminClient();
+  const db = await createAuditedAdminClient({
+    actorUserId: userId,
+    systemActor: 'program_completion',
+  });
 
-  // Mark program completed in DB
+  // 1. Mark program completed in DB
   await db.rpc('mark_program_completed', {
     p_program_enrollment_id: programEnrollmentId,
   });
 
-  // Issue program-level credential certificate
+  // 2. Fetch learner profile and program details
+  const [{ data: profile }, { data: program }] = await Promise.all([
+    db.from('profiles').select('full_name, email').eq('id', userId).single(),
+    db.from('training_programs').select('name, required_hours').eq('id', programId).maybeSingle(),
+  ]);
+
+  const studentName  = profile?.full_name ?? 'Learner';
+  const studentEmail = profile?.email;
+  const programName  = program?.name ?? 'Program';
+  const programHours = program?.required_hours ?? null;
+
+  // 3. Count completed courses for transcript
+  const { count: coursesCompleted } = await db
+    .from('training_enrollments')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .not('completed_at', 'is', null);
+
+  // 4. Write transcript entry (idempotent via unique constraint)
+  const { data: transcriptRow } = await db
+    .from('transcripts')
+    .upsert(
+      {
+        user_id:               userId,
+        program_enrollment_id: programEnrollmentId,
+        program_id:            programId,
+        program_name:          programName,
+        completed_at:          new Date().toISOString(),
+        total_hours:           programHours,
+        courses_completed:     coursesCompleted ?? 0,
+      },
+      { onConflict: 'user_id,program_enrollment_id', ignoreDuplicates: false }
+    )
+    .select('id')
+    .single();
+
+  // 5. Generate certificate PDF and upload to storage
+  let pdfUrl: string | null = null;
+  try {
+    const { generateCertificatePDF, generateCertificateNumber } =
+      await import('@/lib/certificates/generator');
+
+    const certNumber = generateCertificateNumber();
+    const pdfBlob = await generateCertificatePDF({
+      studentName,
+      courseName:      programName,
+      completionDate:  new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      }),
+      certificateNumber: certNumber,
+      programHours:    programHours ?? undefined,
+    });
+
+    const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
+    const storagePath = `programs/${programId}/${userId}/${certNumber}.pdf`;
+
+    const { error: uploadErr } = await db.storage
+      .from('certificates')
+      .upload(storagePath, pdfBuffer, {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+
+    if (!uploadErr) {
+      const { data: signed } = await db.storage
+        .from('certificates')
+        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1-year signed URL
+      pdfUrl = signed?.signedUrl ?? null;
+
+      // Update transcript with PDF URL
+      if (transcriptRow?.id && pdfUrl) {
+        await db.from('transcripts').update({ pdf_url: pdfUrl }).eq('id', transcriptRow.id);
+      }
+    }
+  } catch (pdfErr) {
+    logger.error('[completion] PDF generation failed (non-fatal):', pdfErr);
+  }
+
+  // 6. Issue certificate record via canonical issuer
   try {
     const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
-
-    // Fetch learner profile for certificate
-    const { data: profile } = await db
-      .from('profiles')
-      .select('full_name, email')
-      .eq('id', userId)
-      .single();
-
-    // Fetch program name
-    const { data: program } = await db
-      .from('training_programs')
-      .select('program_name, duration_hours')
-      .eq('id', programId)
-      .maybeSingle();
-
-    await issueCertificate({
-      supabase:      db,
-      studentId:     userId,
-      studentName:   profile?.full_name ?? 'Learner',
-      studentEmail:  profile?.email,
+    const result = await issueCertificate({
+      supabase:     db,
+      studentId:    userId,
+      studentName,
+      studentEmail,
       programId,
-      programName:   program?.program_name,
-      programHours:  program?.duration_hours ?? null,
-      enrollmentId:  programEnrollmentId,
+      programName,
+      programHours,
+      enrollmentId: programEnrollmentId,
     });
+
+    // Link certificate to transcript
+    if (result.success && result.certificate?.id && transcriptRow?.id) {
+      await db.from('transcripts')
+        .update({ certificate_id: result.certificate.id })
+        .eq('id', transcriptRow.id);
+    }
   } catch {
-    // Certificate issuance failure is logged inside issueCertificate.
-    // Do not re-throw — program completion is already recorded.
+    // issueCertificate logs internally — non-fatal
   }
 }

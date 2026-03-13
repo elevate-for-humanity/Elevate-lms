@@ -24,13 +24,8 @@ const PLATFORM_SUBDOMAIN = 'platform.elevateforhumanity.org';
 // NOTE: Landing pages (exact match) are PUBLIC for marketing/preview
 // Only sub-routes require authentication
 const PROTECTED_ROUTES: Record<string, string[]> = {
-  '/admin/dashboard': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/users': ['admin', 'super_admin', 'org_admin'],
-  '/admin/programs': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/settings': ['admin', 'super_admin', 'org_admin'],
-  '/admin/reports': ['admin', 'super_admin', 'org_admin', 'staff'],
-  '/admin/crm': ['admin', 'super_admin', 'org_admin'],
-  '/admin/enrollments': ['admin', 'super_admin', 'org_admin', 'staff'],
+  // /admin/* routes are handled by the namespace gate above — not listed here.
+  // These entries cover non-admin authenticated routes only.
   '/staff-portal/dashboard': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/students': ['staff', 'admin', 'super_admin', 'advisor'],
   '/staff-portal/courses': ['staff', 'admin', 'super_admin', 'advisor'],
@@ -56,7 +51,7 @@ const PROTECTED_ROUTES: Record<string, string[]> = {
 
 // Dashboard landing pages that are PUBLIC (for marketing/preview)
 const PUBLIC_DASHBOARD_LANDINGS = [
-  '/admin',
+  // '/admin' intentionally removed — protected by namespace gate
   '/staff-portal', 
   '/instructor',
   '/program-holder',
@@ -67,8 +62,9 @@ const PUBLIC_DASHBOARD_LANDINGS = [
   '/partner-portal',
 ];
 
-// Routes restricted to specific admin emails only (sub-routes, not landing)
-const ADMIN_ONLY_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/settings', '/admin/crm'];
+// ADMIN_ONLY_ROUTES previously listed /admin/* paths — now dead code.
+// All /admin/* protection is handled by the namespace gate in the proxy function.
+const ADMIN_ONLY_ROUTES: string[] = [];
 
 // Internal paths that should not be indexed by search engines
 const NOINDEX_PREFIXES = [
@@ -131,6 +127,26 @@ const WEBHOOK_PATHS = [
 export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;
+
+  // ── BYPASS POLICY ────────────────────────────────────────────────────────────
+  // Single definition. No other branch in this file references SKIP_ADMIN_AUTH.
+  // allowDevAdminBypass is false in all production builds: NODE_ENV is set to
+  // 'production' by Next.js at build time on Netlify, making this unreachable
+  // regardless of any env var that may be set in the deployment environment.
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const allowDevAdminBypass =
+    isDevelopment && process.env.SKIP_ADMIN_AUTH === 'true';
+
+  // Production misconfiguration guard — bypass remains disabled, but the
+  // presence of SKIP_ADMIN_AUTH in a production environment is logged as an
+  // error so a bad deployment is caught immediately in Netlify function logs.
+  if (!isDevelopment && process.env.SKIP_ADMIN_AUTH) {
+    console.error(
+      '[SECURITY] SKIP_ADMIN_AUTH is set in a non-development environment. ' +
+      'Bypass is disabled (NODE_ENV !== development), but this configuration is invalid and must be removed.'
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   // ============================================
   // WEBHOOK BYPASS (PATCH 4.1)
@@ -238,7 +254,7 @@ export async function proxy(request: NextRequest) {
           .eq('id', apiUser.id)
           .single();
 
-        if (!apiProfile?.role || !['admin', 'super_admin', 'staff'].includes(apiProfile.role)) {
+        if (!apiProfile?.role || !['admin', 'super_admin', 'org_admin', 'staff'].includes(apiProfile.role)) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
       }
@@ -391,12 +407,119 @@ export async function proxy(request: NextRequest) {
   const isPublicDashboardLanding = PUBLIC_DASHBOARD_LANDINGS.some(
     (landing) => pathname === landing || pathname === `${landing}/`
   );
-  
+
   if (isPublicDashboardLanding) {
     return NextResponse.next();
   }
 
-  // Check if route requires protection
+  // ── ADMIN NAMESPACE PROTECTION ──────────────────────────────────────────────
+  // The entire /admin namespace requires authentication and an admin-level role.
+  // This replaces the previous sparse PROTECTED_ROUTES list for admin paths,
+  // which only covered 7 routes and left the rest unprotected at the request layer.
+  //
+  // /admin (exact) is intentionally public — it redirects to /admin/dashboard
+  // and is listed in PUBLIC_DASHBOARD_LANDINGS above, so it never reaches here.
+  // All sub-routes (/admin/*) are protected below.
+  const isAdminNamespace =
+    pathname === '/admin' || pathname.startsWith('/admin/');
+
+  if (isAdminNamespace) {
+    if (allowDevAdminBypass) {
+      return NextResponse.next();
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // If Supabase is not configured, block rather than allow through
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.redirect(new URL('/login', request.url), { status: 307 });
+    }
+
+    let adminResponse = NextResponse.next({ request: { headers: request.headers } });
+    const adminSupabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          adminResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            adminResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    });
+
+    const { data: { user } } = await adminSupabase.auth.getUser();
+
+    if (!user) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl, { status: 307 });
+    }
+
+    const { data: profile } = await adminSupabase
+      .from('profiles')
+      .select('role, tenant_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url), { status: 307 });
+    }
+
+    // Full /admin/* access: platform-level administrative authority only.
+    // staff is NOT in this list — it is an operational role, not an admin role.
+    const FULL_ADMIN_ROLES = ['admin', 'super_admin', 'org_admin'];
+
+    // Staff operational allowlist: day-to-day workflow surfaces only.
+    // Staff cannot reach system config, finance, compliance, security, or user management.
+    const STAFF_ALLOWED_PREFIXES = [
+      '/admin/dashboard',
+      '/admin/students',
+      '/admin/enrollments',
+      '/admin/programs',
+      '/admin/courses',
+      '/admin/completions',
+      '/admin/documents',
+      '/admin/documents/review',
+      '/admin/partners',
+      '/admin/partner-inquiries',
+      '/admin/applications',
+      '/admin/certificates',
+      '/admin/reports',
+      '/admin/queues',
+      '/admin/leads',
+      '/admin/waitlist',
+      '/admin/review-queue',
+      '/admin/applicants',
+      '/admin/cohorts',
+      '/admin/gradebook',
+    ];
+
+    if (FULL_ADMIN_ROLES.includes(profile.role)) {
+      // Full access
+      if (profile.tenant_id) adminResponse.headers.set('x-tenant-id', profile.tenant_id);
+      return adminResponse;
+    }
+
+    if (profile.role === 'staff') {
+      const allowed = STAFF_ALLOWED_PREFIXES.some((prefix) =>
+        pathname === prefix || pathname.startsWith(prefix + '/')
+      );
+      if (!allowed) {
+        return NextResponse.redirect(new URL('/unauthorized', request.url), { status: 307 });
+      }
+      if (profile.tenant_id) adminResponse.headers.set('x-tenant-id', profile.tenant_id);
+      return adminResponse;
+    }
+
+    // Any other role: deny
+    return NextResponse.redirect(new URL('/unauthorized', request.url), { status: 307 });
+  }
+  // ── END ADMIN NAMESPACE PROTECTION ──────────────────────────────────────────
+
+  // Check if route requires protection (non-admin routes)
   const protectedRoute = Object.keys(PROTECTED_ROUTES).find((route) =>
     pathname.startsWith(route)
   );
@@ -492,32 +615,12 @@ export async function proxy(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    // License holders with admin/super_admin/org_admin/staff role can access their tenant's admin
-    if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'org_admin' || profile?.role === 'staff') {
-      // They can only access admin for their own tenant
-      // Inject tenant context for downstream handlers
+    // Full admin roles only — staff is not a full admin role.
+    if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'org_admin') {
       if (profile.tenant_id) {
         response.headers.set('x-tenant-id', profile.tenant_id);
       }
       return response;
-    }
-
-    // Staff with admin permissions granted by license holder
-    if (profile?.role === 'staff') {
-      // Check if staff has admin permissions for their tenant
-      const { data: permissions } = await supabase
-        .from('staff_permissions')
-        .select('can_access_admin')
-        .eq('user_id', user.id)
-        .eq('tenant_id', profile.tenant_id)
-        .single();
-
-      if (permissions?.can_access_admin) {
-        if (profile.tenant_id) {
-          response.headers.set('x-tenant-id', profile.tenant_id);
-        }
-        return response;
-      }
     }
 
     // No access

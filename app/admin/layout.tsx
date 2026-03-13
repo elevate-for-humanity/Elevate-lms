@@ -79,7 +79,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Auth check — redirects to /login?redirect=/admin/dashboard if not authenticated
+  // Auth check — proxy.ts handles request-layer auth; this is the render-layer guard
   await requireAdmin();
 
   // Get license context for banner

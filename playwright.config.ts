@@ -20,13 +20,22 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: { args: ['--no-sandbox', '--disable-setuid-sandbox'] },
+      },
     },
   ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 180000,
-  },
+  // Only start a local dev server when testing against localhost.
+  // When NEXT_PUBLIC_SITE_URL points to a deployed environment, skip webServer.
+  ...((!process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL.includes('localhost'))
+    ? {
+        webServer: {
+          command: 'pnpm dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: true,
+          timeout: 180000,
+        },
+      }
+    : {}),
 });

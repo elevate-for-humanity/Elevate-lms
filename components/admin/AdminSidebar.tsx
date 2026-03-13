@@ -7,25 +7,20 @@ import {
   LayoutDashboard,
   Users,
   GraduationCap,
+  BookOpen,
   Building2,
-  BarChart3,
   FileText,
+  Award,
+  BarChart3,
+  Inbox,
+  Shield,
+  UserCog,
   Settings,
+  Briefcase,
   ChevronDown,
   ChevronRight,
-  BookOpen,
-  Shield,
-  DollarSign,
-  Mail,
-  Wrench,
-  Video,
-  Award,
-  Briefcase,
   X,
   Menu,
-  Sparkles,
-  Workflow,
-  ClipboardList,
 } from 'lucide-react';
 
 interface NavItem {
@@ -41,235 +36,151 @@ interface NavSection {
   items?: NavItem[];
 }
 
-const NAV: NavSection[] = [
+// Primary nav: daily operational surfaces only.
+// Every item here loads real data and supports a staff task that completes without workarounds.
+const PRIMARY_NAV: NavSection[] = [
   {
     name: 'Dashboard',
     icon: LayoutDashboard,
     href: '/admin',
   },
-
-  // ── AI STUDIO ─────────────────────────────────────────────────────
   {
-    name: 'AI Studio',
-    icon: Sparkles,
-    items: [
-      { name: 'AI Console', href: '/admin/ai-console', badge: 'AI' },
-      { name: 'Course Generator', href: '/admin/course-generator', badge: 'AI' },
-      { name: 'Program Generator', href: '/admin/program-generator', badge: 'AI' },
-      { name: 'Syllabus Generator', href: '/admin/syllabus-generator', badge: 'AI' },
-      { name: 'Video Generator', href: '/admin/video-generator', badge: 'AI' },
-      { name: 'Video Manager', href: '/admin/video-manager' },
-      { name: 'AI Tutor Logs', href: '/admin/ai-tutor-logs' },
-      { name: 'Copilot', href: '/admin/copilot', badge: 'AI' },
-      { name: 'Autopilot', href: '/admin/autopilot', badge: 'AI' },
-    ],
-  },
-
-  // ── USERS ─────────────────────────────────────────────────────────
-  {
-    name: 'Users & Access',
+    name: 'Students',
     icon: Users,
-    items: [
-      { name: 'All Users', href: '/admin/users' },
-      { name: 'Students', href: '/admin/students' },
-      { name: 'Instructors', href: '/admin/instructors' },
-      { name: 'Applicants', href: '/admin/applicants' },
-      { name: 'Applicants Live', href: '/admin/applicants-live' },
-      { name: 'Applications', href: '/admin/applications' },
-      { name: 'Leads', href: '/admin/leads' },
-      { name: 'Waitlist', href: '/admin/waitlist' },
-      { name: 'Delegates', href: '/admin/delegates' },
-      { name: 'HR', href: '/admin/hr' },
-      { name: 'At-Risk Students', href: '/admin/at-risk' },
-      { name: 'Intake', href: '/admin/intake' },
-      { name: 'Verifications', href: '/admin/verifications' },
-    ],
+    href: '/admin/students',
   },
-
-  // ── PROGRAMS & COURSES ────────────────────────────────────────────
   {
-    name: 'Programs & Courses',
+    name: 'Enrollments',
     icon: GraduationCap,
     items: [
+      { name: 'Enrollments', href: '/admin/enrollments' },
+      { name: 'Cohorts', href: '/admin/cohorts' },
+    ],
+  },
+  {
+    name: 'Programs',
+    icon: BookOpen,
+    items: [
       { name: 'Programs', href: '/admin/programs' },
+      { name: 'Completions', href: '/admin/completions' },
+    ],
+  },
+  {
+    name: 'Courses',
+    icon: BookOpen,
+    items: [
       { name: 'Courses', href: '/admin/courses' },
       { name: 'Course Builder', href: '/admin/course-builder' },
-      { name: 'Course Templates', href: '/admin/course-templates' },
-      { name: 'Course Import', href: '/admin/course-import' },
-      { name: 'Career Courses', href: '/admin/career-courses' },
       { name: 'Curriculum', href: '/admin/curriculum' },
       { name: 'Modules', href: '/admin/modules' },
       { name: 'Lessons', href: '/admin/lessons' },
-      { name: 'External Modules', href: '/admin/external-modules' },
       { name: 'Quiz Builder', href: '/admin/quiz-builder' },
-      { name: 'Quizzes', href: '/admin/quizzes' },
       { name: 'Gradebook', href: '/admin/gradebook' },
-      { name: 'HVAC Activation', href: '/admin/hvac-activation', badge: 'NEW' },
     ],
   },
-
-  // ── ENROLLMENT & OPERATIONS ───────────────────────────────────────
   {
-    name: 'Enrollment & Ops',
-    icon: ClipboardList,
-    items: [
-      { name: 'Enrollments', href: '/admin/enrollments' },
-      { name: 'Enrollment Jobs', href: '/admin/enrollment-jobs' },
-      { name: 'HSI Enrollments', href: '/admin/hsi-enrollments' },
-      { name: 'Partner Enrollments', href: '/admin/partner-enrollments' },
-      { name: 'Cohorts', href: '/admin/cohorts' },
-      { name: 'Operations', href: '/admin/operations' },
-      { name: 'Next Steps', href: '/admin/next-steps' },
-    ],
-  },
-
-  // ── PARTNERS & EMPLOYERS ──────────────────────────────────────────
-  {
-    name: 'Partners & Employers',
+    name: 'Partners',
     icon: Building2,
     items: [
       { name: 'Partners', href: '/admin/partners' },
+      { name: 'Applications', href: '/admin/applications' },
       { name: 'Partner Inquiries', href: '/admin/partner-inquiries' },
-      { name: 'Employers', href: '/admin/employers' },
-      { name: 'Employers Playbook', href: '/admin/employers-playbook' },
-      { name: 'Program Holders', href: '/admin/program-holders' },
-      { name: 'PH Documents', href: '/admin/program-holder-documents' },
-      { name: 'PH Acknowledgements', href: '/admin/program-holder-acknowledgements' },
-      { name: 'Apprenticeships', href: '/admin/apprenticeships' },
-      { name: 'RAPIDS', href: '/admin/rapids' },
-      { name: 'JRI', href: '/admin/jri' },
-      { name: 'MOU', href: '/admin/mou' },
-      { name: 'Shops', href: '/admin/shops' },
-      { name: 'Barber Shop Applications', href: '/admin/barber-shop-applications' },
-      { name: 'Affiliates', href: '/admin/affiliates' },
-      { name: 'Jobs Board', href: '/admin/jobs' },
     ],
   },
-
-  // ── CREDENTIALS ───────────────────────────────────────────────────
   {
-    name: 'Credentials',
+    name: 'Documents',
+    icon: FileText,
+    items: [
+      { name: 'Documents', href: '/admin/documents' },
+      { name: 'Review Queue', href: '/admin/documents/review' },
+    ],
+  },
+  {
+    name: 'Certificates',
     icon: Award,
     items: [
       { name: 'Certificates', href: '/admin/certificates' },
-      { name: 'Certifications', href: '/admin/certifications' },
-      { name: 'Completions', href: '/admin/completions' },
-      { name: 'Signatures', href: '/admin/signatures' },
-      { name: 'License', href: '/admin/license' },
-      { name: 'Licenses', href: '/admin/licenses' },
-      { name: 'License Requests', href: '/admin/license-requests' },
-      { name: 'Licensing', href: '/admin/licensing' },
-      { name: 'Proctor Portal', href: '/admin/proctor-portal' },
+      { name: 'Issue Certificate', href: '/admin/certificates/issue' },
     ],
   },
-
-  // ── STUDENT SUPPORT ───────────────────────────────────────────────
   {
-    name: 'Student Support',
-    icon: Briefcase,
+    name: 'Reports',
+    icon: BarChart3,
     items: [
-      { name: 'Progress', href: '/admin/progress' },
-      { name: 'External Progress', href: '/admin/external-progress' },
-      { name: 'Learner View', href: '/admin/learner' },
-      { name: 'Barriers', href: '/admin/barriers' },
-      { name: 'Retention', href: '/admin/retention' },
-      { name: 'Success', href: '/admin/success' },
-      { name: 'Support', href: '/admin/support' },
-      { name: 'Transfer Hours', href: '/admin/transfer-hours' },
-      { name: 'Hours Export', href: '/admin/hours-export' },
+      { name: 'Overview', href: '/admin/reports' },
+      { name: 'Enrollment', href: '/admin/reports/enrollment' },
+      { name: 'Financial', href: '/admin/reports/financial' },
+      { name: 'Partners', href: '/admin/reports/partners' },
+      { name: 'Users', href: '/admin/reports/users' },
+      { name: 'Leads', href: '/admin/reports/leads' },
+      { name: 'Charts', href: '/admin/reports/charts' },
     ],
   },
-
-  // ── CONTENT & MEDIA ───────────────────────────────────────────────
   {
-    name: 'Content & Media',
-    icon: Video,
+    name: 'Queues',
+    icon: Inbox,
     items: [
-      { name: 'Media Studio', href: '/admin/media-studio' },
-      { name: 'Videos', href: '/admin/videos' },
-      { name: 'Documents', href: '/admin/documents' },
-      { name: 'Document Center', href: '/admin/document-center' },
-      { name: 'Blog', href: '/admin/blog' },
-      { name: 'Files', href: '/admin/files' },
-      { name: 'Social Media', href: '/admin/social-media' },
-      { name: 'Moderation', href: '/admin/moderation' },
+      { name: 'Leads', href: '/admin/leads' },
+      { name: 'Waitlist', href: '/admin/waitlist' },
       { name: 'Review Queue', href: '/admin/review-queue' },
+      { name: 'Applicants', href: '/admin/applicants' },
     ],
   },
+];
 
-  // ── COMMUNICATION ─────────────────────────────────────────────────
+// Specialist nav: valid surfaces with real data, but infrequent or role-specific.
+// Collapsed behind a divider. Auto-expands when current path is inside.
+const SPECIALIST_NAV: NavSection[] = [
   {
-    name: 'Communication',
-    icon: Mail,
-    items: [
-      { name: 'CRM', href: '/admin/crm' },
-      { name: 'Inbox', href: '/admin/inbox' },
-      { name: 'Live Chat', href: '/admin/live-chat' },
-      { name: 'Email Marketing', href: '/admin/email-marketing' },
-      { name: 'Campaigns', href: '/admin/campaigns' },
-      { name: 'Notifications', href: '/admin/notifications' },
-      { name: 'Contacts', href: '/admin/contacts' },
-      { name: 'Marketing', href: '/admin/marketing' },
-    ],
-  },
-
-  // ── FUNDING & FINANCE ─────────────────────────────────────────────
-  {
-    name: 'Funding & Finance',
-    icon: DollarSign,
-    items: [
-      { name: 'Funding', href: '/admin/funding' },
-      { name: 'Funding Playbook', href: '/admin/funding-playbook' },
-      { name: 'Grants', href: '/admin/grants' },
-      { name: 'WIOA', href: '/admin/wioa' },
-      { name: 'WOTC', href: '/admin/wotc' },
-      { name: 'SAP', href: '/admin/sap' },
-      { name: 'Payroll', href: '/admin/payroll' },
-      { name: 'Payroll Cards', href: '/admin/payroll-cards' },
-      { name: 'Cash Advances', href: '/admin/cash-advances' },
-      { name: 'Incentives', href: '/admin/incentives' },
-      { name: 'Promo Codes', href: '/admin/promo-codes' },
-      { name: 'Tax Filing', href: '/admin/tax-filing' },
-      { name: 'Marketplace', href: '/admin/marketplace' },
-      { name: 'Store', href: '/admin/store' },
-    ],
-  },
-
-  // ── COMPLIANCE & REPORTS ──────────────────────────────────────────
-  {
-    name: 'Compliance & Reports',
+    name: 'Compliance',
     icon: Shield,
     items: [
-      { name: 'Analytics', href: '/admin/analytics' },
-      { name: 'Performance', href: '/admin/performance-dashboard' },
-      { name: 'Reports', href: '/admin/reporting' },
-      { name: 'Impact', href: '/admin/impact' },
-      { name: 'Outcomes', href: '/admin/outcomes' },
-      { name: 'Compliance', href: '/admin/compliance' },
-      { name: 'Compliance Audit', href: '/admin/compliance-audit' },
-      { name: 'Accreditation', href: '/admin/accreditation' },
+      { name: 'WIOA', href: '/admin/wioa' },
+      { name: 'WIOA Eligibility', href: '/admin/wioa/eligibility' },
+      { name: 'WIOA Documents', href: '/admin/wioa/documents' },
+      { name: 'WIOA Reports', href: '/admin/wioa/reports' },
+      { name: 'WIOA Verify', href: '/admin/wioa/verify' },
       { name: 'FERPA', href: '/admin/ferpa' },
+      { name: 'Accreditation', href: '/admin/accreditation' },
+      { name: 'Compliance', href: '/admin/compliance' },
       { name: 'ETPL Alignment', href: '/admin/etpl-alignment' },
-      { name: 'Governance', href: '/admin/governance' },
       { name: 'Audit Logs', href: '/admin/audit-logs' },
-      { name: 'Activity', href: '/admin/activity' },
+      { name: 'Verifications', href: '/admin/verifications/review' },
     ],
   },
-
-  // ── WORKFLOWS & AUTOMATION ────────────────────────────────────────
   {
-    name: 'Workflows',
-    icon: Workflow,
+    name: 'Staff',
+    icon: UserCog,
     items: [
-      { name: 'Workflows', href: '/admin/workflows' },
-      { name: 'Automation', href: '/admin/automation' },
-      { name: 'Automation QA', href: '/admin/automation-qa' },
-      { name: 'Import', href: '/admin/import' },
-      { name: 'Portal Map', href: '/admin/portal-map' },
+      { name: 'Users', href: '/admin/users' },
+      { name: 'Instructors', href: '/admin/instructors' },
+      { name: 'HR', href: '/admin/hr' },
+      { name: 'Delegates', href: '/admin/delegates' },
+      { name: 'Payroll', href: '/admin/payroll' },
     ],
   },
-
-  // ── SYSTEM ────────────────────────────────────────────────────────
+  {
+    name: 'Business Ops',
+    icon: Briefcase,
+    items: [
+      { name: 'Tax Filing', href: '/admin/tax-filing' },
+      { name: 'Grants', href: '/admin/grants' },
+      { name: 'Funding', href: '/admin/funding' },
+      { name: 'JRI', href: '/admin/jri' },
+      { name: 'MOU', href: '/admin/mou' },
+      { name: 'WOTC', href: '/admin/wotc' },
+      { name: 'Program Holders', href: '/admin/program-holders' },
+      { name: 'PH Documents', href: '/admin/program-holder-documents' },
+      { name: 'Employers', href: '/admin/employers' },
+      { name: 'Apprenticeships', href: '/admin/apprenticeships' },
+      { name: 'Barber Shop Applications', href: '/admin/barber-shop-applications' },
+      { name: 'Shops', href: '/admin/shops' },
+      { name: 'Signatures', href: '/admin/signatures' },
+      { name: 'License Requests', href: '/admin/license-requests' },
+      { name: 'Proctor Portal', href: '/admin/proctor-portal' },
+      { name: 'Inbox', href: '/admin/inbox' },
+    ],
+  },
   {
     name: 'System',
     icon: Settings,
@@ -277,31 +188,16 @@ const NAV: NavSection[] = [
       { name: 'Settings', href: '/admin/settings' },
       { name: 'Integrations', href: '/admin/integrations' },
       { name: 'API Keys', href: '/admin/api-keys' },
+      { name: 'Security', href: '/admin/security' },
       { name: 'System Health', href: '/admin/system-health' },
       { name: 'System Status', href: '/admin/system-status' },
-      { name: 'System Monitor', href: '/admin/system-monitor' },
       { name: 'Site Health', href: '/admin/site-health' },
-      { name: 'Monitoring', href: '/admin/monitoring' },
-      { name: 'Security', href: '/admin/security' },
       { name: 'Tenants', href: '/admin/tenants' },
-      { name: 'Mobile Sync', href: '/admin/mobile-sync' },
-    ],
-  },
-
-  // ── DEV TOOLS ─────────────────────────────────────────────────────
-  {
-    name: 'Dev Tools',
-    icon: Wrench,
-    items: [
-      { name: 'Dev Studio', href: '/admin/dev-studio' },
-      { name: 'Advanced Tools', href: '/admin/advanced-tools' },
-      { name: 'Editor', href: '/admin/editor' },
-      { name: 'Data Processor', href: '/admin/data-processor' },
-      { name: 'Migrations', href: '/admin/migrations' },
-      { name: 'Test Emails', href: '/admin/test-emails' },
-      { name: 'Test Payments', href: '/admin/test-payments' },
-      { name: 'Docs', href: '/admin/docs' },
-      { name: 'Internal Docs', href: '/admin/internal-docs' },
+      { name: 'Enrollment Jobs', href: '/admin/enrollment-jobs' },
+      { name: 'Transfer Hours', href: '/admin/transfer-hours' },
+      { name: 'Hours Export', href: '/admin/hours-export' },
+      { name: 'System Monitor', href: '/admin/system-monitor' },
+      { name: 'Automation QA', href: '/admin/automation-qa' },
     ],
   },
 ];
@@ -309,14 +205,8 @@ const NAV: NavSection[] = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
-    // Always open these sections by default
-    const initial = new Set<string>([
-      'Users & Access',
-      'Programs & Courses',
-      'Enrollment & Ops',
-    ]);
-    // Also open the section containing the current path
-    for (const section of NAV) {
+    const initial = new Set<string>();
+    for (const section of [...PRIMARY_NAV, ...SPECIALIST_NAV]) {
       if (section.items?.some((item) => pathname.startsWith(item.href))) {
         initial.add(section.name);
       }
@@ -324,6 +214,7 @@ export default function AdminSidebar() {
     return initial;
   });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showSpecialist, setShowSpecialist] = useState(false);
 
   const toggleSection = (name: string) => {
     setOpenSections((prev) => {
@@ -335,6 +226,77 @@ export default function AdminSidebar() {
   };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+
+  const isInSpecialist = SPECIALIST_NAV.some((s) =>
+    s.items?.some((item) => pathname.startsWith(item.href))
+  );
+
+  const renderSection = (section: NavSection) => {
+    if (section.href && !section.items) {
+      return (
+        <Link
+          key={section.name}
+          href={section.href}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+            isActive(section.href)
+              ? 'bg-brand-blue-600/20 text-brand-blue-400'
+              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+          }`}
+        >
+          <section.icon className="w-4 h-4 flex-shrink-0" />
+          <span>{section.name}</span>
+        </Link>
+      );
+    }
+
+    const isOpen = openSections.has(section.name);
+    const hasActiveChild = section.items?.some((item) => isActive(item.href));
+
+    return (
+      <div key={section.name}>
+        <button
+          onClick={() => toggleSection(section.name)}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+            hasActiveChild
+              ? 'text-brand-blue-400'
+              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+          }`}
+        >
+          <section.icon className="w-4 h-4 flex-shrink-0" />
+          <span className="flex-1 text-left">{section.name}</span>
+          {isOpen ? (
+            <ChevronDown className="w-3.5 h-3.5" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5" />
+          )}
+        </button>
+
+        {isOpen && section.items && (
+          <div className="ml-4 pl-3 border-l border-gray-800 mt-0.5 space-y-0.5">
+            {section.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-blue-600/20 text-brand-blue-400'
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'
+                }`}
+              >
+                <span>{item.name}</span>
+                {item.badge && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand-blue-600 text-white font-medium">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const sidebarContent = (
     <nav className="flex flex-col h-full" aria-label="Admin sidebar">
@@ -351,75 +313,29 @@ export default function AdminSidebar() {
         </Link>
       </div>
 
-      {/* Nav sections */}
       <div className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-        {NAV.map((section) => {
-          if (section.href && !section.items) {
-            // Direct link (Dashboard)
-            return (
-              <Link
-                key={section.name}
-                href={section.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                  isActive(section.href)
-                    ? 'bg-brand-blue-600/20 text-brand-blue-400'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
-              >
-                <section.icon className="w-4 h-4 flex-shrink-0" />
-                <span>{section.name}</span>
-              </Link>
-            );
-          }
+        {PRIMARY_NAV.map(renderSection)}
 
-          const isOpen = openSections.has(section.name);
-          const hasActiveChild = section.items?.some((item) => isActive(item.href));
+        {/* Specialist divider */}
+        <div className="pt-3 pb-1">
+          <button
+            onClick={() => setShowSpecialist((v) => !v)}
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+          >
+            <div className="flex-1 h-px bg-gray-800" />
+            <span className="flex-shrink-0">
+              {showSpecialist || isInSpecialist ? 'Specialist' : 'More'}
+            </span>
+            {showSpecialist || isInSpecialist ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
+            <div className="flex-1 h-px bg-gray-800" />
+          </button>
+        </div>
 
-          return (
-            <div key={section.name}>
-              <button
-                onClick={() => toggleSection(section.name)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                  hasActiveChild
-                    ? 'text-brand-blue-400'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
-              >
-                <section.icon className="w-4 h-4 flex-shrink-0" />
-                <span className="flex-1 text-left">{section.name}</span>
-                {isOpen ? (
-                  <ChevronDown className="w-3.5 h-3.5" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5" />
-                )}
-              </button>
-
-              {isOpen && section.items && (
-                <div className="ml-4 pl-3 border-l border-gray-800 mt-0.5 space-y-0.5">
-                  {section.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
-                        isActive(item.href)
-                          ? 'bg-brand-blue-600/20 text-brand-blue-400'
-                          : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'
-                      }`}
-                    >
-                      <span>{item.name}</span>
-                      {item.badge && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand-blue-600 text-white font-medium">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {(showSpecialist || isInSpecialist) && SPECIALIST_NAV.map(renderSection)}
       </div>
 
       {/* Footer */}

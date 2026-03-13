@@ -131,14 +131,14 @@ export default async function RiseFoundationPage() {
               <MapPin className="w-4 h-4 text-brand-blue-400" />
               Indianapolis, Indiana
             </span>
-            <a href="https://www.selfishincsupport.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-brand-blue-300">
+            <Link href="/pages/selfish-inc.html" className="flex items-center gap-2 hover:text-brand-blue-300">
               <Star className="w-4 h-4 text-amber-400" />
-              selfishincsupport.org
-            </a>
-            <a href="https://www.riseforwardfoundation.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-brand-blue-300">
+              Selfish Inc.
+            </Link>
+            <Link href="/curvature-body-sculpting" className="flex items-center gap-2 hover:text-brand-blue-300">
               <Star className="w-4 h-4 text-amber-400" />
-              riseforwardfoundation.org
-            </a>
+              CurvatureBody Sculpting
+            </Link>
           </div>
         </div>
       </section>
@@ -256,8 +256,8 @@ export default async function RiseFoundationPage() {
                     <Link href="/contact?subject=curvature" className="text-gray-700 hover:text-brand-blue-600">Book a Free Consultation</Link>
                   </li>
                 </ul>
-                <Link href="/contact?subject=curvature" className="inline-flex items-center gap-1 bg-pink-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-pink-700 transition text-sm">
-                  Book Consultation <ArrowRight className="w-4 h-4" />
+                <Link href="/curvature-body-sculpting" className="inline-flex items-center gap-1 bg-pink-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-pink-700 transition text-sm">
+                  Visit Site <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
@@ -389,7 +389,7 @@ export default async function RiseFoundationPage() {
                     <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">Legal Entity · 501(c)(3)</span>
                   </div>
                   <p className="text-gray-600 mt-1">The registered 501(c)(3) nonprofit corporation. All programs, services, and DBAs operate under Selfish Inc. as the legal entity. Founded by Elizabeth Greene.</p>
-                  <a href="https://www.selfishincsupport.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">selfishincsupport.org</a>
+                  <Link href="/pages/selfish-inc.html" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">Selfish Inc. site →</Link>
                 </div>
               </div>
 
@@ -406,7 +406,7 @@ export default async function RiseFoundationPage() {
                       <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full font-semibold">DBA of Selfish Inc.</span>
                     </div>
                     <p className="text-gray-600 text-sm mt-1">The public-facing name for Selfish Inc.'s community programs. Mental wellness counseling, trauma recovery, divorce support, addiction rehabilitation, and young adult wellness services.</p>
-                    <a href="https://www.riseforwardfoundation.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">riseforwardfoundation.org</a>
+                    <Link href="/curvature-body-sculpting" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">CurvatureBody Sculpting site →</Link>
                   </div>
                 </div>
 

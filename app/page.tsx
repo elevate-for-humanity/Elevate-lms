@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Credential Institute — Indianapolis, Indiana',
@@ -35,14 +36,7 @@ export default function HomePage() {
 
       {/* ─── HERO VIDEO ─── */}
       <section className="relative w-full h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[300px] overflow-hidden">
-        <video
-          autoPlay muted loop playsInline preload="metadata"
-          poster="/images/pages/home-hero-video.jpg"
-          aria-label="Elevate for Humanity career training"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        >
-          <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
-        </video>
+        <HomeHeroVideo />
         {/* Hero copy — present on initial render, not gated by JS */}
         <div className="absolute inset-0 flex items-end pointer-events-none">
           <div className="w-full bg-black/55 px-6 py-6 sm:py-8 pointer-events-auto">
@@ -242,7 +236,7 @@ export default function HomePage() {
                 tagColor: 'bg-brand-blue-700',
                 desc: 'The primary federal workforce funding program. Covers tuition, books, tools, and certification exam fees for eligible adults, dislocated workers, and youth ages 16–24. Administered through WorkOne career centers.',
                 href: '/funding/federal-programs',
-                image: '/images/pages/wioa-meeting.jpg',
+                image: '/images/pages/hp-wioa-real.jpg',
               },
               {
                 label: 'Workforce Ready Grant',

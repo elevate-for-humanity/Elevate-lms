@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 interface VideoHeroProps {
   /** Path to the mp4 video file (e.g. "/videos/barber-hero-final.mp4") */
@@ -16,7 +16,8 @@ interface VideoHeroProps {
 
 /**
  * Full-width video hero banner. No text overlay.
- * Autoplays muted on scroll (IntersectionObserver).
+ * Autoplays on scroll via useHeroVideo. Attempts to unmute immediately —
+ * succeeds on desktop; shows "Tap to unmute" on mobile/Safari.
  * Falls back to poster image if video can't play.
  */
 export default function VideoHero({
@@ -25,33 +26,11 @@ export default function VideoHero({
   posterAlt,
   heightClass = 'h-[50vh] md:h-[60vh]',
 }: VideoHeroProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  // Autoplay when the hero scrolls into view
-  useEffect(() => {
-    const video = videoRef.current;
-    const container = containerRef.current;
-    if (!video || !container) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().then(() => setIsPlaying(true)).catch(() => {});
-        } else {
-          video.pause();
-        }
-      },
-      { threshold: 0.25 },
-    );
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
+  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
 
   return (
-    <div ref={containerRef} className={`relative w-full overflow-hidden ${heightClass}`}>
+    <div className={`relative w-full overflow-hidden ${heightClass}`}>
+      {/* Poster shown until video plays */}
       <Image
         src={posterSrc}
         alt={posterAlt}
@@ -62,16 +41,24 @@ export default function VideoHero({
       />
       <video
         ref={videoRef}
-        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${
-          isPlaying ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="absolute inset-0 w-full h-full object-cover z-10"
         loop
-        muted
         playsInline
         preload="metadata"
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
+
+      {showUnmuteButton && (
+        <button
+          onClick={unmute}
+          aria-label="Tap to unmute video"
+          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+        >
+          <span aria-hidden="true">🔇</span>
+          Tap to unmute
+        </button>
+      )}
     </div>
   );
 }

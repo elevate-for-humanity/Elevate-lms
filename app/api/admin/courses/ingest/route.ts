@@ -71,6 +71,7 @@ async function _POST(request: Request) {
   const {
     source_type, source_text, course_mode, program_id,
     certificate_enabled, preview_only, blueprint_override,
+    compile_lessons,
   } = body;
 
   // blueprint_override: client sends back the edited blueprint for the save pass
@@ -142,13 +143,16 @@ async function _POST(request: Request) {
       }
     }
 
-    // Run the AI pipeline on the (possibly summarized) text
+    // Run the AI pipeline on the (possibly summarized) text.
+    // compile_lessons=true triggers the second pass (narration, slides, quiz bank).
+    // Skipped on preview_only calls to keep the review screen fast.
     const blueprint = await ingestCourse({
       source_type,
       source_text: textForExtraction,
       course_mode: course_mode || 'standalone',
       program_id: program_id || null,
       certificate_enabled: certificate_enabled ?? true,
+      compile_lessons: !preview_only && (compile_lessons !== false),
     });
 
     // Merge any large-doc warnings into blueprint warnings

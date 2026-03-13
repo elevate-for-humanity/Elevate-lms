@@ -579,18 +579,38 @@ export async function saveCourseBlueprint(
 
     if (modErr || !moduleRow) continue;
 
-    const lessons = (mod.lessons ?? []).map((lesson, li) => ({
-      course_id: courseId,
-      module_id: moduleRow.id,
-      title: lesson.title,
-      description: lesson.description || null,
-      content: lesson.content || null,
-      order_index: lesson.order_index ?? li,
-      lesson_number: li + 1,
-      duration_minutes: lesson.duration_minutes || null,
-      content_type: lesson.content_type || 'text',
-      is_published: false,
-    }));
+    const lessons = (mod.lessons ?? []).map((lesson, li) => {
+      const compiled = lesson.compiled;
+      // Merge compiled narration into content field; store full compiled package
+      // (slide_outline, examples, quiz_questions) in quiz_questions JSONB column
+      const compiledContent = compiled?.narration_script
+        ? compiled.narration_script
+        : lesson.content || null;
+
+      const lessonQuizData = compiled
+        ? {
+            learning_objectives: compiled.learning_objectives,
+            slide_outline: compiled.slide_outline,
+            examples: compiled.examples,
+            quiz_questions: compiled.quiz_questions,
+          }
+        : null;
+
+      return {
+        course_id: courseId,
+        module_id: moduleRow.id,
+        title: lesson.title,
+        description: lesson.description || null,
+        content: compiledContent,
+        order_index: lesson.order_index ?? li,
+        lesson_number: li + 1,
+        duration_minutes: lesson.duration_minutes || null,
+        content_type: lesson.content_type || 'text',
+        is_published: false,
+        // Store compiled slide/quiz/example assets in quiz_questions JSONB
+        ...(lessonQuizData ? { quiz_questions: lessonQuizData } : {}),
+      };
+    });
 
     if (lessons.length) {
       const { error: lessonErr } = await supabase.from('training_lessons').insert(lessons);

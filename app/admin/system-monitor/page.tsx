@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { useState, useEffect } from 'react';
@@ -35,9 +34,6 @@ export default function SystemMonitorPage() {
       <div className="p-8">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-system-monitor-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <Activity className="h-11 w-11 animate-spin text-brand-blue-600" />
         <p>Loading...</p>
       </div>

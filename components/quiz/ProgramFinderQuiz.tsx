@@ -287,7 +287,7 @@ export default function ProgramFinderQuiz() {
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 640px) 50vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-black/45" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
                   <p className="font-bold text-white text-lg leading-tight">{option.label}</p>

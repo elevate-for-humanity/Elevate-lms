@@ -64,9 +64,6 @@ export default async function DeletionsPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-compliance-deletions-hero.jpg" alt="Data deletions" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image

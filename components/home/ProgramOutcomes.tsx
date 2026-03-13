@@ -100,7 +100,7 @@ export default function ProgramOutcomes() {
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
                     <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">
                       {program.category}
                     </span>

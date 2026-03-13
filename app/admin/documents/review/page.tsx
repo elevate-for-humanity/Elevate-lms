@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
@@ -104,9 +103,6 @@ export default async function AdminDocumentReviewPage() {
     <div className="min-h-screen bg-slate-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-documents-review-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Header */}
       <section className="bg-white border-b py-8">
         <div className="max-w-7xl mx-auto px-6">

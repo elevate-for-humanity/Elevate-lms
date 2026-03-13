@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
@@ -44,9 +43,6 @@ export default async function ModerationPage() {
     <div className="container mx-auto px-4 py-8">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-moderation-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <h1 className="text-3xl font-bold mb-6">Moderation Queue</h1>
 
       <div className="bg-white rounded-lg shadow p-6">

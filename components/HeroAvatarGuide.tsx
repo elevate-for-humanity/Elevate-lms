@@ -201,7 +201,7 @@ export default function HeroAvatarGuide({
               </div>
 
               {/* Bottom Controls */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/55">
                 <div className="flex items-center justify-between">
                   <div className="text-white">
                     <p className="font-semibold">{avatarName}</p>

@@ -70,9 +70,6 @@ export default async function CourseImportPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-course-import-hero.jpg" alt="Course import" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Course Import" }]} />
         </div>

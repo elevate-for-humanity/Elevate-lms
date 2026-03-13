@@ -103,11 +103,8 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+        <div className="absolute inset-0 bg-slate-900" />
       )}
-
-      {/* Bottom gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
       {voiceoverSrc && (
         <>

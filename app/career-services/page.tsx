@@ -28,7 +28,7 @@ export default function CareerServicesPage() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+        <div className="absolute bottom-0 left-0 right-0 bg-black/55 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Career Services</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">

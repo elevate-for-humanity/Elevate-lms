@@ -318,7 +318,7 @@ export default function LessonPlayer({
   if (mediaKind === "audio") {
     return (
       <div ref={containerRef} className="w-full">
-        <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 shadow-xl">
+        <div className="rounded-2xl bg-slate-900 p-6 shadow-xl">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-600/20">
@@ -433,7 +433,7 @@ export default function LessonPlayer({
           {/* Pre-start — semi-transparent so first frame shows through */}
           {!hasStarted && !hasError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer" onClick={play}>
-              <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60" />
+              <div className="absolute inset-0 bg-black/55" />
               {/* Top bar */}
               <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 z-10">
                 <div className="flex items-center gap-2">
@@ -487,7 +487,7 @@ export default function LessonPlayer({
           {/* Controls overlay */}
           {hasStarted && !ended && (
             <div
-              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-10 transition-opacity duration-300 sm:px-5 sm:pb-3 ${
+              className={`absolute bottom-0 left-0 right-0 bg-black/60 px-3 pb-2 pt-4 transition-opacity duration-300 sm:px-5 sm:pb-3 ${
                 showControls ? "opacity-100" : "opacity-0 pointer-events-none"
               }`}
               onClick={(e) => e.stopPropagation()}

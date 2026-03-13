@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
@@ -84,18 +84,8 @@ const STATS = [
 export default function EducationLandingPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    const play = async () => { try { await v.play(); setIsPlaying(true); } catch { /* poster */ } };
-    if (v.readyState >= 2) play();
-    else v.addEventListener('loadeddata', play, { once: true });
-    return () => v.removeEventListener('loadeddata', play);
-  }, []);
 
   const toggleVoice = () => {
     const vo = voiceoverRef.current;
@@ -142,11 +132,9 @@ export default function EducationLandingPage() {
             <source src="/videos/career-services-hero.mp4" type="video/mp4" />
           </video>
           <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
-          {isPlaying && (
-            <button onClick={toggleVoice} className={`absolute z-20 flex items-center gap-2 text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
-              {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
-            </button>
-          )}
+          <button onClick={toggleVoice} className={`absolute z-20 flex items-center gap-2 text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
+            {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
+          </button>
         </div>
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">

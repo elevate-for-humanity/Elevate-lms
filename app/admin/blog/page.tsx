@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -43,9 +42,6 @@ export default async function BlogAdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-blog-hero.jpg" alt="Blog management" fill sizes="100vw" className="object-cover" priority />
-      </section>
 
       <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Blog Management</h1>

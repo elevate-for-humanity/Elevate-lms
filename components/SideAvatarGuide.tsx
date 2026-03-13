@@ -197,7 +197,7 @@ export default function SideAvatarGuide({
       {isExpanded && (
         <div className={`bg-white shadow-2xl border border-gray-200 h-[600px] flex flex-col overflow-hidden ${side === 'right' ? 'rounded-l-2xl' : 'rounded-r-2xl'}`}>
           {/* Avatar Video Section - Larger */}
-          <div className="bg-gradient-to-b from-slate-900 to-slate-800 p-4">
+          <div className="bg-slate-900 p-4">
             <div className="relative">
               <video
                 ref={videoRef}

@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { Award, Briefcase, GraduationCap, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -75,7 +74,23 @@ const phases = [
 export default function FinancePathwayPage() {
   return (
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/business-finance.mp4" />
+      {/* Hero */}
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
+        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover opacity-60">
+          <source src="/videos/business-finance.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 flex items-center px-6">
+          <div className="max-w-5xl mx-auto w-full">
+            <span className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-3 bg-brand-orange-500">Funding Available</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.1]">
+              Finance, Bookkeeping &amp; Accounting
+            </h1>
+            <p className="text-white/85 text-lg mt-3 max-w-2xl leading-relaxed">
+              A tiered credential pathway preparing participants for entry-level and growth-track roles in tax preparation, bookkeeping, payroll support, and small business financial services.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-6 py-3">
@@ -91,13 +106,6 @@ export default function FinancePathwayPage() {
         <section className="bg-white py-10 sm:py-14">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-wider mb-2">Credential Pathway</p>
-            <span className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-4 bg-brand-orange-500">Funding Available</span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-[1.1]">
-              Finance, Bookkeeping &amp; Accounting
-            </h1>
-            <p className="text-slate-500 text-lg mt-3 max-w-2xl leading-relaxed">
-              A tiered credential pathway preparing participants for entry-level and growth-track roles in tax preparation, bookkeeping, payroll support, and small business financial services.
-            </p>
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
               <div><span className="text-slate-400">Structure</span><span className="ml-1.5 font-semibold text-slate-900">3 Tiers (Entry → Intermediate → Advanced)</span></div>
               <div><span className="text-slate-400">Duration</span><span className="ml-1.5 font-semibold text-slate-900">6–20 weeks depending on tier</span></div>

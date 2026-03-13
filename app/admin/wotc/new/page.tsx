@@ -1,5 +1,4 @@
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, User, Building, FileText, Calendar } from 'lucide-react';
@@ -16,9 +15,6 @@ export default function NewWOTCPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-wotc-new-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">

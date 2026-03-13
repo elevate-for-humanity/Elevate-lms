@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Activity, AlertCircle, Database, Server, TrendingUp, Users, Zap, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -149,9 +148,6 @@ export default function MonitoringDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-monitoring-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Monitoring" }]} />
         </div>

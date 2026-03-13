@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -229,9 +228,6 @@ export default async function AccreditationPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-accreditation-hero.jpg" alt="Accreditation management" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">

@@ -190,7 +190,7 @@ export default function AvatarChatBar() {
               </button>
 
               {/* Bottom Controls */}
-              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/55">
                 <div className="flex items-center justify-between">
                   <span className="text-white text-sm font-medium">{name}</span>
                   <button

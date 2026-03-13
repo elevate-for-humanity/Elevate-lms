@@ -11,7 +11,6 @@ import {
   Play,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 import { createBrowserClient } from '@supabase/ssr';
 const addOns = [

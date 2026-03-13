@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/founder' },
@@ -19,8 +18,17 @@ export default function FounderPage() {
         <Breadcrumbs items={[{ label: 'Founder' }]} />
       </div>
 
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/elevate-overview-with-narration.mp4" posterSrc="/images/pages/founder-video-poster.jpg" posterAlt="Founder" />
+      {/* Hero */}
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-slate-900">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover opacity-55" priority />
+        <div className="absolute inset-0 flex items-center px-6">
+          <div className="max-w-6xl mx-auto w-full">
+            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Founder &amp; CEO</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Elizabeth Greene</h1>
+            <p className="text-white/80 text-lg mt-2">Elevate for Humanity Career &amp; Technical Institute</p>
+          </div>
+        </div>
+      </section>
 
       {/* Bio — full body photo left, bio right */}
       <section className="py-10 sm:py-16">

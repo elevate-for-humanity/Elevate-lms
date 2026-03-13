@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
@@ -213,9 +212,6 @@ export default async function SAPMonitoringPage() {
     <div className="min-h-screen bg-slate-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-sap-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">

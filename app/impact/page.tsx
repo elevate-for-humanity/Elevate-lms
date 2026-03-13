@@ -48,8 +48,18 @@ export default async function ImpactPage() {
       </div>
 
 
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/graduation-success.mp4" posterSrc="/images/pages/impact-video-poster.jpg" posterAlt="Impact" />
+      {/* Hero */}
+      <section className="relative h-[55vh] min-h-[320px] overflow-hidden bg-slate-900">
+        <VideoHeroBanner videoSrc="/videos/graduation-success.mp4" posterSrc="/images/pages/impact-video-poster.jpg" posterAlt="Impact" />
+        <div className="absolute inset-0 bg-black/45 flex items-center">
+          <div className="max-w-6xl mx-auto px-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">Impact &amp; Outcomes</h1>
+            <p className="text-lg text-white/85 max-w-2xl">
+              Measurable results for learners, employers, and communities. See how Elevate for Humanity creates lasting workforce change.
+            </p>
+          </div>
+        </div>
+      </section>
 
 
       {/* Why Funders Choose Elevate */}

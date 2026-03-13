@@ -143,7 +143,7 @@ export default function SalesAvatar({
   // Inline position (embedded in page)
   if (position === 'inline') {
     return (
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white">
+      <div className="bg-slate-900 rounded-2xl p-6 text-white">
         <div className="flex gap-4">
           <div className="flex-shrink-0">
             <div className="relative">

@@ -55,7 +55,6 @@ export default function CredentialsPage() {
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
         <LazyVideo src="/videos/career-services-hero.mp4" poster="/images/pages/credentials-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
       </section>
 
       {/* Page header */}
@@ -100,8 +99,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
                 <div className="relative h-36 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>
                 </div>
@@ -131,8 +129,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
                 <div className="relative h-36 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/75 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>
@@ -164,8 +161,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <p className="text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>

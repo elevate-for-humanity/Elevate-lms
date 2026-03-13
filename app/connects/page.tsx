@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Menu, X, Phone, Mail, Volume2, VolumeX, BookOpen, Users, TrendingUp, Clock, DollarSign, Shield, CheckCircle, BarChart2 } from 'lucide-react';
+import { ArrowRight, Menu, X, Phone, Mail, BookOpen, Users, TrendingUp, Clock, DollarSign, Shield, CheckCircle, BarChart2 } from 'lucide-react';
 
 const NAV = [
   { label: 'Portals', href: '#portals' },
@@ -90,27 +90,7 @@ const FEATURES = [
 ];
 
 export default function ConnectsLandingPage() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [voiceActive, setVoiceActive] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    const play = async () => { try { await v.play(); setIsPlaying(true); } catch { /* poster */ } };
-    if (v.readyState >= 2) play();
-    else v.addEventListener('loadeddata', play, { once: true });
-    return () => v.removeEventListener('loadeddata', play);
-  }, []);
-
-  const toggleVoice = () => {
-    const vo = voiceoverRef.current;
-    if (!vo) return;
-    if (!voiceActive) { vo.currentTime = 0; vo.play().catch(() => {}); setVoiceActive(true); }
-    else { vo.pause(); setVoiceActive(false); }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -141,18 +121,10 @@ export default function ConnectsLandingPage() {
         </div>
       </header>
 
-      {/* VIDEO HERO — no overlay, text below */}
+      {/* HERO — static image, portal directory page does not need video */}
       <section className="pt-16">
-        <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '340px' }}>
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/career-services-page-1.jpg">
-            <source src="/videos/career-services-hero.mp4" type="video/mp4" />
-          </video>
-          <audio ref={voiceoverRef} src="/videos/elevate-overview-with-narration.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
-          {isPlaying && (
-            <button onClick={toggleVoice} className={`absolute z-20 flex items-center gap-2 text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-cyan-600 hover:bg-cyan-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
-              {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
-            </button>
-          )}
+        <div className="relative w-full overflow-hidden" style={{ minHeight: '280px', maxHeight: '360px' }}>
+          <Image src="/images/pages/career-services-page-1.jpg" alt="Elevate Connects portal directory" fill sizes="100vw" className="object-cover" priority />
         </div>
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">

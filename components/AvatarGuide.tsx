@@ -133,7 +133,7 @@ export default function AvatarGuide({
   }
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 to-slate-800 border-b-4 border-brand-orange-500">
+    <div className="bg-slate-900 border-b-4 border-brand-orange-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-start gap-6">
           {/* Avatar */}

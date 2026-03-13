@@ -18,7 +18,7 @@ const AUDIENCES = [
     secondaryCta: 'Browse Programs',
     secondaryHref: '/programs',
     image: '/images/pages/comp-home-hero-programs.jpg',
-    color: 'from-brand-blue-600 to-brand-blue-800',
+    color: 'bg-brand-blue-700',
     accent: 'bg-brand-blue-500',
     stats: [
       { value: '$0', label: 'Tuition for eligible students' },
@@ -43,7 +43,7 @@ const AUDIENCES = [
     secondaryCta: 'View Hiring Programs',
     secondaryHref: '/ojt-and-funding',
     image: '/images/pages/for-employers-page-1.jpg',
-    color: 'from-emerald-600 to-emerald-800',
+    color: 'bg-emerald-700',
     accent: 'bg-emerald-500',
     stats: [
       { value: '$9.6K', label: 'Max WOTC credit per hire' },
@@ -68,7 +68,7 @@ const AUDIENCES = [
     secondaryCta: 'Partnership Inquiry',
     secondaryHref: '/contact',
     image: '/images/pages/how-it-works-hero.jpg',
-    color: 'from-slate-700 to-slate-900',
+    color: 'bg-slate-800',
     accent: 'bg-slate-600',
     stats: [
       { value: '100%', label: 'Audit-ready documentation' },
@@ -134,7 +134,7 @@ export default function AudienceRouter() {
           className="overflow-hidden transition-all duration-500 ease-out"
           style={{ maxHeight: '1200px', opacity: 1 }}
         >
-          <div className={`bg-gradient-to-br ${audience.color} text-white`}>
+          <div className={`${audience.color} text-white`}>
             <div className="max-w-7xl mx-auto px-6 py-16 lg:py-20">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 {/* Left: messaging */}

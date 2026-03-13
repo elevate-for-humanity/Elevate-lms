@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ProgramsTable } from './programs-table';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -80,9 +79,6 @@ export default async function ProgramsPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-programs-hero.jpg" alt="Programs management" fill sizes="100vw" className="object-cover" priority />
-      </section>
 
       <div className="p-8 max-w-7xl mx-auto">
         {/* Header */}

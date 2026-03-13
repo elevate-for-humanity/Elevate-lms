@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import VideoUploader from '@/components/admin/VideoUploader';
@@ -67,9 +66,6 @@ export default function VideoManagerPage() {
     <div className="min-h-screen bg-gray-50 p-6">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-video-manager-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-7xl mx-auto">
         <div className="mb-4">
           <Breadcrumbs items={[

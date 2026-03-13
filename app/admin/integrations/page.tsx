@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   Video, Calendar, MessageSquare, Mail, CreditCard, Database,
@@ -169,9 +168,6 @@ export default function AdminIntegrationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="relative h-[160px] sm:h-[220px]">
-        <Image src="/images/pages/admin-integrations-hero.jpg" alt="Integrations" fill sizes="100vw" className="object-cover" priority />
-      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Integrations' }]} />

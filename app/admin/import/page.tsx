@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { useState, useCallback } from 'react';
@@ -223,9 +222,6 @@ export default function AdminImportPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-import-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

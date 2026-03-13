@@ -52,7 +52,7 @@ export default function HeroBanner({
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               src={videoSrc}
-              autoPlay muted loop playsInline preload="metadata"
+              autoPlay loop playsInline preload="auto"
               poster={posterSrc}
             />
             {voiceoverSrc && (

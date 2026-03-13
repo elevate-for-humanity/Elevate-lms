@@ -16,7 +16,7 @@ export default function VideoHeroBanner({ videoSrc, posterSrc, posterAlt }: Vide
       <video
         ref={videoRef}
         src={videoSrc}
-        autoPlay loop muted playsInline preload="metadata"
+        autoPlay loop playsInline preload="auto"
         poster={posterSrc}
         aria-label={posterAlt}
         className="absolute inset-0 w-full h-full object-cover"

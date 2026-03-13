@@ -21,7 +21,7 @@ export default function ApplyHeroVideo() {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
-        loop muted playsInline autoPlay preload="metadata"
+        loop playsInline autoPlay preload="auto"
         poster="/images/pages/apply-hero.jpg"
       >
         <source src="/videos/getting-started-hero.mp4" type="video/mp4" />

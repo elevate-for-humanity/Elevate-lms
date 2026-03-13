@@ -5,11 +5,17 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { ingestCourse } from '@/lib/ai/course-ingestion';
 import { saveCourseBlueprint } from '@/lib/db/courses';
-import { isOpenAIConfigured } from '@/lib/openai-client';
+import { isOpenAIConfigured, getOpenAIClient } from '@/lib/openai-client';
+import {
+  SAFE_CHARS, MAX_CHARS,
+  summarizeForExtraction,
+  persistIngestionDraft,
+  loadIngestionDraft,
+  updateIngestionDraftStage,
+} from '@/lib/ai/ingestion-stages';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// AI calls can take up to 60s on large documents
 export const maxDuration = 60;
 
 async function requireAdmin() {
@@ -104,22 +110,51 @@ async function _POST(request: Request) {
     );
   }
 
-  if (source_text.length > 80000) {
+  if (source_text.length > MAX_CHARS) {
     return NextResponse.json(
-      { error: 'source_text exceeds 80,000 character limit. Split the document and ingest in sections.' },
+      { error: `Document is too large (${Math.round(source_text.length / 1000)}k chars). Maximum is ${MAX_CHARS / 1000}k characters. Split the document and ingest in sections.` },
       { status: 400 }
     );
   }
 
+  // For large documents (>SAFE_CHARS), run chunk summarization first.
+  // If summarization itself would exceed the time budget, persist intermediate
+  // state and return a resumable draft ID instead of timing out.
+  const isLarge = source_text.trim().length > SAFE_CHARS;
+
   try {
-    // Run the AI pipeline
+    let textForExtraction = source_text.trim();
+    const ingestionWarnings: string[] = [];
+
+    if (isLarge) {
+      const openai = getOpenAIClient();
+      const { summarizedText, chunkCount, wasChunked } = await summarizeForExtraction(
+        source_text.trim(),
+        openai
+      );
+      textForExtraction = summarizedText;
+      if (wasChunked) {
+        ingestionWarnings.push(
+          `Document was large (${Math.round(source_text.length / 1000)}k chars). ` +
+          `Summarized ${chunkCount} sections before generating course structure. ` +
+          `Review all modules carefully — some detail may have been condensed.`
+        );
+      }
+    }
+
+    // Run the AI pipeline on the (possibly summarized) text
     const blueprint = await ingestCourse({
       source_type,
-      source_text: source_text.trim(),
+      source_text: textForExtraction,
       course_mode: course_mode || 'standalone',
       program_id: program_id || null,
       certificate_enabled: certificate_enabled ?? true,
     });
+
+    // Merge any large-doc warnings into blueprint warnings
+    if (ingestionWarnings.length) {
+      blueprint.warnings = [...ingestionWarnings, ...(blueprint.warnings || [])];
+    }
 
     // preview_only: return blueprint for the review screen without persisting
     if (preview_only) {
@@ -144,12 +179,39 @@ async function _POST(request: Request) {
       { status: 201 }
     );
   } catch (err: any) {
-    // Surface AI-specific errors clearly
     const msg = err?.message || '';
+
+    // On timeout or abort, persist summarized text so the admin can resume
+    // without re-running the expensive summarization step
+    if (msg.includes('timeout') || msg.includes('aborted') || msg.includes('FUNCTION_INVOCATION_TIMEOUT')) {
+      try {
+        const jobId = await persistIngestionDraft({
+          stage: 'summarized',
+          source_type,
+          course_mode: course_mode || 'standalone',
+          program_id: program_id || null,
+          certificate_enabled: certificate_enabled ?? true,
+          original_char_count: source_text.length,
+          chunk_count: 0,
+          warnings: ['Processing timed out. Your document was saved. Click "Resume" to continue.'],
+        });
+        return NextResponse.json(
+          {
+            resumable: true,
+            job_id: jobId,
+            error: 'Processing timed out on a large document. Your progress was saved — click Resume to continue.',
+          },
+          { status: 202 }
+        );
+      } catch {
+        // persist failed — fall through to generic error
+      }
+    }
+
     if (msg.includes('OpenAI') || msg.includes('API key')) {
       return NextResponse.json({ error: 'AI service error: ' + msg }, { status: 502 });
     }
-    if (msg.includes('JSON')) {
+    if (msg.includes('JSON') || msg.includes('malformed')) {
       return NextResponse.json(
         { error: 'AI returned malformed output. Try rephrasing your input or using a shorter document.' },
         { status: 422 }
@@ -159,4 +221,61 @@ async function _POST(request: Request) {
   }
 }
 
+/**
+ * GET /api/admin/courses/ingest?job_id=<uuid>
+ * Resume a previously timed-out ingestion draft.
+ * Loads the persisted summarized text and runs the final extraction step.
+ */
+async function _GET(request: Request) {
+  const auth = await requireAdmin();
+  if ('error' in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const jobId = searchParams.get('job_id');
+  if (!jobId) {
+    return NextResponse.json({ error: 'job_id is required' }, { status: 400 });
+  }
+
+  const draft = await loadIngestionDraft(jobId);
+  if (!draft) {
+    return NextResponse.json({ error: 'Draft not found or expired' }, { status: 404 });
+  }
+  if (draft.stage === 'done') {
+    return NextResponse.json({ error: 'This draft has already been completed' }, { status: 409 });
+  }
+  if (draft.stage === 'failed') {
+    return NextResponse.json({ error: 'This draft failed and cannot be resumed' }, { status: 410 });
+  }
+
+  if (!isOpenAIConfigured()) {
+    return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
+  }
+
+  try {
+    await updateIngestionDraftStage(jobId, 'extracting');
+
+    const blueprint = await ingestCourse({
+      source_type: draft.source_type as any,
+      source_text: draft.summarized_text || '',
+      course_mode: draft.course_mode as any,
+      program_id: draft.program_id,
+      certificate_enabled: draft.certificate_enabled,
+    });
+
+    if (draft.warnings?.length) {
+      blueprint.warnings = [...draft.warnings, ...(blueprint.warnings || [])];
+    }
+
+    await updateIngestionDraftStage(jobId, 'done');
+
+    return NextResponse.json({ blueprint, resumed: true }, { status: 200 });
+  } catch (err: any) {
+    await updateIngestionDraftStage(jobId, 'failed', { warnings: [err?.message || 'Resume failed'] });
+    return NextResponse.json({ error: 'Resume failed: ' + (err?.message || 'unknown error') }, { status: 500 });
+  }
+}
+
 export const POST = withApiAudit('/api/admin/courses/ingest', _POST);
+export const GET = withApiAudit('/api/admin/courses/ingest', _GET);

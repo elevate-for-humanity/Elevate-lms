@@ -10,7 +10,7 @@ interface Props {
   programs: { id: string; title: string }[];
 }
 
-type Phase = 'input' | 'processing' | 'review' | 'saving';
+type Phase = 'input' | 'processing' | 'review' | 'saving' | 'resumable';
 
 const INPUT_MODES: {
   id: SourceType;
@@ -65,7 +65,9 @@ export default function CourseIngestionWizard({ programs }: Props) {
   const [programId, setProgramId] = useState('');
   const [certEnabled, setCertEnabled] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fileWarning, setFileWarning] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<CourseBlueprint | null>(null);
+  const [resumeJobId, setResumeJobId] = useState<string | null>(null);
 
   const selectedMode = INPUT_MODES.find((m) => m.id === mode)!;
 
@@ -86,6 +88,9 @@ export default function CourseIngestionWizard({ programs }: Props) {
         const json = await res.json();
         if (!res.ok) { setError(json.error || 'File parsing failed.'); return; }
         setSourceText(json.text);
+        // Surface OCR warnings as non-blocking notices
+        if (json.warning) setFileWarning(json.warning);
+        else setFileWarning(null);
       } catch {
         setError('File upload failed. Try copying and pasting the content instead.');
       }
@@ -118,6 +123,11 @@ export default function CourseIngestionWizard({ programs }: Props) {
         }),
       });
       const json = await res.json();
+      if (json.resumable && json.job_id) {
+        setResumeJobId(json.job_id);
+        setPhase('resumable');
+        return;
+      }
       if (!res.ok) { setError(json.error || 'Generation failed.'); setPhase('input'); return; }
       setBlueprint(json.blueprint);
       setPhase('review');
@@ -153,6 +163,52 @@ export default function CourseIngestionWizard({ programs }: Props) {
       setPhase('review');
     }
   };
+
+  const handleResume = async () => {
+    if (!resumeJobId) return;
+    setError(null);
+    setPhase('processing');
+    try {
+      const res = await fetch(`/api/admin/courses/ingest?job_id=${resumeJobId}`);
+      const json = await res.json();
+      if (!res.ok) { setError(json.error || 'Resume failed.'); setPhase('resumable'); return; }
+      setBlueprint(json.blueprint);
+      setPhase('review');
+    } catch {
+      setError('Network error during resume. Please try again.');
+      setPhase('resumable');
+    }
+  };
+
+  if (phase === 'resumable') {
+    return (
+      <div className="bg-white rounded-xl border shadow-sm p-10 flex flex-col items-center gap-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+          <span className="text-yellow-600 text-xl">⏸</span>
+        </div>
+        <h2 className="text-lg font-semibold text-gray-900">Processing paused</h2>
+        <p className="text-sm text-gray-500 max-w-sm">
+          Your document was too large to process in one request. The summarized content was saved.
+          Click Resume to complete the course generation — it will pick up where it left off.
+        </p>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="flex gap-3">
+          <button
+            onClick={handleResume}
+            className="bg-brand-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-brand-blue-700 font-medium text-sm"
+          >
+            Resume generation
+          </button>
+          <button
+            onClick={() => { setPhase('input'); setResumeJobId(null); setError(null); }}
+            className="px-6 py-2.5 border rounded-lg hover:bg-gray-50 text-gray-700 text-sm"
+          >
+            Start over
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (phase === 'processing') {
     return (
@@ -198,7 +254,7 @@ export default function CourseIngestionWizard({ programs }: Props) {
           return (
             <button
               key={m.id}
-              onClick={() => { setMode(m.id); setSourceText(''); setError(null); }}
+              onClick={() => { setMode(m.id); setSourceText(''); setError(null); setFileWarning(null); }}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 text-center transition-colors ${
                 active
                   ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
@@ -265,6 +321,12 @@ export default function CourseIngestionWizard({ programs }: Props) {
             </label>
           </div>
         </div>
+
+        {fileWarning && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+            ⚠️ {fileWarning}
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">{error}</div>

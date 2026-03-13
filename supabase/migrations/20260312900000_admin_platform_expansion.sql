@@ -131,14 +131,14 @@ DO $$ BEGIN
 END $$;
 
 -- 9. Seed program codes for existing programs
-UPDATE programs SET code = 'HVAC' WHERE slug ILIKE '%hvac%' AND code IS NULL;
-UPDATE programs SET code = 'CNA' WHERE slug ILIKE '%cna%' AND code IS NULL;
-UPDATE programs SET code = 'BARBER' WHERE slug ILIKE '%barber-apprenticeship%' AND code IS NULL;
-UPDATE programs SET code = 'CDL' WHERE slug ILIKE '%cdl%' AND code IS NULL;
-UPDATE programs SET code = 'ELECTRICAL' WHERE slug ILIKE '%electrical%' AND code IS NULL;
-UPDATE programs SET code = 'PLUMBING' WHERE slug ILIKE '%plumbing%' AND code IS NULL;
-UPDATE programs SET code = 'WELDING' WHERE slug ILIKE '%welding%' AND code IS NULL;
-UPDATE programs SET code = 'PHLEBOTOMY' WHERE slug ILIKE '%phlebotomy%' AND code IS NULL;
+UPDATE programs SET code = 'HVAC' WHERE slug ILIKE '%hvac%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'HVAC');
+UPDATE programs SET code = 'CNA' WHERE slug ILIKE '%cna%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'CNA');
+UPDATE programs SET code = 'BARBER' WHERE slug ILIKE '%barber-apprenticeship%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'BARBER');
+UPDATE programs SET code = 'CDL' WHERE slug ILIKE '%cdl%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'CDL');
+UPDATE programs SET code = 'ELECTRICAL' WHERE slug ILIKE '%electrical%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'ELECTRICAL');
+UPDATE programs SET code = 'PLUMBING' WHERE slug ILIKE '%plumbing%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'PLUMBING');
+UPDATE programs SET code = 'WELDING' WHERE slug ILIKE '%welding%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'WELDING');
+UPDATE programs SET code = 'PHLEBOTOMY' WHERE slug ILIKE '%phlebotomy%' AND code IS NULL AND NOT EXISTS (SELECT 1 FROM programs WHERE code = 'PHLEBOTOMY');
 
 -- 10. Enable RLS on new tables
 ALTER TABLE curriculum_lessons ENABLE ROW LEVEL SECURITY;

@@ -20,18 +20,25 @@ WHERE progress_percent IS NULL AND progress IS NOT NULL;
 ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS program_id UUID REFERENCES programs(id);
 
 -- 5. Populate course_progress from lesson_progress aggregation
--- (course_progress table exists but is empty)
-INSERT INTO course_progress (user_id, course_id, progress_percent, completed, updated_at)
-SELECT
-  lp.user_id,
-  lp.course_id,
-  ROUND(AVG(lp.progress_percent))::integer,
-  BOOL_AND(lp.completed),
-  MAX(lp.updated_at)
-FROM lesson_progress lp
-WHERE lp.course_id IS NOT NULL
-GROUP BY lp.user_id, lp.course_id
-ON CONFLICT (user_id, course_id) DO UPDATE SET
-  progress_percent = EXCLUDED.progress_percent,
-  completed = EXCLUDED.completed,
-  updated_at = EXCLUDED.updated_at;
+-- Only runs if course_progress has a progress_percent column
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'course_progress' AND column_name = 'progress_percent'
+  ) THEN
+    INSERT INTO course_progress (user_id, course_id, progress_percent, completed, updated_at)
+    SELECT
+      lp.user_id,
+      lp.course_id,
+      ROUND(AVG(lp.progress_percent))::integer,
+      BOOL_AND(lp.completed),
+      MAX(lp.updated_at)
+    FROM lesson_progress lp
+    WHERE lp.course_id IS NOT NULL
+    GROUP BY lp.user_id, lp.course_id
+    ON CONFLICT (user_id, course_id) DO UPDATE SET
+      progress_percent = EXCLUDED.progress_percent,
+      completed = EXCLUDED.completed,
+      updated_at = EXCLUDED.updated_at;
+  END IF;
+END $$;

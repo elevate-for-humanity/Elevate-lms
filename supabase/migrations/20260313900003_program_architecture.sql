@@ -64,10 +64,12 @@ CREATE INDEX IF NOT EXISTS idx_certificates_verification ON certificates(verific
 -- 9. RLS policies for program_completion
 ALTER TABLE program_completion ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own completions" ON program_completion;
 CREATE POLICY "Users can view own completions"
   ON program_completion FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on program_completion" ON program_completion;
 CREATE POLICY "Service role full access on program_completion"
   ON program_completion FOR ALL
   USING (auth.role() = 'service_role');
@@ -87,14 +89,17 @@ CREATE INDEX IF NOT EXISTS idx_exam_events_user ON exam_events(user_id);
 
 ALTER TABLE exam_events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can insert own exam events" ON exam_events;
 CREATE POLICY "Users can insert own exam events"
   ON exam_events FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own exam events" ON exam_events;
 CREATE POLICY "Users can view own exam events"
   ON exam_events FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on exam_events" ON exam_events;
 CREATE POLICY "Service role full access on exam_events"
   ON exam_events FOR ALL
   USING (auth.role() = 'service_role');

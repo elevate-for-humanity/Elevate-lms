@@ -70,6 +70,7 @@ BEGIN
 END;
 $fn$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS trg_webhook_event_lifecycle ON webhook_events_processed;
 CREATE TRIGGER trg_webhook_event_lifecycle
   BEFORE UPDATE OR DELETE ON webhook_events_processed
   FOR EACH ROW

@@ -1,55 +1,66 @@
-# Elevate for Humanity — Security & Access Overview
+# Security Policy
 
-## Authentication
+## Reporting a Vulnerability
 
-- Supabase Auth (JWT-based)
-- Server-side enforcement via Next.js middleware
-- Role-based access control (RBAC)
+**Do not file a public GitHub issue for security vulnerabilities.**
 
-## Authorization
+If you discover a security vulnerability in this platform, report it privately:
 
-- Route-level protection (middleware)
-- Database-level RLS (Supabase)
-- Tenant isolation enforced
+**Email:** info@elevateforhumanity.org
+**Subject:** `Security Vulnerability Report`
 
-## Payments
+Include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Any suggested remediation
 
-- Stripe Checkout + idempotent webhooks
-- No card data stored
-- PCI handled by Stripe
+We will acknowledge receipt within 2 business days and provide a resolution timeline within 5 business days.
 
-## Data Protection
+## Scope
 
-- HTTPS enforced
-- Environment secrets managed
-- Audit logs for critical actions
+This policy covers the Elevate for Humanity Workforce Operating System, including:
 
-## Compliance Alignment
+- [elevateforhumanity.org](https://www.elevateforhumanity.org) and all subpaths
+- API endpoints under `/api/`
+- Authentication and enrollment flows
+- Admin, student, employer, and program holder portals
 
-- Workforce reporting supported
-- Verifiable certificates
-- Readiness for audits and oversight
+## Out of Scope
 
-## Operational Controls
+- Third-party services (Supabase, Stripe, Netlify, Resend, OpenAI) — report those directly to the respective vendor
+- Social engineering or phishing attacks
+- Denial of service
 
-- Provisioning jobs tracked
-- Event idempotency enforced
-- Failure-safe access gating
+## Security Architecture
 
-## Stripe Integration
+| Layer | Implementation |
+|-------|---------------|
+| **Authentication** | Supabase Auth — JWT tokens, server-side validation on every request |
+| **Authorization** | Row Level Security (RLS) on all database tables; role-based access control |
+| **Transport** | HTTPS enforced via Netlify; HSTS enabled |
+| **Payments** | Stripe — no card data stored; PCI DSS handled by Stripe |
+| **Secrets** | Environment variables only; never committed to source |
+| **Audit logging** | All critical actions logged with actor, timestamp, and context |
+| **Input validation** | Zod schemas on all API routes |
+| **Multi-tenancy** | Tenant isolation enforced at database and API layers |
 
-- Canonical webhook: `/api/webhooks/stripe/route.ts`
-- Canonical checkout pattern: enrollment → metadata → webhook provisioning
-- Legacy endpoints acknowledged; deprecation scheduled
+## Data Classification
 
-## Protected Routes
+| Data Type | Classification | Handling |
+|-----------|---------------|---------|
+| Student PII (name, DOB, SSN last 4) | Restricted | Encrypted at rest; RLS-protected; FERPA-aligned |
+| Enrollment and funding records | Restricted | Audit-logged; agency-reportable |
+| Payment data | Restricted | Stripe-managed; not stored locally |
+| Course content and credentials | Internal | RLS-protected |
+| Public program information | Public | No restrictions |
 
-The following paths require authentication:
+## Responsible Disclosure
 
-- `/lms/*` - Learning Management System
-- `/dashboard/*` - User dashboards
-- `/client-portal/*` - Client portal access
-- `/admin/*` - Admin-only (requires admin role)
-- `/api/lms/*` - LMS API endpoints
-- `/api/enroll/*` - Enrollment API endpoints
-- `/api/courses/*` - Course API endpoints
+We ask that you:
+
+- Give us reasonable time to investigate and remediate before public disclosure
+- Avoid accessing, modifying, or deleting data that is not yours
+- Do not disrupt platform availability or degrade service for other users
+
+We will not pursue legal action against researchers who follow this policy in good faith.

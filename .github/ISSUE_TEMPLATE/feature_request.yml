@@ -1,0 +1,72 @@
+name: Feature Request
+description: Propose a new capability or improvement to the platform.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for new capabilities, workflow improvements, or platform enhancements.
+        For bugs, use the Bug Report template. For data or compliance concerns, use the Compliance / Data Concern template.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Platform Area
+      options:
+        - LMS / Course Delivery
+        - Enrollment / Funding Workflows
+        - Admin Panel
+        - Student Portal
+        - Employer / Partner Portal
+        - Program Holder Portal
+        - Compliance / Reporting
+        - Credentialing
+        - Payments / Stripe
+        - Authentication / Access Control
+        - API / Integrations
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Gap
+      description: What is currently missing or not working well? Be specific.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: What should the platform do? Describe the outcome, not the implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: stakeholders
+    attributes:
+      label: Who Does This Affect
+      description: Which stakeholders benefit — students, admins, employers, program holders, agencies?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical — blocking operations
+        - High — significant impact
+        - Medium — meaningful improvement
+        - Low — nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: compliance
+    attributes:
+      label: Compliance or Data Implications
+      description: Does this touch student records, funding data, audit logs, or regulated workflows? If yes, describe.

@@ -1,0 +1,60 @@
+name: Compliance / Data Concern
+description: Report a concern related to data handling, student records, funding compliance, or regulatory requirements.
+title: "[Compliance] "
+labels: ["compliance", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for concerns related to student data, FERPA, WIOA compliance, DOL apprenticeship requirements,
+        audit logging, RLS policies, or any regulated workflow.
+
+        **For security vulnerabilities**, do not use this template. See [SECURITY.md](../docs/SECURITY.md) for private disclosure.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Concern Category
+      options:
+        - Student data / FERPA
+        - WIOA compliance / reporting
+        - DOL apprenticeship / RAPIDS
+        - Audit logging gap
+        - RLS / access control
+        - Funding workflow accuracy
+        - Credential issuance
+        - Data retention
+        - Other regulatory
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the concern clearly. What is the current behavior and why is it a compliance risk?
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location in Codebase
+      description: File path, route, or component where the issue exists, if known.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - High — active regulatory risk
+        - Medium — potential compliance gap
+        - Low — process improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Suggested Remediation
+      description: If you have a proposed fix or approach, describe it here.

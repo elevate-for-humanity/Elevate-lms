@@ -1,33 +1,88 @@
 # Elevate for Humanity — Workforce Operating System
 
-> **Notice**
-> This repository does not represent the complete production system.
-> Elevate for Humanity provides managed platform access and restricted enterprise source-use under formal agreements.
-> Public materials are provided for transparency, documentation, and evaluation only.
+> **Repository Notice**
+> This is a public transparency repository. It does not contain the complete production system.
+> Access to the live platform is provided under formal managed access or enterprise source-use agreements.
+> See [docs/repository-scope.md](docs/repository-scope.md) for what is and is not included here.
 
 ---
 
-**Production URL:** https://www.elevateforhumanity.org
-**Status:** Live and Operational
-**Last Updated:** February 28, 2026
-**Branch:** `main` (single branch — all feature branches merged and pruned)
+**Production:** [elevateforhumanity.org](https://www.elevateforhumanity.org)
+**Status:** Live and Operational — Indianapolis, Indiana
+**Updated:** June 2025
+**Branch:** `main` — single consolidated branch
 
 ---
 
-## Recent Changes (v2.1.0)
+## What This Is
 
-- **Legal entity normalization** — All references corrected to `2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute` (training provider) and `Selfish Inc` (501(c)(3) nonprofit). Affects footer, structured data, enrollment agreements, certificates, and disclosures.
-- **36 program pages redesigned** — Config-driven layout with video hero banners, animated counters, scroll-reveal sections, and FAQ structured data.
-- **Routing governance** — Dynamic `[slug]` route no longer shadows dedicated pages. Redirect safety net for 9 legacy slugs. 14 files with broken program links fixed.
-- **CTA compliance** — Removed false "It's Free" claims from 18 files. Programs range $0–$5,400; CTAs now say "Apply Now".
-- **Stock image elimination** — All 34 Pexels/stock image references replaced with local workforce photography.
-- **Brand color tokens** — All `blue-*` Tailwind classes migrated to `brand-blue-*` across 1,469 files.
-- **Template copy cleanup** — "Join thousands" CTAs, "Access your dashboard" placeholders, and generic template text eliminated from 87+ files.
-- **Branch cleanup** — `feat/program-holder-governance` merged and pruned.
+Elevate for Humanity operates a vertically integrated **Workforce Operating System** — not a course catalog, not a generic LMS. The platform handles the full operational stack for workforce credential delivery:
+
+- **Training delivery** — cohort scheduling, video lessons, quizzes, attendance, progress tracking
+- **Enrollment and funding** — WIOA, Workforce Ready Grant, JRI, and employer-sponsored intake workflows
+- **Compliance and reporting** — DOL apprenticeship (RAPIDS), WIOA performance metrics, RTI hour logs, audit trails
+- **Credentialing** — EPA 608, OSHA 10, WorkKeys NCRC, Certiport, AWS, Indiana ISDH, Indiana BMV
+- **Stakeholder portals** — student, admin, program holder, employer, staff, workforce board, delegate
+- **Employer pipeline** — job postings, OJT agreements, placement tracking, 6- and 12-month outcome reporting
+
+Programs run 4–18 weeks. Most are fully funded at no cost to eligible participants through federal and Indiana state workforce programs.
 
 ---
 
-## Legal Entity
+## Who It Serves
+
+| Stakeholder | Role |
+|-------------|------|
+| **Adult learners** | Career changers, dislocated workers, justice-involved individuals, youth 16–24 |
+| **Workforce agencies** | WorkOne, Indiana DWD, EmployIndy — referring and funding participants |
+| **Employers** | Hiring partners, OJT sponsors, apprenticeship co-sponsors |
+| **Program holders** | Community organizations delivering training under Elevate's infrastructure |
+| **Government** | DOL Office of Apprenticeship, WIOA Title I administrators |
+
+---
+
+## Access Model
+
+| Access Type | Description |
+|-------------|-------------|
+| **Managed Platform Access** | Fully operated by Elevate for Humanity. Subscription-based. No source code access. $1,500–$3,500/month + setup. |
+| **Enterprise Source-Use** | Restricted source-use license for qualified enterprises. Approval required. Starts at $75,000. |
+| **Public Transparency** | This repository. Structural and documentation visibility only. Not a deployable copy of production. |
+
+See [docs/access-model.md](docs/access-model.md) for full terms.
+
+---
+
+## Core Capabilities
+
+### Learning Management
+- 1,439 app pages across student, admin, employer, and program holder surfaces
+- 5 fully built course definitions with lesson-level content (Barber: 260 RTI hrs, HVAC: 432 hrs, CDL, Medical Assistant, Workforce Readiness)
+- Video lessons with per-lesson progress, quiz engine with pass thresholds, certificate generation and verification
+- AI tutoring, adaptive learning, attendance clock-in, instructor records
+
+### Enrollment and Funding
+- Multi-step application with funding eligibility screening
+- WIOA, Workforce Ready Grant, JRI, and Next Level Jobs workflow integration
+- Stripe payments (cards, ACH, Apple Pay, Google Pay) and Affirm BNPL
+- Approval workflows, waitlist management, enrollment status tracking
+
+### Compliance and Reporting
+- DOL Registered Apprenticeship (RAPIDS 2025-IN-132301) — RTI hour logs, OJT tracking, competency rubrics
+- WIOA performance reporting — enrollment, completion, credential attainment, employment outcomes
+- Audit logging on all critical actions, RLS on all database tables
+- Monthly compliance summaries for referring agencies
+
+### Stakeholder Portals
+- **Admin panel** — 289 sections covering enrollment, compliance, analytics, content, users, programs, and operations
+- **Student portal** — dashboard, courses, certificates, attendance, career services
+- **Program Holder** — cohort management, revenue share reporting, participant tracking
+- **Employer portal** — job postings, OJT agreements, hiring pipeline
+- **Workforce Board** — aggregate reporting, outcome data, funding utilization
+
+---
+
+## Legal and Compliance Standing
 
 | Field | Value |
 |-------|-------|
@@ -35,17 +90,12 @@
 | **DBA** | Elevate for Humanity Career & Training Institute |
 | **EIN** | 88-2609728 |
 | **RAPIDS Program** | 2025-IN-132301 |
-| **Registration** | Registered (OA) — U.S. Department of Labor, Office of Apprenticeship |
+| **DOL Registration** | Registered (OA) — U.S. Department of Labor, Office of Apprenticeship |
 | **Location** | 7009 E 56th St, Indianapolis, IN 46226 (Marion County) |
 | **Sponsor Type** | Single Employer |
+| **EPA Authorization** | Section 608 Universal — authorized testing center (ESCO Group, Mainstream Engineering) |
 
----
-
-## What This Is
-
-Elevate for Humanity operates a vertically integrated Workforce Operating System with a full LMS. The platform handles enrollment, course delivery, quizzes, grading, certificates, attendance, progress tracking, AI tutoring, government funding workflows, compliance reporting, employer partnerships, and employment outcomes.
-
-### Registered Apprenticeship Occupations (RAPIDS)
+### Registered Apprenticeship Occupations
 
 | Occupation | RTI Hours | Provider | Method |
 |------------|-----------|----------|--------|
@@ -56,41 +106,11 @@ Elevate for Humanity operates a vertically integrated Workforce Operating System
 | Nail Tech | 200 | Elevate for Humanity (208029) | Classroom / Web-Based |
 | Youth Culinary | 144 | Elevate for Humanity (208029) | Classroom / Web-Based |
 
-### Delivery Models
-
-| Model | Description |
-|-------|-------------|
-| **Managed Platform Access** | Fully operated by Elevate for Humanity. Subscription-based. No source code access. |
-| **Enterprise Source-Use** | Restricted source-use for qualified enterprises. Approval required. |
-
----
-
-## Codebase (Verified Counts)
-
-> Run `bash scripts/count-codebase.sh` to regenerate these numbers.
-
-| Metric | Count |
-|--------|-------|
-| Pages (app/**/page.tsx) | 1,421 |
-| API routes (app/api/**/route.ts) | 998 |
-| React components (components/) | 845 |
-| Library modules (lib/) | 715 |
-| SQL migrations | 192 |
-| Scripts | 586 |
-| Static images | 1,092 |
-| Video files (.mp4) | 543 |
-| Documentation files (docs/) | 62 |
-| Netlify serverless functions | 7 |
-| Admin sections | 280 |
-| LMS app sections | 81 |
-| Program pages | 87 |
-| Course definitions (with full lesson data) | 5 (Barber, HVAC, CDL, Medical Assistant, Workforce Readiness) |
+See [docs/compliance-overview.md](docs/compliance-overview.md) for full compliance posture.
 
 ---
 
 ## Tech Stack
-
-### Core
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
@@ -98,104 +118,38 @@ Elevate for Humanity operates a vertically integrated Workforce Operating System
 | Language | TypeScript | 5.9.3 |
 | UI | React | 19.2.1 |
 | CSS | Tailwind CSS | 3.4.18 |
-| State | Zustand | 5.0.9 |
-| Forms | React Hook Form + Zod | 7.66.1 / 4.1.12 |
 | Database | Supabase (PostgreSQL + Auth + RLS) | — |
 | Payments | Stripe | 19.3.1 |
 | Email | Resend | 6.4.2 |
 | AI | OpenAI | 6.9.1 |
 | Monitoring | Sentry | 10.32.1 |
-| Hosting | Netlify (Serverless) | — |
+| Hosting | Netlify | — |
 | Package Manager | pnpm | 10.28.2 |
-| Node.js | — | 20.19.2 |
+| Node.js | — | 20.x |
 
-### Integrations
-
-Stripe (payments, subscriptions, webhooks), Affirm (BNPL), Resend (transactional email), OpenAI (AI tutors), Supabase (database, auth, storage, realtime), Sentry (error tracking), Netlify (hosting, edge functions, serverless), JotForm (intake forms).
+**Integrations:** Stripe, Affirm, Resend, OpenAI, Supabase, Sentry, Netlify, JotForm.
 
 ---
 
-## Ecosystem Entities
+## Repository Scope
 
-| Entity | Type | Purpose |
-|--------|------|---------|
-| **2Exclusive LLC-S** | Legal Entity / Sponsor | RAPIDS-registered apprenticeship sponsor, parent entity |
-| **Elevate for Humanity Career & Training Institute** | DBA / Training Provider | Instruction, RTI delivery, LMS, workforce programs |
-| **Selfish Inc.** | 501(c)(3) Nonprofit | Mental wellness services and community support |
-| **The Rise Foundation** | DBA of Selfish Inc. | VITA site — free tax preparation and community education |
-| **Supersonic Fast Cash LLC** | Employer | Tax preparation services, hires tax prep graduates |
-| **Curvature Body Sculpting** | Employer | Body sculpting services + Meri-Gold-Round wellness products |
+This public repository contains the application codebase for transparency and evaluation purposes. It does not include production secrets, live student records, proprietary AI assets, or the full video library.
 
----
+**Verified codebase counts (June 2025):**
 
-## Platform Capabilities
+| Artifact | Count |
+|----------|-------|
+| App pages | 1,439 |
+| API routes | 1,020 |
+| React components | 857 |
+| Library modules | 732 |
+| SQL migrations | 225 |
+| Static images | 1,197 |
+| Video files | 737 |
+| Admin sections | 289 |
+| Netlify serverless functions | 7 |
 
-### LMS (Learning Management)
-
-- Course catalog with 27+ programs across healthcare, skilled trades, CDL, barbering, technology, business
-- 5 fully built course definitions with lesson-level content (Barber: 260 RTI hrs, HVAC: 432 hrs, CDL, Medical Assistant, Workforce Readiness)
-- Video-based lessons with per-lesson progress tracking
-- Quiz engine with pass thresholds, explanations, retry
-- Certificate generation and verification
-- Attendance tracking (clock-in, instructor record, export)
-- AI tutoring and adaptive learning
-- Student dashboard with progress analytics
-- 81 LMS app sections (achievements, assignments, calendar, certificates, chat, community, courses, etc.)
-
-### Enrollment
-
-- Multi-step application forms with funding eligibility
-- WIOA, WRG, JRI funding workflow integration
-- Stripe payment processing (cards, ACH, Apple Pay, Google Pay)
-- Affirm buy-now-pay-later
-- Approval workflows and waitlist management
-- Enrollment status tracking
-
-### Compliance & Reporting
-
-- WIOA performance reporting
-- DOL apprenticeship compliance (29 CFR Part 29/30)
-- RTI attendance tracking per session per student
-- OJT hour logs
-- Competency rubric evaluations
-- Credential attainment documentation
-- Monthly progress summaries for referring agencies
-- Audit logs
-
-### Stakeholder Portals
-
-- Student portal
-- Admin panel (145 sections)
-- Program Holder dashboard
-- Employer/Partner portal
-- Staff operations
-- Workforce Board reporting
-- Delegate (sub-office) management
-
-### Apprenticeship Management
-
-- RAPIDS-registered program (2025-IN-132301)
-- Apprentice registration and tracking (3 registered)
-- Hour logging (RTI + OJT)
-- Wage schedule management
-- Sponsor disclosure on all apprenticeship pages
-- Institutional governance documentation
-
----
-
-## Revenue Model
-
-| Stream | Details |
-|--------|---------|
-| Government Funding | WIOA, WRG, JRI, EmployIndy contracts |
-| Program Holder Revenue Share | Partners receive 1/3 (33.33%) of net program revenue per student |
-| Credential Course Markup | 50/50 split on add-on certification courses |
-| Self-Pay / Stripe | Direct enrollment payments |
-| Platform Licensing | Managed Enterprise LMS ($1,500–$3,500/month) |
-| Supersonic Fast Cash | Tax preparation and refund advance services |
-| Curvature Body Sculpting | Body sculpting + Meri-Gold-Round products |
-
-**Funding Disclosure:** Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines.
+See [docs/repository-scope.md](docs/repository-scope.md) for full scope details.
 
 ---
 
@@ -204,25 +158,23 @@ Stripe (payments, subscriptions, webhooks), Affirm (BNPL), Resend (transactional
 ### Prerequisites
 - Node.js 20+ (< 25)
 - pnpm 10+
-- Supabase account
-- Stripe account (for payments)
+- Supabase project
+- Stripe account
 
-### Installation
+### Setup
 
 ```bash
 git clone https://github.com/elevateforhumanity/Elevate-lms.git
 cd Elevate-lms
 pnpm install
 cp .env.example .env.local
-# Edit .env.local with your credentials
+# Fill in .env.local with your credentials
 pnpm dev
 ```
 
-Visit http://localhost:3000
+Visit `http://localhost:3000`
 
-### Environment Variables
-
-See `.env.example` for the complete list. Key variables:
+### Key Environment Variables
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
@@ -235,128 +187,86 @@ RESEND_API_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
+Full variable reference in `.env.example`.
+
+### Common Commands
+
+```bash
+pnpm dev          # Development server (Turbopack)
+pnpm build        # Production build
+pnpm lint         # ESLint
+```
+
 ---
 
 ## Project Structure
 
 ```
 Elevate-lms/
-├── app/                          # Next.js App Router (1,421 pages + 998 API routes)
-│   ├── admin/                    # Admin panel (280 sections)
-│   ├── api/                      # API routes
-│   ├── apprenticeships/          # Apprenticeship landing
-│   ├── courses/                  # Course catalog
-│   ├── institutional-governance/ # Governance & compliance page
-│   ├── lms/(app)/                # LMS application (50 sections)
-│   ├── partners/                 # Partner pages
-│   ├── programs/                 # Training programs (98 pages)
-│   ├── verification-approvals/   # Verification & approvals page
+├── app/                    # Next.js App Router (1,439 pages + 1,020 API routes)
+│   ├── admin/              # Admin panel (289 sections)
+│   ├── api/                # API routes
+│   ├── lms/                # LMS application
+│   ├── programs/           # Training program pages
 │   └── ...
-├── components/                   # React components (800 files)
-│   ├── compliance/               # SponsorDisclosure, compliance blocks
-│   ├── marketing/                # PublicLandingPage, ProgramCatalog
-│   ├── programs/                 # ProgramPageLayout, ProgramCard
-│   ├── site/                     # Header, Footer, navigation
-│   └── ...
-├── lib/                          # Utilities & business logic (664 modules)
-│   ├── courses/                  # Course definitions, quiz banks
-│   ├── programs/                 # Program data, pricing, catalog
-│   ├── supabase/                 # Database clients
-│   └── ...
-├── supabase/migrations/          # SQL migrations (630 files)
-├── netlify/functions/            # Serverless functions (6)
-├── scripts/                      # Automation scripts (860)
-├── public/                       # Static assets (1,032 images, 143 videos)
-├── docs/                         # Documentation (50 files)
-└── data/                         # Static data (team, programs)
+├── components/             # React components (857 files)
+├── lib/                    # Business logic and utilities (732 modules)
+├── supabase/migrations/    # SQL migrations (225 files)
+├── netlify/functions/      # Serverless functions (7)
+├── public/                 # Static assets
+├── docs/                   # Platform documentation
+└── data/                   # Static data (team, programs)
 ```
 
 ---
 
-## Common Commands
+## Ecosystem
 
-```bash
-# Development
-pnpm dev                  # Start dev server (Turbopack)
-pnpm build                # Production build
-pnpm start                # Start production server
-pnpm lint                 # Run ESLint
-pnpm typecheck            # TypeScript checking
-
-# Database
-pnpm db:migrate           # Run migrations
-pnpm db:seed              # Seed database
-pnpm db:check             # Check database status
-
-# Testing
-pnpm test                 # Run tests
-pnpm test:e2e             # End-to-end tests
-pnpm test:smoke           # Smoke tests
-
-# Quality
-pnpm verify               # Pre-deployment checks
-pnpm health               # Health check
-pnpm doctor               # Diagnose issues
-pnpm readiness            # Readiness report
-```
+| Entity | Type | Role |
+|--------|------|------|
+| **2Exclusive LLC-S** | Legal entity / RAPIDS sponsor | Parent entity, apprenticeship sponsor |
+| **Elevate for Humanity Career & Training Institute** | DBA / training provider | Instruction, RTI delivery, LMS, workforce programs |
+| **Selfish Inc.** | 501(c)(3) nonprofit | Mental wellness and community support |
+| **The Rise Foundation** | DBA of Selfish Inc. | VITA site — free tax preparation |
+| **Supersonic Fast Cash LLC** | Employer | Tax preparation services |
 
 ---
 
-## Security
+## Revenue Model
 
-- Supabase Auth with JWT tokens
-- Row Level Security (RLS) policies on all tables
-- HTTPS enforced via Netlify
-- CSRF protection (Next.js built-in)
-- Input validation (Zod schemas)
-- Parameterized queries (SQL injection prevention)
-- API rate limiting
-- Audit logging on critical actions
-- PCI DSS compliance via Stripe
-- FERPA-aligned student data protection
-- WIOA compliance reporting
+| Stream | Details |
+|--------|---------|
+| Government funding | WIOA, WRG, JRI, EmployIndy contracts |
+| Program holder revenue share | Partners receive 33.33% of net program revenue per student |
+| Self-pay / Stripe | Direct enrollment payments |
+| Platform licensing | Managed Enterprise LMS — $1,500–$3,500/month |
+
+**Funding disclosure:** Training may be fully funded for eligible participants through WIOA, JRI, and approved funding partners. Eligibility is determined through WorkOne career centers and applicable agency guidelines.
 
 ---
 
-## Deployment
+## Documentation
 
-Push to `main` triggers automatic Netlify deployment. Environment variables are configured in the Netlify dashboard. Database migrations are managed through Supabase.
-
----
-
-## Institutional Pages
-
-| Page | URL | Purpose |
-|------|-----|---------|
-| Institutional Governance | /institutional-governance | Legal structure, org chart, RTI table, governance framework |
-| Verification & Approvals | /verification-approvals | RAPIDS, EIN, RTI providers, registered occupations, state alignment |
-| Compliance & Security | /compliance | Security posture and compliance documentation |
-| Privacy Policy | /privacy-policy | 14-section policy with FERPA, WIOA, cookies |
-
----
-
-## Licensing
-
-Elevate for Humanity provides licensed access to enterprise platforms it operates. Ownership of software, infrastructure, and intellectual property is not transferred.
-
-| License Type | Details |
-|-------------|---------|
-| **Managed Platform Access** | Subscription-based, fully operated, no source code access |
-| **Enterprise Source-Use** | Restricted source-use, enterprise-only, approval required, starts at $75,000 |
-
-**Managed Enterprise LMS Pricing:**
-- Setup: $7,500–$15,000 (one-time)
-- Subscription: $1,500–$3,500/month
-- Non-payment: automatic suspension
+| Document | Purpose |
+|----------|---------|
+| [docs/architecture-overview.md](docs/architecture-overview.md) | System map — all stakeholder layers and data flows |
+| [docs/access-model.md](docs/access-model.md) | Managed access, enterprise source-use, public boundaries |
+| [docs/compliance-overview.md](docs/compliance-overview.md) | DOL, WIOA, FERPA, audit, RLS posture |
+| [docs/repository-scope.md](docs/repository-scope.md) | What is and is not in this repository |
+| [docs/SECURITY.md](docs/SECURITY.md) | Vulnerability reporting |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+| [SUPPORT.md](SUPPORT.md) | Support channels |
 
 ---
 
 ## Support
 
-- **Issues:** https://github.com/elevateforhumanity/Elevate-lms/issues
-- **Email:** info@elevateforhumanity.org
-- **Website:** https://www.elevateforhumanity.org/support
-- **Phone:** (317) 314-3757
+| Channel | Contact |
+|---------|---------|
+| **General** | info@elevateforhumanity.org |
+| **Phone** | (317) 314-3757 |
+| **Website** | [elevateforhumanity.org/support](https://www.elevateforhumanity.org/support) |
+| **Issues** | [GitHub Issues](https://github.com/elevateforhumanity/Elevate-lms/issues) |
 
 ---
 

@@ -1,16 +1,79 @@
-name: Bug report
-description: Create a report to help us improve
-labels: [bug]
+name: Bug Report
+description: Report a defect in the platform.
+title: "[Bug] "
+labels: ["bug"]
 body:
-  - type: textarea
-    id: describe
+  - type: markdown
     attributes:
-      label: Describe the bug
-      description: Clear steps to reproduce; paste stack traces.
+      value: |
+        For security vulnerabilities, do not file a public issue. See [SECURITY.md](../docs/SECURITY.md).
+        For compliance or data concerns, use the Compliance / Data Concern template.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Platform Area
+      options:
+        - LMS / Course Delivery
+        - Enrollment / Funding Workflows
+        - Admin Panel
+        - Student Portal
+        - Employer / Partner Portal
+        - Authentication / Access Control
+        - Payments / Stripe
+        - API
+        - Public Pages
+        - Other
     validations:
       required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened
+      description: Describe the bug clearly. What did you expect vs. what actually occurred?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps that reliably reproduce the issue.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See error
+    validations:
+      required: true
+
   - type: input
     id: url
     attributes:
-      label: Affected URL (if any)
-      placeholder: https://elevateforhumanity.pages.dev/path
+      label: Affected URL
+      placeholder: https://www.elevateforhumanity.org/path
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Critical — data loss or security issue
+        - High — feature broken, no workaround
+        - Medium — feature degraded, workaround exists
+        - Low — cosmetic or minor
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, device type, and any relevant context.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output or logs
+      description: Paste any console errors, stack traces, or network responses.
+      render: shell

@@ -22,8 +22,12 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 
 async function _POST(req: Request) {
   try {
-    const rateLimited = await applyRateLimit(req, 'api');
+    const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
+
+    const { apiRequireAdmin } = await import('@/lib/authGuards');
+    const auth = await apiRequireAdmin();
+    if (auth.error) return auth.error;
 
     const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;

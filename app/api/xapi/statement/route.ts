@@ -21,6 +21,10 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const { apiAuthGuard } = await import('@/lib/authGuards');
+    const auth = await apiAuthGuard();
+    if (auth.error) return auth.error;
+
   const supabase = createSupabaseClient();
   try {
     const body = await parseBody<Record<string, any>>(request);
@@ -32,7 +36,8 @@ async function _POST(request: NextRequest) {
       const verbId = st?.verb?.id || null;
       const objectId = st?.object?.id || null;
       const objectType = st?.object?.objectType || 'Activity';
-      const learnerId = st?.actor?.account?.name || st?.actor?.mbox || null;
+      // Use authenticated user id — never trust actor from request body
+      const learnerId = auth.user.id;
 
       return {
         tenant_id: null, // Note: Extract from auth or statement context

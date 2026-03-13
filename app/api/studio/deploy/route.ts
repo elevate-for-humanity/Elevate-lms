@@ -10,10 +10,14 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Deploy to Netlify
 async function _POST(req: NextRequest) {
-    const rateLimited = await applyRateLimit(req, 'api');
+    const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
-  const userId = req.headers.get('x-user-id');
+    const { apiRequireAdmin } = await import('@/lib/authGuards');
+    const auth = await apiRequireAdmin();
+    if (auth.error) return auth.error;
+
+  const userId = auth.user.id;
 
   try {
     const { provider, repo, branch, project_id, token } = await req.json();

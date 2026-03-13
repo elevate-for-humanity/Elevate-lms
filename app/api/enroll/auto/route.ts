@@ -1,8 +1,5 @@
 /**
- * @deprecated Use canonical enrollment routes:
- *   - /api/enroll (student enrollment)
- *   - /api/enrollment/submit (comprehensive wizard)
- *   - /api/enrollments/create-enforced (admin/partner)
+ * @deprecated Disabled. Use /api/enrollments/create-enforced.
  */
 
 export const runtime = 'nodejs';
@@ -30,6 +27,10 @@ interface AutoEnrollRequest {
 }
 
 async function _POST(req: Request) {
+  return NextResponse.json(
+    { error: 'This endpoint is deprecated. Use /api/enrollments/create-enforced.' },
+    { status: 410 }
+  );
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;

@@ -17,6 +17,12 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
  */
 async function _GET(req: Request) {
   try {
+    const cronSecret = process.env.CRON_SECRET;
+    const authHeader = (req as Request & { headers: Headers }).headers.get('authorization');
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 

@@ -14,8 +14,12 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(req: Request) {
   try {
-    const rateLimited = await applyRateLimit(req, 'api');
+    const rateLimited = await applyRateLimit(req, 'payment');
     if (rateLimited) return rateLimited;
+
+    const { apiRequireAdmin } = await import('@/lib/authGuards');
+    const auth = await apiRequireAdmin();
+    if (auth.error) return auth.error;
 
     const {
       studentId,

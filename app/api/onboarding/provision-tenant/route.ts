@@ -26,8 +26,18 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
+
+    // Must be called server-side after a verified Stripe payment — require CRON_SECRET or admin session
+    const cronSecret = process.env.CRON_SECRET;
+    const authHeader = request.headers.get('authorization');
+    const isInternalCall = cronSecret && authHeader === `Bearer ${cronSecret}`;
+    if (!isInternalCall) {
+      const { apiRequireAdmin } = await import('@/lib/authGuards');
+      const auth = await apiRequireAdmin();
+      if (auth.error) return auth.error;
+    }
 
     const body = await parseBody<Record<string, any>>(request);
     const {

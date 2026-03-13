@@ -23,8 +23,12 @@ interface CaptureRequest {
 
 async function _POST(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(request, 'payment');
     if (rateLimited) return rateLimited;
+
+    const { apiRequireAdmin } = await import('@/lib/authGuards');
+    const auth = await apiRequireAdmin();
+    if (auth.error) return auth.error;
 
     // Lazy config re-check
     if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {

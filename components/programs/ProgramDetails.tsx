@@ -8,10 +8,9 @@ import { ProgramAppointmentBanner } from '@/components/programs/ProgramAppointme
 import ProgramHowItWorks from '@/components/program/ProgramHowItWorks';
 import ProgramFAQ from '@/components/program/ProgramFAQ';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export function ProgramDetails({ program }: { program: Program }) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const programPrice = program.price || 0; // Use program price from data
 
@@ -336,9 +335,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               className="absolute inset-0 w-full h-full object-cover"
             >
               <source src="/videos/hero-home.mp4" type="video/mp4" />
-            </video>
-            {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-          </div>
+            </video>          </div>
         </div>
       </section>
     </>

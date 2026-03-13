@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Target, Heart, Users, Briefcase, GraduationCap, HandHeart } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 // Force static generation - prevents 10s+ load times
 
@@ -17,6 +18,13 @@ export const metadata: Metadata = {
 export default function MissionPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/mission-page-1.jpg"
+        posterAlt="About Mission — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

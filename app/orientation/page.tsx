@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import OrientationFormClient from './OrientationFormClient';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 
 export const metadata: Metadata = {
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
 export default async function OrientationPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/orientation-page-1.jpg"
+        posterAlt="Orientation — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Orientation' }]} />
       </div>

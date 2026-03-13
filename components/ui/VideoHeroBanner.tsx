@@ -1,7 +1,6 @@
 'use client';
 
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface VideoHeroBannerProps {
   videoSrc: string;
@@ -9,23 +8,19 @@ interface VideoHeroBannerProps {
   posterAlt?: string;
 }
 
-export default function VideoHeroBanner({ videoSrc, posterSrc }: VideoHeroBannerProps) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+export default function VideoHeroBanner({ videoSrc, posterSrc, posterAlt }: VideoHeroBannerProps) {
+  const { videoRef } = useHeroVideo();
 
   return (
-    <section className="relative w-full aspect-[16/5] overflow-hidden bg-black">
+    <div className="absolute inset-0 w-full h-full">
       <video
         ref={videoRef}
         src={videoSrc}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
+        autoPlay loop muted playsInline preload="metadata"
         poster={posterSrc}
+        aria-label={posterAlt}
         className="absolute inset-0 w-full h-full object-cover"
       />
-      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-    </section>
+    </div>
   );
 }

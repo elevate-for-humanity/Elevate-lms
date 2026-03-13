@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, MapPin, Clock, ArrowRight, Building2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Networking Events | Career Services | Elevate For Humanity',
@@ -20,6 +21,14 @@ export default async function NetworkingEventsPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/career-services-page-3.jpg"
+        posterAlt="Career Services Networking Events — Elevate for Humanity"
+        audioSrc="/audio/heroes/career-services.mp3"
+        size="marketing"
+      />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>

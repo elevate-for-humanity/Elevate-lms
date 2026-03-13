@@ -8,7 +8,6 @@ import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
 import { Clock, ArrowRight } from 'lucide-react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface Program {
   title: string;
@@ -84,7 +83,7 @@ export default function ProgramCategoryPage({
   avatarVideoSrc,
   avatarName,
 }: ProgramCategoryPageProps) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
   const [showContent, setShowContent] = useState(false);
   const colors = colorClasses[accentColor];
 
@@ -109,8 +108,6 @@ export default function ProgramCategoryPage({
         >
           <source src={heroVideoSrc} type="video/mp4" />
         </video>
-        {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className={`max-w-2xl transition-all duration-700 ease-out ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <span className={`inline-block ${colors.badge} text-white text-sm font-semibold px-4 py-1 rounded-full mb-4`}>

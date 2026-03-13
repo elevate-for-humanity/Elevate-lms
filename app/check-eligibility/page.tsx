@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { XCircle, AlertCircle, ArrowRight, Phone, MapPin } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Check Eligibility (Before WorkOne) | Elevate for Humanity',
@@ -21,6 +22,13 @@ export const metadata: Metadata = {
 export default function CheckEligibilityPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/funding-hero.jpg"
+        posterAlt="Check Eligibility — Elevate for Humanity"
+        size="marketing"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Check Eligibility" }]} />
       </div>

@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { AuthorityStrip } from '@/components/InstitutionalAuthority';
 import { GraduationCap, Clock, Award, DollarSign, CheckCircle2, ArrowRight, Users, FileText } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Enrollment | Elevate for Humanity',
@@ -41,6 +42,13 @@ export default async function EnrollmentPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/enrollment-page-1.jpg"
+        posterAlt="Enrollment — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <Image src="/images/pages/enrollment-page-1.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />

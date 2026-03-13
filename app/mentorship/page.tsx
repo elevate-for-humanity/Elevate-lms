@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Users, MessageSquare, Calendar, Star, ArrowRight,
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Phone
 } from 'lucide-react';
 
@@ -27,6 +28,14 @@ export default function MentorshipPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/mentorship-page-1.jpg"
+        posterAlt="Mentorship — Elevate for Humanity"
+        audioSrc="/audio/heroes/career-services.mp3"
+        size="marketing"
+      />
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Mentorship Program' }]} />

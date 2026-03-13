@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'ACT WorkKeys / NCRC | Elevate for Humanity — Indianapolis',
@@ -25,6 +26,14 @@ const SUBJECTS = [
 export default function WorkKeysPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/it-technology.mp4"
+        posterSrc="/images/pages/adult-learner.jpg"
+        posterAlt="Workkeys — Elevate for Humanity"
+        audioSrc="/audio/heroes/technology.mp3"
+        size="marketing"
+      />
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">

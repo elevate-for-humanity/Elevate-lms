@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Blog | Elevate For Humanity',
@@ -48,6 +49,13 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      <PageVideoHero
+        videoSrc="/videos/homepage-hero-montage.mp4"
+        posterSrc="/images/pages/career-services-page-1.jpg"
+        posterAlt="Blog — Elevate for Humanity"
+        size="support"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Blog' }]} />

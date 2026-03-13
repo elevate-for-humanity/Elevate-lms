@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import { 
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Globe, ArrowRight, Loader2, Code, 
   Plug, Copy, Check, ExternalLink, Zap, Shield,
   BookOpen, CreditCard, Users, BarChart3
@@ -90,6 +91,13 @@ export default function ConnectPage() {
 
   return (
     <div className="min-h-screen bg-slate-800">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/contact-hero.jpg"
+        posterAlt="Connect — Elevate for Humanity"
+        size="support"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Connect" }]} />
       </div>

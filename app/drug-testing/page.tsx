@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users, Award } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Drug Testing Services | Elevate for Humanity',
@@ -99,6 +100,14 @@ export default async function DrugTestingLandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/healthcare-cna.mp4"
+        posterSrc="/images/pages/drug-testing-main-1.jpg"
+        posterAlt="Drug Testing — Elevate for Humanity"
+        audioSrc="/audio/heroes/healthcare.mp3"
+        size="marketing"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Drug Testing" }]} />
       </div>

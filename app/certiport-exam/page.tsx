@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Award, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 type FundingStatus = 'funded' | 'self_pay' | 'loading';
 type CourseStatus = 'complete' | 'incomplete' | 'loading';
@@ -125,6 +126,14 @@ function CertiportExamContent() {
   if (existingRequest?.status === 'voucher_assigned' && existingRequest.voucherCode) {
     return (
       <div className="min-h-screen bg-slate-50 py-12 px-4">
+
+      <PageVideoHero
+        videoSrc="/videos/it-technology.mp4"
+        posterSrc="/images/pages/cybersecurity.jpg"
+        posterAlt="Certiport Exam — Elevate for Humanity"
+        audioSrc="/audio/heroes/technology.mp3"
+        size="marketing"
+      />
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">

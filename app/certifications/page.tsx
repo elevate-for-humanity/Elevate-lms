@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Award, ArrowRight, Shield, Clock, Users, Circle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Industry Certifications | Elevate for Humanity',
@@ -22,6 +23,13 @@ export default function CertificationsPage() {
 
   return (
     <div className="bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/programs-overview-video-with-narration.mp4"
+        posterSrc="/images/pages/certifications-page-1.jpg"
+        posterAlt="Certifications — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Certifications' }]} />

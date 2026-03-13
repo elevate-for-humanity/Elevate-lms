@@ -5,6 +5,7 @@ import { DollarSign, FileText, Phone, ArrowRight, Shield, Clock, Users, Calculat
 import { FinancialAidCalculator } from '@/components/FinancialAidCalculator';
 import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Financial Aid & Funding | Elevate For Humanity',
@@ -62,6 +63,13 @@ const steps = [
 export default function FinancialAidPage() {
   return (
     <div className="min-h-screen bg-white prose-institutional">
+
+      <PageVideoHero
+        videoSrc="/videos/business-finance.mp4"
+        posterSrc="/images/pages/financial-aid-page-1.jpg"
+        posterAlt="Financial Aid — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake } from 'lucide-react';
 import { CareerHero } from '../components/CareerHero';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Job Placement Services | Elevate for Humanity',
@@ -19,6 +20,14 @@ export default function JobPlacementPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/job-placement.jpg"
+        posterAlt="Career Services Job Placement — Elevate for Humanity"
+        audioSrc="/audio/heroes/career-services.mp3"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

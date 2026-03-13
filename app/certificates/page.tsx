@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Award,
   Shield,
   Search,
@@ -23,6 +24,13 @@ export const metadata: Metadata = {
 export default function CertificatesPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/programs-overview-video-with-narration.mp4"
+        posterSrc="/images/pages/certificates-page-1.jpg"
+        posterAlt="Certificates — Elevate for Humanity"
+        size="marketing"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Certificates" }]} />
       </div>

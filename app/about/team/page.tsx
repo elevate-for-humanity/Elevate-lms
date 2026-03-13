@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: {
@@ -111,6 +112,13 @@ export default async function TeamPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/about-team-hero.jpg"
+        posterAlt="About Team — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

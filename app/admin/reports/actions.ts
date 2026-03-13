@@ -178,21 +178,46 @@ export async function generateUserActivityReport(dateRange: string = '30') {
   };
 }
 
-export async function exportReportAsCSV(reportType: string, data: Record<string, unknown>) {
-  // Convert report data to CSV format
-  let csv = '';
-  
-  if (reportType === 'enrollment' && data.recentEnrollments) {
-    csv = 'Date,Course,Status\n';
-    (data.recentEnrollments as Array<{ created_at: string; courses: { title: string }; status: string }>).forEach(e => {
-      csv += `${new Date(e.created_at).toLocaleDateString()},${e.courses?.title || 'N/A'},${e.status}\n`;
-    });
-  } else if (reportType === 'leads' && data.recentLeads) {
-    csv = 'Date,Name,Email,Source,Status\n';
-    (data.recentLeads as Array<{ created_at: string; first_name: string; last_name: string; email: string; source: string; status: string }>).forEach(l => {
-      csv += `${new Date(l.created_at).toLocaleDateString()},${l.first_name} ${l.last_name},${l.email},${l.source},${l.status}\n`;
-    });
-  }
+export async function exportEnrollmentCSV(): Promise<string> {
+  const supabase = await createClient();
+  const db = createAdminClient() || supabase;
+
+  const { data: enrollments } = await db
+    .from('training_enrollments')
+    .select('*, course:training_courses(course_name), student:profiles(full_name, email)')
+    .order('enrolled_at', { ascending: false })
+    .limit(500);
+
+  let csv = 'Date,Student,Email,Course,Status,Progress\n';
+  (enrollments || []).forEach((e: Record<string, unknown>) => {
+    const student = e.student as { full_name: string | null; email: string } | null;
+    const course = e.course as { course_name: string } | null;
+    const date = new Date(e.enrolled_at as string).toLocaleDateString();
+    const name = (student?.full_name || 'Unknown').replace(/,/g, ' ');
+    const email = (student?.email || '').replace(/,/g, ' ');
+    const courseName = (course?.course_name || 'N/A').replace(/,/g, ' ');
+    csv += `${date},${name},${email},${courseName},${e.status},${e.progress}%\n`;
+  });
+
+  return csv;
+}
+
+export async function exportLeadsCSV(): Promise<string> {
+  const supabase = await createClient();
+  const db = createAdminClient() || supabase;
+
+  const { data: leads } = await db
+    .from('leads')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  let csv = 'Date,Name,Email,Phone,Source,Status\n';
+  (leads || []).forEach((l: Record<string, unknown>) => {
+    const date = new Date(l.created_at as string).toLocaleDateString();
+    const name = ((l.full_name || `${l.first_name || ''} ${l.last_name || ''}`) as string).trim().replace(/,/g, ' ');
+    csv += `${date},${name},${l.email || ''},${l.phone || ''},${l.source || ''},${l.status || ''}\n`;
+  });
 
   return csv;
 }

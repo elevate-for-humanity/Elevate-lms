@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ArrowLeft, GraduationCap, TrendingUp, Circle, Clock } from 'lucide-react';
+import ExportButton from './ExportButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,16 +24,16 @@ export default async function EnrollmentReportPage() {
     { data: courses },
   ] = await Promise.all([
     db
-      .from('program_enrollments')
-      .select('*, courses(title), profiles(first_name, last_name, email)')
-      .order('created_at', { ascending: false })
+      .from('training_enrollments')
+      .select('*, course:training_courses(course_name), student:profiles(full_name, email)')
+      .order('enrolled_at', { ascending: false })
       .limit(50),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    db.from('training_enrollments').select('*', { count: 'exact', head: true }),
     db.from('training_courses').select('id, course_name'),
   ]);
 
   const recentEnrollments = enrollments?.filter(e => 
-    new Date(e.created_at) > new Date(thirtyDaysAgo)
+    new Date(e.enrolled_at) > new Date(thirtyDaysAgo)
   ) || [];
 
   // Calculate stats
@@ -43,8 +44,8 @@ export default async function EnrollmentReportPage() {
   // Enrollment by course
   const enrollmentByCourse: Record<string, number> = {};
   enrollments?.forEach(e => {
-    const title = (e.courses as { title: string })?.title || 'Unknown';
-    enrollmentByCourse[title] = (enrollmentByCourse[title] || 0) + 1;
+    const name = (e.course as { course_name: string } | null)?.course_name || 'Unknown';
+    enrollmentByCourse[name] = (enrollmentByCourse[name] || 0) + 1;
   });
 
   const statusColors: Record<string, string> = {
@@ -67,8 +68,13 @@ export default async function EnrollmentReportPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Reports
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Enrollment Report</h1>
-          <p className="text-gray-600">Student enrollment trends and program performance</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Enrollment Report</h1>
+              <p className="text-gray-600">Student enrollment trends and program performance</p>
+            </div>
+            <ExportButton />
+          </div>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -132,15 +138,14 @@ export default async function EnrollmentReportPage() {
                       <tr key={enrollment.id} className="border-b last:border-0">
                         <td className="py-3 px-2">
                           <p className="font-medium text-gray-900">
-                            {(enrollment.profiles as { first_name: string; last_name: string })?.first_name || 'Unknown'}{' '}
-                            {(enrollment.profiles as { first_name: string; last_name: string })?.last_name || ''}
+                            {(enrollment.student as { full_name: string | null } | null)?.full_name || 'Unknown'}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {(enrollment.profiles as { email: string })?.email || ''}
+                            {(enrollment.student as { email: string } | null)?.email || ''}
                           </p>
                         </td>
                         <td className="py-3 px-2 text-gray-600">
-                          {(enrollment.courses as { title: string })?.title || 'N/A'}
+                          {(enrollment.course as { course_name: string } | null)?.course_name || 'N/A'}
                         </td>
                         <td className="py-3 px-2">
                           <span className={`px-2 py-1 text-xs rounded-full ${statusColors[enrollment.status] || 'bg-gray-100'}`}>
@@ -148,7 +153,7 @@ export default async function EnrollmentReportPage() {
                           </span>
                         </td>
                         <td className="py-3 px-2 text-sm text-gray-600">
-                          {new Date(enrollment.created_at).toLocaleDateString()}
+                          {new Date(enrollment.enrolled_at).toLocaleDateString()}
                         </td>
                       </tr>
                     ))}

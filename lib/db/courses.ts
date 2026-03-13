@@ -34,8 +34,8 @@ export async function createCourse(input: CourseCreate) {
   const { data, error } = await supabase
     .from('training_courses')
     .insert({
-      course_name: input.title,   // DB column is course_name, not title
-      title: input.title,         // also populate title for compatibility
+      course_name: input.title,
+      title: input.title,
       description: input.description || null,
       program_id: input.program_id || null,
       duration_hours: input.duration_hours || null,
@@ -75,17 +75,12 @@ export async function getCourse(id: string) {
 
 export async function updateCourse(id: string, patch: CourseUpdate) {
   const supabase = await getSupabase();
-  const update: Record<string, unknown> = { ...patch, updated_at: new Date().toISOString() };
+  const updateData: Record<string, unknown> = { ...patch, updated_at: new Date().toISOString() };
   // Keep course_name in sync with title
-  if (patch.title) update.course_name = patch.title;
-  // Keep is_active and status in sync with is_published
-  if (typeof patch.is_published === 'boolean') {
-    update.is_active = patch.is_published;
-    update.status = patch.is_published ? 'published' : 'draft';
-  }
+  if (patch.title) updateData.course_name = patch.title;
   const { data, error } = await supabase
     .from('training_courses')
-    .update(update)
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();
@@ -303,7 +298,7 @@ export async function createEnrollment(input: EnrollmentCreate) {
       at_risk: input.at_risk ?? false,
       enrolled_at: new Date().toISOString(),
     })
-    .select('*')
+    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
     .single();
   if (error) throw new Error('Database operation failed');
   return data;
@@ -313,7 +308,7 @@ export async function listEnrollments(filters?: { courseId?: string; userId?: st
   const supabase = await getSupabase();
   let query = supabase
     .from('training_enrollments')
-    .select('*')
+    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
     .order('enrolled_at', { ascending: false });
   
   if (filters?.courseId) query = query.eq('course_id', filters.courseId);
@@ -329,7 +324,7 @@ export async function getEnrollment(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from('training_enrollments')
-    .select('*')
+    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
@@ -339,14 +334,14 @@ export async function getEnrollment(id: string) {
 
 export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
   const supabase = await getSupabase();
-  const updateData: any = { ...patch, updated_at: new Date().toISOString() };
+  const updateData: Record<string, unknown> = { ...patch, updated_at: new Date().toISOString() };
   if (patch.status === 'completed') updateData.completed_at = new Date().toISOString();
   
   const { data, error } = await supabase
     .from('training_enrollments')
     .update(updateData)
     .eq('id', id)
-    .select('*')
+    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
     .single();
   if (error?.code === 'PGRST116') return null;
   if (error) throw new Error('Database operation failed');

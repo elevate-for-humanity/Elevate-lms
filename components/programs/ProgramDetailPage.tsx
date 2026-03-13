@@ -41,24 +41,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
 
   // Module accent colors — cycles through brand palette
   const MODULE_COLORS = [
-    { bg: 'bg-brand-red-500',    light: 'bg-brand-red-50',    border: 'border-brand-red-200',    text: 'text-brand-red-700',    num: 'bg-brand-red-500 text-white' },
-    { bg: 'bg-brand-blue-600',   light: 'bg-brand-blue-50',   border: 'border-brand-blue-200',   text: 'text-brand-blue-700',   num: 'bg-brand-blue-600 text-white' },
-    { bg: 'bg-brand-orange-500', light: 'bg-brand-orange-50', border: 'border-brand-orange-200', text: 'text-brand-orange-700', num: 'bg-brand-orange-500 text-white' },
-    { bg: 'bg-brand-green-600',  light: 'bg-brand-green-50',  border: 'border-brand-green-200',  text: 'text-brand-green-700',  num: 'bg-brand-green-600 text-white' },
-  ];
-
-  // Module photo thumbnails — real images cycling per module
-  const MODULE_PHOTOS = [
-    '/images/hp/train.jpg',
-    '/images/hp/school.jpg',
-    '/images/hp/complete-training.jpg',
-    '/images/hp/candidates.jpg',
-    '/images/hp/ojt.jpg',
-    '/images/hp/employer.jpg',
-    '/images/hp/why-elevate.jpg',
-    '/images/hp/choose-program.jpg',
-    '/images/hp/apply-online.jpg',
-    '/images/hp/healthcare.jpg',
+    { light: 'bg-brand-red-50',    border: 'border-brand-red-200',    text: 'text-brand-red-700',    num: 'bg-brand-red-500 text-white' },
+    { light: 'bg-brand-blue-50',   border: 'border-brand-blue-200',   text: 'text-brand-blue-700',   num: 'bg-brand-blue-600 text-white' },
+    { light: 'bg-brand-orange-50', border: 'border-brand-orange-200', text: 'text-brand-orange-700', num: 'bg-brand-orange-500 text-white' },
+    { light: 'bg-brand-green-50',  border: 'border-brand-green-200',  text: 'text-brand-green-700',  num: 'bg-brand-green-600 text-white' },
   ];
 
   return (
@@ -73,12 +59,12 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             size="program"
           />
         ) : (
-          <div className="relative h-[320px] sm:h-[440px] w-full overflow-hidden">
+          <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
             <Image
               src={p.heroImage}
               alt={p.heroImageAlt}
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority
               sizes="100vw"
             />
@@ -181,32 +167,28 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         </div>
       </section>
 
-      {/* ═══ MODULE PHOTO CARDS ══════════════════════════════════════ */}
-
-      {/* ═══ MODULE PHOTO GRID ══════════════════════════════════════ */}
-      <section className="py-10 bg-white">
+      {/* ═══ CURRICULUM ══════════════════════════════════════════════ */}
+      <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-6">What You&apos;ll Learn</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
+          <p className="text-slate-500 text-sm mb-8">Full curriculum broken down by module. Every topic is covered in class and assessed before you advance.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {p.curriculum.map((mod, i) => {
-              const photo = MODULE_PHOTOS[i % MODULE_PHOTOS.length];
               const color = MODULE_COLORS[i % MODULE_COLORS.length];
               return (
-                <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow-md hover:shadow-xl transition-shadow group">
-                  <Image
-                    src={photo}
-                    alt={mod.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  />
-                  {/* Color tint overlay */}
-                  <div className={`absolute inset-0 ${color.bg} opacity-50`} />
-                  {/* Bottom label */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 p-3">
-                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Module {i + 1}</span>
-                    <p className="text-xs font-bold text-white leading-snug mt-0.5">{mod.title}</p>
+                <div key={i} className={`rounded-xl border ${color.border} ${color.light} p-5`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 ${color.num}`}>{i + 1}</span>
+                    <h3 className={`font-bold text-sm ${color.text}`}>{mod.title}</h3>
                   </div>
+                  <ul className="space-y-1.5">
+                    {mod.topics.map((t, j) => (
+                      <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
+                        <span className="mt-0.5 text-slate-400 flex-shrink-0">·</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               );
             })}

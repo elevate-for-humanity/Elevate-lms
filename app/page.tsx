@@ -120,20 +120,26 @@ export default function HomePage() {
               </p>
             </div>
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {PROGRAMS.map((p, i) => (
               <ScrollReveal key={p.name} delay={i * 50}>
-                <Link href={p.href} className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all flex flex-col h-full">
-                  <div className="relative overflow-hidden" style={{ aspectRatio: '3/2' }}>
-                    <Image src={p.image} alt={p.name + ' training'} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute top-2 left-2">
-                      <span className="bg-slate-900/75 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">{p.sector}</span>
-                    </div>
+                <Link href={p.href} className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all flex flex-row h-full">
+                  {/* Image — fixed square, never cropped vertically */}
+                  <div className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32 self-center m-3 rounded-lg overflow-hidden">
+                    <Image
+                      src={p.image}
+                      alt={p.name + ' training'}
+                      fill
+                      sizes="128px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="font-bold text-slate-900 text-sm mb-1">{p.name}</h3>
-                    <p className="text-xs text-slate-500 mb-1">{p.duration}</p>
-                    <p className="text-xs text-brand-green-700 font-semibold mt-auto">{p.salary} starting salary</p>
+                  {/* Text — right side */}
+                  <div className="py-4 pr-4 flex flex-col justify-center flex-1 min-w-0">
+                    <span className="inline-block bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 w-fit">{p.sector}</span>
+                    <h3 className="font-bold text-slate-900 text-sm leading-snug mb-1">{p.name}</h3>
+                    <p className="text-xs text-slate-500 mb-2">{p.duration}</p>
+                    <p className="text-xs text-brand-green-700 font-semibold">{p.salary} starting</p>
                   </div>
                 </Link>
               </ScrollReveal>
@@ -198,10 +204,12 @@ export default function HomePage() {
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden h-full flex flex-col">
                   <div className="relative w-full overflow-hidden" style={{ aspectRatio: '16/9' }}>
                     <Image src={step.image} alt={step.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
-                    <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-xs flex items-center justify-center shadow-md">{step.num}</div>
                   </div>
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-bold text-slate-900 mb-2 text-base">{step.title}</h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-7 h-7 rounded-full bg-brand-red-600 text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0">{step.num}</span>
+                      <h3 className="font-bold text-slate-900 text-base">{step.title}</h3>
+                    </div>
                     <p className="text-slate-500 text-sm leading-relaxed flex-1">{step.desc}</p>
                   </div>
                 </div>

@@ -5,10 +5,10 @@ import { useHeroVideo } from '@/hooks/useHeroVideo';
 export type HeroSize = 'primary' | 'program' | 'marketing' | 'support';
 
 const SIZE: Record<HeroSize, string> = {
-  primary:   'h-[75svh] min-h-[480px] max-h-[860px]',
-  program:   'h-[65svh] min-h-[420px] max-h-[720px]',
-  marketing: 'h-[60svh] min-h-[380px] max-h-[640px]',
-  support:   'h-[50svh] min-h-[300px] max-h-[520px]',
+  primary:   'h-[75vh] min-h-[480px] max-h-[860px]',
+  program:   'h-[65vh] min-h-[420px] max-h-[720px]',
+  marketing: 'h-[60vh] min-h-[380px] max-h-[640px]',
+  support:   'h-[50vh] min-h-[300px] max-h-[520px]',
 };
 
 interface PageVideoHeroProps {

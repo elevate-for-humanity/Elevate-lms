@@ -103,7 +103,8 @@ export const NAV_ITEMS = [
     href: '/rise-foundation',
     subItems: [
       { name: 'Mental Wellness', href: '/rise-foundation/trauma-recovery' },
-      { name: 'CurvatureBody Sculpting', href: '/rise-foundation#curvature' },
+      { name: 'Young Adult Wellness', href: '/rise-foundation/young-adult-wellness' },
+      { name: 'CurvatureBody Sculpting', href: '/rise-foundation/curvature' },
       { name: 'Meri-Go-Round Products', href: '/rise-foundation#products' },
       { name: 'Free VITA Tax Prep', href: '/tax/rise-up-foundation' },
       { name: 'Events', href: '/rise-foundation/events' },

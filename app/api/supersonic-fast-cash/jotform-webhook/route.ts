@@ -43,6 +43,7 @@ function isAllowedIP(ip: string): boolean {
  * Secured by IP allowlist and optional shared secret.
  */
 async function _POST(request: NextRequest) {
+  let submissionId: string | undefined;
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -66,16 +67,75 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = supabaseServer();
+    const adminDb = createAdminClient();
     const body = await request.json();
 
     // Get submission ID from webhook
-    const submissionId = body.submissionID || body.submission_id;
+    submissionId = body.submissionID || body.submission_id;
 
     if (!submissionId) {
       return NextResponse.json(
         { error: 'No submission ID provided' },
         { status: 400 }
       );
+    }
+
+    const eventId = String(submissionId);
+
+    // --- TRACKING: Idempotent event ledger ---
+    if (adminDb) {
+      // Check existing state first
+      const { data: existing } = await adminDb
+        .from('webhook_events_processed')
+        .select('id, status')
+        .eq('provider', 'jotform')
+        .eq('event_id', eventId)
+        .single();
+
+      // Already processed or currently being processed — short-circuit
+      if (existing && (existing.status === 'processed' || existing.status === 'processing')) {
+        return NextResponse.json({ success: true, message: 'Already processed', duplicate: true });
+      }
+
+      // Insert tracking row with status='received'
+      // ON CONFLICT DO NOTHING — retries don't overwrite existing state
+      if (!existing) {
+        const { error: trackErr } = await adminDb.from('webhook_events_processed').insert({
+          event_id: eventId,
+          provider: 'jotform',
+          event_type: 'form_submission',
+          status: 'received',
+          received_at: new Date().toISOString(),
+          metadata: { source_ip: forwardedFor?.split(',')[0]?.trim() || 'unknown' },
+        });
+
+        // Unique constraint violation = concurrent insert, not an error
+        if (trackErr && !trackErr.message?.includes('duplicate key')) {
+          logger.error('Failed to insert webhook tracking row', trackErr);
+        }
+      }
+
+      // Mark validated (IP + payload checks passed)
+      await adminDb.from('webhook_events_processed')
+        .update({ status: 'validated' })
+        .eq('provider', 'jotform')
+        .eq('event_id', eventId)
+        .in('status', ['received']);
+
+      // --- CONCURRENCY LOCK: Acquire processing lock ---
+      // Only the worker that transitions validated→processing runs business logic.
+      // If another worker already claimed it, this returns no rows.
+      const { data: lockRow } = await adminDb.from('webhook_events_processed')
+        .update({ status: 'processing', processed_at: new Date().toISOString() })
+        .eq('provider', 'jotform')
+        .eq('event_id', eventId)
+        .eq('status', 'validated')
+        .select('id');
+
+      if (!lockRow || lockRow.length === 0) {
+        // Another worker owns this event, or it's already past validated
+        return NextResponse.json({ success: true, message: 'Already being processed', duplicate: true });
+      }
     }
 
     // Step 1: Fetch full submission data from JotForm
@@ -289,9 +349,18 @@ async function _POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch { /* non-fatal */ }
+    } catch (notifyErr) {
+      logger.warn('Failed to send tax pro notification email', notifyErr instanceof Error ? notifyErr : undefined);
+    }
 
-    // Return success
+    // Mark webhook event as processed
+    if (adminDb) {
+      await adminDb.from('webhook_events_processed')
+        .update({ status: 'processed', processed_at: new Date().toISOString() })
+        .eq('provider', 'jotform')
+        .eq('event_id', String(submissionId));
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Client intake processed successfully',
@@ -300,6 +369,42 @@ async function _POST(request: NextRequest) {
       supersonicReturnId: supersonicReturn.returnId,
     });
   } catch (error) {
+    logger.error('JotForm webhook processing failed', error instanceof Error ? error : undefined);
+
+    // Mark webhook event as errored.
+    // Try update first (row exists from receipt-time insert).
+    // Fall back to insert if no row exists (failure happened before tracking insert).
+    if (submissionId) {
+      try {
+        const errDb = createAdminClient();
+        if (errDb) {
+          const eventId = String(submissionId);
+          const now = new Date().toISOString();
+
+          const { count } = await errDb
+            .from('webhook_events_processed')
+            .update({ status: 'errored', error_message: 'Processing failed', processed_at: now })
+            .eq('provider', 'jotform')
+            .eq('event_id', eventId)
+            .select('id', { count: 'exact', head: true });
+
+          // If no row was updated, insert a new one (failure before tracking insert)
+          if (!count || count === 0) {
+            await errDb.from('webhook_events_processed').insert({
+              event_id: eventId,
+              provider: 'jotform',
+              event_type: 'form_submission',
+              status: 'errored',
+              error_message: 'Processing failed (pre-tracking)',
+              received_at: now,
+              processed_at: now,
+            });
+          }
+        }
+      } catch (trackErr) {
+        logger.error('Failed to record webhook error state', trackErr instanceof Error ? trackErr : undefined);
+      }
+    }
     return NextResponse.json(
       { error: 'Failed to process submission' },
       { status: 500 }

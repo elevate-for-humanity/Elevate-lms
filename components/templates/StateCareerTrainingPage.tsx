@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 interface StateCareerTrainingPageProps {
   state: StateConfig;
@@ -24,9 +24,12 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
 
       {/* Hero Section */}
       <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/pages/comp-state-career-hero.jpg" alt={`Career Training in ${state.name}`} fill className="object-cover" priority sizes="100vw" />
-        </div>
+        <PageVideoHero
+          videoSrc="/videos/training-providers-hero.mp4"
+          posterSrc="/images/pages/comp-state-career-hero.jpg"
+          posterAlt={`Career Training in ${state.name}`}
+          size="marketing"
+        />
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <div className="flex items-center gap-2 text-brand-green-300 mb-4 justify-center">

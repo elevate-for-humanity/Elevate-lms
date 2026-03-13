@@ -284,7 +284,7 @@ export default function EqualOpportunityPage() {
               <Phone className="w-5 h-5" /> Visit Support Center
             </a>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-green-600 transition"
             >
               Apply for Training <ArrowRight className="w-5 h-5" />

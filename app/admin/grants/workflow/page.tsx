@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -83,9 +83,6 @@ export default async function GrantWorkflowPage() {
     <div>
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-grants-workflow-hero.jpg" alt="Grant workflow" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image

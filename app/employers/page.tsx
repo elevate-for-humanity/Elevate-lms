@@ -16,6 +16,7 @@ import EmployerPartners from '@/components/EmployerPartners';
 import OJTSection from '@/components/employers/OJTSection';
 import WOTCSection from '@/components/employers/WOTCSection';
 import GrantsSection from '@/components/employers/GrantsSection';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'For Employers — OJT Funding, Tax Credits & Trained Talent | Elevate for Humanity',
@@ -37,6 +38,13 @@ export const metadata: Metadata = {
 export default function EmployersPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/employer-hero.mp4"
+        posterSrc="/images/pages/employers-page-1.jpg"
+        posterAlt="Employers — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

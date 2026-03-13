@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { GraduationCap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Instructor Portal | Elevate For Humanity',
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
 export default function InstructorPortalLanding() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/lms-learning.mp4"
+        posterSrc="/images/pages/instructor-hero.jpg"
+        posterAlt="Instructor — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

@@ -107,7 +107,7 @@ export default async function JoinCommunityPage() {
             Start your journey with Elevate for Humanity today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply" className="bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
+            <Link href="/start" className="bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
               Apply Now
             </Link>
             <Link href="/programs" className="border border-slate-300 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 transition">

@@ -13,6 +13,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Resume Building - Create a Winning Resume | Elevate for Humanity',
@@ -61,6 +62,14 @@ export default function ResumeBuildingPage() {
 
   return (
     <div className="bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/career-services-page-2.jpg"
+        posterAlt="Career Services Resume Building — Elevate for Humanity"
+        audioSrc="/audio/heroes/career-services.mp3"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -274,7 +283,7 @@ export default function ResumeBuildingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Get Started <ArrowRight className="ml-2 w-5 h-5" />

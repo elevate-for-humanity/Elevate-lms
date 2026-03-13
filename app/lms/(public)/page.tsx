@@ -53,7 +53,7 @@ export default async function LmsPublicPage() {
               Student Login
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-zinc-50 text-center"
             >
               Apply Now
@@ -110,7 +110,7 @@ export default async function LmsPublicPage() {
 
           <div className="mt-7 flex flex-col sm:flex-row gap-3">
             <Link
-              href="/apply"
+              href="/start"
               className="rounded-xl bg-brand-blue-600 text-white px-5 py-3 font-bold hover:bg-brand-blue-700 text-center"
             >
               Apply Now

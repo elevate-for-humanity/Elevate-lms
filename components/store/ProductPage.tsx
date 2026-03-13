@@ -199,7 +199,7 @@ export function ProductPage({ product }: ProductPageProps) {
                 </div>
               ) : (
                 <Image
-                  src={product.images[selectedImage]?.src || '/images/pages/comp-cta-training.jpg'}
+                  src={product.images[selectedImage]?.src || '/images/pages/training-classroom.jpg'}
                   alt={product.images[selectedImage]?.alt || product.name}
                   fill
                   className="object-cover"

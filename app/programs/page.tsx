@@ -19,10 +19,6 @@ export const metadata: Metadata = {
 export default function ProgramCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        <Image src="/images/pages/training-cohort.jpg" alt="Students in a workforce training classroom" fill className="object-cover" priority sizes="100vw" />
-      </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
@@ -94,7 +90,7 @@ export default function ProgramCatalogPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
             <Link
-              href="/apply"
+              href="/start"
               className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors"
             >
               Apply Now

@@ -7,7 +7,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Diesel Technology',
 
-  heroImage: '/images/pages/admin-fleet-hero.jpg',
+  heroImage: '/images/pages/diesel-mechanic.jpg',
   heroImageAlt: 'Diesel mechanic student working on an engine',
 
   deliveryMode: 'hybrid',

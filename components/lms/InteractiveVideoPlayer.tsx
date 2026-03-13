@@ -352,7 +352,7 @@ export default function InteractiveVideoPlayer({
             </div>
           </div>
         ) : isAudioOnly ? (
-          <div className="w-full aspect-video flex flex-col items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900">
+          <div className="w-full aspect-video flex flex-col items-center justify-center bg-slate-900">
             <div className="w-24 h-24 rounded-full bg-brand-blue-600 flex items-center justify-center mb-4">
               <Volume2 className="w-12 h-12 text-white" />
             </div>

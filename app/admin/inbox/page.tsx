@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -110,9 +109,6 @@ export default async function AdminInboxPage() {
     <div className="mx-auto max-w-6xl px-4 py-12">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-inbox-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <h1 className="text-3xl font-bold text-zinc-900">Admin Inbox</h1>
       <p className="mt-2 text-zinc-700">One place to review everything.</p>
 

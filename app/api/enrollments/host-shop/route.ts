@@ -8,6 +8,14 @@ async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+    // Auth: require authenticated user
+    const { createClient: createAuthClient } = await import('@/lib/supabase/server');
+    const authSupabase = await createAuthClient();
+    const { data: { session: authSession } } = await authSupabase.auth.getSession();
+    if (!authSession) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
 
     const body = await request.json();
     const { intake, agreement } = body;

@@ -436,13 +436,13 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
   const getHeroImage = () => {
     const cat = normalizeSection(section);
     switch (cat) {
-      case "programs": return "/images/pages/comp-cta-training.jpg";
-      case "funding": return "/images/pages/comp-home-hero-programs.jpg";
-      case "students": return "/images/pages/comp-cta-training.jpg";
-      case "lms": return "/images/pages/comp-cta-training.jpg";
-      case "employers": return "/images/pages/comp-home-hero-programs.jpg";
-      case "community": return "/images/pages/features-hero.jpg";
-      case "admin-staff": return "/images/pages/comp-cta-training.jpg";
+      case "programs": return "/images/pages/training-classroom.jpg";
+      case "funding": return "/images/pages/how-it-works-hero.jpg";
+      case "students": return "/images/pages/healthcare-classroom.jpg";
+      case "lms": return "/images/pages/training-cohort.jpg";
+      case "employers": return "/images/pages/for-employers-page-1.jpg";
+      case "community": return "/images/pages/workforce-training.jpg";
+      case "admin-staff": return "/images/pages/about-hero.jpg";
       default: return "/images/pages/features-hero.jpg";
     }
   };

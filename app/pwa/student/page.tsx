@@ -199,7 +199,7 @@ export default async function StudentPWAPage() {
             Complete Onboarding →
           </Link>
         ) : (
-          <Link href="/apply" className="block w-full bg-brand-red-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-red-700 transition-colors">
+          <Link href="/start" className="block w-full bg-brand-red-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-red-700 transition-colors">
             Apply to a Program
           </Link>
         )}

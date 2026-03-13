@@ -93,7 +93,7 @@ export default function PartnersPage() {
                 step: 6,
                 title: 'Placement and outcome reporting',
                 time: 'Ongoing after program completion',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/career-counseling.jpg',
                 desc: 'Our career services team helps participants with resume building, interview preparation, and direct employer introductions. We track employment outcomes at 6 months and 12 months. You receive a final cohort report with credential attainment rates, employment rates, employer names, job titles, and wage data.',
               },
             ].map((s) => (
@@ -177,7 +177,7 @@ export default function PartnersPage() {
               {
                 type: 'Workforce Boards & Government Agencies',
                 examples: 'WorkOne centers, Indiana DWD, regional workforce boards, county agencies',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/career-counseling.jpg',
                 what: [
                   'WIOA-eligible training programs listed on the Eligible Training Provider List (ETPL)',
                   'Cohort-based training with published start dates, durations, and credential outcomes',
@@ -189,7 +189,7 @@ export default function PartnersPage() {
               {
                 type: 'Community Organizations',
                 examples: 'Goodwill, community centers, reentry programs, faith-based organizations',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/career-counseling.jpg',
                 what: [
                   'Custom cohorts designed for your participant population and their specific needs',
                   'Flexible scheduling — day, evening, and weekend options where available',
@@ -202,7 +202,7 @@ export default function PartnersPage() {
               {
                 type: 'Employers',
                 examples: 'HVAC contractors, healthcare facilities, trucking companies, barbershops, IT firms',
-                image: '/images/pages/comp-cta-career.jpg',
+                image: '/images/pages/career-counseling.jpg',
                 what: [
                   'Apprenticeship host site opportunities — we handle DOL registration, RAPIDS paperwork, and compliance',
                   'Custom training cohorts aligned to your specific hiring needs and job requirements',
@@ -215,7 +215,7 @@ export default function PartnersPage() {
               {
                 type: 'Educational Institutions',
                 examples: 'Community colleges, career centers, high schools, adult education programs',
-                image: '/images/pages/comp-cta-training.jpg',
+                image: '/images/pages/training-classroom.jpg',
                 what: [
                   'Articulation and credit transfer discussions for students moving between programs',
                   'Dual enrollment or bridge program partnerships',

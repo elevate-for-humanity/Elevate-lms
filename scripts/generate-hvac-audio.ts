@@ -3,12 +3,12 @@
  *
  * Run:  npx tsx scripts/generate-hvac-audio.ts
  *
- * - Skips lessons that already have audio in public/generated/lessons/
+ * - Skips lessons that already have audio in public/hvac/audio/
  * - Processes 5 lessons concurrently to stay within OpenAI rate limits
  * - Falls back from gpt-4o-mini-tts to tts-1-hd automatically
  * - Exits 0 on success, 1 if OpenAI is not configured
  *
- * Output: public/generated/lessons/lesson-{uuid}.mp3
+ * Output: public/hvac/audio/lesson-{uuid}.mp3
  *
  * Once generated, files are served as static assets — no API key needed
  * at runtime. HvacLessonVideo checks for the file with a HEAD request
@@ -29,7 +29,7 @@ import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 import { HVAC_LESSON_CONTENT } from '../lib/courses/hvac-lesson-content';
 import { isOpenAIConfigured, getOpenAIClient } from '../lib/openai-client';
 
-const OUTPUT_DIR = path.join(process.cwd(), 'public', 'generated', 'lessons');
+const OUTPUT_DIR = path.join(process.cwd(), 'public', 'hvac', 'audio');
 const CONCURRENCY = 5;
 
 // Marcus personality instruction — same voice across all lessons
@@ -120,27 +120,14 @@ async function generateOne(defId: string, uuid: string): Promise<'skipped' | 'ge
   const openai = getOpenAIClient();
 
   try {
-    // Try gpt-4o-mini-tts first (personality-aware)
-    let buffer: Buffer;
-    try {
-      const res = await (openai.audio.speech as any).create({
-        model: 'gpt-4o-mini-tts',
-        voice: 'onyx',
-        input: script,
-        instructions: MARCUS_INSTRUCTION,
-        response_format: 'mp3',
-      });
-      buffer = Buffer.from(await res.arrayBuffer());
-    } catch {
-      // Fall back to tts-1-hd
-      const res = await openai.audio.speech.create({
-        model: 'tts-1-hd',
-        voice: 'onyx',
-        input: script,
-        response_format: 'mp3',
-      });
-      buffer = Buffer.from(await res.arrayBuffer());
-    }
+    const res = await (openai.audio.speech as any).create({
+      model: 'gpt-4o-mini-tts',
+      voice: 'echo',
+      input: script,
+      instructions: MARCUS_INSTRUCTION,
+      response_format: 'mp3',
+    });
+    const buffer = Buffer.from(await res.arrayBuffer());
 
     fs.writeFileSync(outputPath, buffer);
     return 'generated';
@@ -159,6 +146,11 @@ async function runBatch(batch: [string, string][]): Promise<{ skipped: number; g
   };
 }
 
+function getArg(name: string): string | undefined {
+  const idx = process.argv.indexOf(name);
+  return idx >= 0 ? process.argv[idx + 1] : undefined;
+}
+
 async function main() {
   // Allow key to be passed as first argument: tsx generate-hvac-audio.ts sk-...
   const argKey = process.argv[2];
@@ -170,11 +162,39 @@ async function main() {
     console.log('OPENAI_API_KEY not set — skipping HVAC audio generation.');
     console.log('Lessons will use b-roll video until audio is generated.');
     console.log('To generate now: npx tsx scripts/generate-hvac-audio.ts sk-your-key-here');
-    process.exit(0); // Exit 0 — not an error, just no key
+    process.exit(0);
   }
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
+  // Single-lesson mode: --lesson-id hvac-06-09 --out /path/to/output.mp3
+  const singleLessonId = getArg('--lesson-id');
+  const singleOutPath  = getArg('--out');
+
+  if (singleLessonId) {
+    if (!singleOutPath) {
+      console.error('--out is required when --lesson-id is specified');
+      process.exit(1);
+    }
+    const uuid = HVAC_LESSON_UUID[singleLessonId];
+    if (!uuid) {
+      console.error(`No UUID found for lesson ${singleLessonId} in HVAC_LESSON_UUID`);
+      process.exit(1);
+    }
+    // Override output path to the caller-specified location
+    const originalPath = path.join(OUTPUT_DIR, `lesson-${uuid}.mp3`);
+    const result = await generateOne(singleLessonId, uuid);
+    if (result === 'failed') { process.exit(1); }
+    // Copy to --out path if different
+    if (path.resolve(singleOutPath) !== path.resolve(originalPath) && fs.existsSync(originalPath)) {
+      fs.mkdirSync(path.dirname(singleOutPath), { recursive: true });
+      fs.copyFileSync(originalPath, singleOutPath);
+    }
+    console.log(`Done: ${singleOutPath}`);
+    return;
+  }
+
+  // Batch mode — all lessons
   const entries = Object.entries(HVAC_LESSON_UUID) as [string, string][];
   console.log(`Generating audio for ${entries.length} HVAC lessons...`);
   console.log(`Output: ${OUTPUT_DIR}`);
@@ -184,7 +204,6 @@ async function main() {
   let totalGenerated = 0;
   let totalFailed = 0;
 
-  // Process in batches
   for (let i = 0; i < entries.length; i += CONCURRENCY) {
     const batch = entries.slice(i, i + CONCURRENCY);
     const batchNums = batch.map(([id]) => id).join(', ');
@@ -201,7 +220,6 @@ async function main() {
     if (failed > 0)    parts.push(`${failed} failed`);
     console.log(parts.join(', '));
 
-    // Small delay between batches to avoid rate limit bursts
     if (i + CONCURRENCY < entries.length) {
       await new Promise(r => setTimeout(r, 500));
     }

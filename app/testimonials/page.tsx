@@ -132,7 +132,7 @@ export default function TestimonialsPage() {
               Are you a graduate? We&apos;d love to hear about your journey. Contact us to share your success story.
             </p>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Start Your Journey
@@ -207,7 +207,7 @@ export default function TestimonialsPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-orange-600 font-semibold rounded-lg hover:bg-gray-100 transition"
             >
               Apply Now

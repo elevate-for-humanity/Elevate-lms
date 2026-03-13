@@ -634,7 +634,7 @@ export default function SyllabiPage() {
                     Download Workbooks
                   </Link>
                   <Link
-                    href="/apply"
+                    href="/start"
                     className="px-6 py-3 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition font-medium"
                   >
                     Apply Now

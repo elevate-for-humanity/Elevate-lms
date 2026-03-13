@@ -84,6 +84,24 @@ export default async function VerifyCertificatePage({
     }
   }
 
+  // Check main certificates table (by certificate_number or verification_token)
+  if (!certificate) {
+    const { data: mainCert } = await db
+      .from('certificates')
+      .select('*, profiles:student_id(full_name, email)')
+      .or(`certificate_number.eq.${certificateId},verification_token.eq.${certificateId},id.eq.${certificateId}`)
+      .single();
+
+    if (mainCert) {
+      certificate = mainCert;
+      studentName =
+        mainCert.student_name || mainCert.profiles?.full_name || mainCert.profiles?.email || 'Student';
+      courseName = mainCert.program_name || 'Program';
+      completionDate = mainCert.issued_at || mainCert.completion_date;
+      certificateType = 'Program Completion';
+    }
+  }
+
   if (!certificate) {
     notFound();
   }
@@ -252,7 +270,6 @@ export default async function VerifyCertificatePage({
                 </p>
                 <p>
                   <strong>Status:</strong> WIOA Eligible Training Provider
-                  Provider
                 </p>
                 <p>
                   <strong>Website:</strong>{' '}
@@ -291,19 +308,13 @@ export default async function VerifyCertificatePage({
             </div>
 
             {/* Actions */}
-            <div className="mt-8 flex justify-center gap-4">
+            <div className="mt-8 flex justify-center">
               <Link
                 href="/cert/verify"
                 className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 Verify Another Certificate
               </Link>
-              <button
-                onClick={() => window.print()}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Print Verification
-              </button>
             </div>
           </div>
         </div>

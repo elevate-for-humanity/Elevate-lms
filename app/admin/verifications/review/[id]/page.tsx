@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -74,9 +73,6 @@ export default async function ReviewVerificationPage({
     <div className="min-h-screen bg-slate-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-verifications-review-id-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <section className="bg-white border-b py-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">

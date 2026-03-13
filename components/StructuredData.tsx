@@ -14,7 +14,7 @@ export default function StructuredData() {
       width: 250,
       height: 250,
     },
-    image: 'https://www.elevateforhumanity.org/images/pages/comp-cta-programs.jpg',
+    image: 'https://www.elevateforhumanity.org/images/pages/workforce-training.jpg',
     foundingDate: '2019',
     description:
       'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business. Job placement assistance included.',

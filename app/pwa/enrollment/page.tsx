@@ -56,7 +56,7 @@ export default async function EnrollmentPWAPage() {
 
       {/* Apply CTA */}
       <div className="px-4 mt-6">
-        <Link href="/apply" className="block bg-brand-orange-500 text-white rounded-xl p-5 text-center hover:bg-brand-orange-600 transition-colors">
+        <Link href="/start" className="block bg-brand-orange-500 text-white rounded-xl p-5 text-center hover:bg-brand-orange-600 transition-colors">
           <div className="text-lg font-bold">Start Your Application →</div>
           <div className="text-brand-orange-100 text-sm mt-1">{freePrograms.length} programs with funding available</div>
         </Link>
@@ -81,7 +81,7 @@ export default async function EnrollmentPWAPage() {
           {applications.length === 0 && (
             <div className="bg-white rounded-xl border border-slate-200 p-6 text-center">
               <p className="text-slate-500 text-sm">No applications yet.</p>
-              <Link href="/apply" className="text-brand-orange-600 font-semibold text-sm mt-2 inline-block">Apply Now →</Link>
+              <Link href="/start" className="text-brand-orange-600 font-semibold text-sm mt-2 inline-block">Apply Now →</Link>
             </div>
           )}
           {applications.slice(0, 8).map((app: any) => (

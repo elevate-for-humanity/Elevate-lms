@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Blog | Elevate For Humanity',
@@ -48,6 +49,13 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      <PageVideoHero
+        videoSrc="/videos/homepage-hero-montage.mp4"
+        posterSrc="/images/pages/career-services-page-1.jpg"
+        posterAlt="Blog — Elevate for Humanity"
+        size="support"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Blog' }]} />
@@ -159,7 +167,7 @@ export default async function BlogPage() {
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">Ready to Start Your Career?</h2>
           <p className="text-slate-400 mb-7">Check your eligibility for funded career training programs in Indiana.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors">
               Apply Now
             </Link>
             <Link href="/programs" className="border border-slate-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-slate-800 transition-colors">

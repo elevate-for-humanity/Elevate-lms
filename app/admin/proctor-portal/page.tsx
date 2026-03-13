@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Shield, Plus, Search, Filter, Download, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, Plus, Search, Filter, Download, FileText, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import NewSessionForm from './NewSessionForm';
 import SessionRow from './SessionRow';
 import type { ExamSession, ExamProvider, ExamResult } from './types';
@@ -18,6 +18,7 @@ export default function ProctorPortalPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [providerFilter, setProviderFilter] = useState<ExamProvider | ''>('');
   const [resultFilter, setResultFilter] = useState<ExamResult | ''>('');
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'flagged' | 'under_review' | 'invalidated'>('all');
   const [sortField, setSortField] = useState<'created_at' | 'student_name'>('created_at');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -31,12 +32,13 @@ export default function ProctorPortalPage() {
 
     if (providerFilter) query = query.eq('provider', providerFilter);
     if (resultFilter) query = query.eq('result', resultFilter);
+    if (reviewFilter !== 'all') query = query.eq('review_status', reviewFilter);
     if (searchTerm) query = query.or(`student_name.ilike.%${searchTerm}%,student_email.ilike.%${searchTerm}%`);
 
     const { data, error } = await query;
     if (!error && data) setSessions(data as ExamSession[]);
     setLoading(false);
-  }, [supabase, sortField, sortDir, providerFilter, resultFilter, searchTerm]);
+  }, [supabase, sortField, sortDir, providerFilter, resultFilter, reviewFilter, searchTerm]);
 
   useEffect(() => { fetchSessions(); }, [fetchSessions]);
 
@@ -97,6 +99,7 @@ export default function ProctorPortalPage() {
     pass: sessions.filter(s => s.result === 'pass').length,
     fail: sessions.filter(s => s.result === 'fail').length,
     pending: sessions.filter(s => s.result === 'pending').length,
+    flagged: sessions.filter(s => s.review_status === 'flagged').length,
   };
 
   return (
@@ -129,12 +132,13 @@ export default function ProctorPortalPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
           {[
             { label: 'Total Sessions', value: stats.total, color: 'text-slate-900' },
             { label: 'Passed', value: stats.pass, color: 'text-brand-green-600' },
             { label: 'Failed', value: stats.fail, color: 'text-brand-red-600' },
             { label: 'Pending', value: stats.pending, color: 'text-amber-600' },
+            { label: 'Flagged', value: stats.flagged, color: 'text-orange-600' },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-lg border border-slate-200 p-4">
               <p className="text-xs text-slate-500 uppercase tracking-wider">{s.label}</p>
@@ -175,6 +179,20 @@ export default function ProctorPortalPage() {
               {Object.entries(RESULT_LABELS).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}
+            </select>
+            <select
+              value={reviewFilter}
+              onChange={e => setReviewFilter(e.target.value as typeof reviewFilter)}
+              className={`px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-blue-500 ${
+                reviewFilter !== 'all'
+                  ? 'bg-orange-50 border-orange-300 text-orange-700'
+                  : 'border-slate-300'
+              }`}
+            >
+              <option value="all">All Review Status</option>
+              <option value="flagged">Flagged</option>
+              <option value="under_review">Under Review</option>
+              <option value="invalidated">Invalidated</option>
             </select>
           </div>
         </div>

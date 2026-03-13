@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Award, ArrowRight, Shield, Clock, Users, Circle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Industry Certifications | Elevate for Humanity',
@@ -15,13 +16,20 @@ export default function CertificationsPage() {
     { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/pages/programs-medical-apply-hero.jpg' },
     { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/pages/comp-pathway-healthcare.jpg' },
     { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/pages/hvac-technician.jpg' },
-    { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/pages/comp-pathway-trades.jpg' },
+    { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/pages/hvac-technician.jpg' },
     { name: 'Certiport IT Specialist', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/pages/it-help-desk.jpg' },
     { name: 'Barber License', industry: 'Beauty', duration: '2000 hours', demand: 'Required', image: '/images/pages/barber-gallery-1.jpg' },
   ];
 
   return (
     <div className="bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/programs-overview-video-with-narration.mp4"
+        posterSrc="/images/pages/certifications-page-1.jpg"
+        posterAlt="Certifications — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Certifications' }]} />
@@ -115,7 +123,7 @@ export default function CertificationsPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply Now <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

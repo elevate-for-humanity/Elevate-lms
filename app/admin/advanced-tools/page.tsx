@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { Search, Star, X } from "lucide-react";
@@ -123,9 +122,6 @@ function ToolCard({
     <div className="relative rounded-xl border border-gray-200 bg-white p-4 hover:border-gray-300 hover:shadow-sm transition-all">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-advanced-tools-hero.jpg" alt="Advanced tools" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <button
         onClick={(e) => {
           e.preventDefault();

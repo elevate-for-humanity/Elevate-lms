@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 /**
  * Server-side Compliance Utilities
  * 
@@ -112,7 +113,7 @@ export async function getComplianceAuditTrail(
   const { data, error } = await query;
 
   if (error) {
-    console.error('Audit trail error:', error);
+    logger.error('Audit trail error', error instanceof Error ? error : undefined);
     return [];
   }
 

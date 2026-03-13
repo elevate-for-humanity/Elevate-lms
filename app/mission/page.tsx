@@ -6,6 +6,7 @@ import {
   GraduationCap 
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Our Mission | Elevate for Humanity',
@@ -50,6 +51,13 @@ const populations = [
 export default function MissionPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/mission-page-1.jpg"
+        posterAlt="Mission — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -59,23 +67,19 @@ export default function MissionPage() {
         </div>
       </div>
 
-      {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
-        <Image src="/images/pages/mission-page-1.jpg" alt="Our mission to elevate communities" fill sizes="100vw" className="object-cover" priority />
-      </section>
-
-      {/* Title */}
-      <div className="bg-brand-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-6">
-            Our Mission
-          </h1>
-          <p className="text-xl md:text-2xl text-brand-blue-100 leading-relaxed max-w-3xl mx-auto">
-            To create pathways out of poverty and into prosperity by providing free, 
-            high-quality career training to those who need it most.
-          </p>
+      {/* Hero — image with title overlaid */}
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-brand-blue-900">
+        <Image src="/images/pages/mission-page-1.jpg" alt="Our mission to elevate communities" fill sizes="100vw" className="object-cover opacity-50" priority />
+        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Our Mission</h1>
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
+              To create pathways out of poverty and into prosperity by providing free,
+              high-quality career training to those who need it most.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* The Problem */}

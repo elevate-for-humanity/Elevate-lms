@@ -14,12 +14,12 @@ const defaultHighlights: Highlight[] = [
   {
     title: "No-Cost Training Available",
     description: "No tuition for eligible participants. Funded through WIOA, WRG, and JRI programs.",
-    image: "/images/pages/comp-pathway-trades.jpg"
+    image: "/images/pages/cna-clinical.jpg"
   },
   {
     title: "Earn While You Learn",
     description: "Get paid during training through work-study programs and apprenticeships.",
-    image: "/images/pages/comp-pathway-trades.jpg"
+    image: "/images/pages/hvac-technician.jpg"
   },
   {
     title: "Industry Certification",
@@ -29,17 +29,17 @@ const defaultHighlights: Highlight[] = [
   {
     title: "Job Placement Support",
     description: "We connect you with employers hiring in your field. Resume and interview prep included.",
-    image: "/images/pages/comp-cta-career.jpg"
+    image: "/images/pages/it-helpdesk-desk.jpg"
   },
   {
     title: "Hands-On Experience",
     description: "Real-world training with actual equipment and industry-standard tools.",
-    image: "/images/pages/comp-pathway-trades.jpg"
+    image: "/images/pages/cdl-truck-highway.jpg"
   },
   {
     title: "Support Services",
     description: "Childcare, transportation, and career counseling to keep you on track.",
-    image: "/images/pages/comp-cta-career.jpg"
+    image: "/images/pages/barber-hero-main.jpg"
   }
 ];
 
@@ -121,7 +121,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/pages/comp-highlights-success.jpg"
+                  src="/images/pages/healthcare-grad.jpg"
                   alt="Job placement"
                   fill
                   className="object-cover"

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { programs } from '@/app/data/programs';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createBrowserClient } from '@supabase/ssr';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 const grantFundedPrograms = programs.filter((p) =>
   p.fundingOptions.some(
     (f) =>
@@ -30,6 +31,13 @@ export default function GrantProgramsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/training-providers-hero.mp4"
+        posterSrc="/images/pages/funding-page-3.jpg"
+        posterAlt="Funding Grant Programs — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -260,7 +268,7 @@ export default function GrantProgramsPage() {
 
           <div className="text-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Apply Now
@@ -290,7 +298,7 @@ export default function GrantProgramsPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply/student"
+              href="/start"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
             >
               Check Eligibility

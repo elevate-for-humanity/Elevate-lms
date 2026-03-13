@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, Clock, DollarSign, MapPin } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Certification Training Programs | Elevate for Humanity',
@@ -24,6 +25,13 @@ const certPrograms = [
 export default function CertificationsPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/programs-overview-video-with-narration.mp4"
+        posterSrc="/images/pages/certifications.jpg"
+        posterAlt="Training Certifications — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Training', href: '/programs' }, { label: 'Certifications' }]} />
@@ -101,7 +109,7 @@ export default function CertificationsPage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Certified?</h2>
           <p className="text-xl text-white/90 mb-10">Apply in minutes. Most students start training within 2-4 weeks.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/start" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
             <Link href="/funding" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Check Funding</Link>
           </div>
         </div>

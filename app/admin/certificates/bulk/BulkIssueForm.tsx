@@ -68,7 +68,7 @@ export default function BulkIssueForm({
       if (!res.ok) throw new Error(data.error || 'Bulk issuance failed');
       setResult({ success: data.issued || 0, failed: data.failed || 0 });
     } catch (err: any) {
-      setError(err.message);
+      setError('Failed to issue certificates. Please try again.');
     } finally {
       setIssuing(false);
     }

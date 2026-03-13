@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import PayrollClient from './PayrollClient';
 
 export const metadata: Metadata = {
@@ -35,13 +34,9 @@ export default async function PayrollPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="relative h-[160px] sm:h-[200px]">
-        <Image src="/images/pages/admin-hr-payroll-hero.jpg" alt="Payroll management" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/50" />
-        <div className="absolute inset-0 flex items-end pb-6 px-6">
-          <h1 className="text-2xl font-bold text-white">Payroll Management</h1>
-        </div>
-      </section>
+      <div className="bg-slate-900 px-6 py-5">
+        <h1 className="text-2xl font-bold text-white">Payroll Management</h1>
+      </div>
       <PayrollClient staffCount={staffCount ?? 0} payrollRuns={payrollRuns ?? []} />
     </div>
   );

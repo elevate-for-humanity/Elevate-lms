@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, ChevronLeft, ChevronRight, Flag, AlertTriangle } from 'lucide-react';
+import ExamMonitor from '@/components/exam/ExamMonitor';
+import ExamCamera from '@/components/exam/ExamCamera';
 
 interface Answer {
   id: string;
@@ -34,9 +36,10 @@ interface Props {
   questions: Question[];
   attemptId: string;
   visitorId: string;
+  examSessionId?: string;
 }
 
-export default function QuizTakingInterface({ quiz, questions, attemptId, visitorId }: Props) {
+export default function QuizTakingInterface({ quiz, questions, attemptId, visitorId, examSessionId }: Props) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -130,6 +133,15 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
 
   return (
     <div className="min-h-screen bg-slate-100">
+      {/* Exam monitoring — only active when examSessionId is provided */}
+      {examSessionId && (
+        <>
+          <ExamMonitor examSessionId={examSessionId} />
+          <div className="fixed bottom-4 right-4 z-50">
+            <ExamCamera examSessionId={examSessionId} showPreview />
+          </div>
+        </>
+      )}
       {/* Header */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4">

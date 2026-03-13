@@ -340,9 +340,7 @@ function ActionButton({ title, description, href }: ActionButtonProps) {
       <div className="font-medium text-black mb-1">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-live-chat-hero.jpg" alt="Live chat" fill sizes="100vw" className="object-cover" priority />
-      </section>{title}</div>
+{title}</div>
       <div className="text-sm text-black mb-2">{description}</div>
       <div className="flex items-center text-sm text-brand-blue-600">
         <span>Open</span>

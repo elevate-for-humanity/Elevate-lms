@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users, Award } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Drug Testing Services | Elevate for Humanity',
@@ -20,7 +21,7 @@ const testingCategories = [
     title: 'Urine Drug Tests',
     description: 'Most common and cost-effective. Lab-confirmed results in 24-48 hours.',
     href: '/drug-testing/urine-tests',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     startingPrice: 69,
     tests: ['5-Panel', '10-Panel', 'DOT 5-Panel', 'Expanded Opiates'],
   },
@@ -28,7 +29,7 @@ const testingCategories = [
     title: 'Instant Rapid Tests',
     description: 'On-site results in 5-10 minutes. Perfect for high-volume screening.',
     href: '/drug-testing/instant-tests',
-    image: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     startingPrice: 60,
     tests: ['Rapid 5-Panel', 'Rapid 10-Panel', 'Rapid + Alcohol'],
   },
@@ -99,6 +100,14 @@ export default async function DrugTestingLandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/healthcare-cna.mp4"
+        posterSrc="/images/pages/drug-testing-main-1.jpg"
+        posterAlt="Drug Testing — Elevate for Humanity"
+        audioSrc="/audio/heroes/healthcare.mp3"
+        size="marketing"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Drug Testing" }]} />
       </div>
@@ -386,7 +395,7 @@ export default async function DrugTestingLandingPage() {
               </div>
             )}
             <div className="text-center mt-8">
-              <Link href="/apply/student" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
                 Apply for This Program <ArrowRight className="w-5 h-5" />
               </Link>
               {program.tuition && (

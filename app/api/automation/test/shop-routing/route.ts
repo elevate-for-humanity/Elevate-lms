@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -289,7 +290,7 @@ async function _POST() {
     });
 
   } catch (error) {
-    console.error('[shop-routing test]', error);
+    logger.error('[shop-routing test]', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

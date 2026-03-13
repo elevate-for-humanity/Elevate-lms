@@ -190,7 +190,7 @@ export default function StudentsPage() {
             Apply now and start your career journey today.
           </p>
           <Link
-            href="/apply"
+            href="/start"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
           >
             Apply Now

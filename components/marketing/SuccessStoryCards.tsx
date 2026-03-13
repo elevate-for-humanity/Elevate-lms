@@ -15,7 +15,7 @@ const stories = [
   {
     name: 'Sarah Martinez',
     program: 'Medical Assistant',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
     beforeJob: 'Retail cashier, $12/hour',
     afterJob: 'Medical Assistant',
     salary: '$38,000/year',

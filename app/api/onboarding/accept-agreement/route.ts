@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -44,11 +45,11 @@ export async function POST(req: NextRequest) {
       });
 
     if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
+      logger.error('Agreement insert failed', undefined, { detail: insertError.message }); return NextResponse.json({ error: 'Failed to save agreement' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    logger.error('Accept agreement failed', err instanceof Error ? err : undefined); return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Building2, Users, Briefcase, Shield, Handshake,
   ArrowRight, Phone, FileText, GraduationCap, Scale,
 } from 'lucide-react';
@@ -64,6 +65,13 @@ const QUICK_LINKS = [
 export default function PartnersIndexPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/partner-business.mp4"
+        posterSrc="/images/pages/partner-page-1.jpg"
+        posterAlt="Partners — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partners' }]} />

@@ -114,7 +114,7 @@ export default async function HubWelcomePage() {
                 Sign In to Your Hub
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/apply" className="inline-flex items-center gap-2 px-8 py-4 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors border border-slate-500 text-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 px-8 py-4 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors border border-slate-500 text-lg">
                 Apply for a Program
               </Link>
             </div>

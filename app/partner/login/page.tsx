@@ -1,20 +1,34 @@
 
 'use client';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Building, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
+const IDENTITY_ERRORS: Record<string, string> = {
+  identity: 'Your account could not be verified. Please contact support.',
+  no_partner: 'Your account is not linked to a partner organization. Please contact support at elevate4humanityedu@gmail.com.',
+};
+
 export default function PartnerLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+
+  // Show identity guard errors from redirect
+  useEffect(() => {
+    const errCode = searchParams.get('error');
+    if (errCode && IDENTITY_ERRORS[errCode]) {
+      setError(IDENTITY_ERRORS[errCode]);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

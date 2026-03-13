@@ -6,7 +6,6 @@
  */
 
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface ScrollVideoProps {
   src: string;
@@ -26,7 +25,7 @@ export function ScrollVideo({
   threshold = 0.3,
   loop = true,
 }: ScrollVideoProps) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ threshold });
+  const { videoRef } = useHeroVideo({ threshold });
 
   return (
     <div className="relative">
@@ -39,8 +38,6 @@ export function ScrollVideo({
         playsInline
         className={className}
         style={style}
-      />
-      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-    </div>
+      />    </div>
   );
 }

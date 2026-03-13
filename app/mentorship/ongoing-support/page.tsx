@@ -82,7 +82,7 @@ export default function OngoingSupportPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">You Do Not Have to Do This Alone</h2>
           <p className="text-xl text-teal-100 mb-8">Get the ongoing support you need to succeed.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-teal-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-gray-100 text-teal-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

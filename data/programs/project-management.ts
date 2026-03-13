@@ -3,7 +3,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   slug: 'project-management', title: 'Project Management',
   subtitle: 'Earn Certiport Project Management certification. Agile, Scrum, and traditional PM methodologies in 6 weeks.',
   sector: 'business', category: 'Project Management',
-  heroImage: '/images/pages/admin-projects-hero.jpg', heroImageAlt: 'Project manager leading a team meeting',
+  heroImage: '/images/pages/project-management.jpg', heroImageAlt: 'Project manager leading a team meeting',
   deliveryMode: 'hybrid', durationWeeks: 6, hoursPerWeekMin: 15, hoursPerWeekMax: 20,
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 40, examPrep: 10, careerPlacement: 10 },
   schedule: 'Mon/Wed/Fri, 9:00 AM–12:00 PM', cohortSize: '12–18 participants per cohort',

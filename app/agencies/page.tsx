@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Shield,
   TrendingUp,
   FileCheck,
@@ -34,6 +35,13 @@ export default async function AgenciesPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+
+      <PageVideoHero
+        videoSrc="/videos/employer-hero.mp4"
+        posterSrc="/images/pages/agencies-page-1.jpg"
+        posterAlt="Agencies — Elevate for Humanity"
+        size="marketing"
+      />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>

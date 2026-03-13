@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: {
@@ -112,6 +112,13 @@ export default async function TeamPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/about-team-hero.jpg"
+        posterAlt="About Team — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -124,17 +131,16 @@ export default async function TeamPage() {
         </div>
       </div>
 
-      {/* Hero — video banner, plays on scroll */}
-      <ProgramHeroBanner videoSrc="/videos/about-mission.mp4" />
-
-      <section className="py-10 bg-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">
-            Our Team
-          </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Meet the dedicated professionals behind Elevate for Humanity.
-          </p>
+      {/* Hero */}
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
+        <Image src="/images/pages/team-hero.jpg" alt="Elevate for Humanity team" fill sizes="100vw" className="object-cover opacity-60" priority />
+        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Our Team</h1>
+            <p className="text-lg text-white/85 max-w-2xl mx-auto">
+              Meet the dedicated professionals behind Elevate for Humanity.
+            </p>
+          </div>
         </div>
       </section>
 

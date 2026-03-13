@@ -278,7 +278,7 @@ export default async function OrientationPage() {
                 </p>
               </div>
               <Link
-                href="/apply"
+                href="/start"
                 className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium whitespace-nowrap"
               >
                 Verify Eligibility →

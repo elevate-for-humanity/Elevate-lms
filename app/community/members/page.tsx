@@ -124,7 +124,7 @@ export default async function MembersPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-2">No members yet</h3>
               <p className="text-gray-600 mb-6">Be the first to join the community!</p>
               <Link 
-                href="/apply" 
+                href="/start" 
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
               >
                 Apply Now

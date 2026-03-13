@@ -86,7 +86,7 @@ export default function AboutPage() {
             <Link href="/pathways" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               See Our Career Pathways <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link href="/apply" className="bg-white hover:bg-gray-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
+            <Link href="/start" className="bg-white hover:bg-gray-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
           </div>
@@ -328,7 +328,7 @@ export default function AboutPage() {
             ))}
           </div>
           <div className="mt-8 text-center">
-            <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               Check Your Eligibility <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </div>
@@ -571,7 +571,7 @@ export default function AboutPage() {
             your entire training can be free — tuition, materials, certifications, and career services.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/apply" className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition inline-flex items-center">
+            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition inline-flex items-center">
               Check Eligibility &amp; Apply <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-bold text-lg transition border-2 border-white/30">

@@ -6,7 +6,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
 import { ReactNode } from 'react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 /**
  * Program types determine the primary CTA
@@ -123,7 +122,7 @@ function getFundingLabel(option: FundingOption): string {
  * and compliance with the program page contract.
  */
 export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
   const primaryCTA = getPrimaryCTA(config.programType);
   const primaryUrl = config.programType === 'workforce_funded' && config.eligibilityUrl
     ? config.eligibilityUrl
@@ -158,9 +157,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               poster={config.heroPoster}
             >
               <source src={config.heroVideo} type="video/mp4" />
-            </video>
-            {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-          </>
+            </video>          </>
         ) : config.heroImage ? (
           <Image
             src={config.heroImage}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Award, Clock, Check, ArrowRight, BookOpen, Shield } from 'lucide-react';
 import { COURSES as courses } from '@/app/data/courses';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Certification Courses | Elevate Store',
@@ -30,6 +31,13 @@ export default function StoreCoursesPage() {
 
   return (
     <div className="bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/lms-learning.mp4"
+        posterSrc="/images/pages/courses-page-1.jpg"
+        posterAlt="Store Courses — Elevate for Humanity"
+        size="marketing"
+      />
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Courses" }]} />
       </div>

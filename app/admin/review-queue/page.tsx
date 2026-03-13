@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -93,9 +92,6 @@ export default async function ReviewQueuePage({
     <div className="p-6 max-w-7xl mx-auto">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-review-queue-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Review Queue</h1>
         <p className="text-gray-600">

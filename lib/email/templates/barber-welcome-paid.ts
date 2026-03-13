@@ -29,7 +29,7 @@ export function getBarberWelcomePaidEmail(data: BarberWelcomeEmailData): {
     studentEmail, 
     dashboardUrl,
     miladyEnrollmentUrl,
-    requiredHours = 1500,
+    requiredHours = 2000,
     transferHours = 0,
     rapidsPending = true,
   } = data;

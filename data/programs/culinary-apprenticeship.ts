@@ -3,7 +3,7 @@ export const CULINARY: ProgramSchema = {
   slug: 'culinary-apprenticeship', title: 'Culinary Apprenticeship',
   subtitle: 'Earn ServSafe certification and culinary skills through a registered apprenticeship. Hands-on training in a professional kitchen.',
   sector: 'personal-services', category: 'Culinary Arts',
-  heroImage: '/images/pages/admin-cafeteria-hero.jpg', heroImageAlt: 'Culinary apprentice preparing food in a professional kitchen',
+  heroImage: '/images/pages/culinary.jpg', heroImageAlt: 'Culinary apprentice preparing food in a professional kitchen',
   deliveryMode: 'in-person', durationWeeks: 26, hoursPerWeekMin: 30, hoursPerWeekMax: 40,
   hoursBreakdown: { onlineInstruction: 80, handsOnLab: 700, examPrep: 40, careerPlacement: 40 },
   schedule: 'Full-time, varies by kitchen (30–40 hrs/week)', cohortSize: '2–4 apprentices per kitchen',

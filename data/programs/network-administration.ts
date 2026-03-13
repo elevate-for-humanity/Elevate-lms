@@ -3,7 +3,7 @@ export const NETWORK_ADMIN: ProgramSchema = {
   slug: 'network-administration', title: 'Network Administration',
   subtitle: 'Earn CompTIA Network+ certification. Network design, configuration, and troubleshooting in 10 weeks.',
   sector: 'technology', category: 'Networking',
-  heroImage: '/images/pages/it-networking.jpg', heroImageAlt: 'Network administration student configuring network equipment',
+  heroImage: '/images/pages/network-administration.jpg', heroImageAlt: 'Network administration student configuring network equipment',
   videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 120, examPrep: 20, careerPlacement: 20 },

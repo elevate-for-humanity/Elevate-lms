@@ -55,7 +55,7 @@ export default function HowItWorksPage() {
               { step: '2', title: 'Training & Certification', desc: 'Enroll in an industry-recognized credential program matched to your career goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Programs run 4-16 weeks with instructor oversight. Some programs offer earn-while-you-learn apprenticeship pathways.', image: '/images/pages/training-classroom.jpg', cta: 'View Programs', href: '/programs', external: false },
               { step: '3', title: 'One-on-One Employment Support', desc: 'Every participant receives individualized career coaching throughout the program. This includes resume development, job readiness skills, application assistance, mock interviews, and personalized career planning. Support is adapted to your strengths and needs.', image: '/images/pages/career-services-page-1.jpg', cta: 'Employment Support Services', href: '/employment-support', external: false },
               { step: '4', title: 'Employer Matching & Placement', desc: 'We connect you directly with employers in our hiring network. Staff coordinate introductions, schedule interviews, and support you through the hiring process. We provide employment assistance and employer connection support across healthcare, trades, IT, business, and more.', image: '/images/pages/about-employer-partners.jpg', cta: 'Employer Network', href: '/for-employers', external: false },
-              { step: '5', title: 'Follow-Up & Retention Support', desc: 'Support does not end at placement. We provide ongoing retention check-ins at 30, 60, 90, and 180 days. If workplace challenges arise, we help you navigate them. Our goal is long-term employment stability and career advancement.', image: '/images/pages/comp-highlights-success.jpg', cta: 'Learn More', href: '/employment-support', external: false },
+              { step: '5', title: 'Follow-Up & Retention Support', desc: 'Support does not end at placement. We provide ongoing retention check-ins at 30, 60, 90, and 180 days. If workplace challenges arise, we help you navigate them. Our goal is long-term employment stability and career advancement.', image: '/images/pages/healthcare-grad.jpg', cta: 'Learn More', href: '/employment-support', external: false },
             ].map((item) => (
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0 overflow-hidden">
@@ -120,7 +120,7 @@ export default function HowItWorksPage() {
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Register Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </a>
-            <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+            <Link href="/start" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
               Apply for Training
             </Link>
             <Link href="/booking/enrollment" className="border-2 border-white/60 text-white/90 font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

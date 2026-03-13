@@ -8,6 +8,7 @@ import { ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
   description:
@@ -33,6 +34,13 @@ const programs = (dbRows as any[]) || [];
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/training-providers-hero.mp4"
+        posterSrc="/images/pages/funding-page-1.jpg"
+        posterAlt="Funding Dol — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'DOL Apprenticeship' }]} />
@@ -57,7 +65,7 @@ const programs = (dbRows as any[]) || [];
               <p className="text-slate-700 leading-relaxed mb-6">
                 Elevate for Humanity is a DOL Registered Apprenticeship Sponsor for select programs (currently Barber Apprenticeship), meaning these programs meet federal standards for quality, safety, and outcomes.
               </p>
-              <Link href="/apply/student" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -119,7 +127,7 @@ const programs = (dbRows as any[]) || [];
               </div>
             ))}
           </div>
-          <Link href="/apply/student" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
+          <Link href="/start" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
             Apply Now
           </Link>
         </div>

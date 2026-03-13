@@ -6,7 +6,7 @@ export const FORKLIFT: ProgramSchema = {
   subtitle: 'Earn OSHA-compliant forklift operator certification in 1 week. Hands-on training on sit-down, stand-up, and reach truck forklifts.',
   sector: 'skilled-trades',
   category: 'Warehouse & Logistics',
-  heroImage: '/images/pages/admin-warehouse-hero.jpg',
+  heroImage: '/images/pages/forklift.jpg',
   heroImageAlt: 'Forklift operator training in a warehouse setting',
   deliveryMode: 'hybrid',
   durationWeeks: 1,

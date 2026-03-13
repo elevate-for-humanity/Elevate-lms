@@ -286,9 +286,8 @@ export default function CoursesCatalogPage() {
             className="w-full h-full object-cover"
             style={{ minHeight: '420px' }}
           />
-          {/* Subtle scrim — readable text without hiding the video */}
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* Solid scrim for text contrast */}
+          <div className="absolute inset-0 bg-black/45" />
         </div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-16">
@@ -335,7 +334,6 @@ export default function CoursesCatalogPage() {
                 {/* Photo with play button */}
                 <div className="relative h-44 overflow-hidden">
                   <Image src={p.photo} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width:640px) 100vw, 25vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   {p.badge && (
                     <span className={`absolute top-3 left-3 text-xs font-bold text-white px-2.5 py-1 rounded-full ${p.badgeColor}`}>
                       {p.badge}
@@ -349,8 +347,8 @@ export default function CoursesCatalogPage() {
                   >
                     <Play className="w-4 h-4 ml-0.5 text-brand-blue-600" />
                   </button>
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <p className="text-white font-extrabold text-base leading-snug drop-shadow">{p.title}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
+                    <p className="text-white font-extrabold text-base leading-snug">{p.title}</p>
                     <p className="text-white/80 text-xs mt-0.5">{p.tagline}</p>
                   </div>
                 </div>
@@ -418,7 +416,6 @@ export default function CoursesCatalogPage() {
                 {/* Photo with optional play button */}
                 <div className="relative h-40 overflow-hidden">
                   <Image src={c.photo} alt={c.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width:640px) 100vw, 33vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
                   {/* Category badge */}
                   <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[c.category] ?? 'bg-slate-100 text-slate-700'}`}>
@@ -434,8 +431,8 @@ export default function CoursesCatalogPage() {
                     <Play className="w-4 h-4 ml-0.5 text-brand-blue-600" />
                   </button>
 
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <p className="text-white font-extrabold text-sm leading-snug drop-shadow">{c.title}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
+                    <p className="text-white font-extrabold text-sm leading-snug">{c.title}</p>
                     <p className="text-white/80 text-xs">{c.tagline}</p>
                   </div>
                 </div>
@@ -488,7 +485,7 @@ export default function CoursesCatalogPage() {
             Talk to an advisor. We will look at your goals, your schedule, and what funding you qualify for — then help you pick the right path.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/apply/student"
+            <Link href="/start"
               className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl">
               Apply Free — Takes 5 Minutes
             </Link>

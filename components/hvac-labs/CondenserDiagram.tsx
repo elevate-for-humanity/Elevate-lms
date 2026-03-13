@@ -163,7 +163,7 @@ export default function CondenserDiagram({ mode = 'explore', onComplete, forceDi
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4">
+      <div className="bg-slate-900 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-blue-500/20 rounded-full flex items-center justify-center">

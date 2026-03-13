@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { adminRedirects } from './lib/admin-redirects.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -290,6 +291,8 @@ const nextConfig = {
   // Redirects for consolidated routes
   async redirects() {
     return [
+      // Admin domain consolidation — see lib/admin-redirects.ts
+      ...adminRedirects,
       // ============================================
       // ADMIN SHELL ROUTE REDIRECTS
       // Routes removed from nav — redirect to nearest real surface
@@ -588,6 +591,35 @@ const nextConfig = {
 
       // Verify consolidation
       { source: '/verifycertificate/:path*', destination: '/verify/:path*', permanent: true },
+
+      // Duplicate route consolidation
+      { source: '/mission', destination: '/about/mission', permanent: true },
+      { source: '/microclasses', destination: '/micro-classes', permanent: true },
+      { source: '/fundingimpact', destination: '/impact', permanent: true },
+      { source: '/getstarted', destination: '/apply/student', permanent: true },
+      { source: '/connect', destination: '/contact', permanent: true },
+      { source: '/call-now', destination: '/contact', permanent: true },
+      { source: '/share', destination: '/', permanent: true },
+      { source: '/learning', destination: '/learner', permanent: true },
+      { source: '/for/students', destination: '/apply/student', permanent: true },
+      { source: '/ecosystem', destination: '/about', permanent: true },
+      { source: '/impact', destination: '/about', permanent: true },
+
+      // Internal tools — redirect to admin
+      { source: '/ai-studio', destination: '/admin', permanent: true },
+      { source: '/preview/video-quiz', destination: '/admin', permanent: true },
+
+      // Deleted public routes — redirect to nearest relevant page
+      { source: '/creator/analytics', destination: '/admin', permanent: true },
+      { source: '/franchise/office/:path*', destination: '/admin', permanent: true },
+      { source: '/leaderboard', destination: '/lms/dashboard', permanent: true },
+      { source: '/portal/staff/dashboard', destination: '/staff-portal', permanent: true },
+      { source: '/app-hub', destination: '/apps', permanent: true },
+      { source: '/card', destination: '/', permanent: true },
+      { source: '/calculator/revenue-share', destination: '/admin', permanent: true },
+      { source: '/apps/grants/start-trial', destination: '/apps', permanent: true },
+      { source: '/apps/sam-gov/start-trial', destination: '/apps', permanent: true },
+      { source: '/apps/website-builder/start-trial', destination: '/apps', permanent: true },
 
       // Misc redirects
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },

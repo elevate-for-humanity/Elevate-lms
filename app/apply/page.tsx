@@ -74,7 +74,7 @@ export default async function ApplyPage({
 
         {/* Student — full width, image fills left side */}
         <Link
-          href="/apply/student"
+          href="/start"
           className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
         >
           <div className="flex flex-col md:flex-row">

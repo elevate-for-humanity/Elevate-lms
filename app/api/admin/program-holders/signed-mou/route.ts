@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export const runtime = 'nodejs';

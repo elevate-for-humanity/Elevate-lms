@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import EnrollmentManagementClient from './EnrollmentManagementClient';
 import AutomatedEnrollmentWorkflow from '@/components/AutomatedEnrollmentWorkflow';
@@ -76,9 +75,6 @@ export default async function AdminEnrollmentsPage() {
         </div>
       </div>
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-enrollments-hero.jpg" alt="Enrollment management" fill sizes="100vw" className="object-cover" priority />
-      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-8">

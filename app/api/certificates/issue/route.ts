@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { generateCertificateNumber, generateCertificatePDF } from "@/lib/certificates/generator";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,8 +20,22 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    // Auth: require admin or super_admin to issue certificates
+    const { createClient: createServerClient } = await import('@/lib/supabase/server');
+    const authClient = await createServerClient();
+    const { data: { session } } = await authClient.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const adminDb = createAdminClient();
+    const authDb = adminDb || authClient;
+    const { data: profile } = await authDb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden — admin role required' }, { status: 403 });
+    }
+
     const body = await parseBody<Record<string, any>>(request);
-    const { studentId, programId, studentName, programName, programHours } = body;
+    const { studentId, programId, studentName, programName, programHours, courseId, skipCompletionCheck } = body;
 
     // Validate required fields
     if (!studentId || !programId || !studentName || !programName) {
@@ -36,8 +51,41 @@ async function _POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Generate certificate number
+    // Check completion rules (admin can override with skipCompletionCheck)
+    if (!skipCompletionCheck && courseId) {
+      const { evaluateCompletion } = await import('@/lib/lms/completion-rules');
+      const completionStatus = await evaluateCompletion(studentId, programId, courseId);
+      if (!completionStatus.isComplete) {
+        const unmet = completionStatus.ruleResults
+          .filter(r => !r.passed)
+          .map(r => r.detail)
+          .join('; ');
+        return NextResponse.json(
+          { error: `Completion requirements not met: ${unmet}`, completionStatus },
+          { status: 422 }
+        );
+      }
+    }
+
+    // Prevent duplicate issuance for same student + program
+    const { data: existing } = await supabase
+      .from("certificates")
+      .select("id, certificate_number")
+      .eq("student_id", studentId)
+      .eq("program_id", programId)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Certificate already issued for this student and program", certificateNumber: existing.certificate_number },
+        { status: 409 }
+      );
+    }
+
+    // Generate certificate number and verification token
     const certificateNumber = generateCertificateNumber();
+    const verificationToken = randomUUID();
     const completionDate = new Date().toISOString().split("T")[0];
 
     // Generate certificate PDF
@@ -83,11 +131,13 @@ async function _POST(request: NextRequest) {
         student_id: studentId,
         program_id: programId,
         certificate_number: certificateNumber,
+        verification_token: verificationToken,
         student_name: studentName,
         program_name: programName,
         completion_date: completionDate,
         program_hours: programHours,
         pdf_url: urlData.publicUrl,
+        issued_by: session.user.id,
         issued_at: new Date().toISOString(),
         status: "active",
       })
@@ -106,6 +156,8 @@ async function _POST(request: NextRequest) {
       certificate: {
         id: certRecord.id,
         certificateNumber,
+        verificationToken,
+        verifyUrl: `/verify/${verificationToken}`,
         pdfUrl: urlData.publicUrl,
         issuedAt: certRecord.issued_at,
       },

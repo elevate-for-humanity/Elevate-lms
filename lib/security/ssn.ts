@@ -1,10 +1,10 @@
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 const SSN_SALT = process.env.SSN_SALT;
 
 if (!SSN_SALT && typeof window === 'undefined') {
-  // Server-side only: SSN_SALT is required for any SSN operations
-  console.error('[SECURITY] SSN_SALT environment variable is not set. SSN hashing will fail.');
+  logger.error('SSN_SALT environment variable is not set. SSN hashing will fail.');
 }
 
 /**

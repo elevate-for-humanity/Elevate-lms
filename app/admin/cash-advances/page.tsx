@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -88,9 +88,6 @@ export default async function CashAdvancesAdminPage() {
     <div className="p-6 max-w-7xl mx-auto">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-cash-advances-hero.jpg" alt="Cash advances" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-black mb-2">
           Cash Advance Management

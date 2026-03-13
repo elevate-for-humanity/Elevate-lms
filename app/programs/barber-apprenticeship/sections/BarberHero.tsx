@@ -1,24 +1,28 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { QUICK_STATS } from '../barber-program-data';
 
 export function BarberHero() {
   return (
     <>
-      {/* Hero Video Banner */}
-      <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" voiceoverSrc="/audio/heroes/barber.mp3" />
-
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+      {/* Hero */}
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden bg-slate-900">
         <Image
           src="/images/pages/programs-barber-hero-new.jpg"
           alt="Barber apprentice cutting hair in a licensed barbershop"
           fill sizes="100vw"
-          className="object-cover"
+          className="object-cover opacity-75"
           priority
         />
+        <div className="absolute inset-0 flex items-end">
+          <div className="w-full bg-black/55 px-6 py-6">
+            <div className="max-w-5xl mx-auto">
+              <h1 className="text-3xl md:text-5xl font-black text-white mb-2">Barber Apprenticeship Program</h1>
+              <p className="text-white/85 text-lg max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Waitlist Notice Banner */}
@@ -34,11 +38,9 @@ export function BarberHero() {
         </div>
       </section>
 
-      {/* Title + CTAs below hero */}
-      <section className="py-8 bg-white border-b">
+      {/* CTAs below hero */}
+      <section className="py-6 bg-white border-b">
         <div className="max-w-5xl mx-auto px-4">
-          <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-3">Barber Apprenticeship Program</h1>
-          <p className="text-lg text-slate-600 mb-6 max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
           <div className="flex flex-wrap gap-3">
             <a href="#program-overview" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
               Learn More <ArrowRight className="w-4 h-4" />

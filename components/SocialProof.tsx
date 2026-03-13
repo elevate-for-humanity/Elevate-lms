@@ -33,7 +33,7 @@ const testimonials: Testimonial[] = [
     name: 'Maria Rodriguez',
     role: 'Certified Nursing Assistant',
     program: 'Healthcare Training',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/cna-patient-care.jpg',
     quote:
       'This program changed my life. I went from minimum wage to a career I love with benefits and stability for my family.',
     rating: 5,
@@ -45,7 +45,7 @@ const testimonials: Testimonial[] = [
     name: 'James Thompson',
     role: 'IT Support Specialist',
     program: 'Technology Training',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/it-helpdesk-desk.jpg',
     quote:
       'The hands-on training and certification prep gave me the skills employers were looking for. I had three job offers before graduation.',
     rating: 5,
@@ -57,7 +57,7 @@ const testimonials: Testimonial[] = [
     name: 'Sarah Johnson',
     role: 'HVAC Technician',
     program: 'Skilled Trades',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/hvac-technician.jpg',
     quote:
       'As a single mom, I needed training that was free and flexible. This program delivered both, and now I have a career that supports my family.',
     rating: 5,
@@ -69,7 +69,7 @@ const testimonials: Testimonial[] = [
     name: 'Michael Chen',
     role: 'Medical Assistant',
     program: 'Healthcare Training',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/medical-assistant-lab.jpg',
     quote:
       'The instructors genuinely cared about my success. They helped me overcome barriers and achieve my goals.',
     rating: 5,
@@ -81,7 +81,7 @@ const testimonials: Testimonial[] = [
     name: 'Lisa Williams',
     role: 'Web Developer',
     program: 'Technology Training',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/cybersecurity-screen.jpg',
     quote:
       "I never thought I could work in tech. This program proved me wrong and opened doors I didn't know existed.",
     rating: 5,
@@ -93,7 +93,7 @@ const testimonials: Testimonial[] = [
     name: 'David Martinez',
     role: 'CDL Driver',
     program: 'Transportation',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/cdl-truck-highway.jpg',
     quote:
       "Free CDL training with job placement assistance? I couldn't believe it was real. Now I'm earning more than I ever have.",
     rating: 5,

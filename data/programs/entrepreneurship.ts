@@ -3,7 +3,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   slug: 'entrepreneurship', title: 'Entrepreneurship & Small Business',
   subtitle: 'Launch or grow your business. Business planning, marketing, financial management, and Certiport ESB certification in 6 weeks.',
   sector: 'business', category: 'Entrepreneurship',
-  heroImage: '/images/pages/admin-startup-hero.jpg', heroImageAlt: 'Entrepreneur working on a business plan',
+  heroImage: '/images/pages/entrepreneurship.jpg', heroImageAlt: 'Entrepreneur working on a business plan',
   deliveryMode: 'hybrid', durationWeeks: 6, hoursPerWeekMin: 10, hoursPerWeekMax: 15,
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 30, examPrep: 10, careerPlacement: 10 },
   schedule: 'Tue/Thu, 6:00–9:00 PM + Saturday workshops', cohortSize: '10–15 participants per cohort',

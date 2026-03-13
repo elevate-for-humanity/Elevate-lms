@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { AuthorityStrip } from '@/components/InstitutionalAuthority';
 import { GraduationCap, Clock, Award, DollarSign, CheckCircle2, ArrowRight, Users, FileText } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Enrollment | Elevate for Humanity',
@@ -33,14 +34,21 @@ export default async function EnrollmentPage() {
   ];
 
   const featured = [
-    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '20', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/comp-pathway-trades.jpg' },
-    { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/comp-pathway-trades.jpg' },
-    { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/comp-pathway-trades.jpg' },
+    { name: 'Building Technician with HVAC Fundamentals', hours: '400+', weeks: '20', credentials: '6', href: '/apply/student?program=hvac-technician', image: '/images/pages/hvac-technician.jpg' },
+    { name: 'Electrical Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=electrical', image: '/images/pages/hvac-technician.jpg' },
+    { name: 'Plumbing Apprenticeship', hours: '400+', weeks: '20', credentials: '4', href: '/apply/student?program=plumbing', image: '/images/pages/hvac-technician.jpg' },
     { name: 'Forklift Operator', hours: '40', weeks: '1', credentials: '2', href: '/apply/student?program=forklift', image: '/images/pages/apply-page-1.jpg' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/enrollment-page-1.jpg"
+        posterAlt="Enrollment — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <Image src="/images/pages/enrollment-page-1.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
@@ -125,7 +133,7 @@ export default async function EnrollmentPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
           <p className="text-brand-blue-100 text-sm mb-6">Applications are reviewed within 1-2 business days. No application fee.</p>
-          <Link href="/apply/student" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-50 transition-colors">
+          <Link href="/start" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-blue-700 rounded-lg text-sm font-semibold hover:bg-brand-blue-50 transition-colors">
             Apply Now <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

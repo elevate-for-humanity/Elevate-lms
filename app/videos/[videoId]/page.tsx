@@ -169,7 +169,7 @@ export default async function VideoWatchPage({
             {/* CTA */}
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/apply"
+                href="/start"
                 className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
               >
                 Apply Now

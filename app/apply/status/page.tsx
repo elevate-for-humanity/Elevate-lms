@@ -185,7 +185,7 @@ export default function ApplicationStatusPage() {
         <div className="mt-8 text-center text-gray-600">
           <p>Need help? Contact us at <a href="tel:317-314-3757" className="text-emerald-600 font-medium">317-314-3757</a></p>
           <p className="mt-2">
-            <Link href="/apply" className="text-emerald-600 hover:underline">Submit a new application</Link>
+            <Link href="/start" className="text-emerald-600 hover:underline">Submit a new application</Link>
           </p>
         </div>
       </div>

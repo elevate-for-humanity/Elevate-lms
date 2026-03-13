@@ -31,6 +31,14 @@ export interface ExamSession {
   program_slug: string | null;
   cohort_id: string | null;
   evidence_url: string | null;
+  review_status: 'clear' | 'flagged' | 'under_review' | 'invalidated';
+  flag_reason: string | null;
+  flagged_at: string | null;
+  event_count: number;
+  tab_switch_count: number;
+  fullscreen_exit_count: number;
+  recording_url: string | null;
+  quiz_attempt_id: string | null;
   created_at: string;
   updated_at: string;
 }

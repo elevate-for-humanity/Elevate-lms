@@ -100,7 +100,7 @@ export default function FinalSignoffPage() {
               </tr>
               <tr>
                 <td className="p-2 border print:p-1">On-the-Job Training (OJT)</td>
-                <td className="p-2 border text-center print:p-1">1,500 hours</td>
+                <td className="p-2 border text-center print:p-1">2,000 hours</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">☐</td>
               </tr>

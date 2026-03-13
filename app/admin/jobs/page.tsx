@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Building2, MapPin, Clock, Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
@@ -67,9 +66,6 @@ export default async function JobsPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-jobs-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">

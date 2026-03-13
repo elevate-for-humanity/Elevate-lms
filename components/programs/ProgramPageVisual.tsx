@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export interface VisualProgramData {
   title: string;
@@ -39,7 +38,7 @@ interface Props {
 }
 
 export function ProgramPageVisual({ program }: Props) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,9 +57,7 @@ export function ProgramPageVisual({ program }: Props) {
               poster={program.heroImage}
             >
               <source src={program.heroVideo} type="video/mp4" />
-            </video>
-            {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-          </>
+            </video>          </>
         ) : (
           <Image
             src={program.heroImage}

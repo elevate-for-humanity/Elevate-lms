@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import React, { useState } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CheckCircle, AlertCircle, Loader2, Database, Volume2, BookOpen, Play } from 'lucide-react';
@@ -156,9 +155,6 @@ export default function HVACActivationPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-hvac-activation-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'HVAC Activation' }]} />
 

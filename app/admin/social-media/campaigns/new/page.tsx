@@ -588,9 +588,7 @@ function PlatformButton({
       <div className="font-medium text-black">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-social-campaigns-new-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
-      </section>{name}</div>
+{name}</div>
     </button>
   );
 }

@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import VideoHeroBanner from '@/components/ui/VideoHeroBanner';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/founder' },
@@ -15,12 +15,28 @@ export const metadata: Metadata = {
 export default function FounderPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/founder-video-poster.jpg"
+        posterAlt="Founder — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Founder' }]} />
       </div>
 
-      {/* Video Hero */}
-      <VideoHeroBanner videoSrc="/videos/elevate-overview-with-narration.mp4" posterSrc="/images/pages/founder-video-poster.jpg" posterAlt="Founder" />
+      {/* Hero */}
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-slate-900">
+        <Image src="/images/pages/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover opacity-55" priority />
+        <div className="absolute inset-0 flex items-center px-6">
+          <div className="max-w-6xl mx-auto w-full">
+            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Founder &amp; CEO</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Elizabeth Greene</h1>
+            <p className="text-white/80 text-lg mt-2">Elevate for Humanity Career &amp; Technical Institute</p>
+          </div>
+        </div>
+      </section>
 
       {/* Bio — full body photo left, bio right */}
       <section className="py-10 sm:py-16">
@@ -197,7 +213,7 @@ export default function FounderPage() {
             <Link href="/programs" className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
               Explore Programs
             </Link>
-            <Link href="/apply" className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition">
+            <Link href="/start" className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition">
               Apply Now <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </div>

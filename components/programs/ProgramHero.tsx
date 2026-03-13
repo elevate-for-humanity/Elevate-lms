@@ -4,10 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import type { Program } from '@/app/data/programs';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 export function ProgramHero({ program }: { program: Program }) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo({ pauseOffScreen: false });
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
 
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const isHVACProgram = program.slug === 'hvac-technician';
@@ -48,9 +47,7 @@ export function ProgramHero({ program }: { program: Program }) {
                 className="absolute inset-0 w-full h-full object-cover"
               >
                 <source src="/videos/hero-home.mp4" type="video/mp4" />
-              </video>
-              {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-            </>
+              </video>            </>
           ) : (
             <Image
               src={program.heroImage}

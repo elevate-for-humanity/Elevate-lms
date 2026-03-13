@@ -28,8 +28,8 @@ export default function HomePage() {
       <div className="bg-brand-green-600 text-white py-2.5 text-center text-sm font-semibold tracking-wide">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3 flex-wrap">
           <span>Now Enrolling — Funded Credential Programs in Healthcare, Trades, CDL &amp; Technology</span>
-          <Link href="/apply" className="inline-flex items-center gap-1 bg-white text-brand-green-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-brand-green-50 transition-colors">
-            Check Eligibility →
+          <Link href="/start" className="inline-flex items-center gap-1 bg-white text-brand-green-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-brand-green-50 transition-colors">
+            Start Here →
           </Link>
         </div>
       </div>
@@ -37,6 +37,25 @@ export default function HomePage() {
       {/* ─── HERO VIDEO ─── */}
       <section className="relative w-full h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[300px] overflow-hidden">
         <HomeHeroVideo />
+        {/* Hero copy — present on initial render, not gated by JS */}
+        <div className="absolute inset-0 flex items-end pointer-events-none">
+          <div className="w-full bg-black/55 px-6 py-6 sm:py-8 pointer-events-auto">
+            <div className="max-w-3xl mx-auto">
+              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-4">
+                We train adults for real jobs — in weeks, not years.
+              </h1>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-lg text-sm sm:text-base">
+                  Start Here — It&apos;s Free
+                </Link>
+                <Link href="/programs" className="bg-white/10 border border-white/25 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/20 transition-all text-sm sm:text-base">
+                  See All Programs
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ─── SECTION 1: WHO WE ARE ─── */}
@@ -45,12 +64,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             {/* Left: plain-language explanation */}
-            <ScrollReveal direction="left">
             <div>
-              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
-                We train adults for real jobs — in weeks, not years.
-              </h1>
               <p className="text-slate-300 text-lg leading-relaxed mb-4">
                 Elevate for Humanity is a workforce credential institute based in Indianapolis. We run short-term career training programs in healthcare, skilled trades, CDL driving, barbering, and technology. Programs run 4 to 16 weeks. Most are fully funded at no cost to eligible participants.
               </p>
@@ -58,15 +72,14 @@ export default function HomePage() {
                 We are not a college. We are not a staffing agency. We are a training institute that takes you from where you are today to a nationally recognized credential and a job offer — with funding, hands-on instruction, and employer connections built into every program.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
-                  Apply Now — It&apos;s Free
+                <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
+                  Start Here — It&apos;s Free
                 </Link>
                 <Link href="/programs" className="bg-white/10 border border-white/25 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/20 transition-all text-base">
                   See All Programs
                 </Link>
               </div>
             </div>
-            </ScrollReveal>
 
             {/* Right: 2x2 photo grid of program sectors */}
             <ScrollReveal direction="right" delay={150}>
@@ -411,8 +424,8 @@ export default function HomePage() {
             Apply online in minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
-              Apply Now
+            <Link href="/start" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+              Start Here — It&apos;s Free
             </Link>
             <Link href="/programs" className="border-2 border-white/40 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
               View Programs

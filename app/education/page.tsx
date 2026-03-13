@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Volume2, VolumeX, Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
+import { Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 
 const NAV = [
   { label: 'Programs', href: '/programs' },
@@ -27,8 +27,8 @@ const PROGRAMS = [
   {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/pages/comp-pathway-trades.jpg',
-    icon: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
+    icon: '/images/pages/hvac-technician.jpg',
     desc: 'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
     tags: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
   },
@@ -43,8 +43,8 @@ const PROGRAMS = [
   {
     title: 'CDL & Transportation',
     href: '/programs/cdl-training',
-    image: '/images/pages/comp-pathway-trades.jpg',
-    icon: '/images/pages/comp-pathway-trades.jpg',
+    image: '/images/pages/hvac-technician.jpg',
+    icon: '/images/pages/hvac-technician.jpg',
     desc: 'Commercial Driving License training with job placement. Class A and Class B CDL programs.',
     tags: ['CDL Class A', 'CDL Class B', 'Diesel Mechanic'],
   },
@@ -69,8 +69,8 @@ const PROGRAMS = [
 const LOCATIONS = [
   { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/workforce-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
   { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/workforce-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
-  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Career training aligned with Ohio industry demand.' },
-  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/comp-pathway-trades.jpg', desc: 'Expanding workforce development across Tennessee.' },
+  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/hvac-technician.jpg', desc: 'Career training aligned with Ohio industry demand.' },
+  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/hvac-technician.jpg', desc: 'Expanding workforce development across Tennessee.' },
   { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/workforce-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
 ];
 
@@ -83,26 +83,17 @@ const STATS = [
 
 export default function EducationLandingPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [voiceActive, setVoiceActive] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const playedRef = useRef(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    const play = async () => { try { await v.play(); setIsPlaying(true); } catch { /* poster */ } };
-    if (v.readyState >= 2) play();
-    else v.addEventListener('loadeddata', play, { once: true });
-    return () => v.removeEventListener('loadeddata', play);
+    if (audioRef.current && !playedRef.current) {
+      playedRef.current = true;
+      audioRef.current.volume = 1;
+      audioRef.current.play().catch(() => {});
+    }
   }, []);
-
-  const toggleVoice = () => {
-    const vo = voiceoverRef.current;
-    if (!vo) return;
-    if (!voiceActive) { vo.currentTime = 0; vo.play().catch(() => {}); setVoiceActive(true); }
-    else { vo.pause(); setVoiceActive(false); }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -118,7 +109,7 @@ export default function EducationLandingPage() {
               {NAV.map((n) => (
                 <Link key={n.label} href={n.href} className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-red-600 hover:bg-gray-50 rounded-lg transition-colors">{n.label}</Link>
               ))}
-              <Link href="/apply" className="ml-1 px-5 py-2.5 text-sm font-bold bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-lg transition-colors">Apply Now</Link>
+              <Link href="/start" className="ml-1 px-5 py-2.5 text-sm font-bold bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-lg transition-colors">Apply Now</Link>
               <Link href="/login" className="ml-1 px-4 py-2.5 text-sm font-semibold text-brand-blue-600 border border-brand-blue-200 hover:bg-brand-blue-50 rounded-lg transition-colors">Sign In</Link>
             </nav>
             <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" aria-label="Menu">
@@ -128,7 +119,7 @@ export default function EducationLandingPage() {
           {mobileOpen && (
             <div className="lg:hidden border-t py-3 space-y-1">
               {NAV.map((n) => <Link key={n.label} href={n.href} onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">{n.label}</Link>)}
-              <Link href="/apply" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-bold text-brand-red-600">Apply Now</Link>
+              <Link href="/start" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-bold text-brand-red-600">Apply Now</Link>
               <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 text-sm font-semibold text-brand-blue-600">Sign In</Link>
             </div>
           )}
@@ -139,14 +130,9 @@ export default function EducationLandingPage() {
       <section className="pt-16">
         <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '360px' }}>
           <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/workforce-training.jpg">
-            <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
+            <source src="/videos/career-services-hero.mp4" type="video/mp4" />
           </video>
-          <audio ref={voiceoverRef} src="/audio/heroes/programs.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
-          {isPlaying && (
-            <button onClick={toggleVoice} className={`absolute z-20 flex items-center gap-2 text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
-              {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
-            </button>
-          )}
+          <audio ref={audioRef} src="/audio/heroes/programs.mp3" preload="metadata" aria-hidden="true" />
         </div>
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">
@@ -157,7 +143,7 @@ export default function EducationLandingPage() {
             <p className="text-base md:text-lg text-slate-300 mb-8 max-w-3xl mx-auto">No-cost career training for eligible participants. Choose your program, pick your location, and build a career in healthcare, skilled trades, technology, and more.</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-7 py-3.5 rounded-lg font-bold transition-colors">Browse All Programs <ArrowRight className="w-5 h-5" /></Link>
-              <Link href="/apply" className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-900 px-7 py-3.5 rounded-lg font-bold transition-colors">Apply Now</Link>
+              <Link href="/start" className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-900 px-7 py-3.5 rounded-lg font-bold transition-colors">Apply Now</Link>
               <Link href="/funding" className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-7 py-3.5 rounded-lg font-semibold transition-colors">Check Funding</Link>
             </div>
           </div>
@@ -253,7 +239,7 @@ export default function EducationLandingPage() {
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Many programs are available at no cost through WIOA, state workforce grants, DOL Registered Apprenticeships, and other funding. Self-pay options also available.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/funding" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-7 py-3.5 rounded-lg font-bold transition-colors">Check Funding Eligibility</Link>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-7 py-3.5 rounded-lg font-bold transition-colors">Start Your Application</Link>
+            <Link href="/start" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-7 py-3.5 rounded-lg font-bold transition-colors">Start Your Application</Link>
           </div>
         </div>
       </section>
@@ -278,7 +264,7 @@ export default function EducationLandingPage() {
             <div>
               <div className="text-white font-semibold mb-3">Quick Links</div>
               <div className="space-y-2 text-sm">
-                <Link href="/apply" className="block hover:text-white">Apply Now</Link>
+                <Link href="/start" className="block hover:text-white">Apply Now</Link>
                 <Link href="/funding" className="block hover:text-white">Funding & Financial Aid</Link>
                 <Link href="/locations" className="block hover:text-white">Locations</Link>
                 <Link href="/about" className="block hover:text-white">About Us</Link>

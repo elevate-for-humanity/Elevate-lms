@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+import PageVideoHero from '@/components/ui/PageVideoHero';
   Users,
   BookOpen,
   ArrowRight,
@@ -116,6 +117,13 @@ export default function JRIPage() {
 
   return (
     <div className="bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/training-providers-hero.mp4"
+        posterSrc="/images/pages/jri-hero.jpg"
+        posterAlt="Jri — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

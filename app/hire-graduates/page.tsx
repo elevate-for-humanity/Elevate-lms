@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,13 @@ export default async function HireGraduatesPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+
+      <PageVideoHero
+        videoSrc="/videos/employer-hero.mp4"
+        posterSrc="/images/pages/hire-graduates-page-1.jpg"
+        posterAlt="Hire Graduates — Elevate for Humanity"
+        size="marketing"
+      />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>

@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
 export const maxDuration = 60;

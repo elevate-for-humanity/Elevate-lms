@@ -6,7 +6,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   subtitle: 'Earn OSHA 30, EPA 608, and forklift certifications in 8 weeks. Multi-trade foundation for construction careers.',
   sector: 'skilled-trades',
   category: 'Construction',
-  heroImage: '/images/pages/admin-construction-hero.jpg',
+  heroImage: '/images/pages/construction-trades.jpg',
   heroImageAlt: 'Construction trades students in safety gear on a job site',
   deliveryMode: 'hybrid',
   durationWeeks: 8,

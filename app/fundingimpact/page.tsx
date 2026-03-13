@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import LazyVideo from '@/components/ui/LazyVideo';
 import { 
   TrendingUp, 
   Users, 
@@ -36,9 +37,8 @@ export default function FundingImpactPage() {
       {/* Hero Section with Video Background */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover pointer-events-none">
-            <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
-          </video>
+          <LazyVideo src="/videos/graduation-success.mp4" poster="/images/pages/funding-hero.jpg"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -47,7 +47,7 @@ export default function FundingImpactPage() {
               Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
+              <Link href="/start" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
               <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors border-2 border-white/30">Check Your Eligibility</Link>
             </div>
           </div>
@@ -510,7 +510,7 @@ export default function FundingImpactPage() {
               Check Eligibility
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-800 transition-colors border-2 border-white/30"
             >
               Apply Now

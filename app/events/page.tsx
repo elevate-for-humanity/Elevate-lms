@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Events | Elevate For Humanity',
@@ -33,6 +34,13 @@ export default async function EventsPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+
+      <PageVideoHero
+        videoSrc="/videos/homepage-hero-montage.mp4"
+        posterSrc="/images/pages/events-page-1.jpg"
+        posterAlt="Events — Elevate for Humanity"
+        size="support"
+      />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>

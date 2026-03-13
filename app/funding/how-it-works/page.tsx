@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, FileCheck, GraduationCap, HelpCircle } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/how-it-works' },
@@ -29,6 +30,13 @@ export default function FundingHowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/training-providers-hero.mp4"
+        posterSrc="/images/pages/how-it-works-hero.jpg"
+        posterAlt="Funding How It Works — Elevate for Humanity"
+        size="marketing"
+      />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'How It Works' }]} />
       </div>

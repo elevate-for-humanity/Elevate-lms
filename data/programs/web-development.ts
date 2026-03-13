@@ -3,7 +3,7 @@ export const WEB_DEVELOPMENT: ProgramSchema = {
   slug: 'web-development', title: 'Web Development',
   subtitle: 'Learn HTML, CSS, JavaScript, and WordPress. Earn Meta Front-End Developer and WordPress certifications in 12 weeks.',
   sector: 'technology', category: 'Web Development',
-  heroImage: '/images/pages/admin-code-hero.jpg', heroImageAlt: 'Web development student coding on a laptop',
+  heroImage: '/images/pages/web-development.jpg', heroImageAlt: 'Web development student coding on a laptop',
   deliveryMode: 'hybrid', durationWeeks: 12, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 80, handsOnLab: 140, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',

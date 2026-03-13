@@ -50,17 +50,17 @@ export const PROGRAM_HEROES: Record<string, string> = {
   'healthcare': '/hero-images/healthcare-hero.jpg',
 
   // Skilled Trades
-  'hvac-technician': '/images/pages/comp-pathway-trades.jpg',
-  'hvac': '/images/pages/comp-pathway-trades.jpg',
-  'electrical': '/images/pages/comp-pathway-trades.jpg',
-  'plumbing': '/images/pages/comp-pathway-trades.jpg',
-  'welding': '/images/pages/comp-pathway-trades.jpg',
-  'diesel-mechanic': '/images/pages/comp-cta-training.jpg',
+  'hvac-technician': '/images/pages/hvac-technician.jpg',
+  'hvac': '/images/pages/hvac-unit.jpg',
+  'electrical': '/images/pages/electrical.jpg',
+  'plumbing': '/images/pages/plumbing.jpg',
+  'welding': '/images/pages/welding-sparks.jpg',
+  'diesel-mechanic': '/images/pages/hvac-tools.jpg',
   'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
 
   // Transportation
-  'cdl-training': '/images/pages/comp-cta-training.jpg',
-  'cdl': '/images/pages/comp-cta-training.jpg',
+  'cdl-training': '/images/pages/cdl-training.jpg',
+  'cdl': '/images/pages/cdl-truck-highway.jpg',
   'cdl-transportation': '/hero-images/cdl-cat-new.jpg',
 
   // Technology

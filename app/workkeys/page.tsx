@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'ACT WorkKeys / NCRC | Elevate for Humanity — Indianapolis',
@@ -26,10 +27,17 @@ export default function WorkKeysPage() {
   return (
     <div className="min-h-screen bg-white">
 
+      <PageVideoHero
+        videoSrc="/videos/it-technology.mp4"
+        posterSrc="/images/pages/adult-learner.jpg"
+        posterAlt="Workkeys — Elevate for Humanity"
+        audioSrc="/audio/heroes/technology.mp3"
+        size="marketing"
+      />
+
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
         <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover opacity-60" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
       </section>
 
       {/* Header */}
@@ -82,8 +90,9 @@ export default function WorkKeysPage() {
               <div key={name} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-                  <h3 className="absolute bottom-3 left-4 right-4 font-bold text-white text-sm">{name}</h3>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
+                    <h3 className="font-bold text-white text-sm">{name}</h3>
+                  </div>
                 </div>
                 <div className="p-4 flex-1 bg-white">
                   <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
@@ -104,8 +113,9 @@ export default function WorkKeysPage() {
               <div key={level} className="rounded-xl overflow-hidden border border-slate-200 flex flex-col">
                 <div className="relative h-32 flex-shrink-0">
                   <Image src={img} alt={level} fill sizes="300px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-                  <p className="absolute bottom-2 left-3 font-extrabold text-white text-sm">{level}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5">
+                    <p className="font-extrabold text-white text-sm">{level}</p>
+                  </div>
                 </div>
                 <div className="p-3 bg-white flex-1">
                   <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>

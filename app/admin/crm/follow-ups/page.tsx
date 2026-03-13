@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -89,9 +88,6 @@ export default async function CRMFollowUpsPage() {
     <div className="min-h-screen bg-gray-50 p-8">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-crm-follow-ups-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'CRM', href: '/admin/crm' }, { label: 'Follow-ups' }]} />
       </div>

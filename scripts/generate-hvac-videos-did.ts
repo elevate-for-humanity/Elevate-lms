@@ -3,13 +3,13 @@
  *
  * Uses the existing instructor-trades.jpg photo + pre-generated lesson MP3s.
  * D-ID lip-syncs Marcus Johnson's face to each lesson's audio track.
- * Output: public/generated/videos/lesson-{uuid}.mp4
+ * Output: public/hvac/videos/lesson-{uuid}.mp4
  *
  * Run: npx tsx scripts/generate-hvac-videos-did.ts
  *
  * Requirements:
  *   - DID_API_KEY in .env.local
- *   - All 94 MP3s already in public/generated/lessons/ (run generate-hvac-audio.ts first)
+ *   - All 94 MP3s already in public/hvac/audio/ (run generate-hvac-audio.ts first)
  *   - Site must be deployed so D-ID can fetch the audio via public URL
  *     OR pass --local to upload audio directly as base64
  *
@@ -30,11 +30,15 @@ import { HVAC_LESSON_UUID } from '../lib/courses/hvac-uuids';
 
 const DID_API_BASE = 'https://api.d-id.com';
 const DID_KEY = process.env.DID_API_KEY;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace('localhost:3000', 'www.elevateforhumanity.org') || 'https://www.elevateforhumanity.org';
+const SITE_URL = 'https://www.elevateforhumanity.org';
+const SUPABASE_URL        = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const AUDIO_DIR  = path.join(process.cwd(), 'public', 'generated', 'lessons');
-const VIDEO_DIR  = path.join(process.cwd(), 'public', 'generated', 'videos');
-const PHOTO_URL  = `${SITE_URL}/images/team/instructors/instructor-trades.jpg`;
+const AUDIO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'audio');
+const VIDEO_DIR  = path.join(process.cwd(), 'public', 'hvac', 'videos');
+// elizabeth-greene-headshot.jpg: 800x1080 portrait — passes D-ID face detection
+const PHOTO_LOCAL = path.join(process.cwd(), 'public', 'images', 'team', 'elizabeth-greene-headshot.jpg');
+const PHOTO_URL   = `${SITE_URL}/images/team/elizabeth-greene-headshot.jpg`;
 const CONCURRENCY = 3; // D-ID free tier allows ~3 concurrent
 
 if (!DID_KEY) {
@@ -50,12 +54,34 @@ function didHeaders() {
   };
 }
 
-async function submitTalk(audioUrl: string): Promise<string> {
+/** Upload a local file to Supabase Storage and return its public https URL. */
+async function uploadToSupabase(localPath: string, storagePath: string): Promise<string> {
+  const buf = fs.readFileSync(localPath);
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/lesson-audio/${storagePath}`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'audio/mpeg',
+        'x-upsert': 'true',
+      },
+      body: buf,
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase upload failed: ${err}`);
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/lesson-audio/${storagePath}`;
+}
+
+async function submitTalk(audioUrl: string, photoUrl: string = PHOTO_URL): Promise<string> {
   const res = await fetch(`${DID_API_BASE}/talks`, {
     method: 'POST',
     headers: didHeaders(),
     body: JSON.stringify({
-      source_url: PHOTO_URL,
+      source_url: photoUrl,
       script: { type: 'audio', audio_url: audioUrl },
       config: { stitch: true, result_format: 'mp4' },
     }),
@@ -98,7 +124,7 @@ async function processOne(defId: string, uuid: string): Promise<'skipped' | 'don
     return 'skipped';
   }
 
-  const audioUrl = `${SITE_URL}/generated/lessons/lesson-${uuid}.mp3`;
+  const audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
 
   try {
     const talkId = await submitTalk(audioUrl);
@@ -111,20 +137,96 @@ async function processOne(defId: string, uuid: string): Promise<'skipped' | 'don
   }
 }
 
+function getArg(name: string): string | undefined {
+  const idx = process.argv.indexOf(name);
+  return idx >= 0 ? process.argv[idx + 1] : undefined;
+}
+
 async function main() {
   fs.mkdirSync(VIDEO_DIR, { recursive: true });
 
+  // Single-lesson mode: --lesson-id hvac-06-09 --audio /path/audio.mp3 --out /path/video.mp4
+  const singleLessonId = getArg('--lesson-id');
+  const singleAudioPath = getArg('--audio');
+  const singleOutPath   = getArg('--out');
+
+  if (singleLessonId) {
+    if (!singleAudioPath || !singleOutPath) {
+      console.error('--audio and --out are required when --lesson-id is specified');
+      process.exit(1);
+    }
+    if (!fs.existsSync(singleAudioPath)) {
+      console.error(`Audio file not found: ${singleAudioPath}`);
+      process.exit(1);
+    }
+
+    const uuid = HVAC_LESSON_UUID[singleLessonId];
+    if (!uuid) {
+      console.error(`No UUID found for lesson ${singleLessonId} in HVAC_LESSON_UUID`);
+      process.exit(1);
+    }
+
+    // Upload instructor photo to Supabase so D-ID can fetch it via https://
+    let photoUrl = PHOTO_URL;
+    try {
+      const photoBuf = fs.readFileSync(PHOTO_LOCAL);
+      const photoRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/avatars/hvac-instructor.jpg`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+            'Content-Type': 'image/jpeg',
+            'x-upsert': 'true',
+          },
+          body: photoBuf,
+        }
+      );
+      if (photoRes.ok) {
+        photoUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/hvac-instructor.jpg`;
+        console.log(`  Photo URL: ${photoUrl}`);
+      }
+    } catch { /* fall back to site URL */ }
+
+    // D-ID requires a public https:// URL — upload audio to Supabase Storage first
+    const storagePath = `hvac/audio/lesson-${uuid}.mp3`;
+    console.log(`Generating video for ${singleLessonId}...`);
+    console.log(`  Uploading audio to Supabase Storage...`);
+    let audioUrl: string;
+    try {
+      audioUrl = await uploadToSupabase(singleAudioPath, storagePath);
+    } catch (e: any) {
+      // Fallback: try production site URL directly (works if already deployed)
+      audioUrl = `${SITE_URL}/hvac/audio/lesson-${uuid}.mp3`;
+      console.log(`  Upload failed (${e.message}), trying site URL: ${audioUrl}`);
+    }
+    console.log(`  Audio URL: ${audioUrl}`);
+    console.log(`  Out: ${singleOutPath}`);
+
+    try {
+      const talkId = await submitTalk(audioUrl, photoUrl);
+      const resultUrl = await pollTalk(talkId);
+      await downloadMp4(resultUrl, singleOutPath);
+      console.log(`Done: ${singleOutPath}`);
+    } catch (e: any) {
+      console.error(`Failed: ${e.message}`);
+      process.exit(1);
+    }
+    return;
+  }
+
+  // Batch mode — all lessons
   const all = Object.entries(HVAC_LESSON_UUID) as [string, string][];
   const pending = all.filter(([, uuid]) => !fs.existsSync(path.join(VIDEO_DIR, `lesson-${uuid}.mp4`)));
 
   if (pending.length === 0) {
-    console.log('All 94 HVAC lessons already have video.');
+    console.log('All HVAC lessons already have video.');
     return;
   }
 
   console.log(`Generating ${pending.length} D-ID videos...`);
   console.log(`Photo: ${PHOTO_URL}`);
-  console.log(`Audio base URL: ${SITE_URL}/generated/lessons/`);
+  console.log(`Audio base URL: ${SITE_URL}/hvac/audio/`);
   console.log(`Concurrency: ${CONCURRENCY}\n`);
 
   let done = 0, failed = 0, skipped = 0;

@@ -77,7 +77,7 @@ export default async function SignupPage() {
             Already have an account? Log in
           </Link>
           <Link
-            href="/apply"
+            href="/start"
             aria-label="Link"
             className="underline hover:text-brand-blue-600"
           >

@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   Users, Clock, FileText, ClipboardList, Settings,
@@ -10,6 +8,7 @@ import {
   Scissors, Calendar, Upload, DollarSign,
 } from 'lucide-react';
 import { MOUStatusBadge, MOUStatusAlert } from '@/components/MOUStatusBadge';
+import { requirePartnerIdentity } from '@/lib/auth-guard';
 
 export const metadata: Metadata = {
   title: 'Dashboard | Partner Portal',
@@ -20,13 +19,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function PartnerPortalPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/partner/login');
+  // Identity guard: verifies auth → profiles → partner_users → partners
+  // Redirects to /partner/login?error=... if any link is broken
+  const { user, org, partnerId } = await requirePartnerIdentity();
 
-  const db = createAdminClient() || supabase;
+  const db = createAdminClient();
 
-  let org: any = null;
   let mouStatus = 'not_sent';
   const stats = {
     activeApprentices: 0,
@@ -38,16 +36,8 @@ export default async function PartnerPortalPage() {
   let recentActivity: any[] = [];
 
   try {
-    // Partner user record
-    const { data: partnerUser } = await db
-      .from('partner_users')
-      .select('*, partner_organizations(*)')
-      .eq('user_id', user.id)
-      .single();
-
-    if (partnerUser) {
-      org = partnerUser.partner_organizations;
-      const orgId = org?.id;
+    if (db) {
+      const orgId = partnerId;
 
       if (orgId) {
         // Active apprentices
@@ -135,13 +125,9 @@ export default async function PartnerPortalPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          {org ? (
-            <p className="text-gray-600 mt-1">
-              {org.name} &middot; {org.city || 'Indianapolis'}, {org.state || 'IN'}
-            </p>
-          ) : (
-            <p className="text-gray-600 mt-1">Welcome, {user.email}</p>
-          )}
+          <p className="text-gray-600 mt-1">
+            {org.name} &middot; {org.city || 'Indianapolis'}, {org.state || 'IN'}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <MOUStatusBadge status={mouStatus} />

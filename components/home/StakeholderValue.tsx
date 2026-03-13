@@ -15,7 +15,7 @@ const STAKEHOLDERS = [
     ],
     cta: 'Check Eligibility',
     href: '/wioa-eligibility',
-    gradient: 'from-brand-blue-500 to-brand-blue-700',
+    gradient: 'bg-brand-blue-600',
     bg: 'bg-brand-blue-50',
     border: 'border-brand-blue-200',
   },
@@ -31,7 +31,7 @@ const STAKEHOLDERS = [
     ],
     cta: 'Access Talent Pipeline',
     href: '/employer',
-    gradient: 'from-emerald-500 to-emerald-700',
+    gradient: 'bg-emerald-600',
     bg: 'bg-emerald-50',
     border: 'border-emerald-200',
   },
@@ -47,7 +47,7 @@ const STAKEHOLDERS = [
     ],
     cta: 'Partnership Inquiry',
     href: '/contact',
-    gradient: 'from-slate-600 to-slate-800',
+    gradient: 'bg-slate-700',
     bg: 'bg-slate-50',
     border: 'border-slate-200',
   },
@@ -74,7 +74,7 @@ export default function StakeholderValue() {
             return (
               <ScrollReveal key={i} delay={i * 120}>
                 <div className={`${s.bg} border ${s.border} rounded-2xl p-8 h-full flex flex-col hover:shadow-lg transition-shadow`}>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-5`}>
+                  <div className={`w-12 h-12 rounded-xl ${s.gradient} flex items-center justify-center mb-5`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">

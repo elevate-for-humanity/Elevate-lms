@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Find Programs & Resources | Elevate For Humanity',
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/search',
     images: [
       {
-        url: '/images/pages/comp-highlights-success.jpg',
+        url: '/images/pages/healthcare-grad.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate for Humanity — Workforce Training Programs',
@@ -83,6 +84,13 @@ const quickLinks = [
 export default function SearchPage() {
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/programs-overview-video-with-narration.mp4"
+        posterSrc="/images/pages/comp-home-hero-programs.jpg"
+        posterAlt="Search — Elevate for Humanity"
+        size="support"
+      />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Search' }]} />
@@ -260,7 +268,7 @@ export default function SearchPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              href="/apply/student"
+              href="/start"
               className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg"
             >
               Apply Now

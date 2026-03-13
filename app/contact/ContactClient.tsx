@@ -220,7 +220,7 @@ export default function ContactClient() {
             Apply now and take the first step toward a better future.
           </p>
           <Link
-            href="/apply"
+            href="/start"
             className="inline-flex items-center justify-center bg-zinc-900 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:shadow-2xl hover:scale-105 transition-all"
           >
             Apply Now

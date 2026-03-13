@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Users, TrendingUp, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Ongoing Support | Career Services | Elevate For Humanity',
@@ -85,6 +86,14 @@ export default async function OngoingSupportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/career-services-page-4.jpg"
+        posterAlt="Career Services Ongoing Support — Elevate for Humanity"
+        audioSrc="/audio/heroes/career-services.mp3"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

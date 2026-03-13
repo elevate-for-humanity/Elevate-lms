@@ -101,13 +101,13 @@ function mapSupabaseProgramToProgram(data: any): Program {
  */
 function getDefaultHeroImage(slug: string): string {
   const imageMap: Record<string, string> = {
-    'hvac-technician': '/images/pages/comp-cta-programs.jpg',
-    'barber-apprenticeship': '/images/pages/comp-cta-programs.jpg',
-    cna: '/images/pages/comp-cta-programs.jpg',
-    cdl: '/images/pages/comp-cta-programs.jpg',
-    'building-maintenance': '/images/pages/comp-cta-programs.jpg',
-    'building-technician': '/images/pages/comp-cta-programs.jpg',
-    'workforce-readiness': '/images/pages/comp-cta-programs.jpg',
+    'hvac-technician': '/images/pages/hvac-technician.jpg',
+    'barber-apprenticeship': '/images/pages/barber-hero-main.jpg',
+    cna: '/images/pages/cna-clinical.jpg',
+    cdl: '/images/pages/cdl-truck-highway.jpg',
+    'building-maintenance': '/images/pages/hvac-tools.jpg',
+    'building-technician': '/images/pages/electrical.jpg',
+    'workforce-readiness': '/images/pages/workforce-training.jpg',
   };
 
   return imageMap[slug] || '/images/pages/comp-home-hero-programs.jpg';

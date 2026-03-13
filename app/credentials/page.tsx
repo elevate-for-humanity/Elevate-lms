@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Award, FileCheck, Briefcase, ChevronRight } from 'lucide-react';
+import LazyVideo from '@/components/ui/LazyVideo';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -38,7 +39,7 @@ const industryCerts = [
 ];
 
 const apprenticeshipCreds = [
-  { name: 'Barber License', issuer: 'Indiana Professional Licensing Agency', field: 'Cosmetology', desc: 'State barber license earned through DOL Registered Apprenticeship. Requires 1,500 OJT hours under employer supervision, competency verification, and state board exam. RAPIDS: 2025-IN-132301.', img: '/images/pages/barber-hero-main.jpg' },
+  { name: 'Barber License', issuer: 'Indiana Professional Licensing Agency', field: 'Cosmetology', desc: 'State barber license earned through DOL Registered Apprenticeship. Requires 2,000 total hours (1,500 OJT + 500 RTI) under employer supervision, competency verification, and state board exam. RAPIDS: 2025-IN-132301.', img: '/images/pages/barber-hero-main.jpg' },
 ];
 
 export default function CredentialsPage() {
@@ -52,11 +53,8 @@ export default function CredentialsPage() {
 
       {/* Video hero */}
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
-        <video autoPlay muted loop playsInline poster="/images/pages/credentials-page-1.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-60">
-          <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+        <LazyVideo src="/videos/career-services-hero.mp4" poster="/images/pages/credentials-page-1.jpg"
+          className="absolute inset-0 w-full h-full object-cover opacity-60" />
       </section>
 
       {/* Page header */}
@@ -101,8 +99,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
                 <div className="relative h-36 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>
                 </div>
@@ -132,8 +129,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
                 <div className="relative h-36 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/75 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>
@@ -165,8 +161,7 @@ export default function CredentialsPage() {
               <div key={cred.name} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
                     <p className="text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
                     <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
                   </div>
@@ -213,7 +208,7 @@ export default function CredentialsPage() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
           <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-slate-50 transition-colors shadow-lg">
+            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-slate-50 transition-colors shadow-lg">
               Apply Now
             </Link>
             <Link href="/programs" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-bold text-base hover:bg-white/10 transition-colors">

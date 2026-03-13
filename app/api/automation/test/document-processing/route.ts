@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -220,7 +221,7 @@ async function _POST() {
     });
 
   } catch (error) {
-    console.error('[document-processing test]', error);
+    logger.error('[document-processing test]', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

@@ -133,7 +133,7 @@ export default function HealthcareFundamentalsCoursePage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/apply"
+                  href="/start"
                   className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-2xl"
                 >
                   Enroll Now
@@ -369,7 +369,7 @@ export default function HealthcareFundamentalsCoursePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:bg-gray-100 transition-all"
             >
               Enroll Now

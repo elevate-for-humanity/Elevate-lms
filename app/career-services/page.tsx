@@ -28,7 +28,7 @@ export default function CareerServicesPage() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+        <div className="absolute bottom-0 left-0 right-0 bg-black/55 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Career Services</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
@@ -121,7 +121,7 @@ export default function CareerServicesPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Start Your Career?</h2>
           <p className="text-white mb-6 text-sm">Apply for training and career services are included at no extra cost.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
+            <Link href="/start" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/programs" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

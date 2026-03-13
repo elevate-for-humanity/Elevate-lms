@@ -69,7 +69,7 @@ export default function StudentSupportPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/apply"
+                href="/start"
                 className="inline-flex items-center justify-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
               >
                 Apply Now
@@ -183,7 +183,7 @@ export default function StudentSupportPage() {
           <p className="text-brand-green-100 text-lg mb-8">Check your eligibility for funded career training programs. Most students pay $0 out of pocket.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
             >
               Apply Now <ArrowRight className="w-5 h-5" />

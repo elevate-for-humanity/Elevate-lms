@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -64,9 +63,6 @@ export default function SalesforceIntegrationPage() {
     <div className="min-h-screen bg-gray-50 p-6">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-integrations-sf-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-4xl mx-auto">
         <div className="mb-4">
           <Breadcrumbs items={[

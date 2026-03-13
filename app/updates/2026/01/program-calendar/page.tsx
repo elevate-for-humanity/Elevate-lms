@@ -66,7 +66,7 @@ export default function ProgramCalendar() {
           Applications are accepted on a rolling basis. Cohorts start monthly based on enrollment.
         </p>
         <Link 
-          href="/apply" 
+          href="/start" 
           className="inline-block bg-brand-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-700 transition-colors"
         >
           Start Your Application

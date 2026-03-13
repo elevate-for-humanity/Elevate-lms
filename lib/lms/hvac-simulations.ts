@@ -1,6 +1,7 @@
 // Maps lesson UUIDs to simulation keys
 export const lessonUuidToSimulationKey: Record<string, keyof typeof hvacLessonSimulations> = {
   '2f172cb2-4657-5460-9b93-f9b062ad8dd2': 'hvac-01-01',
+  'ee8c4e3a-b1c6-51bf-acd5-2836c8b16e56': 'hvac-module-1', // How HVAC Systems Work — condenser unit lab
 }
 
 export const hvacLessonSimulations = {

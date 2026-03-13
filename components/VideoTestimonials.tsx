@@ -29,7 +29,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Certified Healthcare Assistant at IU Health',
     salary: '$42,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/features-hero.jpg',
+    thumbnail: '/images/pages/cna-clinical.jpg',
     quote: 'Elevate changed my life. I went from struggling to make ends meet to having a stable career in healthcare.',
     duration: '2:34',
     graduationYear: '2023'
@@ -42,7 +42,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'HVAC Technician at Carrier',
     salary: '$55,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/comp-highlights-success.jpg',
+    thumbnail: '/images/pages/hvac-unit.jpg',
     quote: 'The hands-on training prepared me for real-world work. I got hired before I even graduated!',
     duration: '3:12',
     graduationYear: '2023'
@@ -55,7 +55,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Medical Coder at Community Health Network',
     salary: '$48,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/comp-highlights-success.jpg',
+    thumbnail: '/images/pages/medical-assistant-desk.jpg',
     quote: 'I can work from home now and spend more time with my kids. This program gave me flexibility and financial security.',
     duration: '2:45',
     graduationYear: '2024'
@@ -68,7 +68,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Commercial Truck Driver at Schneider',
     salary: '$65,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/comp-highlights-success.jpg',
+    thumbnail: '/images/pages/cdl-cab-interior.jpg',
     quote: 'In just 4 weeks, I got my CDL and doubled my income. Best decision I ever made.',
     duration: '2:18',
     graduationYear: '2024'
@@ -81,7 +81,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Licensed Cosmetologist, Own Salon',
     salary: '$60,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/features-hero.jpg',
+    thumbnail: '/images/pages/barber-styling-hair.jpg',
     quote: 'I turned my passion into a career. Now I own my own salon and employ 3 other stylists!',
     duration: '3:45',
     graduationYear: '2023'
@@ -94,7 +94,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Phlebotomist at Eskenazi Health',
     salary: '$38,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/comp-highlights-success.jpg',
+    thumbnail: '/images/pages/phlebotomy-draw.jpg',
     quote: 'The program was fast-paced but thorough. I felt confident on my first day at work.',
     duration: '2:56',
     graduationYear: '2024'

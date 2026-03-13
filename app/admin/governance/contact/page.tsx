@@ -1,5 +1,4 @@
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Building2, Shield, Scale, FileText } from 'lucide-react';
@@ -57,9 +56,6 @@ export default function GovernanceContactPage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-governance-contact-hero.jpg" alt="Communications" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <Breadcrumbs
         items={[
           { label: 'Governance', href: '/admin/governance' },

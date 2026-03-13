@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -57,9 +56,6 @@ export default async function PartnerReportsPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-reports-partners-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4">
           <Breadcrumbs items={[

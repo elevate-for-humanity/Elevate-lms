@@ -214,7 +214,7 @@ export function SectionCard({
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-black/50" />
           {badge && (
             <span className="absolute top-3 right-3 px-3 py-1 bg-brand-red-600 text-white text-xs font-bold rounded-full shadow-lg">
               {badge}

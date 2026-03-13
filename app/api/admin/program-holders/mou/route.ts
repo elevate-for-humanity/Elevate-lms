@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';

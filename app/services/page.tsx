@@ -47,7 +47,7 @@ const services = [
     title: 'Academic Advising',
     description: 'One-on-one guidance to help you succeed',
     href: '/advising',
-    image: '/images/pages/comp-highlights-success.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
   },
   {
     title: 'Mentorship Program',

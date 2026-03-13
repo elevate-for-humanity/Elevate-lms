@@ -32,7 +32,7 @@ export function LmsHeroBanner({
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/35 to-transparent" />
+        <div className="absolute inset-0 bg-slate-900/55" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-3xl px-8 md:px-12">
             {eyebrow && (

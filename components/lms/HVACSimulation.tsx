@@ -159,7 +159,7 @@ export default function HVACSimulation({
         </div>
       )}
 
-      <div className="h-[420px] w-full bg-gradient-to-b from-slate-100 to-slate-200">
+      <div className="h-[420px] w-full bg-slate-100">
         <Canvas camera={{ position: [2.5, 2, 2.5], fov: 45 }} shadows gl={{ antialias: true }}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[5, 8, 5]} intensity={1} castShadow />

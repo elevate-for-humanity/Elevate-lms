@@ -20,7 +20,7 @@ async function _POST(
   // Check if quiz exists
   const { data: quiz, error: quizError } = await db
     .from('quizzes')
-    .select('id, max_attempts')
+    .select('id, max_attempts, requires_proctoring')
     .eq('id', quizId)
     .single();
 
@@ -64,6 +64,39 @@ async function _POST(
   if (attemptError) {
     logger.error('Error creating quiz attempt:', attemptError);
     return NextResponse.json({ error: 'Failed to start quiz' }, { status: 500 });
+  }
+
+  // Create exam session for proctored quizzes
+  if (quiz.requires_proctoring && newAttempt) {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', user.id)
+      .single();
+
+    const { error: sessionError } = await db
+      .from('exam_sessions')
+      .insert({
+        student_id: user.id,
+        student_name: profile?.full_name || user.email || 'Unknown',
+        student_email: profile?.email || user.email,
+        provider: 'other',
+        exam_name: `Quiz: ${quizId}`,
+        delivery_method: 'online_proctored',
+        status: 'in_progress',
+        result: 'pending',
+        started_at: new Date().toISOString(),
+        proctor_name: 'System (automated)',
+        duration_min: 0,
+        quiz_attempt_id: newAttempt.id,
+      })
+      .select('id')
+      .single();
+
+    if (sessionError) {
+      logger.error('Error creating exam session for proctored quiz:', sessionError);
+      // Don't block the quiz — monitoring is best-effort
+    }
   }
 
   // Redirect to quiz page

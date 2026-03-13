@@ -32,16 +32,17 @@ export default function Page() {
             <source src="/videos/getting-started-hero.mp4" type="video/mp4" />
           </video>
         </div>
+        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-4xl text-white">
             <p className="text-sm font-bold uppercase tracking-wide text-brand-orange-400 mb-4">
               Begin Your Journey
             </p>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 drop-shadow-2xl">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Start Your Career Journey Today
             </h1>
-            <p className="text-base md:text-lg mb-8 drop-shadow-lg text-white/95">
+            <p className="text-base md:text-lg mb-8 text-white/95">
               Funded training. No cost, no debt. Real careers waiting. Get
               started in 3 simple steps.
             </p>

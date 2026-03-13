@@ -9,6 +9,7 @@ import {
   GraduationCap, HelpCircle, Circle
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Community | Elevate For Humanity',
@@ -88,6 +89,13 @@ export default async function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
+      <PageVideoHero
+        videoSrc="/videos/homepage-hero-montage.mp4"
+        posterSrc="/images/pages/community-page-1.jpg"
+        posterAlt="Community — Elevate for Humanity"
+        size="marketing"
+      />
       {/* Breadcrumbs */}
       <div className="bg-gray-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -360,7 +368,7 @@ export default async function CommunityPage() {
               Join Free <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/apply"
+              href="/start"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors"
             >
               Start Training

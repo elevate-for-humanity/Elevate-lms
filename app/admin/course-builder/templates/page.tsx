@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -55,9 +54,6 @@ export default async function CourseTemplatesPage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/pages/admin-course-builder-templates-hero.jpg" alt="Course templates" fill sizes="100vw" className="object-cover" priority />
-      </section>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Link 

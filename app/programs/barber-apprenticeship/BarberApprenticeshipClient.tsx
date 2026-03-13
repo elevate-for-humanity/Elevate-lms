@@ -82,7 +82,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </div>
             <p className="text-slate-700 leading-relaxed">
               Start as a <strong>Barber Apprentice</strong> earning $24,000–$30,000 while you train under a licensed barber at a host shop.
-              After completing 1,500 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong> ($30,000–$45,000).
+              After completing 2,000 hours and passing the Indiana state exam, you become a <strong>Licensed Barber</strong> ($30,000–$45,000).
               With 3–5 years of experience and an established clientele, you advance to <strong>Senior Barber</strong> ($45,000–$65,000).
               Many graduates go on to open their own shop as a <strong>Shop Owner / Master Barber</strong> ($65,000–$100,000+).
             </p>
@@ -111,7 +111,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                 By program completion, apprentices perform six standard haircut styles — fade, taper, buzz, scissor-over-comb,
                 flat top, and shape-up — to client satisfaction. You will execute straight razor shaves following Indiana
                 sanitation protocols, identify and treat common scalp conditions, and demonstrate proper disinfection procedures
-                per Indiana Board standards. Each apprentice completes 1,000 hours of on-the-job training at a licensed shop,
+                per Indiana Board standards. Each apprentice completes 1,500 hours of on-the-job training at a licensed shop,
                 builds a client portfolio of 50+ documented services, and passes the Indiana Barber License written and practical exams.
               </p>
             </div>
@@ -223,7 +223,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <p className="text-slate-700 leading-relaxed mb-4">
                 Our apprenticeship depends on licensed barbershops willing to host and train apprentices on the job.
                 As a <strong>Partner Barbershop</strong>, you provide the supervised on-the-job training environment where
-                apprentices complete their 1,000 OJT hours. We handle all the paperwork — hour tracking, state compliance,
+                apprentices complete their 1,500 OJT hours. We handle all the paperwork — hour tracking, state compliance,
                 curriculum delivery, and completion documentation.
               </p>
               <p className="text-slate-700 leading-relaxed mb-4">

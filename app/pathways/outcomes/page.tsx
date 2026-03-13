@@ -264,7 +264,7 @@ export default function OutcomesPage() {
                   <Link href={p.href} className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition inline-flex items-center">
                     Full Program Details <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
-                  <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition">
+                  <Link href="/start" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition">
                     Apply Now
                   </Link>
                   <Link href="/funding" className="bg-white hover:bg-gray-50 text-brand-blue-700 border-2 border-brand-blue-200 px-5 py-2.5 rounded-lg font-bold text-sm transition">
@@ -286,7 +286,7 @@ export default function OutcomesPage() {
             We will help you find the right program and the right funding.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">
+            <Link href="/start" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
             <Link href="/pathways" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-bold transition border-2 border-white/30">

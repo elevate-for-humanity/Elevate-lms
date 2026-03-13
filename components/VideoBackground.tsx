@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
-import { UnmuteButton } from '@/components/ui/UnmuteButton';
 
 interface VideoBackgroundProps {
   videoUrl: string;
@@ -19,7 +18,7 @@ export function VideoBackground({
   className = '',
   children,
 }: VideoBackgroundProps) {
-  const { videoRef, showUnmuteButton, unmute } = useHeroVideo();
+  const { videoRef } = useHeroVideo();
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -38,9 +37,6 @@ export function VideoBackground({
 
       {overlay && <div className="absolute inset-0 bg-black/40 z-[1]" />}
 
-      <div className="relative z-10">{children}</div>
-
-      {showUnmuteButton && <UnmuteButton onClick={unmute} />}
-    </div>
+      <div className="relative z-10">{children}</div>    </div>
   );
 }

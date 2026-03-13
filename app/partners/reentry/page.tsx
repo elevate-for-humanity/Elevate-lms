@@ -26,7 +26,7 @@ export default function ReentryPartnerPage() {
           'Elevate for Humanity partners with reentry organizations, community corrections, and probation departments to provide career training for justice-involved individuals. Our programs are funded through JRI and WIOA, removing financial barriers to participation.',
           'We provide hands-on training in high-demand fields where background checks are less restrictive, giving participants a realistic path to stable employment.',
         ],
-        image: '/images/pages/comp-pathway-trades.jpg',
+        image: '/images/pages/hvac-technician.jpg',
       },
       features: {
         heading: 'Program Features',

@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit2, ExternalLink } from 'lucide-react';
+import { Edit2, ExternalLink, AlertTriangle } from 'lucide-react';
 import type { ExamSession } from './types';
 import { PROVIDER_LABELS, STATUS_LABELS, RESULT_LABELS } from './types';
 
@@ -32,9 +32,24 @@ export default function SessionRow({ session: s, onEdit }: { session: ExamSessio
         {s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}
       </td>
       <td className="px-4 py-3">
-        <div className="font-medium text-slate-900">{s.student_name}</div>
+        <div className="flex items-center gap-1.5">
+          <span className="font-medium text-slate-900">{s.student_name}</span>
+          {s.review_status === 'flagged' && (
+            <span title={s.flag_reason || 'Flagged for review'} className="inline-flex items-center gap-0.5 text-[10px] font-semibold uppercase tracking-wider bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">
+              <AlertTriangle className="w-3 h-3" /> Flagged
+            </span>
+          )}
+          {s.review_status === 'invalidated' && (
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-brand-red-100 text-brand-red-700 px-1.5 py-0.5 rounded">Invalidated</span>
+          )}
+        </div>
         {s.student_email && <div className="text-xs text-slate-400">{s.student_email}</div>}
         {s.is_retest && <span className="inline-block mt-0.5 text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Retest</span>}
+        {s.event_count > 0 && (
+          <div className="text-[10px] text-slate-400 mt-0.5">
+            {s.event_count} events · {s.tab_switch_count} tab switches · {s.fullscreen_exit_count} FS exits
+          </div>
+        )}
       </td>
       <td className="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">
         {PROVIDER_LABELS[s.provider]}

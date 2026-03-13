@@ -15,15 +15,24 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
+    // Auth: require admin or instructor
+    const supabase = await createClient();
+    const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { data: profile } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+    if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await req.json();
     const { id, metadata, slug, title } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing course id' }, { status: 400 });
     }
-
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const updateData: any = {};
     if (metadata) updateData.metadata = metadata;

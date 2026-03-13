@@ -8,10 +8,10 @@ export const metadata: Metadata = {
 export default function PartnerRequirementsPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16">
+      <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-3xl md:text-4xl font-bold">Partner Site Requirements</h1>
-          <p className="mt-3 text-gray-300 text-lg">
+          <p className="mt-3 text-slate-300 text-lg">
             Standards for apprenticeship and hands-on training site approval
           </p>
         </div>

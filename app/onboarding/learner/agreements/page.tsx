@@ -109,10 +109,8 @@ export default function AgreementsPage() {
                   sizes="(max-width: 768px) 50vw, 25vw"
                   className="object-cover"
                 />
-                {/* Dark gradient from bottom so title is always readable */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 px-3 py-2">
-                  <span className="text-white text-sm font-bold leading-tight drop-shadow-md">{pt.title}</span>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
+                  <span className="text-white text-sm font-bold leading-tight">{pt.title}</span>
                 </div>
               </div>
               {/* Description below image */}

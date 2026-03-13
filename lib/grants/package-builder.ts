@@ -3,7 +3,10 @@
  * Creates submission-ready packages with PDF, Word, and ZIP exports
  */
 
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
+const supabaseAdmin = createAdminClient();
+void setAuditContext(supabaseAdmin, { systemActor: 'grants-engine' });
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 

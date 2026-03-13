@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { logger } from '@/lib/logger';
 import {
   searchWorkforceGrants,

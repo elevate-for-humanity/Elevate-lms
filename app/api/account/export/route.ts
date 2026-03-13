@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/account/export/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStudentSelfAccess } from '@/lib/audit/ferpa';

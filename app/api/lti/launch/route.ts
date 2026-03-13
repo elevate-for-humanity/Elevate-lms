@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/lti/launch/route.ts
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 

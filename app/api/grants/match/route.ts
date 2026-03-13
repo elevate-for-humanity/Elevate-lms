@@ -5,7 +5,8 @@ export const maxDuration = 60;
 
 // app/api/grants/match/route.ts
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

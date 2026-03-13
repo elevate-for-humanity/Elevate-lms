@@ -8,14 +8,14 @@ export const dynamic = 'force-dynamic';
 // SECURE VERSION with authentication
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
-import { getServerSupabase } from '@/lib/supabaseClients';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const _GET = withAuth(
   async (req: NextRequest, { params, user }) => {
     const { id } = params;
-    const supabase = getServerSupabase();
+    const supabase = await createClient();
 
     if (!supabase) {
       return NextResponse.json(

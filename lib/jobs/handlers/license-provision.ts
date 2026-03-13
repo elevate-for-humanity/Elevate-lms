@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
 

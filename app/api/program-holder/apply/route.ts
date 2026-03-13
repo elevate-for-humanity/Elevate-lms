@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { supabaseServer } from '@/lib/supabaseServer';
+import { createClient } from '@/lib/supabase/server';
 import {
   sendProgramHolderApplicationConfirmation,
   sendAdminProgramHolderNotification,
@@ -62,7 +62,7 @@ async function _POST(req: NextRequest) {
     }
 
     // Check for duplicate by email
-    const supabase = supabaseServer();
+    const supabase = await createClient();
     // Check for duplicate by email
     const { data: existing } = await supabase
       .from('applications')

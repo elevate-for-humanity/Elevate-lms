@@ -5,7 +5,8 @@ export const maxDuration = 60;
 
 // app/api/admin/export/enrollments/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClients';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logBulkExport } from '@/lib/audit/ferpa';

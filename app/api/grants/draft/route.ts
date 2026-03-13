@@ -5,7 +5,8 @@ export const maxDuration = 60;
 
 // app/api/grants/draft/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase-server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -45,7 +45,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     
     const { data, error } = await supabase
       .from('studio_deploy_tokens')
@@ -91,7 +91,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     const encryptedToken = encrypt(token);
 
     const { data, error } = await supabase
@@ -144,7 +144,7 @@ const userId = req.headers.get('x-user-id');
       return NextResponse.json({ error: 'Missing provider' }, { status: 400 });
     }
 
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
     
     const { data, error } = await supabase
       .from('studio_deploy_tokens')
@@ -189,7 +189,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = supabaseServer();
+    const supabase = createAdminClient();
 
     const { error } = await supabase
       .from('studio_deploy_tokens')

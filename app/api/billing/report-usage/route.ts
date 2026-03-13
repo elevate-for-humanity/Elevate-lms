@@ -7,7 +7,7 @@ export const maxDuration = 60;
 // app/api/billing/report-usage/route.ts
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/billing/stripe';
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

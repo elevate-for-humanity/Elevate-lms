@@ -6,7 +6,7 @@ export const maxDuration = 60;
 
 // app/api/courses/[courseId]/check-completion/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseServerClient } from '@/lib/supabaseServer';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -17,7 +17,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = getSupabaseServerClient();
+  const supabase = await createClient();
   const { courseId } = await params;
 
   // 1) Get current user
@@ -124,7 +124,7 @@ async function _GET(req: NextRequest, { params }: Params) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-const supabase = getSupabaseServerClient();
+const supabase = await createClient();
   const { courseId } = await params;
 
   const {

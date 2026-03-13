@@ -5,7 +5,8 @@ export const maxDuration = 60;
 
 // app/api/cm/learners/[id]/route.ts - Get learner details for case manager
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClients';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { getAuthUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

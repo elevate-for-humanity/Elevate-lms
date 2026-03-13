@@ -15,7 +15,8 @@ import {
   notifyGrantSubmitted,
   notifyDeadlineApproaching,
 } from '@/lib/grants/notification-system';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+const supabaseAdmin = createAdminClient();
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

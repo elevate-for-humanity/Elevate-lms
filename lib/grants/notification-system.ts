@@ -3,7 +3,10 @@
  * Multi-channel notifications: Dashboard + Email + SMS
  */
 
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
+const supabaseAdmin = createAdminClient();
+void setAuditContext(supabaseAdmin, { systemActor: 'grants-engine' });
 import { EmailService } from '@/lib/notifications/email';
 import { SMSService } from '@/lib/notifications/sms';
 

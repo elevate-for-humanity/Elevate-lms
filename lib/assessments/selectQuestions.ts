@@ -1,5 +1,5 @@
 // lib/assessments/selectQuestions.ts
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 
 interface Question {
   id: string;

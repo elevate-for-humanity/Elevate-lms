@@ -6,7 +6,7 @@
 // 2. Written to stderr as structured JSON (container-level visibility)
 // 3. Counted in auditFailureCount (scrapable by monitoring)
 // 4. Written to fallback file if DB is unreachable (disaster recovery)
-import { createSupabaseClient } from '@/lib/supabase-api';
+import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 // Telemetry: in-process failure counter. Expose via /api/health or metrics endpoint.

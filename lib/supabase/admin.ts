@@ -46,3 +46,19 @@ export async function createAuditedAdminClient(ctx: {
 
   return client;
 }
+
+// ── Auth user helpers ──────────────────────────────────────────────────────
+
+export async function getUserByEmail(email: string) {
+  const db = createAdminClient();
+  const { data, error } = await db.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw error;
+  return data.users.find((u) => u.email === email) ?? null;
+}
+
+export async function getUserById(userId: string) {
+  const db = createAdminClient();
+  const { data, error } = await db.auth.admin.getUserById(userId);
+  if (error) throw error;
+  return data.user;
+}

@@ -37,14 +37,14 @@ async function _POST(req: Request) {
     const formData = await req.formData();
     const customerEmail = formData.get('customerEmail') as string || user.email;
 
-    // Get cart items with product details
+    // Get cart items with product details + LMS access flags from store_products
     const { data: cartItems, error: cartError } = await db
       .from('cart_items')
       .select(`
         id,
         quantity,
         product_id,
-        product:products(id, name, price, stripe_price_id)
+        product:products(id, name, price, stripe_price_id, slug)
       `)
       .eq('user_id', user.id);
 
@@ -52,17 +52,47 @@ async function _POST(req: Request) {
       return NextResponse.redirect(new URL('/store/cart', req.url));
     }
 
+    // Check store_products for LMS access metadata (grants_course_access, course_id)
+    const productIds = cartItems.map((item: any) => item.product_id).filter(Boolean);
+    const { data: storeProducts } = await db
+      .from('store_products')
+      .select('id, grants_course_access, course_id')
+      .in('id', productIds);
+
+    const storeProductMap: Record<string, { grants_course_access: string | null; course_id: string | null }> = {};
+    for (const sp of storeProducts || []) {
+      storeProductMap[sp.id] = sp;
+    }
+
+    // Collect LMS course IDs for items that grant access
+    // grants_course_access is a text column — treat any truthy non-'false' value as true
+    const lmsCourseIds: string[] = [];
+    for (const item of cartItems) {
+      const sp = storeProductMap[item.product_id];
+      const grantsAccess = sp?.grants_course_access && sp.grants_course_access !== 'false';
+      if (grantsAccess && sp.course_id) {
+        lmsCourseIds.push(sp.course_id);
+      }
+    }
+
+    // Resolve course slugs for webhook fulfillment
+    let courseSlugs: string[] = [];
+    if (lmsCourseIds.length > 0) {
+      const { data: courses } = await db
+        .from('training_courses')
+        .select('id, slug')
+        .in('id', lmsCourseIds);
+      courseSlugs = (courses || []).map((c: any) => c.slug).filter(Boolean);
+    }
+
     // Build line items for Stripe
     const lineItems = cartItems.map((item: any) => {
-      // If product has a Stripe price ID, use it
       if (item.product?.stripe_price_id) {
         return {
           price: item.product.stripe_price_id,
           quantity: item.quantity,
         };
       }
-      
-      // Otherwise create price data inline
       return {
         price_data: {
           currency: 'usd',
@@ -77,6 +107,17 @@ async function _POST(req: Request) {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
+    // Build metadata — include LMS fields so webhook can fulfill enrollment
+    const sessionMetadata: Record<string, string> = {
+      user_id: user.id,
+      cart_item_ids: cartItems.map((item: any) => item.id).join(','),
+    };
+    if (courseSlugs.length > 0) {
+      sessionMetadata.lms_access = 'true';
+      sessionMetadata.course_slugs = courseSlugs.join(',');
+      sessionMetadata.product_type = 'lms_course';
+    }
+
     // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -84,10 +125,7 @@ async function _POST(req: Request) {
       line_items: lineItems,
       success_url: `${siteUrl}/store/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/store/cart`,
-      metadata: {
-        user_id: user.id,
-        cart_item_ids: cartItems.map((item: any) => item.id).join(','),
-      },
+      metadata: sessionMetadata,
       automatic_tax: {
         enabled: true,
       },

@@ -64,6 +64,7 @@ export default function CourseIngestionWizard({ programs }: Props) {
   const [sourceText, setSourceText] = useState('');
   const [programId, setProgramId] = useState('');
   const [certEnabled, setCertEnabled] = useState(true);
+  const [compileLessons, setCompileLessons] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fileWarning, setFileWarning] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<CourseBlueprint | null>(null);
@@ -151,7 +152,8 @@ export default function CourseIngestionWizard({ programs }: Props) {
           program_id: programId || null,
           certificate_enabled: edited.certificate_enabled,
           preview_only: false,
-          // Pass edited blueprint directly so we don't re-run AI
+          compile_lessons: compileLessons,
+          // Pass edited blueprint so we don't re-run the blueprint AI step
           blueprint_override: edited,
         }),
       });

@@ -11,40 +11,60 @@ export const dynamic = 'force-dynamic';
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_STORE || '';
 
 /**
- * Grant LMS course access to user
+ * Grant LMS course access to user via training_enrollments.
+ * Accepts either a course slug or a course UUID.
+ * Uses training_enrollments (not program_enrollments — that requires program_id NOT NULL).
  */
-async function grantLmsAccess(userId: string, courseSlug: string) {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  
-  // Find course by slug
-  const { data: course } = await db
+async function grantLmsAccess(
+  userId: string,
+  courseSlugOrId: string,
+  stripeSessionId?: string,
+  amountPaidCents?: number
+): Promise<boolean> {
+  const adminDb = createAdminClient();
+  if (!adminDb) {
+    logger.error('grantLmsAccess: no admin DB client');
+    return false;
+  }
+
+  // Resolve course by slug or UUID
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseSlugOrId);
+  const { data: course } = await adminDb
     .from('training_courses')
-    .select('id')
-    .eq('slug', courseSlug)
+    .select('id, course_name, slug')
+    .eq(isUuid ? 'id' : 'slug', courseSlugOrId)
     .single();
 
   if (!course) {
-    logger.warn('Course not found for enrollment', { courseSlug, userId });
+    logger.warn('grantLmsAccess: course not found', { courseSlugOrId, userId });
     return false;
   }
 
-  // Create enrollment
-  const { error } = await db.from('program_enrollments').upsert({
-    user_id: userId,
-    course_id: course.id,
-    status: 'active',
-    enrolled_at: new Date().toISOString(),
-    source: 'store_purchase',
-  }, {
-    onConflict: 'user_id,course_id',
-  });
+  // Upsert into training_enrollments — the correct table for self-serve course purchases
+  const { error } = await adminDb
+    .from('training_enrollments')
+    .upsert({
+      user_id: userId,
+      course_id: course.id,
+      status: 'active',
+      enrolled_at: new Date().toISOString(),
+      payment_method: 'self_pay',
+      payment_option: 'full',
+      funding_source: 'self_pay',
+      stripe_checkout_session_id: stripeSessionId || null,
+      amount_paid: amountPaidCents ? amountPaidCents / 100 : null,
+      program_slug: course.slug || null,
+    }, {
+      onConflict: 'user_id,course_id',
+      ignoreDuplicates: false,
+    });
 
   if (error) {
-    logger.error('Failed to create enrollment', { error, userId, courseSlug });
+    logger.error('grantLmsAccess: enrollment upsert failed', { error, userId, courseSlugOrId });
     return false;
   }
 
+  logger.info('grantLmsAccess: enrollment created', { userId, courseId: course.id, courseName: course.course_name });
   return true;
 }
 
@@ -138,44 +158,45 @@ async function _POST(req: NextRequest) {
     const productId = metadata.product_id;
     const productType = metadata.product_type;
     const lmsAccess = metadata.lms_access === 'true';
-    const courseSlug = metadata.course_slug;
-
-    logger.info('Processing store purchase', { 
-      sessionId: session.id, 
-      userId, 
-      productId,
-      productType,
-    });
-
-    // Record the purchase
-    if (userId && productId) {
-      await recordPurchase(
-        userId,
-        session.id,
-        productId,
-        session.amount_total || 0,
-        metadata
-      );
-    }
-
+    const amountPaidCents = session.amount_total || 0;
     const stripePaymentId = session.payment_intent as string;
 
-    // Handle Capital Readiness specific fulfillment
-    if (productType === 'capital_readiness') {
-      if (userId) {
-        // Grant LMS access if applicable
-        if (lmsAccess && courseSlug) {
-          await grantLmsAccess(userId, courseSlug);
-        }
+    // Support singular (legacy direct checkout) and plural (cart checkout) course slug fields
+    const courseSlug = metadata.course_slug;
+    const courseSlugs: string[] = metadata.course_slugs
+      ? metadata.course_slugs.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : courseSlug ? [courseSlug] : [];
 
-        // Unlock PDF download
-        await unlockDownload(userId, productId, stripePaymentId);
+    logger.info('Processing store purchase', {
+      sessionId: session.id,
+      userId,
+      productId,
+      productType,
+      lmsAccess,
+      courseSlugs,
+      amountPaidCents,
+    });
 
-        logger.info('Capital Readiness purchase fulfilled', { userId, productId });
+    // Record the purchase audit trail
+    if (userId && productId) {
+      await recordPurchase(userId, session.id, productId, amountPaidCents, metadata);
+    }
+
+    // ── LMS enrollment fulfillment ──────────────────────────────────────────
+    // Triggered by: cart checkout (course_slugs) or direct checkout (course_slug)
+    if (userId && lmsAccess && courseSlugs.length > 0) {
+      for (const slug of courseSlugs) {
+        const granted = await grantLmsAccess(userId, slug, session.id, amountPaidCents);
+        logger.info('LMS enrollment result', { userId, slug, granted });
       }
     }
 
-    // Generic digital product fulfillment
+    // ── Product-type specific fulfillment ───────────────────────────────────
+    if (productType === 'capital_readiness' && userId && productId) {
+      await unlockDownload(userId, productId, stripePaymentId);
+      logger.info('Capital Readiness fulfilled', { userId, productId });
+    }
+
     if (metadata.delivery === 'digital' && userId && productId) {
       await unlockDownload(userId, productId, stripePaymentId);
     }

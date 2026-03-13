@@ -84,7 +84,7 @@ export default async function RiseFoundationPage() {
           sizes="100vw"
           quality={90}
         />
-        <div className="absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
             <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
@@ -158,8 +158,8 @@ export default async function RiseFoundationPage() {
             <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
               <div className="h-52 relative">
                 <Image
-                  src="/images/pages/rise-foundation-page-2.jpg"
-                  alt="Mental wellness counseling"
+                  src="/images/pages/rise-foundation-page-1.jpg"
+                  alt="Mental wellness counseling and support services"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -212,7 +212,7 @@ export default async function RiseFoundationPage() {
               <div className="h-52 relative">
                 <Image
                   src="/images/pages/rise-foundation-page-2.jpg"
-                  alt="CurvatureBody Sculpting non-invasive body contouring"
+                  alt="CurvatureBody Sculpting non-invasive body contouring services"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -266,8 +266,8 @@ export default async function RiseFoundationPage() {
             <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
               <div className="h-52 relative">
                 <Image
-                  src="/images/pages/rise-foundation-page-2.jpg"
-                  alt="Community volunteers at VITA tax site"
+                  src="/images/pages/community.jpg"
+                  alt="Community volunteers at VITA free tax preparation site"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -335,10 +335,10 @@ export default async function RiseFoundationPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Calm Blend Herbal Tea', price: '$18.99', desc: 'Chamomile, lavender, and lemon balm loose-leaf blend. Caffeine-free. Promotes relaxation and restful sleep.', image: '/images/pages/comp-cta-career.jpg' },
-              { name: 'Shea Body Butter — Lavender', price: '$24.99', desc: 'Whipped shea butter with lavender essential oil and vitamin E. Deep moisture for dry skin. 8 oz jar.', image: '/images/pages/comp-cta-career.jpg' },
-              { name: 'Essential Oil Collection', price: '$44.99', desc: '6-oil starter set: lavender, peppermint, eucalyptus, tea tree, lemon, and frankincense. 10ml bottles.', image: '/images/pages/comp-cta-training.jpg' },
-              { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/pages/comp-cta-career.jpg' },
+              { name: 'Calm Blend Herbal Tea', price: '$18.99', desc: 'Chamomile, lavender, and lemon balm loose-leaf blend. Caffeine-free. Promotes relaxation and restful sleep.', image: '/images/pages/community-page-1.jpg' },
+              { name: 'Shea Body Butter — Lavender', price: '$24.99', desc: 'Whipped shea butter with lavender essential oil and vitamin E. Deep moisture for dry skin. 8 oz jar.', image: '/images/pages/community-page-3.jpg' },
+              { name: 'Essential Oil Collection', price: '$44.99', desc: '6-oil starter set: lavender, peppermint, eucalyptus, tea tree, lemon, and frankincense. 10ml bottles.', image: '/images/pages/community-page-5.jpg' },
+              { name: 'Handmade Soap Set (4 bars)', price: '$22.99', desc: 'Cold-process soaps: oatmeal honey, charcoal detox, lavender calm, and citrus energy. Natural ingredients.', image: '/images/pages/community-page-7.jpg' },
             ].map((product) => (
               <div key={product.name} className="bg-white rounded-xl overflow-hidden border shadow-sm hover:shadow-lg transition">
                 <div className="relative h-40 overflow-hidden">
@@ -374,48 +374,68 @@ export default async function RiseFoundationPage() {
       {/* Entity Structure */}
       <section id="organization" className="py-16 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Organization</h2>
+          <h2 className="text-3xl font-bold text-center mb-2">Our Organization</h2>
+          <p className="text-center text-gray-500 mb-10 text-sm">Legal entity and operating names explained</p>
           <div className="bg-white rounded-2xl border shadow-sm p-8">
             <div className="space-y-6">
+              {/* Legal entity */}
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Shield className="w-6 h-6 text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Selfish Inc.</h3>
-                  <p className="text-gray-600">Registered 501(c)(3) nonprofit organization. The legal entity behind all Rise Foundation programs and services.</p>
-                  <a href="https://www.selfishincsupport.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline">selfishincsupport.org</a>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-lg">Selfish Inc.</h3>
+                    <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">Legal Entity · 501(c)(3)</span>
+                  </div>
+                  <p className="text-gray-600 mt-1">The registered 501(c)(3) nonprofit corporation. All programs, services, and DBAs operate under Selfish Inc. as the legal entity. Founded by Elizabeth Greene.</p>
+                  <a href="https://www.selfishincsupport.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">selfishincsupport.org</a>
                 </div>
               </div>
-              <div className="ml-6 border-l-2 border-slate-200 pl-10">
-                <div className="flex items-start gap-4 mb-6">
+
+              {/* DBA tree */}
+              <div className="ml-6 border-l-2 border-slate-200 pl-10 space-y-6">
+
+                <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Heart className="w-5 h-5 text-brand-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold">Rise Forward Foundation</h4>
-                    <p className="text-gray-600 text-sm">DBA (trade name) of Selfish Inc. Coordinates community outreach, employer partnerships, and supportive services.</p>
-                    <a href="https://www.riseforwardfoundation.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline">riseforwardfoundation.org</a>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold">The Rise Foundation</h4>
+                      <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full font-semibold">DBA of Selfish Inc.</span>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-1">The public-facing name for Selfish Inc.'s community programs. Mental wellness counseling, trauma recovery, divorce support, addiction rehabilitation, and young adult wellness services.</p>
+                    <a href="https://www.riseforwardfoundation.org" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline mt-1 inline-block">riseforwardfoundation.org</a>
                   </div>
                 </div>
-                <div className="flex items-start gap-4 mb-6">
+
+                <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-5 h-5 text-pink-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold">CurvatureBody Sculpting</h4>
-                    <p className="text-gray-600 text-sm">A wellness program of Rise Forward Foundation (not a separate entity). Body contouring and Meri-Go-Round products.</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold">CurvatureBody Sculpting</h4>
+                      <span className="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-semibold">Program of Selfish Inc.</span>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-1">Non-invasive body contouring and wellness services. Ultrasonic cavitation, radio frequency, vacuum therapy, and wood therapy. All proceeds fund Rise Foundation community programs.</p>
                   </div>
                 </div>
+
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Award className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold">VITA Tax Services</h4>
-                    <p className="text-gray-600 text-sm">IRS-certified free tax preparation through the Volunteer Income Tax Assistance program. Serving qualifying Indianapolis families.</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold">VITA Free Tax Preparation</h4>
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Program of Selfish Inc.</span>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-1">IRS-certified Volunteer Income Tax Assistance (VITA) site. Free tax preparation for qualifying Indianapolis families. Operated by Elizabeth Greene, IRS Enrolled Agent (EA) with EFIN and PTIN.</p>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>

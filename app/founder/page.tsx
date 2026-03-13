@@ -27,13 +27,13 @@ export default function FounderPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
 
-            {/* Full body photo */}
+            {/* Founder hero photo */}
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/team/elizabeth-greene.jpg"
+                src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
                 alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
                 fill
-                className="object-cover"
+                className="object-cover object-top"
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -43,49 +43,46 @@ export default function FounderPage() {
             <div>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">Elizabeth Greene</h1>
               <p className="text-brand-red-600 font-bold text-lg mb-1">Founder & Chief Executive Officer</p>
-              <p className="text-slate-500 text-sm mb-8">Elevate for Humanity Career & Technical Institute</p>
+              <p className="text-slate-500 text-sm mb-8">Elevate for Humanity Career & Technical Institute · Indianapolis, IN</p>
 
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
                 <p>
-                  Elizabeth Greene is a U.S. military veteran and the founder of Elevate for Humanity
-                  Career & Technical Institute, a workforce development organization in Indianapolis
+                  Elizabeth Greene is a U.S. Army veteran and the founder of Elevate for Humanity
+                  Career & Technical Institute — a workforce development organization in Indianapolis
                   serving justice-involved individuals, low-income families, veterans, and anyone
                   facing barriers to employment.
                 </p>
 
                 <p>
-                  She is an IRS Enrolled Agent (EA) holding both an EFIN and PTIN, authorized to
-                  represent taxpayers before the Internal Revenue Service. She is also a licensed
-                  barber through the Indiana Professional Licensing Agency, holds an Indiana
-                  Substitute Teacher License, and is OSHA 10-Hour Safety certified.
+                  She is an IRS Enrolled Agent (EA) with both an EFIN and PTIN, authorized to
+                  represent taxpayers before the Internal Revenue Service at all administrative
+                  levels. She holds an Indiana Barber License through the Indiana Professional
+                  Licensing Agency, an Indiana Substitute Teacher License, and is OSHA 10-Hour
+                  Safety certified.
                 </p>
 
                 <p>
-                  Elizabeth is a certified proctor for EPA Section 608 refrigerant handling exams
-                  through both the ESCO Group and Mainstream Engineering, allowing Elevate to
-                  administer EPA certification exams on-site. She also operates a Certiport
-                  Authorized Testing Center (CATC) for industry certifications.
+                  Elizabeth is a nationally authorized EPA Section 608 proctor through both the
+                  ESCO Group (Proctor ID: 358010) and Mainstream Engineering — one of the few
+                  training providers in Indiana authorized by both certifying bodies. She also
+                  operates a Certiport Authorized Testing Center (CATC) for Microsoft Office
+                  Specialist, IC3, and IT Specialist credentials.
                 </p>
 
                 <p>
-                  Under her leadership, Elevate for Humanity has secured approvals across federal,
-                  state, and local agencies. The organization is a U.S. Department of Labor Registered
-                  Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), listed on the Eligible Training
-                  Provider List (ETPL), and approved as a Workforce Ready Grant (WRG) provider.
-                  Elevate is WIOA and JRI funding approved, and partners with EmployIndy, Choice
-                  Medical CNA School, Milady, and the National Retail Federation Foundation (NRF Rise Up).
+                  Under her leadership, Elevate has secured approvals across federal, state, and
+                  local agencies: U.S. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301),
+                  Indiana ETPL listed, Workforce Ready Grant (WRG) approved, WIOA and JRI funding
+                  approved, and Job Ready Indy partner. Elevate is enrolled in PECOS with an NPI,
+                  holds a federal CAGE code (0Q856), UEI VX2GK5S8SZH8, is ITAP/INDOT registered,
+                  and ByBlack certified through the U.S. Black Chambers / NAACP.
                 </p>
 
                 <p>
-                  Elevate is enrolled in PECOS as a Medicare provider with a National Provider
-                  Identifier (NPI), registered as an Indiana State Bidder with a federal CAGE code,
-                  ITAP/INDOT registered, and ByBlack certified through the NAACP.
-                </p>
-
-                <p>
-                  Elizabeth also founded SupersonicFastCash, a tax preparation software company, and
-                  the RISE Foundation, a 501(c)(3) nonprofit providing philanthropic support for
-                  workforce development initiatives.
+                  Elizabeth also founded SupersonicFastCash (tax preparation software) and
+                  Selfish Inc. — a 501(c)(3) nonprofit operating as The Rise Foundation — providing
+                  mental wellness counseling, body sculpting services, VITA free tax preparation,
+                  and community support programs across Indianapolis.
                 </p>
               </div>
 
@@ -102,40 +99,96 @@ export default function FounderPage() {
         </div>
       </section>
 
-      {/* Credentials — compact dark section */}
-      <section className="py-12 bg-slate-900">
+      {/* Credentials — categorized dark section */}
+      <section className="py-14 bg-slate-900">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-xl font-bold text-white mb-6 text-center">Credentials & Approvals</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {[
-              'U.S. Military Veteran',
-              'IRS Enrolled Agent (EA)',
-              'EFIN & PTIN Holder',
-              'Licensed Barber — IN PLA',
-              'IN Substitute Teacher License',
-              'OSHA 10-Hour Certified',
-              'EPA 608 Proctor — ESCO Group',
-              'EPA 608 Proctor — Mainstream Eng.',
-              'DOL Apprenticeship Sponsor',
-              'ETPL Listed Provider',
-              'WRG Approved',
-              'WIOA Approved',
-              'JRI Approved',
-              'Certiport CATC',
-              'Milady Partner',
-              'NRF Rise Up Provider',
-              'EmployIndy Partner',
-              'Choice Medical CNA Partner',
-              'PECOS / NPI Enrolled',
-              'ITAP / INDOT Registered',
-              'Indiana State Bidder',
-              'CAGE Code Registered',
-              'ByBlack Certified — NAACP',
-            ].map((cred) => (
-              <div key={cred} className="bg-slate-800 rounded-lg px-3 py-2.5">
-                <span className="text-white text-xs font-medium">{cred}</span>
-              </div>
-            ))}
+          <h2 className="text-2xl font-bold text-white mb-10 text-center">Credentials & Approvals</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            {/* Personal Licenses */}
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Personal Licenses</p>
+              <ul className="space-y-2">
+                {[
+                  'U.S. Army Veteran',
+                  'IRS Enrolled Agent (EA)',
+                  'EFIN Holder',
+                  'PTIN Holder',
+                  'Indiana Barber License — IN PLA',
+                  'Indiana Substitute Teacher License',
+                  'OSHA 10-Hour Safety Certified',
+                ].map((c) => (
+                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                    <span className="text-brand-red-400 mt-0.5">▸</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Testing & Proctoring */}
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Testing & Proctoring</p>
+              <ul className="space-y-2">
+                {[
+                  'EPA 608 Proctor — ESCO Group (#358010)',
+                  'EPA 608 Proctor — Mainstream Engineering',
+                  'Certiport Authorized Testing Center (CATC)',
+                  'Microsoft Office Specialist Proctor',
+                  'IC3 Digital Literacy Proctor',
+                  'IT Specialist Proctor',
+                ].map((c) => (
+                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                    <span className="text-brand-red-400 mt-0.5">▸</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Federal & State Approvals */}
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Federal & State Approvals</p>
+              <ul className="space-y-2">
+                {[
+                  'DOL Apprenticeship Sponsor — RAPIDS 2025-IN-132301',
+                  'Indiana ETPL Listed Provider',
+                  'Workforce Ready Grant (WRG) Approved',
+                  'WIOA Funding Approved',
+                  'JRI Funding Approved',
+                  'Job Ready Indy Partner',
+                  'PECOS / NPI Enrolled',
+                  'ITAP / INDOT Registered',
+                  'Indiana State Bidder',
+                  'CAGE Code: 0Q856',
+                  'UEI: VX2GK5S8SZH8',
+                ].map((c) => (
+                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                    <span className="text-brand-red-400 mt-0.5">▸</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Partners & Certifications */}
+            <div>
+              <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Partners & Certifications</p>
+              <ul className="space-y-2">
+                {[
+                  'ByBlack Certified — U.S. Black Chambers / NAACP',
+                  'EmployIndy Partner',
+                  'Choice Medical CNA School Partner',
+                  'Milady Partner',
+                  'NRF Rise Up Provider',
+                  'Selfish Inc. — 501(c)(3) Nonprofit',
+                  'The Rise Foundation (DBA of Selfish Inc.)',
+                  'SupersonicFastCash — Tax Software',
+                ].map((c) => (
+                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                    <span className="text-brand-red-400 mt-0.5">▸</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </div>
       </section>
@@ -160,28 +213,37 @@ export default function FounderPage() {
               {
                 name: 'Elevate for Humanity',
                 role: 'Career & Technical Institute',
-                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor, ETPL listed, WRG and WIOA approved.',
+                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG, WIOA, and JRI approved. CAGE Code: 0Q856.',
+                href: '/about',
+              },
+              {
+                name: 'Selfish Inc. — The Rise Foundation',
+                role: '501(c)(3) Nonprofit · DBA: The Rise Foundation',
+                desc: 'IRS-recognized 501(c)(3) nonprofit. The Rise Foundation is the operating DBA of Selfish Inc. Programs include mental wellness counseling, CurvatureBody Sculpting, Meri-Go-Round wellness products, and free VITA tax preparation for Indianapolis families.',
+                href: '/rise-foundation',
               },
               {
                 name: 'SupersonicFastCash',
                 role: 'Tax Preparation Software',
-                desc: 'Tax preparation software company. Elizabeth is an IRS Enrolled Agent with EFIN and PTIN, authorized to represent taxpayers before the IRS.',
+                desc: 'Tax preparation software company. Elizabeth is an IRS Enrolled Agent (EA) with EFIN and PTIN, authorized to represent taxpayers before the IRS at all administrative levels.',
+                href: null,
               },
               {
-                name: 'RISE Foundation',
-                role: '501(c)(3) Nonprofit',
-                desc: 'Philanthropic support for workforce development initiatives. IRS tax-exempt determination received July 2024.',
-              },
-              {
-                name: 'Certiport Testing Center',
-                role: 'Authorized CATC',
-                desc: 'On-site proctoring for industry certification exams including Microsoft Office Specialist, IC3, and IT Specialist credentials.',
+                name: 'Certiport Authorized Testing Center',
+                role: 'CATC · EPA 608 Proctor Site',
+                desc: 'On-site proctoring for Microsoft Office Specialist, IC3, and IT Specialist credentials. Also an authorized EPA Section 608 proctor site for both ESCO Group (ID: 358010) and Mainstream Engineering.',
+                href: '/testing',
               },
             ].map((org) => (
               <div key={org.name} className="border border-slate-200 rounded-xl p-6">
                 <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">{org.role}</p>
                 <h3 className="text-lg font-bold text-slate-900 mt-1">{org.name}</h3>
                 <p className="text-slate-600 text-sm mt-2">{org.desc}</p>
+                {org.href && (
+                  <Link href={org.href} className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold mt-3 hover:underline">
+                    Learn more <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
               </div>
             ))}
           </div>

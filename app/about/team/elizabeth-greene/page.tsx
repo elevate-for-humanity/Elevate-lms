@@ -26,8 +26,8 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/team/elizabeth-greene-headshot.jpg"
-                  alt="Elizabeth Greene"
+                  src="/images/team/elizabeth-greene.jpg"
+                  alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
                   fill
                   className="object-cover"
                   priority

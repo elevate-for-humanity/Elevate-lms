@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'My Calendar | Elevate For Humanity',
@@ -23,15 +22,7 @@ export default async function CalendarPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      <PageVideoHero
-        videoSrc="/videos/career-services-hero.mp4"
-        posterSrc="/images/pages/calendar-hero.jpg"
-        posterAlt="Calendar — Elevate for Humanity"
-        size="support"
-      />
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
         </div>

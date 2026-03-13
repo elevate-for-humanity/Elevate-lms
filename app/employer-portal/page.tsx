@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
-import PageVideoHero from '@/components/ui/PageVideoHero';
   Users, Briefcase, FileText, BarChart3, ArrowRight,
   Building2, CheckCircle, Clock, TrendingUp, PlusCircle,
   MessageSquare, BookOpen,
@@ -53,15 +52,7 @@ export default async function EmployerPortalDashboard() {
     .limit(5);
 
   return (
-    <div>
-
-      <PageVideoHero
-        videoSrc="/videos/employer-hero.mp4"
-        posterSrc="/images/pages/employer-portal-page-1.jpg"
-        posterAlt="Employer Portal — Elevate for Humanity"
-        size="marketing"
-      />
-      {/* Header */}
+    <div>      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Employer Dashboard</h1>

@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 const EFFECTIVE_DATE = 'February 17, 2026';
@@ -53,15 +52,7 @@ const tocItems = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/homepage-hero-montage.mp4"
-        posterSrc="/images/pages/policies-page-1.jpg"
-        posterAlt="Privacy Policy — Elevate for Humanity"
-        size="support"
-      />
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Privacy Policy' }]} />

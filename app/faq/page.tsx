@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { MessageSquare } from 'lucide-react';
 import FAQSearch from './FAQSearch';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'FAQ | Elevate For Humanity',
@@ -64,15 +63,7 @@ export default function FAQPage() {
   const categories = [...new Set(faqs.map((faq: FAQ) => faq.category))];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      <PageVideoHero
-        videoSrc="/videos/career-services-hero.mp4"
-        posterSrc="/images/pages/faq-page-1.jpg"
-        posterAlt="Faq — Elevate for Humanity"
-        size="support"
-      />
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-gray-50">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'FAQ' }]} />

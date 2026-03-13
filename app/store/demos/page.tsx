@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Platform Demos | Elevate for Humanity',
@@ -57,15 +56,7 @@ const demos = [
 export default function StoreDemosPage() {
 
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/store-demo.mp4"
-        posterSrc="/images/pages/demos-hero.jpg"
-        posterAlt="Store Demos — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform', href: '/store' }, { label: 'Demos' }]} />
         </div>

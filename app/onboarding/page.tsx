@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import {
-import PageVideoHero from '@/components/ui/PageVideoHero';
   Users,
   Building2,
   GraduationCap,
@@ -29,15 +28,7 @@ export default async function OnboardingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      <PageVideoHero
-        videoSrc="/videos/getting-started-hero.mp4"
-        posterSrc="/images/pages/onboarding-page-1.jpg"
-        posterAlt="Onboarding — Elevate for Humanity"
-        size="marketing"
-      />
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
         </div>

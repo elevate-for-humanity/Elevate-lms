@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/founder' },
@@ -14,15 +13,7 @@ export const metadata: Metadata = {
 
 export default function FounderPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/about-mission.mp4"
-        posterSrc="/images/pages/founder-video-poster.jpg"
-        posterAlt="Founder — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-white">      <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Founder' }]} />
       </div>
 

@@ -8,7 +8,6 @@ import { ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
   description:
@@ -33,15 +32,7 @@ export default async function DOLFundingPage() {
 const programs = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/funding-page-1.jpg"
-        posterAlt="Funding Dol — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'DOL Apprenticeship' }]} />
         </div>

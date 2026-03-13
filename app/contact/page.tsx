@@ -9,7 +9,6 @@ import Turnstile from '@/components/Turnstile';
 
 
 import FeedbackWidget from '@/components/FeedbackWidget';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 const contactInfo = [
   { icon: Phone, title: 'Phone', value: 'Get Help Online', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:support center' },
@@ -66,15 +65,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      <PageVideoHero
-        videoSrc="/videos/career-services-hero.mp4"
-        posterSrc="/images/pages/contact-hero.jpg"
-        posterAlt="Contact — Elevate for Humanity"
-        size="support"
-      />
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-gray-50">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Contact Us' }]} />

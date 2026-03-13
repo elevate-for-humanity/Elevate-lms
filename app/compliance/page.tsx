@@ -6,7 +6,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 export const metadata: Metadata = { 
   title: 'Compliance & Credentials | Elevate for Humanity',
   description: 'Compliance posture, credential disclosure, and program-to-credential mapping for Elevate for Humanity workforce programs.',
@@ -23,15 +22,7 @@ export default async function CompliancePage() {
   const programCredentials = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      <PageVideoHero
-        videoSrc="/videos/programs-overview-video-with-narration.mp4"
-        posterSrc="/images/pages/compliance-page-1.jpg"
-        posterAlt="Compliance — Elevate for Humanity"
-        size="support"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-gray-50">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Compliance & Credentials' }]} />
         </div>

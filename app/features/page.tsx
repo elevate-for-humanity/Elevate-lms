@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, GraduationCap, Briefcase, DollarSign, Users, Monitor, Shield } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Platform Features | Elevate for Humanity',
@@ -52,15 +51,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/lms-learning.mp4"
-        posterSrc="/images/pages/features-hero.jpg"
-        posterAlt="Features — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Features' }]} />
         </div>

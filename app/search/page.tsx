@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Find Programs & Resources | Elevate For Humanity',
@@ -83,15 +82,7 @@ const quickLinks = [
 
 export default function SearchPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/programs-overview-video-with-narration.mp4"
-        posterSrc="/images/pages/comp-home-hero-programs.jpg"
-        posterAlt="Search — Elevate for Humanity"
-        size="support"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Search' }]} />
         </div>

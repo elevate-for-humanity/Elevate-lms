@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Shield, Building2, GraduationCap, Briefcase, FileCheck, Users, ClipboardCheck, ArrowRight } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Registered Apprenticeship Sponsor | Elevate for Humanity',
@@ -13,15 +12,7 @@ export const metadata: Metadata = {
 
 export default function ApprenticeshipSponsorPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/barber-training.mp4"
-        posterSrc="/images/pages/apprenticeship-sponsor-page-1.jpg"
-        posterAlt="Apprenticeship Sponsor — Elevate for Humanity"
-        size="marketing"
-      />
-      {/* Hero */}
+    <div className="min-h-screen bg-white">      {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/apprenticeship-sponsor-page-1.jpg" alt="Apprenticeship sponsor" fill sizes="100vw" className="object-cover" priority />
       </section>

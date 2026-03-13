@@ -13,7 +13,6 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Resume Building - Create a Winning Resume | Elevate for Humanity',
@@ -61,16 +60,7 @@ export default function ResumeBuildingPage() {
   ];
 
   return (
-    <div className="bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/career-services-hero.mp4"
-        posterSrc="/images/pages/career-services-page-2.jpg"
-        posterAlt="Career Services Resume Building — Elevate for Humanity"
-        audioSrc="/audio/heroes/career-services.mp3"
-        size="marketing"
-      />
-      {/* Breadcrumbs */}
+    <div className="bg-white">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Resume Building' }]} />

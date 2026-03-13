@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Phone } from 'lucide-react';
-import LazyVideo from '@/components/ui/LazyVideo';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Hire Trained Graduates | Employer Partnership | Elevate for Humanity',
@@ -39,11 +39,12 @@ export default function EmployerPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Video hero */}
-      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-slate-900">
-        <LazyVideo src="/videos/employer-hero.mp4" poster="/images/pages/employer-hero.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-65" />
-      </section>
+      <PageVideoHero
+        videoSrc="/videos/employer-hero.mp4"
+        posterSrc="/images/pages/employer-hero.jpg"
+        posterAlt="Employer partnerships — hire trained graduates"
+        size="marketing"
+      />
 
       {/* Header */}
       <div className="bg-white border-b border-slate-100 py-8">

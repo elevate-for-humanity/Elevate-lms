@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 import { Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 
 const NAV = [
@@ -82,18 +83,7 @@ const STATS = [
 ];
 
 export default function EducationLandingPage() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const playedRef = useRef(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    if (audioRef.current && !playedRef.current) {
-      playedRef.current = true;
-      audioRef.current.volume = 1;
-      audioRef.current.play().catch(() => {});
-    }
-  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -126,14 +116,14 @@ export default function EducationLandingPage() {
         </div>
       </header>
 
-      {/* VIDEO HERO — no overlay, text below video */}
+      {/* VIDEO HERO */}
       <section className="pt-16">
-        <div className="relative w-full" style={{ aspectRatio: '16/7', minHeight: '360px' }}>
-          <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" loop muted playsInline autoPlay preload="metadata" poster="/images/pages/workforce-training.jpg">
-            <source src="/videos/career-services-hero.mp4" type="video/mp4" />
-          </video>
-          <audio ref={audioRef} src="/audio/heroes/programs.mp3" preload="metadata" aria-hidden="true" />
-        </div>
+        <PageVideoHero
+          videoSrc="/videos/lms-learning.mp4"
+          posterSrc="/images/pages/education-hero.jpg"
+          posterAlt="Career training programs at Elevate for Humanity"
+          size="marketing"
+        />
         <div className="bg-slate-900 py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4">

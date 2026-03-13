@@ -10,6 +10,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 import {
   Award, BookOpen, Briefcase, CheckCircle, Clock, DollarSign,
   GraduationCap, MapPin, Shield, TrendingUp, Users, ChevronRight,
@@ -62,17 +63,25 @@ export default function ProgramDetailPage({ program: p, children }: Props) {
     <div className="min-h-screen bg-white">
       {/* ═══ A. HERO ════════════════════════════════════════════════ */}
       <section>
-        {/* Full-bleed hero image — no overlay, no text on image */}
-        <div className="relative h-[320px] sm:h-[440px] w-full overflow-hidden">
-          <Image
-            src={p.heroImage}
-            alt={p.heroImageAlt}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
+        {p.videoSrc ? (
+          <PageVideoHero
+            videoSrc={p.videoSrc}
+            posterSrc={p.heroImage}
+            posterAlt={p.heroImageAlt}
+            size="program"
           />
-        </div>
+        ) : (
+          <div className="relative h-[320px] sm:h-[440px] w-full overflow-hidden">
+            <Image
+              src={p.heroImage}
+              alt={p.heroImageAlt}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          </div>
+        )}
 
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-slate-900">

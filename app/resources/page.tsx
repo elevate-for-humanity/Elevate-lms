@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, ExternalLink, GraduationCap, DollarSign, Briefcase, Shield } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Resources | Elevate for Humanity',
@@ -70,15 +69,7 @@ const sections = [
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/homepage-hero-montage.mp4"
-        posterSrc="/images/pages/career-services-page-6.jpg"
-        posterAlt="Resources — Elevate for Humanity"
-        size="support"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Resources' }]} />
         </div>

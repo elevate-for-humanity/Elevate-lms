@@ -7,6 +7,7 @@ import { Award, BookOpen, Clock, MapPin, ChevronRight, GraduationCap } from 'luc
 import { ALL_PROGRAMS, SECTORS } from '@/data/programs/catalog';
 import { getTotalHoursRange } from '@/lib/programs/program-schema';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Credential Pathways | Funded Career Training Programs',
@@ -19,6 +20,12 @@ export const metadata: Metadata = {
 export default function ProgramCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PageVideoHero
+        videoSrc="/videos/program-hero.mp4"
+        posterSrc="/images/pages/programs-hero.jpg"
+        posterAlt="Workforce training programs — trades, healthcare, technology"
+        size="primary"
+      />
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">

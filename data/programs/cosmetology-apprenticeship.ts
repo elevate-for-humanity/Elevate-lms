@@ -8,6 +8,7 @@ export const COSMETOLOGY: ProgramSchema = {
   category: 'Cosmetology',
   heroImage: '/images/pages/cosmetology.jpg',
   heroImageAlt: 'Cosmetology apprentice styling hair in a salon',
+  videoSrc: '/videos/beauty-cosmetology.mp4',
   deliveryMode: 'in-person',
   durationWeeks: 52,
   hoursPerWeekMin: 35,

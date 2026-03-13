@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type HeroSize = 'primary' | 'program' | 'marketing' | 'support';
 
@@ -20,8 +20,10 @@ interface PageVideoHeroProps {
 }
 
 /**
- * Full-width video hero. No text, no gradient, no mute button.
- * Video loops muted. Voiceover plays once when section enters viewport.
+ * Full-width video hero. No text overlay, no gradient.
+ * Video autoplays muted on scroll into view (browsers allow muted autoplay).
+ * If audioSrc is provided, a "Play narration" button appears — audio only
+ * starts on explicit click to satisfy browser autoplay policies.
  */
 export default function PageVideoHero({
   videoSrc,
@@ -33,8 +35,9 @@ export default function PageVideoHero({
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef   = useRef<HTMLVideoElement>(null);
   const audioRef   = useRef<HTMLAudioElement>(null);
-  const playedRef  = useRef(false);
+  const [playing, setPlaying] = useState(false);
 
+  // Muted video autoplay on scroll — no user gesture required for muted media
   useEffect(() => {
     const section = sectionRef.current;
     const video   = videoRef.current;
@@ -43,13 +46,7 @@ export default function PageVideoHero({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.muted = true;
           video.play().catch(() => {});
-          if (audioSrc && audioRef.current && !playedRef.current) {
-            playedRef.current = true;
-            audioRef.current.volume = 1;
-            audioRef.current.play().catch(() => {});
-          }
         } else {
           video.pause();
         }
@@ -59,7 +56,23 @@ export default function PageVideoHero({
 
     observer.observe(section);
     return () => observer.disconnect();
-  }, [audioSrc]);
+  }, []);
+
+  function handleNarration() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else {
+      audio.play().catch(() => {});
+      setPlaying(true);
+    }
+  }
+
+  function handleAudioEnded() {
+    setPlaying(false);
+  }
 
   return (
     <section
@@ -80,7 +93,23 @@ export default function PageVideoHero({
       </video>
 
       {audioSrc && (
-        <audio ref={audioRef} src={audioSrc} preload="none" aria-hidden="true" />
+        <>
+          <audio
+            ref={audioRef}
+            src={audioSrc}
+            preload="none"
+            onEnded={handleAudioEnded}
+            aria-hidden="true"
+          />
+          <button
+            onClick={handleNarration}
+            aria-label={playing ? 'Pause narration' : 'Play narration'}
+            className="absolute bottom-4 right-4 z-10 flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+          >
+            <span aria-hidden="true">{playing ? '⏸' : '▶'}</span>
+            {playing ? 'Pause narration' : 'Play narration'}
+          </button>
+        </>
       )}
     </section>
   );

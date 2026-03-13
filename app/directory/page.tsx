@@ -8,7 +8,6 @@ import { Building2, MapPin, Globe, ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 export const metadata: Metadata = {
   title: 'Partner Directory | Elevate for Humanity',
   description: 'Workforce development partners, employer partners, and community resources in Indianapolis. WorkOne, Indiana DWD, EmployIndy, and more.',
@@ -30,15 +29,7 @@ export default async function DirectoryPage() {
 const partners = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/employer-hero.mp4"
-        posterSrc="/images/pages/partner-page-1.jpg"
-        posterAlt="Directory — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner Directory' }]} />
         </div>

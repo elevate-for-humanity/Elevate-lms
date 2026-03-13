@@ -7,7 +7,6 @@ import { Metadata } from 'next';
 import { Building2, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createPublicClient } from '@/lib/supabase/server';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Our Partners | Elevate for Humanity',
@@ -36,15 +35,7 @@ export default async function PartnersPage() {
   const workforcePartners = partners.filter(p => p.partner_type === 'workforce');
 
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/partner-business.mp4"
-        posterSrc="/images/pages/about-partners-hero.jpg"
-        posterAlt="About Partners — Elevate for Humanity"
-        size="marketing"
-      />
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Partners' }]} />

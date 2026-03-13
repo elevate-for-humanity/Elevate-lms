@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -32,27 +33,12 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Video hero */}
-      <section className="relative h-[60vh] sm:h-[70vh] md:h-[78vh] min-h-[380px] overflow-hidden bg-slate-900">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover opacity-80"
-          poster="/images/team/elizabeth-greene.jpg"
-        >
-          <source src="/videos/about-mission.mp4" type="video/mp4" />
-        </video>
-
-        {/* Founder identity — shows while video loads and on the poster frame */}
-        <div className="absolute bottom-8 left-6 sm:left-10">
-          <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-1">Founder & CEO</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">Elizabeth Greene</h1>
-          <p className="text-slate-300 text-sm mt-1">Elevate for Humanity · Indianapolis, Indiana</p>
-        </div>
-      </section>
+      <PageVideoHero
+        videoSrc="/videos/about-mission.mp4"
+        posterSrc="/images/pages/about-hero.jpg"
+        posterAlt="About Elevate for Humanity"
+        size="marketing"
+      />
 
       {/* Who We Are */}
       <section className="py-12 bg-white">

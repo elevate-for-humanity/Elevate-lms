@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
 import VirtualCareerFair from '@/components/VirtualCareerFair';
 import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
@@ -25,18 +26,12 @@ export default function CareerServicesPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 bg-black/55 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Career Services</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Training is just the beginning. We help you build your resume, prepare for interviews, and connect directly with employers who are hiring.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageVideoHero
+        videoSrc="/videos/career-services-hero.mp4"
+        posterSrc="/images/pages/career-services-hero.jpg"
+        posterAlt="Career services — job placement and coaching"
+        size="marketing"
+      />
 
       {/* What We Offer — stacked on mobile */}
       <section className="py-8 sm:py-14 bg-white">

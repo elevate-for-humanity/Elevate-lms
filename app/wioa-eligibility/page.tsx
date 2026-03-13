@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import EligibilityPreQualifier from '@/components/enrollment/EligibilityPreQualifier';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/wioa-eligibility' },
@@ -14,15 +13,7 @@ export const metadata: Metadata = {
 
 export default function WIOAEligibilityPage() {
   return (
-    <div className="min-h-screen bg-white">
-
-      <PageVideoHero
-        videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/funding-hero.jpg"
-        posterAlt="Wioa Eligibility — Elevate for Humanity"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'WIOA Funding' }]} />
         </div>

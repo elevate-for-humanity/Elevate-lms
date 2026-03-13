@@ -510,3 +510,103 @@ export async function deleteApplication(id: string) {
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
+
+// ============ COURSE BLUEPRINT PERSISTENCE ============
+import type { CourseBlueprint } from '@/lib/ai/course-ingestion';
+
+/**
+ * Persist a full AI-generated course blueprint as a draft.
+ *
+ * Schema alignment (verified 2025-03):
+ *   training_courses  → UUID PK — course record + quiz stored in metadata JSONB
+ *   course_modules    → UUID PK, course_id UUID
+ *   training_lessons  → UUID PK, course_id UUID, module_id UUID
+ *
+ * NOTE: The legacy quizzes/quiz_questions/quiz_answer_options tables use integer PKs
+ * and are incompatible with the UUID-based training stack. Quiz data is stored in
+ * training_courses.metadata until a UUID quiz table is created.
+ */
+export async function saveCourseBlueprint(
+  blueprint: CourseBlueprint,
+  options: { program_id?: string | null; created_by?: string | null } = {}
+): Promise<{ courseId: string; moduleCount: number; lessonCount: number; questionCount: number }> {
+  const supabase = await getSupabase();
+
+  // 1. Create course record — quiz stored in metadata JSONB
+  const quizMetadata = blueprint.quiz_questions?.length
+    ? {
+        quiz_title: blueprint.quiz_title || 'Course Assessment',
+        quiz_passing_score: blueprint.quiz_passing_score || 70,
+        quiz_questions: blueprint.quiz_questions,
+      }
+    : null;
+
+  const { data: course, error: courseErr } = await supabase
+    .from('training_courses')
+    .insert({
+      title: blueprint.title,
+      subtitle: blueprint.subtitle || null,
+      description: blueprint.description || null,
+      skill_level: blueprint.skill_level || 'beginner',
+      category: blueprint.category || null,
+      duration_hours: blueprint.estimated_duration_hours
+        ? Math.round(blueprint.estimated_duration_hours)
+        : null,
+      program_id: options.program_id || null,
+      is_published: false,
+      status: 'draft',
+      certificate_enabled: blueprint.certificate_enabled ?? false,
+      certificate_title: blueprint.certificate_title || null,
+      passing_score: blueprint.passing_score || 70,
+      created_by: options.created_by || null,
+      metadata: quizMetadata,
+    })
+    .select('id')
+    .single();
+
+  if (courseErr || !course) throw new Error('Failed to create course record');
+  const courseId = course.id;
+
+  let lessonCount = 0;
+
+  // 2. Create modules + lessons
+  for (const mod of blueprint.modules ?? []) {
+    const { data: moduleRow, error: modErr } = await supabase
+      .from('course_modules')
+      .insert({
+        course_id: courseId,
+        title: mod.title,
+        description: mod.description || null,
+        order_index: mod.order_index ?? 0,
+      })
+      .select('id')
+      .single();
+
+    if (modErr || !moduleRow) continue;
+
+    const lessons = (mod.lessons ?? []).map((lesson, li) => ({
+      course_id: courseId,
+      module_id: moduleRow.id,
+      title: lesson.title,
+      description: lesson.description || null,
+      content: lesson.content || null,
+      order_index: lesson.order_index ?? li,
+      lesson_number: li + 1,
+      duration_minutes: lesson.duration_minutes || null,
+      content_type: lesson.content_type || 'text',
+      is_published: false,
+    }));
+
+    if (lessons.length) {
+      const { error: lessonErr } = await supabase.from('training_lessons').insert(lessons);
+      if (!lessonErr) lessonCount += lessons.length;
+    }
+  }
+
+  return {
+    courseId,
+    moduleCount: blueprint.modules?.length ?? 0,
+    lessonCount,
+    questionCount: blueprint.quiz_questions?.length ?? 0,
+  };
+}

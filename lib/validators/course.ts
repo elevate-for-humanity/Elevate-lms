@@ -3,19 +3,33 @@ import { z } from 'zod';
 // ============ COURSES ============
 export const CourseCreateSchema = z.object({
   title: z.string().min(1, 'Title is required'),
+  subtitle: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   program_id: z.string().uuid().optional().nullable(),
   duration_hours: z.number().int().min(0).optional().nullable(),
   category: z.string().optional().nullable(),
   is_published: z.boolean().default(false),
+  status: z.enum(['draft', 'review', 'published', 'archived']).default('draft'),
+  skill_level: z.enum(['beginner', 'intermediate', 'advanced']).default('beginner'),
+  category: z.string().optional().nullable(),
+  certificate_enabled: z.boolean().default(false),
+  certificate_title: z.string().optional().nullable(),
+  passing_score: z.number().int().min(0).max(100).default(70),
 });
 
 export const CourseUpdateSchema = z.object({
   title: z.string().min(1).optional(),
+  subtitle: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   program_id: z.string().uuid().optional().nullable(),
   duration_hours: z.number().int().min(0).optional().nullable(),
   is_published: z.boolean().optional(),
+  status: z.enum(['draft', 'review', 'published', 'archived']).optional(),
+  skill_level: z.enum(['beginner', 'intermediate', 'advanced']).optional().nullable(),
+  category: z.string().optional().nullable(),
+  certificate_enabled: z.boolean().optional(),
+  certificate_title: z.string().optional().nullable(),
+  passing_score: z.number().int().min(0).max(100).optional().nullable(),
 });
 
 export type CourseCreate = z.infer<typeof CourseCreateSchema>;

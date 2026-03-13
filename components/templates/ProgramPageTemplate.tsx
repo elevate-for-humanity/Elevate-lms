@@ -85,7 +85,7 @@ export function ProgramPageTemplate({
   outcomes,
   enrollLink,
   applyLink,
-  contactPhone = '(317) 760-7908',
+  contactPhone = '(317) 314-3757',
 }: ProgramPageProps) {
   const { videoRef } = useHeroVideo();
 

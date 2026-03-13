@@ -62,7 +62,7 @@ export function getWelcomeEmail(data: CourseEmailData) {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          Elevate for Humanity | 3737 N Meridian St, Suite 200, Indianapolis, IN 46208<br>
+          Elevate for Humanity | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br>
           <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
         </p>
       </body>

@@ -239,7 +239,7 @@ export default function TrainingProvidersPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">ETPL Listed</div>
               <div className="text-brand-blue-200">Students Placed</div>
             </div>
             <div>

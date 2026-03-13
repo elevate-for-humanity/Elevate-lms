@@ -149,7 +149,7 @@ export default async function TalentPipelinePage() {
               <div className="text-brand-orange-200">Job Placement Rate</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold">1,000+</div>
+              <div className="text-4xl md:text-5xl font-bold">Active</div>
               <div className="text-brand-orange-200">Graduates Placed</div>
             </div>
             <div>

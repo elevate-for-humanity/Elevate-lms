@@ -40,7 +40,7 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     key: 'esco',
     name: 'EPA Section 608 (ESCO Institute)',
     capability: 'IN_PERSON_ONLY',
-    description: 'Federal refrigerant handling certification required by the Clean Air Act. Must be proctored in person at an authorized site.',
+    description: 'Federal refrigerant handling certification required by the Clean Air Act. Elevate for Humanity is a nationally authorized proctor site for both ESCO Group and Mainstream Engineering. Proctored in person on-site.',
     exams: ['Core', 'Type I — Small Appliances', 'Type II — High-Pressure', 'Type III — Low-Pressure', 'Universal'],
     verifyUrl: 'https://www.escogroup.org/esco/certifications/epa608.aspx',
     status: 'active',

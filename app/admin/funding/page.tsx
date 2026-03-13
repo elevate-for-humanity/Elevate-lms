@@ -175,7 +175,7 @@ export default async function FundingPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-900">{g.title}</p>
                     <p className="text-xs text-gray-500">
-                      {g.amount ? `$${Number(g.amount).toLocaleString()}` : 'Amount TBD'}
+                      {g.amount ? `$${Number(g.amount).toLocaleString()}` : 'Pending'}
                       {g.deadline ? ` · Due ${new Date(g.deadline).toLocaleDateString()}` : ''}
                     </p>
                   </div>

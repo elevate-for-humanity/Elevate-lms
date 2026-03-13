@@ -20,6 +20,7 @@ export function CreateCourseForm({ categories, programs }: Props) {
   const [description, setDescription] = useState('');
   const [programId, setProgramId] = useState('');
   const [durationHours, setDurationHours] = useState('');
+  const [category, setCategory] = useState('');
   const [isPublished, setIsPublished] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +40,7 @@ export function CreateCourseForm({ categories, programs }: Props) {
         description: description.trim() || null,
         program_id: programId || null,
         duration_hours: durationHours ? parseInt(durationHours, 10) : null,
+        category: category || null,
         is_published: isPublished,
       });
 
@@ -127,6 +129,26 @@ export function CreateCourseForm({ categories, programs }: Props) {
             min="0"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Category
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2"
+        >
+          <option value="">Select category</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="trades">Skilled Trades</option>
+          <option value="technology">Technology</option>
+          <option value="business">Business</option>
+          <option value="transportation">Transportation / CDL</option>
+          <option value="personal-services">Personal Services</option>
+          <option value="tax">Tax Preparation</option>
+        </select>
       </div>
 
       <div className="flex items-center gap-3">

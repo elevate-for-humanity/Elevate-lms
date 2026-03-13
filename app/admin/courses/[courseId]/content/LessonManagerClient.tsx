@@ -78,6 +78,8 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
       video_url: formData.video_url || null,
       duration_minutes: formData.duration_minutes ? parseInt(formData.duration_minutes) : null,
       order_index: editingLesson ? editingLesson.order_index : lessons.length,
+      // lesson_number is NOT NULL in DB — assign sequentially on create
+      ...(editingLesson ? {} : { lesson_number: lessons.length + 1 }),
     };
 
     try {

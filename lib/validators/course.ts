@@ -6,6 +6,7 @@ export const CourseCreateSchema = z.object({
   description: z.string().optional().nullable(),
   program_id: z.string().uuid().optional().nullable(),
   duration_hours: z.number().int().min(0).optional().nullable(),
+  category: z.string().optional().nullable(),
   is_published: z.boolean().default(false),
 });
 

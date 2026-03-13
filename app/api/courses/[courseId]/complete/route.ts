@@ -40,7 +40,7 @@ async function _POST(
 
     // Check enrollment
     const { data: enrollment, error: enrollmentError } = await db
-      .from('program_enrollments')
+      .from('training_enrollments')
       .select('id, status, progress')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
@@ -134,7 +134,7 @@ async function _POST(
 
     // Mark enrollment as completed
     const { error: updateError } = await db
-      .from('program_enrollments')
+      .from('training_enrollments')
       .update({
         status: 'completed',
         progress: 100,
@@ -260,7 +260,7 @@ async function _GET(
 
     // Get completion status
     const { data: enrollment } = await db
-      .from('program_enrollments')
+      .from('training_enrollments')
       .select('status, progress, completed_at')
       .eq('user_id', user.id)
       .eq('course_id', courseId)

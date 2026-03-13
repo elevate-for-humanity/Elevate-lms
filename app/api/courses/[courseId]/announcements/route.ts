@@ -96,9 +96,9 @@ async function _POST(
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
-  // Optional: create notifications for enrolled students
+  // Notify enrolled students — training_enrollments is the canonical course enrollment table
   const { data: enrollments } = await db
-    .from('program_enrollments')
+    .from('training_enrollments')
     .select('user_id')
     .eq('course_id', courseId);
 

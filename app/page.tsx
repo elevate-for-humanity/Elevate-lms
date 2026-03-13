@@ -37,12 +37,12 @@ export default function HomePage() {
       {/* ─── HERO VIDEO ─── */}
       <section className="relative w-full h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[300px] overflow-hidden">
         <HomeHeroVideo />
-        {/* Hero copy — present on initial render, not gated by JS */}
+        {/* Hero copy */}
         <div className="absolute inset-0 flex items-end pointer-events-none">
-          <div className="w-full bg-black/55 px-6 py-6 sm:py-8 pointer-events-auto">
+          <div className="w-full px-6 py-6 sm:py-8 pointer-events-auto">
             <div className="max-w-3xl mx-auto">
-              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-4">
+              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2 drop-shadow-md">Indianapolis, Indiana</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-4 drop-shadow-lg">
                 We train adults for real jobs — in weeks, not years.
               </h1>
               <div className="flex flex-wrap gap-3">

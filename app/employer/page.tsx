@@ -78,11 +78,9 @@ export default function EmployerPage() {
               <div key={title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
                 <div className="relative h-40 flex-shrink-0">
                   <Image src={img} alt={alt} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-white text-sm leading-tight">{title}</h3>
-                  </div>
                 </div>
                 <div className="p-4 flex-1">
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               </div>
@@ -101,11 +99,9 @@ export default function EmployerPage() {
               <div key={label} className="group rounded-xl overflow-hidden border border-slate-200">
                 <div className="relative h-28">
                   <Image src={img} alt={label} fill sizes="200px" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-2 py-1.5">
-                    <p className="text-white font-bold text-xs leading-tight">{label}</p>
-                  </div>
                 </div>
                 <div className="p-2 bg-white">
+                  <p className="text-xs font-bold text-slate-900 leading-tight mb-0.5">{label}</p>
                   <p className="text-[10px] text-slate-400 leading-tight">{credential}</p>
                 </div>
               </div>

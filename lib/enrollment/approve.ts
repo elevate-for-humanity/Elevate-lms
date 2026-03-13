@@ -25,6 +25,8 @@ export interface ApproveApplicationResult {
   success: boolean;
   userId?: string;
   enrollmentId?: string | null;
+  /** Password setup link for new users — null if user already existed */
+  passwordSetupLink?: string | null;
   error?: string;
 }
 
@@ -56,6 +58,7 @@ export async function approveApplication(
 
   // Step 1: Find or create user
   let userId: string | null = null;
+  let isNewUser = false;
 
   // Check profiles first (fast, indexed)
   const { data: existingProfile } = await db
@@ -76,7 +79,7 @@ export async function approveApplication(
     if (existingUser) {
       userId = existingUser.id;
     } else {
-      // Create new auth user
+      // Create new auth user with a random temp password
       const tempPassword = `EFH-${Math.random().toString(36).slice(2, 10)}-Temp!`;
       const { data: newUser, error: createError } = await db.auth.admin.createUser({
         email,
@@ -93,6 +96,7 @@ export async function approveApplication(
         return { success: false, error: 'Failed to create user account' };
       }
       userId = newUser.user.id;
+      isNewUser = true;
     }
 
     // Ensure profile exists for newly created user
@@ -174,12 +178,32 @@ export async function approveApplication(
       .eq('id', userId);
   }
 
+  // Generate password setup link for new users
+  let passwordSetupLink: string | null = null;
+  if (isNewUser && userId) {
+    try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+      const { data: linkData } = await db.auth.admin.generateLink({
+        type: 'recovery',
+        email,
+        options: {
+          redirectTo: `${siteUrl}/auth/confirm?next=/auth/reset-password`,
+        },
+      });
+      passwordSetupLink = linkData?.properties?.action_link || null;
+    } catch (linkErr) {
+      logger.warn('[approve] Failed to generate password setup link (non-fatal)', { email, error: linkErr });
+    }
+  }
+
   logger.info('[approve] Application approved', {
     applicationId,
     userId,
     programId: resolvedProgramId,
     enrollmentId,
+    isNewUser,
+    hasPasswordLink: !!passwordSetupLink,
   });
 
-  return { success: true, userId: userId!, enrollmentId };
+  return { success: true, userId: userId!, enrollmentId, passwordSetupLink };
 }

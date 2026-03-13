@@ -70,6 +70,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             {/* Left: plain-language explanation */}
+            <ScrollReveal direction="left">
             <div>
               <p className="text-slate-300 text-lg leading-relaxed mb-4">
                 Elevate for Humanity is a workforce credential institute based in Indianapolis. We run short-term career training programs in healthcare, skilled trades, CDL driving, barbering, and technology. Programs run 4 to 16 weeks. Most are fully funded at no cost to eligible participants.
@@ -86,6 +87,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+            </ScrollReveal>
 
             {/* Right: 2x2 photo grid of program sectors */}
             <ScrollReveal direction="right" delay={150}>

@@ -31,23 +31,11 @@ export default function AdminLoginPage() {
       if (authError) throw authError;
       if (!data?.user) throw new Error('Login succeeded but no user returned');
 
-      // Verify admin role
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        setError('Unable to verify your account. Contact support.');
-        setLoading(false);
-        return;
-      }
-
-      const adminRoles = ['admin', 'super_admin', 'org_admin'];
-      if (!adminRoles.includes(profile.role)) {
-        setError('This login is for administrators only. Use the main sign-in page for your portal.');
+      // Verify admin role server-side — never trust client-side profile reads
+      const check = await fetch('/api/auth/verify-admin-role', { method: 'POST' });
+      if (!check.ok) {
         await supabase.auth.signOut();
+        setError('This login is for administrators only. Use the main sign-in page for your portal.');
         setLoading(false);
         return;
       }

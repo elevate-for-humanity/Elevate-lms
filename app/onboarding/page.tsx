@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import PageVideoHero from '@/components/ui/PageVideoHero';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';

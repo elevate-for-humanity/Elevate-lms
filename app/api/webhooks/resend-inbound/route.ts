@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
 const FORWARD_MAP: Record<string, string> = {
@@ -70,7 +71,16 @@ async function _POST(request: NextRequest) {
 
     const event = JSON.parse(rawBody);
 
+    // svix-id is the stable delivery ID — Svix retries reuse the same svix-id,
+    // making it the correct dedup key for this provider.
+    const eventId = svixId;
+
     if (event.type !== 'email.received') {
+      // Track non-email events as skipped so the monitor sees all delivery attempts
+      await claimWebhookEvent('resend', eventId, event.type || 'unknown', { skipped: true })
+        .catch(() => {});
+      await finalizeWebhookEvent('resend', eventId, 'skipped', `unhandled type: ${event.type}`)
+        .catch(() => {});
       return NextResponse.json({ ok: true, skipped: true });
     }
 
@@ -84,6 +94,22 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'missing email_id' }, { status: 400 });
     }
 
+    const { shouldProcess, confident } = await claimWebhookEvent(
+      'resend',
+      eventId,
+      event.type,
+      { email_id: emailId, from, subject, to: toAddresses },
+    );
+
+    if (!shouldProcess) {
+      return NextResponse.json({ ok: true, idempotent: true });
+    }
+
+    if (!confident) {
+      logger.error('[Resend Inbound] Cannot verify idempotency — rejecting for retry', { eventId });
+      return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
+    }
+
     // Determine forwarding destination based on the recipient address
     let forwardTo = DEFAULT_FORWARD;
     for (const addr of toAddresses) {
@@ -94,13 +120,7 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    logger.info('[Resend Inbound] Forwarding email', {
-      emailId,
-      from,
-      to: toAddresses,
-      subject,
-      forwardTo,
-    });
+    logger.info('[Resend Inbound] Forwarding email', { emailId, from, to: toAddresses, subject, forwardTo });
 
     // Use Resend SDK forward helper — handles content + attachments automatically
     // TODO: receiving.forward is Resend-specific; needs dedicated client if re-enabled
@@ -112,9 +132,11 @@ async function _POST(request: NextRequest) {
 
     if (error) {
       logger.error('[Resend Inbound] Forward failed:', error);
+      await finalizeWebhookEvent('resend', eventId, 'errored', String(error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
+    await finalizeWebhookEvent('resend', eventId, 'processed');
     logger.info('[Resend Inbound] Forwarded successfully', { emailId, forwardedId: data?.id });
     return NextResponse.json({ ok: true, forwardedId: data?.id });
   } catch (err) {

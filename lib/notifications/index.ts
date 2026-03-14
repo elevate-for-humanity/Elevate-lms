@@ -19,7 +19,18 @@ export type TemplateKey =
   | 'hostshop_decision'
   | 'apprentice_decision'
   | 'transfer_evaluated'
-  | 'match_assigned';
+  | 'match_assigned'
+  // Employer workflow
+  | 'employer_application_received'
+  | 'employer_decision'
+  | 'employer_activated'
+  // Barbershop partner workflow (legacy)
+  | 'partner_approved'
+  // Provider (training org) workflow
+  | 'provider_approved'
+  | 'compliance_expiring'
+  | 'program_approved'
+  | 'program_rejected';
 
 export interface NotificationData {
   toEmail: string;

@@ -24,7 +24,13 @@ export type TemplateKey =
   | 'employer_application_received'
   | 'employer_decision'
   | 'employer_activated'
-  | 'partner_approved';
+  // Barbershop partner workflow (legacy)
+  | 'partner_approved'
+  // Provider (training org) workflow
+  | 'provider_approved'
+  | 'compliance_expiring'
+  | 'program_approved'
+  | 'program_rejected';
 
 const BRAND_COLOR = '#7c3aed';
 const SUPPORT_EMAIL = 'support@elevateforhumanity.org';
@@ -593,6 +599,78 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
           <p style="font-size: 14px; color: #666;">If you have questions about onboarding, insurance requirements, or the program, reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
         text: `Partner Onboarding \u2014 You're Approved\n\nHi ${data.owner_name || 'there'},\n\nYour partner application has been approved. Your shop is now an authorized training site in the Elevate for Humanity Barber Apprenticeship Program.\n\nONBOARDING CHECKLIST\n1. Sign in to your Partner Portal: ${data.login_link || 'https://www.elevateforhumanity.org/login'}\n2. Upload your Certificate of Insurance (COI) \u2014 Commercial General Liability ($1M/$2M) with "Elevate for Humanity" as Certificate Holder\n3. Sign the Memorandum of Understanding (MOU)\n4. Confirm your supervising barber\n5. Set your apprentice capacity\n\nINSURANCE REQUIREMENT: Your COI must be on file and approved before apprentices can be placed. Ask your insurance agent for an ACORD 25 certificate naming "Elevate for Humanity" as Certificate Holder.\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n\nElevate for Humanity | Indianapolis, IN`,
+      };
+
+    case 'provider_approved':
+      return {
+        subject: `Your provider application has been approved — ${data.org_name || 'Elevate Network'}`,
+        html: baseTemplate(`
+          <h2 style="color: #16a34a;">Welcome to the Elevate Workforce Hub</h2>
+          <p>Hi ${data.contact_name || 'there'},</p>
+          <p><strong>${data.org_name || 'Your organization'}</strong> has been approved as a provider on the Elevate Workforce Hub.</p>
+          <p>Use the link below to sign in and complete your provider profile. Your account is ready — no password required for first login.</p>
+          ${button('Access Your Provider Portal →', data.login_link || 'https://www.elevateforhumanity.org/provider/dashboard')}
+          <p><strong>Your next steps:</strong></p>
+          <ol style="padding-left: 20px; line-height: 2;">
+            <li>Complete your organization profile and upload your logo</li>
+            <li>Upload required compliance documents (MOU, insurance, W-9)</li>
+            <li>Submit your first program for review</li>
+          </ol>
+          <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Your provider application has been approved\n\nHi ${data.contact_name || 'there'},\n\n${data.org_name || 'Your organization'} has been approved as a provider on the Elevate Workforce Hub.\n\nSign in to your provider portal: ${data.login_link || 'https://www.elevateforhumanity.org/provider/dashboard'}\n\nNext steps:\n1. Complete your organization profile\n2. Upload compliance documents (MOU, insurance, W-9)\n3. Submit your first program for review\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\nElevate for Humanity | Indianapolis, IN`,
+      };
+
+    case 'compliance_expiring': {
+      const daysLeft = data.days_until_expiry ?? '30';
+      return {
+        subject: `Action required: ${data.artifact_label || 'Compliance document'} expires in ${daysLeft} days`,
+        html: baseTemplate(`
+          <h2 style="color: #d97706;">Compliance Document Expiring Soon</h2>
+          <p>Hi ${data.contact_name || 'there'},</p>
+          <p>The following compliance document for <strong>${data.org_name || 'your organization'}</strong> expires in <strong>${daysLeft} days</strong>:</p>
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>${data.artifact_label || 'Document'}</strong><br>
+            Expires: <strong>${data.expires_at || 'soon'}</strong></p>
+          </div>
+          <p>Upload a renewed document in your provider portal to avoid a compliance hold on your programs.</p>
+          ${button('Upload Renewal →', data.portal_link || 'https://www.elevateforhumanity.org/provider/compliance')}
+          <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Compliance document expiring in ${daysLeft} days\n\nHi ${data.contact_name || 'there'},\n\n${data.artifact_label || 'A compliance document'} for ${data.org_name || 'your organization'} expires on ${data.expires_at || 'soon'}.\n\nUpload a renewal at: ${data.portal_link || 'https://www.elevateforhumanity.org/provider/compliance'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\nElevate for Humanity | Indianapolis, IN`,
+      };
+    }
+
+    case 'program_approved':
+      return {
+        subject: `Program approved: ${data.program_title || 'Your program'}`,
+        html: baseTemplate(`
+          <h2 style="color: #16a34a;">Program Approved</h2>
+          <p>Hi ${data.contact_name || 'there'},</p>
+          <p><strong>${data.program_title || 'Your program'}</strong> has been reviewed and approved. It is now published in the Elevate program catalog.</p>
+          ${data.review_notes ? `<p><strong>Reviewer notes:</strong> ${data.review_notes}</p>` : ''}
+          ${button('View Your Programs →', data.portal_link || 'https://www.elevateforhumanity.org/provider/programs')}
+          <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Program approved: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} has been approved and is now published in the catalog.\n\n${data.review_notes ? `Reviewer notes: ${data.review_notes}\n\n` : ''}View your programs: ${data.portal_link || 'https://www.elevateforhumanity.org/provider/programs'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\nElevate for Humanity | Indianapolis, IN`,
+      };
+
+    case 'program_rejected':
+      return {
+        subject: `Program needs revision: ${data.program_title || 'Your program'}`,
+        html: baseTemplate(`
+          <h2 style="color: #dc2626;">Program Needs Revision</h2>
+          <p>Hi ${data.contact_name || 'there'},</p>
+          <p><strong>${data.program_title || 'Your program'}</strong> was reviewed and requires changes before it can be published.</p>
+          ${data.review_notes ? `
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Reviewer feedback:</strong><br>${data.review_notes}</p>
+          </div>` : ''}
+          <p>Update your program submission and resubmit for review.</p>
+          ${button('Edit Program →', data.portal_link || 'https://www.elevateforhumanity.org/provider/programs')}
+          <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Program needs revision: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} requires changes before it can be published.\n\n${data.review_notes ? `Reviewer feedback: ${data.review_notes}\n\n` : ''}Edit your program: ${data.portal_link || 'https://www.elevateforhumanity.org/provider/programs'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\nElevate for Humanity | Indianapolis, IN`,
       };
 
     default:

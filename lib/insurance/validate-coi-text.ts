@@ -226,7 +226,7 @@ export function validateCoiText(
   // Look for "INSURED" section (not "INSURER")
   const insuredSection =
     extractSection(/(?:named\s+)?insured\s*[:\n]/i, raw, 200) ||
-    extractSection(/\binsured\b(?!\s*(a|b|c|d|e|f)\s*:)/i, raw, 200);
+    extractSection(/(?:^|[\s,])insured(?:[\s,:]|$)(?!\s*(?:a|b|c|d|e|f)\s*:)/i, raw, 200);
 
   if (insuredSection) {
     // Extract first meaningful line after the header
@@ -372,7 +372,7 @@ export function validateCoiText(
     if (wcSection) {
       const wcNorm = normalize(wcSection);
       // Reject "N/A", "not applicable", "none", "excluded" WC sections
-      const isExcluded = /\bn/?a\b|not applicable|none|excluded|waived/.test(wcNorm);
+      const isExcluded = /^n\/?a$|not applicable|^none$|excluded|waived/i.test(wcNorm);
       if (!isExcluded) {
         // Must have at least a policy number pattern and a date
         const hasWcPolicyNum = /[A-Z]{1,4}[\s-]?\d{4,}/i.test(wcSection);

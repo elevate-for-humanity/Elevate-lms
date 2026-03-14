@@ -142,7 +142,7 @@ export default function ComplianceUpload({ tenantId }: { tenantId: string }) {
         Submit Document
       </button>
       <p className="text-xs text-slate-400">
-        File upload via Supabase Storage coming soon. For now, paste a link to your document above.
+        To attach a file, upload it to your organization's document storage and paste the link above.
       </p>
     </form>
   );

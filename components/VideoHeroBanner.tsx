@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 interface VideoHeroBannerProps {
   title: string;
@@ -16,7 +17,6 @@ interface VideoHeroBannerProps {
   secondaryCtaLink?: string;
   textPosition?: 'left' | 'center' | 'right';
   height?: 'full' | 'large' | 'medium';
-  autoPlay?: boolean;
   loop?: boolean;
   bannerId?: string;
 }
@@ -33,11 +33,10 @@ export default function VideoHeroBanner({
   secondaryCtaLink,
   textPosition = 'left',
   height = 'large',
-  autoPlay = true,
   loop = true,
   bannerId,
 }: VideoHeroBannerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const [isLoaded, setIsLoaded] = useState(false);
   const supabase = createClient();
 
@@ -55,14 +54,6 @@ export default function VideoHeroBanner({
     logBannerView();
   }, [bannerId, videoSrc, supabase]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video && autoPlay) {
-      video.muted = true;
-      video.play().catch(() => {});
-    }
-  }, [autoPlay]);
-
   const heightClasses = { full: 'min-h-screen', large: 'min-h-[80vh]', medium: 'min-h-[60vh]' };
   const textPositionClasses = { left: 'items-start text-left', center: 'items-center text-center', right: 'items-end text-right' };
 
@@ -74,7 +65,6 @@ export default function VideoHeroBanner({
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
           poster={posterImage}
           loop={loop}
-          muted
           playsInline
           onLoadedData={() => setIsLoaded(true)}
         >

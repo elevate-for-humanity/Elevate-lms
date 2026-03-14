@@ -1,44 +1,22 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Play, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { RotateCcw } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function StoreHeroVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const [hasEnded, setHasEnded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const playVideo = () => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = false;
-      video.volume = 1;
-      video.play();
-      setIsPlaying(true);
-      setHasEnded(false);
-    }
-  };
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
 
   const replayVideo = () => {
     const video = videoRef.current;
-    if (video) {
-      video.currentTime = 0;
-      video.muted = false;
-      video.volume = 1;
-      video.play();
-      setHasEnded(false);
-      setIsPlaying(true);
-    }
+    if (!video) return;
+    video.currentTime = 0;
+    video.muted = false;
+    video.volume = 1;
+    video.play().catch(() => {});
+    setHasEnded(false);
   };
 
   return (
@@ -48,36 +26,20 @@ export default function StoreHeroVideo() {
           ref={videoRef}
           className="w-full h-full object-cover"
           playsInline
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => { setHasEnded(true); setIsPlaying(false); }}
+          onEnded={() => setHasEnded(true)}
           onLoadedData={() => setIsLoaded(true)}
         >
           <source src="/videos/avatars/store-assistant.mp4" type="video/mp4" />
         </video>
 
-        {/* Loading state */}
         {!isLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
           </div>
         )}
 
-        {/* Play overlay - show when not playing */}
-        {!isPlaying && !hasEnded && isLoaded && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center bg-white/40 cursor-pointer"
-            onClick={playVideo}
-          >
-            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-              <Play className="w-10 h-10 text-brand-blue-600 ml-1" />
-            </div>
-          </div>
-        )}
-
-        {/* Replay overlay */}
         {hasEnded && (
-          <div 
+          <div
             className="absolute inset-0 flex items-center justify-center bg-white/50 cursor-pointer"
             onClick={replayVideo}
           >
@@ -89,27 +51,8 @@ export default function StoreHeroVideo() {
             </div>
           </div>
         )}
-
-        {/* Controls - only show when playing */}
-        {isPlaying && !hasEnded && (
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <button
-              onClick={toggleMute}
-              className="p-3 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-900 transition-all"
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-            </button>
-            
-            <span className="text-slate-900 text-sm font-medium bg-white/40 px-4 py-2 rounded-full backdrop-blur-sm">
-              Store Guide
-            </span>
-            
-            <div className="w-12" />
-          </div>
-        )}
       </div>
-      
+
       <p className="text-slate-600 text-sm mt-3">
         Watch our guide explain what&apos;s available in the store
       </p>

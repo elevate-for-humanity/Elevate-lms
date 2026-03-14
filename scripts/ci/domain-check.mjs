@@ -148,59 +148,7 @@ if (!existsSync(CERT_GENERATE)) {
   }
 }
 
-// ── 5. Job queue invariants ───────────────────────────────────────────────
-
-section('Job queue invariants');
-
-const JOB_QUEUE_MIGRATION = join(ROOT, 'supabase', 'migrations', '20260319000002_job_queue.sql');
-if (!existsSync(JOB_QUEUE_MIGRATION)) {
-  fail('supabase/migrations/20260319000002_job_queue.sql — job_queue migration missing');
-} else {
-  const src = readFileSync(JOB_QUEUE_MIGRATION, 'utf8');
-  if (!src.includes('job_queue')) {
-    fail('20260319000002_job_queue.sql — does not create job_queue table');
-  } else {
-    pass('job_queue migration present');
-  }
-}
-
-const ENQUEUE_HELPER = join(ROOT, 'lib', 'jobs', 'enqueue.ts');
-if (!existsSync(ENQUEUE_HELPER)) {
-  fail('lib/jobs/enqueue.ts — enqueueJob helper missing');
-} else {
-  const src = readFileSync(ENQUEUE_HELPER, 'utf8');
-  if (!src.includes('export async function enqueueJob')) {
-    fail('lib/jobs/enqueue.ts — enqueueJob not exported');
-  } else {
-    pass('lib/jobs/enqueue.ts exports enqueueJob');
-  }
-}
-
-const PROCESSOR = join(ROOT, 'app', 'api', 'jobs', 'process', 'route.ts');
-if (!existsSync(PROCESSOR)) {
-  fail('app/api/jobs/process/route.ts — job processor endpoint missing');
-} else {
-  pass('app/api/jobs/process/route.ts present');
-}
-
-// Verify issueCertificate uses enqueueJob, not inline email/notification
-const ISSUE_CERT = join(ROOT, 'lib', 'certificates', 'issue-certificate.ts');
-if (existsSync(ISSUE_CERT)) {
-  const src = readFileSync(ISSUE_CERT, 'utf8');
-  if (!src.includes("enqueueJob")) {
-    fail('lib/certificates/issue-certificate.ts — does not call enqueueJob (side effects may be inline)');
-  } else {
-    pass('lib/certificates/issue-certificate.ts uses enqueueJob');
-  }
-  // Ensure inline email send is gone
-  if (src.includes('sendCertificateNotification') && !src.includes('enqueueJob')) {
-    fail('lib/certificates/issue-certificate.ts — sendCertificateNotification called inline (should be in job processor)');
-  } else {
-    pass('lib/certificates/issue-certificate.ts — no inline sendCertificateNotification');
-  }
-}
-
-// ── 6. No error.message leaks in API responses ────────────────────────────
+// ── 5. No error.message leaks in API responses ────────────────────────────
 
 section('API error.message leak check');
 

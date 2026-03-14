@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
 
@@ -8,24 +8,24 @@ export default function HomeHeroVideo() {
   const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const audioRef = useRef<HTMLAudioElement>(null);
   const playedRef = useRef(false);
-  const [audioBlocked, setAudioBlocked] = useState(false);
 
   useEffect(() => {
-    // Play voiceover on first user interaction (scroll or click)
-    const tryAudio = () => {
-      if (playedRef.current || !audioRef.current) return;
-      playedRef.current = true;
-      const audio = audioRef.current;
-      audio.muted = false;
-      audio.volume = 1;
-      audio.play().catch(() => setAudioBlocked(true));
-    };
-    window.addEventListener('scroll', tryAudio, { once: true, passive: true });
-    window.addEventListener('click', tryAudio, { once: true });
-    return () => {
-      window.removeEventListener('scroll', tryAudio);
-      window.removeEventListener('click', tryAudio);
-    };
+    if (!audioRef.current || playedRef.current) return;
+    playedRef.current = true;
+    const audio = audioRef.current;
+    audio.volume = 1;
+    audio.muted = false;
+    audio.play().catch(() => {
+      audio.muted = true;
+      audio.play().catch(() => {});
+      const unmute = () => {
+        audio.muted = false;
+        window.removeEventListener('scroll', unmute, true);
+        window.removeEventListener('touchmove', unmute, true);
+      };
+      window.addEventListener('scroll', unmute, { capture: true, passive: true });
+      window.addEventListener('touchmove', unmute, { capture: true, passive: true });
+    });
   }, []);
 
   return (
@@ -45,21 +45,6 @@ export default function HomeHeroVideo() {
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
       <audio ref={audioRef} src="/audio/welcome-voiceover.mp3" preload="auto" aria-hidden="true" />
-      {audioBlocked && (
-        <button
-          onClick={() => {
-            const audio = audioRef.current;
-            if (!audio) return;
-            audio.muted = false;
-            audio.play().catch(() => {});
-            setAudioBlocked(false);
-          }}
-          className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/70 hover:bg-black/90 text-white text-sm font-semibold px-4 py-2 rounded-full transition"
-          aria-label="Play audio"
-        >
-          🔊 Tap to hear
-        </button>
-      )}
     </div>
   );
 }

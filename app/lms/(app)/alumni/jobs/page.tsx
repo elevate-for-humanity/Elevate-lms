@@ -1,111 +1,60 @@
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Metadata } from 'next';
-import { Briefcase, MapPin, Clock, DollarSign, Building } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'Job Board | Alumni',
-  description: 'Exclusive job opportunities for alumni.',
-};
+import Image from 'next/image';
+import { Briefcase, MapPin, DollarSign, Wifi } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { getActiveJobs, formatSalary, jobTypeLabel, jobTypeBadge } from '@/lib/data/jobs';
+import JobCard from '@/components/jobs/JobCard';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'Job Board | Alumni | Elevate LMS',
+  description: 'Exclusive job opportunities from Elevate employer partners for graduates and alumni.',
+};
+
 export default async function AlumniJobsPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) redirect('/login?next=/lms/alumni/jobs');
+  if (!user) redirect('/login?redirect=/lms/alumni/jobs');
 
-  // Fetch job postings from database
-  const { data: jobs, error } = await db
-    .from('job_postings')
-    .select(`
-      id,
-      title,
-      company,
-      location,
-      salary_range,
-      job_type,
-      description,
-      requirements,
-      is_active,
-      created_at
-    `)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching jobs:', error.message);
-  }
-
-  const jobList = jobs || [];
+  const jobs = await getActiveJobs({ limit: 30 });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Alumni Job Board</h1>
-          <p className="text-gray-600 mt-1">Exclusive opportunities from our employer partners</p>
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 py-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Alumni</p>
+          <h1 className="text-2xl font-bold text-slate-900">Job Board</h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Opportunities from Elevate employer partners — open to graduates and current learners.
+          </p>
         </div>
+      </div>
 
-        {jobList.length > 0 ? (
-          <div className="space-y-4">
-            {jobList.map((job: any) => (
-              <div key={job.id} className="bg-white rounded-xl border p-6 hover:shadow-lg transition">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                      <Building className="w-6 h-6 text-brand-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-                      <p className="text-gray-600">{job.company}</p>
-                      <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {job.location || 'Remote'}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {job.job_type || 'Full-time'}
-                        </span>
-                        {job.salary_range && (
-                          <span className="flex items-center gap-1">
-                            <DollarSign className="w-4 h-4" />
-                            {job.salary_range}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/lms/alumni/jobs/${job.id}`}
-                    className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
-                  >
-                    View Details
-                  </Link>
-                </div>
-                {job.description && (
-                  <p className="text-gray-600 mt-4 line-clamp-2">{job.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl border p-12 text-center">
-            <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">No job postings yet</h2>
-            <p className="text-gray-600 mb-6">Check back soon for exclusive job opportunities from our employer partners.</p>
-            <Link 
-              href="/lms/alumni"
-              className="text-brand-blue-600 hover:underline"
-            >
-              Return to Alumni Portal
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {jobs.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 px-8 text-center">
+            <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-600 font-medium">No job postings available right now.</p>
+            <p className="text-slate-500 text-sm mt-1">New opportunities are added regularly as employer partners post openings.</p>
+            <Link href="/career-services" className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline font-medium">
+              Visit Career Services →
             </Link>
           </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-sm text-slate-500">{jobs.length} open position{jobs.length !== 1 ? 's' : ''}</p>
+              <Link href="/career-services/networking-events" className="text-sm text-brand-blue-600 hover:underline">
+                Upcoming career fairs →
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {jobs.map(job => <JobCard key={job.id} job={job} showApply href={`/lms/alumni/jobs/${job.id}`} />)}
+            </div>
+          </>
         )}
       </div>
     </div>

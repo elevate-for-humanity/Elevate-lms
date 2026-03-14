@@ -5,11 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
-import {
-  getActivePositions,
-  formatSalaryRange,
-  getEmploymentTypeDisplay,
-} from '@/lib/data/careers';
+import { getActiveJobs, formatSalary, jobTypeLabel } from '@/lib/data/jobs';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,21 +50,7 @@ export default async function CareersPage() {
     );
   }
   
-  // Fetch real job positions from database
-  const { data: dbPositions } = await db
-    .from('job_postings')
-    .select('*')
-    .eq('status', 'active')
-    .order('created_at', { ascending: false });
-
-  let openPositions = dbPositions || [];
-  if (openPositions.length === 0) {
-    try {
-      openPositions = await getActivePositions();
-    } catch (error) { /* Error handled silently */ 
-      // Continue with empty positions array
-    }
-  }
+  const openPositions = await getActiveJobs({ limit: 20 });
 
   const benefits = [
     {
@@ -217,40 +199,31 @@ export default async function CareersPage() {
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2">
-                        {position.title}
-                      </h3>
+                      <h3 className="text-xl font-semibold mb-2">{position.title}</h3>
                       <p className="text-black mb-3">
-                        {position.description ||
-                          'Join our team and make a difference in workforce development.'}
+                        {position.description || 'Join our team and make a difference in workforce development.'}
                       </p>
                       <div className="flex flex-wrap gap-3 text-sm">
-                        {position.department?.name && (
+                        {position.remote_allowed && (
+                          <span className="bg-brand-green-100 text-brand-green-700 px-3 py-2 rounded-full">Remote OK</span>
+                        )}
+                        {(position.job_type || position.employment_type) && (
                           <span className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full">
-                            {position.department.name}
+                            {jobTypeLabel(position.job_type ?? position.employment_type)}
                           </span>
                         )}
-                        <span className="bg-brand-green-100 text-brand-green-700 px-3 py-2 rounded-full">
-                          Remote
-                        </span>
-                        <span className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full">
-                          {getEmploymentTypeDisplay(position.employment_type)}
-                        </span>
-                        {(position.min_salary || position.max_salary) && (
+                        {(position.salary_range || position.salary_min) && (
                           <span className="bg-emerald-100 text-emerald-700 px-3 py-2 rounded-full">
-                            {formatSalaryRange(
-                              position.min_salary,
-                              position.max_salary
-                            )}
+                            {formatSalary(position)}
                           </span>
+                        )}
+                        {position.location && (
+                          <span className="bg-slate-100 text-slate-700 px-3 py-2 rounded-full">{position.location}</span>
                         )}
                       </div>
                     </div>
                     <div>
-                      <Link
-                        href={`/careers/${position.id}`}
-                        className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-                      >
+                      <Link href={`/careers/jobs/${position.id}`} className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
                         Apply Now
                       </Link>
                     </div>
@@ -261,13 +234,9 @@ export default async function CareersPage() {
 
             {openPositions.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-xl text-black mb-4">
-                  No open positions at the moment.
-                </p>
-                <p className="text-black">
-                  Check back soon or send us your resume for future
-                  opportunities.
-                </p>
+                <p className="text-xl text-black mb-4">No open positions at the moment.</p>
+                <p className="text-black">Send us your resume and we will reach out when a matching role opens.</p>
+                <Link href="/contact" className="mt-4 inline-block text-brand-blue-600 font-semibold hover:underline">Contact us →</Link>
               </div>
             )}
           </div>

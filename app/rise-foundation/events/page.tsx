@@ -1,140 +1,92 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { Calendar, MapPin, Users, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { getUpcomingEvents, getPastEvents } from '@/lib/data/events';
+import EventCard from '@/components/events/EventCard';
+import EventsEmptyState from '@/components/events/EventsEmptyState';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/rise-foundation/events',
-  },
   title: 'Events | Rise Foundation',
-  description: 'Join us for upcoming community events and programs.',
+  description: 'Community fundraisers, volunteer events, and programs from the Rise Foundation at Elevate for Humanity.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/rise-foundation/events' },
 };
 
-export default async function EventsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+const RISE_TYPES = ['fundraiser', 'community', 'orientation', 'graduation'];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { data: events } = await db
-    .from('events')
-    .select('*')
-    .gte('date', new Date().toISOString().split('T')[0])
-    .order('date', { ascending: true });
+export default async function RiseFoundationEventsPage() {
+  const [upcoming, past] = await Promise.all([
+    getUpcomingEvents({ types: RISE_TYPES, limit: 9 }),
+    getPastEvents({ types: RISE_TYPES, limit: 3 }),
+  ]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Rise Foundation', href: '/rise-foundation' }, { label: 'Events' }]} />
-        </div>
-      </div>
-
-      <section className="bg-zinc-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Upcoming Events</h1>
-          <p className="text-xl text-indigo-100">
-            Join us for workshops, training sessions, and community gatherings
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <div className="relative h-64 sm:h-80 w-full overflow-hidden">
+        <Image
+          src="/images/pages/success-hero.jpg"
+          alt="Rise Foundation community events"
+          fill className="object-cover" priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-300 mb-1">Rise Foundation</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">Events &amp; Programs</h1>
+          <p className="text-slate-300 mt-1 text-sm max-w-xl">
+            Fundraisers, community gatherings, graduations, and programs supporting workforce development in Indianapolis.
           </p>
         </div>
-      </section>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {!events || events.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12 text-center">
-            <Calendar className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-black mb-2">
-              No Upcoming Events
-            </h3>
-            <p className="text-black mb-6">
-              Check back soon for new events and programs
-            </p>
-            <Link
-              href="/contact"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Contact Us for Information
-            </Link>
-          </div>
+      <div className="max-w-6xl mx-auto px-4 py-3">
+        <Breadcrumbs items={[
+          { label: 'Home', href: '/' },
+          { label: 'Rise Foundation', href: '/rise-foundation' },
+          { label: 'Events' },
+        ]} />
+      </div>
+
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-slate-900">Upcoming Events</h2>
+          <Link href="/events" className="text-sm text-brand-blue-600 hover:underline">All events →</Link>
+        </div>
+        {upcoming.length === 0 ? (
+          <EventsEmptyState
+            message="No Rise Foundation events scheduled right now. Contact us to learn about upcoming programs."
+            ctaLabel="Contact us" ctaHref="/contact"
+          />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold text-black flex-1">
-                      {event.title}
-                    </h3>
-                    <Calendar className="h-5 w-5 text-indigo-600 flex-shrink-0" />
-                  </div>
-
-                  {event.description && (
-                    <p className="text-black text-sm mb-4 line-clamp-3">
-                      {event.description}
-                    </p>
-                  )}
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-black">
-                      <Calendar className="h-4 w-4" />
-                      <span>
-                        {new Date(event.date).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </span>
-                    </div>
-
-                    {event.time && (
-                      <div className="flex items-center gap-2 text-sm text-black">
-                        <Clock className="h-4 w-4" />
-                        <span>{event.time}</span>
-                      </div>
-                    )}
-
-                    {event.location && (
-                      <div className="flex items-center gap-2 text-sm text-black">
-                        <MapPin className="h-4 w-4" />
-                        <span>{event.location}</span>
-                      </div>
-                    )}
-
-                    {event.capacity && (
-                      <div className="flex items-center gap-2 text-sm text-black">
-                        <Users className="h-4 w-4" />
-                        <span>Capacity: {event.capacity}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <button className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium" aria-label="Action button">
-                    RSVP Now
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map(e => <EventCard key={e.id} event={e} />)}
           </div>
         )}
-      </div>
+      </section>
+
+      {past.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 pb-12">
+          <h2 className="text-lg font-bold text-slate-700 mb-4">Past Events</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map(e => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
+
+      <section className="bg-slate-900 py-10">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h2 className="text-xl font-bold text-white">Support the Rise Foundation</h2>
+          <p className="text-slate-400 mt-2 text-sm max-w-lg mx-auto">
+            Your donation funds scholarships, tools, and wraparound services for workforce training participants.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-5">
+            <Link href="/rise-foundation/donate" className="bg-brand-orange-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:bg-brand-orange-600 transition-colors">Donate</Link>
+            <Link href="/contact" className="border border-slate-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:border-white transition-colors">Contact Us</Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,238 +1,87 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { getUpcomingEvents, getPastEvents } from '@/lib/data/events';
+import EventCard from '@/components/events/EventCard';
+import EventsEmptyState from '@/components/events/EventsEmptyState';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const metadata: Metadata = {
-  title: 'Events | Elevate For Humanity',
-  description: 'Discover upcoming workshops, seminars, info sessions, and career fairs.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/events',
-  },
-};
 
 export const dynamic = 'force-dynamic';
 
-interface Event {
-  id: string;
-  title: string;
-  description: string | null;
-  event_type: string;
-  start_time: string;
-  end_time: string;
-  location: string | null;
-}
+export const metadata: Metadata = {
+  title: 'Events | Elevate for Humanity',
+  description: 'Upcoming workshops, info sessions, career fairs, and community events in Indianapolis and online.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/events' },
+};
 
 export default async function EventsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { data: upcomingEvents, error } = await db
-    .from('events')
-    .select('id, title, description, event_type, start_time, end_time, location')
-    .gte('start_time', new Date().toISOString())
-    .order('start_time', { ascending: true })
-    .limit(12);
-
-  const { data: pastEvents } = await db
-    .from('events')
-    .select('id, title, description, event_type, start_time, end_time, location')
-    .lt('start_time', new Date().toISOString())
-    .order('start_time', { ascending: false })
-    .limit(6);
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Events</h1>
-          <p className="text-gray-600 mb-6">Unable to load events.</p>
-          <Link href="/contact" className="text-brand-blue-600 hover:underline">
-            Contact us for event information
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-  };
-
-  const getEventTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      'info_session': 'Info Session',
-      'workshop': 'Workshop',
-      'career_fair': 'Career Fair',
-      'graduation': 'Graduation',
-      'networking': 'Networking',
-    };
-    return labels[type] || type;
-  };
-
-  const getEventTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      'info_session': 'bg-brand-blue-100 text-brand-blue-700',
-      'workshop': 'bg-brand-blue-100 text-brand-blue-700',
-      'career_fair': 'bg-brand-green-100 text-brand-green-700',
-      'graduation': 'bg-yellow-100 text-yellow-700',
-      'networking': 'bg-brand-orange-100 text-brand-orange-700',
-    };
-    return colors[type] || 'bg-gray-100 text-gray-700';
-  };
+  const [upcoming, past] = await Promise.all([
+    getUpcomingEvents({ limit: 12 }),
+    getPastEvents({ limit: 6 }),
+  ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Events' }]} />
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <div className="relative h-64 sm:h-80 w-full overflow-hidden">
+        <Image
+          src="/images/pages/events-page-1.jpg"
+          alt="Elevate for Humanity community events"
+          fill className="object-cover" priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">Events</h1>
+          <p className="text-slate-300 mt-1 text-sm max-w-xl">
+            Workshops, info sessions, career fairs, and community gatherings in Indianapolis and online.
+          </p>
         </div>
       </div>
 
-      {/* Hero Image */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
-        <Image src="/images/pages/events-page-1.jpg" alt="Upcoming events and workshops" fill sizes="100vw" className="object-cover" priority />
+      <div className="max-w-6xl mx-auto px-4 py-3">
+        <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Events' }]} />
+      </div>
+
+      {/* Upcoming */}
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-slate-900">Upcoming Events</h2>
+          <span className="text-sm text-slate-500">{upcoming.length} scheduled</span>
+        </div>
+        {upcoming.length === 0 ? (
+          <EventsEmptyState
+            message="No upcoming events right now. Contact us to be notified when new events are added."
+            ctaLabel="Get notified" ctaHref="/contact"
+          />
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map(e => <EventCard key={e.id} event={e} />)}
+          </div>
+        )}
       </section>
 
-      {/* Title */}
-      <div className="bg-rose-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Events</h1>
-          <p className="text-xl text-rose-100 max-w-2xl">
-            Join us for workshops, info sessions, career fairs, and networking events.
+      {past.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 pb-12">
+          <h2 className="text-lg font-bold text-slate-700 mb-4">Past Events</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map(e => <EventCard key={e.id} event={e} />)}
+          </div>
+        </section>
+      )}
+
+      <section className="bg-slate-900 py-12">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold text-white">Want to host or sponsor an event?</h2>
+          <p className="text-slate-400 mt-2 max-w-xl mx-auto text-sm">
+            Partner with Elevate for Humanity to connect with workforce-ready talent and the Indianapolis community.
           </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+            <Link href="/contact" className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors">Contact Us</Link>
+            <Link href="/for/employers" className="border border-slate-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:border-white transition-colors">Employer Partnerships</Link>
+          </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Upcoming Events */}
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Upcoming Events</h2>
-          
-          {upcomingEvents && upcomingEvents.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcomingEvents.map((event: Event) => (
-                <div key={event.id} className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition">
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className={`text-xs font-medium px-3 py-1 rounded-full ${getEventTypeColor(event.event_type)}`}>
-                        {getEventTypeLabel(event.event_type)}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">{event.title}</h3>
-                    
-                    {event.description && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.description}</p>
-                    )}
-                    
-                    <div className="space-y-2 text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(event.start_time)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{formatTime(event.start_time)} - {formatTime(event.end_time)}</span>
-                      </div>
-                      {event.location && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="px-6 py-4 bg-gray-50 border-t">
-                    <Link
-                      href="/contact?type=event"
-                      className="text-brand-blue-600 font-medium text-sm hover:underline"
-                    >
-                      Register / Learn More
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-white rounded-lg border">
-              <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Events</h3>
-              <p className="text-gray-600 mb-4">Check back soon for new events!</p>
-              <Link href="/contact" className="text-brand-blue-600 hover:underline">
-                Contact us for event information
-              </Link>
-            </div>
-          )}
-        </section>
-
-        {/* Past Events */}
-        {pastEvents && pastEvents.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Past Events</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pastEvents.map((event: Event) => (
-                <div key={event.id} className="bg-white rounded-xl shadow-sm border p-6 opacity-75">
-                  <span className={`text-xs font-medium px-3 py-1 rounded-full ${getEventTypeColor(event.event_type)}`}>
-                    {getEventTypeLabel(event.event_type)}
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900 mt-4 mb-2">{event.title}</h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="w-4 h-4" />
-                    <span>{formatDate(event.start_time)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* CTA */}
-        <section className="bg-rose-600 rounded-2xl p-8 text-white text-center">
-          <h2 className="text-2xl font-bold mb-4">Want to Host an Event?</h2>
-          <p className="text-rose-100 mb-6 max-w-xl mx-auto">
-            Partner with us to host career fairs, workshops, or info sessions at your location.
-          </p>
-          <Link
-            href="/contact?type=partner"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-rose-600 font-semibold rounded-lg hover:bg-gray-100 transition"
-          >
-            Contact Us
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

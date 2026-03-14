@@ -55,7 +55,7 @@ const defaultFiles = [
 // Default template files for the AI site builder editor scaffold
 const templateFileContents: Record<string, string> = {
   '/app/page.tsx': `export default async function HomePage() {
-  const supabase: any = createClient();
+  const supabase: any = await createClient();
 
   const router = useRouter();
   useEffect(() => {

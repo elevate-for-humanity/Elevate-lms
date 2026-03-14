@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/analytics/reports/wioa' } });
 
-    const supabase = createClient();
+    const supabase = await createClient();
   const session = await requireApiAuth();
   if (!session || !(session as any).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

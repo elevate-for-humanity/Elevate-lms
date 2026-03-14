@@ -7,7 +7,7 @@ export async function uploadComplianceEvidenceFile(
   file: File,
   itemId: string
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const ext = file.name.split(".").pop() || "bin";
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
   const path = `items/${itemId}/${fileName}`;

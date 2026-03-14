@@ -16,7 +16,7 @@ async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createClient();
+const supabase = await createClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

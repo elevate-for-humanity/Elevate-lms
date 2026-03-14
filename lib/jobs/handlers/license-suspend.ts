@@ -7,7 +7,7 @@ import { ProvisioningJob } from '../queue';
  * STEP 6A: License suspend/reactivate job handler
  */
 export async function processLicenseSuspend(job: ProvisioningJob): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { licenseId, reason, action } = job.payload as {
     licenseId: string;
     reason: string;

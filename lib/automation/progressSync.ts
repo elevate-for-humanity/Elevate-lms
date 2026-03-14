@@ -6,7 +6,7 @@ import { getPartnerClient, PartnerType } from '../partners';
 
 
 export async function syncSingleEnrollment(enrollmentId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
@@ -46,7 +46,7 @@ export async function syncSingleEnrollment(enrollmentId: string) {
 }
 
 export async function syncAllActivePartnerEnrollments() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: enrollments } = await supabase
     .from('partner_lms_enrollments')

@@ -136,9 +136,12 @@ export default function MOUPage() {
       if (insertError) throw insertError;
       setSigned(true);
       // Redirect back to the correct onboarding hub based on role
-      const dest = profile?.role === 'employer'
-        ? '/onboarding/employer'
-        : '/onboarding/partner';
+      const role = profile?.role;
+      const dest =
+        role === 'employer' ? '/onboarding/employer' :
+        role === 'learner'  ? '/onboarding/learner'  :
+        role === 'partner'  ? '/onboarding/partner'  :
+        '/dashboard';
       router.push(dest);
     } catch (err: any) {
       setError('Failed to record MOU acceptance. Please try again.');

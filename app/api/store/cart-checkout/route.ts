@@ -56,12 +56,13 @@ async function _POST(req: Request) {
     const productIds = cartItems.map((item: any) => item.product_id).filter(Boolean);
     const { data: storeProducts } = await db
       .from('store_products')
-      .select('id, grants_course_access, course_id')
-      .in('id', productIds);
+      .select('product_id, grants_course_access, course_id')
+      .in('product_id', productIds);
 
+    // Key by product_id (FK to products) so lookups via item.product_id work correctly.
     const storeProductMap: Record<string, { grants_course_access: string | null; course_id: string | null }> = {};
     for (const sp of storeProducts || []) {
-      storeProductMap[sp.id] = sp;
+      storeProductMap[sp.product_id] = sp;
     }
 
     // Collect LMS course IDs for items that grant access

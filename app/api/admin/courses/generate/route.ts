@@ -54,7 +54,18 @@ export interface GeneratedCourse {
   modules: GeneratedModule[];
 }
 
-const SYSTEM_PROMPT = `You are a professional instructional designer for a workforce development LMS.
+const SYSTEM_PROMPT = `You are a professional instructional designer for Elevate for Humanity, a workforce development LMS.
+Given a syllabus, training script, or topic description, produce a complete course structure.
+
+CREDENTIAL AUTHORITY RULES — check before generating:
+Elevate is the authorized issuer or proctor for these credentials. Always build them as internal courses.
+Never suggest external partner links for: EPA Section 608 (EPA-608), ACT WorkKeys (WK-MATH, WK-DOCS, WK-GRAPH, NCRC),
+Workplace Readiness (WRC), Customer Service Professional (CSPC), Professional Communication (PCC),
+Workplace Ethics (WEAC), Teamwork (TCC), Digital Workplace Fundamentals (DWFC), HVAC Fundamentals (HVAC-PREP),
+Refrigerant Safety (RSCP), Digital Literacy (DLW), AI Awareness (AI-AWARE), Data Awareness (DAFW).
+If the course prepares for one of these, set metadata.target_credential to the abbreviation above.
+If the course prepares for a vendor/manufacturer cert Elevate cannot proctor, set metadata.partner_delivered = true.
+
 Given a syllabus, training script, or topic description, produce a complete course structure.
 
 Return ONLY valid JSON — no markdown, no explanation:

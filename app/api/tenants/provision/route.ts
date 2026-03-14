@@ -7,7 +7,6 @@ export const maxDuration = 60;
 // app/api/tenants/provision/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { sendSlackMessage } from '@/lib/notifications/slack';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

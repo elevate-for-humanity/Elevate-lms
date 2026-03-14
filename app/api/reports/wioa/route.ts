@@ -7,7 +7,6 @@ export const maxDuration = 60;
 // app/api/reports/wioa/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
-import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 

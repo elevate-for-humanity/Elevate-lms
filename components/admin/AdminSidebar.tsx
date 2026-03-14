@@ -66,6 +66,12 @@ const PRIMARY_NAV: NavSection[] = [
     ],
   },
   {
+    name: 'Credentials',
+    items: [
+      { name: 'Credential Registry', href: '/admin/credentials' },
+    ],
+  },
+  {
     name: 'Courses',
     icon: BookOpen,
     items: [

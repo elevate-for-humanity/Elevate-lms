@@ -10,7 +10,7 @@
  *
  * Schema verified against live DB (cuxzzpsyufcewtmicszk):
  *   completion_rules  — entity_type/entity_id (no direct course_id column)
- *   program_courses   — order_index (not sort_order)
+ *   program_courses   — order_index (confirmed in production DB)
  *   training_courses  — created_by, certificate_enabled, summary present
  *   training_lessons  — narration_script not a column; stored in metadata
  *
@@ -295,7 +295,7 @@ async function publishCompiledDraft(
   });
   if (ruleErr) logger.warn('completion_rules insert failed (non-fatal)', { courseId, error: ruleErr.message });
 
-  // 4. program_courses — order_index column (not sort_order)
+  // 4. program_courses — sort_order column (not order_index)
   if (draft.program_id) {
     const { error: pcErr } = await db
       .from('program_courses')
@@ -422,7 +422,7 @@ async function _POST(req: NextRequest) {
     if (ruleErr) logger.warn('completion_rules insert (non-fatal):', ruleErr.message);
 
     // ── 4. Program mapping ──────────────────────────────────────────────────
-    // order_index is the real column name (not sort_order)
+    // order_index is the real column name on program_courses (confirmed in production)
     if (program_id) {
       const { error: pcErr } = await db
         .from('program_courses')

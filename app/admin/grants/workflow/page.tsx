@@ -5,7 +5,6 @@ const supabaseAdmin = createAdminClient();
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 

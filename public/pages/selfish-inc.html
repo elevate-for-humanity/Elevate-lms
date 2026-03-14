@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Selfish Inc - Community-focused nonprofit organization dedicated to workforce development and social impact initiatives. Partner of Elevate for Humanity."
+    />
+    <meta
+      name="keywords"
+      content="nonprofit, community development, workforce training, social impact, education, job readiness, selfish inc"
+    />
+    <meta name="author" content="Selfish Inc" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Selfish Inc - Community Nonprofit Organization"
+    />
+    <meta
+      property="og:description"
+      content="Empowering underserved communities through education and workforce development programs"
+    />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <!-- Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-EFHWORKFORCE01"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-EFHWORKFORCE01');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Selfish Inc • Community-Focused Nonprofit</title>
+
+    <!-- Universal Navigation System -->
+    <script src="/unified-navigation.js"></script>
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Selfish Inc - Community Nonprofit Organization"
+    />
+    <meta
+      property="og:description"
+      content="Empowering underserved communities through education and workforce development programs"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.selfishincsupport.org" />
+    <meta
+      property="og:image"
+      content="/images/Social_media_open_graph_2ded65c5.png"
+    />
+
+    <!-- Styles -->
+    <style>
+      :root {
+        --primary-blue: #2563eb;
+        --secondary-purple: #7c3aed;
+        --accent-green: #059669;
+        --warm-orange: #ea580c;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --border-light: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background: var(--bg-light);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Header */
+      header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary-blue);
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: white;
+        padding: 5rem 0;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-block;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: white;
+        color: var(--primary-blue);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-secondary:hover {
+        background: white;
+        color: var(--primary-blue);
+      }
+
+      /* Sections */
+      section {
+        padding: 4rem 0;
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 3rem;
+        color: var(--text-dark);
+      }
+
+      /* Mission Section */
+      .mission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .mission-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+
+      .mission-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .mission-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-blue);
+      }
+
+      .mission-card p {
+        color: var(--text-light);
+      }
+
+      /* Programs Section */
+      .programs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .program-card {
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+
+      .program-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .program-icon {
+        font-size: 3rem;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      }
+
+      .program-content {
+        padding: 1.5rem;
+      }
+
+      .program-content h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-dark);
+      }
+
+      .program-content p {
+        color: var(--text-light);
+        font-size: 0.95rem;
+      }
+
+      /* Impact Stats */
+      .impact-stats {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: white;
+        padding: 4rem 0;
+        text-align: center;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .stat-item h3 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-item p {
+        font-size: 1.125rem;
+        opacity: 0.9;
+      }
+
+      /* CTA Section */
+      .cta-section {
+        background: var(--bg-light);
+        text-align: center;
+        padding: 5rem 0;
+      }
+
+      .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+      }
+
+      .cta-section p {
+        font-size: 1.25rem;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--text-dark);
+        color: white;
+        padding: 3rem 0 1.5rem;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .footer-section h3 {
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+      }
+
+      .footer-section p,
+      .footer-section a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .footer-section a:hover {
+        color: white;
+      }
+
+      .footer-bottom {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 1rem;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .nav-links {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Universal header will be injected here by unified-navigation.js -->
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>Selfish Inc</h1>
+        <p>
+          Community-Focused Nonprofit Organization<br />
+          Empowering Communities Through Education & Workforce Development
+        </p>
+        <p>
+          Selfish Inc is dedicated to breaking barriers and creating pathways to
+          success for underserved communities. Through education, workforce
+          training, and community partnerships, we empower people to advance in
+          their careers and transform their lives.
+        </p>
+        <div
+          style="
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+          "
+        >
+          <a href="#programs" class="btn btn-primary">Explore Programs</a>
+          <a href="#contact" class="btn btn-secondary">Get Involved</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section id="mission">
+      <div class="container">
+        <h2 class="section-title">Our Mission</h2>
+        <div class="mission-grid">
+          <div class="mission-card">
+            <h3>🎯 Community Impact</h3>
+            <p>
+              Creating lasting change in underserved communities through
+              targeted workforce development and educational programs.
+            </p>
+          </div>
+          <div class="mission-card">
+            <h3>💼 Career Pathways</h3>
+            <p>
+              Building bridges to sustainable careers through comprehensive
+              training, mentorship, and job placement support.
+            </p>
+          </div>
+          <div class="mission-card">
+            <h3>🤝 Partnership Network</h3>
+            <p>
+              Collaborating with local businesses, government agencies, and
+              community organizations to maximize impact.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" style="background: white">
+      <div class="container">
+        <h2 class="section-title">Our Programs</h2>
+        <div class="programs-grid">
+          <div class="program-card">
+            <div class="program-icon">📚</div>
+            <div class="program-content">
+              <h3>Workforce Training</h3>
+              <p>
+                Industry-recognized certifications and skills training in
+                high-demand fields including technology, healthcare, and trades.
+              </p>
+            </div>
+          </div>
+          <div class="program-card">
+            <div class="program-icon">💻</div>
+            <div class="program-content">
+              <h3>Digital Literacy</h3>
+              <p>
+                Essential computer skills and digital competencies for the
+                modern workplace, from basics to advanced applications.
+              </p>
+            </div>
+          </div>
+          <div class="program-card">
+            <div class="program-icon">🎓</div>
+            <div class="program-content">
+              <h3>Career Coaching</h3>
+              <p>
+                One-on-one guidance, resume building, interview preparation, and
+                ongoing career development support.
+              </p>
+            </div>
+          </div>
+          <div class="program-card">
+            <div class="program-icon">🏢</div>
+            <div class="program-content">
+              <h3>Job Placement</h3>
+              <p>
+                Direct connections to employers, internship opportunities, and
+                ongoing employment support services.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Impact Stats -->
+    <section id="impact" class="impact-stats">
+      <div class="container">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem">Our Impact</h2>
+        <p style="font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem">
+          Making a difference in our community, one person at a time
+        </p>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <h3>500+</h3>
+            <p>Lives Transformed</p>
+          </div>
+          <div class="stat-item">
+            <h3>85%</h3>
+            <p>Job Placement Rate</p>
+          </div>
+          <div class="stat-item">
+            <h3>50+</h3>
+            <p>Partner Organizations</p>
+          </div>
+          <div class="stat-item">
+            <h3>$2M+</h3>
+            <p>Community Investment</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section style="background: white">
+      <div class="container">
+        <h2 class="section-title">About Selfish Inc</h2>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center">
+          <p
+            style="
+              font-size: 1.125rem;
+              color: var(--text-light);
+              margin-bottom: 1.5rem;
+            "
+          >
+            Selfish Inc operates as a nonprofit organization in partnership with
+            Elevate for Humanity, a 501(c)(3) nonprofit dedicated to workforce
+            development and community empowerment.
+          </p>
+          <p
+            style="
+              font-size: 1.125rem;
+              color: var(--text-light);
+              margin-bottom: 1.5rem;
+            "
+          >
+            Our programs are designed to meet the unique needs of underserved
+            communities, providing accessible, high-quality training and support
+            services that lead to meaningful employment and career advancement.
+          </p>
+          <p style="font-size: 1.125rem; color: var(--text-light)">
+            We believe in the power of education and opportunity to transform
+            lives and strengthen communities. Through our comprehensive
+            approach, we address barriers to employment and create pathways to
+            success.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="cta-section">
+      <div class="container">
+        <h2>Ready to Make a Difference?</h2>
+        <p>
+          Join us in empowering communities through education and workforce
+          development
+        </p>
+        <div class="cta-buttons">
+          <a href="mailto:elevateforhumanity@gmail.com" class="btn btn-primary">
+            📧 Contact Us
+          </a>
+          <a
+            href="https://portal.elevateforhumanity.org/programs"
+            class="btn btn-secondary"
+          >
+            View All Programs
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Universal footer will be injected here by unified-navigation.js -->
+
+    <!-- Google Analytics Event Tracking -->
+    <script>
+      // Track button clicks
+      document.querySelectorAll('.btn').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          gtag('event', 'button_click', {
+            button_text: this.textContent.trim(),
+            page_location: window.location.href,
+          });
+        });
+      });
+
+      // Track section views
+      const sections = document.querySelectorAll('section[id]');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              gtag('event', 'section_view', {
+                section_id: entry.target.id,
+                page_location: window.location.href,
+              });
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+</html>

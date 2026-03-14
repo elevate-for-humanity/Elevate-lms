@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 type HeroVideoProps = {
   src: string;
@@ -9,42 +10,11 @@ type HeroVideoProps = {
   audioTrack?: string;
 };
 
-export default function HeroVideo({
-  src,
-  poster,
-  className,
-  audioTrack,
-}: HeroVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export default function HeroVideo({ src, poster, className, audioTrack }: HeroVideoProps) {
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Autoplay with sound on load; fall back to muted if browser blocks it
-  useEffect(() => {
-    const v = videoRef.current;
-    const a = audioRef.current;
-    if (!v) return;
-
-    const play = async () => {
-      if (audioTrack && a) {
-        v.muted = true;
-        try {
-          await Promise.all([v.play(), a.play()]);
-        } catch {
-          v.play().catch(() => {});
-        }
-      } else {
-        v.muted = false;
-        v.play().catch(() => {
-          v.muted = true;
-          v.play().catch(() => {});
-        });
-      }
-    };
-
-    play();
-  }, [audioTrack]);
-
-  // Keep audio in sync with video
+  // Sync separate audio track with video play/pause/seek
   useEffect(() => {
     if (!audioTrack) return;
     const v = videoRef.current;
@@ -52,9 +22,7 @@ export default function HeroVideo({
     if (!v || !a) return;
 
     const syncAudio = () => {
-      if (Math.abs(v.currentTime - a.currentTime) > 0.3) {
-        a.currentTime = v.currentTime;
-      }
+      if (Math.abs(v.currentTime - a.currentTime) > 0.3) a.currentTime = v.currentTime;
     };
     const handlePause = () => a.pause();
     const handlePlay = () => a.play().catch(() => {});
@@ -62,13 +30,12 @@ export default function HeroVideo({
     v.addEventListener('timeupdate', syncAudio);
     v.addEventListener('pause', handlePause);
     v.addEventListener('play', handlePlay);
-
     return () => {
       v.removeEventListener('timeupdate', syncAudio);
       v.removeEventListener('pause', handlePause);
       v.removeEventListener('play', handlePlay);
     };
-  }, [audioTrack]);
+  }, [audioTrack, videoRef]);
 
   return (
     <div className={`relative w-full ${className ?? ''}`}>

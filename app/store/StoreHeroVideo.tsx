@@ -2,33 +2,21 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function StoreHeroVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
   const [hasEnded, setHasEnded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Autoplay with sound on load; fall back to muted if browser blocks it
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = false;
-    video.volume = 1;
-    video.play().catch(() => {
-      video.muted = true;
-      video.play().catch(() => {});
-    });
-  }, []);
-
   const replayVideo = () => {
     const video = videoRef.current;
-    if (video) {
-      video.currentTime = 0;
-      video.muted = false;
-      video.volume = 1;
-      video.play();
-      setHasEnded(false);
-    }
+    if (!video) return;
+    video.currentTime = 0;
+    video.muted = false;
+    video.volume = 1;
+    video.play().catch(() => {});
+    setHasEnded(false);
   };
 
   return (
@@ -46,7 +34,7 @@ export default function StoreHeroVideo() {
 
         {!isLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
           </div>
         )}
 

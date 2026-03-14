@@ -102,6 +102,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No input provided' }, { status: 400 });
   } catch (err: any) {
     logger.error('Parse error:', err);
-    return NextResponse.json({ error: err.message || 'Parse failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Parse failed' }, { status: 500 });
   }
 }

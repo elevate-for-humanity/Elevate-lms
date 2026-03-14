@@ -68,6 +68,6 @@ Minimum 2 quiz questions. Real instructional content only.`;
     return NextResponse.json({ lesson });
   } catch (err: any) {
     logger.error('Regenerate error:', err);
-    return NextResponse.json({ error: err.message || 'Regenerate failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Regenerate failed' }, { status: 500 });
   }
 }

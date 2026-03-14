@@ -273,3 +273,114 @@ Key decisions made:
 - ✅ All blue-* → brand-blue-* across app/ and components/
 - ✅ 27+ public pages rewritten with real content
 - ✅ Auth flow: signin/signup redirect to real forms
+
+---
+
+# Multi-Provider Hub — Canonical Patterns
+
+## Role Model (complete)
+
+```ts
+export type UserRole =
+  | 'student' | 'instructor' | 'admin' | 'super_admin' | 'staff'
+  | 'program_holder' | 'provider_admin' | 'case_manager'
+  | 'employer' | 'partner' | 'delegate';
+```
+
+`provider_admin` — scoped to a single `tenant_id`. Cannot read cross-tenant data.  
+`case_manager` — scoped to assigned learners via `case_manager_assignments`. Read-only except placement verification.
+
+## Tenant Architecture
+
+- `tenants.type` enum: `elevate | partner_provider | employer | workforce_agency`
+- `organizations.tenant_id` FK → `tenants` (required for `type = 'training_provider'`)
+- RLS helpers (all `SECURITY DEFINER`, stable):
+  - `get_my_tenant_id()` — returns caller's `tenant_id` from profiles
+  - `is_provider_admin()` — boolean check
+  - `is_case_manager()` — boolean check
+  - `get_my_assigned_learner_ids()` — UUID[] of assigned learners
+  - `get_my_role()` — returns role string
+  - `is_admin_role()` — boolean for admin/super_admin/staff
+
+## Safe Error Responses
+
+Always use `lib/api/safe-error.ts`. Never return `error.message` in API responses.
+
+```ts
+import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
+
+// Expected errors
+return safeError('Program not found', 404);
+
+// Unexpected errors — logs internally, returns generic message
+return safeInternalError(err, 'Failed to create enrollment');
+
+// Supabase errors
+if (error) return safeDbError(error, 'Failed to fetch programs');
+```
+
+## Admin IP Guard
+
+```ts
+import { checkAdminIP } from '@/lib/api/admin-ip-guard';
+const blocked = checkAdminIP(request);
+if (blocked) return blocked;
+```
+
+Controlled by `ADMIN_IP_ALLOWLIST` env var (comma-separated CIDRs). No-op if unset.
+
+## Credential Authority Separation
+
+- Platform stores credential records and verification links
+- Certifications are issued by their respective authorities (EPA, PTCB, CompTIA, NCCER, Indiana SDOH)
+- Elevate does not issue credentials it does not legally control
+- `learner_credentials.verification_source` tracks how verification was obtained
+- External verification: `lib/credentials/verification.ts` (CompTIA implemented; add providers to registry)
+- Badge issuance: `lib/credentials/credly.ts` + job handler `lib/jobs/handlers/credly-badge.ts`
+
+## Enrollment Schema — Source of Truth
+
+Three enrollment tables exist. Use `program_enrollments` for new code:
+
+| Table | References | Status |
+|-------|-----------|--------|
+| `program_enrollments` | 409 | **Canonical** — use this |
+| `training_enrollments` | 68 | LMS operational (attendance, cohort, docs) |
+| `enrollments` | 15 | Legacy — compatibility view → `program_enrollments` |
+
+## Key New Tables (Phase 1–10)
+
+| Table | Purpose |
+|-------|---------|
+| `provider_program_approvals` | External provider program approval workflow |
+| `placement_records` | First-class employment outcome records |
+| `enrollment_funding_records` | Funding source per enrollment (WIOA/WRG/JRI) |
+| `data_deletion_requests` | FERPA/CCPA deletion request tracking |
+| `consent_records` | Structured data sharing consent |
+| `tenant_compliance_records` | Compliance status per tenant per area |
+| `wioa_participants` | WIOA participant records (PIRL-aligned) |
+| `wioa_participant_records` | Individual PIRL data points |
+
+## Key New Routes
+
+| Route | Auth | Purpose |
+|-------|------|---------|
+| `POST /api/provider/programs/submit` | provider_admin | Submit program for review |
+| `POST /api/provider/programs/[id]/review` | admin/staff | Approve or reject |
+| `GET /api/provider/programs/list` | provider_admin/admin | List approvals |
+| `GET/POST /api/placements` | admin/staff/case_manager | Placement records |
+| `GET /api/employer/matches` | admin/employer | Employer-program matching |
+| `GET /api/cron/expire-credentials` | CRON_SECRET | Expire stale credentials |
+| `POST/DELETE /api/admin/impersonate` | admin/super_admin | Support impersonation |
+| `POST /api/provider/export` | provider_admin | Queue CSV data export |
+
+## Impersonation
+
+Admin-only. Every session is written to `admin_audit_events` (immutable).  
+Cannot impersonate admin-tier users. Sessions expire after 60 minutes.  
+UI: `/admin/impersonate`
+
+## Docs
+
+- `docs/platform-readiness-implementation-plan.md` — audit findings and execution plan
+- `docs/platform-readiness-completion-report.md` — full completion report with deployment steps

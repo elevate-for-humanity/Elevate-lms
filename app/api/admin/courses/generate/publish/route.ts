@@ -441,7 +441,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ ok: true, courseId, slug: courseRow.slug, lessonCount: lessonRows.length });
   } catch (err: any) {
     logger.error('Course publish error:', err);
-    return NextResponse.json({ ok: false, error: err.message || 'Publish failed' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Publish failed' }, { status: 500 });
   }
 }
 

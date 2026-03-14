@@ -6,7 +6,18 @@ import { NextResponse } from 'next/server';
 // TYPE DEFINITIONS
 // =====================================================
 
-export type UserRole = 'student' | 'instructor' | 'admin' | 'program_holder' | 'delegate';
+export type UserRole =
+  | 'student'
+  | 'instructor'
+  | 'admin'
+  | 'super_admin'
+  | 'staff'
+  | 'program_holder'
+  | 'provider_admin'
+  | 'case_manager'
+  | 'employer'
+  | 'partner'
+  | 'delegate';
 
 export interface AuthGuardOptions {
   requireAuth?: boolean;

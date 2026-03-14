@@ -173,7 +173,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ course });
   } catch (err: any) {
     logger.error('Course generation error:', err);
-    return NextResponse.json({ error: err.message || 'Generation failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Generation failed' }, { status: 500 });
   }
 }
 

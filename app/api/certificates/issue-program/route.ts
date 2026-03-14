@@ -6,6 +6,7 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { checkCertificateIssuanceEligibility } from '@/lib/services/credential-pipeline';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,7 @@ async function _POST(request: NextRequest) {
 
     const { data: enrollment, error: enrollError } = await supabase
       .from('program_enrollments')
-      .select('id, user_id, course_id, status')
+      .select('id, user_id, course_id, program_id, status')
       .eq('id', enrollment_id)
       .single();
 
@@ -46,6 +47,16 @@ async function _POST(request: NextRequest) {
 
     if (enrollment.status !== 'completed') {
       return NextResponse.json({ error: 'Enrollment must be completed before issuing certificate' }, { status: 400 });
+    }
+
+    // Credential pipeline gate — payment + exam passage
+    // Admins cannot bypass this: if the learner hasn't paid or passed the exam,
+    // the certificate must not be issued regardless of who is requesting.
+    if (enrollment.program_id) {
+      const gate = await checkCertificateIssuanceEligibility(enrollment.user_id, enrollment.program_id);
+      if (!gate.eligible) {
+        return NextResponse.json({ error: gate.reason }, { status: 400 });
+      }
     }
 
     // Check for existing certificate

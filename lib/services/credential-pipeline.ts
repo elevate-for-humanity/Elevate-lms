@@ -541,3 +541,90 @@ export async function issueCompletionCertificate(
   if (error || !cert) return { ok: false, error: 'Failed to issue certificate' };
   return { ok: true, certificateId: cert.id };
 }
+
+// =============================================================================
+// checkCertificateIssuanceEligibility
+//
+// Gate that must pass before any certificate is inserted.
+// Checks two independent conditions:
+//
+//   1. Payment guard — if the primary credential requires self_pay, there must
+//      be a 'paid' exam_funding_authorization for this learner + credential.
+//      Prevents issuing certificates to learners who never paid the exam fee.
+//
+//   2. Exam passage guard — if the program has a primary credential, there must
+//      be a passed credential_attempt for this learner + credential.
+//      Prevents issuing certificates before the exam is actually passed.
+//
+// Returns { eligible: true } or { eligible: false, reason: string }.
+// Callers must return 400 with the reason if not eligible.
+//
+// Non-exam programs (non_exam_program = true on programs table) skip guard 2.
+// Programs with no program_credentials rows pass both guards (legacy programs).
+// =============================================================================
+
+export async function checkCertificateIssuanceEligibility(
+  learnerId: string,
+  programId: string
+): Promise<{ eligible: boolean; reason?: string }> {
+  const db = createAdminClient();
+  if (!db) return { eligible: false, reason: 'Database unavailable' };
+
+  // Load primary credential for this program (if any)
+  const { data: pc } = await db
+    .from('program_credentials')
+    .select('credential_id, is_primary, exam_fee_payer, exam_fee_cents')
+    .eq('program_id', programId)
+    .eq('is_primary', true)
+    .maybeSingle();
+
+  // No program_credentials row → legacy program, no gate
+  if (!pc) return { eligible: true };
+
+  // Check whether this is a non-exam program (attendance/hours only)
+  const { data: prog } = await db
+    .from('programs')
+    .select('non_exam_program')
+    .eq('id', programId)
+    .maybeSingle();
+
+  const isNonExam = prog?.non_exam_program === true;
+
+  // Guard 1: payment check for self_pay credentials with a non-zero fee
+  if (pc.exam_fee_payer === 'self_pay' && (pc.exam_fee_cents ?? 0) > 0) {
+    const { data: auth } = await db
+      .from('exam_funding_authorizations')
+      .select('id, funding_status')
+      .eq('learner_id', learnerId)
+      .eq('credential_id', pc.credential_id)
+      .eq('funding_status', 'paid')
+      .maybeSingle();
+
+    if (!auth) {
+      return {
+        eligible: false,
+        reason: 'Exam fee has not been paid. Complete checkout before requesting a certificate.',
+      };
+    }
+  }
+
+  // Guard 2: exam passage check (skip for non-exam programs)
+  if (!isNonExam) {
+    const { data: attempt } = await db
+      .from('credential_attempts')
+      .select('id, passed, attempt_status')
+      .eq('learner_id', learnerId)
+      .eq('credential_id', pc.credential_id)
+      .eq('passed', true)
+      .maybeSingle();
+
+    if (!attempt) {
+      return {
+        eligible: false,
+        reason: 'Primary credential exam has not been passed. Pass the exam before requesting a certificate.',
+      };
+    }
+  }
+
+  return { eligible: true };
+}

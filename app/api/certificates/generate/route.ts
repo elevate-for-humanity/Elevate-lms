@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
+import { checkCertificateIssuanceEligibility } from '@/lib/services/credential-pipeline';
 import { createHash } from 'crypto';
 
 const BUILD_SHA = process.env.COMMIT_REF?.slice(0, 12) || 'dev';
@@ -278,6 +279,18 @@ async function _POST(request: Request) {
         ),
         attestation_types: [...new Set((attestations || []).map((a: any) => a.attestation_type))],
       };
+    }
+
+    // 2c) Credential pipeline gate — payment + exam passage
+    // Checks program_credentials for a primary credential. If one exists:
+    //   - self_pay credentials require a paid exam_funding_authorization
+    //   - non-exam programs skip the exam passage check
+    //   - all other primary credentials require a passed credential_attempt
+    if (program?.id) {
+      const gate = await checkCertificateIssuanceEligibility(enrollment.user_id, program.id);
+      if (!gate.eligible) {
+        return NextResponse.json({ error: gate.reason }, { status: 400 });
+      }
     }
 
     // 3) Check if certificate already exists

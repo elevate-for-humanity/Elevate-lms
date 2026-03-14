@@ -27,10 +27,8 @@ export function TutorialSystem({
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!tutorial?.steps?.length) return null;
-
-  const currentStep = tutorial.steps[currentStepIndex];
-  const isLastStep = currentStepIndex === tutorial.steps.length - 1;
+  const currentStep = tutorial?.steps?.[currentStepIndex];
+  const isLastStep = currentStepIndex === (tutorial?.steps?.length ?? 1) - 1;
   const isFirstStep = currentStepIndex === 0;
 
   // Load progress on mount
@@ -102,7 +100,7 @@ export function TutorialSystem({
     onClose?.();
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || !tutorial?.steps?.length) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">

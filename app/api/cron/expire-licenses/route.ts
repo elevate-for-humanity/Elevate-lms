@@ -26,7 +26,7 @@ async function _GET(request: Request) {
   }
   
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Call the batch expiry function
     const { data, error } = await supabase.rpc('expire_all_overdue_licenses');

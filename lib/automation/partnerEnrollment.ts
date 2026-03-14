@@ -25,7 +25,7 @@ export interface AutoEnrollmentResult {
 export async function autoEnrollPartnerCourse(
   payload: AutoEnrollmentRequest
 ): Promise<AutoEnrollmentResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // 1) Load student profile
@@ -137,7 +137,7 @@ export async function autoEnrollPartnerCourse(
   } catch (err: any) {
     // Error: $1
 
-    const supabase2 = createClient();
+    const supabase2 = await createClient();
     await supabase2.from('partner_lms_enrollment_failures').insert({
       student_id: payload.studentId,
       provider_id: payload.partnerId,

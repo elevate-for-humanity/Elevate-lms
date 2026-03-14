@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { email, reason } = await req.json();
 
   if (!email) {

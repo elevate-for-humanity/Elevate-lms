@@ -14,7 +14,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const body = await req.json();
 
     const { data, error }: any = await supabase

@@ -37,7 +37,7 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   // Channel 3: Durable DB fallback — separate table with minimal constraints.
   // Uses a fresh client to avoid reusing the one that just failed.
   try {
-    const fallbackClient = createClient();
+    const fallbackClient = await createClient();
     // Fire-and-forget: don't await, don't let this throw
     fallbackClient.from('audit_failures').insert({
       context,
@@ -128,7 +128,7 @@ export async function logAuditEvent(event: AuditEvent): Promise<void> {
   };
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { error } = await supabase.from('audit_logs').insert(payload);
 
     if (error) {

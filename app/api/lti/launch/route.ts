@@ -14,7 +14,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const formData = await request.formData();
   const idToken = String(formData.get('id_token') || '');
   const state = String(formData.get('state') || '');

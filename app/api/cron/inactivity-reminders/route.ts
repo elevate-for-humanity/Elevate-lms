@@ -21,7 +21,7 @@ async function _GET(request: Request) {
     }
 
     // Use service role key for admin operations
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Find students who haven't logged in for 7+ days
     const sevenDaysAgo = new Date();

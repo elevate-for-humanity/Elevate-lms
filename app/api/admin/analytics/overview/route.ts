@@ -14,7 +14,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 const _GET = withAuth(
   async (req: NextRequest, user) => {
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const db = supabase;
   const tenantId = req.headers.get('x-tenant-id');
 

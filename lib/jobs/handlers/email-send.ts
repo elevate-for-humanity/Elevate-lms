@@ -30,7 +30,7 @@ interface EmailPayload {
 }
 
 export async function processEmailSend(job: ProvisioningJob): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const payload = job.payload as EmailPayload;
   
   if (!payload.to || !payload.emailType) {

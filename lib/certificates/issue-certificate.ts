@@ -13,6 +13,18 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
+/** Postgres unique constraint violation code. */
+const PG_UNIQUE_VIOLATION = '23505';
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code: string }).code === PG_UNIQUE_VIOLATION
+  );
+}
+
 export interface CompetencyEvidence {
   quizScores?: Record<string, number>;
   seatTimeHours?: number;
@@ -157,6 +169,7 @@ export async function issueCertificate(
         user_id: studentId,
         student_id: studentId,
         course_id: courseId || null,
+        program_id: programId || null,
         enrollment_id: enrollmentId || null,
         certificate_number: certificateNumber,
         course_title: courseTitle || null,
@@ -173,6 +186,35 @@ export async function issueCertificate(
       .single();
 
     if (certError) {
+      // Unique constraint fired — a concurrent request inserted first.
+      // Re-fetch and return the existing certificate rather than failing.
+      if (isUniqueViolation(certError)) {
+        logger.info('Unique constraint prevented duplicate — fetching existing', {
+          enrollmentId, studentId, courseId, programId,
+        });
+        let retryQuery = supabase
+          .from('certificates')
+          .select('*')
+          .or(`student_id.eq.${studentId},user_id.eq.${studentId}`);
+        if (courseId) retryQuery = retryQuery.eq('course_id', courseId);
+        else if (programId) retryQuery = retryQuery.eq('program_id', programId);
+        const { data: concurrent } = await retryQuery.maybeSingle();
+        if (concurrent) {
+          const concurrentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${concurrent.id}`;
+          return {
+            success: true,
+            alreadyIssued: true,
+            certificate: {
+              id: concurrent.id,
+              certificate_number: concurrent.certificate_number,
+              student_name: concurrent.metadata?.student_name || studentName,
+              program_name: concurrent.program_name || concurrent.course_title || displayName,
+              completion_date: concurrent.issued_at || concurrent.metadata?.completion_date || '',
+              url: concurrentUrl,
+            },
+          };
+        }
+      }
       logger.error('Failed to create certificate', certError as Error);
       return {
         success: false,

@@ -12,18 +12,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
-
-/** Postgres unique constraint violation code. */
-const PG_UNIQUE_VIOLATION = '23505';
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code: string }).code === PG_UNIQUE_VIOLATION
-  );
-}
+import { enqueueJob } from '@/lib/jobs/enqueue';
 
 export interface CompetencyEvidence {
   quizScores?: Record<string, number>;
@@ -169,7 +158,6 @@ export async function issueCertificate(
         user_id: studentId,
         student_id: studentId,
         course_id: courseId || null,
-        program_id: programId || null,
         enrollment_id: enrollmentId || null,
         certificate_number: certificateNumber,
         course_title: courseTitle || null,
@@ -186,35 +174,6 @@ export async function issueCertificate(
       .single();
 
     if (certError) {
-      // Unique constraint fired — a concurrent request inserted first.
-      // Re-fetch and return the existing certificate rather than failing.
-      if (isUniqueViolation(certError)) {
-        logger.info('Unique constraint prevented duplicate — fetching existing', {
-          enrollmentId, studentId, courseId, programId,
-        });
-        let retryQuery = supabase
-          .from('certificates')
-          .select('*')
-          .or(`student_id.eq.${studentId},user_id.eq.${studentId}`);
-        if (courseId) retryQuery = retryQuery.eq('course_id', courseId);
-        else if (programId) retryQuery = retryQuery.eq('program_id', programId);
-        const { data: concurrent } = await retryQuery.maybeSingle();
-        if (concurrent) {
-          const concurrentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${concurrent.id}`;
-          return {
-            success: true,
-            alreadyIssued: true,
-            certificate: {
-              id: concurrent.id,
-              certificate_number: concurrent.certificate_number,
-              student_name: concurrent.metadata?.student_name || studentName,
-              program_name: concurrent.program_name || concurrent.course_title || displayName,
-              completion_date: concurrent.issued_at || concurrent.metadata?.completion_date || '',
-              url: concurrentUrl,
-            },
-          };
-        }
-      }
       logger.error('Failed to create certificate', certError as Error);
       return {
         success: false,
@@ -246,38 +205,21 @@ export async function issueCertificate(
       // Certificate was created, continue to email
     }
 
-    // Send certificate delivery email
     const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${certificate.id}`;
 
-    if (studentEmail) {
-    try {
-      const { emailService } = await import('@/lib/notifications/email');
-      await emailService.sendCertificateNotification(
-        studentEmail,
-        studentName,
-        displayName,
-        certificateUrl
-      );
-      logger.info('Certificate delivery email sent', {
-        email: studentEmail,
-        certificateId: certificate.id,
-      });
-    } catch (emailError) {
-      logger.error('Certificate email failed', emailError as Error);
-      // Don't fail - certificate is issued
-    }
-    } // end if (studentEmail)
-
-    // Create in-app notification
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: studentId,
-        type: 'achievement',
-        title: 'Certificate Issued!',
-        message: `Congratulations! Your certificate for ${displayName} is ready.`,
-        action_url: certificateUrl,
-      });
+    // Enqueue side effects — email, notification, verification index.
+    // Certificate is already issued at this point; a failed enqueue must not
+    // affect the response. The job processor handles retries.
+    await enqueueJob(supabase, 'certificate_issued', {
+      certificateId: certificate.id,
+      learnerId: studentId,
+      learnerEmail: studentEmail,
+      learnerName: studentName,
+      programId: programId ?? undefined,
+      courseId: courseId ?? undefined,
+      credentialName: displayName,
+      certificateUrl,
+    });
 
     return {
       success: true,

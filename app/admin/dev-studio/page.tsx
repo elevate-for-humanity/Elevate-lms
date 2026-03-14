@@ -6,20 +6,16 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import FileTree from '@/components/dev-studio/FileTree';
 import Terminal from '@/components/dev-studio/Terminal';
 import PreviewPanel from '@/components/dev-studio/PreviewPanel';
 import {
-  AlertTriangle,
   GitBranch,
   Play,
   Rocket,
   Save,
-  Settings,
-  XCircle,
-CheckCircle, } from 'lucide-react';
+} from 'lucide-react';
 
 // Lazy load Monaco to avoid SSR issues
 const CodeEditor = dynamic(() => import('@/components/dev-studio/CodeEditor'), {
@@ -35,19 +31,6 @@ const CodeEditor = dynamic(() => import('@/components/dev-studio/CodeEditor'), {
 });
 
 export default function DevStudioPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check admin auth
-    fetch('/api/auth/check-admin')
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.isAdmin) {
-          router.push('/login?redirect=/admin');
-        }
-      })
-      .catch(() => router.push('/login'));
-  }, [router]);
 
   // GitHub state
   const [token, setToken] = useState<string>('');
@@ -79,9 +62,7 @@ export default function DevStudioPage() {
       setToken(storedToken);
       loadRepos(storedToken);
     } else {
-      addTerminalOutput(
-        '<AlertTriangle className="w-5 h-5 inline-block" />  No GitHub token found. Please connect GitHub first.'
-      );
+      addTerminalOutput('⚠  No GitHub token found. Please connect GitHub first.');
     }
   }, []);
 
@@ -104,7 +85,7 @@ export default function DevStudioPage() {
       localStorage.setItem('gh_token', newToken);
       setToken(newToken);
       addTerminalOutput(
-        '<span className="text-slate-400 flex-shrink-0">•</span> GitHub connected successfully'
+        '✓ GitHub connected successfully'
       );
       loadRepos(newToken);
     }
@@ -121,16 +102,16 @@ export default function DevStudioPage() {
         const data = await res.json();
         setRepos(data);
         addTerminalOutput(
-          `<span className="text-slate-400 flex-shrink-0">•</span> Loaded ${data.length} repositories`
+          `✓ Loaded ${data.length} repositories`
         );
       } else {
         addTerminalOutput(
-          '<XCircle className="w-5 h-5 inline-block" /> Failed to load repositories'
+          '✗ Failed to load repositories'
         );
       }
     } catch (error) { /* Error handled silently */ 
       addTerminalOutput(
-        '<XCircle className="w-5 h-5 inline-block" /> Error loading repositories'
+        '✗ Error loading repositories'
       );
     } finally {
       setLoading(false);
@@ -155,16 +136,16 @@ export default function DevStudioPage() {
         const filePaths = data.files.map((f: Record<string, any>) => f.path);
         setFiles(filePaths);
         addTerminalOutput(
-          `<span className="text-slate-400 flex-shrink-0">•</span> Loaded ${filePaths.length} files`
+          `✓ Loaded ${filePaths.length} files`
         );
       } else {
         addTerminalOutput(
-          '<XCircle className="w-5 h-5 inline-block" /> Failed to load file tree'
+          '✗ Failed to load file tree'
         );
       }
     } catch (error) { /* Error handled silently */ 
       addTerminalOutput(
-        '<XCircle className="w-5 h-5 inline-block" /> Error loading file tree'
+        '✗ Error loading file tree'
       );
     } finally {
       setLoading(false);
@@ -192,16 +173,16 @@ export default function DevStudioPage() {
         setFileSha(data.sha);
         setHasChanges(false);
         addTerminalOutput(
-          `<span className="text-slate-400 flex-shrink-0">•</span> Opened ${path}`
+          `✓ Opened ${path}`
         );
       } else {
         addTerminalOutput(
-          `<XCircle className="w-5 h-5 inline-block" /> Failed to open ${path}`
+          `✗ Failed to open ${path}`
         );
       }
     } catch (error) { /* Error handled silently */ 
       addTerminalOutput(
-        `<XCircle className="w-5 h-5 inline-block" /> Error opening ${path}`
+        `✗ Error opening ${path}`
       );
     } finally {
       setLoading(false);
@@ -233,18 +214,18 @@ export default function DevStudioPage() {
         setFileSha(data.content.sha);
         setHasChanges(false);
         addTerminalOutput(
-          `<span className="text-slate-400 flex-shrink-0">•</span> Saved ${selectedFile}`
+          `✓ Saved ${selectedFile}`
         );
         addTerminalOutput(`   Commit: ${data.commit.substring(0, 7)}`);
       } else {
         const error = await res.json();
         addTerminalOutput(
-          `<XCircle className="w-5 h-5 inline-block" /> Failed to save: ${'Operation failed'}`
+          `✗ Failed to save`
         );
       }
     } catch (error) { /* Error handled silently */ 
       addTerminalOutput(
-        '<XCircle className="w-5 h-5 inline-block" /> Error saving file'
+        '✗ Error saving file'
       );
     } finally {
       setLoading(false);
@@ -376,7 +357,7 @@ export default function DevStudioPage() {
                 filePath={selectedFile}
               />
             ) : (
-              <div className="flex items-center justify-center h-full bg-slate-900 text-black">
+              <div className="flex items-center justify-center h-full bg-slate-900 text-slate-400">
                 <div className="text-center">
                   <p className="text-lg mb-2">No file selected</p>
                   <p className="text-sm">
@@ -400,35 +381,35 @@ export default function DevStudioPage() {
         <div className="w-96 border-l border-slate-700">
           <PreviewPanel url={process.env.NEXT_PUBLIC_SITE_URL || ''} filePath={selectedFile} />
         </div>
+      </div>
 
-        {/* CTA Section */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6">
+      {/* CTA Section */}
+      <section className="py-16 bg-slate-800">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">
               Content Development Studio
-                          </h2>
-              <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+            </h2>
+            <p className="text-base md:text-lg mb-8 text-slate-300">
               Build courses, quizzes, and learning materials.
-                          </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/admin/courses"
-                  className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
-                >
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/admin/courses"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+              >
                 View Courses
-                </Link>
-                <Link
-                  href="/admin/quiz-builder"
-                  className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
-                >
+              </Link>
+              <Link
+                href="/admin/quiz-builder"
+                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
+              >
                 Quiz Builder
-                </Link>
-              </div>
+              </Link>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

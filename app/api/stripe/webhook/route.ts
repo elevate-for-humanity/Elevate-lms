@@ -107,8 +107,11 @@ async function _POST(req: Request) {
       // Check if this is a tax intake payment
       const intakeId = session.client_reference_id || session.metadata?.intake_id;
       if (intakeId && session.metadata?.service_type === 'tax_intake') {
-        const { createAdminClient: _createAdmin } = await import('@/lib/supabase/admin');
-        const supabaseAdmin = _createAdmin();
+        const { createClient } = await import('@/lib/supabase/server');
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
         const { error } = await supabaseAdmin
           .from('tax_intake')

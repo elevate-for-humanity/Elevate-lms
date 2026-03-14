@@ -1,6 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
 
 // lib/automation/partnerEnrollment.ts
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 import { getPartnerClient, PartnerType, StudentData } from '../partners';
 
 type UUID = string;
@@ -20,12 +21,25 @@ export interface AutoEnrollmentResult {
   error?: string;
 }
 
-
+function getSupabaseServerClient() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+}
 
 export async function autoEnrollPartnerCourse(
   payload: AutoEnrollmentRequest
 ): Promise<AutoEnrollmentResult> {
-  const supabase = await createClient();
+  const supabase = getSupabaseServerClient();
 
   try {
     // 1) Load student profile
@@ -137,7 +151,7 @@ export async function autoEnrollPartnerCourse(
   } catch (err: any) {
     // Error: $1
 
-    const supabase2 = await createClient();
+    const supabase2 = getSupabaseServerClient();
     await supabase2.from('partner_lms_enrollment_failures').insert({
       student_id: payload.studentId,
       provider_id: payload.partnerId,

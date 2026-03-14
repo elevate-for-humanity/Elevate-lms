@@ -3,10 +3,7 @@
  * Tracks submission status, timeline, and confirmations
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
-import { setAuditContext } from '@/lib/audit-context';
-const supabaseAdmin = createAdminClient();
-void setAuditContext(supabaseAdmin, { systemActor: 'grants-engine' });
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyGrantSubmitted } from './notification-system';
 
 import { logAuditEvent } from '@/lib/audit';

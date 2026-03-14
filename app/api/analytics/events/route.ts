@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/analytics/events/route.ts
 // Track user activity events
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseClient } from "@/lib/supabase-api";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -14,7 +14,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const { tenantId, userId, eventType, payload, path } = await req.json();
 
   if (!eventType || !tenantId) {

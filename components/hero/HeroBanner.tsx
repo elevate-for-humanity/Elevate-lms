@@ -36,22 +36,11 @@ export default function HeroBanner({
   const playedRef = useRef(false);
 
   useEffect(() => {
-    if (!voiceoverSrc || !audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio.muted = false;
-    audio.play().catch(() => {
-      audio.muted = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio.muted = false;
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('touchmove', unmute, true);
-      };
-      window.addEventListener('scroll', unmute, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmute, { capture: true, passive: true });
-    });
+    if (voiceoverSrc && audioRef.current && !playedRef.current) {
+      playedRef.current = true;
+      audioRef.current.volume = 1;
+      audioRef.current.play().catch(() => {});
+    }
   }, [voiceoverSrc]);
 
   return (
@@ -63,7 +52,7 @@ export default function HeroBanner({
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               src={videoSrc}
-              loop playsInline preload="auto"
+              autoPlay loop playsInline preload="auto"
               poster={posterSrc}
             />
             {voiceoverSrc && (

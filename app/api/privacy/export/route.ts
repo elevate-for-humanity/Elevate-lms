@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/privacy/export/route.ts
 // GDPR/CCPA: Data export endpoint
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseClient } from "@/lib/supabase-api";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const { email } = await req.json();
 
   if (!email) {

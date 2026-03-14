@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
-import { createAdminClient } from '@/lib/supabase/admin';
-const supabaseAdmin = createAdminClient();
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 

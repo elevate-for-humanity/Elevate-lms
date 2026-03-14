@@ -394,8 +394,8 @@ importers:
         specifier: ^5.1.2
         version: 5.1.2
       '@netlify/plugin-nextjs':
-        specifier: 5.15.9
-        version: 5.15.9
+        specifier: 5.15.7
+        version: 5.15.7
       '@next/bundle-analyzer':
         specifier: 16.1.1
         version: 16.1.1
@@ -1654,8 +1654,8 @@ packages:
     resolution: {integrity: sha512-tpPiLSkQatuexH8AdAZ8RlALvT7ixOE9VhvpkzQGNvihcms8hzmvUDuSxQa7UneTj/sHsdirnXmnJ+nmf+Nx/w==}
     engines: {node: '>=18.0.0'}
 
-  '@netlify/plugin-nextjs@5.15.9':
-    resolution: {integrity: sha512-4kJvV+wrt4/ncehfaOXfhv1FYKCv9EFjq6/tgXXYSlqPDcbsuTXR0DTz9IvyZ/CpPRadRD/zzIqD9wXgCmA2lg==}
+  '@netlify/plugin-nextjs@5.15.7':
+    resolution: {integrity: sha512-tSlGTwOR/dFZMrjhCxynlwc/NkOwY+bc0gurOranLtwASH5wat2WqZaPkyIdfVdNd/zNpmGxgbkH0uppg1Lsxg==}
     engines: {node: '>=18.0.0'}
 
   '@netlify/types@2.3.0':
@@ -10225,7 +10225,7 @@ snapshots:
     dependencies:
       '@netlify/types': 2.3.0
 
-  '@netlify/plugin-nextjs@5.15.9': {}
+  '@netlify/plugin-nextjs@5.15.7': {}
 
   '@netlify/types@2.3.0': {}
 

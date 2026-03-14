@@ -48,7 +48,7 @@ class DataSynchronizationManager {
    * Subscribe to real-time updates for a table
    */
   subscribe(config: SyncConfig): () => void {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { table, onUpdate, onInsert, onDelete, filter } = config;
     const channelName = `sync_${table}_${Date.now()}`;
     // Initialize sync state
@@ -127,7 +127,7 @@ class DataSynchronizationManager {
     data: Record<string, any>,
     operation: 'insert' | 'update' | 'delete'
   ): Promise<boolean> {
-    const supabase = await createClient();
+    const supabase = createClient();
     const state = this.syncState.get(table);
     if (!state) {
       // Error logged

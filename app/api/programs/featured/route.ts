@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/programs/featured/route.ts
 // Cached featured programs endpoint
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseClient } from "@/lib/supabase-api";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,7 +16,7 @@ async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = await createClient();
+const supabase = createSupabaseClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

@@ -53,14 +53,6 @@ export default tseslint.config(
       'no-unsafe-optional-chaining': 'warn',
     },
   },
-  // Content files in lib/courses/ are data-heavy; cap at 400 lines to prevent
-  // monolith drift (the hvac-troubleshooting-sims.ts incident was 784 lines).
-  {
-    files: ['lib/courses/**/*.ts'],
-    rules: {
-      'max-lines': ['warn', { max: 400, skipBlankLines: true, skipComments: true }],
-    },
-  },
   {
     ignores: [
       'dist/**',

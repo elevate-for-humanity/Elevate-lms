@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -21,7 +21,7 @@ async function _GET(request: Request) {
     }
 
     // Use service role key for admin operations
-    const supabase = await createClient();
+    const supabase = createSupabaseClient();
 
     // Find students who haven't logged in for 7+ days
     const sevenDaysAgo = new Date();

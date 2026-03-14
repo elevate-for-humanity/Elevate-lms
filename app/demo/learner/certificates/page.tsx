@@ -4,15 +4,14 @@ import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Award, Download, Lock } from 'lucide-react';
 
-// Demo page — uses static data to avoid coupling to live certificate schema.
-const DEMO_CERTS = [
-  { id: '1', name: 'HVAC Technician Fundamentals', issuer: 'Elevate for Humanity', status: 'Earned', earned: 'Jan 2024', credentialId: 'EFH-2024-001' },
-  { id: '2', name: 'EPA Section 608 Universal', issuer: 'ESCO Institute', status: 'In Progress', earned: null, credentialId: null },
-  { id: '3', name: 'OSHA 10-Hour General Industry', issuer: 'CareerSafe', status: 'Locked', earned: null, credentialId: null },
-];
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function DemoCertificatesPage() {
-  const certs = DEMO_CERTS;
+  const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('certificates').select('*').limit(50);
+const certs = (dbRows as any[]) || [];
 
   return (
     <DemoPageShell title="Certificates & Credentials" description="Credentials you've earned and those in progress." portal="learner">

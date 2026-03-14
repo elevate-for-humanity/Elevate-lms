@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,7 +16,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('studio_settings')
     .select('*')
@@ -46,7 +47,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const body = await req.json();
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
 
   const { data, error } = await supabase
     .from('studio_settings')

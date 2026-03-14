@@ -100,7 +100,7 @@ export default function CoursePreviewPage() {
 
   const fetchCourse = async () => {
     const { createClient } = await import('@/lib/supabase/client');
-    const supabase = await createClient();
+    const supabase = createClient();
 
     const { data: courseData } = await supabase
       .from('training_courses')

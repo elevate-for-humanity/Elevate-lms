@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -41,7 +41,7 @@ const checks: Record<string, any> = {
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     ) {
-      const supabase = await createClient();
+      const supabase = createSupabaseClient();
   const db = supabase;
 
       const { error } = await db

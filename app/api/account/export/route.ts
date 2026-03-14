@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
@@ -7,6 +6,7 @@ export const maxDuration = 60;
 // app/api/account/export/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStudentSelfAccess } from '@/lib/audit/ferpa';
@@ -24,7 +24,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = createSupabaseClient();
   const db = supabase;
     const { data: user, error: userError } = await db
       .from('users')

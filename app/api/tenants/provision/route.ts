@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -8,6 +7,7 @@ export const maxDuration = 60;
 // app/api/tenants/provision/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendSlackMessage } from '@/lib/notifications/slack';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -16,7 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

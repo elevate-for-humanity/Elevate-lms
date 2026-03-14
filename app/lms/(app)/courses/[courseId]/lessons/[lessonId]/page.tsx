@@ -62,7 +62,7 @@ export default function LessonPage() {
 
   const fetchLessonData = async () => {
     const { createClient } = await import('@/lib/supabase/client');
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // Check enrollment via server API (bypasses RLS — no student SELECT policy on training_enrollments)
     const { data: { user } } = await supabase.auth.getUser();

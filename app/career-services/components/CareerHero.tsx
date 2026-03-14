@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export function CareerHero() {
@@ -9,27 +9,16 @@ export function CareerHero() {
   const playedRef = useRef(false);
 
   useEffect(() => {
-    if (!audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio.muted = false;
-    audio.play().catch(() => {
-      audio.muted = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio.muted = false;
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('touchmove', unmute, true);
-      };
-      window.addEventListener('scroll', unmute, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmute, { capture: true, passive: true });
-    });
+    if (audioRef.current && !playedRef.current) {
+      playedRef.current = true;
+      audioRef.current.volume = 1;
+      audioRef.current.play().catch(() => {});
+    }
   }, []);
 
   return (
     <section className="relative h-[60svh] min-h-[380px] max-h-[640px] overflow-hidden bg-slate-900">
-      <video ref={videoRef} loop playsInline preload="auto"
+      <video ref={videoRef} autoPlay loop playsInline preload="auto"
         className="absolute inset-0 w-full h-full object-cover">
         <source src="/videos/career-services-hero.mp4" type="video/mp4" />
       </video>

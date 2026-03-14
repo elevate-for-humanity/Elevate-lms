@@ -10,7 +10,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server';
 async function getPartnerClient() {
   const admin = createAdminClient();
   if (admin) return admin;
-  return await createClient();
+  return createClient();
 }
 
 export interface PartnerStudent {

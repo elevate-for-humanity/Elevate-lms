@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -72,7 +73,7 @@ async function _POST(req: NextRequest) {
 
     // Save deployment to database
     if (userId) {
-      const supabase = createAdminClient();
+      const supabase = supabaseServer();
       await supabase.from('studio_deployments').insert({
         user_id: userId,
         provider,
@@ -134,7 +135,7 @@ const userId = req.headers.get('x-user-id');
 
     // Update database
     if (userId) {
-      const supabase = createAdminClient();
+      const supabase = supabaseServer();
       await supabase
         .from('studio_deployments')
         .update({ status, url, updated_at: new Date().toISOString() })
@@ -169,7 +170,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const { repo } = await req.json();
     
-    const supabase = createAdminClient();
+    const supabase = supabaseServer();
     let query = supabase
       .from('studio_deployments')
       .select('*')

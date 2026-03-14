@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
 // app/api/account/delete/route.ts
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -21,7 +21,7 @@ async function _POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const db = supabase;
   const { data: user, error: userError } = await db
     .from('users')

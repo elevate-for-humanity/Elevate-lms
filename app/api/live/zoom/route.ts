@@ -7,7 +7,7 @@ export const maxDuration = 60;
 // app/api/live/zoom/route.ts
 // API endpoint for instructors to schedule Zoom live sessions
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseClient } from "@/lib/supabase-api";
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   try {
     const { courseId, topic, startTime, durationMinutes, instructorZoomId, tenantId } = await request.json();
 

@@ -12,7 +12,6 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
-import { enqueueJob } from '@/lib/jobs/enqueue';
 
 export interface CompetencyEvidence {
   quizScores?: Record<string, number>;
@@ -205,21 +204,38 @@ export async function issueCertificate(
       // Certificate was created, continue to email
     }
 
+    // Send certificate delivery email
     const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${certificate.id}`;
 
-    // Enqueue side effects — email, notification, verification index.
-    // Certificate is already issued at this point; a failed enqueue must not
-    // affect the response. The job processor handles retries.
-    await enqueueJob(supabase, 'certificate_issued', {
-      certificateId: certificate.id,
-      learnerId: studentId,
-      learnerEmail: studentEmail,
-      learnerName: studentName,
-      programId: programId ?? undefined,
-      courseId: courseId ?? undefined,
-      credentialName: displayName,
-      certificateUrl,
-    });
+    if (studentEmail) {
+    try {
+      const { emailService } = await import('@/lib/notifications/email');
+      await emailService.sendCertificateNotification(
+        studentEmail,
+        studentName,
+        displayName,
+        certificateUrl
+      );
+      logger.info('Certificate delivery email sent', {
+        email: studentEmail,
+        certificateId: certificate.id,
+      });
+    } catch (emailError) {
+      logger.error('Certificate email failed', emailError as Error);
+      // Don't fail - certificate is issued
+    }
+    } // end if (studentEmail)
+
+    // Create in-app notification
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: studentId,
+        type: 'achievement',
+        title: 'Certificate Issued!',
+        message: `Congratulations! Your certificate for ${displayName} is ready.`,
+        action_url: certificateUrl,
+      });
 
     return {
       success: true,

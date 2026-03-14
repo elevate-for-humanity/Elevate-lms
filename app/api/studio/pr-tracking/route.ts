@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -20,7 +21,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = supabaseServer();
     
     let query = supabase
       .from('studio_pr_tracking')
@@ -67,7 +68,7 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = supabaseServer();
 
     // Upsert tracking record
     const { data, error } = await supabase
@@ -118,7 +119,7 @@ const userId = req.headers.get('x-user-id');
       return NextResponse.json({ error: 'Missing tracking ID' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = supabaseServer();
 
     const updates: Record<string, any> = {};
     if (is_watching !== undefined) updates.is_watching = is_watching;
@@ -162,7 +163,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   try {
-    const supabase = createAdminClient();
+    const supabase = supabaseServer();
 
     const { error } = await supabase
       .from('studio_pr_tracking')

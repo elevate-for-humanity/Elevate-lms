@@ -100,7 +100,7 @@ export default function CoursePreviewPage() {
 
   const fetchCourse = async () => {
     const { createClient } = await import('@/lib/supabase/client');
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // Support both UUID and slug lookups
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseId);

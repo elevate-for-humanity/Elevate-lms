@@ -5,7 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { createClient } from '@/lib/supabase/server';
+import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -27,7 +27,7 @@ async function _GET(
     }
 
 
-    const supabase = await createClient();
+    const supabase = getSupabaseServerClient();
     const { quizId } = await params;
 
     // Fetch quiz details
@@ -74,7 +74,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = await createClient();
+    const supabase = getSupabaseServerClient();
     const { quizId } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { userId, enrollmentId, answers, timeTakenSeconds } = body;

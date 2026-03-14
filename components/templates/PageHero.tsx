@@ -37,7 +37,9 @@ export default function PageHero({ title, description, forceHero }: PageHeroProp
         <>
           <video
             ref={videoRef}
+            autoPlay
             loop
+            muted
             playsInline
             preload="metadata"
             className="absolute inset-0 w-full h-full object-cover"

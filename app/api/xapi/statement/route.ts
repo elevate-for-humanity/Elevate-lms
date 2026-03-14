@@ -8,7 +8,7 @@ export const maxDuration = 60;
 // xAPI Learning Record Store (LRS) endpoint
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -25,7 +25,7 @@ async function _POST(request: NextRequest) {
     const auth = await apiAuthGuard();
     if (auth.error) return auth.error;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   try {
     const body = await parseBody<Record<string, any>>(request);
 
@@ -81,7 +81,7 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = await createClient();
+const supabase = createSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const learnerId = searchParams.get('actor');

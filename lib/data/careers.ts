@@ -30,7 +30,7 @@ export interface JobPosition {
  * Get all active job positions
  */
 export async function getActivePositions(): Promise<JobPosition[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data, error }: any = await supabase
     .from('positions')
@@ -55,7 +55,7 @@ export async function getActivePositions(): Promise<JobPosition[]> {
  * Get position by ID
  */
 export async function getPositionById(id: string): Promise<JobPosition | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data, error }: any = await supabase
     .from('positions')
@@ -83,7 +83,7 @@ export async function getPositionById(id: string): Promise<JobPosition | null> {
 export async function getPositionsByDepartment(
   departmentId: string
 ): Promise<JobPosition[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data, error }: any = await supabase
     .from('positions')
@@ -111,7 +111,7 @@ export async function getPositionsByDepartment(
 export async function getPositionsByType(
   employmentType: string
 ): Promise<JobPosition[]> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data, error }: any = await supabase
     .from('positions')

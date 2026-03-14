@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -8,6 +7,7 @@ export const maxDuration = 60;
 // app/api/billing/report-usage/route.ts
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/billing/stripe';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -16,7 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const auth = request.headers.get('x-internal-token');
   if (auth !== process.env.INTERNAL_CRON_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

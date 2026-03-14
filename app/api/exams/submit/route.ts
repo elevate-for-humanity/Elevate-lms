@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -8,6 +7,7 @@ export const maxDuration = 60;
 // app/api/exams/submit/route.ts
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
+import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -15,7 +15,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
+  const supabase = createSupabaseClient();
   const db = supabase;
   const session = await requireApiAuth();
   const { attemptId, answers } = await request.json();

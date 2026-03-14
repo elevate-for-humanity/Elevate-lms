@@ -39,7 +39,9 @@ export function ProgramHero({ program }: { program: Program }) {
             <>
               <video
                 ref={videoRef}
+                autoPlay
                 loop
+                muted
                 playsInline
                 preload="metadata"
                 className="absolute inset-0 w-full h-full object-cover"

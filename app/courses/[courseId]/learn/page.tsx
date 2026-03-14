@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { mapCourseRow, type RawCourseRow } from '@/lib/domain';
 
 export const metadata: Metadata = {
   title: 'Learn | Elevate For Humanity',
@@ -21,8 +20,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
   if (!user) redirect('/login');
 
   // Use underlying tables directly to avoid VIEW permission issues
-  const { data: rawCourse } = await db.from('training_courses').select('*').eq('id', courseId).single();
-  const course = rawCourse ? mapCourseRow(rawCourse as RawCourseRow) : null;
+  const { data: course } = await db.from('training_courses').select('*').eq('id', courseId).single();
   const { data: lessons } = await db.from('training_lessons').select('*').eq('course_id', courseId).order('order_index');
   const { data: enrollment } = await db.from('training_enrollments').select('*').eq('course_id', courseId).eq('user_id', user.id).single();
 
@@ -31,7 +29,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Link href={`/courses/${courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.title ?? 'Course'}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.course_name || course?.title || 'Course'}</h1>
           <div className="flex items-center gap-4 mt-2">
             <span className="text-sm text-gray-500">{lessons?.length || 0} lessons</span>
             <span className="text-sm text-gray-500">Progress: {enrollment?.progress || 0}%</span>

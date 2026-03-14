@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/supabase/admin';
+import { getUserByEmail } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

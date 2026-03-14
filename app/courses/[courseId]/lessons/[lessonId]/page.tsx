@@ -202,7 +202,7 @@ export default function LessonPage() {
     // Fetch user progress in background
     try {
       const { createClient } = await import('@/lib/supabase/client');
-      const supabase = await createClient();
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       setIsAuthenticated(!!user);
       if (user && lessonsData) {

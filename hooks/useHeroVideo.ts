@@ -1,5 +1,20 @@
 'use client';
 
+/**
+ * useHeroVideo
+ *
+ * Autoplay lifecycle for hero background videos.
+ *
+ * Strategy:
+ *   1. Attempt unmuted autoplay immediately (works on Chrome/Firefox desktop).
+ *   2. If the browser rejects it (Safari, mobile), fall back to muted autoplay.
+ *   3. On the first user gesture (click, scroll, keydown, touchstart) unmute
+ *      any video still muted — satisfies Safari's policy.
+ *
+ * No mute button is shown. No user action required on browsers that permit
+ * unmuted autoplay.
+ */
+
 import { useEffect, useRef } from 'react';
 
 interface UseHeroVideoOptions {
@@ -9,6 +24,26 @@ interface UseHeroVideoOptions {
 
 interface UseHeroVideoReturn {
   videoRef: React.RefObject<HTMLVideoElement>;
+}
+
+// Module-level: shared across all hero videos on the page.
+const pendingUnmute: Set<() => void> = new Set();
+let gestureReceived = false;
+
+function onFirstGesture() {
+  if (gestureReceived) return;
+  gestureReceived = true;
+  pendingUnmute.forEach((fn) => fn());
+  pendingUnmute.clear();
+  (['click', 'keydown', 'scroll', 'touchstart'] as const).forEach((evt) =>
+    window.removeEventListener(evt, onFirstGesture, { capture: true } as EventListenerOptions)
+  );
+}
+
+if (typeof window !== 'undefined') {
+  (['click', 'keydown', 'scroll', 'touchstart'] as const).forEach((evt) =>
+    window.addEventListener(evt, onFirstGesture, { capture: true, passive: true })
+  );
 }
 
 export function useHeroVideo({
@@ -24,34 +59,36 @@ export function useHeroVideo({
     async function startPlay() {
       if (!el) return;
 
-      // Attempt unmuted first (works on desktop)
+      // Attempt 1: unmuted autoplay (works on most desktop browsers)
       el.muted = false;
       el.volume = 1;
       try {
         await el.play();
-        return;
+        return; // playing with sound — done
       } catch {
-        // Browser requires a gesture first — start muted
+        // Browser blocked unmuted autoplay — fall back to muted
       }
 
-      // Muted autoplay (always allowed)
+      // Attempt 2: muted autoplay (always permitted)
       el.muted = true;
       try {
         await el.play();
       } catch {
-        return;
+        return; // autoplay blocked entirely — poster shows
       }
 
-      // Unmute on the next scroll event — scroll itself is the gesture
-      const unmuteOnScroll = () => {
+      // Queue unmute for first user gesture
+      const doUnmute = () => {
         if (!el) return;
         el.muted = false;
         el.volume = 1;
-        window.removeEventListener('scroll', unmuteOnScroll, true);
-        window.removeEventListener('touchmove', unmuteOnScroll, true);
       };
-      window.addEventListener('scroll', unmuteOnScroll, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmuteOnScroll, { capture: true, passive: true });
+
+      if (gestureReceived) {
+        doUnmute();
+      } else {
+        pendingUnmute.add(doUnmute);
+      }
     }
 
     if (!pauseOffScreen) {
@@ -76,7 +113,9 @@ export function useHeroVideo({
     observer.observe(el);
     if (alreadyInView) startPlay();
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [pauseOffScreen, threshold]);
 
   return { videoRef };

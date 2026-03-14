@@ -1,12 +1,26 @@
-import { createClient } from '@/lib/supabase/server';
 
 // lib/automation/progressSync.ts
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 import { getPartnerClient, PartnerType } from '../partners';
 
-
+function getSupabaseServerClient() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+}
 
 export async function syncSingleEnrollment(enrollmentId: string) {
-  const supabase = await createClient();
+  const supabase = getSupabaseServerClient();
 
   const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
@@ -46,7 +60,7 @@ export async function syncSingleEnrollment(enrollmentId: string) {
 }
 
 export async function syncAllActivePartnerEnrollments() {
-  const supabase = await createClient();
+  const supabase = getSupabaseServerClient();
 
   const { data: enrollments } = await supabase
     .from('partner_lms_enrollments')

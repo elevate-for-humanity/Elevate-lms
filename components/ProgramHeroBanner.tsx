@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -9,54 +8,78 @@ interface ProgramHeroBannerProps {
   posterImage?: string;
 }
 
+/**
+ * Video hero banner for program pages.
+ * Video autoplays muted (browser requirement for autoplay).
+ * Voiceover plays with sound on scroll-into-view after any user interaction.
+ * If the browser blocks unmuted audio, a click-to-unmute button appears.
+ */
 export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage }: ProgramHeroBannerProps) {
-  const { videoRef } = useHeroVideo();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [audioBlocked, setAudioBlocked] = useState(false);
   const playedRef = useRef(false);
+  const interactedRef = useRef(false);
+
+  // Track any user interaction — browsers allow unmuted audio after this
+  useEffect(() => {
+    const onInteract = () => { interactedRef.current = true; };
+    window.addEventListener('scroll', onInteract, { once: true, passive: true });
+    window.addEventListener('click', onInteract, { once: true });
+    window.addEventListener('keydown', onInteract, { once: true });
+    return () => {
+      window.removeEventListener('scroll', onInteract);
+      window.removeEventListener('click', onInteract);
+      window.removeEventListener('keydown', onInteract);
+    };
+  }, []);
 
   useEffect(() => {
-    if (!voiceoverSrc || !audioRef.current) return;
-    const audio = audioRef.current;
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container) return;
+
+    // Start muted — required for autoplay
+    video.muted = true;
+    video.play().catch(() => {});
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !playedRef.current) {
-          playedRef.current = true;
-          audio.volume = 1;
-          audio.muted = false;
-          audio.play().catch(() => {
-            // Muted fallback, unmute on next scroll
-            audio.muted = true;
-            audio.play().catch(() => {});
-            const unmute = () => {
-              audio.muted = false;
-              window.removeEventListener('scroll', unmute, true);
-              window.removeEventListener('touchmove', unmute, true);
-            };
-            window.addEventListener('scroll', unmute, { capture: true, passive: true });
-            window.addEventListener('touchmove', unmute, { capture: true, passive: true });
-          });
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+          // Play voiceover with sound once user has interacted
+          if (voiceoverSrc && audioRef.current && !playedRef.current) {
+            playedRef.current = true;
+            const audio = audioRef.current;
+            audio.volume = 1;
+            audio.muted = false;
+            audio.play().catch(() => {
+              // Browser blocked unmuted audio — show unmute button
+              setAudioBlocked(true);
+            });
+          }
+        } else {
+          video.pause();
         }
       },
       { threshold: 0.3 }
     );
 
-    observer.observe(audio);
+    observer.observe(container);
     return () => observer.disconnect();
   }, [voiceoverSrc]);
 
   return (
-    <div className="relative w-full h-full bg-black">
+    <div ref={containerRef} className="relative w-full h-full bg-black">
       {!videoFailed ? (
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
           src={videoSrc}
           poster={posterImage}
-          loop
-          playsInline
-          preload="metadata"
+          autoPlay muted loop playsInline preload="metadata"
           onError={() => setVideoFailed(true)}
         />
       ) : posterImage ? (
@@ -66,6 +89,21 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
       )}
       {voiceoverSrc && (
         <audio ref={audioRef} src={voiceoverSrc} preload="auto" aria-hidden="true" />
+      )}
+      {audioBlocked && (
+        <button
+          onClick={() => {
+            const audio = audioRef.current;
+            if (!audio) return;
+            audio.muted = false;
+            audio.play().catch(() => {});
+            setAudioBlocked(false);
+          }}
+          className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/70 hover:bg-black/90 text-white text-sm font-semibold px-4 py-2 rounded-full transition"
+          aria-label="Play audio"
+        >
+          🔊 Tap to hear
+        </button>
       )}
     </div>
   );

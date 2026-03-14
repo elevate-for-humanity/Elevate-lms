@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -19,7 +20,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
   
   let query = supabase
     .from('studio_comments')
@@ -54,7 +55,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('studio_comments')
     .insert({
@@ -90,7 +91,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (content !== undefined) updates.content = content;
   if (resolved !== undefined) updates.resolved = resolved;
@@ -124,7 +125,7 @@ const userId = req.headers.get('x-user-id');
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = supabaseServer();
   const { error } = await supabase
     .from('studio_comments')
     .delete()

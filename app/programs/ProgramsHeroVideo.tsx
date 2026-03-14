@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function ProgramsHeroVideo() {
@@ -9,22 +9,11 @@ export default function ProgramsHeroVideo() {
   const playedRef = useRef(false);
 
   useEffect(() => {
-    if (!audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio.muted = false;
-    audio.play().catch(() => {
-      audio.muted = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio.muted = false;
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('touchmove', unmute, true);
-      };
-      window.addEventListener('scroll', unmute, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmute, { capture: true, passive: true });
-    });
+    if (audioRef.current && !playedRef.current) {
+      playedRef.current = true;
+      audioRef.current.volume = 1;
+      audioRef.current.play().catch(() => {});
+    }
   }, []);
 
   return (
@@ -32,7 +21,7 @@ export default function ProgramsHeroVideo() {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
-        loop playsInline preload="metadata"
+        loop muted playsInline autoPlay preload="metadata"
         poster="/images/pages/training-cohort.jpg"
       >
         <source src="/videos/programs-overview-video-with-narration.mp4" type="video/mp4" />

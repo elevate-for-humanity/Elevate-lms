@@ -11,22 +11,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
 import { createHash } from 'crypto';
 
-/** Fail fast before DB insert if any field required for a valid certificate is missing. */
-function assertCertificateInsertable(fields: {
-  student_id: string | null | undefined;
-  certificate_number: string | null | undefined;
-  verification_code: string | null | undefined;
-  student_name: string | null | undefined;
-  issued_date: string | null | undefined;
-}): void {
-  const missing = (Object.entries(fields) as [string, unknown][])
-    .filter(([, v]) => !v)
-    .map(([k]) => k);
-  if (missing.length > 0) {
-    throw new Error(`Certificate insert blocked: missing required fields: ${missing.join(', ')}`);
-  }
-}
-
 const BUILD_SHA = process.env.COMMIT_REF?.slice(0, 12) || 'dev';
 
 async function _POST(request: Request) {
@@ -323,17 +307,7 @@ async function _POST(request: Request) {
     const certificateNumber = `EFH-${course_id}-${Date.now()}`;
     const verificationCode = generateVerificationCode();
 
-    // 6) Insert certificate — guard required fields before hitting the DB
-    const issuedDate = new Date().toISOString();
-    const studentName = profile?.full_name || profile?.email || 'Student';
-    assertCertificateInsertable({
-      student_id: enrollment.user_id,
-      certificate_number: certificateNumber,
-      verification_code: verificationCode,
-      student_name: studentName,
-      issued_date: issuedDate,
-    });
-
+    // 6) Insert certificate
     const { data: cert, error: certError } = await db
       .from('certificates')
       .insert({
@@ -342,8 +316,8 @@ async function _POST(request: Request) {
         program_id: program?.id ?? null,
         certificate_number: certificateNumber,
         verification_code: verificationCode,
-        issued_date: issuedDate,
-        student_name: studentName,
+        issued_date: new Date().toISOString(),
+        student_name: profile?.full_name || profile?.email || 'Student',
         course_title: course?.title,
         program_name: program?.title ?? null,
         hours_completed: isApprenticeship

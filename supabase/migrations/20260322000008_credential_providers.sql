@@ -86,7 +86,7 @@ INSERT INTO public.credential_providers
 VALUES
 
 -- EPA — federal, proctors on-site at Elevate
-('cp000000-0000-0000-0000-000000000001',
+('c0000000-0000-0000-0000-000000000001',
  'U.S. Environmental Protection Agency', 'federal_agency',
  'https://www.epa.gov/section608',
  NULL,
@@ -95,7 +95,7 @@ VALUES
  'EPA 608 exams are proctored on-site at Elevate. No external scheduling URL.'),
 
 -- CompTIA — industry body, Pearson VUE scheduling
-('cp000000-0000-0000-0000-000000000002',
+('c0000000-0000-0000-0000-000000000002',
  'CompTIA', 'industry_body',
  'https://home.pearsonvue.com/comptia',
  'https://api.comptia.org/v1',
@@ -104,7 +104,7 @@ VALUES
  'Security+ SY0-701. Pearson VUE test centers or online proctored.'),
 
 -- Indiana PLA — state agency, no public API
-('cp000000-0000-0000-0000-000000000003',
+('c0000000-0000-0000-0000-000000000003',
  'Indiana Professional Licensing Agency', 'state_agency',
  'https://www.in.gov/pla/barbering-and-cosmetology/',
  NULL,
@@ -113,7 +113,7 @@ VALUES
  'Barber, Cosmetology, Nail Tech state board exams. Manual scheduling via PLA portal.'),
 
 -- ACT — industry body, WorkKeys / NCRC
-('cp000000-0000-0000-0000-000000000004',
+('c0000000-0000-0000-0000-000000000004',
  'ACT', 'industry_body',
  'https://www.act.org/content/act/en/products-and-services/workkeys-for-job-seekers.html',
  'https://api.act.org/workkeys/v1',
@@ -122,7 +122,7 @@ VALUES
  'WorkKeys NCRC. Elevate is an authorized ACT testing site.'),
 
 -- NCCT — industry body, Medical Assistant + Phlebotomy
-('cp000000-0000-0000-0000-000000000005',
+('c0000000-0000-0000-0000-000000000005',
  'National Center for Competency Testing', 'industry_body',
  'https://www.ncctinc.com/certifications',
  'https://www.ncctinc.com/api/verify',
@@ -131,7 +131,7 @@ VALUES
  'NCMA and NPT certifications. Computer-based at approved test sites.'),
 
 -- Indiana BMV — state agency, CDL
-('cp000000-0000-0000-0000-000000000006',
+('c0000000-0000-0000-0000-000000000006',
  'Indiana Bureau of Motor Vehicles', 'state_agency',
  'https://www.in.gov/bmv/licenses-permits-ids/commercial-driver-license/',
  NULL,
@@ -140,7 +140,7 @@ VALUES
  'CDL Class A knowledge and skills tests. Scheduled through Indiana BMV.'),
 
 -- Indiana SDOH — state agency, CNA
-('cp000000-0000-0000-0000-000000000007',
+('c0000000-0000-0000-0000-000000000007',
  'Indiana State Department of Health', 'state_agency',
  'https://www.in.gov/isdh/nursing-assistant-registry/',
  'https://www.in.gov/isdh/api/cna',
@@ -149,7 +149,7 @@ VALUES
  'CNA state exam via Prometric. Registry verification available.'),
 
 -- ICAADA — industry body, Peer Recovery Specialist
-('cp000000-0000-0000-0000-000000000008',
+('c0000000-0000-0000-0000-000000000008',
  'Indiana Counseling Association on Alcohol and Drug Abuse', 'industry_body',
  'https://www.icaada.org/certification',
  NULL,
@@ -158,7 +158,7 @@ VALUES
  'PRS certification exam. Manual scheduling through ICAADA.'),
 
 -- DOT — federal agency, Specimen Collector
-('cp000000-0000-0000-0000-000000000009',
+('c0000000-0000-0000-0000-000000000009',
  'U.S. Department of Transportation', 'federal_agency',
  'https://www.transportation.gov/odapc/dot-drug-alcohol-testing',
  NULL,
@@ -167,7 +167,7 @@ VALUES
  'DOT 49 CFR Part 40 collector certification. Practical assessment at Elevate.'),
 
 -- IRS — federal agency, AFSP
-('cp000000-0000-0000-0000-000000000010',
+('c0000000-0000-0000-0000-000000000010',
  'Internal Revenue Service', 'federal_agency',
  'https://www.irs.gov/tax-professionals/annual-filing-season-program',
  'https://www.irs.gov/api/efin/v1',
@@ -176,7 +176,7 @@ VALUES
  'AFSP CE completion tracked via IRS PTIN system. No separate exam.'),
 
 -- Elevate — for internally-issued credentials
-('cp000000-0000-0000-0000-000000000011',
+('c0000000-0000-0000-0000-000000000011',
  'Elevate for Humanity', 'elevate',
  NULL,
  NULL,
@@ -212,41 +212,41 @@ CREATE INDEX IF NOT EXISTS idx_cr_provider
 -- Uses issuing_authority text to resolve — safe because we control both sides.
 -- =============================================================================
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000001'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000001'
   WHERE issuing_authority ILIKE '%Environmental Protection%' OR abbreviation = 'EPA-608';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000002'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000002'
   WHERE issuing_authority ILIKE '%CompTIA%' OR abbreviation = 'SEC+';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000003'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000003'
   WHERE issuing_authority ILIKE '%Professional Licensing%'
      OR abbreviation IN ('IN-BARBER','IN-COSMO','IN-NAIL');
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000004'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000004'
   WHERE issuing_authority ILIKE '%ACT%'
      OR abbreviation IN ('NCRC','WK-MATH','WK-DOCS','WK-GRAPH');
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000005'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000005'
   WHERE issuing_authority ILIKE '%Competency Testing%'
      OR abbreviation IN ('NCMA','NPT');
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000006'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000006'
   WHERE issuing_authority ILIKE '%Motor Vehicles%' OR abbreviation = 'CDL-A';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000007'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000007'
   WHERE issuing_authority ILIKE '%Department of Health%' OR abbreviation = 'IN-CNA';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000008'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000008'
   WHERE issuing_authority ILIKE '%ICAADA%' OR abbreviation = 'IN-PRS';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000009'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000009'
   WHERE issuing_authority ILIKE '%Transportation%' OR abbreviation = 'DOT-COLLECTOR';
 
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000010'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000010'
   WHERE issuing_authority ILIKE '%Internal Revenue%' OR abbreviation = 'AFSP';
 
 -- Elevate-issued credentials (issuer_type = 'elevate_issued')
-UPDATE public.credential_registry SET provider_id = 'cp000000-0000-0000-0000-000000000011'
+UPDATE public.credential_registry SET provider_id = 'c0000000-0000-0000-0000-000000000011'
   WHERE issuer_type = 'elevate_issued' AND provider_id IS NULL;
 
 -- =============================================================================

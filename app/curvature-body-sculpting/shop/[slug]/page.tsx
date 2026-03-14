@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowLeft, ShoppingCart, Heart, Truck, Shield, RotateCcw, Minus, Plus } from 'lucide-react';
-import AddToCartButton from './AddToCartButton';
+import AddToCartButton from '@/components/store/AddToCartButton';
 
 interface Props {
   params: { slug: string };

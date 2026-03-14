@@ -85,7 +85,6 @@ export default function HvacCourseLicensePage() {
 
             {/* Video preview */}
             <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-black">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
                 className="w-full h-full object-contain"
                 controls

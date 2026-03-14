@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -17,7 +17,7 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = getSupabaseServerClient();
+const supabase = createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -54,7 +54,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = getSupabaseServerClient();
+  const supabase = createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 

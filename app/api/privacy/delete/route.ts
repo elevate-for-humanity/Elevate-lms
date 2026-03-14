@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // app/api/privacy/delete/route.ts
 // GDPR/CCPA: Right to be forgotten
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createClient } from '@/lib/supabase/server';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { email, reason } = await req.json();
 
   if (!email) {

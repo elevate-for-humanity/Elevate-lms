@@ -7,14 +7,14 @@ export const maxDuration = 60;
 // app/api/admin/analytics/overview/route.ts
 // Real-time analytics overview
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseClient } from "@/lib/supabase-api";
+import { createClient } from '@/lib/supabase/server';
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const _GET = withAuth(
   async (req: NextRequest, user) => {
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const db = supabase;
   const tenantId = req.headers.get('x-tenant-id');
 

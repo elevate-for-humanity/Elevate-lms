@@ -1,6 +1,6 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { supabaseServer } from "@/lib/supabaseServer";
+import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = supabaseServer();
+    const supabase = createClient();
     const body = await req.json();
 
     const { data, error }: any = await supabase

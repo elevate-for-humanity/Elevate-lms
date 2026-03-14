@@ -37,11 +37,14 @@ export function useHeroVideo({
       }
     }
 
+    // Play immediately on page load, muted (browsers allow muted autoplay universally).
+    startPlay();
+
     if (!pauseOffScreen) {
-      startPlay();
       return;
     }
 
+    // Pause when scrolled off screen to save resources.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -54,12 +57,6 @@ export function useHeroVideo({
     );
 
     observer.observe(el);
-
-    // If already in view on mount, play immediately
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      startPlay();
-    }
 
     return () => observer.disconnect();
   }, [pauseOffScreen, threshold]);

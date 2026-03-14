@@ -1,5 +1,5 @@
 
-export const runtime = 'edge';
+
 export const maxDuration = 60;
 // AUTH: Intentionally public — no authentication required
 

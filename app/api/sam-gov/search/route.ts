@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 // AUTH: Intentionally public — no authentication required
 
-export const runtime = 'edge';
+
 export const maxDuration = 60;
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';

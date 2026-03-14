@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apiRequireAdmin } from '@/lib/admin/guards';
+import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError, safeError } from '@/lib/api/safe-error';
 import { upsertPage, upsertSections } from '@/lib/data/pages';
@@ -11,8 +11,8 @@ interface Params {
 
 // GET /api/page-builder/pages/[id] — fetch one page with sections
 export async function GET(request: NextRequest, { params }: Params) {
-  const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
+  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 
@@ -44,8 +44,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
+  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 
@@ -74,8 +74,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ["admin", "super_admin"] });
+  if (!auth.authorized) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
 

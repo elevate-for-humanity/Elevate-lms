@@ -15,12 +15,16 @@ import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { markPaymentSucceeded } from '@/lib/services/credential-pipeline';
-import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(req: NextRequest) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripeKey || !webhookSecret) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+  }
+  const stripe = new Stripe(stripeKey);
+
   const body = await req.text();
   const sig = req.headers.get('stripe-signature');
 
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
@@ -98,6 +102,7 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (profile?.email && credential) {
+        const { resend } = await import('@/lib/resend');
         await resend.emails.send({
           from: process.env.EMAIL_FROM ?? 'Elevate for Humanity <noreply@elevateforhumanity.org>',
           to: profile.email,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
+
 export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';

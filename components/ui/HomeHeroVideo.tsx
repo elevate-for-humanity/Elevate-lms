@@ -14,9 +14,11 @@ export default function HomeHeroVideo() {
   return (
     <video
       ref={videoRef}
+      autoPlay
+      muted
       loop
       playsInline
-      preload="metadata"
+      preload="auto"
       poster="/images/pages/home-hero-video.jpg"
       aria-label="Elevate for Humanity career training"
       className="absolute inset-0 w-full h-full object-cover object-center"

@@ -3,7 +3,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
-export const runtime = 'edge';
+
 export const maxDuration = 60;
 
 async function _GET(request: Request) {

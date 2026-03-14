@@ -3,7 +3,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const runtime = 'edge';
+
 export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {

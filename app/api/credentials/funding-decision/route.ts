@@ -11,7 +11,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard(req);
-  if ('error' in auth) return auth.error;
+  const auth = await apiAuthGuard({ requireAuth: true });
+  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { user } = auth;
 
   const attemptId = req.nextUrl.searchParams.get('attemptId');

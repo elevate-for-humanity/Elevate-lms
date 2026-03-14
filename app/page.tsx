@@ -40,17 +40,17 @@ export default function HomePage() {
       </section>
 
       {/* ─── HERO COPY (below video) ─── */}
-      <section className="bg-slate-900 py-10 sm:py-12">
+      <section className="bg-white border-b border-slate-100 py-10 sm:py-12">
         <div className="max-w-3xl mx-auto px-6 text-center sm:text-left">
-          <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-5">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
             We train adults for real jobs — in weeks, not years.
           </h1>
           <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
             <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-lg text-sm sm:text-base">
               Start Here — It&apos;s Free
             </Link>
-            <Link href="/programs" className="bg-white/10 border border-white/25 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/20 transition-all text-sm sm:text-base">
+            <Link href="/programs" className="border-2 border-slate-300 text-slate-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-all text-sm sm:text-base">
               See All Programs
             </Link>
           </div>
@@ -58,24 +58,24 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 1: WHO WE ARE ─── */}
-      <section className="bg-slate-900 py-16 sm:py-20">
+      <section className="bg-white py-16 sm:py-20 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             {/* Left: plain-language explanation */}
             <ScrollReveal direction="left">
             <div>
-              <p className="text-slate-300 text-lg leading-relaxed mb-4">
+              <p className="text-slate-700 text-lg leading-relaxed mb-4">
                 Elevate for Humanity is a workforce credential institute based in Indianapolis. We run short-term career training programs in healthcare, skilled trades, CDL driving, barbering, and technology. Programs run 4 to 16 weeks. Most are fully funded at no cost to eligible participants.
               </p>
-              <p className="text-slate-400 text-base leading-relaxed mb-8">
+              <p className="text-slate-600 text-base leading-relaxed mb-8">
                 We are not a college. We are not a staffing agency. We are a training institute that takes you from where you are today to a nationally recognized credential and a job offer — with funding, hands-on instruction, and employer connections built into every program.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
                   Start Here — It&apos;s Free
                 </Link>
-                <Link href="/programs" className="bg-white/10 border border-white/25 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/20 transition-all text-base">
+                <Link href="/programs" className="border-2 border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-all text-base">
                   See All Programs
                 </Link>
               </div>
@@ -92,13 +92,13 @@ export default function HomePage() {
                   { src: '/images/pages/cdl-truck-highway.jpg',   alt: 'CDL commercial driving' },
                   { src: '/images/pages/it-helpdesk-desk.jpg',    alt: 'IT support training' },
                 ].map((img) => (
-                  <div key={img.src} className="relative rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '4/3' }}>
+                  <div key={img.src} className="relative rounded-xl overflow-hidden shadow-md border border-slate-100" style={{ aspectRatio: '4/3' }}>
                     <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="25vw" />
                   </div>
                 ))}
               </div>
-              <div className="bg-brand-green-900/40 border border-brand-green-700/40 rounded-xl p-4 text-center">
-                <p className="text-brand-green-300 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>
+              <div className="bg-white border border-brand-green-200 rounded-xl p-4 text-center">
+                <p className="text-brand-green-700 text-sm font-semibold">U.S. DOL Registered Apprenticeship Sponsor · Indiana DWD ETPL Provider · EPA 608 Authorized Testing Center</p>
               </div>
             </div>
             </ScrollReveal>
@@ -150,7 +150,7 @@ export default function HomePage() {
               },
             ].map((layer) => (
               <ScrollReveal key={layer.number}>
-                <div className={`rounded-2xl border-2 ${layer.color === 'brand-red' ? 'border-brand-red-200 bg-brand-red-50' : layer.color === 'brand-blue' ? 'border-brand-blue-200 bg-brand-blue-50' : 'border-brand-green-200 bg-brand-green-50'} p-6 h-full flex flex-col`}>
+                <div className={`rounded-2xl border-2 bg-white ${layer.color === 'brand-red' ? 'border-brand-red-200' : layer.color === 'brand-blue' ? 'border-brand-blue-200' : 'border-brand-green-200'} p-6 h-full flex flex-col`}>
                   <div className={`text-4xl font-black mb-3 ${layer.color === 'brand-red' ? 'text-brand-red-200' : layer.color === 'brand-blue' ? 'text-brand-blue-200' : 'text-brand-green-200'}`}>{layer.number}</div>
                   <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${layer.color === 'brand-red' ? 'text-brand-red-600' : layer.color === 'brand-blue' ? 'text-brand-blue-600' : 'text-brand-green-600'}`}>{layer.label}</p>
                   <h3 className="text-lg font-bold text-slate-900 mb-3">{layer.heading}</h3>
@@ -164,8 +164,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 2: PROGRAMS ─── */}
-      <div className="h-1.5 bg-brand-red-600" aria-hidden="true" />
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
             <div className="mb-10">
@@ -213,8 +212,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 3: HOW IT WORKS ─── */}
-      <div className="h-1.5 bg-slate-900" aria-hidden="true" />
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
             <div className="mb-10">
@@ -279,7 +277,6 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 4: FUNDING ─── */}
-      <div className="h-1.5 bg-brand-green-600" aria-hidden="true" />
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
@@ -374,8 +371,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 5: EMPLOYERS ─── */}
-      <div className="h-1.5 bg-brand-red-600" aria-hidden="true" />
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <ScrollReveal direction="left">
@@ -410,7 +406,7 @@ export default function HomePage() {
                 <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center text-sm">
                   Employer Portal
                 </Link>
-                <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center text-sm">
+                <Link href="/apply/program-holder" className="border-2 border-slate-300 text-slate-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors text-center text-sm">
                   Become a Training Partner
                 </Link>
               </div>
@@ -421,8 +417,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 6: TESTIMONIALS ─── */}
-      <div className="h-1.5 bg-slate-900" aria-hidden="true" />
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
             <div className="mb-10">
@@ -458,7 +453,7 @@ export default function HomePage() {
               },
             ].map((t) => (
               <ScrollReveal key={t.name}>
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 h-full flex flex-col">
                   <div className="flex gap-0.5 mb-4">
                     {[1,2,3,4,5].map((s) => <span key={s} className="text-amber-400 text-sm">★</span>)}
                   </div>
@@ -481,13 +476,13 @@ export default function HomePage() {
       </section>
 
       {/* ─── NETWORK NODES ─── */}
-      <section className="py-16 sm:py-20 bg-slate-900">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
             <div className="text-center mb-10">
-              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">The Network</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">Who the platform connects</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">The Network</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Who the platform connects</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto text-sm leading-relaxed">
                 A hub is defined by its connections. Here are the nodes Elevate coordinates across the workforce system.
               </p>
             </div>
@@ -516,11 +511,11 @@ export default function HomePage() {
               },
             ].map((group) => (
               <ScrollReveal key={group.category}>
-                <div className="bg-slate-800 rounded-xl p-5 h-full">
-                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${group.color === 'brand-blue' ? 'text-brand-blue-400' : group.color === 'brand-green' ? 'text-brand-green-400' : group.color === 'brand-orange' ? 'text-orange-400' : 'text-brand-red-400'}`}>{group.category}</p>
+                <div className={`bg-white rounded-xl p-5 h-full border-2 ${group.color === 'brand-blue' ? 'border-brand-blue-200' : group.color === 'brand-green' ? 'border-brand-green-200' : group.color === 'brand-orange' ? 'border-orange-200' : 'border-brand-red-200'}`}>
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${group.color === 'brand-blue' ? 'text-brand-blue-600' : group.color === 'brand-green' ? 'text-brand-green-600' : group.color === 'brand-orange' ? 'text-orange-600' : 'text-brand-red-600'}`}>{group.category}</p>
                   <ul className="space-y-1.5">
                     {group.nodes.map((node) => (
-                      <li key={node} className="text-slate-300 text-sm flex items-start gap-2">
+                      <li key={node} className="text-slate-700 text-sm flex items-start gap-2">
                         <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${group.color === 'brand-blue' ? 'bg-brand-blue-400' : group.color === 'brand-green' ? 'bg-brand-green-400' : group.color === 'brand-orange' ? 'bg-orange-400' : 'bg-brand-red-400'}`} />
                         {node}
                       </li>
@@ -532,7 +527,7 @@ export default function HomePage() {
           </div>
           <ScrollReveal>
             <div className="mt-8 text-center">
-              <Link href="/partners" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">
+              <Link href="/partners" className="text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors">
                 View all partners and network members →
               </Link>
             </div>
@@ -541,20 +536,21 @@ export default function HomePage() {
       </section>
 
       {/* ─── SECTION 7: CTA ─── */}
-      <section className="py-16 sm:py-20 bg-brand-red-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_60%)]" />
-        <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Ready to start?</h2>
-          <p className="text-white/85 text-lg mb-8 leading-relaxed">
-            Apply online in minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/start" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
-              Start Here — It&apos;s Free
-            </Link>
-            <Link href="/programs" className="border-2 border-white/40 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors">
-              View Programs
-            </Link>
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="rounded-2xl border-2 border-brand-red-200 bg-white p-10 sm:p-14 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Ready to start?</h2>
+            <p className="text-slate-600 text-lg mb-8 leading-relaxed">
+              Apply online in minutes. Training may be fully funded. Graduate with a nationally recognized credential and a job offer.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition-colors">
+                Start Here — It&apos;s Free
+              </Link>
+              <Link href="/programs" className="border-2 border-slate-300 text-slate-700 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+                View Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>

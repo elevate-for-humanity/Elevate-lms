@@ -12,8 +12,8 @@ import {
   Eye,
   FileText,
 } from 'lucide-react';
-import { ComponentLabels, ComponentDefaults } from '@/lib/components/registry';
-import type { RegisteredComponent } from '@/lib/components/registry';
+import { ComponentLabels, ComponentDefaults } from '@/lib/components/registry-meta';
+import type { RegisteredComponent } from '@/lib/components/registry-meta';
 
 interface Section {
   id: string;           // temp client ID before save

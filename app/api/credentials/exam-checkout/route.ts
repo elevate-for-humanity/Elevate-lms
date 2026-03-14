@@ -14,19 +14,21 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resolvePaymentResponsibility } from '@/lib/services/credential-pipeline';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(req: NextRequest) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+  const stripe = new Stripe(stripeKey);
+
   const rateLimited = await applyRateLimit(req, 'payment');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard(req);
-  if ('error' in auth) return auth.error;
+  const auth = await apiAuthGuard({ requireAuth: true });
+  if (!auth.authorized) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { user } = auth;
 
   const body = await req.json();

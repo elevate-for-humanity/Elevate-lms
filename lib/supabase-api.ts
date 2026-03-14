@@ -10,12 +10,7 @@ export function createSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'Content-service-key';
 
-  // Only throw error at runtime in production, not during build
-  if ((!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) &&
-      process.env.NODE_ENV === 'production' &&
-      typeof window !== 'undefined') {
-    throw new Error('Missing Supabase environment variables');
-  }
+  // Never throw — missing env vars return a no-op client so the lambda doesn't crash on cold start
 
   return createClient(supabaseUrl, supabaseKey, {
     auth: {

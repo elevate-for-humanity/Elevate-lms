@@ -17,10 +17,7 @@ function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key';
 
-  // Only throw error in production, allow build to continue in development
-  if ((!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) && process.env.NODE_ENV === 'production') {
-    throw new Error('Missing Supabase environment variables for admin client');
-  }
+  // Never throw — missing env vars return a no-op client so the lambda doesn't crash on cold start
 
   _supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {

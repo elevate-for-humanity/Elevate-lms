@@ -12,7 +12,11 @@ function getSupabaseAdmin(): SupabaseClient {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase credentials not configured');
+    // Return a no-op client — never throw on cold start
+    _supabaseAdmin = createClient('https://placeholder.supabase.co', 'placeholder', {
+      auth: { persistSession: false },
+    });
+    return _supabaseAdmin;
   }
 
   _supabaseAdmin = createClient(supabaseUrl, supabaseKey, {

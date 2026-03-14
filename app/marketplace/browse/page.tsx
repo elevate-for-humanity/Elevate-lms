@@ -127,7 +127,7 @@ export default async function MarketplaceBrowsePage() {
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Items Available</h2>
-              <p className="text-gray-600 mb-6">Check back soon for digital products and resources.</p>
+              <p className="text-gray-600 mb-6">No products listed yet. Contact us to request study materials or resources.</p>
               <Link href="/store" className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 Visit Store
               </Link>

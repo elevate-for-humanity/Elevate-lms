@@ -189,7 +189,7 @@ export default async function ProductsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No products available</h2>
-            <p className="text-gray-600 mb-6">Check back soon for new products and learning materials.</p>
+            <p className="text-gray-600 mb-6">No products available yet. Contact us to request learning materials.</p>
             <Link href="/shop" className="text-brand-blue-600 hover:underline">
               Return to Shop
             </Link>

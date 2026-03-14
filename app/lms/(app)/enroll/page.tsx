@@ -278,7 +278,7 @@ export default async function EnrollPage({ searchParams }: Props) {
             </div>
             <h2 className="text-xl font-bold text-slate-900 mb-2">All Caught Up!</h2>
             <p className="text-slate-600 mb-6">
-              You&apos;re enrolled in all available courses. Check back later for new courses.
+              You&apos;re enrolled in all available courses. New courses will appear here when added to your program.
             </p>
             <Link
               href="/lms/courses"

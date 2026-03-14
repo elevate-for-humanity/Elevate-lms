@@ -68,7 +68,7 @@ export default async function MarketplaceProductsPage() {
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">No products yet</h2>
-            <p className="text-gray-500">Check back soon for study guides, templates, and resources.</p>
+            <p className="text-gray-500">No products listed yet. Contact us to request study guides, templates, or resources.</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

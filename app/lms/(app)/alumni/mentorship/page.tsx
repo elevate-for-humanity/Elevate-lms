@@ -131,7 +131,7 @@ export default async function MentorshipPage() {
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Mentors Available</h2>
-              <p className="text-gray-600 mb-6">Check back soon as we expand our mentor network.</p>
+              <p className="text-gray-600 mb-6">No mentors are available yet. Contact career services to be matched with a mentor.</p>
               <Link 
                 href="/lms/alumni"
                 className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"

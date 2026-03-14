@@ -87,7 +87,7 @@ export default async function DrugTestingTrainingPage() {
         <div className="max-w-6xl mx-auto px-4">
           {categories.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No courses available at this time. Please check back later.</p>
+              <p className="text-gray-500">No training courses published yet. Contact us to learn about upcoming drug testing certification programs.</p>
             </div>
           ) : (
             categories.map((category) => (

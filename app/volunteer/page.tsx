@@ -130,7 +130,7 @@ export default async function VolunteerPage() {
           <div className="bg-white rounded-xl border p-12 text-center">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No opportunities listed</h3>
-            <p className="text-gray-600 mb-6">Check back soon for new volunteer opportunities, or contact us to learn more.</p>
+            <p className="text-gray-600 mb-6">No volunteer opportunities posted yet. Contact us to express your interest and we will reach out when openings are available.</p>
             <Link
               href="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600"

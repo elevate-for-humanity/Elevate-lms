@@ -102,7 +102,7 @@ export default async function ClassroomPage() {
             <div className="text-center py-16 bg-white rounded-2xl border">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">No Courses Available</h3>
-              <p className="text-gray-600 mb-6">Check back soon for new courses!</p>
+              <p className="text-gray-600 mb-6">No courses are published yet. Contact us to learn about upcoming programs.</p>
               <Link
                 href="/community"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700"

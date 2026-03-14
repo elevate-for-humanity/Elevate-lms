@@ -162,7 +162,7 @@ export default async function InteractiveCoursesPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">All Courses</h2>
           {displayCourses.length === 0 ? (
             <div className="bg-white rounded-xl shadow-md p-12 text-center">
-              <p className="text-gray-500">No courses available yet. Check back soon!</p>
+              <p className="text-gray-500">No courses assigned yet. Contact your advisor or browse available programs.</p>
             </div>
           ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

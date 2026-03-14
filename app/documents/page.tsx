@@ -154,7 +154,7 @@ export default async function DocumentsPage() {
                   <td colSpan={5} className="px-4 py-12 text-center">
                     <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                     <p className="font-medium text-gray-900">No documents yet</p>
-                    <p className="text-sm text-gray-500">Upload documents or check back later</p>
+                    <p className="text-sm text-gray-500">No documents on file. Upload a document to get started.</p>
                   </td>
                 </tr>
               )}

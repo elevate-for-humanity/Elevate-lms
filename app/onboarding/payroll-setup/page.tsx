@@ -34,7 +34,7 @@ export default async function PayrollSetupPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/onboarding/payroll-setup');
+    redirect('/login?redirect=/onboarding/payroll-setup');
   }
 
   // Get user's profile to determine role

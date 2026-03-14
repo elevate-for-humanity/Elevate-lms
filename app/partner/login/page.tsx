@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 
 const IDENTITY_ERRORS: Record<string, string> = {
   identity: 'Your account could not be verified. Please contact support.',
-  no_partner: 'Your account is not linked to a partner organization. Please contact support at elevate4humanityedu@gmail.com.',
+  no_partner: 'Your account is not linked to a partner organization. Please contact support at info@elevateforhumanity.org.',
 };
 
 export default function PartnerLoginPage() {

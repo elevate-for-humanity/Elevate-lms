@@ -34,7 +34,7 @@ export default async function ShopDocumentsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/shop/onboarding/documents');
+    redirect('/login?redirect=/shop/onboarding/documents');
   }
 
   // Get shop for this user

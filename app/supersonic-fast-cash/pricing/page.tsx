@@ -308,7 +308,7 @@ export default function PricingPage() {
               className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               <Phone className="w-5 h-5" />
-              Get Help Online
+              (317) 314-3757
             </a>
             <Link
               href="/supersonic-fast-cash/book-appointment"

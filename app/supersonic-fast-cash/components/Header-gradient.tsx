@@ -122,7 +122,7 @@ export function SupersonicHeader() {
               href="/support"
               className="hidden sm:block font-bold text-lg hover:text-brand-red-400 transition-colors"
             >
-              <Phone className="w-5 h-5 inline-block" /> Get Help Online
+              <Phone className="w-5 h-5 inline-block" /> (317) 314-3757
             </a>
             <Link
               href="/supersonic-fast-cash/apply"

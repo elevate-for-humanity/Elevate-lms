@@ -326,7 +326,7 @@ export default function VerifyCredentialsPage() {
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
                     <a href="/support" className="font-medium text-gray-900 hover:text-brand-blue-600">
-                      Get Help Online
+                      (317) 314-3757
                     </a>
                   </div>
                 </div>

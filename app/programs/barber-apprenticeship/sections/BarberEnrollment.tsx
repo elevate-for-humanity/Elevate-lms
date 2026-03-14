@@ -205,7 +205,7 @@ export function BarberEnrollment() {
               <CreditCard className="w-4 h-4" /> BNPL Options
             </Link>
             <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full font-semibold transition-all border border-white/30">
-              <Phone className="w-4 h-4" /> Get Help Online
+              <Phone className="w-4 h-4" /> (317) 314-3757
             </Link>
           </div>
           <div className="mt-4 flex justify-center">

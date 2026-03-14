@@ -192,7 +192,7 @@ export default async function HelpCenterPage({
               href="/support"
               className="px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition"
             >
-              Call Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

@@ -264,7 +264,7 @@ function SubmitTicketContent() {
             <p className="text-sm text-gray-600 text-center">
               Need immediate help? Contact us at{' '}
               <a href="/support" className="text-brand-blue-600 font-semibold hover:underline">
-                Get Help Online
+                (317) 314-3757
               </a>
             </p>
           </div>

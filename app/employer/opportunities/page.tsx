@@ -29,7 +29,7 @@ export default async function OpportunitiesPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/employer/opportunities');
+  if (!user) redirect('/login?redirect=/employer/opportunities');
 
   const { data: opportunities } = await db
     .from('job_opportunities')

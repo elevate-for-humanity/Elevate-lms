@@ -80,10 +80,10 @@ export default async function BarberShopApplicationsPage() {
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
-  if (!supabase) redirect('/login?next=/admin/barber-shop-applications');
+  if (!supabase) redirect('/login?redirect=/admin/barber-shop-applications');
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/admin/barber-shop-applications');
+  if (!user) redirect('/login?redirect=/admin/barber-shop-applications');
 
   const { data: profile } = await db
     .from('profiles')

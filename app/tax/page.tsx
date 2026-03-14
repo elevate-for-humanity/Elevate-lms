@@ -426,7 +426,7 @@ export default function TaxServicesPage() {
           </div>
           <p className="mt-8 text-brand-blue-200">
             <Phone className="inline-block w-4 h-4 mr-2" />
-            Questions? Contact us at Get Help Online
+            Questions? Contact us at (317) 314-3757
           </p>
         </div>
       </section>
@@ -447,7 +447,7 @@ export default function TaxServicesPage() {
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

@@ -194,7 +194,7 @@ export default async function DrugTestingTrainingPage() {
               Contact Us
             </Link>
             <a href="/support" className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
-              <Phone className="w-5 h-5" /> Get Help Online
+              <Phone className="w-5 h-5" /> (317) 314-3757
             </a>
           </div>
         </div>

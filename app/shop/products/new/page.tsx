@@ -38,7 +38,7 @@ export default async function AddProductPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/shop/products/new');
+  if (!user) redirect('/login?redirect=/shop/products/new');
 
   const { data: profile } = await db
     .from('profiles')

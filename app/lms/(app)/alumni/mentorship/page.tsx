@@ -18,7 +18,7 @@ export default async function MentorshipPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user) redirect('/login?next=/lms/alumni/mentorship');
+  if (!user) redirect('/login?redirect=/lms/alumni/mentorship');
 
   // Fetch mentors from database
   const { data: mentors, error } = await db

@@ -37,7 +37,7 @@ export default async function AtRiskStudentsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/admin/at-risk');
+    redirect('/login?redirect=/admin/at-risk');
   }
 
   const { data: profile } = await db

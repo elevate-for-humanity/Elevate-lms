@@ -1,0 +1,123 @@
+/**
+ * Stripe webhook handler for exam fee payments.
+ *
+ * Listens for checkout.session.completed events where metadata.payment_type = 'exam_fee'.
+ * On success: marks exam_funding_authorizations as paid, then sends the learner
+ * an email with exam scheduling instructions.
+ *
+ * Idempotent — safe to replay. Uses stripe_webhook_events for deduplication.
+ */
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+import Stripe from 'stripe';
+import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { markPaymentSucceeded } from '@/lib/services/credential-pipeline';
+import { resend } from '@/lib/resend';
+import { logger } from '@/lib/logger';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export async function POST(req: NextRequest) {
+  const body = await req.text();
+  const sig = req.headers.get('stripe-signature');
+
+  if (!sig) {
+    return NextResponse.json({ error: 'Missing stripe-signature' }, { status: 400 });
+  }
+
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  } catch {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  // Only handle exam fee payments
+  if (event.type !== 'checkout.session.completed') {
+    return NextResponse.json({ received: true, skipped: true });
+  }
+
+  const session = event.data.object as Stripe.Checkout.Session;
+  if (session.metadata?.payment_type !== 'exam_fee') {
+    return NextResponse.json({ received: true, skipped: true });
+  }
+
+  const db = createAdminClient();
+  if (!db) {
+    logger.error('exam-payment webhook: database unavailable');
+    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
+  }
+
+  // Idempotency check
+  const { data: existing } = await db
+    .from('stripe_webhook_events')
+    .select('id')
+    .eq('stripe_event_id', event.id)
+    .maybeSingle();
+
+  if (existing) {
+    return NextResponse.json({ received: true, skipped: true });
+  }
+
+  await db.from('stripe_webhook_events').insert({
+    stripe_event_id: event.id,
+    event_type: event.type,
+    processed_at: new Date().toISOString(),
+  });
+
+  const paymentIntentId = typeof session.payment_intent === 'string'
+    ? session.payment_intent
+    : session.payment_intent?.id ?? '';
+
+  const result = await markPaymentSucceeded(session.id, paymentIntentId);
+
+  if (!result.ok) {
+    logger.error('exam-payment webhook: markPaymentSucceeded failed', undefined, { sessionId: session.id });
+    return NextResponse.json({ error: result.error }, { status: 500 });
+  }
+
+  // Send exam scheduling email if learner_id and credential_id are in metadata
+  const learnerId = session.metadata?.learner_id;
+  const credentialId = session.metadata?.credential_id;
+
+  if (learnerId && credentialId) {
+    try {
+      const { data: profile } = await db
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', learnerId)
+        .single();
+
+      const { data: credential } = await db
+        .from('credentials')
+        .select('name, issuing_authority')
+        .eq('id', credentialId)
+        .single();
+
+      if (profile?.email && credential) {
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM ?? 'Elevate for Humanity <noreply@elevateforhumanity.org>',
+          to: profile.email,
+          subject: `Exam fee confirmed — schedule your ${credential.name} exam`,
+          html: `
+            <p>Hi ${profile.full_name ?? 'there'},</p>
+            <p>Your exam fee for the <strong>${credential.name}</strong> credential has been confirmed.</p>
+            <p>You can now schedule your exam. Log in to your dashboard and visit
+            <strong>My Credentials</strong> to see your scheduling options.</p>
+            <p>Issued by: ${credential.issuing_authority}</p>
+            <p>Questions? Call (317) 314-3757 or reply to this email.</p>
+            <p>— Elevate for Humanity</p>
+          `,
+        });
+      }
+    } catch (emailErr) {
+      // Email failure must not fail the webhook response
+      logger.error('exam-payment webhook: email send failed', emailErr instanceof Error ? emailErr : undefined);
+    }
+  }
+
+  return NextResponse.json({ received: true });
+}

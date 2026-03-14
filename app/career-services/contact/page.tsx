@@ -59,7 +59,7 @@ export default function CareerServicesContactPage() {
                 href="/support"
                 className="text-2xl font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
-                Get Help Online
+                (317) 314-3757
               </a>
               <p className="text-sm text-gray-500 mt-2">Mon-Fri, 9am-5pm EST</p>
             </div>

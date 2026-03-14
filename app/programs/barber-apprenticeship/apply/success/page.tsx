@@ -84,7 +84,7 @@ export default function BarberApplySuccessPage() {
               (317) 314-3757
             </a>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="mailto:info@elevateforhumanity.org"
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm font-medium"
             >
               <Mail className="w-4 h-4" />

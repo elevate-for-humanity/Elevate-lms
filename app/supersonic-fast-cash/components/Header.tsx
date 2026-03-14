@@ -32,7 +32,7 @@ export function SupersonicHeader() {
             </div>
             <a href="/support" className="flex items-center gap-2 hover:text-brand-blue-200">
               <Phone className="w-4 h-4" />
-              <span>Get Help Online</span>
+              <span>(317) 314-3757</span>
             </a>
           </div>
         </div>

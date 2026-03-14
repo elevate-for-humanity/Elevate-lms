@@ -308,7 +308,7 @@ export default async function DrugTestingLandingPage() {
           </h2>
           <div className="space-y-8">
             {[
-              { step: 1, title: 'Order Your Test', desc: 'Call Get Help Online or order online. We confirm your test type and send collection authorization.' },
+              { step: 1, title: 'Order Your Test', desc: '(317) 314-3757 or order online. We confirm your test type and send collection authorization.' },
               { step: 2, title: 'Visit Collection Site', desc: 'Go to any of our 20,000+ nationwide locations. Bring valid photo ID. Walk-ins welcome at most sites.' },
               { step: 3, title: 'Sample Collection', desc: 'Trained collector obtains your sample following proper chain of custody procedures.' },
               { step: 4, title: 'Lab Analysis', desc: 'Sample sent to SAMHSA-certified lab. Positive screens confirmed with GC/MS testing.' },
@@ -411,7 +411,7 @@ export default async function DrugTestingLandingPage() {
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
             >
               <Phone className="w-5 h-5" />
-              Get Help Online
+              (317) 314-3757
             </a>
             <Link
               href="/contact"

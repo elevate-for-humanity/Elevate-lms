@@ -187,7 +187,7 @@ export default async function HSISuccessPage({
               <div className="space-y-2">
                 <a href="/support" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Phone className="w-4 h-4" />
-                  Get Help Online
+                  (317) 314-3757
                 </a>
                 <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Mail className="w-4 h-4" />

@@ -34,7 +34,7 @@ export default async function NewWeeklyReport() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/shop/reports/new');
+    redirect('/login?redirect=/shop/reports/new');
   }
 
   // Get shop for this user

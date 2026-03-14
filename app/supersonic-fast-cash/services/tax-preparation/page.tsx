@@ -84,7 +84,7 @@ export default function TaxPreparationPage() {
                 Book Free Consultation
               </Link>
               <p className="text-center text-sm text-gray-500 mt-4">
-                Or call Get Help Online
+                Or call (317) 314-3757
               </p>
             </div>
           </div>

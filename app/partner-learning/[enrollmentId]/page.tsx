@@ -31,13 +31,13 @@ export default async function PartnerLearningPage({ params }: Props) {
   const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
-    redirect('/login?next=/partner-learning/' + enrollmentId);
+    redirect('/login?redirect=/partner-learning/' + enrollmentId);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    redirect('/login?next=/partner-learning/' + enrollmentId);
+    redirect('/login?redirect=/partner-learning/' + enrollmentId);
   }
 
   // Fetch the partner enrollment

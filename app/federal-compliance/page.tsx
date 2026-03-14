@@ -262,7 +262,7 @@ export default function FederalCompliancePage() {
             </p>
             <div className="space-y-2 text-brand-blue-900">
               <p><strong>Email:</strong> our contact form</p>
-              <p><strong>Phone:</strong> Get Help Online</p>
+              <p><strong>Phone:</strong> (317) 314-3757</p>
               <p><strong>Address:</strong> Indianapolis, IN</p>
             </div>
           </div>
@@ -312,7 +312,7 @@ export default function FederalCompliancePage() {
               href="/support"
               className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition border border-white/30"
             >
-              <Phone className="w-5 h-5" /> Get Help Online
+              <Phone className="w-5 h-5" /> (317) 314-3757
             </a>
           </div>
         </div>

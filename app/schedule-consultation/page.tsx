@@ -115,7 +115,7 @@ export default function ScheduleConsultationPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-[160px] sm:h-[200px] overflow-hidden">
-        <Image src="/images/pages/schedule-consultation-page-1.jpg" alt="Schedule enrollment consultation" fill className="object-cover" priority />
+        <Image src="/images/pages/schedule-consultation-page-1.jpg" alt="Schedule enrollment consultation" fill sizes="100vw" className="object-cover" priority />
       </div>
       <div className="bg-white border-b border-slate-200 py-6 px-6">
         <div className="max-w-2xl mx-auto">

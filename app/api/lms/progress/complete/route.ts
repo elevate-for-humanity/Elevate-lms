@@ -11,6 +11,7 @@ import { checkCourseCompletion } from '@/lib/course-completion';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCourseRequirements } from '@/lib/courses/completion-requirements';
+import { startCredentialAttempt } from '@/lib/services/credential-pipeline';
 
 /**
  * Mark course as completed
@@ -230,6 +231,37 @@ async function _POST(req: NextRequest) {
       logger.error("Certificate generation failed", certError instanceof Error ? certError : undefined);
     }
 
+    // ── CREDENTIAL PIPELINE TRIGGER ─────────────────────────────────
+    // After course completion, check if this course is linked to a credential
+    // that requires an exam. If so, start the credential attempt and resolve
+    // the funding decision. The learner is then routed to /lms/certification
+    // where they see their next required action (pay / wait for approval / schedule).
+    let credentialAttemptId: string | null = null;
+    let fundingDecision = null;
+
+    try {
+      const { data: courseCredential } = await db
+        .from('training_courses')
+        .select('credential_id, program_id')
+        .eq('id', courseId)
+        .maybeSingle();
+
+      if (courseCredential?.credential_id) {
+        const result = await startCredentialAttempt(
+          user.id,
+          courseCredential.credential_id,
+          courseCredential.program_id ?? null
+        );
+        if ('attemptId' in result) {
+          credentialAttemptId = result.attemptId;
+          fundingDecision = result.funding;
+        }
+      }
+    } catch (pipelineErr) {
+      // Pipeline failure must not block completion — log and continue
+      logger.error('Credential pipeline trigger failed', pipelineErr instanceof Error ? pipelineErr : undefined);
+    }
+
     // Redirect if form submission, JSON response if API call
     if (
       contentType?.includes('application/x-www-form-urlencoded') ||
@@ -240,7 +272,16 @@ async function _POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      ...(credentialAttemptId && {
+        credentialAttemptId,
+        fundingDecision,
+        nextStep: fundingDecision?.requiresCheckout
+          ? `/lms/payments/checkout?attemptId=${credentialAttemptId}`
+          : `/lms/certification`,
+      }),
+    });
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },

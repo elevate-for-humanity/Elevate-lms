@@ -193,7 +193,7 @@ export default async function ApplicationSuccessPage({
                 className="flex items-center gap-2 text-brand-blue-600 hover:underline text-sm"
               >
                 <Phone className="w-4 h-4" />
-                Get Help Online
+                (317) 314-3757
               </Link>
               <Link
                 href="/contact"

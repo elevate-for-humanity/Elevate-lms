@@ -17,13 +17,13 @@ export default async function DIYInterviewLayout({ children }: { children: React
   const supabase = await createClient();
   
   if (!supabase) {
-    redirect('/login?next=/supersonic-fast-cash/diy/interview&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/diy/interview&reason=secure');
   }
 
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/supersonic-fast-cash/diy/interview&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/diy/interview&reason=secure');
   }
 
   return <>{children}</>;

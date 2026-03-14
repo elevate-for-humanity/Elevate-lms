@@ -113,7 +113,7 @@ export default function PartnerOnboardingSuccessPage() {
           <p className="mt-8 text-sm text-slate-500">
             Questions? Contact us at{' '}
             <a href="/support" className="text-brand-blue-600 hover:underline">
-              Get Help Online
+              (317) 314-3757
             </a>
           </p>
         </div>

@@ -43,7 +43,7 @@ export default async function AdminShopsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/admin/shops');
+    redirect('/login?redirect=/admin/shops');
   }
 
   // Check if user is admin

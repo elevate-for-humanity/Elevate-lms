@@ -112,7 +112,7 @@ export default function SupportPage() {
                 href="/support" 
                 className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
               >
-                Get Help Online
+                (317) 314-3757
               </a>
             </div>
 

@@ -191,7 +191,7 @@ export default async function SupportPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-gray-600">
-                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at our contact form or call Get Help Online.
+                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at our contact form or call (317) 314-3757.
               </div>
             </details>
             

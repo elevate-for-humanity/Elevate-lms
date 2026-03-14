@@ -105,7 +105,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-gray-700">
               2Exclusive LLC-S (d/b/a Supersonic Fast Cash)<br />
               Email: privacy@supersonicfastcash.com<br />
-              Phone: Get Help Online
+              Phone: (317) 314-3757
             </p>
           </section>
 

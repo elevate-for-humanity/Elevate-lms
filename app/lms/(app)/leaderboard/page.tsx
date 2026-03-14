@@ -55,7 +55,7 @@ export default async function LeaderboardPage() {
     );
   }
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/lms/leaderboard');
+  if (!user) redirect('/login?redirect=/lms/leaderboard');
 
   // Fetch all profiles
   const { data: profiles } = await db

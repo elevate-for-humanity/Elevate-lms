@@ -391,7 +391,7 @@ export default function WorkOnePartnerPacketPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/support" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
               <Phone className="w-5 h-5 mr-2" />
-              Get Help Online
+              (317) 314-3757
             </a>
             <a href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-teal-700 text-white rounded-lg font-bold hover:bg-teal-800 transition-colors border-2 border-white/30">
               <Mail className="w-5 h-5 mr-2" />

@@ -131,7 +131,7 @@ export default async function ThankyouPage() {
               <Phone className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Contact Us</div>
-                <div className="text-gray-600">Get Help Online</div>
+                <div className="text-gray-600">(317) 314-3757</div>
               </div>
             </a>
             <a 

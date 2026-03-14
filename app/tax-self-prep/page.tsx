@@ -550,7 +550,7 @@ export default async function TaxSelfPrepPage() {
             Start For Free →
           </Link>
           <p className="mt-6 text-sm opacity-90">
-            Questions? Chat with us 24/7 or call Get Help Online
+            Questions? Chat with us 24/7 or call (317) 314-3757
           </p>
         </div>
       </section>
@@ -571,7 +571,7 @@ export default async function TaxSelfPrepPage() {
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

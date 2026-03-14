@@ -45,7 +45,7 @@ export default async function AccreditationPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/admin/accreditation');
+    redirect('/login?redirect=/admin/accreditation');
   }
 
   // Check admin role

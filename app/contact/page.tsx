@@ -11,7 +11,7 @@ import Turnstile from '@/components/Turnstile';
 import FeedbackWidget from '@/components/FeedbackWidget';
 
 const contactInfo = [
-  { icon: Phone, title: 'Phone', value: 'Get Help Online', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:support center' },
+  { icon: Phone, title: 'Phone', value: '(317) 314-3757', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:+13173143757' },
   { icon: Mail, title: 'Email', value: 'Use the form below', subtitle: 'We respond within 24 hours', href: '#contact-form' },
   { icon: MapPin, title: 'Address', value: 'Indianapolis, IN', subtitle: 'Central Indiana', href: null },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
@@ -74,7 +74,7 @@ export default function ContactPage() {
 
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        <Image src="/images/pages/contact-page-1.jpg" alt="Elevate for Humanity contact" fill quality={90} className="object-cover" priority />
+        <Image src="/images/pages/contact-page-1.jpg" alt="Elevate for Humanity contact" fill sizes="100vw" quality={90} className="object-cover" priority />
       </div>
       <div className="bg-white border-b border-slate-200 py-8 px-6">
         <div className="max-w-7xl mx-auto">
@@ -385,7 +385,7 @@ export default function ContactPage() {
         <div className="space-y-4">
           {[
             { q: 'What are your office hours?', a: 'Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we\'ll respond within 1-2 business days.' },
-            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at Get Help Online.' },
+            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at (317) 314-3757.' },
             { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Contact us to arrange a visit.' },
             { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or contact us directly. Our enrollment team will assist you.' },
             { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or contact us with your name and the program you applied for.' },

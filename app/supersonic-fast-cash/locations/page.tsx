@@ -85,7 +85,7 @@ export default async function LocationsPage() {
                       href="/support"
                       className="text-brand-blue-600 hover:text-brand-blue-700"
                     >
-                      Get Help Online
+                      (317) 314-3757
                     </a>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export default async function LocationsPage() {
               href="/support"
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors border-2 border-white"
             >
-              Call Get Help Online
+              Call (317) 314-3757
             </Link>
           </div>
         </div>

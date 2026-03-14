@@ -34,7 +34,7 @@ export default async function OnboardingStartPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/onboarding/start');
+    redirect('/login?redirect=/onboarding/start');
   }
 
   // Get user's profile to determine role

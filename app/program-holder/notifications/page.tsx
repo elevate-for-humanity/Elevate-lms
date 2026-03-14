@@ -37,7 +37,7 @@ export default async function ProgramHolderNotificationsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/program-holder/notifications');
+    redirect('/login?redirect=/program-holder/notifications');
   }
 
   // Get notifications for this user

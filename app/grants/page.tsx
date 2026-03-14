@@ -242,7 +242,7 @@ export default function GrantsPage() {
           <p className="text-slate-700">
             Contact us at{' '}
             <a href="/support" className="font-semibold text-brand-blue-600 hover:underline">
-              Get Help Online
+              (317) 314-3757
             </a>{' '}
             or email{' '}
             <a href="/contact" className="font-semibold text-brand-blue-600 hover:underline">

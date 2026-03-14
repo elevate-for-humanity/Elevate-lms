@@ -51,7 +51,7 @@ export default function SupersonicFastCashPage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Get Your Tax Refund <span className="block text-transparent bg-clip-text bg-slate-700 animate-pulse"> TODAY! </span></h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Get Your Tax Refund <span className="text-brand-red-400"> TODAY!</span></h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Up to <span className="text-brand-red-400">$7,500</span> in Just{' '} <span className="text-brand-red-400">15 Minutes</span></p>
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function SupersonicFastCashPage() {
                   <Phone className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Contact Us</h3>
-                    <p className="text-brand-blue-200">Get Help Online</p>
+                    <p className="text-brand-blue-200">(317) 314-3757</p>
                   </div>
                 </div>
               </div>
@@ -401,7 +401,7 @@ export default function SupersonicFastCashPage() {
             </Link>
           </div>
           <p className="mt-6 text-brand-red-200 text-sm">
-            Or contact us at <a href="/support" className="underline font-bold text-white">Get Help Online</a>
+            Or contact us at <a href="/support" className="underline font-bold text-white">(317) 314-3757</a>
           </p>
         </div>
       </section>

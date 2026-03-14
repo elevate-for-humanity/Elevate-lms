@@ -12,13 +12,13 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
   const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
-    redirect('/login?next=/lms/dashboard');
+    redirect('/login?redirect=/lms/dashboard');
   }
 
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/login?next=/lms/dashboard');
+    redirect('/login?redirect=/lms/dashboard');
   }
 
   const { data: profile } = await db

@@ -280,7 +280,7 @@ export default function TrainingProvidersPage() {
               className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition border-2 border-gray-200 text-lg"
             >
               <Phone className="w-5 h-5" />
-              Call Get Help Online
+              Call (317) 314-3757
             </a>
           </div>
           <p className="mt-8 text-gray-500">

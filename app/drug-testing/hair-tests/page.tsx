@@ -256,7 +256,7 @@ export default function HairTestsPage() {
             className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
-            Get Help Online
+            (317) 314-3757
           </a>
         </div>
       </section>

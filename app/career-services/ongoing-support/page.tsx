@@ -191,7 +191,7 @@ export default async function OngoingSupportPage() {
                 href="/support"
                 className="flex items-center justify-center gap-2 text-pink-600 font-medium"
               >
-                <Phone className="w-4 h-4" /> Get Help Online
+                <Phone className="w-4 h-4" /> (317) 314-3757
               </a>
             </div>
 

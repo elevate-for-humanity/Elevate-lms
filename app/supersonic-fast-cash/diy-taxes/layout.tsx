@@ -20,13 +20,13 @@ export default async function DIYTaxesLayout({ children }: { children: React.Rea
   const supabase = await createClient();
   
   if (!supabase) {
-    redirect('/login?next=/supersonic-fast-cash/diy-taxes&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/diy-taxes&reason=secure');
   }
 
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/supersonic-fast-cash/diy-taxes&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/diy-taxes&reason=secure');
   }
 
   return <>{children}</>;

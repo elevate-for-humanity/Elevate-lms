@@ -411,7 +411,7 @@ export default function ApprenticeForm() {
                     href="/support" 
                     className="inline-block mt-2 text-brand-red-600 font-medium hover:underline"
                   >
-                    Need help? Call Get Help Online
+                    Need help? Call (317) 314-3757
                   </a>
                 )}
               </div>

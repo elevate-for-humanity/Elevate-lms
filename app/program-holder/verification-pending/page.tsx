@@ -13,7 +13,7 @@ export default async function VerificationPendingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?next=/program-holder/verification-pending');
+  if (!user) redirect('/login?redirect=/program-holder/verification-pending');
 
   const { data: profile } = await supabase
     .from('profiles')

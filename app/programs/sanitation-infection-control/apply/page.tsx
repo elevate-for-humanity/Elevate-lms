@@ -178,7 +178,7 @@ export default function ApplyPage() {
         <div className="bg-slate-900 text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
-            Call <a href="/support" className="text-brand-green-400 font-bold hover:underline">Get Help Online</a> or email{' '}
+            Call <a href="/support" className="text-brand-green-400 font-bold hover:underline">(317) 314-3757</a> or email{' '}
             <a href="/contact" className="text-brand-green-400 font-bold hover:underline">Contact Us</a>
           </p>
         </div>

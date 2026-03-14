@@ -20,13 +20,13 @@ export default async function UploadDocumentsLayout({ children }: { children: Re
   const supabase = await createClient();
   
   if (!supabase) {
-    redirect('/login?next=/supersonic-fast-cash/upload-documents&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/upload-documents&reason=secure');
   }
 
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/supersonic-fast-cash/upload-documents&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/upload-documents&reason=secure');
   }
 
   return <>{children}</>;

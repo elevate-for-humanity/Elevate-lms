@@ -74,7 +74,7 @@ export function SupersonicFooter() {
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-gray-500" />
                 <a href="/support" className="text-gray-400 hover:text-white text-sm">
-                  Get Help Online
+                  (317) 314-3757
                 </a>
               </li>
               <li className="flex items-center gap-2">

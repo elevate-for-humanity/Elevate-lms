@@ -18,7 +18,7 @@ export default async function AssignmentsPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user) redirect('/login?next=/student-portal/assignments');
+  if (!user) redirect('/login?redirect=/student-portal/assignments');
 
   // Fetch assignments from database
   const { data: assignments, error } = await db

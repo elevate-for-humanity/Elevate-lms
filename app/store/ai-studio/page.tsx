@@ -124,7 +124,7 @@ export default function AIStudioPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 AI Studio
-                <span className="block text-transparent bg-clip-text bg-slate-100">
+                <span className="block text-slate-100">
                   Create Content at Scale
                 </span>
               </h1>

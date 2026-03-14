@@ -268,7 +268,7 @@ export default function AttendancePolicyPage() {
             <strong>Effective Date:</strong> January 2026
           </p>
           <p className="text-gray-600 text-sm mb-6">
-            Questions about attendance? Contact your program coordinator or call Get Help Online.
+            Questions about attendance? Contact your program coordinator or call (317) 314-3757.
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>
@@ -294,7 +294,7 @@ export default function AttendancePolicyPage() {
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

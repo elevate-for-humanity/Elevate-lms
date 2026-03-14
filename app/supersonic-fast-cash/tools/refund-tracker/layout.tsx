@@ -17,13 +17,13 @@ export default async function RefundTrackerLayout({ children }: { children: Reac
   const supabase = await createClient();
   
   if (!supabase) {
-    redirect('/login?next=/supersonic-fast-cash/tools/refund-tracker&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/tools/refund-tracker&reason=secure');
   }
 
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/supersonic-fast-cash/tools/refund-tracker&reason=secure');
+    redirect('/login?redirect=/supersonic-fast-cash/tools/refund-tracker&reason=secure');
   }
 
   return <>{children}</>;

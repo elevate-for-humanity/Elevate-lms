@@ -152,7 +152,7 @@ export default async function HelpPage() {
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Contact Us</div>
-                <div className="text-gray-600">Get Help Online</div>
+                <div className="text-gray-600">(317) 314-3757</div>
               </div>
             </a>
             <a href="/contact" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">

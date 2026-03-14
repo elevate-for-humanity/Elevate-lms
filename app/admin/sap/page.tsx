@@ -43,7 +43,7 @@ export default async function SAPMonitoringPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/admin/sap');
+    redirect('/login?redirect=/admin/sap');
   }
 
   // Check admin role

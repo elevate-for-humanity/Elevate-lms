@@ -19,7 +19,7 @@ export default async function EmployerHoursPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?next=/employer/hours');
+  if (!user) redirect('/login?redirect=/employer/hours');
 
   // Verify employer role
   const { data: profile } = await db

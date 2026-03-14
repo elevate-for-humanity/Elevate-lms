@@ -27,7 +27,7 @@ export default async function CreateShopPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/employer/shop/create');
+  if (!user) redirect('/login?redirect=/employer/shop/create');
 
   const { data: profile } = await db
     .from('profiles')

@@ -37,7 +37,7 @@ export default async function SchedulePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/lms/schedule');
+    redirect('/login?redirect=/lms/schedule');
   }
 
   // Get user's enrollments for schedule

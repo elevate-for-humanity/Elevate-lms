@@ -43,7 +43,7 @@ export default async function GroupsPage() {
     );
   }
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/lms/groups');
+  if (!user) redirect('/login?redirect=/lms/groups');
 
   // Fetch user's group memberships
   const { data: memberships } = await db

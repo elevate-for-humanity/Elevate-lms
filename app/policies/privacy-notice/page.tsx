@@ -438,7 +438,7 @@ export default function PrivacyNoticePage() {
           <p className="mb-2">
             <strong>Phone:</strong>{' '}
             <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-800">
-              Get Help Online
+              (317) 314-3757
             </a>
           </p>
           <p className="mb-2">
@@ -506,7 +506,7 @@ export default function PrivacyNoticePage() {
           </a>{' '}
           or call{' '}
           <a href="/support" className="text-brand-green-900 font-semibold hover:underline">
-            Get Help Online
+            (317) 314-3757
           </a>.
         </p>
       </div>

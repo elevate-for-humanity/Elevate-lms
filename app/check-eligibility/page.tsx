@@ -167,7 +167,7 @@ export default function CheckEligibilityPage() {
               className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:underline"
             >
               <Phone className="w-5 h-5" />
-              Call Get Help Online
+              Call (317) 314-3757
             </a>
           </div>
         </div>

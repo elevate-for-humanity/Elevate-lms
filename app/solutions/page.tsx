@@ -291,7 +291,7 @@ export default function SolutionsPage() {
             Questions About Our Programs?
           </h2>
           <p className="text-base md:text-lg text-slate-300 mb-8">
-            Contact us at Get Help Online or schedule a walkthrough of our platform.
+            Contact us at (317) 314-3757 or schedule a walkthrough of our platform.
             We'll show you exactly how enrollment, tracking, and reporting works.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -327,7 +327,7 @@ export default function SolutionsPage() {
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

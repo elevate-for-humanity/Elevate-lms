@@ -209,7 +209,7 @@ export default async function LowIncomePage() {
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
-              Get Help Online
+              (317) 314-3757
             </a>
           </div>
         </div>

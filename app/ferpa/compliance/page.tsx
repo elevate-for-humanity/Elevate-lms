@@ -40,7 +40,7 @@ export default async function FerpaCompliancePage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/ferpa/compliance');
+  if (!user) redirect('/login?redirect=/ferpa/compliance');
 
   const { data: profile } = await db
     .from('profiles')

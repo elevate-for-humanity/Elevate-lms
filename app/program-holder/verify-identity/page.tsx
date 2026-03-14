@@ -36,7 +36,7 @@ export default async function IdentityVerificationPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/program-holder/verify-identity');
+    redirect('/login?redirect=/program-holder/verify-identity');
   }
 
   const { data: profile } = await db

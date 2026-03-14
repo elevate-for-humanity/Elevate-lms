@@ -35,7 +35,7 @@ export default async function CommunityPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/lms/community');
+    redirect('/login?redirect=/lms/community');
   }
 
   return (

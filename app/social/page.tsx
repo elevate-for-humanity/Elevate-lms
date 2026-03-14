@@ -256,7 +256,7 @@ export default function SocialMediaPage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Follow Our <span className="block text-transparent bg-clip-text bg-slate-700"> Journey </span></h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Follow Our Journey</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Stay connected with Elevate for Humanity. Get updates, success stories, tips, and inspiration across all our social platforms.</p>
           </div>
         </div>

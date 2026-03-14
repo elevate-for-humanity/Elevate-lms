@@ -39,7 +39,7 @@ export default async function FerpaHelpPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/ferpa/help');
+  if (!user) redirect('/login?redirect=/ferpa/help');
 
   const faqs = [
     {
@@ -175,7 +175,7 @@ export default async function FerpaHelpPage() {
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
                     <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-700">
-                      Get Help Online
+                      (317) 314-3757
                     </a>
                   </div>
                 </div>

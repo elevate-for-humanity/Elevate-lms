@@ -58,7 +58,7 @@ export default async function FerpaCalendarPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/ferpa/calendar');
+  if (!user) redirect('/login?redirect=/ferpa/calendar');
 
   const { data: profile } = await db
     .from('profiles')

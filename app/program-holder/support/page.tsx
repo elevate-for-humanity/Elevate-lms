@@ -61,7 +61,7 @@ export default async function SupportPage() {
       icon: Phone,
       value: 'support center',
       description: 'Mon-Fri 9am-5pm EST',
-      href: 'tel:support center',
+      href: 'tel:+13173143757',
       color: 'green',
     },
   ];

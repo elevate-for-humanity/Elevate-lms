@@ -17,7 +17,7 @@ export default async function CareerMessagesPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user) redirect('/login?next=/lms/messages/career');
+  if (!user) redirect('/login?redirect=/lms/messages/career');
 
   // Fetch messages from database
   const { data: messages, error } = await db

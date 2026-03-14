@@ -17,7 +17,7 @@ export default async function InstructorMessagesPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   
-  if (!user) redirect('/login?next=/lms/messages/instructor');
+  if (!user) redirect('/login?redirect=/lms/messages/instructor');
 
   // Fetch messages from database
   const { data: messages, error } = await db

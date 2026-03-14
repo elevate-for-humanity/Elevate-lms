@@ -226,7 +226,7 @@ export default function BookAppointmentPage() {
                       setFormData({ ...formData, phone: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    placeholder="Get Help Online"
+                    placeholder="(317) 314-3757"
                   />
                 </div>
               </div>

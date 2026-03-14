@@ -27,7 +27,7 @@ export default async function FERPATrainingPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/admin/ferpa/training');
+    redirect('/login?redirect=/admin/ferpa/training');
   }
 
   const { data: profile } = await db

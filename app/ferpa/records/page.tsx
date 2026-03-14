@@ -57,7 +57,7 @@ export default async function FerpaRecordsPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/ferpa/records');
+    redirect('/login?redirect=/ferpa/records');
   }
 
   const { data: profile } = await db

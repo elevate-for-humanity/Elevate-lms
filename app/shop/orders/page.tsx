@@ -56,7 +56,7 @@ export default async function OrderHistoryPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/shop/orders');
+  if (!user) redirect('/login?redirect=/shop/orders');
 
   // Fetch orders from database
   const { data: ordersData, error } = await db

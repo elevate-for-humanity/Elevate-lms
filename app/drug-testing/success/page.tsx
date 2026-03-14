@@ -75,7 +75,7 @@ export default function DrugTestingSuccessPage() {
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
             >
               <Phone className="w-5 h-5" />
-              Call Get Help Online
+              Call (317) 314-3757
             </a>
             <Link
               href="/contact"

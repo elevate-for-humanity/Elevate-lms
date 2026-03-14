@@ -42,7 +42,7 @@ export default async function EnrollmentPage() {
   return (
     <div className="min-h-screen bg-white">      {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <Image src="/images/pages/enrollment-page-1.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
+        <Image src="/images/pages/enrollment-page-1.jpg" alt="Elevate for Humanity enrollment" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       <div className="py-4 border-b border-gray-100">

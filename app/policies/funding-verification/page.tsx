@@ -132,7 +132,7 @@ export default function FundingVerificationPage() {
                 <Mail className="w-4 h-4" /> Email Us
               </a>
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
-                <Phone className="w-4 h-4" /> Get Help Online
+                <Phone className="w-4 h-4" /> (317) 314-3757
               </a>
               <Link href="/check-eligibility" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
                 Register at Indiana Career Connect <ArrowRight className="w-4 h-4" />

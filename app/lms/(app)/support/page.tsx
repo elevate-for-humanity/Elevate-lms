@@ -213,7 +213,7 @@ export default async function SupportPage() {
                   </div>
                   <div>
                     <div className="font-medium text-slate-900">Phone Support</div>
-                    <div className="text-sm">Get Help Online</div>
+                    <div className="text-sm">(317) 314-3757</div>
                   </div>
                 </a>
                 <a href="/contact" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">

@@ -30,7 +30,7 @@ export default async function ReportsPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/reports');
+  if (!user) redirect('/login?redirect=/reports');
 
   const { data: reports } = await db
     .from('reports')

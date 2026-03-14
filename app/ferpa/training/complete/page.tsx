@@ -32,7 +32,7 @@ export default async function CompleteFERPATrainingPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?next=/ferpa/training/complete');
+    redirect('/login?redirect=/ferpa/training/complete');
   }
 
   const { data: profile } = await db

@@ -136,7 +136,7 @@ export function SupersonicFooter() {
                     href="/support"
                     className="text-gray-300 hover:text-brand-red-400 transition-colors font-semibold"
                   >
-                    Get Help Online
+                    (317) 314-3757
                   </a>
                   <div className="text-xs text-gray-300">Mon-Fri 9am-7pm</div>
                 </div>

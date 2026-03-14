@@ -54,7 +54,7 @@ export default async function AlumniDirectoryPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/lms/alumni/directory');
+  if (!user) redirect('/login?redirect=/lms/alumni/directory');
 
   // Fetch alumni profiles (users who have completed at least one program)
   const { data: alumni } = await db

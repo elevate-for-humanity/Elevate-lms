@@ -127,7 +127,7 @@ export default function StartPage() {
               <p className="font-medium text-gray-900">Prefer to talk to someone?</p>
               <p className="mt-1 text-sm text-gray-600">
                 Call <a href="tel:+13173143757" className="font-medium text-brand-blue-600 hover:underline">(317) 314-3757</a> or
-                email <a href="mailto:elevate4humanityedu@gmail.com" className="font-medium text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
+                email <a href="mailto:info@elevateforhumanity.org" className="font-medium text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
               </p>
             </div>
           </div>

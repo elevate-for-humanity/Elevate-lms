@@ -19,46 +19,31 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
   const audioRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [audioBlocked, setAudioBlocked] = useState(false);
   const playedRef = useRef(false);
-  const interactedRef = useRef(false);
-
-  // Track any user interaction — browsers allow unmuted audio after this
-  useEffect(() => {
-    const onInteract = () => { interactedRef.current = true; };
-    window.addEventListener('scroll', onInteract, { once: true, passive: true });
-    window.addEventListener('click', onInteract, { once: true });
-    window.addEventListener('keydown', onInteract, { once: true });
-    return () => {
-      window.removeEventListener('scroll', onInteract);
-      window.removeEventListener('click', onInteract);
-      window.removeEventListener('keydown', onInteract);
-    };
-  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
     if (!video || !container) return;
 
-    // Start muted — required for autoplay
-    video.muted = true;
-    video.play().catch(() => {});
+    // Autoplay muted (browser requirement); attempt unmuted immediately
+    video.muted = false;
+    video.play().catch(() => {
+      video.muted = true;
+      video.play().catch(() => {});
+    });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           video.play().catch(() => {});
-          // Play voiceover with sound once user has interacted
+          // Play voiceover with sound on scroll into view
           if (voiceoverSrc && audioRef.current && !playedRef.current) {
             playedRef.current = true;
             const audio = audioRef.current;
             audio.volume = 1;
             audio.muted = false;
-            audio.play().catch(() => {
-              // Browser blocked unmuted audio — show unmute button
-              setAudioBlocked(true);
-            });
+            audio.play().catch(() => {});
           }
         } else {
           video.pause();
@@ -90,21 +75,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
       {voiceoverSrc && (
         <audio ref={audioRef} src={voiceoverSrc} preload="auto" aria-hidden="true" />
       )}
-      {audioBlocked && (
-        <button
-          onClick={() => {
-            const audio = audioRef.current;
-            if (!audio) return;
-            audio.muted = false;
-            audio.play().catch(() => {});
-            setAudioBlocked(false);
-          }}
-          className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/70 hover:bg-black/90 text-white text-sm font-semibold px-4 py-2 rounded-full transition"
-          aria-label="Play audio"
-        >
-          🔊 Tap to hear
-        </button>
-      )}
+
     </div>
   );
 }

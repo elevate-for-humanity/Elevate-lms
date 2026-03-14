@@ -225,6 +225,18 @@
 # [functions."social-media-scheduler"]
 #   schedule = "0 14,18,22 * * *"
 
+# Compliance expiration — weekly, Monday 3 AM ET
+# Finds provider_compliance_artifacts expiring within 30 days and queues notifications.
+# Requires CRON_SECRET env var in Netlify site settings.
+[functions."cron-compliance-expiration"]
+  schedule = "0 8 * * 1"
+
+# Onboarding reminder — weekly, Monday 9 AM ET
+# Nudges providers with incomplete onboarding steps.
+# Requires CRON_SECRET env var in Netlify site settings.
+[functions."cron-onboarding-reminder"]
+  schedule = "0 14 * * 1"
+
 # ============================================
 # ADMIN DOMAIN (www.elevateconnectsdirectory.org)
 # Rewrites admin domain to /admin dashboard

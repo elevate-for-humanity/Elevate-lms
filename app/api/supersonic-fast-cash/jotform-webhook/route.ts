@@ -56,13 +56,18 @@ async function _POST(request: NextRequest) {
     const webhookSecret = process.env.JOTFORM_WEBHOOK_SECRET;
 
     if (process.env.NODE_ENV === 'production') {
-      if (!isAllowedIP(sourceIP)) {
-        // Check shared secret as fallback
-        const providedSecret = request.headers.get('x-jotform-secret');
-        if (!webhookSecret || providedSecret !== webhookSecret) {
-          logger.error('JotForm webhook: unauthorized request', { sourceIP });
-          return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-        }
+      const ipAllowed = isAllowedIP(sourceIP);
+      const providedSecret = request.headers.get('x-jotform-secret');
+
+      // Constant-time secret comparison to prevent timing attacks
+      const secretValid = webhookSecret != null &&
+        providedSecret != null &&
+        providedSecret.length === webhookSecret.length &&
+        Buffer.from(providedSecret).equals(Buffer.from(webhookSecret));
+
+      if (!ipAllowed && !secretValid) {
+        logger.error('JotForm webhook: unauthorized request', { sourceIP });
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
       }
     }
 

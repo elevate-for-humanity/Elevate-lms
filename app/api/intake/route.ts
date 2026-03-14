@@ -71,12 +71,57 @@ async function _POST(req: Request) {
     return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
   }
 
+  // Provision a learner account if an email was provided.
+  // Non-blocking: intake record is already saved above. Auth failures are logged
+  // and surfaced in the admin intake queue for manual follow-up.
+  const intakeEmail = body.email?.trim().toLowerCase();
+  if (intakeEmail) {
+    (async () => {
+      try {
+        // inviteUserByEmail sends a magic link and creates the auth user atomically.
+        // If the user already exists, Supabase returns the existing user without error.
+        const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
+          intakeEmail,
+          {
+            data: {
+              full_name: body.full_name.trim(),
+              role: 'student',
+            },
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org'}/learner/dashboard`,
+          }
+        );
+
+        if (inviteError) {
+          logger.warn('[Intake API] Auth invite failed', { email: intakeEmail, error: inviteError.message });
+          return;
+        }
+
+        // Upsert profile row so the learner portal can resolve their role and name.
+        // ON CONFLICT: if profile already exists (returning learner), update name only.
+        await supabase
+          .from('profiles')
+          .upsert(
+            {
+              id: invited.user.id,
+              email: intakeEmail,
+              full_name: body.full_name.trim(),
+              role: 'student',
+              phone: body.phone?.trim() || null,
+            },
+            { onConflict: 'id', ignoreDuplicates: false }
+          );
+      } catch (provisionError) {
+        logger.error('[Intake API] Learner provisioning error', provisionError instanceof Error ? provisionError.message : 'Unknown');
+      }
+    })();
+  }
+
   // Send email notifications (non-blocking — don't fail the response if email fails)
   const applicationData = {
     id: `intake-${Date.now()}`,
     firstName: body.full_name.trim().split(' ')[0] || body.full_name.trim(),
     lastName: body.full_name.trim().split(' ').slice(1).join(' ') || '',
-    email: body.email?.trim() || '',
+    email: intakeEmail ?? '',
     phone: body.phone?.trim(),
     programInterest: body.program_interest || 'general',
     city: body.city?.trim(),

@@ -277,7 +277,7 @@ async function _GET(request: Request) {
     return NextResponse.json({ blueprint, resumed: true }, { status: 200 });
   } catch (err: any) {
     await updateIngestionDraftStage(jobId, 'failed', { warnings: [err?.message || 'Resume failed'] });
-    return NextResponse.json({ error: 'Resume failed: ' + (err?.message || 'unknown error') }, { status: 500 });
+    return NextResponse.json({ error: 'Resume failed' }, { status: 500 });
   }
 }
 

@@ -107,6 +107,62 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ─── SYSTEM ARCHITECTURE ─── */}
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">How Elevate Works</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Three integrated layers. One workforce system.</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                Elevate is not just a training school. It operates a workforce development system that connects training, credentials, and employment through a single coordinated platform.
+              </p>
+            </div>
+          </ScrollReveal>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                number: '01',
+                label: 'Training Institute',
+                color: 'brand-red',
+                heading: 'Short-term career training',
+                body: 'Elevate operates workforce training programs in healthcare, skilled trades, CDL, barbering, and technology. Programs run 4–16 weeks. Most are funded at no cost for eligible participants through WIOA, Workforce Ready Grant, JRI, and Job Ready Indy.',
+                link: '/programs',
+                linkText: 'See all programs →',
+              },
+              {
+                number: '02',
+                label: 'Credential Infrastructure',
+                color: 'brand-blue',
+                heading: 'Credential pathways & verification',
+                body: 'The platform manages exam preparation, progress tracking, and credential verification records. Industry certifications are issued by their respective national authorities — EPA, PTCB, CompTIA, NCCER, and others. Elevate manages the learning pipeline and testing coordination.',
+                link: '/credentials',
+                linkText: 'View credentials →',
+              },
+              {
+                number: '03',
+                label: 'Workforce Network',
+                color: 'brand-green',
+                heading: 'Employers, agencies & partners',
+                body: 'The Elevate Hub connects training providers, credential authorities, employers, and workforce agencies through a shared system. Employers post hiring needs. Agencies track outcomes. Partners run cohorts. Everyone operates from the same platform.',
+                link: '/platform',
+                linkText: 'Platform overview →',
+              },
+            ].map((layer) => (
+              <ScrollReveal key={layer.number}>
+                <div className={`rounded-2xl border-2 ${layer.color === 'brand-red' ? 'border-brand-red-200 bg-brand-red-50' : layer.color === 'brand-blue' ? 'border-brand-blue-200 bg-brand-blue-50' : 'border-brand-green-200 bg-brand-green-50'} p-6 h-full flex flex-col`}>
+                  <div className={`text-4xl font-black mb-3 ${layer.color === 'brand-red' ? 'text-brand-red-200' : layer.color === 'brand-blue' ? 'text-brand-blue-200' : 'text-brand-green-200'}`}>{layer.number}</div>
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${layer.color === 'brand-red' ? 'text-brand-red-600' : layer.color === 'brand-blue' ? 'text-brand-blue-600' : 'text-brand-green-600'}`}>{layer.label}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-3">{layer.heading}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{layer.body}</p>
+                  <Link href={layer.link} className={`mt-4 text-sm font-semibold ${layer.color === 'brand-red' ? 'text-brand-red-600 hover:text-brand-red-700' : layer.color === 'brand-blue' ? 'text-brand-blue-600 hover:text-brand-blue-700' : 'text-brand-green-600 hover:text-brand-green-700'}`}>{layer.linkText}</Link>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── SECTION 2: PROGRAMS ─── */}
       <div className="h-1.5 bg-brand-red-600" aria-hidden="true" />
       <section className="py-16 sm:py-20 bg-white">
@@ -421,6 +477,66 @@ export default function HomePage() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─── NETWORK NODES ─── */}
+      <section className="py-16 sm:py-20 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-6">
+          <ScrollReveal>
+            <div className="text-center mb-10">
+              <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">The Network</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">Who the platform connects</h2>
+              <p className="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed">
+                A hub is defined by its connections. Here are the nodes Elevate coordinates across the workforce system.
+              </p>
+            </div>
+          </ScrollReveal>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                category: 'Credential Authorities',
+                color: 'brand-blue',
+                nodes: ['EPA Section 608', 'Indiana State Dept. of Health (CNA)', 'PTCB (Pharmacy Tech)', 'CompTIA (IT/Cyber)', 'NCCER (Trades)', 'ACT WorkKeys / NCRC', 'OSHA Training Institute'],
+              },
+              {
+                category: 'Funding & Workforce Agencies',
+                color: 'brand-green',
+                nodes: ['U.S. Dept. of Labor', 'Indiana DWD', 'WorkOne Career Centers', 'Next Level Jobs', 'Job Ready Indy (Marion Co.)', 'JRI (Indiana DWD)', 'WIOA Title I & II'],
+              },
+              {
+                category: 'Training & Community Partners',
+                color: 'brand-orange',
+                nodes: ['Barbershop Apprenticeship Sites', 'OJT Employer Partners', 'Reentry Organizations', 'Rise Forward Foundation', 'La Plaza (HVAC Cohort)', 'Community Training Sites'],
+              },
+              {
+                category: 'Employer Pipeline',
+                color: 'brand-red',
+                nodes: ['Healthcare Facilities', 'Trucking & Logistics', 'Electrical Contractors', 'HVAC Companies', 'IT & Cybersecurity Firms', 'Barbershops & Salons', 'Government & Public Sector'],
+              },
+            ].map((group) => (
+              <ScrollReveal key={group.category}>
+                <div className="bg-slate-800 rounded-xl p-5 h-full">
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${group.color === 'brand-blue' ? 'text-brand-blue-400' : group.color === 'brand-green' ? 'text-brand-green-400' : group.color === 'brand-orange' ? 'text-orange-400' : 'text-brand-red-400'}`}>{group.category}</p>
+                  <ul className="space-y-1.5">
+                    {group.nodes.map((node) => (
+                      <li key={node} className="text-slate-300 text-sm flex items-start gap-2">
+                        <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${group.color === 'brand-blue' ? 'bg-brand-blue-400' : group.color === 'brand-green' ? 'bg-brand-green-400' : group.color === 'brand-orange' ? 'bg-orange-400' : 'bg-brand-red-400'}`} />
+                        {node}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal>
+            <div className="mt-8 text-center">
+              <Link href="/partners" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">
+                View all partners and network members →
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

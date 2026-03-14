@@ -6,7 +6,8 @@
  * - Client Components: Use createBrowserClient from './client'
  */
 
-export { createClient, createAdminClient } from './server';
+export { createClient } from './server';
+export { createAdminClient } from './admin';
 export { createBrowserClient } from './client';
 
 // Re-export types

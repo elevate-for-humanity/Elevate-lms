@@ -73,6 +73,9 @@ function IntakeForm() {
           <p className="text-lg text-slate-600 mb-2">
             Thank you for your interest in Elevate for Humanity.
           </p>
+          <p className="text-sm text-slate-500 mb-2">
+            Check your email — we sent you a link to access your learner account and track your application status.
+          </p>
           {fundingTag === 'jri' && (
             <p className="text-base text-slate-700 mb-6">
               Based on your responses, you may qualify for Job Ready Indy (JRI) funding.

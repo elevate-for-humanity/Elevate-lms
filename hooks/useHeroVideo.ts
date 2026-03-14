@@ -24,34 +24,27 @@ export function useHeroVideo({
     async function startPlay() {
       if (!el) return;
 
-      // Attempt unmuted first (works on desktop)
-      el.muted = false;
+      // Always start muted — required by autoplay policy on all browsers.
+      // Unmuting before a user gesture causes jarring audio on page load.
+      el.muted = true;
       el.volume = 1;
       try {
         await el.play();
-        return;
       } catch {
-        // Browser requires a gesture first — start muted
+        return; // autoplay blocked entirely — poster shows
       }
 
-      // Muted autoplay (always allowed)
-      el.muted = true;
-      try {
-        await el.play();
-      } catch {
-        return;
-      }
-
-      // Unmute on the next scroll event — scroll itself is the gesture
-      const unmuteOnScroll = () => {
+      // Unmute on first scroll or touch gesture
+      const unmuteOnGesture = () => {
         if (!el) return;
         el.muted = false;
-        el.volume = 1;
-        window.removeEventListener('scroll', unmuteOnScroll, true);
-        window.removeEventListener('touchmove', unmuteOnScroll, true);
+        window.removeEventListener('scroll', unmuteOnGesture, true);
+        window.removeEventListener('touchmove', unmuteOnGesture, true);
+        window.removeEventListener('click', unmuteOnGesture, true);
       };
-      window.addEventListener('scroll', unmuteOnScroll, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmuteOnScroll, { capture: true, passive: true });
+      window.addEventListener('scroll', unmuteOnGesture, { capture: true, passive: true });
+      window.addEventListener('touchmove', unmuteOnGesture, { capture: true, passive: true });
+      window.addEventListener('click', unmuteOnGesture, { capture: true, passive: true });
     }
 
     if (!pauseOffScreen) {

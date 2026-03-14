@@ -1,0 +1,81 @@
+{
+  "id": "sim-02",
+  "title": "Compressor Hums But Will Not Start",
+  "system": "R-410A split system, 2-ton",
+  "complaint": "Outdoor unit hums loudly but the compressor does not start. Condenser fan runs normally.",
+  "initialData": [
+    "Thermostat calling for cooling",
+    "Contactor is pulled in (24V at coil)",
+    "Condenser fan running at normal speed",
+    "Compressor hums for 3–5 seconds then trips on overload"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "The contactor is closed and the fan runs. The compressor hums but trips. What is the most likely cause?",
+      "options": [
+        { "label": "Failed contactor", "next": "s1-wrong" },
+        { "label": "Failed run/start capacitor", "next": "s2", "correct": true },
+        { "label": "Low refrigerant charge", "next": "s1-wrong" },
+        { "label": "Bad thermostat", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "The contactor is confirmed closed (fan runs). Low charge would not cause humming. A humming motor that cannot start points to the capacitor.",
+      "feedback": "Humming + trips on overload = motor trying but cannot turn = capacitor failure.",
+      "options": [
+        { "label": "Check the capacitor", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "Before testing the capacitor, what must you do?",
+      "options": [
+        { "label": "Test it live with the system running", "next": "s2-wrong" },
+        { "label": "Discharge it with a 10kΩ resistor after LOTO", "next": "s3", "correct": true },
+        { "label": "Just replace it without testing", "next": "s2-partial" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "Testing a live capacitor without discharge is dangerous — it can hold a lethal charge even after power is removed.",
+      "feedback": "Always discharge capacitors before handling. Use a 10kΩ, 5W resistor across the terminals.",
+      "options": [
+        { "label": "Discharge after LOTO, then test", "next": "s3", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "Replacing without testing is acceptable in the field but wastes parts if the capacitor is good. What is the correct test?",
+      "options": [
+        { "label": "Discharge after LOTO, measure capacitance in microfarads", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "After LOTO and discharge, you measure the dual-run capacitor: HERM reads 28 µF (rated 45 µF), FAN reads 7.5 µF (rated 7.5 µF). What do you do?",
+      "options": [
+        { "label": "Replace the entire dual-run capacitor", "next": "pass", "correct": true },
+        { "label": "Replace only the FAN section", "next": "s3-wrong" },
+        { "label": "The capacitor is fine — look elsewhere", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "The HERM section reads 28 µF vs. rated 45 µF — that is 38% low, well outside the ±6% tolerance. The dual-run capacitor must be replaced as a unit.",
+      "feedback": "Dual-run capacitors are replaced as a complete unit. A weak HERM section causes the compressor to draw excess current and trip.",
+      "options": [
+        { "label": "Replace the dual-run capacitor", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Replacing the dual-run capacitor restored normal compressor starting. Root cause: weak HERM capacitor section caused insufficient starting torque.",
+      "feedback": "Weak run capacitor → insufficient phase shift → motor cannot develop starting torque → hums and trips on thermal overload.",
+      "options": []
+    }
+  }
+}

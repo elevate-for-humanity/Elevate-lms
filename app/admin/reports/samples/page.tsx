@@ -4,6 +4,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, Users, Award, DollarSign, ArrowLeft, Download, BarChart3, GraduationCap } from 'lucide-react';
+import {
+  mapStudentRow, mapEnrollmentRow, mapCertificateReportRow, mapProgramSummaryRow, mapCourseSummaryRow,
+  type RawStudentRow, type RawEnrollmentRow, type RawCertificateReportRow,
+  type RawProgramSummaryRow, type RawCourseSummaryRow,
+} from '@/lib/domain';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,34 +34,39 @@ export default async function SampleReportsPage() {
     db.from('training_courses').select('id, course_name, is_active', { count: 'exact' }),
   ]);
 
+  const mappedStudents    = (students.data    ?? []).map((r) => mapStudentRow(r as RawStudentRow));
+  const mappedEnrollments = (enrollments.data ?? []).map((r) => mapEnrollmentRow(r as RawEnrollmentRow));
+  const mappedCerts       = (certificates.data ?? []).map((r) => mapCertificateReportRow(r as RawCertificateReportRow));
+  const mappedPrograms    = (programs.data    ?? []).map((r) => mapProgramSummaryRow(r as RawProgramSummaryRow));
+
   const reportSections = [
     {
       title: 'Student Roster',
       icon: Users,
-      count: students.data?.length ?? 0,
+      count: mappedStudents.length,
       color: 'brand-blue',
-      rows: (students.data ?? []).map((s: any) => ({
-        cols: [s.full_name || s.email || 'Unknown', s.role, s.enrollment_status || 'pending', s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'],
+      rows: mappedStudents.map((s) => ({
+        cols: [s.displayName, s.role, s.enrollmentStatus, s.registeredAt],
       })),
       headers: ['Name', 'Role', 'Status', 'Registered'],
     },
     {
       title: 'Enrollment Report',
       icon: GraduationCap,
-      count: enrollments.data?.length ?? 0,
+      count: mappedEnrollments.length,
       color: 'emerald',
-      rows: (enrollments.data ?? []).map((e: any) => ({
-        cols: [e.id.slice(0, 8), e.status || 'active', e.program_id?.slice(0, 8) || '—', e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'],
+      rows: mappedEnrollments.map((e) => ({
+        cols: [e.shortId, e.status, e.shortProgramId, e.enrolledAt],
       })),
       headers: ['ID', 'Status', 'Program', 'Date'],
     },
     {
       title: 'Certificates Issued',
       icon: Award,
-      count: certificates.data?.length ?? 0,
+      count: mappedCerts.length,
       color: 'purple',
-      rows: (certificates.data ?? []).map((c: any) => ({
-        cols: [c.id.slice(0, 8), c.status || 'issued', c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'],
+      rows: mappedCerts.map((c) => ({
+        cols: [c.shortId, c.status, c.issuedAt],
       })),
       headers: ['ID', 'Status', 'Issued'],
     },
@@ -65,8 +75,8 @@ export default async function SampleReportsPage() {
       icon: BarChart3,
       count: programs.count ?? 0,
       color: 'amber',
-      rows: (programs.data ?? []).map((p: any) => ({
-        cols: [p.name || 'Unnamed', p.status || '—'],
+      rows: mappedPrograms.map((p) => ({
+        cols: [p.title, p.status],
       })),
       headers: ['Program', 'Status'],
     },

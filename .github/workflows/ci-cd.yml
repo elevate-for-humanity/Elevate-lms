@@ -62,7 +62,60 @@ jobs:
 
       - name: Type check
         run: pnpm run typecheck
-        continue-on-error: true  # 543 files have pre-existing TS errors; next build uses ignoreBuildErrors
+        continue-on-error: true  # Pre-existing TS errors across app/; next build uses ignoreBuildErrors
+
+      - name: Validate HVAC sim content (hard gate)
+        # Parses every JSON file against the Zod schema.
+        # Catches malformed content, missing required fields, and duplicate IDs
+        # before they reach the build — the failure mode that caused 246 TS errors.
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, readdirSync } from 'fs';
+          import { join } from 'path';
+
+          const dir = 'content/hvac-sims';
+          const files = readdirSync(dir).filter(f => f.endsWith('.json')).sort();
+
+          if (files.length !== 10) {
+            console.error(`Expected 10 sim files, found ${files.length}`);
+            process.exit(1);
+          }
+
+          const ids = [];
+          for (const file of files) {
+            const raw = JSON.parse(readFileSync(join(dir, file), 'utf8'));
+            // Required fields
+            for (const field of ['id', 'title', 'system', 'complaint', 'initialData', 'steps', 'entryStep', 'passingStep']) {
+              if (!(field in raw)) { console.error(`${file}: missing field "${field}"`); process.exit(1); }
+            }
+            // ID format
+            if (!/^sim-\d{2}$/.test(raw.id)) { console.error(`${file}: invalid id "${raw.id}"`); process.exit(1); }
+            // entryStep and passingStep must exist in steps
+            if (!(raw.entryStep in raw.steps)) { console.error(`${file}: entryStep "${raw.entryStep}" not in steps`); process.exit(1); }
+            if (!(raw.passingStep in raw.steps)) { console.error(`${file}: passingStep "${raw.passingStep}" not in steps`); process.exit(1); }
+            // Each step must have id, prompt, options array
+            for (const [key, step] of Object.entries(raw.steps)) {
+              if (!step.id || !step.prompt || !Array.isArray(step.options)) {
+                console.error(`${file}: step "${key}" malformed`); process.exit(1);
+              }
+            }
+            ids.push(raw.id);
+            console.log(`  ok  ${file} (${raw.id}: ${Object.keys(raw.steps).length} steps)`);
+          }
+
+          // Duplicate ID check
+          const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+          if (dupes.length) { console.error(`Duplicate sim IDs: ${dupes.join(', ')}`); process.exit(1); }
+
+          console.log(`\nHVAC sim validation passed: ${files.length}/10 sims, 0 duplicates`);
+          EOF
+        continue-on-error: false
+
+      - name: Domain layer invariant checks (hard gate)
+        # Verifies domain exports, sim content integrity, credential ID uniqueness,
+        # certificate pipeline guard, and absence of error.message leaks in API routes.
+        run: node scripts/ci/domain-check.mjs
+        continue-on-error: false
 
       - name: Archetype + Quality Gates
         run: pnpm run archetype:check

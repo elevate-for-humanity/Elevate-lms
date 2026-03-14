@@ -1,0 +1,73 @@
+{
+  "id": "sim-05",
+  "title": "High Head Pressure — Outdoor Unit",
+  "system": "R-410A split system, 4-ton",
+  "complaint": "System runs but trips on high-pressure cutout after 20–30 minutes.",
+  "initialData": [
+    "Outdoor temp: 95°F",
+    "High-pressure cutout trips at 650 psig",
+    "Suction pressure: 120 psig (normal for conditions)",
+    "Subcooling: 22°F (target 10–15°F)",
+    "Compressor amperage: 18A (RLA 16A)"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "High head pressure, high subcooling, high amperage. Suction is normal. What is the most likely cause?",
+      "options": [
+        { "label": "Undercharge", "next": "s1-wrong" },
+        { "label": "Overcharge or dirty/restricted condenser", "next": "s2", "correct": true },
+        { "label": "Failed TXV", "next": "s1-wrong" },
+        { "label": "Low indoor airflow", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "Undercharge causes LOW head pressure and LOW subcooling. High head + high subcooling + normal suction = overcharge or condenser problem.",
+      "options": [
+        { "label": "Check for overcharge or condenser restriction", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You inspect the condenser coil. The fins are heavily clogged with cottonwood seeds and debris. What do you do?",
+      "options": [
+        { "label": "Recover refrigerant to reduce the overcharge", "next": "s2-wrong" },
+        { "label": "Clean the condenser coil and recheck pressures", "next": "s3", "correct": true },
+        { "label": "Replace the condenser fan motor", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "The condenser coil is clogged — that is the root cause of high head pressure. Fix the restriction before adjusting refrigerant charge.",
+      "feedback": "Never recover refrigerant to compensate for a dirty condenser. Clean the coil first, then recheck.",
+      "options": [
+        { "label": "Clean the condenser coil", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "After cleaning the coil, head pressure drops to 410 psig and subcooling is 12°F. Amperage is 15.5A. What do you do?",
+      "options": [
+        { "label": "Add refrigerant — subcooling could be higher", "next": "s3-wrong" },
+        { "label": "System is within spec — verify operation and document", "next": "pass", "correct": true },
+        { "label": "Replace the high-pressure cutout switch", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "12°F subcooling is within the 10–15°F target. The system is operating correctly after cleaning. No refrigerant adjustment needed.",
+      "options": [
+        { "label": "Verify operation and document", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Clogged condenser coil restricted airflow, reducing heat rejection and raising head pressure. Cleaning restored normal operation.",
+      "feedback": "Dirty condenser → reduced heat transfer → high head pressure → high subcooling → compressor overload → HPC trip.",
+      "options": []
+    }
+  }
+}

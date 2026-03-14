@@ -1,0 +1,73 @@
+{
+  "id": "sim-06",
+  "title": "Frozen Evaporator Coil",
+  "system": "R-410A split system, 2-ton, fixed orifice",
+  "complaint": "No cooling. Ice visible on the refrigerant lines at the air handler.",
+  "initialData": [
+    "Ice on suction line at air handler",
+    "Supply air barely moving from registers",
+    "Suction pressure: 48 psig (saturation ~28°F)",
+    "Superheat: 4°F",
+    "System has been running for 6+ hours"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "Ice on the coil, very low suction pressure, low superheat, barely any airflow. What is the first action?",
+      "options": [
+        { "label": "Add refrigerant immediately", "next": "s1-wrong" },
+        { "label": "Turn the system to fan-only to thaw the coil, then find the root cause", "next": "s2", "correct": true },
+        { "label": "Replace the metering device", "next": "s1-wrong" },
+        { "label": "Check refrigerant charge with the coil frozen", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "You cannot accurately diagnose a frozen system. The coil must be thawed first. Adding refrigerant to a frozen system is dangerous.",
+      "feedback": "Always thaw a frozen coil before diagnosis. Run fan-only for 30–60 minutes.",
+      "options": [
+        { "label": "Thaw the coil first", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "After 45 minutes on fan-only, the coil is thawed. You check the filter — it is completely blocked. Static pressure is 1.1 in. w.c. What do you do?",
+      "options": [
+        { "label": "Check refrigerant charge", "next": "s2-wrong" },
+        { "label": "Replace the filter and recheck operating pressures", "next": "s3", "correct": true },
+        { "label": "Replace the blower motor", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "A completely blocked filter is the obvious root cause of low airflow. Fix the airflow restriction before checking charge.",
+      "options": [
+        { "label": "Replace the filter and recheck", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "After replacing the filter, static pressure is 0.48 in. w.c. Suction pressure: 118 psig. Superheat: 9°F. Temperature split: 19°F. What do you do?",
+      "options": [
+        { "label": "Add refrigerant — superheat could be higher", "next": "s3-wrong" },
+        { "label": "System is within spec — verify and document, advise customer on filter maintenance", "next": "pass", "correct": true },
+        { "label": "Replace the metering device", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "All parameters are within spec. The root cause was a blocked filter causing low airflow and coil freeze. No refrigerant adjustment needed.",
+      "options": [
+        { "label": "Verify, document, and advise on filter maintenance", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Blocked filter → low airflow → coil temperature below 32°F → freeze. Replacing the filter restored normal operation.",
+      "feedback": "Frozen coil root causes: (1) low airflow — dirty filter, closed registers, failed blower; (2) low refrigerant charge. Always check airflow first.",
+      "options": []
+    }
+  }
+}

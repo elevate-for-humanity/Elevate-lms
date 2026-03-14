@@ -1,0 +1,86 @@
+{
+  "id": "sim-04",
+  "title": "Heat Pump — No Heating in Winter",
+  "system": "R-410A heat pump, 3-ton, O-type wiring",
+  "complaint": "Heat pump runs in winter but blows cold air. Auxiliary heat works.",
+  "initialData": [
+    "Outdoor temp: 28°F",
+    "Thermostat set to heat, 68°F setpoint",
+    "Compressor and outdoor fan running",
+    "Indoor air feels cold from supply registers",
+    "Auxiliary heat strips work when Emergency Heat selected"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "The compressor runs but blows cold air in heat mode. Aux heat works. What is the most likely cause?",
+      "options": [
+        { "label": "Low refrigerant charge", "next": "s1-partial" },
+        { "label": "Reversing valve stuck in cooling position or O-terminal wiring issue", "next": "s2", "correct": true },
+        { "label": "Failed compressor", "next": "s1-wrong" },
+        { "label": "Dirty air filter", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "The compressor is running (audible). A dirty filter would not cause cold air in heat mode. The system is running in cooling mode when it should be heating.",
+      "options": [
+        { "label": "Check the reversing valve and O-terminal", "next": "s2", "correct": true }
+      ]
+    },
+    "s1-partial": {
+      "id": "s1-partial",
+      "prompt": "Low charge is possible but would not cause the system to blow cold air — it would just reduce heating capacity. The system appears to be in cooling mode.",
+      "options": [
+        { "label": "Check the reversing valve and O-terminal", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You check the thermostat O-terminal. In heat mode, O should be de-energized (O-type system). You measure 24V at O in heat mode. What does this mean?",
+      "options": [
+        { "label": "Normal — O is always energized", "next": "s2-wrong" },
+        { "label": "The thermostat is energizing O in heat mode — it should not be", "next": "s3", "correct": true },
+        { "label": "The reversing valve solenoid is failed open", "next": "s2-partial" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "On O-type systems, O is energized in COOLING and de-energized in HEATING. 24V at O in heat mode means the thermostat is commanding cooling.",
+      "options": [
+        { "label": "The thermostat is misconfigured or failed", "next": "s3", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "Possible, but first confirm the thermostat is not sending the wrong signal. 24V at O in heat mode points to the thermostat.",
+      "options": [
+        { "label": "Check thermostat O/B configuration", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "You check the thermostat settings. The O/B reversing valve setting is configured as \"B\" (energize in heating) instead of \"O\" (energize in cooling). What do you do?",
+      "options": [
+        { "label": "Replace the thermostat", "next": "s3-wrong" },
+        { "label": "Change the O/B setting to \"O\" and verify heating operation", "next": "pass", "correct": true },
+        { "label": "Replace the reversing valve", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "The thermostat is misconfigured, not failed. Changing the O/B setting is the correct fix — no parts needed.",
+      "options": [
+        { "label": "Change O/B setting to \"O\" and verify", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. The thermostat O/B setting was configured for a B-type system (Rheem/Ruud) instead of O-type. Correcting the setting restored normal heating.",
+      "feedback": "O-type: reversing valve energized in cooling. B-type: energized in heating. Always verify thermostat configuration matches the equipment.",
+      "options": []
+    }
+  }
+}

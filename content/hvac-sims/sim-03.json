@@ -1,0 +1,80 @@
+{
+  "id": "sim-03",
+  "title": "Gas Furnace — Ignites Then Shuts Off",
+  "system": "Natural gas 80% AFUE furnace",
+  "complaint": "Furnace ignites but shuts off after 3–4 seconds. Repeats 3 times then locks out.",
+  "initialData": [
+    "Thermostat calling for heat",
+    "Inducer starts normally",
+    "Hot surface igniter glows and gas ignites",
+    "Flame visible for 3–4 seconds then gas valve closes",
+    "Control board fault code: 3 flashes = flame sense fault"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "The fault code says flame sense fault. The flame is visible. What is the most likely cause?",
+      "options": [
+        { "label": "Failed gas valve", "next": "s1-wrong" },
+        { "label": "Dirty or failed flame sensor", "next": "s2", "correct": true },
+        { "label": "Cracked heat exchanger", "next": "s1-wrong" },
+        { "label": "Failed igniter", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "The igniter works (flame is visible) and the gas valve opens (flame appears). The board sees a flame sense fault — the sensor is not proving the flame.",
+      "feedback": "Flame sense fault with visible flame = dirty or failed flame sensor. The igniter and gas valve are working.",
+      "options": [
+        { "label": "Check the flame sensor", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You locate the flame sensor — a metal rod in the burner flame path. What do you check first?",
+      "options": [
+        { "label": "Replace it immediately", "next": "s2-partial" },
+        { "label": "Inspect for oxide coating and measure microamp signal", "next": "s3", "correct": true },
+        { "label": "Check gas pressure", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "Gas pressure is not the issue — the flame ignites normally. The sensor is not proving the flame.",
+      "options": [
+        { "label": "Inspect the flame sensor", "next": "s3", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "Replacing without diagnosis is acceptable but costly. The sensor has a white oxide coating — cleaning it may restore function.",
+      "options": [
+        { "label": "Clean with fine steel wool and retest", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "The sensor has a heavy white oxide coating. You clean it with fine steel wool. After reinstalling, the furnace runs through a full cycle. What do you do next?",
+      "options": [
+        { "label": "Verify 2–3 complete heat cycles and document", "next": "pass", "correct": true },
+        { "label": "Replace the control board anyway", "next": "s3-wrong" },
+        { "label": "Leave immediately — it is fixed", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "Always verify the repair through multiple cycles before leaving. Document the fault code, cause, and repair.",
+      "options": [
+        { "label": "Verify 2–3 cycles and document", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Oxide buildup on the flame sensor prevented it from passing sufficient microamp current to prove the flame. Cleaning restored normal operation.",
+      "feedback": "Flame sensor oxide coating is the most common cause of flame sense faults. Clean with fine steel wool — never sandpaper.",
+      "options": []
+    }
+  }
+}

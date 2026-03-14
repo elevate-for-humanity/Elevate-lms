@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LessonManagerClient from './LessonManagerClient';
 import QuizManagerClient from './QuizManagerClient';
+import { mapCourseRow, type RawCourseRow } from '@/lib/domain';
 
 export const metadata: Metadata = {
   title: 'Course Content | Elevate For Humanity',
@@ -25,7 +26,15 @@ export default async function CourseContentPage({ params }: { params: Promise<{ 
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: rawCourse } = await db.from('training_courses').select('*').eq('id', courseId).single();
-  const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name || rawCourse.title } : null;
+  // mapCourseRow resolves title/course_name drift and normalizes status/nulls.
+  // Re-project to the snake_case shape LessonManagerClient expects.
+  const mapped = rawCourse ? mapCourseRow(rawCourse as RawCourseRow) : null;
+  const course = mapped ? {
+    id: mapped.id,
+    title: mapped.title,
+    description: mapped.description || null,
+    duration_hours: mapped.durationHours,
+  } : null;
   const { data: lessons } = await db.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
 
   // Extract quiz data from metadata JSONB (set by AI ingestion pipeline)

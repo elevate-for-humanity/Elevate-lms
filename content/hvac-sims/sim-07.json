@@ -1,0 +1,87 @@
+{
+  "id": "sim-07",
+  "title": "Refrigerant Leak — Low Charge Diagnosis",
+  "system": "R-410A split system, 3-ton, TXV",
+  "complaint": "System runs but cooling is inadequate. Customer says it has been getting worse over the summer.",
+  "initialData": [
+    "Suction pressure: 95 psig (saturation ~42°F)",
+    "Head pressure: 280 psig (saturation ~108°F)",
+    "Superheat: 18°F (target 8–12°F for TXV)",
+    "Subcooling: 4°F (target 10–15°F)",
+    "Compressor amperage: 11A (RLA 14A)"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "Low suction, low head, high superheat, low subcooling, low amperage. What does this indicate?",
+      "options": [
+        { "label": "Overcharge", "next": "s1-wrong" },
+        { "label": "Undercharge — low refrigerant", "next": "s2", "correct": true },
+        { "label": "Dirty condenser", "next": "s1-wrong" },
+        { "label": "Failed TXV", "next": "s1-partial" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "Overcharge causes HIGH head and HIGH subcooling. Dirty condenser causes HIGH head. All pressures are low — this is undercharge.",
+      "options": [
+        { "label": "Diagnose as undercharge", "next": "s2", "correct": true }
+      ]
+    },
+    "s1-partial": {
+      "id": "s1-partial",
+      "prompt": "A failed TXV (stuck closed) would cause very low suction and very high superheat. These readings are consistent with undercharge — the TXV is likely responding correctly to low charge.",
+      "options": [
+        { "label": "Diagnose as undercharge first", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "Before adding refrigerant, what must you do?",
+      "options": [
+        { "label": "Add refrigerant immediately to restore charge", "next": "s2-wrong" },
+        { "label": "Find and repair the leak first", "next": "s3", "correct": true },
+        { "label": "Replace the TXV", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "Adding refrigerant to a leaking system is a violation of EPA Section 608 and wastes refrigerant. Find and fix the leak first.",
+      "feedback": "EPA requires leak repair before recharging systems with 50+ lbs. Even smaller systems should be repaired — not just topped off.",
+      "options": [
+        { "label": "Find and repair the leak", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "You use an electronic leak detector and find a leak at a flare fitting on the liquid line. What do you do?",
+      "options": [
+        { "label": "Tighten the flare fitting and recharge", "next": "s3-partial" },
+        { "label": "Recover refrigerant, repair the flare, pressure test with nitrogen, evacuate, then recharge", "next": "pass", "correct": true },
+        { "label": "Add refrigerant and monitor", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "Adding refrigerant without repairing the leak is an EPA violation. The leak must be repaired first.",
+      "options": [
+        { "label": "Recover, repair, test, evacuate, recharge", "next": "pass", "correct": true }
+      ]
+    },
+    "s3-partial": {
+      "id": "s3-partial",
+      "prompt": "Tightening without recovery risks venting refrigerant. The correct procedure is to recover first, then repair, test, evacuate, and recharge.",
+      "options": [
+        { "label": "Recover, repair, test, evacuate, recharge", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Low charge from a leaking flare fitting. Proper procedure: recover → repair → nitrogen pressure test → evacuate to 500 microns → recharge by subcooling.",
+      "feedback": "Never add refrigerant to a leaking system. Always recover, repair, test, evacuate, and recharge.",
+      "options": []
+    }
+  }
+}

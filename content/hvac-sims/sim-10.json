@@ -1,0 +1,87 @@
+{
+  "id": "sim-10",
+  "title": "Electrical — Contactor and Capacitor Diagnosis",
+  "system": "R-410A split system, 2-ton",
+  "complaint": "Outdoor unit not running. Indoor unit blows unconditioned air.",
+  "initialData": [
+    "Thermostat calling for cooling — Y terminal has 24V",
+    "Indoor blower running normally",
+    "Outdoor unit completely off — no fan, no compressor",
+    "Disconnect is closed",
+    "Breaker is on"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "Outdoor unit completely off, 24V at Y. What do you check first?",
+      "options": [
+        { "label": "Check refrigerant charge", "next": "s1-wrong" },
+        { "label": "Check for 24V at the contactor coil and line voltage at the contactor", "next": "s2", "correct": true },
+        { "label": "Replace the capacitor", "next": "s1-wrong" },
+        { "label": "Replace the thermostat", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "The outdoor unit is completely off — no electrical components are running. Trace the electrical circuit before checking refrigerant or replacing parts.",
+      "options": [
+        { "label": "Check voltage at the contactor", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You measure: 24V at contactor coil terminals ✓, 240V line voltage at contactor line side ✓, 0V at contactor load side. What does this mean?",
+      "options": [
+        { "label": "The thermostat is not calling", "next": "s2-wrong" },
+        { "label": "The contactor coil has 24V but contacts are not closing — failed contactor", "next": "s3", "correct": true },
+        { "label": "The breaker is tripped", "next": "s2-wrong" },
+        { "label": "The capacitor is failed", "next": "s2-partial" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "24V is present at the coil (thermostat is calling). 240V is present at the line side (breaker is on). 0V at load side means the contacts are not closing.",
+      "options": [
+        { "label": "Failed contactor — contacts not closing", "next": "s3", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "A failed capacitor would not prevent the contactor from closing. The contactor has power but is not passing it through — the contacts are failed.",
+      "options": [
+        { "label": "Failed contactor contacts", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "You inspect the contactor — the contacts are severely pitted and burned. Before replacing, what else should you check?",
+      "options": [
+        { "label": "Nothing — just replace the contactor", "next": "s3-partial" },
+        { "label": "Check the capacitor and compressor windings — pitted contacts often indicate a hard-starting compressor", "next": "pass", "correct": true },
+        { "label": "Check refrigerant charge", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "Refrigerant charge is not related to pitted contacts. Pitted contacts are often caused by a hard-starting compressor drawing excessive current.",
+      "options": [
+        { "label": "Check capacitor and compressor windings", "next": "pass", "correct": true }
+      ]
+    },
+    "s3-partial": {
+      "id": "s3-partial",
+      "prompt": "Replacing the contactor alone may work, but pitted contacts often indicate a hard-starting compressor. Check the capacitor and windings to find the root cause.",
+      "options": [
+        { "label": "Check capacitor and compressor windings first", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Failed contactor contacts prevented power from reaching the outdoor unit. Pitted contacts indicate a hard-starting compressor — check the capacitor and consider a hard-start kit.",
+      "feedback": "Pitted contactor contacts are often caused by a weak capacitor or hard-starting compressor drawing excessive inrush current. Fix the root cause, not just the symptom.",
+      "options": []
+    }
+  }
+}

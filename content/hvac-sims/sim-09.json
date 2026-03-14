@@ -1,0 +1,87 @@
+{
+  "id": "sim-09",
+  "title": "EPA 608 — Refrigerant Recovery Scenario",
+  "system": "R-410A rooftop unit, 10-ton, TXV",
+  "complaint": "Compressor failed. Unit must be opened for compressor replacement.",
+  "initialData": [
+    "System charge: approximately 18 lbs R-410A",
+    "System pressure: 120 psig suction, 380 psig discharge",
+    "Recovery machine available: rated for R-410A",
+    "Recovery cylinder: gray body, yellow top, 50 lb capacity, currently empty"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "Before opening the refrigerant circuit, what must you do?",
+      "options": [
+        { "label": "Open the system immediately — the compressor is already failed", "next": "s1-wrong" },
+        { "label": "Recover all refrigerant to the required level", "next": "s2", "correct": true },
+        { "label": "Vent the refrigerant — the system is broken anyway", "next": "s1-vent" },
+        { "label": "Only recover if the system has more than 50 lbs", "next": "s1-wrong" }
+      ]
+    },
+    "s1-vent": {
+      "id": "s1-vent",
+      "prompt": "Intentionally venting refrigerant is a federal violation regardless of system condition. Penalties up to $44,539 per day.",
+      "feedback": "Refrigerant must always be recovered before opening any refrigerant circuit — no exceptions.",
+      "options": [
+        { "label": "Recover the refrigerant properly", "next": "s2", "correct": true }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "All refrigerant must be recovered before opening any refrigerant circuit, regardless of system size or condition.",
+      "options": [
+        { "label": "Recover the refrigerant", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You connect the recovery machine. What is the required recovery level for this system (less than 200 lbs, high-pressure)?",
+      "options": [
+        { "label": "0 psig (atmospheric)", "next": "s2-wrong" },
+        { "label": "10 in. Hg vacuum", "next": "pass-check", "correct": true },
+        { "label": "500 microns", "next": "s2-partial" },
+        { "label": "4 in. Hg vacuum", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "For high-pressure systems with less than 200 lbs: required recovery level is 10 in. Hg vacuum. Systems with 200+ lbs require 4 in. Hg.",
+      "options": [
+        { "label": "10 in. Hg vacuum is correct", "next": "pass-check", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "500 microns is the evacuation standard for dehydration before charging — not the recovery standard. Recovery for this system size requires 10 in. Hg.",
+      "options": [
+        { "label": "10 in. Hg vacuum is the recovery standard", "next": "pass-check", "correct": true }
+      ]
+    },
+    "pass-check": {
+      "id": "pass-check",
+      "prompt": "Recovery is complete at 10 in. Hg. The recovery cylinder now contains approximately 18 lbs. The cylinder capacity is 50 lbs. Is it safe to use?",
+      "options": [
+        { "label": "Yes — 18 lbs is well under 80% of 50 lbs (40 lbs max)", "next": "pass", "correct": true },
+        { "label": "No — the cylinder must be empty before use", "next": "pass-check-wrong" },
+        { "label": "No — recovery cylinders cannot be reused", "next": "pass-check-wrong" }
+      ]
+    },
+    "pass-check-wrong": {
+      "id": "pass-check-wrong",
+      "prompt": "Recovery cylinders can be reused and do not need to be empty — they just cannot exceed 80% of capacity by weight. 18 lbs in a 50 lb cylinder is 36% — well within limits.",
+      "options": [
+        { "label": "18 lbs is within the 80% limit — safe to use", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Recover to 10 in. Hg for high-pressure systems under 200 lbs. Verify cylinder is under 80% capacity. Document the recovery.",
+      "feedback": "Recovery requirements: <200 lbs high-pressure = 10 in. Hg; 200+ lbs = 4 in. Hg; low-pressure = 25 mm Hg absolute.",
+      "options": []
+    }
+  }
+}

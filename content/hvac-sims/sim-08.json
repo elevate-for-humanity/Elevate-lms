@@ -1,0 +1,80 @@
+{
+  "id": "sim-08",
+  "title": "Furnace Short Cycling",
+  "system": "Natural gas 96% AFUE two-stage furnace",
+  "complaint": "Furnace turns on and off every 3–4 minutes. House never reaches setpoint.",
+  "initialData": [
+    "Thermostat calling for heat continuously",
+    "Furnace starts, runs 3–4 minutes, shuts off",
+    "Control board fault code: 4 flashes = high limit open",
+    "Filter was replaced last month",
+    "Supply air temperature: 145°F (limit opens at 150°F)"
+  ],
+  "entryStep": "s1",
+  "passingStep": "pass",
+  "steps": {
+    "s1": {
+      "id": "s1",
+      "prompt": "High limit fault, supply air near the limit temperature, filter is clean. What do you check next?",
+      "options": [
+        { "label": "Replace the high limit switch", "next": "s1-wrong" },
+        { "label": "Check for other airflow restrictions — registers, blower, duct system", "next": "s2", "correct": true },
+        { "label": "Check gas pressure", "next": "s1-wrong" },
+        { "label": "Replace the heat exchanger", "next": "s1-wrong" }
+      ]
+    },
+    "s1-wrong": {
+      "id": "s1-wrong",
+      "prompt": "The high limit is doing its job — the heat exchanger is actually overheating. Replacing the limit without fixing the cause will result in a cracked heat exchanger.",
+      "feedback": "Never replace a high limit without finding why it is tripping. The limit is a symptom, not the cause.",
+      "options": [
+        { "label": "Find the airflow restriction", "next": "s2", "correct": true }
+      ]
+    },
+    "s2": {
+      "id": "s2",
+      "prompt": "You check the supply registers — 4 of 12 are closed. You also measure static pressure: 0.85 in. w.c. (rated 0.5). What do you do?",
+      "options": [
+        { "label": "Open the closed registers and recheck", "next": "s3", "correct": true },
+        { "label": "Increase blower speed to compensate", "next": "s2-partial" },
+        { "label": "Replace the blower motor", "next": "s2-wrong" }
+      ]
+    },
+    "s2-wrong": {
+      "id": "s2-wrong",
+      "prompt": "The blower motor is not the problem — closed registers are restricting airflow. Fix the root cause.",
+      "options": [
+        { "label": "Open the closed registers", "next": "s3", "correct": true }
+      ]
+    },
+    "s2-partial": {
+      "id": "s2-partial",
+      "prompt": "Increasing blower speed may help but does not fix the root cause. Open the registers first.",
+      "options": [
+        { "label": "Open the closed registers and recheck", "next": "s3", "correct": true }
+      ]
+    },
+    "s3": {
+      "id": "s3",
+      "prompt": "After opening all registers, static pressure drops to 0.46 in. w.c. Supply air temperature stabilizes at 128°F. The furnace runs through a full cycle. What do you do?",
+      "options": [
+        { "label": "Replace the high limit switch anyway", "next": "s3-wrong" },
+        { "label": "Verify multiple complete cycles, document, and advise customer not to close registers", "next": "pass", "correct": true },
+        { "label": "Check refrigerant charge", "next": "s3-wrong" }
+      ]
+    },
+    "s3-wrong": {
+      "id": "s3-wrong",
+      "prompt": "The system is operating correctly. The high limit switch is functioning properly — it was protecting the heat exchanger from overheating.",
+      "options": [
+        { "label": "Verify cycles, document, and advise customer", "next": "pass", "correct": true }
+      ]
+    },
+    "pass": {
+      "id": "pass",
+      "prompt": "Correct. Closed supply registers restricted airflow, causing the heat exchanger to overheat and trip the high limit. Opening registers restored normal operation.",
+      "feedback": "Closed registers are a common cause of high limit trips. Educate customers: closing registers does not save energy — it causes equipment damage.",
+      "options": []
+    }
+  }
+}

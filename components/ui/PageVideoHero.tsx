@@ -1,6 +1,7 @@
 'use client';
 
 import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { Volume2, VolumeX } from 'lucide-react';
 
 export type HeroSize = 'primary' | 'program' | 'marketing' | 'support';
 
@@ -21,10 +22,10 @@ interface PageVideoHeroProps {
 }
 
 /**
- * Full-width video hero. No text overlay, no gradient.
- * Autoplays on scroll into view via useHeroVideo. Attempts to unmute
- * immediately after play — succeeds on desktop; shows a "Tap to unmute"
- * button on mobile/Safari where browser policy blocks unmuted autoplay.
+ * Full-width video hero.
+ * Starts muted (required for autoplay on all browsers).
+ * Shows a sound toggle button — clicking unmutes with a user gesture,
+ * which satisfies browser autoplay policy.
  */
 export default function PageVideoHero({
   videoSrc,
@@ -32,7 +33,7 @@ export default function PageVideoHero({
   posterAlt,
   size = 'marketing',
 }: PageVideoHeroProps) {
-  const { videoRef } = useHeroVideo();
+  const { videoRef, muted, unmute } = useHeroVideo();
 
   return (
     <section
@@ -42,6 +43,7 @@ export default function PageVideoHero({
         ref={videoRef}
         loop
         playsInline
+        muted
         preload="metadata"
         poster={posterSrc}
         aria-label={posterAlt}
@@ -49,6 +51,32 @@ export default function PageVideoHero({
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
+
+      {/* Sound toggle — only shown while muted */}
+      {muted && (
+        <button
+          onClick={unmute}
+          aria-label="Unmute video"
+          className="absolute bottom-4 right-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 text-white text-sm font-medium hover:bg-black/70 transition backdrop-blur-sm"
+        >
+          <VolumeX className="w-4 h-4" />
+          <span className="hidden sm:inline">Tap for sound</span>
+        </button>
+      )}
+
+      {/* Confirmation when unmuted */}
+      {!muted && (
+        <button
+          onClick={() => {
+            const el = videoRef.current;
+            if (el) { el.muted = true; }
+          }}
+          aria-label="Mute video"
+          className="absolute bottom-4 right-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full bg-black/50 text-white text-sm font-medium hover:bg-black/70 transition backdrop-blur-sm"
+        >
+          <Volume2 className="w-4 h-4" />
+        </button>
+      )}
     </section>
   );
 }

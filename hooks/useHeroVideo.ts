@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseHeroVideoOptions {
   pauseOffScreen?: boolean;
@@ -9,28 +9,31 @@ interface UseHeroVideoOptions {
 
 interface UseHeroVideoReturn {
   videoRef: React.RefObject<HTMLVideoElement>;
+  muted: boolean;
+  unmute: () => void;
 }
 
 export function useHeroVideo({
   pauseOffScreen = true,
-  threshold = 0.2,
+  threshold = 0.3,
 }: UseHeroVideoOptions = {}): UseHeroVideoReturn {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
 
+    // Always start muted — browsers allow muted autoplay universally.
+    el.muted = true;
+    el.volume = 1; // pre-set so unmute is instant
+
     async function startPlay() {
       if (!el) return;
-      el.muted = false;
-      el.volume = 1;
       try {
         await el.play();
       } catch {
-        // Browser blocked unmuted autoplay — fall back to muted
-        el.muted = true;
-        try { await el.play(); } catch { /* poster shows */ }
+        // Autoplay blocked entirely — poster stays visible
       }
     }
 
@@ -38,9 +41,6 @@ export function useHeroVideo({
       startPlay();
       return;
     }
-
-    const rect = el.getBoundingClientRect();
-    const alreadyInView = rect.top < window.innerHeight && rect.bottom > 0;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -50,14 +50,30 @@ export function useHeroVideo({
           el.pause();
         }
       },
-      { threshold: alreadyInView ? 0 : threshold }
+      { threshold }
     );
 
     observer.observe(el);
-    if (alreadyInView) startPlay();
+
+    // If already in view on mount, play immediately
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      startPlay();
+    }
 
     return () => observer.disconnect();
   }, [pauseOffScreen, threshold]);
 
-  return { videoRef };
+  function unmute() {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = false;
+    setMuted(false);
+    el.play().catch(() => {
+      el.muted = true;
+      setMuted(true);
+    });
+  }
+
+  return { videoRef, muted, unmute };
 }

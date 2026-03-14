@@ -24,7 +24,7 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
   const db = supabase;
     const { data: user, error: userError } = await db
       .from('users')

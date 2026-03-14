@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createPublicClient } from '@/lib/supabase/server';
 // lib/audit.ts
 // Audit logging helper for enterprise compliance
 //
@@ -35,9 +35,9 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   logger.error(context, error as Error, { event });
 
   // Channel 3: Durable DB fallback — separate table with minimal constraints.
-  // Uses a fresh client to avoid reusing the one that just failed.
+  // Uses createPublicClient (sync) to avoid async in this non-async failure handler.
   try {
-    const fallbackClient = createClient();
+    const fallbackClient = createPublicClient();
     // Fire-and-forget: don't await, don't let this throw
     fallbackClient.from('audit_failures').insert({
       context,
@@ -128,7 +128,7 @@ export async function logAuditEvent(event: AuditEvent): Promise<void> {
   };
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { error } = await supabase.from('audit_logs').insert(payload);
 
     if (error) {

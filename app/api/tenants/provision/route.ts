@@ -16,7 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

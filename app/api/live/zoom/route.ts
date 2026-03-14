@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const { courseId, topic, startTime, durationMinutes, instructorZoomId, tenantId } = await request.json();
 

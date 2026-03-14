@@ -20,7 +20,7 @@ export async function selectQuestionsForExamAttempt(
   examId: string,
   adaptive: boolean
 ): Promise<Question[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: exam, error: examError } = await supabase
     .from('exams')
     .select('*, bank:question_banks(*, questions(*))')

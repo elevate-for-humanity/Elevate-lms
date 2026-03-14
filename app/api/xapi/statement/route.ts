@@ -25,7 +25,7 @@ async function _POST(request: NextRequest) {
     const auth = await apiAuthGuard();
     if (auth.error) return auth.error;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const body = await parseBody<Record<string, any>>(request);
 
@@ -81,7 +81,7 @@ async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createClient();
+const supabase = await createClient();
   try {
     const { searchParams } = new URL(request.url);
     const learnerId = searchParams.get('actor');

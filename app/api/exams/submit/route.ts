@@ -15,7 +15,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const db = supabase;
   const session = await requireApiAuth();
   const { attemptId, answers } = await request.json();

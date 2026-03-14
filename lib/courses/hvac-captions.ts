@@ -1,3 +1,4 @@
+/* eslint-disable no-loss-of-precision */
 export interface CaptionSegment { start: number; end: number; text: string; }
 
 /** Whisper-transcribed captions for all HVAC lessons. Maps lesson UUID to segments. */

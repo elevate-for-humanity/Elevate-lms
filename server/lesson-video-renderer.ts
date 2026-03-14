@@ -11,6 +11,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { execSync } from 'child_process';
 import type { LessonSlide } from '../lib/autopilot/lesson-script-generator';
 
 // Lazy-load native deps
@@ -281,7 +282,7 @@ export async function renderLessonVideo(
     ffmpeg.ffprobe(audioPath, (err: any, meta: any) => {
       if (err) {
         // Try system ffprobe as last resort
-        const { execSync } = require('child_process');
+        // execSync imported at top of file
         try {
           const out = execSync(
             `ffprobe -v quiet -print_format json -show_format "${audioPath}"`,

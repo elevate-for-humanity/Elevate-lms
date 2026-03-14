@@ -400,8 +400,6 @@ export const HVAC_TROUBLESHOOTING_SIMS: TroubleshootingSim[] = [
       },
     },
   },
-];
-
   {
     id: 'sim-06',
     title: 'Frozen Evaporator Coil',

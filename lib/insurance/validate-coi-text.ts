@@ -192,10 +192,10 @@ export function validateCoiText(
   // ACORD 25 has "INSURER A:", "INSURER B:", etc. or "INSURANCE COMPANY"
   let insurerName: string | null = null;
   const insurerMatch =
-    raw.match(/insurer\s*[a-f]?\s*[:\-]\s*(.{5,80})/i) ||
-    raw.match(/insurance\s+company\s*[:\-]?\s*(.{5,80})/i) ||
-    raw.match(/carrier\s*[:\-]\s*(.{5,80})/i) ||
-    raw.match(/underwritten\s+by\s*[:\-]?\s*(.{5,80})/i);
+    raw.match(/insurer\s*[a-f]?\s*[:-]\s*(.{5,80})/i) ||
+    raw.match(/insurance\s+company\s*[:-]?\s*(.{5,80})/i) ||
+    raw.match(/carrier\s*[:-]\s*(.{5,80})/i) ||
+    raw.match(/underwritten\s+by\s*[:-]?\s*(.{5,80})/i);
   if (insurerMatch?.[1]) {
     insurerName = insurerMatch[1].replace(/\s+/g, " ").trim().slice(0, 80);
   }
@@ -206,7 +206,7 @@ export function validateCoiText(
     /policy\s*(number|no|#|num)/i.test(raw) ||
     /pol\s*#/i.test(raw) ||
     // Common policy number patterns: letters + digits, 6+ chars
-    /[A-Z]{2,4}[\s\-]?\d{5,}/i.test(raw);
+    /[A-Z]{2,4}[\s-]?\d{5,}/i.test(raw);
 
   if (!insurerName) {
     missing.push("Insurance carrier/company name not detected — document may be incomplete");
@@ -239,7 +239,7 @@ export function validateCoiText(
       namedInsured = lines[1].slice(0, 100);
     } else if (lines.length === 1) {
       // Header and value on same line
-      const afterColon = lines[0].replace(/^.*?insured\s*[:\-]?\s*/i, "").trim();
+      const afterColon = lines[0].replace(/^.*?insured\s*[:-]?\s*/i, "").trim();
       if (afterColon.length > 2) {
         namedInsured = afterColon.slice(0, 100);
       }
@@ -372,11 +372,11 @@ export function validateCoiText(
     if (wcSection) {
       const wcNorm = normalize(wcSection);
       // Reject "N/A", "not applicable", "none", "excluded" WC sections
-      const isExcluded = /\bn\/?a\b|not applicable|none|excluded|waived/.test(wcNorm);
+      const isExcluded = /\bn/?a\b|not applicable|none|excluded|waived/.test(wcNorm);
       if (!isExcluded) {
         // Must have at least a policy number pattern and a date
-        const hasWcPolicyNum = /[A-Z]{1,4}[\s\-]?\d{4,}/i.test(wcSection);
-        const hasWcDate = /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(wcSection);
+        const hasWcPolicyNum = /[A-Z]{1,4}[\s-]?\d{4,}/i.test(wcSection);
+        const hasWcDate = /\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/.test(wcSection);
         workersCompVerified = hasWcPolicyNum && hasWcDate;
       }
     }
@@ -444,15 +444,15 @@ export function validateCoiText(
 
   const effStr =
     findFirst(
-      /effective(?:\s+date)?\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /effective(?:\s+date)?\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     ) ||
     findFirst(
-      /policy\s+effective\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /policy\s+effective\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     ) ||
     findFirst(
-      /inception\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /inception\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     );
 
@@ -460,15 +460,15 @@ export function validateCoiText(
 
   const expStr =
     findFirst(
-      /expiration(?:\s+date)?\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /expiration(?:\s+date)?\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     ) ||
     findFirst(
-      /policy\s+expiration\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /policy\s+expiration\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     ) ||
     findFirst(
-      /expires?\s*[:\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      /expires?\s*[:-]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       raw
     );
 

@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -15,7 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const auth = request.headers.get('x-internal-token');
   if (auth !== process.env.INTERNAL_CRON_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

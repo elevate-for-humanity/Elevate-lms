@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
@@ -6,7 +7,7 @@ import { ProvisioningJob } from '../queue';
  * STEP 6A: License suspend/reactivate job handler
  */
 export async function processLicenseSuspend(job: ProvisioningJob): Promise<void> {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { licenseId, reason, action } = job.payload as {
     licenseId: string;
     reason: string;

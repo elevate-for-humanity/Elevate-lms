@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -5,27 +6,12 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-async function getSupabaseServerClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-}
+
 
 const toDateString = (value: any) => {
   if (value instanceof Date) return value.toLocaleDateString();
@@ -46,7 +32,7 @@ const _GET = withAuth(
     const since = new Date();
     since.setDate(since.getDate() - (isNaN(days) ? 7 : days));
 
-    const supabase = await getSupabaseServerClient();
+    const supabase = await createClient();
   const db = supabase;
 
     const { data, error }: any = await db

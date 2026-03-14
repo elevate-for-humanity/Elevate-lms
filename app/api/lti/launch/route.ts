@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const formData = await request.formData();
   const idToken = String(formData.get('id_token') || '');
   const state = String(formData.get('state') || '');

@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 // lib/assessments/selectQuestions.ts
 import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 
@@ -19,7 +20,7 @@ export async function selectQuestionsForExamAttempt(
   examId: string,
   adaptive: boolean
 ): Promise<Question[]> {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { data: exam, error: examError } = await supabase
     .from('exams')
     .select('*, bank:question_banks(*, questions(*))')

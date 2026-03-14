@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -25,7 +26,7 @@ async function _GET(request: Request) {
   }
   
   try {
-    const supabase = createSupabaseClient();
+    const supabase = createClient();
     
     // Call the batch expiry function
     const { data, error } = await supabase.rpc('expire_all_overdue_licenses');

@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -15,7 +16,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

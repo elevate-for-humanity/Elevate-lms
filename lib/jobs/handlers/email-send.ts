@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 import { createAdminClient as createSupabaseClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
@@ -29,7 +30,7 @@ interface EmailPayload {
 }
 
 export async function processEmailSend(job: ProvisioningJob): Promise<void> {
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const payload = job.payload as EmailPayload;
   
   if (!payload.to || !payload.emailType) {

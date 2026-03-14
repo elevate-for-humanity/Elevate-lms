@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
@@ -17,7 +18,7 @@ async function _GET(
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+const supabase = createClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
 
@@ -52,7 +53,7 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
+  const supabase = createClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
   const { data } = await request.json();

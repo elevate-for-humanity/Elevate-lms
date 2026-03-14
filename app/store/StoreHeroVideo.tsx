@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
 

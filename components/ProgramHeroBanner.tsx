@@ -15,7 +15,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
   const [videoFailed, setVideoFailed] = useState(false);
   const playedRef = useRef(false);
 
-  // Play voiceover on scroll-into-view, unmuting on first gesture (mobile safe)
   useEffect(() => {
     if (!voiceoverSrc || !audioRef.current) return;
     const audio = audioRef.current;
@@ -27,25 +26,23 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
           audio.volume = 1;
           audio.muted = false;
           audio.play().catch(() => {
-            // Mobile blocked — unmute on first gesture
+            // Muted fallback, unmute on next scroll
             audio.muted = true;
             audio.play().catch(() => {});
             const unmute = () => {
               audio.muted = false;
-              ['click', 'scroll', 'touchstart', 'keydown'].forEach(e =>
-                window.removeEventListener(e, unmute, true)
-              );
+              window.removeEventListener('scroll', unmute, true);
+              window.removeEventListener('touchmove', unmute, true);
             };
-            ['click', 'scroll', 'touchstart', 'keydown'].forEach(e =>
-              window.addEventListener(e, unmute, { once: true, capture: true, passive: true } as EventListenerOptions)
-            );
+            window.addEventListener('scroll', unmute, { capture: true, passive: true });
+            window.addEventListener('touchmove', unmute, { capture: true, passive: true });
           });
         }
       },
       { threshold: 0.3 }
     );
 
-    if (audioRef.current) observer.observe(audioRef.current);
+    observer.observe(audio);
     return () => observer.disconnect();
   }, [voiceoverSrc]);
 

@@ -88,7 +88,7 @@ const supabase = await createClient();
 
   // Enrich with user names
   const userIds = [...new Set(rows.map((r: any) => r.user_id).filter(Boolean))];
-  let profileMap: Record<string, string> = {};
+  const profileMap: Record<string, string> = {};
   if (userIds.length > 0) {
     const { data: profiles } = await db
       .from('profiles')

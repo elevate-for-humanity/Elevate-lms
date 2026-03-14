@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
 
     // Enrich with profile data
     const userIds = [...new Set((rawHours || []).map((h: any) => h.user_id).filter(Boolean))];
-    let profileMap: Record<string, any> = {};
+    const profileMap: Record<string, any> = {};
     if (userIds.length > 0) {
       const { data: profiles } = await db
         .from('profiles')

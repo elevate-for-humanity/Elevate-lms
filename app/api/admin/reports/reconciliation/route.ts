@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     // 2) Collect user_ids to batch-fetch certificates
     const userIds = [...new Set((enrollments || []).map((e: any) => e.user_id).filter(Boolean))];
 
-    let certMap = new Map<string, any[]>();
+    const certMap = new Map<string, any[]>();
     if (userIds.length > 0) {
       let certQuery = db
         .from('certificates')
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
       .map((e: any) => e.payment_id)
       .filter(Boolean);
 
-    let refundedPayments = new Set<string>();
+    const refundedPayments = new Set<string>();
     if (paymentIds.length > 0) {
       const { data: refundEvents } = await db
         .from('webhook_events_processed')

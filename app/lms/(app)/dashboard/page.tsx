@@ -41,7 +41,7 @@ import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
 import { StreakTracker } from '@/components/gamification/StreakTracker';
 import { ApprenticeProgressWidget } from '@/components/apprenticeship/ApprenticeProgressWidget';
 import { MiladyAccessCard } from '@/components/apprenticeship/MiladyAccessCard';
-import { TutorialSystem } from '@/components/TutorialSystem';
+import { TutorialLibrary } from '@/components/TutorialSystem';
 import PeerTutoringMarketplace from '@/components/PeerTutoringMarketplace';
 import { NotificationBell } from '@/components/lms/NotificationBell';
 import { GlobalSearch } from '@/components/lms/GlobalSearch';
@@ -650,7 +650,7 @@ export default async function StudentDashboardOrchestrated() {
 
             {/* Tutorial System */}
             <div className="mt-6">
-              <TutorialSystem userId={user.id} userRole="student" />
+              <TutorialLibrary userId={user.id} userRole="student" />
             </div>
 
             {/* Peer Tutoring */}

@@ -31,11 +31,14 @@ export function TutorialSystem({
   const isLastStep = currentStepIndex === (tutorial?.steps?.length ?? 1) - 1;
   const isFirstStep = currentStepIndex === 0;
 
+  const tutorialId = tutorial?.id;
+
   // Load progress on mount
   useEffect(() => {
+    if (!userId || !tutorialId) return;
     async function loadProgress() {
       try {
-        const response = await fetch(`/api/tutorials?action=progress&tutorialId=${tutorial.id}`);
+        const response = await fetch(`/api/tutorials?action=progress&tutorialId=${tutorialId}`);
         if (response.ok) {
           const data = await response.json();
           if (data.progress) {
@@ -43,29 +46,25 @@ export function TutorialSystem({
             setCompletedSteps(data.progress.completedSteps);
           }
         }
-      } catch (error) { /* Error handled silently */ 
-        // Error: $1
-      }
+      } catch (error) { /* silent */ }
     }
     loadProgress();
-  }, [userId, tutorial.id]);
+  }, [userId, tutorialId]);
 
   const handleNext = async () => {
-    // Mark current step as completed via API
+    if (!tutorialId || !currentStep) return;
     try {
       await fetch('/api/tutorials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'update-progress',
-          tutorialId: tutorial.id,
+          tutorialId,
           stepId: currentStep.id,
           stepIndex: currentStepIndex,
         }),
       });
-    } catch (error) { /* Error handled silently */ 
-      // Error: $1
-    }
+    } catch { /* silent */ }
 
     setCompletedSteps([...completedSteps, currentStep.id]);
 
@@ -74,14 +73,9 @@ export function TutorialSystem({
         await fetch('/api/tutorials', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'complete',
-            tutorialId: tutorial.id,
-          }),
+          body: JSON.stringify({ action: 'complete', tutorialId }),
         });
-      } catch (error) { /* Error handled silently */ 
-        // Error: $1
-      }
+      } catch { /* silent */ }
       setIsVisible(false);
       onComplete?.();
     } else {

@@ -194,8 +194,8 @@ export default function CatalogFilters({ programs, sectors }: Props) {
   const bySector = useMemo(() => {
     return sectors
       .map((s) => ({ sector: s, items: filtered.filter((p) => p.sector === s.key) }))
-      .filter((g) => g.items.length > 0 || (!activeSector && !query && !activeMode && !activeFunding));
-  }, [filtered, sectors, activeSector, query, activeMode, activeFunding]);
+      .filter((g) => g.items.length > 0);
+  }, [filtered, sectors]);
 
   const hasFilters = query || activeSector || activeMode || activeFunding;
 
@@ -313,12 +313,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           {bySector.map(({ sector, items }) => (
             <div key={sector.key}>
               <div className="mb-5">
-                <h2 className="text-xl font-bold text-slate-900">
-                  {sector.label}
-                  <span className="ml-2 text-sm font-normal text-slate-500">
-                    ({items.length} {items.length === 1 ? 'program' : 'programs'})
-                  </span>
-                </h2>
+                <h2 className="text-xl font-bold text-slate-900">{sector.label}</h2>
                 <p className="text-sm text-slate-500 mt-0.5">{sector.description}</p>
               </div>
               {items.length === 0 ? (

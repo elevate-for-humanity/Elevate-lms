@@ -41,10 +41,11 @@ export default function PageVideoHero({
     >
       <video
         ref={videoRef}
+        autoPlay
         loop
         playsInline
         muted
-        preload="metadata"
+        preload="auto"
         poster={posterSrc}
         aria-label={posterAlt}
         className="absolute inset-0 w-full h-full object-cover"

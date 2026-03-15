@@ -119,7 +119,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                image: '/images/programs-hq/training-classroom.jpg',
+                image: '/images/pages/training-classroom.jpg',
                 alt: 'Students in workforce training classroom',
                 label: 'Training Institute',
                 heading: 'Short-term programs, real credentials',
@@ -129,7 +129,7 @@ export default function HomePage() {
                 accent: 'brand-red',
               },
               {
-                image: '/images/heroes-hq/career-services-hero.jpg',
+                image: '/images/pages/career-services-hero.jpg',
                 alt: 'Credential pathway and certification tracking',
                 label: 'Credential Pathways',
                 heading: 'Exam prep to verified certification',
@@ -139,7 +139,7 @@ export default function HomePage() {
                 accent: 'brand-blue',
               },
               {
-                image: '/images/heroes-hq/employer-hero.jpg',
+                image: '/images/pages/employer-hero.jpg',
                 alt: 'Employers and workforce agencies collaborating',
                 label: 'Workforce Network',
                 heading: 'Employers, agencies, and partners',

@@ -1,106 +1,72 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
+import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function HomeHeroVideo() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [voiceActive, setVoiceActive] = useState(false);
-  const hasPlayedRef = useRef(false);
+  const [dismissed, setDismissed] = useState(false);
 
-  // Autoplay silent video
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const play = async () => {
-      try { await video.play(); setIsPlaying(true); } catch { /* poster visible */ }
-    };
-    if (video.readyState >= 2) play();
-    else video.addEventListener('loadeddata', play, { once: true });
-    return () => video.removeEventListener('loadeddata', play);
-  }, []);
-
-  const playVoiceover = useCallback(() => {
-    const audio = voiceoverRef.current;
-    if (!audio || hasPlayedRef.current) return;
-    hasPlayedRef.current = true;
-    audio.currentTime = 0;
-    audio.play()
-      .then(() => setVoiceActive(true))
-      .catch(() => {
-        // Browser blocked — reset so manual tap still works
-        hasPlayedRef.current = false;
-      });
-  }, []);
-
-  // Trigger voiceover when user scrolls past the hero
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting && !hasPlayedRef.current) {
-          playVoiceover();
-        }
-      },
-      { threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [playVoiceover]);
-
-  const toggleVoiceover = () => {
-    const audio = voiceoverRef.current;
+  const playAudio = useCallback(() => {
+    const audio = audioRef.current;
     if (!audio) return;
-    if (!voiceActive) {
-      audio.currentTime = 0;
-      audio.play().then(() => {
-        setVoiceActive(true);
-        hasPlayedRef.current = true;
-      }).catch(() => {});
-    } else {
-      audio.pause();
-      setVoiceActive(false);
-    }
+    audio.currentTime = 0;
+    audio.muted = false;
+    audio.play()
+      .then(() => { setVoiceActive(true); setDismissed(true); })
+      .catch(() => {});
+  }, []);
+
+  const toggleAudio = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!voiceActive) { playAudio(); }
+    else { audio.pause(); setVoiceActive(false); }
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
-      <Image src="/images/pages/home-hero-video.jpg" alt="Elevate for Humanity career training" fill priority sizes="100vw" className="object-cover z-0" />
+    <div className="relative w-full h-full overflow-hidden">
+      <Image
+        src="/images/pages/home-hero-video.jpg"
+        alt="Elevate for Humanity career training"
+        fill priority sizes="100vw"
+        className="object-cover object-center"
+      />
       <video
         ref={videoRef}
-        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 hidden md:block ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
-        loop muted playsInline autoPlay preload="metadata"
+        loop playsInline preload="auto" autoPlay muted
+        poster="/images/pages/home-hero-video.jpg"
+        className="absolute inset-0 w-full h-full object-cover object-center hidden md:block"
       >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
 
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
+      <audio ref={audioRef} src="/audio/welcome-voiceover.mp3" preload="auto" aria-hidden="true"
+        onEnded={() => setVoiceActive(false)} />
 
-      {isPlaying && (
+      {/* Big centered button — impossible to miss */}
+      {!dismissed && (
         <button
-          onClick={toggleVoiceover}
-          className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${
-            voiceActive
-              ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
-              : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
-          }`}
-          aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+          onClick={toggleAudio}
+          aria-label="Play welcome narration"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2 bg-black/70 hover:bg-black/90 text-white rounded-2xl px-8 py-5 shadow-2xl border-2 border-white/30 transition-all"
         >
-          {voiceActive ? (
-            <>
-              <span className="text-lg leading-none" aria-hidden="true">&#x1F50A;</span>
-              <span className="text-sm font-semibold hidden sm:inline">Narration On</span>
-            </>
-          ) : (
-            <>
-              <span className="text-lg leading-none" aria-hidden="true">&#x1F507;</span>
-              <span className="text-sm font-bold">Tap for Narration</span>
-            </>
-          )}
+          <span className="text-4xl">🔊</span>
+          <span className="text-base font-bold tracking-wide">Tap to hear welcome</span>
+          <span className="text-xs text-white/60">Tap anywhere else to dismiss</span>
+        </button>
+      )}
+
+      {dismissed && (
+        <button
+          onClick={toggleAudio}
+          aria-label={voiceActive ? 'Stop' : 'Replay welcome'}
+          className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white bg-black/60 hover:bg-black/80 shadow-lg min-h-[44px]"
+        >
+          {voiceActive ? '🔊 Playing' : '▶ Replay'}
         </button>
       )}
     </div>

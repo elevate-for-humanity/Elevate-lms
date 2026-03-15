@@ -138,12 +138,15 @@ export default async function ApplicationsPage({
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">All Applications</h1>
-          <Link
-            href="/admin/dashboard"
-            className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            Back to Dashboard
-          </Link>
+          <div className="flex gap-3">
+            <FollowUpBlastButton pendingCount={(statusCounts['pending'] || 0) + (statusCounts['submitted'] || 0) + (statusCounts['in_review'] || 0)} />
+            <Link
+              href="/admin/dashboard"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}

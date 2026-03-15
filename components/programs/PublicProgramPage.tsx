@@ -201,7 +201,14 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
   return (
     <>
       {/* Video Hero Banner */}
-      <ProgramHeroBanner videoSrc={config.videoSrc} voiceoverSrc={config.voiceoverSrc} />
+      <ProgramHeroBanner
+        videoSrc={config.videoSrc}
+        voiceoverSrc={config.voiceoverSrc}
+        posterImage={config.posterImage}
+        title={config.heroTitle || config.title}
+        subtitle={config.heroSubtitle}
+        badge={config.badge}
+      />
 
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">

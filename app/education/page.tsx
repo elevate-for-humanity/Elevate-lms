@@ -123,6 +123,8 @@ export default function EducationLandingPage() {
           posterSrc="/images/pages/education-hero.jpg"
           posterAlt="Career training programs at Elevate for Humanity"
           size="marketing"
+          title="Career Training That Works"
+          subtitle="Short-term programs in healthcare, trades, technology, and business. Funding available for eligible Indiana residents."
         />
         <div className="bg-white py-10 md:py-14 px-6">
           <div className="max-w-5xl mx-auto text-center">

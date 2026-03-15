@@ -44,6 +44,8 @@ export default function EmployersPage() {
         posterSrc="/images/pages/employers-page-1.jpg"
         posterAlt="Employers — Elevate for Humanity"
         size="marketing"
+        title="Hire Trained, Certified Graduates"
+        subtitle="Access our talent pipeline. Candidates arrive job-ready with industry certifications and hands-on training."
       />
       {/* Breadcrumbs */}
       <div className="bg-white border-b">

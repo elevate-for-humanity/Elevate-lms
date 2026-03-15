@@ -44,6 +44,9 @@ export default function ProgramCatalogPage() {
         audioSrc="/audio/heroes/programs.mp3"
         posterAlt="Workforce training programs — trades, healthcare, technology"
         size="primary"
+        title="Workforce Training Programs"
+        subtitle="Healthcare, skilled trades, CDL, barbering, and technology. Most programs funded for eligible Indiana residents."
+        badge="WIOA Approved"
       />
 
       {/* Page header */}

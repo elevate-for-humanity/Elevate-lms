@@ -32,6 +32,9 @@ export default function CareerServicesPage() {
         audioSrc="/audio/heroes/career-services.mp3"
         posterAlt="Career services — job placement and coaching"
         size="marketing"
+        title="Career Services"
+        subtitle="Resume building, interview prep, job fairs, and direct employer connections. We help you get hired after training."
+        badge="Free for Graduates"
       />
 
       {/* What We Offer — stacked on mobile */}

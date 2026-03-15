@@ -167,7 +167,14 @@ export default function ProgramPageLayout({
 
       {/* ===== HERO — video or static image ===== */}
       {c.videoSrc ? (
-        <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} posterImage={c.heroImage || c.overviewImage} />
+        <ProgramHeroBanner
+          videoSrc={c.videoSrc}
+          voiceoverSrc={c.voiceoverSrc}
+          posterImage={c.heroImage || c.overviewImage}
+          title={c.title}
+          subtitle={c.subtitle}
+          badge={c.badge}
+        />
       ) : c.heroImage ? (
         <div className="relative w-full aspect-[21/9]">
           <Image

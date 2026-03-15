@@ -112,51 +112,68 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <ScrollReveal>
             <div className="text-center mb-12">
-              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">How Elevate Works</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Three integrated layers. One workforce system.</h2>
-              <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Elevate is not just a training school. It operates a workforce development system that connects training, credentials, and employment through a single coordinated platform.
-              </p>
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">What We Do</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Training. Credentials. Network.</h2>
             </div>
           </ScrollReveal>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                number: '01',
+                image: '/images/programs-hq/training-classroom.jpg',
+                alt: 'Students in workforce training classroom',
                 label: 'Training Institute',
-                color: 'brand-red',
-                heading: 'Short-term career training',
-                body: 'Elevate operates workforce training programs in healthcare, skilled trades, CDL, barbering, and technology. Programs run 4–16 weeks. Most are funded at no cost for eligible participants through WIOA, Workforce Ready Grant, JRI, and Job Ready Indy.',
+                heading: 'Short-term programs, real credentials',
+                body: 'Healthcare, skilled trades, CDL, barbering, and technology — 4 to 16 weeks, most fully funded.',
                 link: '/programs',
-                linkText: 'See all programs →',
+                linkText: 'See programs',
+                accent: 'brand-red',
               },
               {
-                number: '02',
-                label: 'Credential Infrastructure',
-                color: 'brand-blue',
-                heading: 'Credential pathways & verification',
-                body: 'The platform manages exam preparation, progress tracking, and credential verification records. Industry certifications are issued by their respective national authorities — EPA, PTCB, CompTIA, NCCER, and others. Elevate manages the learning pipeline and testing coordination.',
+                image: '/images/heroes-hq/career-services-hero.jpg',
+                alt: 'Credential pathway and certification tracking',
+                label: 'Credential Pathways',
+                heading: 'Exam prep to verified certification',
+                body: 'Elevate tracks eligibility and coordinates testing. Credentials are issued by EPA, PTCB, CompTIA, and NCCER.',
                 link: '/credentials',
-                linkText: 'View credentials →',
+                linkText: 'View credentials',
+                accent: 'brand-blue',
               },
               {
-                number: '03',
+                image: '/images/heroes-hq/employer-hero.jpg',
+                alt: 'Employers and workforce agencies collaborating',
                 label: 'Workforce Network',
-                color: 'brand-green',
-                heading: 'Employers, agencies & partners',
-                body: 'The Elevate Hub connects training providers, credential authorities, employers, and workforce agencies through a shared system. Employers post hiring needs. Agencies track outcomes. Partners run cohorts. Everyone operates from the same platform.',
+                heading: 'Employers, agencies, and partners',
+                body: 'One platform connects training providers, workforce agencies, and hiring employers for outcome tracking and placement.',
                 link: '/platform',
-                linkText: 'Platform overview →',
+                linkText: 'Explore the network',
+                accent: 'brand-green',
               },
-            ].map((layer) => (
-              <ScrollReveal key={layer.number}>
-                <div className={`rounded-2xl border-2 bg-white ${layer.color === 'brand-red' ? 'border-brand-red-200' : layer.color === 'brand-blue' ? 'border-brand-blue-200' : 'border-brand-green-200'} p-6 h-full flex flex-col`}>
-                  <div className={`text-4xl font-black mb-3 ${layer.color === 'brand-red' ? 'text-brand-red-200' : layer.color === 'brand-blue' ? 'text-brand-blue-200' : 'text-brand-green-200'}`}>{layer.number}</div>
-                  <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${layer.color === 'brand-red' ? 'text-brand-red-600' : layer.color === 'brand-blue' ? 'text-brand-blue-600' : 'text-brand-green-600'}`}>{layer.label}</p>
-                  <h3 className="text-lg font-bold text-slate-900 mb-3">{layer.heading}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{layer.body}</p>
-                  <Link href={layer.link} className={`mt-4 text-sm font-semibold ${layer.color === 'brand-red' ? 'text-brand-red-600 hover:text-brand-red-700' : layer.color === 'brand-blue' ? 'text-brand-blue-600 hover:text-brand-blue-700' : 'text-brand-green-600 hover:text-brand-green-700'}`}>{layer.linkText}</Link>
-                </div>
+            ].map((tile) => (
+              <ScrollReveal key={tile.label}>
+                <Link href={tile.link} className="group block rounded-2xl overflow-hidden border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-white h-full">
+                  {/* Image */}
+                  <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                    <Image
+                      src={tile.image}
+                      alt={tile.alt}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <span className={`absolute bottom-3 left-3 text-xs font-bold uppercase tracking-widest px-2 py-1 rounded ${tile.accent === 'brand-red' ? 'bg-brand-red-600 text-white' : tile.accent === 'brand-blue' ? 'bg-brand-blue-600 text-white' : 'bg-brand-green-600 text-white'}`}>
+                      {tile.label}
+                    </span>
+                  </div>
+                  {/* Text */}
+                  <div className="p-5">
+                    <h3 className="text-base font-bold text-slate-900 mb-1">{tile.heading}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">{tile.body}</p>
+                    <span className={`text-sm font-semibold ${tile.accent === 'brand-red' ? 'text-brand-red-600' : tile.accent === 'brand-blue' ? 'text-brand-blue-600' : 'text-brand-green-600'}`}>
+                      {tile.linkText} →
+                    </span>
+                  </div>
+                </Link>
               </ScrollReveal>
             ))}
           </div>

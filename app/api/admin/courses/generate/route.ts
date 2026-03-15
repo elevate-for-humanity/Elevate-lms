@@ -34,6 +34,12 @@ export interface GeneratedLesson {
   duration_minutes: number;
   is_required: boolean;
   quiz_questions: GeneratedQuizQuestion[];
+  /** 1–3 sentence learner-facing summary for preview and audit scoring */
+  summary_text?: string;
+  /** Open-ended reflection question at end of lesson */
+  reflection_prompt?: string;
+  /** Competency keys this lesson covers. Max 3. */
+  competency_keys?: string[];
 }
 
 export interface GeneratedModule {
@@ -79,6 +85,9 @@ Return ONLY valid JSON — no markdown, no explanation:
           "description": "string — one sentence",
           "objectives": ["string"],
           "content": "string — 200-500 words of real instructional content",
+          "summary_text": "string — 1-3 sentences: what the learner will be able to do after this lesson",
+          "reflection_prompt": "string — one open-ended question for learner reflection",
+          "competency_keys": ["string — 1-3 kebab-case keys naming the specific competency taught, e.g. peer-support-boundaries"],
           "content_type": "video|reading|quiz|assignment",
           "duration_minutes": number,
           "is_required": true,

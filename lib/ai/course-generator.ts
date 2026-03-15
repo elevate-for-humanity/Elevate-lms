@@ -29,8 +29,15 @@ export interface GeneratedLesson {
   title: string;
   description: string;        // 1–2 sentence summary
   content: string;            // Full lesson body (markdown)
+  /** 1–3 sentence learner-facing summary for preview and audit scoring */
+  summary_text: string;
   key_takeaways: string[];
   reflection_prompt: string;
+  /**
+   * Competency keys this lesson covers. Must match keys in competency_exam_profiles.
+   * Max 3 — more than 3 triggers stuffing penalty in the validator.
+   */
+  competency_keys: string[];
   quiz_questions: GeneratedQuizQuestion[];
   duration_minutes: number;
 }
@@ -115,8 +122,10 @@ Return a single JSON object with this exact structure:
       "title": "string",
       "description": "string (1–2 sentence summary)",
       "content": "string (200–400 words of practical instruction)",
+      "summary_text": "string (1–3 sentences — what the learner will be able to do after this lesson)",
       "key_takeaways": ["string", ...],
-      "reflection_prompt": "string",
+      "reflection_prompt": "string (one open-ended question for learner reflection)",
+      "competency_keys": ["string", ...],
       "duration_minutes": number,
       "quiz_questions": [
         {
@@ -132,7 +141,10 @@ Return a single JSON object with this exact structure:
 
 Generate exactly ${lessonCount} lessons.
 ${!includeQuiz ? 'Set quiz_questions to [] for all lessons.' : 'Include 2–3 quiz questions per lesson.'}
-${!includeReflection ? 'Set reflection_prompt to "" for all lessons.' : ''}`;
+${!includeReflection ? 'Set reflection_prompt to "" for all lessons.' : ''}
+
+For competency_keys: assign 1–3 short kebab-case keys per lesson that name the specific competency the lesson teaches (e.g. "peer-support-boundaries", "motivational-interviewing", "trauma-informed-care"). These must be specific to the lesson content, not generic labels.
+For summary_text: write 1–3 sentences describing what the learner will be able to do after completing this lesson.`;
 }
 
 // ─── JSON repair ───────────────────────────────────────────────────────────────
@@ -177,10 +189,14 @@ function validateCourse(data: unknown): GeneratedCourse {
         title: String(lesson.title || `Lesson ${i + 1}`).trim(),
         description: String(lesson.description || '').trim(),
         content: String(lesson.content || '').trim(),
+        summary_text: String(lesson.summary_text || lesson.description || '').trim(),
         key_takeaways: Array.isArray(lesson.key_takeaways)
           ? (lesson.key_takeaways as unknown[]).map(String)
           : [],
         reflection_prompt: String(lesson.reflection_prompt || '').trim(),
+        competency_keys: Array.isArray(lesson.competency_keys)
+          ? (lesson.competency_keys as unknown[]).map(String).slice(0, 3)
+          : [],
         duration_minutes: typeof lesson.duration_minutes === 'number' ? lesson.duration_minutes : 30,
         quiz_questions: Array.isArray(lesson.quiz_questions)
           ? (lesson.quiz_questions as unknown[]).map((q: unknown) => {

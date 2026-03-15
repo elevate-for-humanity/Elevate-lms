@@ -47,6 +47,15 @@ const CompiledLessonSchema = z.object({
   lesson_objectives: z.array(z.string().min(1)).min(1),
   estimated_minutes: z.number().int().min(1),
   narration_script: z.string().min(1),
+  /** 1–3 sentence learner-facing summary for preview and audit scoring */
+  summary_text: z.string().default(''),
+  /** Open-ended reflection question at end of lesson */
+  reflection_prompt: z.string().default(''),
+  /**
+   * Competency keys this lesson covers. Max 3 — more than 3 triggers stuffing penalty.
+   * Must match keys in competency_exam_profiles.
+   */
+  competency_keys: z.array(z.string().min(1)).max(3).default([]),
   slide_outline: z.array(SlideSectionSchema).min(1),
   practice_exercise: z.object({
     title: z.string().min(1),
@@ -301,18 +310,23 @@ async function publishCompiledDraft(
         const keyTerms: Array<{ term: string; definition: string }> = [];
 
         curriculumRows.push({
-          program_id:      draft.program_id,
-          course_id:       courseId,
-          lesson_slug:     lessonSlug,
-          lesson_title:    lesson.lesson_title,
-          lesson_order:    clLessonNumber - 1,
-          module_order:    mod.module_order - 1,
-          module_title:    mod.module_title,
+          program_id:       draft.program_id,
+          course_id:        courseId,
+          lesson_slug:      lessonSlug,
+          lesson_title:     lesson.lesson_title,
+          lesson_order:     clLessonNumber - 1,
+          module_order:     mod.module_order - 1,
+          module_title:     mod.module_title,
           // script_text is the canonical content field for curriculum_lessons
-          script_text:     lesson.narration_script,
-          key_terms:       keyTerms,
+          script_text:      lesson.narration_script,
+          // summary_text and reflection_prompt are used by the audit and learner UI
+          summary_text:     lesson.summary_text || '',
+          reflection_prompt: lesson.reflection_prompt || '',
+          // competency_keys drives per-competency fidelity gating in audit-alignment.ts
+          competency_keys:  lesson.competency_keys ?? [],
+          key_terms:        keyTerms,
           duration_minutes: lesson.estimated_minutes,
-          status:          draft.auto_publish ? 'published' : 'draft',
+          status:           draft.auto_publish ? 'published' : 'draft',
         });
         clLessonNumber++;
       }
@@ -477,16 +491,19 @@ async function _POST(req: NextRequest) {
             .slice(0, 80);
           return {
             program_id,
-            course_id:       courseId,
-            lesson_slug:     `${slugBase}-${lesson.lesson_number}`,
-            lesson_title:    lesson.title,
-            lesson_order:    lesson.lesson_number - 1,
-            module_order:    modIdx,
-            module_title:    mod.title,
-            script_text:     lesson.content,
-            key_terms:       [] as Array<{ term: string; definition: string }>,
+            course_id:        courseId,
+            lesson_slug:      `${slugBase}-${lesson.lesson_number}`,
+            lesson_title:     lesson.title,
+            lesson_order:     lesson.lesson_number - 1,
+            module_order:     modIdx,
+            module_title:     mod.title,
+            script_text:      lesson.content,
+            summary_text:     lesson.summary_text || lesson.description || '',
+            reflection_prompt: lesson.reflection_prompt || '',
+            competency_keys:  lesson.competency_keys ?? [],
+            key_terms:        [] as Array<{ term: string; definition: string }>,
             duration_minutes: lesson.duration_minutes,
-            status:          is_published ? 'published' : 'draft',
+            status:           is_published ? 'published' : 'draft',
           };
         })
       );

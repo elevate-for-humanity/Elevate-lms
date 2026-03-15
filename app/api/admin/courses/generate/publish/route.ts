@@ -99,6 +99,30 @@ type PublishDraft = z.infer<typeof PublishDraftSchema>;
 type CompiledLesson = z.infer<typeof CompiledLessonSchema>;
 type CompiledModule = z.infer<typeof CompiledModuleSchema>;
 
+// ── Publish status resolver ───────────────────────────────────────────────────
+
+/**
+ * Determines the correct status string for a course or lesson row.
+ *
+ * Rules:
+ *   - wantsLive=false → always 'draft' (caller is staging, not publishing)
+ *   - wantsLive=true + admin/super_admin/staff → 'published' (trusted roles)
+ *   - wantsLive=true + any other role → 'pending_review' (requires human approval)
+ *
+ * This is the single place that enforces the review workflow. All status
+ * assignments in the publish path must go through this function.
+ */
+const TRUSTED_PUBLISH_ROLES = new Set(['admin', 'super_admin', 'staff']);
+
+function resolvePublishStatus(
+  wantsLive: boolean,
+  callerRole: string | null | undefined
+): 'draft' | 'pending_review' | 'published' {
+  if (!wantsLive) return 'draft';
+  if (callerRole && TRUSTED_PUBLISH_ROLES.has(callerRole)) return 'published';
+  return 'pending_review';
+}
+
 // ── Coverage gate ─────────────────────────────────────────────────────────────
 
 /**
@@ -274,6 +298,7 @@ function renderCompiledLessonContent(lesson: CompiledLesson): string {
 async function publishCompiledDraft(
   draft: PublishDraft,
   userId: string,
+  callerRole: string | null | undefined,
   db: ReturnType<typeof createAdminClient>
 ): Promise<{ courseId: string; slug: string; lessonCount: number }> {
   ensureUniqueLessonTitles(draft);
@@ -308,9 +333,9 @@ async function publishCompiledDraft(
       difficulty:          draft.difficulty,
       duration_hours:      durationHours,
       slug,
-      is_published:        draft.auto_publish,
-      is_active:           draft.auto_publish,
-      status:              draft.auto_publish ? 'published' : 'draft',
+      is_published:        draft.auto_publish && TRUSTED_PUBLISH_ROLES.has(callerRole ?? ''),
+      is_active:           draft.auto_publish && TRUSTED_PUBLISH_ROLES.has(callerRole ?? ''),
+      status:              resolvePublishStatus(draft.auto_publish, callerRole),
       passing_score:       passingScore,
       certificate_enabled: draft.certificate_enabled,
       created_by:          userId,
@@ -349,7 +374,7 @@ async function publishCompiledDraft(
         content_type:     'text',
         duration_minutes: lesson.estimated_minutes,
         is_required:      true,
-        is_published:     draft.auto_publish,
+        is_published:     draft.auto_publish && TRUSTED_PUBLISH_ROLES.has(callerRole ?? ''),
         order_index:      lessonNumber - 1,
         quiz_questions:   lesson.knowledge_check,
         metadata: {
@@ -409,7 +434,7 @@ async function publishCompiledDraft(
           competency_keys:  lesson.competency_keys ?? [],
           key_terms:        keyTerms,
           duration_minutes: lesson.estimated_minutes,
-          status:           draft.auto_publish ? 'published' : 'draft',
+          status:           resolvePublishStatus(draft.auto_publish, callerRole),
         });
         clLessonNumber++;
       }
@@ -472,6 +497,8 @@ async function _POST(req: NextRequest) {
     const body = await req.json();
     const db = createAdminClient();
 
+    const callerRole = user.profile?.role ?? null;
+
     // ── v2 compiled draft path ──────────────────────────────────────────────
     if (body.draft) {
       const parsed = PublishDraftSchema.safeParse(body.draft);
@@ -479,9 +506,10 @@ async function _POST(req: NextRequest) {
         const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
         return NextResponse.json({ error: `Invalid draft: ${issues}` }, { status: 422 });
       }
-      const result = await publishCompiledDraft(parsed.data, user.id, db);
-      logger.info('AI course published (v2)', { userId: user.id, ...result });
-      return NextResponse.json({ ok: true, ...result });
+      const result = await publishCompiledDraft(parsed.data, user.id, callerRole, db);
+      const finalStatus = resolvePublishStatus(parsed.data.auto_publish, callerRole);
+      logger.info('AI course published (v2)', { userId: user.id, status: finalStatus, ...result });
+      return NextResponse.json({ ok: true, status: finalStatus, ...result });
     }
 
     // ── Legacy GeneratedCourse path ─────────────────────────────────────────
@@ -526,9 +554,9 @@ async function _POST(req: NextRequest) {
         category:       course.category,
         duration_hours: durationHours,
         slug,
-        is_published,
-        is_active:      is_published,
-        status:         is_published ? 'published' : 'draft',
+        is_published:   is_published && TRUSTED_PUBLISH_ROLES.has(callerRole ?? ''),
+        is_active:      is_published && TRUSTED_PUBLISH_ROLES.has(callerRole ?? ''),
+        status:         resolvePublishStatus(is_published, callerRole),
         passing_score:  course.passing_score ?? 70,
         created_by:     user.id,
         metadata: {
@@ -594,7 +622,7 @@ async function _POST(req: NextRequest) {
             competency_keys:  lesson.competency_keys ?? [],
             key_terms:        [] as Array<{ term: string; definition: string }>,
             duration_minutes: lesson.duration_minutes,
-            status:           is_published ? 'published' : 'draft',
+            status:           resolvePublishStatus(is_published, callerRole),
           };
         })
       );
@@ -634,12 +662,13 @@ async function _POST(req: NextRequest) {
       if (pcErr) logger.warn('program_courses upsert (non-fatal):', pcErr.message);
     }
 
+    const finalStatus = resolvePublishStatus(is_published, callerRole);
     logger.info('Course published from generator', {
-      userId: user.id, courseId, slug: courseRow.slug,
+      userId: user.id, courseId, slug: courseRow.slug, status: finalStatus,
       title: course.title, lessons: lessonRows.length, programId: program_id,
     });
 
-    return NextResponse.json({ ok: true, courseId, slug: courseRow.slug, lessonCount: lessonRows.length });
+    return NextResponse.json({ ok: true, courseId, slug: courseRow.slug, lessonCount: lessonRows.length, status: finalStatus });
   } catch (err: any) {
     logger.error('Course publish error:', err);
     return NextResponse.json({ ok: false, error: 'Publish failed' }, { status: 500 });

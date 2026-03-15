@@ -1734,6 +1734,6 @@ export const TOTAL_QUIZ_QUESTIONS =
   INSTALLATION_QUIZ.length +
   TROUBLESHOOTING_QUIZ.length +
   OSHA_30_QUIZ.length;
-// Expected: 75+75+75+75 + 5+5+5+5+5+5+5+5+8 = 353 questions
+// Expected: 100+100+100+100 + 5+5+5+5+5+5+5+5+8 = 453 questions
 
 

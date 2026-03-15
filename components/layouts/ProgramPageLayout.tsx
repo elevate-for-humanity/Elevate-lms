@@ -230,13 +230,11 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
               Class Location
             </h3>
             <p className="text-sm text-black">
-              8888 Keystone Crossing Suite 1300
-              <br />
+              8888 Keystone Crossing, Suite 1300<br />
               Indianapolis, IN 46240
             </p>
-            <p className="mt-2 text-xs text-slate-500">
-              Some coursework and support may be completed online. Ask your
-              career coach about virtual options.
+            <p className="mt-2 text-xs font-medium text-amber-700">
+              Hybrid institute — by appointment only. Not a walk-in location.
             </p>
           </div>
         </aside>

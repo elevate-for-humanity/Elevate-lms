@@ -48,8 +48,10 @@ export default function SEO({
           image: 'https://elevateforhumanity.pages.dev/og-image.svg',
           address: {
             '@type': 'PostalAddress',
+            streetAddress: '8888 Keystone Crossing, Suite 1300',
             addressLocality: 'Indianapolis',
             addressRegion: 'IN',
+            postalCode: '46240',
             addressCountry: 'US',
           },
           contactPoint: {
@@ -97,8 +99,10 @@ export default function SEO({
           image: 'https://elevateforhumanity.pages.dev/og-image.svg',
           address: {
             '@type': 'PostalAddress',
+            streetAddress: '8888 Keystone Crossing, Suite 1300',
             addressLocality: 'Indianapolis',
             addressRegion: 'IN',
+            postalCode: '46240',
             addressCountry: 'US',
           },
           telephone: '+1-317-314-3757',

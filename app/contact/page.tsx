@@ -371,9 +371,9 @@ export default function ContactPage() {
             {/* Campus Info */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-2">Elevate for Humanity</h3>
-              <p className="text-gray-600">Indianapolis, Indiana</p>
-              <p className="text-gray-600">Central Indiana Region</p>
-              <p className="text-gray-600 mt-4">Multiple training locations available. In-person visits are by appointment only — use the calendar above to schedule.</p>
+              <p className="text-gray-600">8888 Keystone Crossing, Suite 1300</p>
+              <p className="text-gray-600">Indianapolis, IN 46240</p>
+              <p className="text-gray-600 mt-3 text-sm font-medium text-amber-700">⚠️ By appointment only — this is a hybrid training institute, not a walk-in location. Schedule below before visiting.</p>
             </div>
           </div>
         </div>
@@ -386,7 +386,7 @@ export default function ContactPage() {
           {[
             { q: 'What are your office hours?', a: 'Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we\'ll respond within 1-2 business days.' },
             { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at (317) 314-3757.' },
-            { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Contact us to arrange a visit.' },
+            { q: 'Can I visit your office in person?', a: 'Elevate is a hybrid training institute — not a walk-in location. Our address is 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. All visits are by appointment only. Use the calendar above to schedule.' },
             { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or contact us directly. Our enrollment team will assist you.' },
             { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or contact us with your name and the program you applied for.' },
             { q: 'I\'m an employer - who do I contact?', a: 'Select "Employer Partnership" in the contact form or email us directly. Our employer relations team will reach out to discuss partnership opportunities.' },

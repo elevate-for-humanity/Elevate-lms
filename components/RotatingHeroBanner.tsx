@@ -2,72 +2,54 @@
 
 import React from 'react';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-  {
-    image: "/images/pages/comp-home-hero.jpg",
-    title: "From Unemployed to Employed in 4-12 Weeks",
-    subtitle: "No-Cost Career Training for Eligible Participants",
-    description: "CNA • HVAC • Barber • CDL • Medical Assistant • Building Tech",
-    cta1: "Start Free Training",
-    cta2: "Check Your Funding",
-  },
-  {
-    image: "/images/pages/comp-home-hero-programs.jpg",
-    title: "$0 Out of Pocket. Real Jobs. Real Credentials.",
-    subtitle: "Government Pays 100% - You Pay Nothing",
-    description: "WIOA • WRG • JRI • Apprenticeships • OJT Programs",
-    cta1: "Apply Now",
-    cta2: "See Programs",
-  },
-  {
-    image: "/images/pages/training-classroom.jpg",
-    title: "Earn $35K-$65K After Training",
-    subtitle: "High-Demand Careers in Healthcare, Trades & Tech",
-    description: "Job placement support • Industry credentials • Soft skills training",
-    cta1: "Explore Careers",
-    cta2: "Talk to Advisor",
-  },
+  { image: "/images/pages/comp-home-hero.jpg" },
+  { image: "/images/pages/comp-home-hero-programs.jpg" },
+  { image: "/images/pages/training-classroom.jpg" },
 ];
 
 export default function RotatingHeroBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
-
+    if (isPaused) return;
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isPaused]);
+
+  // Resume auto-play 8s after last manual interaction
+  const pauseAndResume = () => {
+    setIsPaused(true);
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => setIsPaused(false), 8000);
+  };
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
-    setIsAutoPlaying(false);
+    pauseAndResume();
   };
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-    setIsAutoPlaying(false);
+    pauseAndResume();
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-    setIsAutoPlaying(false);
+    pauseAndResume();
   };
-
-  const slide = slides[currentSlide];
 
   return (
     <section className="relative h-[600px] md:h-[700px] overflow-hidden bg-slate-900">
-      {/* Background Image with Overlay */}
+      {/* Background Images */}
       <div className="absolute inset-0">
         {slides.map((s, index) => (
           <div
@@ -78,59 +60,20 @@ export default function RotatingHeroBanner() {
           >
             <Image
               src={s.image}
-              alt={s.title}
+              alt=""
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority={index === 0}
               quality={90}
             />
           </div>
         ))}
+        {/* Dark gradient overlay — always on top of images */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/60 to-slate-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative h-full flex items-center">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
-            {/* Animated Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-6 py-3 text-sm font-bold text-white mb-6 animate-pulse shadow-lg">
-              <span className="text-lg">💯</span>
-              <span>NO-COST TRAINING FOR ELIGIBLE PARTICIPANTS</span>
-            </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight animate-fade-in">
-              {slide.title}
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-2xl md:text-3xl text-brand-orange-400 font-bold mb-4">
-              {slide.subtitle}
-            </p>
-
-            {/* Description */}
-            <p className="text-lg md:text-xl text-slate-200 mb-8">
-              {slide.description}
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-orange-500 rounded-full hover:bg-brand-orange-600 transition-all hover:scale-105 shadow-2xl"
-              >
-                {slide.cta1}
-              </Link>
-              <Link
-                href="/funding"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-blue-600 rounded-full hover:bg-brand-blue-700 transition-all hover:scale-105 shadow-2xl border-2 border-white/20"
-              >
-                {slide.cta2}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Navigation Arrows */}
       <button

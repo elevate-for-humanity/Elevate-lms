@@ -2,8 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Award, FileCheck, Briefcase, ChevronRight } from 'lucide-react';
-import LazyVideo from '@/components/ui/LazyVideo';
+import { Award, FileCheck, Briefcase, ChevronRight, BadgeCheck, DollarSign, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -51,20 +50,72 @@ export default function CredentialsPage() {
         </div>
       </div>
 
-      {/* Video hero */}
-      <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
-        <LazyVideo src="/videos/career-services-hero.mp4" poster="/images/pages/credentials-page-1.jpg"
-          className="absolute inset-0 w-full h-full object-cover" />
+      {/* Hero banner */}
+      <section className="relative h-[340px] sm:h-[460px] overflow-hidden bg-slate-900">
+        <Image
+          src="/images/pages/credentials-page-1.jpg"
+          alt="Credential pathways at Elevate for Humanity"
+          fill
+          sizes="100vw"
+          className="object-cover object-center opacity-50"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
+        <div className="relative h-full flex items-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
+            <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Credential Pathways</p>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight max-w-2xl">
+              Credentials at Elevate
+            </h1>
+            <p className="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+              Three layers of credentials — completion certificates we issue, industry certifications from external testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a href="#layer-1" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
+                <FileCheck className="w-4 h-4" /> Completion Certificates
+              </a>
+              <a href="#layer-2" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
+                <Award className="w-4 h-4" /> Industry Certifications
+              </a>
+              <a href="#layer-3" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
+                <Briefcase className="w-4 h-4" /> Apprenticeship
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Page header */}
-      <div className="bg-white border-b border-slate-100 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Credential Pathways</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Credentials at Elevate</h1>
-          <p className="text-slate-500 text-base sm:text-lg max-w-3xl leading-relaxed">
-            Three layers of credentials — internal certificates we issue, industry certifications awarded by external testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
-          </p>
+      {/* Stats bar */}
+      <div className="bg-slate-900 border-t border-slate-700">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6">
+          <div className="flex items-center gap-3">
+            <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-lg leading-none">20+</p>
+              <p className="text-slate-400 text-xs mt-0.5">Credentials offered</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <DollarSign className="w-8 h-8 text-emerald-400 flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-lg leading-none">$0</p>
+              <p className="text-slate-400 text-xs mt-0.5">For eligible Indiana residents</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapPin className="w-8 h-8 text-amber-400 flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-sm leading-none">On-site proctoring</p>
+              <p className="text-slate-400 text-xs mt-0.5">EPA 608 · Certiport · CompTIA</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-brand-blue-400 flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-sm leading-none">DOL Registered</p>
+              <p className="text-slate-400 text-xs mt-0.5">Apprenticeship Sponsor</p>
+            </div>
+          </div>
         </div>
       </div>
 

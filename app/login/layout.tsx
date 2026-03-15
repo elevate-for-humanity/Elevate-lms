@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/login',
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function LoginLayout({

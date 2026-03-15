@@ -1,19 +1,5 @@
 export const dynamic = 'force-static';
 export const revalidate = 86400;
-import { Metadata } from 'next';
-import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
-import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
-import { CONSTRUCTION_TRADES } from '@/data/programs/construction-trades-certification';
-import { validateProgram } from '@/lib/programs/program-schema';
-
-const p = CONSTRUCTION_TRADES;
-
-const errors = validateProgram(p);
-if (errors.length > 0) {
-  throw new Error(
-    ` program schema validation failed:\n${errors.map((e) => `  ${e.field}: ${e.message}`).join('\n')}`
-  );
-}
 
 export const metadata: Metadata = {
   title: p.metaTitle,

@@ -1,42 +1,51 @@
-
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
 
 export const metadata: Metadata = {
   title: 'Participation Agreement | Elevate for Humanity',
+  robots: { index: false, follow: false },
 };
 
 export default function ParticipationAgreementPage() {
-
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <Link href="/student-portal/onboarding/agreements" className="text-brand-blue-600 hover:underline mb-6 inline-block">&larr; Back to Agreements</Link>
-        <h1 className="text-3xl font-bold text-slate-900 mb-6">Participation Agreement</h1>
+    <>
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement' }]} />
+      </div>
+      <DocumentPage
+        documentType="Participation Agreement"
+        title="Participation Agreement"
+        subtitle="Elevate for Humanity Career & Training Institute"
+        date="2025-01-01"
+        version="1.0"
+      >
+        <DocumentSection heading="Purpose" number={1}>
+          <p>
+            This Participation Agreement outlines the expectations and requirements for active participation in Elevate for Humanity career pathway programs. By signing, the Student agrees to meet these standards for the duration of their enrollment.
+          </p>
+        </DocumentSection>
 
-        <div className="prose prose-slate max-w-none space-y-6">
-          <p className="text-slate-600">Effective Date: January 1, 2025</p>
-
-          <h2>1. Purpose</h2>
-          <p>This Participation Agreement outlines the expectations and requirements for active participation in Elevate for Humanity career pathway programs.</p>
-
-          <h2>2. Attendance Requirements</h2>
+        <DocumentSection heading="Attendance Requirements" number={2}>
           <ul>
-            <li>Students must attend a minimum of 80% of scheduled sessions</li>
-            <li>Absences must be reported to the program coordinator within 24 hours</li>
+            <li>Maintain a minimum attendance rate of 80% of scheduled sessions</li>
+            <li>Report absences to the program coordinator within 24 hours</li>
             <li>Three consecutive unexcused absences may result in program probation</li>
+            <li>Tardiness of more than 15 minutes counts as a half-absence</li>
             <li>Excessive absences may result in dismissal from the program</li>
           </ul>
+        </DocumentSection>
 
-          <h2>3. Academic Standards</h2>
+        <DocumentSection heading="Academic Standards" number={3}>
           <ul>
-            <li>Complete all assignments by their due dates</li>
-            <li>Maintain satisfactory progress as defined by the program</li>
+            <li>Complete all assignments and assessments by their due dates</li>
+            <li>Maintain satisfactory academic progress as defined by the program</li>
             <li>Participate actively in classroom, lab, and employer site day activities</li>
-            <li>Seek help from instructors when needed</li>
+            <li>Seek help from instructors or the program coordinator when needed</li>
           </ul>
+        </DocumentSection>
 
-          <h2>4. Professional Conduct</h2>
+        <DocumentSection heading="Professional Conduct" number={4}>
           <ul>
             <li>Treat all students, staff, instructors, and employer partners with respect</li>
             <li>Arrive on time and prepared for each session</li>
@@ -44,23 +53,27 @@ export default function ParticipationAgreementPage() {
             <li>Dress appropriately per program dress code requirements</li>
             <li>No use of alcohol, drugs, or weapons on any training site</li>
           </ul>
+        </DocumentSection>
 
-          <h2>5. Technology and LMS Usage</h2>
+        <DocumentSection heading="Technology and LMS Usage" number={5}>
           <ul>
             <li>Complete all online coursework through the Elevate LMS platform</li>
             <li>Do not share login credentials with others</li>
-            <li>Report any technical issues to the program coordinator</li>
+            <li>Report any technical issues to the program coordinator promptly</li>
+            <li>Do not use training devices for personal social media during class hours</li>
           </ul>
+        </DocumentSection>
 
-          <h2>6. Employer Site Day Expectations</h2>
+        <DocumentSection heading="Employer Site Day Expectations" number={6}>
           <ul>
             <li>Follow all employer site rules and safety requirements</li>
-            <li>Represent Elevate for Humanity professionally</li>
-            <li>Complete all required site documentation</li>
+            <li>Represent Elevate for Humanity professionally at all times</li>
+            <li>Complete all required site documentation before leaving</li>
             <li>Report any incidents or concerns to the program coordinator immediately</li>
           </ul>
+        </DocumentSection>
 
-          <h2>7. Consequences of Non-Compliance</h2>
+        <DocumentSection heading="Consequences of Non-Compliance" number={7}>
           <p>Failure to meet participation requirements may result in:</p>
           <ul>
             <li>Written warning</li>
@@ -68,11 +81,30 @@ export default function ParticipationAgreementPage() {
             <li>Suspension from employer site days</li>
             <li>Dismissal from the program</li>
           </ul>
+          <p>Serious violations (violence, weapons, drug use) result in immediate dismissal without warning.</p>
+        </DocumentSection>
 
-          <h2>8. Acknowledgment</h2>
-          <p>By signing this agreement, the student acknowledges that they have read, understand, and agree to comply with all participation requirements outlined above.</p>
-        </div>
-      </div>
-    </div>
+        <DocumentSection heading="Grievance Procedure" number={8}>
+          <p>
+            Students who have a complaint should first speak with their program coordinator. If unresolved, submit a written grievance to the Program Director at <strong>info@elevateforhumanity.org</strong>. Elevate will respond within 10 business days.
+          </p>
+        </DocumentSection>
+
+        <DocumentSection heading="Contact" number={9}>
+          <p>
+            Elevate for Humanity — Program Director<br />
+            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br />
+            Email: info@elevateforhumanity.org · Phone: (317) 314-3757
+          </p>
+        </DocumentSection>
+
+        <DocumentSignatureBlock
+          agreementType="participation"
+          agreementVersion="1.0"
+          buttonLabel="Sign Participation Agreement"
+          nextUrl="/student-portal/onboarding"
+        />
+      </DocumentPage>
+    </>
   );
 }

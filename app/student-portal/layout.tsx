@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     template: '%s | Student Portal',
   },
   description: 'Access your courses, assignments, and academic resources.',
+  robots: { index: false, follow: false },
 };
 
 const navItems = [

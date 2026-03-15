@@ -9,7 +9,6 @@ const imagesToEnhance = [
   // Staff photos - enhance to excellent quality
   'images/elizabeth-greene-founder.jpg',
   'images/carlina-wilkes.jpg',
-  'images/sharon-douglas.jpg',
   'images/jozanna-george.jpg',
   'images/ameco-martin.jpg',
   'images/leslie-wafford.jpg',

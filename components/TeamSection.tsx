@@ -6,7 +6,7 @@ const teamMembers = [
     name: "Elizabeth Greene",
     title: "Founder & Chief Executive Officer",
     image: "/images/team/elizabeth-greene-headshot.jpg",
-    bio: "U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, EPA 608 Certified Proctor (ESCO Group & Mainstream Engineering). Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor, ETPL listed, WRG approved, WIOA and JRI approved, EmployIndy partner, Milady curriculum partner, NRF Rise Up provider, Certiport CATC, Choice Medical CNA School partner, PECOS enrolled (Medicare provider), NPI registered, ITAP/INDOT registered, Indiana State Bidder, CAGE code registered, and ByBlack certified (NAACP).",
+    bio: "U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA), EFIN and PTIN holder, EPA 608 Certified Proctor (ESCO Group & Mainstream Engineering). Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company, and Selfish Inc. — a 501(c)(3) nonprofit (DBA: The Rise Foundation) providing VITA free tax preparation, mental wellness counseling, and community services. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), ETPL listed, WRG approved, WIOA and JRI approved, Job Ready Indy partner, WorkOne partner, EmployIndy partner, HSI affiliate, CareerSafe OSHA training provider, Milady curriculum partner, NRF Rise Up provider, Certiport CATC, Choice Medical CNA School partner, PECOS enrolled (Medicare provider), NPI registered, ITAP/INDOT registered, Indiana State Bidder, SAM.gov registered (UEI: VX2GK5S8SZH8, CAGE: 0Q856), federal government contractor, and ByBlack certified (U.S. Black Chambers / NAACP).",
   },
   {
     name: "Jozanna George",
@@ -19,12 +19,6 @@ const teamMembers = [
     title: "Executive Director of Financial Operations & Organizational Compliance",
     image: "/images/carlina-wilkes.jpg",
     bio: "Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.",
-  },
-  {
-    name: "Sharon Douglass",
-    title: "Respiratory Therapy & Health Informatics Specialist",
-    image: "/images/sharon-douglas.jpg",
-    bio: "Sharon brings 30+ years as a Respiratory Therapist with a Master's in Health Informatics. She supports healthcare training programs and workforce readiness initiatives.",
   },
   {
     name: "Leslie Wafford",

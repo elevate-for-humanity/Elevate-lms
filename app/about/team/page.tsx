@@ -19,7 +19,7 @@ const fallbackTeam = [
     name: 'Elizabeth Greene',
     title: 'Founder & Chief Executive Officer',
     image_url: '/images/team/elizabeth-greene-headshot.jpg',
-    bio: 'U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor. Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company.',
+    bio: 'U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA), EFIN and PTIN holder, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor. Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company.',
     email: '',
   },
   {
@@ -37,14 +37,6 @@ const fallbackTeam = [
     image_url: '/images/carlina-wilkes.jpg',
     bio: 'Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.',
     email: 'carlina@elevateforhumanity.org',
-  },
-  {
-    id: '4', slug: 'sharon-douglass',
-    name: 'Sharon Douglass',
-    title: 'Respiratory Therapy & Health Informatics Specialist',
-    image_url: '/images/sharon-douglas.jpg',
-    bio: 'Sharon brings 30+ years as a Respiratory Therapist with a Master\'s in Health Informatics. She supports healthcare training programs and workforce readiness initiatives.',
-    email: 'sharon@elevateforhumanity.org',
   },
   {
     id: '5', slug: 'leslie-wafford',
@@ -88,14 +80,6 @@ const fallbackTeam = [
     email: '',
   },
   {
-    id: '10', slug: 'carl-brown',
-    name: 'Carl Brown',
-    title: 'CDL Instructor & Commercial Truck Driver',
-    image_url: '/images/team/carl-brown.jpg',
-    bio: 'Carl Brown is an experienced Commercial Truck Driver and Trainer with over 15 years in the transportation and logistics industry, specializing in safety-focused operations, driver training, and fleet logistics. Currently serving at Renascent, Inc. in Indianapolis, Carl provides hands-on instruction to new drivers while conducting daily safety inspections and operating a range of commercial equipment including dump trailers, roll-offs, dump trucks, tractor trailers, and flatbeds. Throughout his career, Carl has demonstrated strong leadership, operational planning, and workforce training capabilities across multiple transportation environments, including intermodal, over-the-road (OTR), and delivery logistics. He holds a Class A Commercial Driver\'s License obtained through Chattanooga State Technical Community College and is CPR and First Aid certified.',
-    email: '',
-  },
-  {
     id: '11', slug: 'amir-naseen',
     name: 'Amir Naseen',
     title: 'Credit Repair Specialist',
@@ -122,17 +106,9 @@ export default async function TeamPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
+      {/* Hero — image only, no text overlay */}
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
         <Image src="/images/pages/team-hero.jpg" alt="Elevate for Humanity team" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-          <div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Our Team</h1>
-            <p className="text-lg text-white/85 max-w-2xl mx-auto">
-              Meet the dedicated professionals behind Elevate for Humanity.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Team Grid — 3 across, Elizabeth centered top */}

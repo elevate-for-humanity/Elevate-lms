@@ -2,6 +2,13 @@ import type { MetadataRoute } from 'next';
 import { SITE } from '@/lib/seo/siteMetadata';
 
 export default function robots(): MetadataRoute.Robots {
+  // Block all indexing on preview/branch deployments
+  if (process.env.ROBOTS_NOINDEX === 'true') {
+    return {
+      rules: [{ userAgent: '*', disallow: '/' }],
+    };
+  }
+
   return {
     rules: [
       {

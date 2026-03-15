@@ -7,6 +7,15 @@
   publish = ".next"
   functions = "netlify/functions"
 
+# Block preview and branch deployments from search engine indexing
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    ROBOTS_NOINDEX = "true"
+
+[context.branch-deploy]
+  [context.branch-deploy.environment]
+    ROBOTS_NOINDEX = "true"
+
 [build.environment]
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=8192"

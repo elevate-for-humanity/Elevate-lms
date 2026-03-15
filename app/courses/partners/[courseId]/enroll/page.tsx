@@ -176,7 +176,7 @@ export default function EnrollPage({
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           {/* Course Header */}
-          <div className="bg-brand-blue-600 text-white p-8">
+          <div className="bg-white text-white p-8">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <span className="inline-block px-3 py-2 bg-white/20 text-white text-xs font-semibold rounded-full mb-3">
@@ -238,7 +238,7 @@ export default function EnrollPage({
             {/* What Happens Next */}
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
               <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 What Happens Next
               </h3>
               <ol className="space-y-3 text-black">

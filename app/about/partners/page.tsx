@@ -48,7 +48,7 @@ export default async function PartnersPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/about-partners-hero.jpg" alt="Partners background" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Partners</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">We collaborate with government agencies, employers, and credential providers to deliver funded credential pathway programs.</p>
@@ -172,7 +172,7 @@ export default async function PartnersPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Handshake className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>

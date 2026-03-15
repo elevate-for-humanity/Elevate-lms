@@ -214,7 +214,7 @@ export default function NewExamSession() {
                         }`}
                       >
                         {preset.name}
-                        <span className="text-slate-400 ml-2">({preset.duration} min)</span>
+                        <span className="text-slate-500 ml-2">({preset.duration} min)</span>
                       </button>
                     ))}
                   </div>
@@ -275,7 +275,7 @@ export default function NewExamSession() {
                   className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   autoFocus
                 />
-                <p className="text-xs text-slate-400 mt-1">Must match the name on the photo ID presented.</p>
+                <p className="text-xs text-slate-500 mt-1">Must match the name on the photo ID presented.</p>
               </div>
 
               <div>

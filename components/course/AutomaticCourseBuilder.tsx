@@ -275,7 +275,7 @@ export default function AutomaticCourseBuilder() {
             </div>
             <div className="w-full h-4 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-blue-600 transition-all duration-500 ease-out"
+                className="h-full bg-white transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>

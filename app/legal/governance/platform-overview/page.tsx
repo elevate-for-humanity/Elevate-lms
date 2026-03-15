@@ -17,7 +17,7 @@ export default function PlatformOverviewPage() {
         <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Platform Overview" }]} />
       </div>
 {/* Document Header */}
-      <div className="bg-gray-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
             <Link href="/" className="hover:text-white">Home</Link>

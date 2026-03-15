@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
         <Image src="/images/pages/how-it-works-hero.jpg" alt="How Elevate works" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">How It Works</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-2">How It Works</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
               From assessment to employment and ongoing support. Training, one-on-one coaching, employer placement, and follow-up — all in one program.
             </p>
@@ -111,10 +111,10 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-brand-blue-600">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Begin?</h2>
-          <p className="text-white mb-6 text-sm">Register at Indiana Career Connect to get started.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Ready to Begin?</h2>
+          <p className="text-slate-900 mb-6 text-sm">Register at Indiana Career Connect to get started.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">

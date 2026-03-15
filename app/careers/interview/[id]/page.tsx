@@ -153,22 +153,22 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
 
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Header */}
-        <div className="bg-slate-900 text-white rounded-2xl p-8 mb-6">
+        <div className="bg-white text-white rounded-2xl p-8 mb-6">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 bg-brand-blue-600 rounded-2xl flex items-center justify-center">
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center">
               <Video className="w-7 h-7 text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Video Interview</h1>
-              <p className="text-slate-400">{position} · Elevate for Humanity</p>
+              <p className="text-slate-500">{position} · Elevate for Humanity</p>
             </div>
           </div>
           {app.status === 'interview_scheduled' || zoomLink ? (
-            <div className="inline-flex items-center gap-2 bg-brand-green-600/20 border border-brand-green-500/30 text-brand-green-300 px-4 py-2 rounded-full text-sm">
+            <div className="inline-flex items-center gap-2 bg-white/20 border border-brand-green-500/30 text-brand-green-300 px-4 py-2 rounded-full text-sm">
               <CheckCircle className="w-4 h-4" /> Interview Scheduled
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 text-amber-300 px-4 py-2 rounded-full text-sm">
+            <div className="inline-flex items-center gap-2 bg-white/20 border border-amber-400/30 text-amber-300 px-4 py-2 rounded-full text-sm">
               <Clock className="w-4 h-4" /> Pending Scheduling
             </div>
           )}
@@ -184,7 +184,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-brand-blue-500 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-slate-400">Date</p>
+                      <p className="text-xs text-slate-500">Date</p>
                       <p className="font-semibold text-slate-900">{formattedDate}</p>
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                   <div className="flex items-center gap-3">
                     <Clock className="w-5 h-5 text-brand-blue-500 flex-shrink-0" />
                     <div>
-                      <p className="text-xs text-slate-400">Time</p>
+                      <p className="text-xs text-slate-500">Time</p>
                       <p className="font-semibold text-slate-900">{formattedTime}</p>
                     </div>
                   </div>
@@ -201,14 +201,14 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                 <div className="flex items-center gap-3">
                   <Video className="w-5 h-5 text-brand-blue-500 flex-shrink-0" />
                   <div>
-                    <p className="text-xs text-slate-400">Format</p>
+                    <p className="text-xs text-slate-500">Format</p>
                     <p className="font-semibold text-slate-900">Zoom Video Interview (45 minutes)</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <User className="w-5 h-5 text-brand-blue-500 flex-shrink-0" />
                   <div>
-                    <p className="text-xs text-slate-400">Interviewer</p>
+                    <p className="text-xs text-slate-500">Interviewer</p>
                     <p className="font-semibold text-slate-900">Elevate for Humanity HR Team</p>
                   </div>
                 </div>

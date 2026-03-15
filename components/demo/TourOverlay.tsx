@@ -144,9 +144,9 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
       {/* Overlay Panel */}
       <div className="absolute bottom-0 left-0 right-0 md:bottom-4 md:right-4 md:left-auto md:w-[480px] bg-white rounded-t-2xl md:rounded-2xl shadow-2xl pointer-events-auto max-h-[80vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+        <div className="bg-white text-white px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-brand-orange-600 p-1.5 rounded-lg">
+            <div className="bg-white p-1.5 rounded-lg">
               <Play className="w-4 h-4" />
             </div>
             <div>
@@ -250,7 +250,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
             >
               {isLastStep ? (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   {currentStep.next_button_label}
                 </>
               ) : (

@@ -31,7 +31,7 @@ export function ArchetypeBase({
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[400px] bg-gray-900">
+      <section className="relative h-[400px] bg-white">
         {finalContent.hero.image && (
           <Image
             src={finalContent.hero.image}

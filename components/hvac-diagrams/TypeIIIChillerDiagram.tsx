@@ -144,14 +144,14 @@ export default function TypeIIIChillerDiagram({ onComplete }: { onComplete?: () 
   return (
     <div className="space-y-5">
 
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type III — Low-Pressure Systems</p>
         <h2 className="text-xl font-extrabold">Centrifugal Chillers</h2>
-        <p className="text-slate-400 text-sm mt-1">The most specialized section. Expand each concept, then take the quiz.</p>
+        <p className="text-slate-500 text-sm mt-1">The most specialized section. Expand each concept, then take the quiz.</p>
       </div>
 
       {/* Key difference callout */}
-      <div className="bg-brand-blue-900 rounded-2xl p-4 text-white">
+      <div className="bg-white rounded-2xl p-4 text-white">
         <p className="font-extrabold text-sm mb-1">The Key Difference from Type I and II</p>
         <p className="text-brand-blue-200 text-sm leading-relaxed">
           Type III systems operate <span className="text-white font-bold">below atmospheric pressure</span> (in a vacuum).
@@ -204,7 +204,7 @@ export default function TypeIIIChillerDiagram({ onComplete }: { onComplete?: () 
             <div key={item.label} className="bg-white rounded-xl border border-slate-200 p-3 text-center">
               <p className="text-xs text-slate-500 font-medium">{item.label}</p>
               <p className="text-xl font-extrabold text-brand-blue-700 mt-1">{item.value}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">{item.sub}</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">{item.sub}</p>
             </div>
           ))}
         </div>

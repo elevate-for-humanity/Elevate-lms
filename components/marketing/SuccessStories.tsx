@@ -32,7 +32,7 @@ export function SuccessStories() {
           <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
             Real people, real outcomes.
           </p>
-          <p className="mt-3 text-sm text-slate-300">
+          <p className="mt-3 text-sm text-slate-600">
             Elevate For Humanity is built around people — not just programs.
             These stories are just the start of what happens when approvals,
             funding, and employers line up.
@@ -46,12 +46,12 @@ export function SuccessStories() {
               className="flex flex-col rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800"
             >
               <div className="mb-3 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-slate-800" />
+                <div className="h-10 w-10 rounded-full bg-white" />
                 <div>
                   <h3 className="text-sm font-semibold text-slate-50">
                     {story.name}
                   </h3>
-                  <p className="text-xs text-slate-400">{story.role}</p>
+                  <p className="text-xs text-slate-500">{story.role}</p>
                 </div>
               </div>
               <p className="text-sm text-slate-200">&ldquo;{story.quote}&rdquo;</p>

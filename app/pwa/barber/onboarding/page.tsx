@@ -108,7 +108,7 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
@@ -117,14 +117,14 @@ export default function OnboardingPage() {
   const allComplete = completedCount === steps.length;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Getting Started</h1>
+            <h1 className="text-xl font-bold text-slate-900">Getting Started</h1>
             <p className="text-brand-blue-200 text-sm">Complete your onboarding</p>
           </div>
         </div>
@@ -146,11 +146,11 @@ export default function OnboardingPage() {
 
       <main className="px-4 py-6 space-y-4">
         {allComplete ? (
-          <div className="bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
-            <div className="w-16 h-16 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">You're All Set!</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">You're All Set!</h2>
             <p className="text-brand-green-200 mb-4">
               You've completed all onboarding steps. You're ready to start your apprenticeship journey!
             </p>
@@ -170,17 +170,17 @@ export default function OnboardingPage() {
               const Icon = ICON_MAP[nextStep.icon];
               
               return (
-                <div className="bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4">
+                <div className="bg-white/20 border border-brand-blue-500/30 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-5 h-5 text-brand-blue-400" />
                     <span className="text-brand-blue-300 text-sm font-medium">Next Step</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-bold">{nextStep.title}</h3>
+                      <h3 className="text-slate-900 font-bold">{nextStep.title}</h3>
                       <p className="text-brand-blue-200 text-sm">{nextStep.description}</p>
                     </div>
                   </div>
@@ -212,9 +212,9 @@ export default function OnboardingPage() {
                         step.completed ? 'bg-brand-green-500' : 'bg-slate-700'
                       }`}>
                         {step.completed ? (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-slate-500 flex-shrink-0">•</span>
                         ) : (
-                          <span className="text-slate-400 font-medium">{index + 1}</span>
+                          <span className="text-slate-500 font-medium">{index + 1}</span>
                         )}
                       </div>
                       <div className="flex-1">
@@ -237,9 +237,9 @@ export default function OnboardingPage() {
         )}
 
         {/* Help Section */}
-        <div className="bg-slate-800 rounded-xl p-4 mt-6">
-          <h3 className="text-white font-medium mb-2">Need Help?</h3>
-          <p className="text-slate-400 text-sm mb-3">
+        <div className="bg-white rounded-xl p-4 mt-6">
+          <h3 className="text-slate-900 font-medium mb-2">Need Help?</h3>
+          <p className="text-slate-500 text-sm mb-3">
             Contact your supervisor or program coordinator if you have questions about your apprenticeship.
           </p>
           <Link 

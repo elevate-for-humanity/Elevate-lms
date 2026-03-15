@@ -83,7 +83,7 @@ export default function EnrollmentDashboard() {
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
+        return <span className="text-slate-500 flex-shrink-0">•</span>;
       case 'active':
       case 'enrolled':
       case 'in_progress':
@@ -162,7 +162,7 @@ export default function EnrollmentDashboard() {
                       </div>
                       <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-brand-blue-500 rounded-full transition-all"
+                          className="h-full bg-white rounded-full transition-all"
                           style={{ width: `${enrollment.progress}%` }}
                         />
                       </div>

@@ -221,7 +221,7 @@ export function NotificationPermissionBanner({ onDismiss }: NotificationPermissi
   };
 
   return (
-    <div className="bg-brand-blue-600 text-white px-4 py-3">
+    <div className="bg-white text-white px-4 py-3">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Bell className="w-5 h-5 flex-shrink-0" />

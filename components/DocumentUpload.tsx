@@ -375,7 +375,7 @@ export default function DocumentUpload({
           animate={{ opacity: 1, y: 0 }}
           className="mt-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3"
         >
-          <div className="w-10 h-10 bg-brand-green-600 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
             <Check className="w-6 h-6 text-white" />
           </div>
           <div>

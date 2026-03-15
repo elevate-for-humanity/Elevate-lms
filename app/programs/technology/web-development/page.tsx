@@ -70,8 +70,8 @@ export default function WebDevelopmentPage() {
         </div>
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Web Development</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Full-Stack Development Bootcamp</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Web Development</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Full-Stack Development Bootcamp</p>
           </div>
         </div>
       </section>
@@ -180,7 +180,7 @@ export default function WebDevelopmentPage() {
               <div className="space-y-3">
                 {projectPortfolio.map((project, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{project}</span>
                   </div>
                 ))}
@@ -224,7 +224,7 @@ export default function WebDevelopmentPage() {
                   'Reliable internet access',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -240,7 +240,7 @@ export default function WebDevelopmentPage() {
                   'Career support included after graduation',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -251,7 +251,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-purple-700 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Learn to Code?</h2>
           <p className="text-purple-100 text-lg mb-8">Apply now or check if you qualify for free training through workforce funding.</p>

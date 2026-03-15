@@ -71,7 +71,7 @@ export default function JobCard({ job, href, showApply = false }: JobCardProps) 
               <span key={s} className="text-[11px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full">{s}</span>
             ))}
             {job.skills_required.length > 4 && (
-              <span className="text-[11px] text-slate-400">+{job.skills_required.length - 4} more</span>
+              <span className="text-[11px] text-slate-500">+{job.skills_required.length - 4} more</span>
             )}
           </div>
         )}

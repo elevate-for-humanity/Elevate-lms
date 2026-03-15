@@ -144,7 +144,7 @@ export default async function AgenciesPage() {
               <ul className="space-y-3">
                 {platformFeatures.map((feature, index) => (
                   <li key={index} className="flex items-center gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -188,7 +188,7 @@ export default async function AgenciesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {governanceFeatures.map((feature, index) => (
               <div key={index} className="flex items-start gap-3 bg-white rounded-lg p-5 shadow-sm border">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature}</span>
               </div>
             ))}
@@ -215,7 +215,7 @@ export default async function AgenciesPage() {
                   {partner.logo_url ? (
                     <Image src={partner.logo_url} alt={partner.name} fill className="object-contain" sizes="128px" />
                   ) : (
-                    <span className="text-gray-400 font-medium">{partner.name}</span>
+                    <span className="text-slate-500 font-medium">{partner.name}</span>
                   )}
                 </div>
               ))}
@@ -245,9 +245,9 @@ export default async function AgenciesPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Modernize Your Workforce System?
           </h2>
           <p className="text-brand-blue-100 mb-8">

@@ -86,9 +86,9 @@ export default async function LocationsPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-brand-blue-600 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">Our Locations</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Our Locations</h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Visit us in Indianapolis to learn more about our programs and services.
           </p>
@@ -249,7 +249,7 @@ export default async function LocationsPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-brand-blue-600 rounded-2xl p-8 text-white text-center">
+        <section className="bg-white rounded-2xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Visit?</h2>
           <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
             Schedule a campus tour or meet with an enrollment advisor to learn about our programs.

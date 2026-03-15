@@ -219,7 +219,7 @@ export default function LearningAnalyticsDashboard() {
                     </div>
                     <div className="w-20 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-brand-green-500 h-2 rounded-full"
+                        className="bg-white h-2 rounded-full"
                         style={{ width: `${day.score}%` }}
                       />
                     </div>

@@ -162,9 +162,9 @@ export default async function SponsorLicensingPage() {
             </div>
 
             {/* Professional */}
-            <div className="bg-zinc-900   rounded-3xl shadow-2xl border-4 border-indigo-400 p-8 relative transform lg:scale-105">
+            <div className="bg-white   rounded-3xl shadow-2xl border-4 border-indigo-400 p-8 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold">
+                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold">
                   MOST POPULAR
                 </div>
               </div>
@@ -174,18 +174,18 @@ export default async function SponsorLicensingPage() {
                   <Image src="/images/icons/users.png" alt="Growth" width={24} height={24} className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-2xl font-bold text-slate-900">
                     Professional
                   </h3>
-                  <p className="text-sm text-white/80">Regional Authority</p>
+                  <p className="text-sm text-slate-600">Regional Authority</p>
                 </div>
               </div>
 
               <div className="mb-6">
                 <div className="text-4xl font-bold text-white mb-2">
-                  $2,500<span className="text-xl text-white/80">/month</span>
+                  $2,500<span className="text-xl text-slate-600">/month</span>
                 </div>
-                <div className="text-sm text-white/80">+ $5,000 setup fee</div>
+                <div className="text-sm text-slate-600">+ $5,000 setup fee</div>
               </div>
 
               <div className="mb-6">
@@ -235,7 +235,7 @@ export default async function SponsorLicensingPage() {
               </div>
 
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-6">
-                <p className="text-sm font-bold text-white mb-2">Includes:</p>
+                <p className="text-sm font-bold text-slate-900 mb-2">Includes:</p>
                 <ul className="text-sm text-white space-y-1">
                   <li>• Up to 25 employers</li>
                   <li>• Up to 250 apprentices</li>
@@ -392,7 +392,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* Employer Fees */}
-      <section className="py-20 bg-zinc-900  ">
+      <section className="py-20 bg-white  ">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-block px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-bold mb-4">
@@ -526,7 +526,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-zinc-900   text-white">
+      <section className="py-20 bg-white   text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to License?

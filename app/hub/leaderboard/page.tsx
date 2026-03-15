@@ -51,7 +51,7 @@ export default async function LeaderboardPage() {
 
         {/* User's Rank Card */}
         {userRank >= 0 && (
-          <div className="bg-brand-green-500 rounded-2xl p-6 mb-8 text-white">
+          <div className="bg-white rounded-2xl p-6 mb-8 text-white">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-brand-green-100 text-sm">Your Rank</p>
@@ -84,7 +84,7 @@ export default async function LeaderboardPage() {
             <div className="text-center">
               <div className="relative">
                 <Crown className="w-8 h-8 text-yellow-500 absolute -top-6 left-1/2 -translate-x-1/2" />
-                <div className="w-24 h-24 rounded-full bg-yellow-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-2">
+                <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-white text-3xl font-bold mx-auto mb-2">
                   {topLearners[0]?.full_name?.charAt(0) || '1'}
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default async function LeaderboardPage() {
 
             {/* 3rd Place */}
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
+              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
                 {topLearners[2]?.full_name?.charAt(0) || '3'}
               </div>
               <div className="bg-brand-orange-100 rounded-t-lg px-6 py-6">
@@ -123,7 +123,7 @@ export default async function LeaderboardPage() {
                 <div className="w-8 text-center font-bold text-slate-500">
                   {index + 4}
                 </div>
-                <div className="w-10 h-10 rounded-full bg-brand-blue-500 flex items-center justify-center text-white font-medium">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-white font-medium">
                   {learner.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1">

@@ -101,10 +101,10 @@ export default function ApproveHoursPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading pending hours...</p>
+          <p className="text-slate-900">Loading pending hours...</p>
         </div>
       </div>
     );
@@ -112,11 +112,11 @@ export default function ApproveHoursPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/approve-hours"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -129,47 +129,47 @@ export default function ApproveHoursPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/shop-owner" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Approve Hours</h1>
-            <p className="text-slate-400 text-sm">{entries.length} pending approval</p>
+            <h1 className="text-xl font-bold text-slate-900">Approve Hours</h1>
+            <p className="text-slate-500 text-sm">{entries.length} pending approval</p>
           </div>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-4">
         {entries.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-8 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            <h2 className="text-xl font-bold text-white mb-2">All Caught Up!</h2>
-            <p className="text-slate-400">No pending hours to approve</p>
+          <div className="bg-white rounded-xl p-8 text-center">
+            <span className="text-slate-500 flex-shrink-0">•</span>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">All Caught Up!</h2>
+            <p className="text-slate-500">No pending hours to approve</p>
           </div>
         ) : (
           entries.map((entry) => (
-            <div key={entry.id} className="bg-slate-800 rounded-xl p-4">
+            <div key={entry.id} className="bg-white rounded-xl p-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                   <User className="w-6 h-6 text-brand-blue-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-white font-medium">{entry.apprenticeName}</p>
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-slate-900 font-medium">{entry.apprenticeName}</p>
+                  <p className="text-slate-500 text-sm">
                     Week ending {new Date(entry.weekEnding).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-white">{entry.hours}</p>
-                  <p className="text-slate-400 text-sm">hours</p>
+                  <p className="text-2xl font-bold text-slate-900">{entry.hours}</p>
+                  <p className="text-slate-500 text-sm">hours</p>
                 </div>
               </div>
 
               {entry.notes && (
-                <p className="text-slate-400 text-sm mb-4 bg-slate-700/50 rounded-lg p-3">
+                <p className="text-slate-500 text-sm mb-4 bg-slate-700/50 rounded-lg p-3">
                   {entry.notes}
                 </p>
               )}
@@ -184,7 +184,7 @@ export default function ApproveHoursPage() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Approve
                     </>
                   )}

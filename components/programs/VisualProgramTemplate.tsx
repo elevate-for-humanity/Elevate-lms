@@ -50,10 +50,10 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
         )}
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
               {program.name || program.heroTitle}
             </h1>
-            <p className="text-lg text-slate-300 mb-6 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 mb-6 max-w-2xl mx-auto">
               Eligibility approval is required before enrollment. Start your application to check eligibility.
             </p>
             <Link
@@ -110,7 +110,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
                     sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <p className="absolute bottom-3 left-3 right-3 text-white text-sm font-medium">
+                  <p className="absolute bottom-3 left-3 right-3 text-slate-900 text-sm font-medium">
                     {item}
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               Your first step is confirming eligibility.
             </h2>
             <Link
@@ -280,11 +280,11 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           sizes="(max-width: 640px) 50vw, 25vw"
           className="object-cover"
         />
-        <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm">
           {step}
         </div>
         <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="font-bold text-white">{label}</h3>
+          <h3 className="font-bold text-slate-900">{label}</h3>
           <p className="text-slate-600 text-xs">{description}</p>
         </div>
       </div>

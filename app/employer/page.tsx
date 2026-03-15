@@ -102,7 +102,7 @@ export default function EmployerPage() {
                 </div>
                 <div className="p-2 bg-white">
                   <p className="text-xs font-bold text-slate-900 leading-tight mb-0.5">{label}</p>
-                  <p className="text-[10px] text-slate-400 leading-tight">{credential}</p>
+                  <p className="text-[10px] text-slate-500 leading-tight">{credential}</p>
                 </div>
               </div>
             ))}
@@ -120,7 +120,7 @@ export default function EmployerPage() {
               <div key={n} className="flex flex-col">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-3 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-sm flex items-center justify-center shadow">{n}</div>
+                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white text-white font-extrabold text-sm flex items-center justify-center shadow">{n}</div>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">{title}</h3>
                 <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
@@ -131,13 +131,13 @@ export default function EmployerPage() {
       </section>
 
       {/* Dark CTA */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Hire?</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Start the Conversation</h2>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Start the Conversation</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-6">
                 Tell us what roles you need to fill. We'll match you to current graduates, walk you through available incentives, and set up a hiring pipeline that works for your team.
               </p>
               <div className="flex flex-wrap gap-3">

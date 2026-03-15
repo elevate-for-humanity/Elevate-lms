@@ -71,11 +71,11 @@ export default function FSSAPartnershipRequestPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-zinc-900   py-12 px-4">
+      <div className="min-h-screen bg-white   py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
             <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-black mb-4">
               Thank You for Your Interest!
@@ -140,9 +140,9 @@ export default function FSSAPartnershipRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-900">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-800 border-b border-slate-700">
+      <div className="bg-white border-b border-slate-700">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'FSSA Partnership Request' }]} />
         </div>
@@ -165,7 +165,7 @@ export default function FSSAPartnershipRequestPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h3 className="font-bold text-black mb-2">ETPL Approved</h3>
             <p className="text-sm text-black">

@@ -122,7 +122,7 @@ export default async function PendingStudentsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <h3 className="text-sm font-medium text-black">
                     This Week
                   </h3>

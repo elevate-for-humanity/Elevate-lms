@@ -129,10 +129,10 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-white">
       <div className="flex flex-col h-screen">
         {/* Header */}
-        <div className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
+        <div className="bg-white text-white px-6 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold">JavaScript Advanced Concepts</h1>
             <p className="text-sm text-gray-400">Live Session • 45 participants</p>
@@ -148,7 +148,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
           {/* Main Video Area */}
           <div className="flex-1 flex flex-col bg-black">
             {/* Video Stream */}
-            <div className="flex-1 relative bg-gray-900 flex items-center justify-center">
+            <div className="flex-1 relative bg-white flex items-center justify-center">
               <div className="text-center text-white">
                 <div className="text-6xl mb-4 text-4xl md:text-5xl lg:text-6xl">🎥</div>
                 <p className="text-xl">Live Stream Active</p>
@@ -156,7 +156,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
               </div>
 
               {/* Screen Share Indicator */}
-              <div className="absolute top-4 left-4 bg-brand-orange-600 text-white px-3 py-2 rounded text-sm">
+              <div className="absolute top-4 left-4 bg-white text-white px-3 py-2 rounded text-sm">
                 🖥️ Screen Sharing
               </div>
 
@@ -164,14 +164,14 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
               <div className="absolute bottom-4 right-4 flex gap-2">
                 {participants.slice(0, 3).map((p) => (
                   <div key={p.id} className="relative">
-                    <div className="w-24 h-24 bg-gray-800 rounded-lg flex items-center justify-center text-3xl">
+                    <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center text-3xl">
                       {p.avatar}
                     </div>
                     <div className="absolute bottom-1 left-1 right-1 bg-black/70 text-white text-xs px-1 py-0.5 rounded truncate">
                       {p.name.split(' ')[0]}
                     </div>
                     {!p.muted && (
-                      <div className="absolute top-1 right-1 bg-brand-green-500 w-2 h-2 rounded-full" />
+                      <div className="absolute top-1 right-1 bg-white w-2 h-2 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -179,7 +179,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
             </div>
 
             {/* Controls */}
-            <div className="bg-gray-800 px-6 py-4 flex justify-center gap-4">
+            <div className="bg-white px-6 py-4 flex justify-center gap-4">
               <button className="p-3 bg-gray-700 hover:bg-gray-600 rounded-full text-white">
                 🎤 Mute
               </button>
@@ -204,7 +204,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
           </div>
 
           {/* Side Panel */}
-          <div className="w-80 bg-gray-800 flex flex-col">
+          <div className="w-80 bg-white flex flex-col">
             {/* Panel Tabs */}
             <div className="flex border-b border-gray-700">
               {(['chat', 'participants', 'polls'] as const).map((panel) => (
@@ -228,7 +228,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                 <div className="flex flex-col h-full">
                   <div className="flex-1 p-4 space-y-3">
                     {chatMessages.map((msg) => (
-                      <div key={msg.id} className="bg-gray-700 rounded p-3">
+                      <div key={msg.id} className="bg-white rounded p-3">
                         <div className="flex justify-between items-start mb-1">
                           <span className="font-semibold text-white text-sm">{msg.author}</span>
                           <span className="text-xs text-gray-400">{msg.timestamp}</span>
@@ -258,7 +258,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                     {participants.length} participants
                   </div>
                   {participants.map((p) => (
-                    <div key={p.id} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded">
+                    <div key={p.id} className="flex items-center justify-between p-2 hover:bg-white rounded">
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">{p.avatar}</div>
                         <div>
@@ -294,7 +294,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                                 <span className="text-white text-sm">{option.text}</span>
                                 <span className="text-gray-300 text-sm">{option.votes} votes</span>
                               </div>
-                              <div className="w-full bg-gray-800 rounded-full h-2">
+                              <div className="w-full bg-white rounded-full h-2">
                                 <div
                                   className="bg-brand-orange-600 h-2 rounded-full transition-all"
                                   style={{ width: `${percentage}%` }}

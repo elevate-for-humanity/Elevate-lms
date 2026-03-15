@@ -168,7 +168,7 @@ export default async function IndustriesPage() {
                   className="group bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-blue-500 hover:shadow-xl transition-all"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex-shrink-0 w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center group-hover:bg-brand-blue-600 transition-colors">
+                    <div className="flex-shrink-0 w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
                       <Icon className="h-11 w-11 text-brand-blue-600 group-hover:text-white transition-colors" />
                     </div>
                     <div className="flex-1">

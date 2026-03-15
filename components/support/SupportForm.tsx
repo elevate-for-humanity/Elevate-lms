@@ -40,7 +40,7 @@ export default function SupportForm() {
   if (status === 'success') {
     return (
       <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
-        <span className="text-slate-400 flex-shrink-0">•</span>
+        <span className="text-slate-500 flex-shrink-0">•</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Request Submitted</h3>
         <p className="text-gray-600 mb-6">
           We've received your support request and will respond within 24 hours.

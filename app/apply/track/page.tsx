@@ -136,7 +136,7 @@ export default function TrackApplicationPage() {
   const StatusIcon = status?.icon;
 
   return (
-    <div className="min-h-screen bg-zinc-900  via-white ">
+    <div className="min-h-screen bg-white  via-white ">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

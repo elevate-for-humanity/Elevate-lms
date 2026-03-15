@@ -158,9 +158,9 @@ export default function ComponentIDLab() {
 
         {/* Component Detail */}
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div className="bg-slate-900 text-white px-6 py-4">
+          <div className="bg-white text-white px-6 py-4">
             <h4 className="text-lg font-bold">{comp.name}</h4>
-            <p className="text-sm text-slate-300">{comp.system}</p>
+            <p className="text-sm text-slate-600">{comp.system}</p>
           </div>
           <div className="p-6 space-y-5">
             <div>
@@ -198,7 +198,7 @@ export default function ComponentIDLab() {
           >
             ← Previous
           </button>
-          <span className="text-sm text-slate-400">{currentIdx + 1} / {COMPONENTS.length}</span>
+          <span className="text-sm text-slate-500">{currentIdx + 1} / {COMPONENTS.length}</span>
           <button
             onClick={() => setCurrentIdx((prev) => Math.min(COMPONENTS.length - 1, prev + 1))}
             disabled={currentIdx === COMPONENTS.length - 1}

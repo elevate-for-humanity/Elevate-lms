@@ -85,10 +85,10 @@ export default async function TimeOffPage() {
             return (
               <div key={b.type} className="bg-white rounded-xl shadow-sm p-6">
                 <h3 className="font-medium text-gray-500 text-sm mb-1">{b.type}</h3>
-                <p className="text-3xl font-bold text-gray-900">{available}<span className="text-lg text-gray-400">h</span></p>
+                <p className="text-3xl font-bold text-gray-900">{available}<span className="text-lg text-slate-500">h</span></p>
                 <p className="text-sm text-gray-500 mt-1">of {b.total}h available</p>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
-                  <div className="bg-brand-blue-500 h-2 rounded-full" style={{ width: `${Math.min(100, pct)}%` }} />
+                  <div className="bg-white h-2 rounded-full" style={{ width: `${Math.min(100, pct)}%` }} />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>{b.used}h used</span>

@@ -244,7 +244,7 @@ export default function PathwaysPage() {
                 <div className="flex flex-col lg:flex-row">
                   <div className="relative h-64 lg:h-auto lg:w-96 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 1024px) 100vw, 384px" className="object-cover" />
-                    <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {s.num}
                     </div>
                   </div>
@@ -445,7 +445,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-14 bg-brand-blue-900 text-white">
+      <section className="py-14 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start?</h2>
           <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">

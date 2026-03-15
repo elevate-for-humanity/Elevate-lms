@@ -140,10 +140,10 @@ export default function InstructionalFrameworkPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               Official Compliance Document
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Instructional Delivery Framework
             </h1>
           </div>
@@ -208,7 +208,7 @@ export default function InstructionalFrameworkPage() {
               { role: 'Central Compliance System', entity: 'Institutional LMS', detail: 'Single system of record for RTI attendance, module completion, assessments, instructor verification, OJT hour logging, and cohort progress reporting.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 items-start bg-white rounded-lg p-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold">
                   {i + 1}
                 </div>
                 <div>

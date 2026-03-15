@@ -115,7 +115,7 @@ export default function ScheduleMeetingPage() {
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Meeting Scheduled!</h1>
           <p className="text-gray-600 mb-6">
@@ -447,7 +447,7 @@ export default function ScheduleMeetingPage() {
                     </>
                   ) : (
                     <>
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Confirm Meeting
                     </>
                   )}

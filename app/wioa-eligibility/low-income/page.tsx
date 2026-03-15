@@ -65,7 +65,7 @@ export default async function LowIncomePage() {
         </div>
       </div>
 
-      <section className="bg-brand-blue-600 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -134,7 +134,7 @@ export default async function LowIncomePage() {
           <div className="grid md:grid-cols-2 gap-3">
             {additionalQualifiers.map((qualifier, index) => (
               <div key={index} className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{qualifier}</span>
               </div>
             ))}
@@ -192,7 +192,7 @@ export default async function LowIncomePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-white rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Not Sure If You Qualify?</h3>
           <p className="text-brand-blue-100 mb-6">
             Apply anyway! We'll help determine your eligibility and find funding options.

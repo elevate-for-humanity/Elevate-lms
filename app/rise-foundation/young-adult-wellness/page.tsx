@@ -55,7 +55,7 @@ export default function YoungAdultWellnessPage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[320px] sm:h-[420px] overflow-hidden bg-slate-900">
+      <section className="relative h-[320px] sm:h-[420px] overflow-hidden bg-white">
         <Image
           src="/images/pages/rise-foundation.jpg"
           alt="Young adult wellness support"
@@ -105,7 +105,7 @@ export default function YoungAdultWellnessPage() {
         </div>
 
         {/* For Parents & Caregivers */}
-        <div className="bg-slate-900 text-white rounded-2xl p-8 mb-10">
+        <div className="bg-white text-white rounded-2xl p-8 mb-10">
           <h2 className="text-2xl font-bold mb-4">For Parents &amp; Caregivers</h2>
           <p className="text-white/80 leading-relaxed mb-6">
             Supporting a young person&apos;s mental health starts with understanding. Selfish Inc. offers guidance sessions for parents and caregivers — practical conversations about how to listen, when to act, and how to connect your young adult to the right resources without creating distance.

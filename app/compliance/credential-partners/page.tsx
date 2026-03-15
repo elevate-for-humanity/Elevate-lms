@@ -124,10 +124,10 @@ export default function CredentialPartnersPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               Compliance Registry
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Credential Partner Registry
             </h1>
           </div>
@@ -178,8 +178,8 @@ export default function CredentialPartnersPage() {
           <div className="space-y-6">
             {CREDENTIAL_PARTNERS.map((partner, i) => (
               <div key={i} className="bg-white rounded-xl border overflow-hidden">
-                <div className="bg-brand-blue-600 px-6 py-3 flex items-center justify-between">
-                  <h3 className="font-bold text-white">{partner.program}</h3>
+                <div className="bg-white px-6 py-3 flex items-center justify-between">
+                  <h3 className="font-bold text-slate-900">{partner.program}</h3>
                   <span className="text-xs text-brand-blue-100 bg-brand-blue-700 px-2 py-0.5 rounded">
                     {partner.licenseStatus}
                   </span>

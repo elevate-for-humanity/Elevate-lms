@@ -114,7 +114,7 @@ export default async function SellOnMarketplacePage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-brand-blue-600 text-white py-16">
+      <div className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">Share Your Expertise, Earn Revenue</h1>
           <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
@@ -173,7 +173,7 @@ export default async function SellOnMarketplacePage() {
                   <ul className="space-y-2">
                     {type.examples.map((example, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         {example}
                       </li>
                     ))}
@@ -190,7 +190,7 @@ export default async function SellOnMarketplacePage() {
           <div className="grid sm:grid-cols-4 gap-6">
             {steps.map((step) => (
               <div key={step.number} className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   {step.number}
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{step.title}</h3>
@@ -212,7 +212,7 @@ export default async function SellOnMarketplacePage() {
               </div>
               <div className="text-4xl text-gray-300">/</div>
               <div>
-                <p className="text-5xl font-bold text-gray-400">30%</p>
+                <p className="text-5xl font-bold text-slate-500">30%</p>
                 <p className="text-gray-600">Platform Fee</p>
               </div>
             </div>

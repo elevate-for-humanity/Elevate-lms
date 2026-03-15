@@ -295,7 +295,7 @@ export default function ContentLibrary({
                   </div>
 
                   <div className="mt-4 pt-3 border-t flex items-center justify-between">
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-500">
                       {item.view_count?.toLocaleString() || 0} views
                     </span>
                     <button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium flex items-center gap-1">

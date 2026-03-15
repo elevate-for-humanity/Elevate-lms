@@ -153,7 +153,7 @@ export default async function PartnerReportsPage() {
                 <div key={q.name} className="flex items-center gap-4">
                   <span className="w-8 text-sm font-medium text-gray-500">{q.name}</span>
                   <div className="flex-1 bg-white rounded-full h-4 overflow-hidden">
-                    <div className="bg-brand-orange-500 h-full rounded-full" 
+                    <div className="bg-white h-full rounded-full" 
                       style={{ width: `${Math.min(100, (idx + 1) * 20)}%` }} />
                   </div>
                   <span className="text-sm text-gray-600 w-16 text-right">

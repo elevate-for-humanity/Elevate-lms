@@ -27,13 +27,13 @@ interface ApprenticeData {
 // Public Landing Page Component
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="bg-brand-blue-700 px-6 pt-16 pb-12 text-center">
+      <div className="bg-white px-6 pt-16 pb-12 text-center">
         <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Scissors className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-3xl font-black text-white mb-3">Barber Apprentice</h1>
+        <h1 className="text-3xl font-black text-slate-900 mb-3">Barber Apprentice</h1>
         <p className="text-brand-blue-200 text-lg max-w-xs mx-auto">
           Track your hours, access training, and progress toward your barber license.
         </p>
@@ -41,33 +41,33 @@ function LandingPage() {
 
       {/* Features */}
       <div className="px-6 py-8 space-y-4">
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-brand-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <Clock className="w-5 h-5 text-brand-green-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Track Your Hours</h3>
-            <p className="text-slate-400 text-sm">Log training hours and see your progress toward 2,000 hours.</p>
+            <h3 className="text-slate-900 font-semibold">Track Your Hours</h3>
+            <p className="text-slate-500 text-sm">Log training hours and see your progress toward 2,000 hours.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Training Materials</h3>
-            <p className="text-slate-400 text-sm">Access Milady curriculum and instructional videos.</p>
+            <h3 className="text-slate-900 font-semibold">Training Materials</h3>
+            <p className="text-slate-500 text-sm">Access Milady curriculum and instructional videos.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <Award className="w-5 h-5 text-amber-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Earn Milestones</h3>
-            <p className="text-slate-400 text-sm">Unlock achievements as you progress through your apprenticeship.</p>
+            <h3 className="text-slate-900 font-semibold">Earn Milestones</h3>
+            <p className="text-slate-500 text-sm">Unlock achievements as you progress through your apprenticeship.</p>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
   const hoursRemaining = TARGET_HOURS - totalHours;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between mb-4">
@@ -121,7 +121,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
             </div>
             <div>
               <p className="text-brand-blue-200 text-sm">Welcome back,</p>
-              <h1 className="text-white font-bold text-lg">{apprentice.name}</h1>
+              <h1 className="text-slate-900 font-bold text-lg">{apprentice.name}</h1>
             </div>
           </div>
           <div className="flex gap-2">
@@ -142,7 +142,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </div>
           <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
             <div 
-              className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+              className="h-full bg-white rounded-full transition-all duration-500"
               style={{ width: `${Math.min(progressPercent, 100)}%` }}
             />
           </div>
@@ -157,32 +157,32 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
       <main className="px-4 py-6 space-y-6">
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-brand-blue-400" />
-              <span className="text-slate-400 text-sm">This Week</span>
+              <span className="text-slate-500 text-sm">This Week</span>
             </div>
-            <p className="text-2xl font-bold text-white">{apprentice.weeklyHours || 0} hrs</p>
+            <p className="text-2xl font-bold text-slate-900">{apprentice.weeklyHours || 0} hrs</p>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-brand-green-400" />
-              <span className="text-slate-400 text-sm">Remaining</span>
+              <span className="text-slate-500 text-sm">Remaining</span>
             </div>
-            <p className="text-2xl font-bold text-white">{formatHours(hoursRemaining)} hrs</p>
+            <p className="text-2xl font-bold text-slate-900">{formatHours(hoursRemaining)} hrs</p>
           </div>
         </div>
 
         {/* Next Milestone */}
         {apprentice.nextMilestone && (
-          <div className="bg-amber-500/20 border border-amber-500/30 rounded-xl p-4">
+          <div className="bg-white/20 border border-amber-500/30 rounded-xl p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                 <Award className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
                 <p className="text-amber-200 text-sm">Next Milestone</p>
-                <p className="text-white font-bold">{formatHours(apprentice.nextMilestone)} Hours</p>
+                <p className="text-slate-900 font-bold">{formatHours(apprentice.nextMilestone)} Hours</p>
               </div>
               <div className="text-right">
                 <p className="text-amber-200 text-sm">
@@ -195,117 +195,117 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
 
         {/* Quick Actions */}
         <div className="space-y-3">
-          <h2 className="text-white font-bold text-lg">Quick Actions</h2>
+          <h2 className="text-slate-900 font-bold text-lg">Quick Actions</h2>
           
           <Link href="/pwa/barber/checkin" className="flex items-center gap-4 bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-4 active:opacity-80">
-            <div className="w-12 h-12 bg-brand-green-500 rounded-xl flex items-center justify-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Check In</p>
+              <p className="text-slate-900 font-medium">Check In</p>
               <p className="text-brand-green-300 text-sm">Start tracking your hours</p>
             </div>
             <ChevronRight className="w-5 h-5 text-brand-green-400" />
           </Link>
 
           <Link href="/pwa/barber/hours/submit" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Plus className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Submit Hours</p>
-              <p className="text-slate-400 text-sm">Log hours with photo proof</p>
+              <p className="text-slate-900 font-medium">Submit Hours</p>
+              <p className="text-slate-500 text-sm">Log hours with photo proof</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/log-hours" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-green-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Plus className="w-6 h-6 text-brand-green-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Quick Log</p>
-              <p className="text-slate-400 text-sm">Record today's training</p>
+              <p className="text-slate-900 font-medium">Quick Log</p>
+              <p className="text-slate-500 text-sm">Record today's training</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/progress" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">View Progress</p>
-              <p className="text-slate-400 text-sm">Detailed hour breakdown</p>
+              <p className="text-slate-900 font-medium">View Progress</p>
+              <p className="text-slate-500 text-sm">Detailed hour breakdown</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/training" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Training Materials</p>
-              <p className="text-slate-400 text-sm">Milady curriculum & videos</p>
+              <p className="text-slate-900 font-medium">Training Materials</p>
+              <p className="text-slate-500 text-sm">Milady curriculum & videos</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/history" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Calendar className="w-6 h-6 text-amber-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Hour History</p>
-              <p className="text-slate-400 text-sm">View all logged hours</p>
+              <p className="text-slate-900 font-medium">Hour History</p>
+              <p className="text-slate-500 text-sm">View all logged hours</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/milestones" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Award className="w-6 h-6 text-amber-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Milestones</p>
-              <p className="text-slate-400 text-sm">Track achievements & rewards</p>
+              <p className="text-slate-900 font-medium">Milestones</p>
+              <p className="text-slate-500 text-sm">Track achievements & rewards</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/reports" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Star className="w-6 h-6 text-slate-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Reports</p>
-              <p className="text-slate-400 text-sm">Export & view summaries</p>
+              <p className="text-slate-900 font-medium">Reports</p>
+              <p className="text-slate-500 text-sm">Export & view summaries</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/barber/profile" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <User className="w-6 h-6 text-slate-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">My Profile</p>
-              <p className="text-slate-400 text-sm">View your apprentice profile</p>
+              <p className="text-slate-900 font-medium">My Profile</p>
+              <p className="text-slate-500 text-sm">View your apprentice profile</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
         </div>
 
         {/* Shop Info */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
             <Scissors className="w-5 h-5 text-brand-blue-400" />
-            <span className="text-slate-400 text-sm">Training Location</span>
+            <span className="text-slate-500 text-sm">Training Location</span>
           </div>
-          <p className="text-white font-medium">{apprentice.shopName}</p>
+          <p className="text-slate-900 font-medium">{apprentice.shopName}</p>
           {apprentice.startDate && (
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1">
               Started {new Date(apprentice.startDate).toLocaleDateString()}
             </p>
           )}
@@ -388,10 +388,10 @@ export default function BarberPWAHome() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading...</p>
+          <p className="text-slate-900">Loading...</p>
         </div>
       </div>
     );
@@ -405,11 +405,11 @@ export default function BarberPWAHome() {
   // Logged in but not enrolled
   if (!apprentice) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Not Enrolled</h1>
-          <p className="text-slate-400 mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Not Enrolled</h1>
+          <p className="text-slate-500 mb-6">
             You're signed in but not enrolled in the Barber Apprenticeship program.
           </p>
           <Link

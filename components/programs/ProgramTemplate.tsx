@@ -38,7 +38,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
           posterImage={program.heroImage}
         />
       ) : (
-        <section className="bg-zinc-900 text-white py-16">
+        <section className="bg-white text-white py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="max-w-4xl">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -441,7 +441,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
       {/* POST-COMPLETION PATHWAY */}
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-white text-center">
+          <h2 className="text-3xl font-bold mb-8 text-slate-900 text-center">
             What Happens After Completion?
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -449,8 +449,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Career Services</h3>
-              <p className="text-white/80">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Career Services</h3>
+              <p className="text-slate-600">
                 Resume review, interview prep, and job search assistance from our career services team.
               </p>
             </div>
@@ -458,8 +458,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-2xl">🤝</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Employer Connections</h3>
-              <p className="text-white/80">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Employer Connections</h3>
+              <p className="text-slate-600">
                 Direct introductions to hiring employers in our partner network actively seeking graduates.
               </p>
             </div>
@@ -467,8 +467,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-2xl">📈</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Career Advancement</h3>
-              <p className="text-white/80">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Career Advancement</h3>
+              <p className="text-slate-600">
                 Pathways to advanced certifications, specializations, and leadership roles in your field.
               </p>
             </div>
@@ -485,7 +485,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-zinc-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-white/90 mb-8">
@@ -517,7 +517,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
           </div>
 
           <div className="pt-8 border-t border-white/20">
-            <p className="text-sm text-white/70">
+            <p className="text-sm text-slate-500">
               Questions? Call us at Get Help Online or email
               our contact form
             </p>
@@ -545,7 +545,7 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-600 text-white text-xl font-bold mb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-white text-xl font-bold mb-4">
           {n}
         </div>
         <div className="font-bold text-black mb-2">{title}</div>

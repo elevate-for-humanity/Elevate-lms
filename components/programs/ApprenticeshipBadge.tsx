@@ -8,7 +8,7 @@ export function ApprenticeshipBadge() {
   return (
     <div className="mt-4 rounded-2xl border border-brand-blue-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
+        <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
           <Award className="w-6 h-6 text-white" />
         </div>
         <div>

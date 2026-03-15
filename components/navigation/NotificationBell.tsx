@@ -195,7 +195,7 @@ export function NotificationBell() {
                         </p>
                       </div>
                       {notif.unread && (
-                        <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2" />
+                        <div className="w-2 h-2 bg-white rounded-full mt-2" />
                       )}
                     </div>
                   </div>

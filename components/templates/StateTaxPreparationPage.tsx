@@ -30,7 +30,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
               VITA Sites Across {state.name}
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             {state.taxPreparation.headline}
           </h1>
           <p className="text-xl text-brand-blue-100 mb-8 max-w-3xl">
@@ -63,7 +63,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <div className="grid md:grid-cols-2 gap-6">
             {state.taxPreparation.features.map((item) => (
               <div key={item} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -80,19 +80,19 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <div className="bg-white p-8 rounded-xl shadow-sm">
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Households earning $64,000 or less annually</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Persons with disabilities</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Limited English speaking taxpayers</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Senior citizens (60+)</span>
               </li>
             </ul>
@@ -146,9 +146,9 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Get Your Maximum Refund
           </h2>
           <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">

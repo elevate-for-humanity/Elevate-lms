@@ -120,7 +120,7 @@ export default async function InstructorStudentsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <div>
                 <div className="text-2xl font-bold">{completedStudents.length}</div>
                 <div className="text-sm text-gray-600">Completed</div>
@@ -180,7 +180,7 @@ export default async function InstructorStudentsPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-brand-blue-600 rounded-full"
+                            className="h-full bg-white rounded-full"
                             style={{ width: `${enrollment.progress || 0}%` }}
                           />
                         </div>

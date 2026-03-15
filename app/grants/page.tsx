@@ -197,7 +197,7 @@ export default function GrantsPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-white mb-4 text-center">
             How to Get Started

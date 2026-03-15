@@ -68,7 +68,7 @@ export default function HiringGuidePage() {
   return (
     <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
-<div className="relative h-80 bg-brand-blue-800 overflow-hidden">
+<div className="relative h-80 bg-white overflow-hidden">
         <Image
           src="/images/pages/employer-portal-page-2.jpg"
           alt="Hiring guide"
@@ -107,7 +107,7 @@ export default function HiringGuidePage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+                  <div className="absolute top-4 left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">
                     {step.number}
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export default function HiringGuidePage() {
           </div>
         </div>
 
-        <div className="bg-brand-blue-600 rounded-2xl p-8 text-white text-center">
+        <div className="bg-white rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Hiring?</h3>
           <p className="text-brand-blue-200 mb-6 max-w-2xl mx-auto">
             Post your first job and connect with pre-screened, WOTC-eligible candidates today.

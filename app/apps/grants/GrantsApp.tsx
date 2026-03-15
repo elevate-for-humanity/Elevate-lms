@@ -43,7 +43,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
     <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
-        <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
+        <div className="bg-white text-yellow-900 px-4 py-2 text-center text-sm font-medium">
           Trial: {trialDaysRemaining} days remaining. 
           <Link href="/store/apps/grants?upgrade=true" className="underline ml-2">Upgrade now</Link>
         </div>
@@ -234,7 +234,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                     {app.status === 'draft' && (
                       <div className="mt-2">
                         <div className="h-2 bg-gray-200 rounded-full">
-                          <div className="h-2 bg-brand-blue-600 rounded-full" style={{ width: `${app.progress || 0}%` }} />
+                          <div className="h-2 bg-white rounded-full" style={{ width: `${app.progress || 0}%` }} />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">{app.progress || 0}% complete</p>
                       </div>

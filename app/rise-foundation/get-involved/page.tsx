@@ -89,10 +89,10 @@ export default async function GetInvolvedPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/rise-foundation-page-1.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Get Involved</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Join our community of compassionate individuals making a difference in people's lives.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Get Involved</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Join our community of compassionate individuals making a difference in people's lives.</p>
           </div>
         </div>
       </section>
@@ -175,7 +175,7 @@ export default async function GetInvolvedPage() {
       )}
 
       {/* Contact */}
-      <section className="py-16 bg-slate-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Make a Difference?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

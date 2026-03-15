@@ -88,7 +88,7 @@ export default function RevocationPage() {
             <div className="bg-white rounded-xl p-8 border-2 border-gray-200 mb-6">
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -101,7 +101,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -114,7 +114,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -133,7 +133,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -151,7 +151,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>
@@ -164,7 +164,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gray-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     6
                   </div>
                   <div>

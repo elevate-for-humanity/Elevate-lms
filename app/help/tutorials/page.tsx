@@ -288,12 +288,12 @@ export default async function TutorialsPage() {
                 className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:border-brand-blue-500 hover:shadow-lg transition-all group"
               >
                 {/* Video Thumbnail Placeholder */}
-                <div className="relative h-48 bg-brand-blue-600 flex items-center justify-center overflow-hidden">
+                <div className="relative h-48 bg-white flex items-center justify-center overflow-hidden">
                   
                   <div className="relative z-10 w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform overflow-hidden">
                     <Play className="w-8 h-8 text-white ml-1" />
                   </div>
-                  <div className="absolute bottom-4 right-4 bg-slate-800 text-white text-sm px-2 py-1 rounded">
+                  <div className="absolute bottom-4 right-4 bg-white text-white text-sm px-2 py-1 rounded">
                     {tutorial.duration}
                   </div>
                 </div>
@@ -378,12 +378,12 @@ export default async function TutorialsPage() {
                   <div className="space-y-2 mb-4">
                     {tutorial.steps.slice(0, 3).map((step, index) => (
                       <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span>{step}</span>
                       </div>
                     ))}
                     {tutorial.steps.length > 3 && (
-                      <p className="text-sm text-gray-400 pl-6">
+                      <p className="text-sm text-slate-500 pl-6">
                         +{tutorial.steps.length - 3} more steps
                       </p>
                     )}
@@ -401,7 +401,7 @@ export default async function TutorialsPage() {
 
         {/* Help CTA */}
         <section className="mt-12">
-          <div className="bg-brand-blue-600 rounded-xl p-8 text-white">
+          <div className="bg-white rounded-xl p-8 text-white">
             <div className="max-w-2xl">
               <h2 className="text-2xl font-bold mb-2">Can't Find What You Need?</h2>
               <p className="text-brand-blue-100 mb-6">

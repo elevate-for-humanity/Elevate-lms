@@ -81,10 +81,10 @@ export default async function CoursesPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/courses-page-9.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Launch Your New Career <span className="block text-brand-green-400">In Weeks, Not Years</span></h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Industry-recognized certifications in healthcare, skilled trades, technology, and more. Free for eligible Indiana residents through WIOA funding.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Launch Your New Career <span className="block text-brand-green-400">In Weeks, Not Years</span></h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Industry-recognized certifications in healthcare, skilled trades, technology, and more. Free for eligible Indiana residents through WIOA funding.</p>
           </div>
         </div>
       </section>
@@ -138,8 +138,8 @@ export default async function CoursesPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white mb-1">{category.name}</h3>
-                    <p className="text-sm text-white/80">{category.courses} programs available</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-1">{category.name}</h3>
+                    <p className="text-sm text-slate-600">{category.courses} programs available</p>
                   </div>
                 </div>
                 <div className="p-6">
@@ -156,13 +156,13 @@ export default async function CoursesPage() {
 
       {/* Featured Courses */}
       {featuredCourses.length > 0 && (
-        <section className="py-20 bg-slate-900">
+        <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
                 Featured Programs
               </h2>
-              <p className="text-xl text-slate-400">Our most popular training programs</p>
+              <p className="text-xl text-slate-500">Our most popular training programs</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -184,7 +184,7 @@ export default async function CoursesPage() {
                     <span className="text-xs font-bold text-brand-green-400 uppercase tracking-wide">
                       {course.category}
                     </span>
-                    <h3 className="text-lg font-bold text-white mt-2 mb-2 group-hover:text-brand-green-400 transition-colors">
+                    <h3 className="text-lg font-bold text-slate-900 mt-2 mb-2 group-hover:text-brand-green-400 transition-colors">
                       {course.title}
                     </h3>
                     {course.duration && (
@@ -316,9 +316,9 @@ export default async function CoursesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-green-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
             Ready to Start Your New Career?
           </h2>
           <p className="text-xl text-brand-green-100 mb-8">

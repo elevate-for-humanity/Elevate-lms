@@ -169,7 +169,7 @@ export default function BarberDocumentsPage() {
       <div className="max-w-2xl mx-auto px-6 py-8">
         {/* Required Documents */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div className="bg-brand-red-600 px-6 py-3">
+          <div className="bg-white px-6 py-3">
             <h2 className="text-lg font-bold text-slate-900">Required</h2>
           </div>
           <div className="p-6">
@@ -181,7 +181,7 @@ export default function BarberDocumentsPage() {
                     <p className="text-sm text-slate-500">{doc.description}</p>
                   </div>
                   {governmentId?.status === 'complete' && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   )}
                 </div>
 
@@ -222,7 +222,7 @@ export default function BarberDocumentsPage() {
 
         {/* Optional Documents */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-          <div className="bg-slate-600 px-6 py-3">
+          <div className="bg-white px-6 py-3">
             <h2 className="text-lg font-bold text-slate-900">Optional (Can Submit Later)</h2>
           </div>
           <div className="p-6">

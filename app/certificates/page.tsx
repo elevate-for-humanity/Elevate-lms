@@ -189,7 +189,7 @@ export default function CertificatesPage() {
                 <ul className="space-y-3">
                   {category.items.map((item: any) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-black">{item}</span>
                     </li>
                   ))}
@@ -295,7 +295,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h3 className="text-lg font-bold text-black mb-2">WIOA</h3>
               <p className="text-sm text-black mb-3">
                 Workforce Innovation & Opportunity Act
@@ -371,7 +371,7 @@ export default function CertificatesPage() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
                 Verified & Secure

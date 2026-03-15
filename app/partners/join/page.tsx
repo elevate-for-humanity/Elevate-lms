@@ -120,7 +120,7 @@ export default function JoinPartnerPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
           {STEPS.map((s) => (
             <div key={s.n} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+              <div className="w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold text-sm shrink-0">
                 {s.n}
               </div>
               <div>
@@ -132,7 +132,7 @@ export default function JoinPartnerPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-brand-blue-600 rounded-2xl p-8 text-center text-white">
+        <div className="bg-white rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-2">Ready to Partner?</h2>
           <p className="text-white/80 mb-6">Submit your application and we will follow up within 2 business days.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

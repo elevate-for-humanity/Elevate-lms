@@ -75,7 +75,7 @@ export default function PhilanthropyPage() {
               { title: 'Volunteer', desc: 'Mentor students, lead workshops, or assist with career services events.' },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-4 p-5 bg-white rounded-xl border border-slate-200">
-                <div className="w-2 h-2 rounded-full bg-brand-red-600 mt-2.5 flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full bg-white mt-2.5 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-slate-900">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -87,7 +87,7 @@ export default function PhilanthropyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-brand-red-600">
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Heart className="w-10 h-10 text-white/80 mx-auto mb-4" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Make a Difference Today</h2>

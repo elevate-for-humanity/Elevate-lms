@@ -56,7 +56,7 @@ export default async function CareerCoursesPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-brand-blue-800 text-white py-20">
+      <section className="relative bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 bg-white/20 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">

@@ -290,7 +290,7 @@ function LegalAgreementsContent() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] overflow-hidden bg-slate-900">
+      <section className="relative h-[240px] sm:h-[320px] overflow-hidden bg-white">
         <Image
           src="/images/pages/enrollment-agreement.jpg"
           alt="Legal agreements"
@@ -303,8 +303,8 @@ function LegalAgreementsContent() {
         <div className="relative h-full flex items-end pb-8">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 w-full">
             <p className="text-brand-blue-300 text-xs font-bold uppercase tracking-widest mb-2">Onboarding</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">Required Agreements</h1>
-            <p className="text-slate-300 text-sm sm:text-base">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2">Required Agreements</h1>
+            <p className="text-slate-600 text-sm sm:text-base">
               Please review and sign the following agreements to complete your enrollment.
             </p>
           </div>
@@ -389,7 +389,7 @@ function LegalAgreementsContent() {
                 <p className="text-brand-blue-300 text-xs font-bold uppercase tracking-wider mb-0.5">
                   Agreement {currentIndex + 1} of {missingAgreements.length}
                 </p>
-                <h2 className="text-xl font-bold text-white leading-tight">{currentAgreement.title}</h2>
+                <h2 className="text-xl font-bold text-slate-900 leading-tight">{currentAgreement.title}</h2>
               </div>
             </div>
           </div>
@@ -535,7 +535,7 @@ function LegalAgreementsContent() {
               )}
             </button>
 
-            <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1.5">
+            <p className="text-xs text-slate-500 text-center flex items-center justify-center gap-1.5">
               <Lock className="w-3 h-3" />
               Your signature, IP address, and timestamp are recorded securely.
             </p>

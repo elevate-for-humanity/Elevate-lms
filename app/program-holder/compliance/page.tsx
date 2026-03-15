@@ -298,7 +298,7 @@ export default async function CompliancePage() {
             {/* No Issues */}
             {issues.length === 0 && (
               <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-8 mb-8 text-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <h3 className="text-2xl font-bold text-brand-green-900 mb-2">
                   All Clear!
                 </h3>

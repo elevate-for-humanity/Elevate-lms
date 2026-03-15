@@ -95,7 +95,7 @@ export default async function MembersPage() {
               {members.map((member: any) => (
                 <div key={member.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-full bg-brand-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                       {getInitial(member.full_name)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -111,7 +111,7 @@ export default async function MembersPage() {
                     <span className="text-sm text-gray-500">
                       {(member.points || 0).toLocaleString()} points
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-500">
                       Joined {new Date(member.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -136,9 +136,9 @@ export default async function MembersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Join?</h2>
           <p className="text-brand-orange-100 mb-8 max-w-2xl mx-auto">
             Start your journey and connect with others working toward career success.
           </p>

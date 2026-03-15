@@ -165,7 +165,7 @@ export default function VolunteerPage() {
         <h2 className="text-2xl font-bold mb-4">How to Get Started</h2>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
               1
             </div>
             <div>
@@ -178,7 +178,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
               2
             </div>
             <div>
@@ -193,7 +193,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
               3
             </div>
             <div>
@@ -212,7 +212,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
               4
             </div>
             <div>
@@ -225,7 +225,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
               5
             </div>
             <div>

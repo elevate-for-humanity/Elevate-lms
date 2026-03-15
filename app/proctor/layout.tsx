@@ -21,7 +21,7 @@ export default function ProctorLayout({ children }: { children: React.ReactNode 
             <Shield className="w-6 h-6 text-brand-blue-400" />
             <div>
               <h1 className="text-lg font-bold leading-tight">Proctor Portal</h1>
-              <p className="text-xs text-slate-400">Elevate for Humanity Testing Center</p>
+              <p className="text-xs text-slate-500">Elevate for Humanity Testing Center</p>
             </div>
           </div>
           <nav className="flex items-center gap-2">

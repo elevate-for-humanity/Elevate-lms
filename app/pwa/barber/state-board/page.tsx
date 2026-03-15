@@ -80,7 +80,7 @@ export default function StateBoardPrepPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
@@ -100,14 +100,14 @@ export default function StateBoardPrepPage() {
   const isEligible = totalHours >= 2000;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">State Board Prep</h1>
+            <h1 className="text-xl font-bold text-slate-900">State Board Prep</h1>
             <p className="text-brand-blue-200 text-sm">Indiana Barber License Exam</p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function StateBoardPrepPage() {
               <p className={`font-medium ${isEligible ? 'text-brand-green-300' : 'text-amber-300'}`}>
                 {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 2,000 hours`}
               </p>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-slate-500">
                 {isEligible ? 'You meet the hour requirement' : `${(2000 - totalHours).toLocaleString()} hours remaining`}
               </p>
             </div>
@@ -134,15 +134,15 @@ export default function StateBoardPrepPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div className="bg-white/10 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-white">{topics.length}</p>
+            <p className="text-2xl font-bold text-slate-900">{topics.length}</p>
             <p className="text-brand-blue-200 text-xs">Topics</p>
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-white">{completedTests}/{tests.length}</p>
+            <p className="text-2xl font-bold text-slate-900">{completedTests}/{tests.length}</p>
             <p className="text-brand-blue-200 text-xs">Tests Passed</p>
           </div>
           <div className="bg-white/10 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-white">{avgScore}%</p>
+            <p className="text-2xl font-bold text-slate-900">{avgScore}%</p>
             <p className="text-brand-blue-200 text-xs">Avg Score</p>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function StateBoardPrepPage() {
 
       {/* Tabs */}
       <div className="px-4 py-4">
-        <div className="flex bg-slate-800 rounded-xl p-1">
+        <div className="flex bg-white rounded-xl p-1">
           <button
             onClick={() => setActiveTab('study')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -178,13 +178,13 @@ export default function StateBoardPrepPage() {
           topics.length === 0 ? (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No study topics available yet.</p>
+              <p className="text-slate-500">No study topics available yet.</p>
             </div>
           ) : (
             topics.map(topic => {
               const colors = CATEGORY_COLORS[topic.category] || CATEGORY_COLORS.theory;
               return (
-                <div key={topic.id} className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+                <div key={topic.id} className="bg-white rounded-xl p-4 border border-slate-700">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -192,9 +192,9 @@ export default function StateBoardPrepPage() {
                           {topic.category}
                         </span>
                       </div>
-                      <h3 className="font-bold text-white">{topic.title}</h3>
+                      <h3 className="font-bold text-slate-900">{topic.title}</h3>
                       {topic.content && (
-                        <p className="text-sm text-slate-400 mt-1 line-clamp-2">{topic.content}</p>
+                        <p className="text-sm text-slate-500 mt-1 line-clamp-2">{topic.content}</p>
                       )}
                       {topic.resources && topic.resources.length > 0 && (
                         <p className="text-xs text-slate-500 mt-2">{topic.resources.length} resources</p>
@@ -210,7 +210,7 @@ export default function StateBoardPrepPage() {
           tests.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No practice tests available yet.</p>
+              <p className="text-slate-500">No practice tests available yet.</p>
             </div>
           ) : (
             tests.map(test => {
@@ -222,7 +222,7 @@ export default function StateBoardPrepPage() {
                 }`}>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-bold text-white">{test.title}</h3>
+                      <h3 className="font-bold text-slate-900">{test.title}</h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
                         <span className="flex items-center gap-1">
                           <FileText className="w-4 h-4" />

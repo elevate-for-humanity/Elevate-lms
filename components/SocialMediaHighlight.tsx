@@ -38,7 +38,7 @@ export default function SocialMediaHighlight() {
               />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex items-center gap-3 text-white">
-                  <div className="w-12 h-12 rounded-full bg-brand-blue-600 flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
                     <Facebook size={24} strokeWidth={2.5} />
                   </div>
                   <div>
@@ -75,7 +75,7 @@ export default function SocialMediaHighlight() {
               />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex items-center gap-3 text-white">
-                  <div className="w-12 h-12 rounded-full bg-brand-blue-700 flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
                     <Linkedin size={24} strokeWidth={2.5} />
                   </div>
                   <div>

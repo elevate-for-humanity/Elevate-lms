@@ -233,11 +233,11 @@ export default function HVACClassroomPreview() {
       `}</style>
     <div className="flex h-screen bg-white">
       {/* Banner */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white text-center py-3 text-sm font-medium shadow-lg">
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-white text-white text-center py-3 text-sm font-medium shadow-lg">
         <GraduationCap className="w-4 h-4 inline mr-2" />
         <span className="font-bold">HVAC Technician Program</span>
-        <span className="hidden sm:inline text-slate-400 mx-2">|</span>
-        <span className="hidden sm:inline text-slate-300">640 Hours &middot; EPA 608 &middot; OSHA 10 &middot; CPR/AED</span>
+        <span className="hidden sm:inline text-slate-500 mx-2">|</span>
+        <span className="hidden sm:inline text-slate-600">640 Hours &middot; EPA 608 &middot; OSHA 10 &middot; CPR/AED</span>
         <Link href="/apply?program=hvac-technician" className="ml-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-3 py-1 rounded-full text-xs font-bold transition">Apply Now</Link>
       </div>
 
@@ -249,7 +249,7 @@ export default function HVACClassroomPreview() {
       >
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
-      {sidebarOpen && <div className="fixed inset-0 bg-slate-900/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && <div className="fixed inset-0 bg-white/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 bg-white border-r overflow-y-auto transition-transform duration-300 fixed md:relative h-full z-40 pt-10`}>
@@ -264,7 +264,7 @@ export default function HVACClassroomPreview() {
               <span>{overallProgress}%</span>
             </div>
             <div className="bg-white rounded-full h-2">
-              <div className="bg-brand-green-600 h-2 rounded-full transition-all duration-500" style={{ width: `${overallProgress}%` }} />
+              <div className="bg-white h-2 rounded-full transition-all duration-500" style={{ width: `${overallProgress}%` }} />
             </div>
           </div>
         </div>
@@ -301,7 +301,7 @@ export default function HVACClassroomPreview() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium truncate ${locked ? 'text-slate-400' : 'text-slate-800'}`}>{m.title}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500">
                       {locked ? 'Complete previous module' : `${mDone.size}/${TABS.length} tabs`}
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export default function HVACClassroomPreview() {
 
           {/* CareerSafe External Certifications */}
           <div className="mt-4 pt-4 border-t border-slate-200">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">External Certifications</p>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">External Certifications</p>
             <button
               onClick={() => { setCurrentModuleIndex(course.modules.length); setSidebarOpen(false); }}
               className={`w-full text-left p-3 rounded-lg mb-1 transition ${
@@ -331,7 +331,7 @@ export default function HVACClassroomPreview() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium truncate ${currentModuleIndex === course.modules.length ? 'text-amber-800' : 'text-slate-800'}`}>CareerSafe Certifications</p>
-                  <p className="text-xs text-slate-400">OSHA 10 &middot; CPR/AED</p>
+                  <p className="text-xs text-slate-500">OSHA 10 &middot; CPR/AED</p>
                 </div>
               </div>
             </button>
@@ -402,11 +402,11 @@ export default function HVACClassroomPreview() {
                   onComplete={() => completeTab('video')}
                 />
               ) : (
-                <div className="bg-slate-900 aspect-video rounded-xl flex items-center justify-center">
+                <div className="bg-white aspect-video rounded-xl flex items-center justify-center">
                   <div className="text-center text-white">
                     <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p className="text-lg font-semibold">{mod.title}</p>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-sm text-slate-500 mt-1">
                       {videoLessons.length} video{videoLessons.length !== 1 ? 's' : ''} · {videoLessons.reduce((s, l) => s + (l.durationMinutes || 15), 0)} min
                     </p>
                   </div>
@@ -414,7 +414,7 @@ export default function HVACClassroomPreview() {
               )}
               <div className="mt-4 flex items-center gap-3 text-sm">
                 <div className="flex-1 bg-slate-200 rounded-full h-2">
-                  <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${videoProgress}%` }} />
+                  <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${videoProgress}%` }} />
                 </div>
                 <span className="text-slate-500">{Math.round(videoProgress)}%</span>
               </div>

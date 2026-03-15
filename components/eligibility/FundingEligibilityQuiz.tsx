@@ -174,7 +174,7 @@ export function FundingEligibilityQuiz() {
         <div className={`p-8 rounded-2xl text-center mb-8 ${isEligible ? 'bg-brand-green-50 border-2 border-brand-green-200' : 'bg-amber-50 border-2 border-amber-200'}`}>
           {isEligible ? (
             <>
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h2 className="text-3xl font-bold text-brand-green-800 mb-2">You Likely Qualify!</h2>
               <p className="text-brand-green-700 text-lg">
                 Based on your answers, you may be eligible for <strong>{eligiblePrograms.length}</strong> funding program{eligiblePrograms.length > 1 ? 's' : ''}
@@ -198,7 +198,7 @@ export function FundingEligibilityQuiz() {
             <div className="space-y-3">
               {eligiblePrograms.map((program) => (
                 <div key={program.name} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start gap-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <h4 className="font-semibold text-slate-900">{program.name}</h4>
                     <p className="text-sm text-slate-600">{program.description}</p>
@@ -263,7 +263,7 @@ export function FundingEligibilityQuiz() {
         </div>
         <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-brand-blue-600 transition-all duration-300"
+            className="h-full bg-white transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>

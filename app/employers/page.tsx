@@ -99,7 +99,7 @@ export default function EmployersPage() {
       </section>
 
       {/* Value Props — Top Line */}
-      <section className="py-6 bg-slate-900 text-white">
+      <section className="py-6 bg-white text-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -225,7 +225,7 @@ export default function EmployersPage() {
       {/* Host an Apprentice */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-slate-900 rounded-2xl p-8 md:p-12 text-white">
+          <div className="bg-white rounded-2xl p-8 md:p-12 text-white">
             <div className="grid md:grid-cols-2 gap-10 items-start">
               <div>
                 <Building2 className="w-10 h-10 text-brand-orange-400 mb-4" />
@@ -282,7 +282,7 @@ export default function EmployersPage() {
                     </div>
                   ))}
                 </div>
-                <div className="bg-brand-orange-500/20 border border-brand-orange-400/30 rounded-xl p-5">
+                <div className="bg-white/20 border border-brand-orange-400/30 rounded-xl p-5">
                   <h4 className="font-bold text-brand-orange-300 text-sm mb-2">
                     Barbershop owners: This is built for you
                   </h4>
@@ -308,7 +308,7 @@ export default function EmployersPage() {
       <EmployerPartners variant="full" showStats={true} showCTA={false} />
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-500">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Hire Smarter?

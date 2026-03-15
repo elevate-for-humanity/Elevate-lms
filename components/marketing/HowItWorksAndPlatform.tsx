@@ -46,7 +46,7 @@ export function HowItWorksAndPlatform() {
             <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
               A whole ecosystem around each learner.
             </p>
-            <p className="mt-3 text-sm text-slate-300">
+            <p className="mt-3 text-sm text-slate-600">
               Elevate is designed for real lives — justice-involved learners,
               parents, career changers, and employers who want to hire
               differently. We tie funding, training, and employment together.
@@ -65,7 +65,7 @@ export function HowItWorksAndPlatform() {
                     <h3 className="text-sm font-semibold text-slate-50">
                       {step.title}
                     </h3>
-                    <p className="mt-1 text-sm text-slate-300">
+                    <p className="mt-1 text-sm text-slate-600">
                       {step.body}
                     </p>
                   </div>
@@ -75,14 +75,14 @@ export function HowItWorksAndPlatform() {
           </div>
 
           {/* Platform */}
-          <div className="rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800">
+          <div className="rounded-3xl bg-white/80 p-5 ring-1 ring-slate-800">
             <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               The Elevate platform
             </h3>
             <p className="mt-2 text-lg font-semibold text-slate-50">
               People + technology that keep everyone aligned.
             </p>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 text-sm text-slate-600">
               Student and employer portals, mobile, and real humans behind the
               screens so case managers, workforce boards, and employers can see
               what's happening in real time.

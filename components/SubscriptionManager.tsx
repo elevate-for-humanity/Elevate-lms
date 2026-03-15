@@ -248,7 +248,7 @@ export function SubscriptionManager() {
                 <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -288,7 +288,7 @@ export function SubscriptionManager() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <div className="font-semibold">

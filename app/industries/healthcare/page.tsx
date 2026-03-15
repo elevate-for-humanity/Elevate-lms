@@ -58,7 +58,7 @@ export default function HealthcarePage() {
                   href={`/programs/${program.slug}`}
                   className="group block bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                 >
-                  <div className="aspect-video relative overflow-hidden bg-gray-900">
+                  <div className="aspect-video relative overflow-hidden bg-white">
                     {program.heroImage && (
                       <Image
                         src={program.heroImage}
@@ -107,7 +107,7 @@ export default function HealthcarePage() {
               </h2>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -121,7 +121,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -132,7 +132,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -146,7 +146,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>

@@ -29,7 +29,7 @@ export default function AIHubPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-zinc-900  via-white  py-20">
+      <section className="bg-white  via-white  py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-900 rounded-full text-sm font-bold mb-6">
             <Brain className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function AIHubPage() {
               href="/ai-tutor"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Brain className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -85,7 +85,7 @@ export default function AIHubPage() {
               href="/ai-chat"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-green-200 hover:border-brand-green-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <MessageSquare className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -106,7 +106,7 @@ export default function AIHubPage() {
               href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <BookOpen className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -133,7 +133,7 @@ export default function AIHubPage() {
               href="/ai/job-match"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-orange-200 hover:border-brand-orange-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Briefcase className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -154,7 +154,7 @@ export default function AIHubPage() {
               href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-pink-200 hover:border-pink-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-pink-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Brain className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -175,7 +175,7 @@ export default function AIHubPage() {
               href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-teal-200 hover:border-teal-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-teal-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Sparkles className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -245,7 +245,7 @@ export default function AIHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-zinc-900   text-white">
+      <section className="py-16 bg-white   text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Learn with AI?</h2>
           <p className="text-xl opacity-90 mb-8">

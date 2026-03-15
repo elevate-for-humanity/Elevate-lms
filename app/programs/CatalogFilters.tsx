@@ -114,7 +114,7 @@ function ProgramCard({ p }: { p: CatalogProgram }) {
       <div className="space-y-4 p-4">
         {/* Provider + subtitle */}
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Elevate for Humanity</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Elevate for Humanity</p>
           <p className="mt-1 text-sm text-slate-600 line-clamp-2">{p.subtitle}</p>
         </div>
 
@@ -152,7 +152,7 @@ function ProgramCard({ p }: { p: CatalogProgram }) {
             </span>
           ))}
           {p.credentials.length > 2 && (
-            <span className="text-[11px] text-slate-400 self-center">+{p.credentials.length - 2} more</span>
+            <span className="text-[11px] text-slate-500 self-center">+{p.credentials.length - 2} more</span>
           )}
         </div>
 
@@ -254,7 +254,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           ))}
 
           {/* Divider */}
-          <span className="self-center text-slate-300 select-none">|</span>
+          <span className="self-center text-slate-600 select-none">|</span>
 
           {/* Mode chips */}
           {MODE_CHIPS.map((c) => (
@@ -272,7 +272,7 @@ export default function CatalogFilters({ programs, sectors }: Props) {
           ))}
 
           {/* Divider */}
-          <span className="self-center text-slate-300 select-none">|</span>
+          <span className="self-center text-slate-600 select-none">|</span>
 
           {/* Funding chips */}
           {FUNDING_CHIPS.map((c) => (

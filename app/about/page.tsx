@@ -80,9 +80,9 @@ export default function AboutPage() {
       </section>
 
       {/* Our Mission */}
-      <section className="py-12 bg-brand-red-600">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Our Mission</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Our Mission</h2>
           <p className="text-lg text-brand-red-100 leading-relaxed max-w-3xl mx-auto">
             To create pathways out of poverty and into prosperity by connecting justice-involved
             individuals, low-income families, veterans, individuals with disabilities, and anyone
@@ -90,7 +90,7 @@ export default function AboutPage() {
             employment support, and direct employer placement.
           </p>
           <div className="mt-6">
-            <Link href="/about/mission" className="inline-flex items-center text-white/80 hover:text-white text-sm font-semibold underline underline-offset-4">
+            <Link href="/about/mission" className="inline-flex items-center text-slate-600 hover:text-white text-sm font-semibold underline underline-offset-4">
               Full mission statement &amp; values <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </div>
@@ -549,9 +549,9 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-brand-red-600">
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
           <p className="text-lg text-brand-red-100 mb-8 max-w-2xl mx-auto">
             Check your eligibility in about 5 minutes. If you qualify for funding,
             your entire training can be free — tuition, materials, certifications, and career services.

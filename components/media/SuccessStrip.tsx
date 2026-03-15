@@ -9,7 +9,7 @@ export function SuccessStrip({ stories }: SuccessStripProps) {
   if (!stories.length) return null;
 
   return (
-    <section className="border-b border-slate-800 bg-slate-800">
+    <section className="border-b border-slate-800 bg-white">
       <div className="mx-auto max-w-6xl px-3 py-5 text-white md:px-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
@@ -19,7 +19,7 @@ export function SuccessStrip({ stories }: SuccessStripProps) {
             <h2 className="text-base font-bold md:text-lg">
               Success Stories & Impact
             </h2>
-            <p className="mt-1 text-[11px] text-slate-300 md:text-xs">
+            <p className="mt-1 text-[11px] text-slate-600 md:text-xs">
               These images represent the kinds of wins Elevate is built for:
               stable jobs, credentials, and confidence.
             </p>
@@ -46,7 +46,7 @@ export function SuccessStrip({ stories }: SuccessStripProps) {
                 <p className="mt-0.5 text-[11px] text-brand-green-300">
                   {story.outcome}
                 </p>
-                <p className="mt-1 text-[11px] text-slate-300">
+                <p className="mt-1 text-[11px] text-slate-600">
                   "{story.quote}"
                 </p>
               </div>

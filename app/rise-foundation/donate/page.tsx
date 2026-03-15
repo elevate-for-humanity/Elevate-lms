@@ -44,7 +44,7 @@ export default async function DonatePage() {
         </div>
       </div>
 
-      <section className="bg-zinc-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Heart className="h-16 w-16 mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4">Make a Difference Today</h1>
@@ -128,7 +128,7 @@ export default async function DonatePage() {
                         </div>
                         <div className="w-full bg-slate-200 rounded-full h-3">
                           <div
-                            className="bg-brand-blue-600 h-3 rounded-full transition-all duration-500"
+                            className="bg-white h-3 rounded-full transition-all duration-500"
                             style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>

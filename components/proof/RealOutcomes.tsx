@@ -162,7 +162,7 @@ export function RealOutcomes() {
         </div>
 
         {/* Data Source Proof */}
-        <div className="bg-slate-900 text-white rounded-lg p-6">
+        <div className="bg-white text-white rounded-lg p-6">
           <div className="flex items-start gap-4">
             <Calendar className="h-5 w-5 flex-shrink-0 mt-1" />
             <div className="flex-1">

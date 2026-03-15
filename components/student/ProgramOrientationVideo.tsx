@@ -89,7 +89,7 @@ export default function ProgramOrientationVideo({
           <div className="flex-shrink-0">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
               {hasWatched ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               ) : (
                 <Play className="w-8 h-8 text-brand-blue-600" />
               )}
@@ -153,7 +153,7 @@ export default function ProgramOrientationVideo({
               </p>
               {hasWatched && (
                 <div className="flex items-center gap-2 text-brand-green-600">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="font-medium">
                     Orientation completed! You can close this window.
                   </span>

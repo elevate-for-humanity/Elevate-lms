@@ -84,11 +84,11 @@ export default function OutcomeProof() {
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/[0.08] transition-colors h-full flex flex-col">
                 {/* Trajectory arrow */}
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="px-3 py-1.5 bg-brand-red-500/20 text-brand-red-400 rounded-lg text-sm font-medium">
+                  <div className="px-3 py-1.5 bg-white/20 text-brand-red-400 rounded-lg text-sm font-medium">
                     {outcome.beforeWage}
                   </div>
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  <div className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-bold">
+                  <div className="px-3 py-1.5 bg-white/20 text-emerald-400 rounded-lg text-sm font-bold">
                     {outcome.afterWage}
                   </div>
                 </div>

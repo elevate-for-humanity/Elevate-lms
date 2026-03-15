@@ -83,8 +83,8 @@ export default function AdvisingPage() {
 
         {isSubmitted ? (
           <section className="rounded-2xl bg-brand-green-50 p-8 shadow-sm ring-1 ring-brand-green-200 text-center">
-            <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h2 className="text-2xl font-bold text-black mb-2">
               Request Submitted!

@@ -294,7 +294,7 @@ export default function CoursesCatalogPage() {
           <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-5">
             Free to Apply · Grant Funding Available
           </span>
-          <h1 className="text-4xl sm:text-6xl font-black text-white leading-tight mb-5 drop-shadow-lg max-w-3xl">
+          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 leading-tight mb-5 drop-shadow-lg max-w-3xl">
             Find Your Career.<br />Start Training Today.
           </h1>
           <p className="text-white/90 text-lg max-w-2xl mb-8 leading-relaxed">
@@ -348,8 +348,8 @@ export default function CoursesCatalogPage() {
                     <Play className="w-4 h-4 ml-0.5 text-brand-blue-600" />
                   </button>
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
-                    <p className="text-white font-extrabold text-base leading-snug">{p.title}</p>
-                    <p className="text-white/80 text-xs mt-0.5">{p.tagline}</p>
+                    <p className="text-slate-900 font-extrabold text-base leading-snug">{p.title}</p>
+                    <p className="text-slate-600 text-xs mt-0.5">{p.tagline}</p>
                   </div>
                 </div>
 
@@ -359,7 +359,7 @@ export default function CoursesCatalogPage() {
                   {/* Salary + duration */}
                   <div className="flex items-center justify-between text-xs mb-3">
                     <span className="font-bold text-brand-green-700 bg-brand-green-50 px-2 py-1 rounded-lg">{p.salary}</span>
-                    <span className="text-slate-400">{p.duration}</span>
+                    <span className="text-slate-500">{p.duration}</span>
                   </div>
 
                   {/* Credentials */}
@@ -432,8 +432,8 @@ export default function CoursesCatalogPage() {
                   </button>
 
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
-                    <p className="text-white font-extrabold text-sm leading-snug">{c.title}</p>
-                    <p className="text-white/80 text-xs">{c.tagline}</p>
+                    <p className="text-slate-900 font-extrabold text-sm leading-snug">{c.title}</p>
+                    <p className="text-slate-600 text-xs">{c.tagline}</p>
                   </div>
                 </div>
 
@@ -480,7 +480,7 @@ export default function CoursesCatalogPage() {
         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-white/10" />
         <div className="max-w-4xl mx-auto px-4 text-center relative">
-          <h2 className="text-3xl font-extrabold text-white mb-3">Not sure which course is right for you?</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Not sure which course is right for you?</h2>
           <p className="text-white/85 text-base max-w-xl mx-auto mb-8">
             Talk to an advisor. We will look at your goals, your schedule, and what funding you qualify for — then help you pick the right path.
           </p>

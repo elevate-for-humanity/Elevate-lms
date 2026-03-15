@@ -54,7 +54,7 @@ export function StateAwareDashboard({
   return (
     <div className="min-h-screen bg-slate-50">
       {/* DOMINANT ACTION BANNER - Cannot Be Missed */}
-      <section className="bg-zinc-900   text-white py-8 shadow-lg">
+      <section className="bg-white   text-white py-8 shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -84,7 +84,7 @@ export function StateAwareDashboard({
                 <span>Your Progress</span>
                 <span className="font-bold">{progressPercentage}%</span>
               </div>
-              <div className="w-full bg-brand-blue-800 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-white rounded-full h-3 overflow-hidden">
                 <div
                   className="bg-white h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPercentage}%` }}
@@ -221,7 +221,7 @@ export function SectionCard({
             </span>
           )}
           <div className="absolute bottom-3 left-4 right-4">
-            <h4 className="font-bold text-white text-lg drop-shadow-lg">{title}</h4>
+            <h4 className="font-bold text-slate-900 text-lg drop-shadow-lg">{title}</h4>
           </div>
         </div>
       ) : (

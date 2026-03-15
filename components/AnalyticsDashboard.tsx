@@ -167,7 +167,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
                 <div key={index} className="flex gap-3">
-                  <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2" />
+                  <div className="w-2 h-2 bg-white rounded-full mt-2" />
                   <div className="flex-1">
                     <div className="font-semibold text-sm">{activity.user}</div>
                     <div className="text-sm text-black">{activity.action}</div>

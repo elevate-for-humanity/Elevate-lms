@@ -127,13 +127,13 @@ function CertiportExamContent() {
       <div className="min-h-screen bg-white py-12 px-4">        <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h1 className="text-2xl font-bold mb-2">Your Exam Voucher</h1>
             <p className="text-slate-600 mb-6">Present this code at the testing center.</p>
 
-            <div className="bg-slate-900 text-white rounded-xl p-6 mb-6">
-              <p className="text-sm text-slate-400 mb-1">Voucher Code</p>
+            <div className="bg-white text-white rounded-xl p-6 mb-6">
+              <p className="text-sm text-slate-500 mb-1">Voucher Code</p>
               <p className="text-3xl font-mono font-bold tracking-wider">{existingRequest.voucherCode}</p>
             </div>
 
@@ -192,7 +192,7 @@ function CertiportExamContent() {
     <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Award className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900">Certification Exam</h1>
@@ -234,8 +234,8 @@ function CertiportExamContent() {
         <div className="space-y-6 mb-8">
           {Object.entries(examCategories).map(([category, exams]) => (
             <div key={category} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="bg-slate-800 px-6 py-3">
-                <h2 className="text-white font-semibold">{category}</h2>
+              <div className="bg-white px-6 py-3">
+                <h2 className="text-slate-900 font-semibold">{category}</h2>
               </div>
               <div className="p-4 space-y-2">
                 {exams.map((exam) => (

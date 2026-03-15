@@ -41,7 +41,7 @@ export default function DemoEmployerPage() {
   return (
     <DemoPageShell title="Employer Dashboard" description="Manage apprentices, find candidates, and track hiring incentives." portal="employer">
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
+        <div className="fixed top-20 right-4 z-50 bg-white text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
       )}
 
       <div className="space-y-6">
@@ -98,7 +98,7 @@ export default function DemoEmployerPage() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${(a.hours / a.total) * 100}%` }} />
+                            <div className="h-full bg-white rounded-full" style={{ width: `${(a.hours / a.total) * 100}%` }} />
                           </div>
                           <span className="text-xs text-gray-500">{a.hours}/{a.total}</span>
                         </div>
@@ -117,7 +117,7 @@ export default function DemoEmployerPage() {
                             <ThumbsUp className="w-3 h-3" /> Approve {a.pendingHours}h
                           </button>
                         ) : a.pendingHours > 0 && approvedHours.has(a.id) ? (
-                          <span className="text-xs text-brand-green-600 flex items-center gap-1"><span className="text-slate-400 flex-shrink-0">•</span> Approved</span>
+                          <span className="text-xs text-brand-green-600 flex items-center gap-1"><span className="text-slate-500 flex-shrink-0">•</span> Approved</span>
                         ) : (
                           <button onClick={() => showToast(`Viewing ${a.name}'s profile`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white transition flex items-center gap-1">
                             <Eye className="w-3 h-3" /> View
@@ -157,7 +157,7 @@ export default function DemoEmployerPage() {
                 </div>
               </div>
             ))}
-            <p className="text-xs text-gray-400 text-center">Showing top matches. {31} more candidates available.</p>
+            <p className="text-xs text-slate-500 text-center">Showing top matches. {31} more candidates available.</p>
           </div>
         )}
 
@@ -195,7 +195,7 @@ export default function DemoEmployerPage() {
                           </button>
                         )}
                         {inc.status === 'Pending' && (
-                          <span className="text-xs text-gray-400">Awaiting review</span>
+                          <span className="text-xs text-slate-500">Awaiting review</span>
                         )}
                         {inc.status === 'Processing' && (
                           <span className="text-xs text-brand-blue-600">In progress</span>

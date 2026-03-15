@@ -54,7 +54,7 @@ export function HeroSection({
         <div className="max-w-3xl">
           {/* Badge */}
           {badge && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-6 py-3 text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold mb-6 shadow-lg">
               <span>{badge}</span>
             </div>
           )}

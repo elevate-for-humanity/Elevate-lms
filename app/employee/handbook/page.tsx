@@ -147,23 +147,23 @@ export default async function EmployeeHandbookPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Employee Handbook</h1>
-              <p className="text-slate-400 text-sm">Elevate for Humanity Career &amp; Technical Institute · {new Date().getFullYear()} Edition</p>
+              <p className="text-slate-500 text-sm">Elevate for Humanity Career &amp; Technical Institute · {new Date().getFullYear()} Edition</p>
             </div>
           </div>
-          <p className="text-slate-300 max-w-2xl">
+          <p className="text-slate-600 max-w-2xl">
             This handbook describes the policies, procedures, and expectations for all Elevate for Humanity employees.
             Please read each section carefully and acknowledge at the bottom.
           </p>
           {ack && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-brand-green-600/20 border border-brand-green-500/30 text-brand-green-300 px-4 py-2 rounded-full text-sm">
+            <div className="mt-4 inline-flex items-center gap-2 bg-white/20 border border-brand-green-500/30 text-brand-green-300 px-4 py-2 rounded-full text-sm">
               <CheckCircle className="w-4 h-4" />
               Acknowledged on {new Date(ack.acknowledged_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
@@ -181,7 +181,7 @@ export default async function EmployeeHandbookPage() {
             {HANDBOOK_SECTIONS.map((s, i) => (
               <a key={s.id} href={`#${s.id}`}
                 className="flex items-center gap-4 px-6 py-3 hover:bg-white transition group">
-                <span className="text-sm text-slate-400 w-6">{i + 1}</span>
+                <span className="text-sm text-slate-500 w-6">{i + 1}</span>
                 <s.icon className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-500" />
                 <span className="flex-1 text-sm font-medium text-slate-700 group-hover:text-brand-blue-700">{s.title}</span>
                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-400" />
@@ -199,7 +199,7 @@ export default async function EmployeeHandbookPage() {
                   <section.icon className={`w-5 h-5 text-${section.color}-600`} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Section {i + 1}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Section {i + 1}</p>
                   <h2 className="text-lg font-bold text-slate-900">{section.title}</h2>
                 </div>
               </div>

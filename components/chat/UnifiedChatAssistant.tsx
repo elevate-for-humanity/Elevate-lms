@@ -245,7 +245,7 @@ export default function UnifiedChatAssistant({
           } ${position === 'inline' ? 'w-full' : 'w-[380px]'}`}
         >
           {/* Header */}
-          <div className="bg-brand-blue-600 text-white px-4 py-3 flex items-center justify-between">
+          <div className="bg-white text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <Bot className="w-5 h-5" />

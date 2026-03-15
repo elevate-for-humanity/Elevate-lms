@@ -82,7 +82,7 @@ export default function ExternalModuleLauncher({
           </p>
         )}
         {module.partner_name && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-lg">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 rounded-lg">
             <span className="text-slate-400 text-sm">Partner:</span>
             <span className="text-white font-medium">
               {module.partner_name}
@@ -117,7 +117,7 @@ export default function ExternalModuleLauncher({
         </a>
       </div>
       {/* Instructions */}
-      <div className="bg-slate-800/50 rounded-lg p-6 mb-8">
+      <div className="bg-white/50 rounded-lg p-6 mb-8">
         <h3 className="text-white font-semibold mb-3">📋 Instructions</h3>
         <ol className="text-slate-300 text-sm space-y-2 list-decimal list-inside">
           <li>

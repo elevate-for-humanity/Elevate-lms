@@ -75,12 +75,12 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-5">
+            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
               {p.breadcrumbs.map((b, i) => (
                 <span key={i} className="flex items-center gap-1.5">
                   {i > 0 && <ChevronRight className="w-3 h-3" />}
                   {b.href ? (
-                    <Link href={b.href} className="hover:text-white/80 transition-colors">{b.label}</Link>
+                    <Link href={b.href} className="hover:text-slate-600 transition-colors">{b.label}</Link>
                   ) : (
                     <span className="text-slate-600 font-medium">{b.label}</span>
                   )}
@@ -101,7 +101,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                     {p.badge}
                   </span>
                 )}
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-3">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
                 </h1>
                 <p className="text-white/75 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
@@ -130,7 +130,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
                   <p className="text-xs text-slate-500 mb-4">self-pay · funding may cover 100%</p>
 
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">New Applicant</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">New Applicant</p>
                   <Link
                     href={p.cta.applyHref}
                     className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
@@ -138,7 +138,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                     Apply Now
                   </Link>
 
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
                   <Link
                     href={p.cta.enrollHref || '/lms/dashboard'}
                     className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
@@ -184,7 +184,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   <ul className="space-y-1.5">
                     {mod.topics.map((t, j) => (
                       <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
-                        <span className="mt-0.5 text-slate-400 flex-shrink-0">·</span>
+                        <span className="mt-0.5 text-slate-500 flex-shrink-0">·</span>
                         {t}
                       </li>
                     ))}
@@ -224,7 +224,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   {p.enrollmentTracks.funded.description}
                 </p>
                 <div className="space-y-2">
-                  <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Eligible programs include</p>
+                  <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Eligible programs include</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map(prog => (
                       <span key={prog} className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg">{prog}</span>
@@ -236,7 +236,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   >
                     Apply — Check My Eligibility
                   </Link>
-                  <p className="text-center text-xs text-slate-400 mt-1">Free to apply · eligibility verified before enrollment</p>
+                  <p className="text-center text-xs text-slate-500 mt-1">Free to apply · eligibility verified before enrollment</p>
                 </div>
               </div>
 
@@ -250,7 +250,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.selfPay.label}</h3>
                 <p className="text-2xl font-extrabold text-slate-900 mb-3">
                   {p.enrollmentTracks.selfPay.cost}
-                  <span className="text-sm font-normal text-slate-400 ml-1">tuition</span>
+                  <span className="text-sm font-normal text-slate-500 ml-1">tuition</span>
                 </p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-1">
                   {p.enrollmentTracks.selfPay.description}
@@ -287,7 +287,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             </div>
 
             {/* Expansion note */}
-            <p className="text-center text-slate-400 text-sm mt-8">
+            <p className="text-center text-slate-500 text-sm mt-8">
               Workforce-funded training currently available for Indiana residents.
               Additional states will be added as partnerships develop.
             </p>
@@ -300,7 +300,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-white/10" />
         <div className="max-w-3xl mx-auto px-4 text-center relative">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
           <p className="text-slate-600 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
@@ -309,32 +309,32 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
             {/* New applicant */}
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">New Applicant</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">New Applicant</span>
               <Link
                 href={p.cta.applyHref}
                 className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl whitespace-nowrap"
               >
                 Apply to This Program
               </Link>
-              <span className="text-white/60 text-xs">Free to apply · takes 5 min</span>
+              <span className="text-slate-500 text-xs">Free to apply · takes 5 min</span>
             </div>
 
             {/* Already enrolled */}
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Already Enrolled</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Already Enrolled</span>
               <Link
                 href={p.cta.enrollHref || '/lms/dashboard'}
                 className="bg-brand-blue-500 hover:bg-brand-blue-400 text-white px-10 py-4 rounded-2xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap border-2 border-white/30"
               >
                 Go to My Courses
               </Link>
-              <span className="text-white/60 text-xs">Log in to access your training</span>
+              <span className="text-slate-500 text-xs">Log in to access your training</span>
             </div>
           </div>
 
           <Link
             href={p.cta.advisorHref || '/contact'}
-            className="inline-block border-2 border-white/40 text-white/80 px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors mt-2"
+            className="inline-block border-2 border-white/40 text-slate-600 px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors mt-2"
           >
             Questions? Talk to an Advisor
           </Link>
@@ -378,7 +378,7 @@ function HoursBar({ label, hours, total }: { label: string; hours: number; total
         <span className="font-medium">{hours} hrs</span>
       </div>
       <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-        <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-white rounded-full" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

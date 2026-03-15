@@ -268,7 +268,7 @@ export default async function FerpaRecordsSearchPage({
               <div className="px-6 py-12 text-center">
                 <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500">No records found matching &quot;{query}&quot;</p>
-                <p className="text-sm text-gray-400 mt-1">Try a different search term</p>
+                <p className="text-sm text-slate-500 mt-1">Try a different search term</p>
               </div>
             )}
           </div>

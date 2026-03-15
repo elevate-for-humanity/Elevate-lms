@@ -118,7 +118,7 @@ export default async function CaseManagerDashboardPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-slate-900 text-white px-6 py-8">
+      <div className="bg-white text-white px-6 py-8">
         <div className="max-w-6xl mx-auto">
           <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">
             Workforce Hub

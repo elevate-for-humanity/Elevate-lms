@@ -110,7 +110,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-green-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>

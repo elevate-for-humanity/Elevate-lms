@@ -157,7 +157,7 @@ export default function TestimonialsPage() {
                         className="object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-slate-700">
+                      <div className="w-full h-full flex items-center justify-center bg-white">
                         <span className="text-4xl font-bold text-slate-900">
                           {story.name.charAt(0)}
                         </span>
@@ -199,7 +199,7 @@ export default function TestimonialsPage() {
         )}
 
         {/* CTA */}
-        <section className="bg-slate-700 rounded-2xl p-8 text-center">
+        <section className="bg-white rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Your Success Story Starts Here</h2>
           <p className="text-brand-orange-100 mb-6 max-w-xl mx-auto">
             Join the graduates who have transformed their lives through 

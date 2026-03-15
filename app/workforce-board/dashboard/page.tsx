@@ -191,7 +191,7 @@ export default async function WorkforceBoardDashboard() {
             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
               <BarChart3 className="w-5 h-5 mr-2 text-brand-blue-600" />WIOA Performance Indicators
             </h2>
-            <span className="text-xs text-gray-400 bg-white px-2 py-1 rounded">Derived from enrollment data</span>
+            <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded">Derived from enrollment data</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
@@ -225,7 +225,7 @@ export default async function WorkforceBoardDashboard() {
               <p className="text-xs text-gray-500 mt-1">Target: 75%</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-4">Employment rate and median wage gain require post-exit follow-up data. Connect employment outcomes to enable these indicators.</p>
+          <p className="text-xs text-slate-500 mt-4">Employment rate and median wage gain require post-exit follow-up data. Connect employment outcomes to enable these indicators.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -250,7 +250,7 @@ export default async function WorkforceBoardDashboard() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <p>No at-risk participants</p>
               </div>
             )}
@@ -333,10 +333,10 @@ export default async function WorkforceBoardDashboard() {
           </Link>
         </div>
 
-        <div className="mt-8 bg-slate-700 rounded-xl border border-brand-green-200 p-6">
+        <div className="mt-8 bg-white rounded-xl border border-brand-green-200 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-semibold text-gray-900">Compliance Status: Good Standing</h3>
                 <p className="text-sm text-gray-600">All required reports submitted. Next audit: Q2 2026</p>

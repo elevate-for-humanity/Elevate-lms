@@ -126,7 +126,7 @@ export function EligibilityChecker() {
             {fullyEligible ? (
               <>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <h4 className="text-2xl font-bold text-brand-green-900">
                     You Qualify!
                   </h4>

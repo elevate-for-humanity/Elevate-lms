@@ -69,29 +69,29 @@ export default async function CopyrightPage() {
 
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Website content and structure
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Platform workflows and dashboards
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">Documentation and reports</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Branding, logos, and design elements
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Proprietary configurations and integrations
               </span>
@@ -139,15 +139,15 @@ export default async function CopyrightPage() {
 
           <ul className="space-y-2 mb-6">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">A formal agreement</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">Explicit authorization</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">Defined scope of use</span>
             </li>
           </ul>
@@ -162,19 +162,19 @@ export default async function CopyrightPage() {
           </h3>
           <ul className="space-y-2">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Platform access is granted by agreement, not purchase alone
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Licensing does not transfer ownership
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span className="text-black">
                 Access may be revoked if terms are violated
               </span>

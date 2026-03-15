@@ -34,10 +34,10 @@ export default function EmploymentPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/workforce-board-page-1.jpg" alt="Employment services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Employment Services</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">From training completion to career placement — we support you every step of the way.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Employment Services</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">From training completion to career placement — we support you every step of the way.</p>
           </div>
         </div>
       </section>
@@ -76,7 +76,7 @@ export default function EmploymentPage() {
               { step: '4', title: 'Get Hired', desc: 'Start your new career with ongoing support for the first 90 days.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -88,7 +88,7 @@ export default function EmploymentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

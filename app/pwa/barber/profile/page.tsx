@@ -58,10 +58,10 @@ export default function BarberProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading profile...</p>
+          <p className="text-slate-900">Loading profile...</p>
         </div>
       </div>
     );
@@ -69,11 +69,11 @@ export default function BarberProfilePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/profile"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -90,7 +90,7 @@ export default function BarberProfilePage() {
   const progressPercent = (profile.totalHours / profile.targetHours) * 100;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-brand-blue-600 px-4 pt-12 pb-8 safe-area-inset-top">
         <div className="flex items-center justify-between mb-6">
@@ -108,64 +108,64 @@ export default function BarberProfilePage() {
               {profile.name.charAt(0)}
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1">{profile.name}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">{profile.name}</h1>
           <p className="text-brand-blue-200">Barber Apprentice</p>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-6">
         {/* Progress Card */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-slate-400">Overall Progress</span>
+            <span className="text-slate-500">Overall Progress</span>
             <span className="text-white font-bold">{progressPercent.toFixed(1)}%</span>
           </div>
-          <div className="h-3 bg-slate-700 rounded-full overflow-hidden mb-3">
+          <div className="h-3 bg-white rounded-full overflow-hidden mb-3">
             <div 
-              className="h-full bg-brand-blue-500 rounded-full"
+              className="h-full bg-white rounded-full"
               style={{ width: `${Math.min(progressPercent, 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-slate-400">{profile.totalHours.toLocaleString()} hours</span>
-            <span className="text-slate-400">{profile.targetHours.toLocaleString()} goal</span>
+            <span className="text-slate-500">{profile.totalHours.toLocaleString()} hours</span>
+            <span className="text-slate-500">{profile.targetHours.toLocaleString()} goal</span>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <Clock className="w-6 h-6 text-brand-blue-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{profile.totalHours.toLocaleString()}</p>
-            <p className="text-slate-400 text-sm">Total Hours</p>
+            <p className="text-2xl font-bold text-slate-900">{profile.totalHours.toLocaleString()}</p>
+            <p className="text-slate-500 text-sm">Total Hours</p>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <Award className="w-6 h-6 text-amber-400 mb-2" />
-            <p className="text-2xl font-bold text-white">{profile.milestonesAchieved}/{profile.totalMilestones}</p>
-            <p className="text-slate-400 text-sm">Milestones</p>
+            <p className="text-2xl font-bold text-slate-900">{profile.milestonesAchieved}/{profile.totalMilestones}</p>
+            <p className="text-slate-500 text-sm">Milestones</p>
           </div>
         </div>
 
         {/* Contact Info */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-4">
-          <h2 className="text-white font-bold">Contact Information</h2>
+        <div className="bg-white rounded-xl p-4 space-y-4">
+          <h2 className="text-slate-900 font-bold">Contact Information</h2>
           
           <div className="flex items-center gap-3">
             <Mail className="w-5 h-5 text-slate-500" />
-            <span className="text-slate-300">{profile.email}</span>
+            <span className="text-slate-600">{profile.email}</span>
           </div>
           
           {profile.phone && (
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500" />
-              <span className="text-slate-300">{profile.phone}</span>
+              <span className="text-slate-600">{profile.phone}</span>
             </div>
           )}
         </div>
 
         {/* Training Location */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-4">
-          <h2 className="text-white font-bold">Training Location</h2>
+        <div className="bg-white rounded-xl p-4 space-y-4">
+          <h2 className="text-slate-900 font-bold">Training Location</h2>
           
           <div className="flex items-center gap-3">
             <Scissors className="w-5 h-5 text-brand-blue-400" />
@@ -175,7 +175,7 @@ export default function BarberProfilePage() {
           {(profile.shopCity || profile.shopState) && (
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-slate-500" />
-              <span className="text-slate-300">
+              <span className="text-slate-600">
                 {[profile.shopCity, profile.shopState].filter(Boolean).join(', ')}
               </span>
             </div>
@@ -183,7 +183,7 @@ export default function BarberProfilePage() {
           
           <div className="flex items-center gap-3">
             <Calendar className="w-5 h-5 text-slate-500" />
-            <span className="text-slate-300">
+            <span className="text-slate-600">
               Started {new Date(profile.startDate).toLocaleDateString()}
             </span>
           </div>

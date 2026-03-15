@@ -32,12 +32,12 @@ export default function ApprenticeshipSponsorPage() {
 
         {/* Sponsor Identity */}
         <section className="mb-14">
-          <div className="bg-slate-900 text-white rounded-2xl p-8 sm:p-10">
+          <div className="bg-white text-white rounded-2xl p-8 sm:p-10">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-8 h-8 text-brand-red-400" />
               <h2 className="text-2xl font-bold">Sponsor of Record</h2>
             </div>
-            <p className="text-slate-300 text-lg leading-relaxed mb-6">
+            <p className="text-slate-600 text-lg leading-relaxed mb-6">
               Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
             </p>
             <dl className="grid sm:grid-cols-3 gap-6">
@@ -166,14 +166,14 @@ export default function ApprenticeshipSponsorPage() {
             Governance Hierarchy
           </h2>
           <div className="space-y-3">
-            <div className="bg-slate-900 text-white rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-white text-white rounded-xl p-5 flex items-center gap-4">
               <span className="bg-brand-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">1</span>
               <div>
                 <p className="font-bold">2Exclusive LLC-S — Sponsor &amp; Governing Entity</p>
-                <p className="text-slate-400 text-sm">Standards, compliance, apprentice registration, oversight</p>
+                <p className="text-slate-500 text-sm">Standards, compliance, apprentice registration, oversight</p>
               </div>
             </div>
-            <div className="bg-brand-red-600 text-white rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-white text-white rounded-xl p-5 flex items-center gap-4">
               <span className="bg-white text-brand-red-600 text-xs font-bold px-2.5 py-1 rounded">2</span>
               <div>
                 <p className="font-bold">Elevate for Humanity Career &amp; Technical Institute — Training Division</p>

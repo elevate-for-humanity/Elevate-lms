@@ -422,7 +422,7 @@ export default async function ProgramDetailPage({
             </Link>
           </div>
           {PROGRAMS[slug] && (
-            <div className="mt-6 bg-slate-900 rounded-xl p-6">
+            <div className="mt-6 bg-white rounded-xl p-6">
               <ProgramTutorCTA
                 programSlug={slug}
                 programName={displayProgram.title}

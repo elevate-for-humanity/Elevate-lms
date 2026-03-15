@@ -175,7 +175,7 @@ export function ShopDocumentUpload({
                   }`}
                 >
                   {message.type === 'success' ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   ) : (
                     <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5" />
                   )}

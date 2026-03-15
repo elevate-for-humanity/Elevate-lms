@@ -102,13 +102,13 @@ export default function ProvidersPage() {
       </div>
 
       {/* ─── HEADER ─── */}
-      <section className="bg-slate-900 py-16 sm:py-20">
+      <section className="bg-white py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Workforce Development Hub</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
             Provider Requirements & Governance
           </h1>
-          <p className="text-slate-300 text-lg leading-relaxed max-w-3xl mb-8">
+          <p className="text-slate-600 text-lg leading-relaxed max-w-3xl mb-8">
             Organizations delivering training programs inside the Elevate hub operate under a formal governance framework. These requirements protect learners, credential authorities, and workforce funders. They apply to all providers — including Elevate itself.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -254,7 +254,7 @@ export default function ProvidersPage() {
           <div className="space-y-4">
             {onboardingSteps.map((step) => (
               <div key={step.step} className="flex gap-5">
-                <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0 mt-0.5">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0 mt-0.5">
                   {step.step}
                 </div>
                 <div className="border-b border-slate-100 pb-4 flex-1">
@@ -330,10 +330,10 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-extrabold text-white mb-4">Ready to apply?</h2>
-          <p className="text-slate-400 text-sm max-w-xl mx-auto mb-8 leading-relaxed">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-4">Ready to apply?</h2>
+          <p className="text-slate-500 text-sm max-w-xl mx-auto mb-8 leading-relaxed">
             If your organization meets the eligibility requirements and has programs that align with the hub&apos;s standards, start the provider application. Questions before applying are welcome.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">

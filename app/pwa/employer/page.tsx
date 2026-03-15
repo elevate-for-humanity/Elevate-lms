@@ -29,7 +29,7 @@ export default async function EmployerPWAPage() {
         <Image src="/images/pages/demo-page-2.jpg" alt="Employer partnership" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
-          <h1 className="text-2xl font-bold text-white">Employer Portal</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Employer Portal</h1>
           <p className="text-emerald-200 text-sm mt-1">Hire trained, credentialed graduates</p>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default async function EmployerPWAPage() {
                 <div className="font-semibold text-slate-900 text-sm truncate">{prog.name}</div>
                 <div className="text-xs text-slate-500">{prog.category}{prog.placement_rate ? ` · ${prog.placement_rate}% placement` : ''}</div>
               </div>
-              <span className="text-slate-400 text-sm">→</span>
+              <span className="text-slate-500 text-sm">→</span>
             </Link>
           ))}
         </div>

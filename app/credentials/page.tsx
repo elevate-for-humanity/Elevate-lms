@@ -51,7 +51,7 @@ export default function CredentialsPage() {
       </div>
 
       {/* Hero banner */}
-      <section className="relative h-[340px] sm:h-[460px] overflow-hidden bg-slate-900">
+      <section className="relative h-[340px] sm:h-[460px] overflow-hidden bg-white">
         <Image
           src="/images/pages/credentials-page-1.jpg"
           alt="Credential pathways at Elevate for Humanity"
@@ -86,7 +86,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* Stats bar */}
-      <div className="bg-slate-900 border-t border-slate-700">
+      <div className="bg-white border-t border-slate-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6">
           <div className="flex items-center gap-3">
             <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
@@ -197,7 +197,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* Layer 3 — Registered Apprenticeship */}
-      <section id="layer-3" className="py-14 bg-slate-900 border-b border-slate-800">
+      <section id="layer-3" className="py-14 bg-white border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
             <Briefcase className="w-5 h-5 text-amber-400" />
@@ -209,7 +209,7 @@ export default function CredentialsPage() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {apprenticeshipCreds.map((cred) => (
-              <div key={cred.name} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col">
+              <div key={cred.name} className="bg-white rounded-2xl border border-slate-700 overflow-hidden flex flex-col">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
@@ -254,7 +254,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-brand-red-600">
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
           <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>

@@ -78,7 +78,7 @@ export default function EnrollmentBookingPage() {
       <div className="min-h-screen bg-brand-blue-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Appointment Confirmed!</h1>
           <p className="text-gray-600 mb-6">
@@ -119,7 +119,7 @@ export default function EnrollmentBookingPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-brand-blue-900 text-white py-8">
+      <div className="bg-white text-white py-8">
         <div className="max-w-3xl mx-auto px-4">
           <Link href="/booking" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />

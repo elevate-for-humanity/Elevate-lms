@@ -82,7 +82,7 @@ export default function FinancePathwayPage() {
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-5xl mx-auto w-full">
             <span className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-3 bg-brand-orange-500">Funding Available</span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.1]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-[1.1]">
               Finance, Bookkeeping &amp; Accounting
             </h1>
             <p className="text-white/85 text-lg mt-3 max-w-2xl leading-relaxed">
@@ -107,10 +107,10 @@ export default function FinancePathwayPage() {
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-wider mb-2">Credential Pathway</p>
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
-              <div><span className="text-slate-400">Structure</span><span className="ml-1.5 font-semibold text-slate-900">3 Tiers (Entry → Intermediate → Advanced)</span></div>
-              <div><span className="text-slate-400">Duration</span><span className="ml-1.5 font-semibold text-slate-900">6–20 weeks depending on tier</span></div>
-              <div><span className="text-slate-400">Funding</span><span className="ml-1.5 font-semibold text-slate-900">WIOA / WRG eligible (ETPL #10004627)</span></div>
-              <div><span className="text-slate-400">Testing</span><span className="ml-1.5 font-semibold text-slate-900">Certiport + WorkKeys on-site</span></div>
+              <div><span className="text-slate-500">Structure</span><span className="ml-1.5 font-semibold text-slate-900">3 Tiers (Entry → Intermediate → Advanced)</span></div>
+              <div><span className="text-slate-500">Duration</span><span className="ml-1.5 font-semibold text-slate-900">6–20 weeks depending on tier</span></div>
+              <div><span className="text-slate-500">Funding</span><span className="ml-1.5 font-semibold text-slate-900">WIOA / WRG eligible (ETPL #10004627)</span></div>
+              <div><span className="text-slate-500">Testing</span><span className="ml-1.5 font-semibold text-slate-900">Certiport + WorkKeys on-site</span></div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 mt-8">
               <Link href="/apply?program=finance-bookkeeping-accounting" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base">
@@ -136,7 +136,7 @@ export default function FinancePathwayPage() {
             <div className="grid sm:grid-cols-3 gap-6">
               {phases.map((p) => (
                 <div key={p.phase} className="bg-white rounded-xl p-6 border border-slate-200">
-                  <div className="w-10 h-10 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
+                  <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
                   <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
                   <p className="text-sm text-slate-600">{p.desc}</p>
                 </div>
@@ -329,10 +329,10 @@ export default function FinancePathwayPage() {
 
       {/* ===== CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
+        <section className="py-14 sm:py-20 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Start This Credential Pathway</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Start This Credential Pathway</h2>
             <p className="text-xl text-white/90 mb-8">Apply in minutes. Training may be fully funded for eligible participants.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/apply?program=finance-bookkeeping-accounting" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors">

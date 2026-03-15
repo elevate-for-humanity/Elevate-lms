@@ -91,7 +91,7 @@ export default function PartnerDocumentsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'accepted':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
+        return <span className="text-slate-500 flex-shrink-0">•</span>;
       case 'rejected':
         return <X className="w-5 h-5 text-brand-red-500" />;
       case 'pending':
@@ -167,7 +167,7 @@ export default function PartnerDocumentsPage() {
           </div>
           {allComplete && (
             <div className="mt-4 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <div>
                 <p className="font-medium text-brand-green-800">All documents accepted!</p>
                 <p className="text-sm text-brand-green-600">Your partner account is now active.</p>
@@ -244,7 +244,7 @@ export default function PartnerDocumentsPage() {
                         <div className="text-center">
                           <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm text-slate-600">Click to upload or drag and drop</p>
-                          <p className="text-xs text-slate-400 mt-1">PDF, JPEG, or PNG (max 10MB)</p>
+                          <p className="text-xs text-slate-500 mt-1">PDF, JPEG, or PNG (max 10MB)</p>
                         </div>
                       )}
                     </div>

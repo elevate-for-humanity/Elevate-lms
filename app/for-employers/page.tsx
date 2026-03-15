@@ -81,24 +81,24 @@ export default async function ForEmployersPage() {
       </div>
 
       {/* Stats Bar */}
-      <section className="bg-slate-900 text-white py-6">
+      <section className="bg-white text-white py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <p className="text-3xl font-bold text-brand-blue-400">{programCount ?? '49'}+</p>
-              <p className="text-slate-400 text-sm">Training Programs</p>
+              <p className="text-slate-500 text-sm">Training Programs</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-brand-green-400">{employerCount ?? '50'}+</p>
-              <p className="text-slate-400 text-sm">Employer Partners</p>
+              <p className="text-slate-500 text-sm">Employer Partners</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-amber-400">$0</p>
-              <p className="text-slate-400 text-sm">Recruitment Cost</p>
+              <p className="text-slate-500 text-sm">Recruitment Cost</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-pink-400">WIOA</p>
-              <p className="text-slate-400 text-sm">Funded Training</p>
+              <p className="text-slate-500 text-sm">Funded Training</p>
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default async function ForEmployersPage() {
               { step: '4', title: 'Claim Tax Credits', description: 'We help you file WOTC paperwork for eligible hires. Credits range from $2,400 to $9,600 per employee.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -221,7 +221,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Hire?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

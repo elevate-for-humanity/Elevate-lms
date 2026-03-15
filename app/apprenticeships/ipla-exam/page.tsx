@@ -86,8 +86,8 @@ export default function IPLAExamSignup() {
             <div className="flex items-center gap-3 mb-2">
               <Award className="w-10 h-10 text-white" />
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white">IPLA Apprenticeship Exam</h1>
-                <p className="text-white/80">Indiana Professional Licensing Agency</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900">IPLA Apprenticeship Exam</h1>
+                <p className="text-slate-600">Indiana Professional Licensing Agency</p>
               </div>
             </div>
             <p className="text-lg text-white/90 max-w-2xl">
@@ -111,19 +111,19 @@ export default function IPLAExamSignup() {
               <h3 className="font-bold text-lg mb-3">What's Included</h3>
               <ul className="space-y-2 text-black">
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>State licensing exam fee</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Testing center access</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Official score report</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Certificate upon passing</span>
                 </li>
               </ul>

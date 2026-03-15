@@ -64,11 +64,11 @@ export default async function DevelopersPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-800 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Code className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Developer Resources</h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             API documentation, SDKs, and tools for building on Elevate
           </p>
         </div>
@@ -113,7 +113,7 @@ export default async function DevelopersPage() {
               </h2>
               <div className="bg-white rounded-xl border p-6">
                 <h3 className="font-bold mb-4">Quick Start Guide</h3>
-                <div className="bg-slate-900 rounded-lg p-4 mb-4">
+                <div className="bg-white rounded-lg p-4 mb-4">
                   <pre className="text-brand-green-400 text-sm overflow-x-auto">
 {`# Install the Elevate SDK
 npm install @elevate/sdk

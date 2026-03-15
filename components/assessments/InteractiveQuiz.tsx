@@ -116,26 +116,26 @@ export function InteractiveQuiz({
     const passed = score >= passingScore;
 
     return (
-      <div className="bg-slate-800 rounded-lg p-8 text-center">
+      <div className="bg-white rounded-lg p-8 text-center">
         <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${
           passed ? "bg-brand-green-500/20" : "bg-brand-orange-500/20"
         }`}>
           {passed ? (
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           ) : (
             <XCircle className="w-12 h-12 text-brand-red-400" />
           )}
         </div>
 
-        <h2 className="text-3xl font-bold text-white mb-2">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">
           {passed ? "Congratulations!" : "Keep Practicing"}
         </h2>
 
-        <p className="text-xl text-slate-300 mb-6">
+        <p className="text-xl text-slate-600 mb-6">
           You scored {Math.round(score)}%
         </p>
 
-        <p className="text-slate-400 mb-8">
+        <p className="text-slate-500 mb-8">
           {passed
             ? `You passed! The passing score was ${passingScore}%.`
             : `You need ${passingScore}% to pass. Review the material and try again.`}
@@ -160,14 +160,14 @@ export function InteractiveQuiz({
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg p-8">
+    <div className="bg-white rounded-lg p-8">
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
           <span>Question {currentQuestion + 1} of {questions.length}</span>
           <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete</span>
         </div>
-        <div className="w-full bg-slate-700 rounded-full h-2">
+        <div className="w-full bg-white rounded-full h-2">
           <div
             className="bg-brand-orange-500 rounded-full h-2 transition-all"
             style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
@@ -176,7 +176,7 @@ export function InteractiveQuiz({
       </div>
 
       {/* Question */}
-      <h3 className="text-2xl font-bold text-white mb-6">{question.question_text}</h3>
+      <h3 className="text-2xl font-bold text-slate-900 mb-6">{question.question_text}</h3>
 
       {/* Options */}
       <div className="space-y-3 mb-6">
@@ -221,7 +221,7 @@ export function InteractiveQuiz({
         }`}>
           <div className="flex items-start gap-3">
             {JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer) ? (
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             ) : (
               <AlertCircle className="w-6 h-6 text-brand-red-400 flex-shrink-0 mt-1" />
             )}
@@ -235,7 +235,7 @@ export function InteractiveQuiz({
                   ? "Correct!"
                   : "Incorrect"}
               </p>
-              <p className="text-slate-300">{question.explanation}</p>
+              <p className="text-slate-600">{question.explanation}</p>
             </div>
           </div>
         </div>

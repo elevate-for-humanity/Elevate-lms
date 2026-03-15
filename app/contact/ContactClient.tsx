@@ -65,7 +65,7 @@ export default function ContactClient() {
   return (
     <main className="bg-white overflow-hidden">
       {/* Hero Section with Curved Bottom */}
-      <section className="relative bg-zinc-900 py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-white py-24 md:py-32 overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -104,7 +104,7 @@ export default function ContactClient() {
                   </div>
 
                   {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-zinc-900">
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-white">
                     <h3 className="text-lg md:text-lg font-bold text-white mb-2 group-hover:text-brand-orange-300 transition">
                       {option.title}
                     </h3>
@@ -126,7 +126,7 @@ export default function ContactClient() {
       </section>
 
       {/* Quick Contact Section */}
-      <section className="py-20 bg-zinc-900 relative overflow-hidden">
+      <section className="py-20 bg-white relative overflow-hidden">
         {/* Decorative shapes */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-orange-200 rounded-full opacity-20 blur-3xl" />
 
@@ -134,7 +134,7 @@ export default function ContactClient() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Get Started */}
             <div className="bg-white rounded-3xl p-10 shadow-xl">
-              <div className="w-20 h-20 bg-zinc-900 rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
+              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
                 <span className="text-4xl">
                   <Phone className="w-5 h-5 inline-block" />
                 </span>
@@ -156,7 +156,7 @@ export default function ContactClient() {
 
             {/* Right: Email */}
             <div className="bg-white rounded-3xl p-10 shadow-xl">
-              <div className="w-20 h-20 bg-zinc-900 rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
+              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
                 <span className="text-4xl">✉️</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
@@ -187,9 +187,9 @@ export default function ContactClient() {
       {/* Already Enrolled Section */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-zinc-900 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
+          <div className="bg-white rounded-3xl p-12 shadow-2xl relative overflow-hidden">
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-orange-600/20 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl" />
 
             <div className="relative z-10">
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -211,7 +211,7 @@ export default function ContactClient() {
       </section>
 
       {/* Ready to Join Section */}
-      <section className="py-20 bg-zinc-900">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
             Ready to start your journey?

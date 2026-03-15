@@ -39,7 +39,7 @@ export function ProgramCatalog() {
             <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
               Training that leads to real employment.
             </p>
-            <p className="mt-3 text-sm text-slate-300">
+            <p className="mt-3 text-sm text-slate-600">
               Every pathway is built with an employer or workforce need behind
               it. No random classes — just programs that connect to real roles,
               apprenticeships, and income.
@@ -75,10 +75,10 @@ export function ProgramCatalog() {
               <h3 className="text-base font-semibold text-slate-50">
                 {program.name}
               </h3>
-              <p className="mt-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+              <p className="mt-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
                 {program.meta}
               </p>
-              <p className="mt-3 text-sm text-slate-300 flex-1">
+              <p className="mt-3 text-sm text-slate-600 flex-1">
                 {program.summary}
               </p>
               <Link

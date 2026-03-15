@@ -56,7 +56,7 @@ export default async function TrainingPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Training" }]} />
         </div>
       {/* Header */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Program Holder Training & Resources
@@ -82,7 +82,7 @@ export default async function TrainingPage() {
               </p>
 
               {/* Video Player */}
-              <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
+              <div className="relative aspect-video bg-white rounded-lg overflow-hidden">
                 <video
                   controls
                   className="w-full h-full"
@@ -229,7 +229,7 @@ export default async function TrainingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

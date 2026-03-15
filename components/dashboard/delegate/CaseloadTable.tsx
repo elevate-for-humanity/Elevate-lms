@@ -74,7 +74,7 @@ export function CaseloadTable({ learners }: Props) {
                     </span>
                     <div className="h-1.5 w-20 rounded-full bg-slate-100">
                       <div
-                        className="h-1.5 rounded-full bg-brand-blue-500"
+                        className="h-1.5 rounded-full bg-white"
                         style={{
                           width: `${Math.min(
                             Math.max(l.progressPercent, 0),

@@ -58,7 +58,7 @@ export default async function EmployerDocumentsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
+        return <span className="text-slate-500 flex-shrink-0">•</span>;
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-600" />;
       case 'rejected':

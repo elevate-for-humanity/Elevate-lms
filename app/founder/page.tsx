@@ -18,13 +18,13 @@ export default function FounderPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-slate-900">
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-white">
         <Image src="/images/pages/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
             <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Founder &amp; CEO</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">Elizabeth Greene</h1>
-            <p className="text-white/80 text-lg mt-2">Elevate for Humanity Career &amp; Technical Institute</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900">Elizabeth Greene</h1>
+            <p className="text-slate-600 text-lg mt-2">Elevate for Humanity Career &amp; Technical Institute</p>
           </div>
         </div>
       </section>
@@ -107,9 +107,9 @@ export default function FounderPage() {
       </section>
 
       {/* Credentials — categorized dark section */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-white mb-10 text-center">Credentials & Approvals</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-10 text-center">Credentials & Approvals</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
             {/* Personal Licenses */}
@@ -125,7 +125,7 @@ export default function FounderPage() {
                   'Indiana Substitute Teacher License',
                   'OSHA 10-Hour Safety Certified',
                 ].map((c) => (
-                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                  <li key={c} className="flex items-start gap-2 text-slate-600 text-sm">
                     <span className="text-brand-red-400 mt-0.5">▸</span>{c}
                   </li>
                 ))}
@@ -144,7 +144,7 @@ export default function FounderPage() {
                   'IC3 Digital Literacy Proctor',
                   'IT Specialist Proctor',
                 ].map((c) => (
-                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                  <li key={c} className="flex items-start gap-2 text-slate-600 text-sm">
                     <span className="text-brand-red-400 mt-0.5">▸</span>{c}
                   </li>
                 ))}
@@ -170,7 +170,7 @@ export default function FounderPage() {
                   'CAGE Code: 0Q856',
                   'UEI: VX2GK5S8SZH8',
                 ].map((c) => (
-                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                  <li key={c} className="flex items-start gap-2 text-slate-600 text-sm">
                     <span className="text-brand-red-400 mt-0.5">▸</span>{c}
                   </li>
                 ))}
@@ -196,7 +196,7 @@ export default function FounderPage() {
                   'The Rise Foundation (DBA of Selfish Inc.) — VITA Free Tax Prep',
                   'SupersonicFastCash — Tax Software',
                 ].map((c) => (
-                  <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">
+                  <li key={c} className="flex items-start gap-2 text-slate-600 text-sm">
                     <span className="text-brand-red-400 mt-0.5">▸</span>{c}
                   </li>
                 ))}
@@ -265,10 +265,10 @@ export default function FounderPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-red-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Start Your Career</h2>
-          <p className="text-white/80 text-lg mb-8">Explore funded training programs or apply today.</p>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Start Your Career</h2>
+          <p className="text-slate-600 text-lg mb-8">Explore funded training programs or apply today.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/programs" className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition">
               Explore Programs

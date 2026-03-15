@@ -194,7 +194,7 @@ export default async function EmployerOnboardingPage() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-brand-blue-600 h-2 rounded-full transition-all"
+              className="bg-white h-2 rounded-full transition-all"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

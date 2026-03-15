@@ -247,7 +247,7 @@ export function ModuleListForProgram({
                   {/* Module Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-medium text-slate-400">
+                      <span className="text-xs font-medium text-slate-500">
                         Module {module.order_index}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
@@ -360,7 +360,7 @@ export function ModuleListForProgram({
         </Link>
       )}
 
-      <p className="text-xs text-slate-400 mt-4">
+      <p className="text-xs text-slate-500 mt-4">
         {modules.length} module{modules.length !== 1 ? 's' : ''} • 
         {modules.filter(m => m.is_published).length} published
       </p>

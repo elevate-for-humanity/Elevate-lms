@@ -71,7 +71,7 @@ export default async function ProgramStudentsPage({
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-16 bg-gray-200 rounded-full h-2">
-                          <div className="bg-brand-blue-600 h-2 rounded-full" style={{ width: `${Math.min(s.progress, 100)}%` }} />
+                          <div className="bg-white h-2 rounded-full" style={{ width: `${Math.min(s.progress, 100)}%` }} />
                         </div>
                         <span className="text-xs font-medium">{s.progress}%</span>
                       </div>

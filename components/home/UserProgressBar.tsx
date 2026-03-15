@@ -77,7 +77,7 @@ export default function UserProgressBar() {
           <div className="flex items-center gap-4">
             <div className="w-48 h-3 bg-slate-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+                className="h-full bg-white rounded-full transition-all duration-500"
                 style={{ width: `${activeEnrollment.progress || 0}%` }}
               />
             </div>

@@ -94,7 +94,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
           </div>
           <div>
             <p className="text-sm text-gray-600">Upload a new photo</p>
-            <p className="text-xs text-gray-400 mt-1">JPG, PNG. Max 2MB</p>
+            <p className="text-xs text-slate-500 mt-1">JPG, PNG. Max 2MB</p>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               disabled
               className="w-full px-4 py-2 border rounded-lg bg-white text-gray-500"
             />
-            <p className="text-xs text-gray-400 mt-1">Email cannot be changed</p>
+            <p className="text-xs text-slate-500 mt-1">Email cannot be changed</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

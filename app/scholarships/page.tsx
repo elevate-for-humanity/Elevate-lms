@@ -85,10 +85,10 @@ const scholarshipTypes = (dbRows as any[]) || [];
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <GraduationCap className="w-4 h-4" /> Funding Available
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
               Scholarships & Financial Aid
             </h1>
             <p className="text-xl text-white/90 max-w-xl mb-6">
@@ -107,7 +107,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* Stats Strip */}
-      <section className="py-8 bg-slate-900">
+      <section className="py-8 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -158,7 +158,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
                   <ul className="space-y-1">
                     {option.eligibility.map((item, j) => (
                       <li key={j} className="flex items-center gap-2 text-sm text-slate-600">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -185,21 +185,21 @@ const scholarshipTypes = (dbRows as any[]) || [];
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Covers Everything</h3>
                     <p className="text-slate-600">Tuition, books, supplies, uniforms, certification exams</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Support Services</h3>
                     <p className="text-slate-600">Transportation, childcare, work clothes assistance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">No Repayment</h3>
                     <p className="text-slate-600">This is a grant, not a loan. Nothing to pay back.</p>
@@ -228,7 +228,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-700">
                     <div className="w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     </div>
                     {item}
                   </li>
@@ -269,7 +269,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
           <div className="grid md:grid-cols-4 gap-6">
             {steps.map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
@@ -314,12 +314,12 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Don&apos;t Let Cost Stop You
           </h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <p className="text-xl text-slate-600 mb-8">
             85% of our students pay $0 for training. Let us help you find funding.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

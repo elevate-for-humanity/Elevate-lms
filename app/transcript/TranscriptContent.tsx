@@ -178,7 +178,7 @@ export default function TranscriptContent() {
                   <p className="text-sm text-gray-600">
                     Elevate for Humanity — HVAC Technician Training Program
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     CIP Code: 47.0201 &middot; SOC Code: 49-9021 &middot;{" "}
                     {TOTAL_THEORY + TOTAL_OJT} Clock Hours
                   </p>
@@ -429,17 +429,17 @@ export default function TranscriptContent() {
                   Program Director Signature
                 </label>
                 <div className="border-b border-gray-400 h-10" />
-                <p className="text-xs text-gray-400 mt-1">Date: ___/___/______</p>
+                <p className="text-xs text-slate-500 mt-1">Date: ___/___/______</p>
               </div>
               <div>
                 <label className="text-xs text-gray-400 block mb-1">
                   Registrar / Authorized Official
                 </label>
                 <div className="border-b border-gray-400 h-10" />
-                <p className="text-xs text-gray-400 mt-1">Date: ___/___/______</p>
+                <p className="text-xs text-slate-500 mt-1">Date: ___/___/______</p>
               </div>
             </div>
-            <p className="text-[10px] text-gray-400 mt-6 text-center">
+            <p className="text-[10px] text-slate-500 mt-6 text-center">
               This transcript is an official document of Elevate for Humanity.
               Unauthorized alteration or reproduction is prohibited. Verify
               authenticity by contacting records@elevateforhumanity.org.

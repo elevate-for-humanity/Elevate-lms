@@ -76,7 +76,7 @@ export default async function CommunityEventsPage() {
         </section>
       )}
 
-      <section className="bg-slate-900 py-10">
+      <section className="bg-white py-10">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-xl font-bold text-white">Suggest a topic or host a session</h2>
           <p className="text-slate-400 mt-2 text-sm max-w-lg mx-auto">

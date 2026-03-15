@@ -96,7 +96,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
     <>
       {/* Cart Summary (if items) */}
       {cart.length > 0 && (
-        <div className="bg-brand-green-600 text-white py-3 sticky top-0 z-50">
+        <div className="bg-white text-white py-3 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ShoppingCart className="w-5 h-5" />
@@ -134,7 +134,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                     <ul className="space-y-2">
                       {sortedFeatures(bundle.features || []).map((f, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-slate-500 flex-shrink-0">•</span>
                           <span>{f.feature}</span>
                         </li>
                       ))}
@@ -153,7 +153,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                   >
                     {cart.includes(bundle.id) ? (
                       <>
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         Added to Cart
                       </>
                     ) : (
@@ -228,7 +228,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         <div className="flex items-center gap-2">
                           <span className="text-2xl font-bold text-gray-900">${Number(course.price).toFixed(0)}</span>
                           {course.original_price && (
-                            <span className="text-gray-400 line-through">${Number(course.original_price).toFixed(0)}</span>
+                            <span className="text-slate-500 line-through">${Number(course.original_price).toFixed(0)}</span>
                           )}
                         </div>
                       </div>
@@ -247,7 +247,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         >
                           {cart.includes(course.id) ? (
                             <>
-                              <span className="text-slate-400 flex-shrink-0">•</span>
+                              <span className="text-slate-500 flex-shrink-0">•</span>
                               Added
                             </>
                           ) : (

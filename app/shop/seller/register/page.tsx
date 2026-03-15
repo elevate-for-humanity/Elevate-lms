@@ -47,7 +47,7 @@ export default function SellerRegisterPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">We will review your seller application and get back to you within 2-3 business days.</p>
           <Link href="/" className="text-brand-blue-600 font-medium">Return to Home</Link>
@@ -65,7 +65,7 @@ export default function SellerRegisterPage() {
         </div>
       </div>
 
-      <div className="bg-brand-blue-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Store className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h1 className="text-3xl font-bold mb-2">Become a Seller</h1>

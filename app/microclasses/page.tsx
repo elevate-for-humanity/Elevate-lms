@@ -71,7 +71,7 @@ export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-brand-blue-600 text-white py-16 lg:py-24">
+      <section className="bg-white text-white py-16 lg:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center">
             <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
@@ -93,7 +93,7 @@ export default function MicroclassesPage() {
                 <span>Industry Certifications</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Free with WIOA</span>
               </div>
             </div>
@@ -107,8 +107,8 @@ export default function MicroclassesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {microclasses.map((course, index) => (
               <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition group">
-                <div className="h-48 bg-brand-blue-500 flex items-center justify-center">
-                  <Award className="w-16 h-16 text-white/80" />
+                <div className="h-48 bg-white flex items-center justify-center">
+                  <Award className="w-16 h-16 text-slate-600" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
@@ -124,7 +124,7 @@ export default function MicroclassesPage() {
                       <span className="text-gray-600">{course.certification}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-brand-green-600 font-medium">{course.price}</span>
                     </div>
                   </div>

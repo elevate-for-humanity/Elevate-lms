@@ -16,7 +16,7 @@ export default function OnboardingUXPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Onboarding Ux" }]} />
       </div>
-<div className="bg-gray-900 text-white py-12">
+<div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
             <Link href="/" className="hover:text-white">Home</Link>
@@ -26,7 +26,7 @@ export default function OnboardingUXPage() {
             <span className="text-white">Onboarding & UX</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Onboarding and User Experience Standards</h1>
-          <p className="text-gray-300">User journeys, accessibility, support, and experience guidelines</p>
+          <p className="text-slate-600">User journeys, accessibility, support, and experience guidelines</p>
           <div className="flex items-center gap-6 mt-6 text-sm">
             <span className="flex items-center gap-2"><FileText className="w-4 h-4" />EFH-UX-001</span>
             <span>Version 1.0</span>

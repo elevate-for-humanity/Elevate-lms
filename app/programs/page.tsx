@@ -84,7 +84,7 @@ export default function ProgramCatalogPage() {
       <section className="bg-white py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900">Not Sure Which Program Is Right for You?</h2>
-          <p className="text-slate-400 mt-2 max-w-xl mx-auto">
+          <p className="text-slate-500 mt-2 max-w-xl mx-auto">
             Talk to an advisor. We help you match your goals, schedule, and funding eligibility to the right training pathway.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">

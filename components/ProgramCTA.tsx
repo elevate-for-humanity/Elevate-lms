@@ -97,7 +97,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
       </section>
 
       {/* Secondary CTA - Indiana Career Connect */}
-      <section className="py-16 sm:py-20 bg-slate-900 text-white">
+      <section className="py-16 sm:py-20 bg-white text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-2xl order-2 md:order-1">
@@ -119,19 +119,19 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">1</div>
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold">1</div>
                   <p className="text-slate-300">Create account at IndianaCareerConnect.com</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">2</div>
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold">2</div>
                   <p className="text-slate-300">Schedule appointment with career advisor</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">3</div>
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold">3</div>
                   <p className="text-slate-300">Get approved for WIOA funding</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">4</div>
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold">4</div>
                   <p className="text-slate-300">Enroll with Elevate for Humanity</p>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
       </section>
 
       {/* Final CTA - Contact */}
-      <section className="py-16 sm:py-20 bg-brand-blue-700 text-white">
+      <section className="py-16 sm:py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Questions? We're Here to Help
@@ -239,21 +239,21 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
-            <div className="bg-brand-blue-800 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">💬</div>
               <h3 className="font-bold mb-2 text-white">Get Support</h3>
               <a href="/support" className="text-white/90 hover:text-white">
                 Visit Support Center
               </a>
             </div>
-            <div className="bg-brand-blue-800 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">✉️</div>
               <h3 className="font-bold mb-2 text-white">Email Us</h3>
               <a href="/contact" className="text-white/90 hover:text-white">
                 our contact form
               </a>
             </div>
-            <div className="bg-brand-blue-800 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📍</div>
               <h3 className="font-bold mb-2 text-white">Visit Us</h3>
               <p className="text-white/90 text-sm">

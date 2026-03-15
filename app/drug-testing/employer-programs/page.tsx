@@ -157,7 +157,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Volume Pricing */}
-      <section className="py-16 bg-brand-blue-900 text-slate-900">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">Volume Discounts</h2>
           <p className="text-brand-blue-200 text-center mb-8">
@@ -199,7 +199,7 @@ export default function EmployerProgramsPage() {
               { step: 4, title: 'Start Testing', desc: 'Send employees to any of our 20,000+ locations nationwide.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -284,7 +284,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-slate-900">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up Your Program?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

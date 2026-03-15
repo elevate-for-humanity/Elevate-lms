@@ -366,7 +366,7 @@ export default async function LearnerOnboardingPage() {
               </div>
               <div className="h-2 bg-white rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
+                  className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -492,7 +492,7 @@ export default async function LearnerOnboardingPage() {
 
         {/* Help Section */}
         <section className="mt-12 sm:mt-16">
-          <div className="relative overflow-hidden rounded-2xl bg-slate-900">
+          <div className="relative overflow-hidden rounded-2xl bg-white">
             <div className="absolute inset-0">
               <Image
                 src="/images/pages/onboarding-page-1.jpg"
@@ -502,8 +502,8 @@ export default async function LearnerOnboardingPage() {
               />
             </div>
             <div className="relative p-6 sm:p-10 text-center">
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-2">Need Help?</h3>
-              <p className="text-slate-300 mb-6 max-w-lg mx-auto">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2">Need Help?</h3>
+              <p className="text-slate-600 mb-6 max-w-lg mx-auto">
                 Our enrollment team is available Monday through Friday to help you complete your onboarding.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">

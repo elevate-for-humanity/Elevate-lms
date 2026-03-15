@@ -146,7 +146,7 @@ export default function CoursePreviewPage() {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-500 mx-auto" />
-          <p className="mt-3 text-sm text-slate-400">Loading course...</p>
+          <p className="mt-3 text-sm text-slate-500">Loading course...</p>
         </div>
       </div>
     );
@@ -158,7 +158,7 @@ export default function CoursePreviewPage() {
         <div className="text-center">
           <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
           <p className="text-lg font-semibold">Course not found</p>
-          <p className="text-sm text-slate-400 mt-1">This course may have been removed or the link is invalid.</p>
+          <p className="text-sm text-slate-500 mt-1">This course may have been removed or the link is invalid.</p>
         </div>
       </div>
     );
@@ -170,7 +170,7 @@ export default function CoursePreviewPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header with progress */}
-      <div className="bg-slate-900 border-b border-slate-800">
+      <div className="bg-white border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -189,9 +189,9 @@ export default function CoursePreviewPage() {
             </div>
           </div>
           {/* Progress bar */}
-          <div className="w-full bg-slate-800 rounded-full h-1.5">
+          <div className="w-full bg-white rounded-full h-1.5">
             <div
-              className="bg-brand-blue-500 h-1.5 rounded-full transition-all duration-500"
+              className="bg-white h-1.5 rounded-full transition-all duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -199,10 +199,10 @@ export default function CoursePreviewPage() {
 
         {/* Credential mapping banner */}
         {credential && (
-          <div className="border-t border-slate-800 bg-slate-900/80">
+          <div className="border-t border-slate-800 bg-white/80">
             <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center gap-3">
               <CredIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-600">
                 <span className="text-amber-400 font-semibold">Credential Alignment:</span>{' '}
                 This course prepares you for <span className="text-white font-medium">{credential.credential}</span>
                 {' '}<span className="text-slate-500">issued by {credential.issuer}</span>
@@ -214,13 +214,13 @@ export default function CoursePreviewPage() {
 
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-0">
         {/* Sidebar */}
-        <aside className="lg:w-80 bg-slate-900/50 border-r border-slate-800 lg:min-h-[calc(100vh-120px)]">
+        <aside className="lg:w-80 bg-white/50 border-r border-slate-800 lg:min-h-[calc(100vh-120px)]">
           <div className="p-4">
             {/* Sidebar progress summary */}
             <div className="mb-4 pb-4 border-b border-slate-800">
               <p className="text-xs text-slate-500 mb-1">{viewedLessons.size} of {lessons.length} viewed</p>
-              <div className="w-full bg-slate-800 rounded-full h-1">
-                <div className="bg-brand-green-500 h-1 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+              <div className="w-full bg-white rounded-full h-1">
+                <div className="bg-white h-1 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
               </div>
             </div>
 
@@ -278,15 +278,15 @@ export default function CoursePreviewPage() {
               </div>
 
               {/* Lesson info */}
-              <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-6">
+              <div className="bg-white/50 rounded-xl border border-slate-800 p-6">
                 <h2 className="text-2xl font-bold mb-2">{activeLesson.title}</h2>
-                <p className="text-slate-400 mb-4">
+                <p className="text-slate-500 mb-4">
                   Lesson {activeIdx + 1} of {lessons.length}
                 </p>
 
                 {activeLesson.content && (
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-slate-300 leading-relaxed">{activeLesson.content}</p>
+                    <p className="text-slate-600 leading-relaxed">{activeLesson.content}</p>
                   </div>
                 )}
 
@@ -295,7 +295,7 @@ export default function CoursePreviewPage() {
                     <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Topics Covered</h3>
                     <div className="flex flex-wrap gap-2">
                       {activeLesson.topics.map((topic: string, i: number) => (
-                        <span key={i} className="bg-slate-800 text-slate-300 px-3 py-1 rounded-full text-sm">
+                        <span key={i} className="bg-slate-800 text-slate-600 px-3 py-1 rounded-full text-sm">
                           {topic}
                         </span>
                       ))}
@@ -331,21 +331,21 @@ export default function CoursePreviewPage() {
 
               {/* Competency Checklist — shows after last lesson or when all viewed */}
               {(activeIdx === lessons.length - 1 || progressPct === 100) && (
-                <div className="mt-8 bg-slate-900/50 rounded-xl border border-amber-500/20 p-6">
+                <div className="mt-8 bg-white/50 rounded-xl border border-amber-500/20 p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
                       <Award className="w-5 h-5 text-amber-400" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold">Competency Checklist</h3>
-                      <p className="text-xs text-slate-400">Skills demonstrated upon course completion</p>
+                      <p className="text-xs text-slate-500">Skills demonstrated upon course completion</p>
                     </div>
                   </div>
                   <ul className="space-y-2">
                     {competencies.map((item, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm">
                         <CheckCircle className="w-4 h-4 text-brand-green-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-slate-300">{item}</span>
+                        <span className="text-slate-600">{item}</span>
                       </li>
                     ))}
                   </ul>

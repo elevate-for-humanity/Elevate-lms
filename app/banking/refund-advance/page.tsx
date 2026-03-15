@@ -74,7 +74,7 @@ export default function RefundAdvancePage() {
               <p className="text-sm text-gray-600">Get your money within hours</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h3 className="font-bold text-gray-900 mb-2">Auto Repayment</h3>
               <p className="text-sm text-gray-600">Repaid from your IRS refund</p>
             </div>
@@ -102,7 +102,7 @@ export default function RefundAdvancePage() {
               <p className="text-sm text-gray-500">Cover bills and expenses</p>
             </div>
 
-            <div className="bg-brand-blue-600 rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
+            <div className="bg-white rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
               <div className="bg-yellow-400 text-brand-blue-900 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">
                 MOST POPULAR
               </div>
@@ -134,7 +134,7 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   1
                 </div>
                 <div className="ml-4">
@@ -147,7 +147,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   2
                 </div>
                 <div className="ml-4">
@@ -160,7 +160,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   3
                 </div>
                 <div className="ml-4">
@@ -173,7 +173,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   4
                 </div>
                 <div className="ml-4">
@@ -227,24 +227,24 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-brand-green-50 rounded-xl p-6 border border-brand-green-200">
               <h3 className="text-xl font-bold text-brand-green-800 mb-4 flex items-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 What You Need
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-700">Valid government-issued ID</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-700">Social Security card or ITIN</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-700">W-2s, 1099s, or other income documents</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-700">Expected refund of at least $1,000</span>
                 </li>
               </ul>
@@ -376,7 +376,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Need Cash Now?

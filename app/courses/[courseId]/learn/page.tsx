@@ -53,7 +53,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
           </div>
           <div className="lg:col-span-3">
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center mb-6">
+              <div className="aspect-video bg-white rounded-lg flex items-center justify-center mb-6">
                 <p className="text-white">Select a lesson to begin</p>
               </div>
               <h2 className="text-xl font-semibold mb-2">Welcome to {course?.course_name || course?.title}</h2>

@@ -33,7 +33,7 @@ export default function MentorshipPage() {
         </div>
       </div>
 
-      <section className="bg-indigo-600 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Users className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Mentorship Program</h1>
@@ -50,7 +50,7 @@ export default function MentorshipPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{benefit}</span>
               </div>
             ))}
@@ -101,7 +101,7 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-indigo-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Become a Mentor</h2>
           <p className="text-indigo-100 mb-8">Share your experience and help others succeed in their careers.</p>
@@ -111,7 +111,7 @@ export default function MentorshipPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

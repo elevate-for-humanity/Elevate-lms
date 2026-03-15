@@ -39,10 +39,10 @@ export default function CreateProgramPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/partners-pub-page-6.jpg" alt="Create a training program" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Create a Training Program</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Partner with Elevate to deliver workforce training and receive funded student referrals.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Create a Training Program</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Partner with Elevate to deliver workforce training and receive funded student referrals.</p>
           </div>
         </div>
       </section>
@@ -54,7 +54,7 @@ export default function CreateProgramPage() {
           <div className="space-y-8">
             {STEPS.map((s) => (
               <div key={s.step} className="flex gap-4">
-                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">{s.step}</div>
+                <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{s.title}</h3>
                   <p className="text-gray-600">{s.desc}</p>
@@ -85,7 +85,7 @@ export default function CreateProgramPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to List Your Program?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Contact our partnerships team to get started.</p>

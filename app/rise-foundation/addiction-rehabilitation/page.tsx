@@ -74,7 +74,7 @@ export default async function AddictionRehabilitationPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-700 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Addiction Rehabilitation</h1>
@@ -118,7 +118,7 @@ export default async function AddictionRehabilitationPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {displayServices.map((service: any, index: number) => (
               <div key={index} className="bg-teal-50 rounded-xl p-6">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <h3 className="font-bold text-lg mb-2">{service.title}</h3>
                 <p className="text-gray-600">{service.description}</p>
               </div>

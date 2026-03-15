@@ -5,7 +5,7 @@ const VIDEO_URL =
 
 export default function HeyGenTestPage() {
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-8">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8">
       <h1 className="text-2xl font-bold text-white mb-2">HeyGen Avatar Test — Scene 1</h1>
       <p className="text-slate-400 mb-6 text-center max-w-xl">
         Single-scene test: Brandon avatar with David Boles voice, DALL-E HVAC condenser background.

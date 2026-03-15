@@ -59,11 +59,11 @@ export default function MissionPage() {
       </div>
 
       {/* Hero — image with title overlaid */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-brand-blue-900">
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-white">
         <Image src="/images/pages/mission-page-1.jpg" alt="Our mission to elevate communities" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex items-center justify-center text-center px-4">
           <div className="max-w-3xl">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Our Mission</h1>
+            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">Our Mission</h1>
             <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
               To create pathways out of poverty and into prosperity by providing free,
               high-quality career training to those who need it most.
@@ -98,7 +98,7 @@ export default function MissionPage() {
             <ul className="space-y-3">
               {populations.map((pop, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-slate-700">{pop}</span>
                 </li>
               ))}
@@ -127,21 +127,21 @@ export default function MissionPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">How It Works</h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Enroll in a Training Program</h3>
                 <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Most are fully funded through WIOA, WRG, or employer sponsorship.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Complete Training and Earn Credentials</h3>
                 <p className="text-slate-600">Finish your program, pass certification exams, and earn industry-recognized credentials that employers value.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Get Placed in Employment</h3>
                 <p className="text-slate-600">Our employer partners hire directly from our programs. Career services support you through placement and beyond.</p>

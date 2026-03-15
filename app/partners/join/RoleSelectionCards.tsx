@@ -275,7 +275,7 @@ export default function RoleSelectionCards({
                     key={idx}
                     className="flex items-start gap-2 text-sm text-black"
                   >
-                    <span className="text-slate-400 mt-0.5">•</span>
+                    <span className="text-slate-500 mt-0.5">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

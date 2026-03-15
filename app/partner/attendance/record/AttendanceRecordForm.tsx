@@ -67,7 +67,7 @@ export default function AttendanceRecordForm({
   if (submitted) {
     return (
       <div className="text-center py-12">
-        <span className="text-slate-400 flex-shrink-0">•</span>
+        <span className="text-slate-500 flex-shrink-0">•</span>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Attendance Recorded!</h2>
         <p className="text-gray-600">Redirecting...</p>
       </div>

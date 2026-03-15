@@ -103,10 +103,10 @@ export default async function HubWelcomePage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/hub-page-1.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Everything You Need In One Place</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Everything You Need In One Place</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
               Track your enrollment, monitor progress, connect with peers, and see exactly what the system is doing to help you succeed. The Hub is your personalized dashboard for career success.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
@@ -153,15 +153,15 @@ export default async function HubWelcomePage() {
                   <p className="text-lg text-slate-600 mb-6 leading-relaxed">{feature.description}</p>
                   <ul className="space-y-3">
                     <li className="flex items-center gap-3 text-slate-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span>Real-time updates</span>
                     </li>
                     <li className="flex items-center gap-3 text-slate-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span>Automated tracking</span>
                     </li>
                     <li className="flex items-center gap-3 text-slate-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span>No manual entry required</span>
                     </li>
                   </ul>
@@ -196,7 +196,7 @@ export default async function HubWelcomePage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">{page.title}</h3>
+                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{page.title}</h3>
                 </div>
                 <div className="p-5">
                   <p className="text-slate-600 text-sm">{page.description}</p>
@@ -212,18 +212,18 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Success Stories</h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Success Stories</h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto">
               Real students who used the Hub to complete their programs and launch their careers.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {successStories.map((story) => (
-              <div key={story.name} className="bg-slate-800 rounded-2xl overflow-hidden">
+              <div key={story.name} className="bg-white rounded-2xl overflow-hidden">
                 <div className="relative h-56 overflow-hidden">
                   <Image
                     src={story.image}
@@ -233,9 +233,9 @@ export default async function HubWelcomePage() {
                   />
                 </div>
                 <div className="p-6">
-                  <p className="text-slate-300 mb-4 italic">"{story.quote}"</p>
+                  <p className="text-slate-600 mb-4 italic">"{story.quote}"</p>
                   <div>
-                    <p className="font-semibold text-white">{story.name}</p>
+                    <p className="font-semibold text-slate-900">{story.name}</p>
                     <p className="text-sm text-brand-green-400">{story.program}</p>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export default async function HubWelcomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -270,7 +270,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -286,7 +286,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -305,9 +305,9 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-brand-green-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Questions? Contact Us</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">Questions? Contact Us</h2>
           <p className="text-xl text-brand-green-100 mb-8 max-w-2xl mx-auto">
             Use the Hub to track your progress and achieve your career goals.
           </p>

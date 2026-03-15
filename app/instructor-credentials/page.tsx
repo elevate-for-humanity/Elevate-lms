@@ -172,10 +172,10 @@ export default function InstructorCredentialsPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               RTI Provider Qualifications
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Instructor Credentials
             </h1>
           </div>
@@ -259,8 +259,8 @@ export default function InstructorCredentialsPage() {
             {PROGRAM_CREDENTIALS.map((prog, i) => (
               <div key={i} className="bg-white rounded-xl border overflow-hidden">
                 {/* Header */}
-                <div className="bg-brand-blue-600 px-6 py-4">
-                  <h3 className="text-lg font-bold text-white">{prog.program}</h3>
+                <div className="bg-white px-6 py-4">
+                  <h3 className="text-lg font-bold text-slate-900">{prog.program}</h3>
                   <p className="text-brand-blue-100 text-sm">Occupation: {prog.occupation}</p>
                 </div>
 

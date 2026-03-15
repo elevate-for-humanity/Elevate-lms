@@ -33,7 +33,7 @@ export default async function PaymentCancelPage() {
   // Log payment cancellation
   await db.from('page_views').insert({ page: 'payment_cancel' }).select();
   return (
-    <div className="min-h-screen bg-zinc-900  to-white py-20">
+    <div className="min-h-screen bg-white  to-white py-20">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Payment", href: "/payment" }, { label: "Cancel" }]} />
       </div>

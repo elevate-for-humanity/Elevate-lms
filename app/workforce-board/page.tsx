@@ -126,7 +126,7 @@ export default async function WorkforceBoardPage() {
           <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/how-it-works-hero.jpg"
             className="absolute inset-0 w-full h-full object-cover" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Portal</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Program oversight, performance metrics, and compliance monitoring in one place</p>
@@ -208,7 +208,7 @@ export default async function WorkforceBoardPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-6 bg-slate-700 text-white">
+      <section className="py-16 px-6 bg-white text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Get Started?

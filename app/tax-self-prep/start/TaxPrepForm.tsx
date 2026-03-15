@@ -183,7 +183,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                 activeSection === section.id ? 'bg-brand-orange-500 text-white' : 'bg-gray-200'
               }`}>
                 {completedSections.includes(section.id) 
-                  ? <span className="text-slate-400 flex-shrink-0">•</span> 
+                  ? <span className="text-slate-500 flex-shrink-0">•</span> 
                   : <section.icon className="w-4 h-4" />}
               </div>
               <span className="text-sm font-medium">{section.name}</span>
@@ -359,7 +359,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                   <div key={section.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                     <span>{section.name}</span>
                     {completedSections.includes(section.id) ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <span className="text-sm text-brand-orange-600">Incomplete</span>
                     )}

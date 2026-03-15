@@ -26,7 +26,7 @@ export default function WorkKeysPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-slate-900">
+      <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-white">
         <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover" priority />
       </section>
 
@@ -81,7 +81,7 @@ export default function WorkKeysPage() {
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={name} fill sizes="400px" className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-white text-sm">{name}</h3>
+                    <h3 className="font-bold text-slate-900 text-sm">{name}</h3>
                   </div>
                 </div>
                 <div className="p-4 flex-1 bg-white">
@@ -104,11 +104,11 @@ export default function WorkKeysPage() {
                 <div className="relative h-32 flex-shrink-0">
                   <Image src={img} alt={level} fill sizes="300px" className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-1.5">
-                    <p className="font-extrabold text-white text-sm">{level}</p>
+                    <p className="font-extrabold text-slate-900 text-sm">{level}</p>
                   </div>
                 </div>
                 <div className="p-3 bg-white flex-1">
-                  <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -117,13 +117,13 @@ export default function WorkKeysPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Schedule Your Test</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Take WorkKeys at Elevate</h2>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Take WorkKeys at Elevate</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-6">
                 We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. Contact us to schedule.
               </p>
               <div className="flex flex-wrap gap-3">

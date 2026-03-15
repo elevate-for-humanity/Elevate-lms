@@ -265,7 +265,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
                   <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-brand-blue-400 hover:bg-brand-blue-50 transition">
                     <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                     <p className="text-sm font-medium text-slate-700">Click to upload your completed W-9</p>
-                    <p className="text-xs text-slate-400 mt-1">PDF, JPG, or PNG · Max 10MB</p>
+                    <p className="text-xs text-slate-500 mt-1">PDF, JPG, or PNG · Max 10MB</p>
                     {w9File && <p className="text-xs text-brand-green-600 mt-2 font-medium">{w9File.name}</p>}
                   </div>
                   <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"

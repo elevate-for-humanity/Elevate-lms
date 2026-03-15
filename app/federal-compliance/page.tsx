@@ -15,14 +15,14 @@ export default function FederalCompliancePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-800 border-b border-slate-700">
+      <div className="bg-white border-b border-slate-700">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Federal Compliance' }]} />
         </div>
       </div>
 
       {/* Hero */}
-      <section className="bg-zinc-800 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
@@ -32,7 +32,7 @@ export default function FederalCompliancePage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Federal Compliance
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-xl text-slate-600 leading-relaxed">
               Elevate for Humanity is committed to full compliance with all federal regulations 
               governing workforce development, education, and equal opportunity. We maintain 
               rigorous standards to protect participants and ensure program integrity.
@@ -65,25 +65,25 @@ export default function FederalCompliancePage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Eligible Training Provider:</strong> Programs listed on state Eligible Training Provider Lists (ETPL)
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Performance Reporting:</strong> Track and report participant outcomes as required
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Equal Opportunity:</strong> Non-discrimination in all programs and activities
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Data Privacy:</strong> Protect participant personally identifiable information (PII)
                   </span>
@@ -113,25 +113,25 @@ export default function FederalCompliancePage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Student Consent:</strong> Obtain written consent before disclosing education records
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Access Rights:</strong> Students can review and request amendments to their records
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Secure Storage:</strong> Education records stored securely with access controls
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Limited Disclosure:</strong> Share information only as permitted by law
                   </span>
@@ -161,25 +161,25 @@ export default function FederalCompliancePage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Web Accessibility:</strong> WCAG 2.1 Level AA compliance for digital content
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Reasonable Accommodations:</strong> Provide accommodations for participants with disabilities
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Accessible Facilities:</strong> Physical locations meet ADA accessibility standards
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">
                     <strong>Assistive Technology:</strong> Compatible with screen readers and other assistive devices
                   </span>
@@ -209,43 +209,43 @@ export default function FederalCompliancePage() {
               </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Race</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Color</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Religion</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Sex</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">National Origin</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Age</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Disability</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Veteran Status</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Genetic Information</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-black">Citizenship Status</span>
                 </div>
               </div>
@@ -295,9 +295,9 @@ export default function FederalCompliancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Questions About Compliance?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Questions About Compliance?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
             Contact our compliance team for more information about our policies and procedures.
           </p>

@@ -36,10 +36,10 @@ const partners = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-900 py-14 sm:py-20">
+      <section className="bg-white py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Partner Directory</h1>
-          <p className="text-lg text-slate-300 max-w-2xl">Workforce development partners, government agencies, and community resources.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">Partner Directory</h1>
+          <p className="text-lg text-slate-600 max-w-2xl">Workforce development partners, government agencies, and community resources.</p>
         </div>
       </section>
 
@@ -71,7 +71,7 @@ const partners = (dbRows as any[]) || [];
                       )}
                     </div>
                     <p className="text-slate-600 mt-2">{p.desc}</p>
-                    <p className="text-sm text-slate-400 mt-2 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {p.address}</p>
+                    <p className="text-sm text-slate-500 mt-2 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {p.address}</p>
                   </div>
                 </div>
               </div>

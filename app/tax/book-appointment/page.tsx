@@ -95,7 +95,7 @@ export default function BookAppointmentPage() {
           {status === 'success' ? (
             <div className="rounded-2xl border-2 border-brand-green-200 bg-brand-green-50 p-8 text-center">
               <div className="w-16 h-16 rounded-full bg-brand-green-100 flex items-center justify-center mx-auto mb-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
               <h2 className="text-2xl font-bold text-black mb-2">
                 Appointment Request Received!
@@ -415,15 +415,15 @@ export default function BookAppointmentPage() {
             </p>
             <ul className="space-y-2 text-sm text-black">
               <li className="flex items-start gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Same service as in-person</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>Secure document sharing</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>No software installation needed</span>
               </li>
             </ul>

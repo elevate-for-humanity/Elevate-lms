@@ -45,22 +45,22 @@ export default function LogHoursPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-slate-800 px-4 pt-12 pb-4 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
-          <h1 className="text-white font-bold text-xl">Log Hours</h1>
+          <h1 className="text-slate-900 font-bold text-xl">Log Hours</h1>
         </div>
       </header>
 
       <main className="px-4 py-6">
         {success ? (
-          <div className="bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            <h2 className="text-white font-bold text-xl mb-2">Hours Logged!</h2>
+          <div className="bg-white/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
+            <span className="text-slate-500 flex-shrink-0">•</span>
+            <h2 className="text-slate-900 font-bold text-xl mb-2">Hours Logged!</h2>
             <p className="text-brand-green-200">Your training hours have been recorded.</p>
           </div>
         ) : (
@@ -143,7 +143,7 @@ export default function LogHoursPage() {
                 </>
               ) : (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   Log {hours || '0'} Hours
                 </>
               )}

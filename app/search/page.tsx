@@ -251,7 +251,7 @@ export default function SearchPage() {
       <section className="py-16 sm:py-24 bg-gradient-to-br from-brand-red-600 to-brand-red-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Start Your New Career Today
           </h2>
           <p className="text-xl text-white/90 mb-10">

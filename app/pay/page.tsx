@@ -116,19 +116,19 @@ export default function PayPage() {
           <h3 className="text-lg font-bold text-black mb-4">All Payments Include:</h3>
           <div className="grid md:grid-cols-2 gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-black">Secure payment via Stripe</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-black">Instant enrollment confirmation</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-black">All materials included</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-black">Job placement assistance</span>
             </div>
           </div>

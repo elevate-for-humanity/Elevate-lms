@@ -55,7 +55,7 @@ export default async function EnrollmentPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {steps.map((s) => (
             <div key={s.step} className="text-center">
-              <div className="w-12 h-12 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-lg font-bold mx-auto mb-3">{s.step}</div>
+              <div className="w-12 h-12 rounded-full bg-white text-white flex items-center justify-center text-lg font-bold mx-auto mb-3">{s.step}</div>
               <h3 className="font-semibold text-gray-900 mb-1">{s.title}</h3>
               <p className="text-xs text-gray-500">{s.desc}</p>
               {s.href && (
@@ -120,7 +120,7 @@ export default async function EnrollmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-brand-blue-600 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
           <p className="text-brand-blue-100 text-sm mb-6">Applications are reviewed within 1-2 business days. No application fee.</p>

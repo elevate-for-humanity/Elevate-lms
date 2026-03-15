@@ -202,7 +202,7 @@ export default function PolicyAcknowledgmentPage() {
           </span>
           <div className="w-48 bg-gray-200 rounded-full h-2">
             <div
-              className="bg-brand-blue-600 h-2 rounded-full transition-all"
+              className="bg-white h-2 rounded-full transition-all"
               style={{ width: `${(acknowledged.size / POLICIES.length) * 100}%` }}
             />
           </div>
@@ -253,7 +253,7 @@ export default function PolicyAcknowledgmentPage() {
                     <ul className="space-y-1.5">
                       {policy.details.map((detail, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
-                          <span className="text-gray-300 mt-1">•</span>
+                          <span className="text-slate-600 mt-1">•</span>
                           {detail}
                         </li>
                       ))}

@@ -129,7 +129,7 @@ export function QuizPanel({
       {/* Progress bar */}
       <div className="h-1.5 bg-white">
         <div
-          className="h-full bg-brand-blue-500 transition-all duration-300"
+          className="h-full bg-white transition-all duration-300"
           style={{ width: `${((current + 1) / questions.length) * 100}%` }}
         />
       </div>
@@ -149,7 +149,7 @@ export function QuizPanel({
                 {formatTime(secondsLeft)}
               </span>
             )}
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               {passingScore}/{questions.length} to pass
             </span>
           </div>

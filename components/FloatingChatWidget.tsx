@@ -107,7 +107,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 
       {isOpen && (
         <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-50 flex h-[80vh] md:h-[600px] w-full md:w-[400px] flex-col md:rounded-2xl border border-slate-200 bg-white shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between rounded-t-2xl bg-brand-blue-600 px-4 py-3 text-white">
+          <div className="flex items-center justify-between rounded-t-2xl bg-white px-4 py-3 text-white">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor"

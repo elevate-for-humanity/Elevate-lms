@@ -116,7 +116,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* Features Bar */}
-      <section className="py-8 bg-brand-blue-900 text-slate-900">
+      <section className="py-8 bg-white text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-6">
             {features.map((feature) => (
@@ -250,11 +250,11 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* DOT Section */}
-      <section className="py-20 bg-gray-900 text-slate-900">
+      <section className="py-20 bg-white text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-brand-orange-500 px-4 py-2 rounded-full text-sm font-bold mb-4">
+              <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-bold mb-4">
                 <Truck className="w-4 h-4" />
                 DOT Compliant
               </div>
@@ -316,7 +316,7 @@ export default async function DrugTestingLandingPage() {
               { step: 6, title: 'Results Delivered', desc: 'Receive results via secure portal and email. Most results in 24-48 hours.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6">
-                <div className="w-14 h-14 bg-brand-blue-600 text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-14 h-14 bg-white text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -397,7 +397,7 @@ export default async function DrugTestingLandingPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-slate-900">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Schedule a Drug Test?

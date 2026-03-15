@@ -86,7 +86,7 @@ export default function OJTTrainingPlanPage() {
                 <ul className="space-y-1.5">
                   {phase.skills.map((skill) => (
                     <li key={skill} className="flex items-start gap-2 text-sm text-slate-600">
-                      <span className="text-slate-400 mt-0.5">☐</span>
+                      <span className="text-slate-500 mt-0.5">☐</span>
                       {skill}
                     </li>
                   ))}

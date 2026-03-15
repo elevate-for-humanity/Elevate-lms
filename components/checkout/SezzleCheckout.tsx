@@ -240,7 +240,7 @@ export default function SezzleCheckout({
       {/* Payment Info */}
       <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-16 h-8 bg-purple-600 rounded flex items-center justify-center">
+          <div className="w-16 h-8 bg-white rounded flex items-center justify-center">
             <span className="text-white text-xs font-bold">Sezzle</span>
           </div>
           <div>

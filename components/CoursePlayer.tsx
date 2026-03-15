@@ -43,7 +43,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
         <p className="text-[10px] uppercase tracking-wide text-brand-orange-400">
           Course
         </p>
-        <h1 className="mt-1 text-[13px] font-semibold text-white">
+        <h1 className="mt-1 text-[13px] font-semibold text-slate-900">
           {courseTitle}
         </h1>
         {activeLesson ? (
@@ -51,7 +51,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
             <p className="mt-2 text-[11px] font-semibold text-slate-200">
               {activeLesson.title}
             </p>
-            <div className="mt-2 rounded-lg border border-slate-800 bg-slate-900 p-2 text-[11px]">
+            <div className="mt-2 rounded-lg border border-slate-800 bg-white p-2 text-[11px]">
               {activeLesson.contentType === "video" && activeLesson.contentUrl && (
                 <video
                   src={activeLesson.contentUrl}
@@ -74,13 +74,13 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
                 />
               )}
               {activeLesson.contentType === "quiz" && (
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   Quiz content will appear here. We can wire this to live quiz
                   items stored in Supabase.
                 </p>
               )}
               {activeLesson.contentType === "reflection" && (
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   Reflection prompt: We&apos;ll store learner responses in
                   Supabase so coaches can review them.
                 </p>
@@ -97,7 +97,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
                   </a>
                 )}
               {activeLesson.contentType === "other" && (
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   This lesson uses a custom content type that we can define
                   later.
                 </p>
@@ -109,14 +109,14 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
             </p>
           </>
         ) : (
-          <p className="mt-2 text-[11px] text-slate-300">
+          <p className="mt-2 text-[11px] text-slate-600">
             No lessons found for this course yet.
           </p>
         )}
       </div>
 
       <aside className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-[11px]">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
           Lessons
         </p>
         <ul className="mt-2 space-y-1">
@@ -135,7 +135,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
                 >
                   <span>{lesson.title}</span>
                   {lesson.durationMinutes && (
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-slate-500">
                       {lesson.durationMinutes} min
                     </span>
                   )}

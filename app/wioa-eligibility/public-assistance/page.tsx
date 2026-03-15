@@ -61,7 +61,7 @@ export default async function PublicAssistancePage() {
         </div>
       </div>
 
-      <section className="bg-brand-green-600 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -101,7 +101,7 @@ export default async function PublicAssistancePage() {
           <ul className="space-y-4">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{benefit}</span>
               </li>
             ))}
@@ -113,19 +113,19 @@ export default async function PublicAssistancePage() {
           <h2 className="text-2xl font-bold mb-6">Required Documents</h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Proof of public assistance (award letter, benefit statement, or EBT card)</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Valid government-issued ID</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Proof of Indiana residency</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Social Security number (entered online)</span>
             </li>
           </ul>
@@ -153,7 +153,7 @@ export default async function PublicAssistancePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-brand-green-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-white rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Your Career?</h3>
           <p className="text-brand-green-100 mb-6">
             Apply today - your public assistance status qualifies you for free training.

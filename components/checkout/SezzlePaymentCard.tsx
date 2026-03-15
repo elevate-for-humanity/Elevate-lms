@@ -50,14 +50,14 @@ export default function SezzlePaymentCard({
     >
       {/* Selection indicator */}
       {selected && (
-        <div className="absolute top-3 right-3 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+        <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center">
           <Check className="w-4 h-4 text-white" />
         </div>
       )}
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-8 bg-purple-600 rounded flex items-center justify-center">
+        <div className="w-12 h-8 bg-white rounded flex items-center justify-center">
           <span className="text-white text-xs font-bold">Sezzle</span>
         </div>
         <div>
@@ -121,7 +121,7 @@ export function SezzlePaymentBadge({ price }: { price: number }) {
 
   return (
     <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-3 py-1.5">
-      <div className="w-14 h-5 bg-purple-600 rounded flex items-center justify-center">
+      <div className="w-14 h-5 bg-white rounded flex items-center justify-center">
         <span className="text-white text-[10px] font-bold">Sezzle</span>
       </div>
       <span className="text-sm text-purple-700">

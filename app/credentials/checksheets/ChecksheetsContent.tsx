@@ -370,7 +370,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
             <div className="border-b border-gray-400 h-8 mt-1" />
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-4">
+        <p className="text-xs text-slate-500 mt-4">
           Supervisor: By signing, you verify that the student performed all
           tasks under your direct observation and met the acceptance criteria
           indicated. Remediation notes should be documented on the reverse side.
@@ -430,7 +430,7 @@ export default function ChecksheetsContent() {
                       {sheet.estimatedMinutes} min
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-gray-400">
+                  <span className="text-xs font-mono text-slate-500">
                     EFH-CS-{sheet.id.toUpperCase()}
                   </span>
                 </div>

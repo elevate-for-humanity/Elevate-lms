@@ -97,7 +97,7 @@ export function HSICoursePlayer({
             {/* Overlay Instructions */}
             <div className="absolute top-4 left-4 right-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 shadow-lg">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center">
+                <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center">
                   <span className="text-white font-bold">i</span>
                 </div>
                 <div className="flex-1">
@@ -159,10 +159,10 @@ export function HSICoursePlayer({
 
       {/* Completion Banner */}
       {completed && (
-        <div className="bg-brand-green-600 text-white px-6 py-4 shadow-lg">
+        <div className="bg-white text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
                 <div className="text-sm text-brand-green-100">

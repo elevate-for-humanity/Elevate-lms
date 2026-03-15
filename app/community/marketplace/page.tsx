@@ -156,7 +156,7 @@ export default async function CommunityMarketplacePage() {
         </div>
 
         {/* Hero Section */}
-        <section className="bg-emerald-600 text-white">
+        <section className="bg-white text-white">
           <div className="max-w-7xl mx-auto px-4 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -457,16 +457,16 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Become a Seller CTA */}
-        <section className="py-20 bg-slate-800 text-white">
+        <section className="py-20 bg-white text-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <div className="inline-flex items-center gap-2 bg-brand-green-500/20 px-4 py-2 rounded-full text-brand-green-400 text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-brand-green-400 text-sm font-medium mb-6">
               <TrendingUp className="w-4 h-4" />
               <span>Join {totalSellers}+ Sellers</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-black mb-6">
               Turn Your Expertise Into Income
             </h2>
-            <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
               Are you a certified professional, program owner, or industry expert? 
               Create courses, sell products, and build your brand in our marketplace.
             </p>

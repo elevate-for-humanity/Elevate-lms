@@ -94,26 +94,26 @@ export function FormLoadingSkeleton() {
 
 export function CourseLoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-900 animate-pulse" role="status" aria-label="Loading course">
+    <div className="min-h-screen bg-white animate-pulse" role="status" aria-label="Loading course">
       <div className="flex">
-        <aside className="hidden lg:block w-80 bg-slate-800 min-h-screen p-4">
-          <div className="h-6 w-32 bg-slate-700 rounded mb-6" />
+        <aside className="hidden lg:block w-80 bg-white min-h-screen p-4">
+          <div className="h-6 w-32 bg-white rounded mb-6" />
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="mb-4">
-              <div className="h-5 w-full bg-slate-700 rounded mb-2" />
+              <div className="h-5 w-full bg-white rounded mb-2" />
               <div className="pl-4 space-y-2">
-                <div className="h-4 w-3/4 bg-slate-700/50 rounded" />
-                <div className="h-4 w-2/3 bg-slate-700/50 rounded" />
+                <div className="h-4 w-3/4 bg-white/50 rounded" />
+                <div className="h-4 w-2/3 bg-white/50 rounded" />
               </div>
             </div>
           ))}
         </aside>
         <main className="flex-1">
-          <div className="aspect-video bg-slate-800" />
+          <div className="aspect-video bg-white" />
           <div className="p-6">
-            <div className="h-8 w-2/3 bg-slate-700 rounded mb-4" />
-            <div className="h-4 w-full bg-slate-700/50 rounded mb-2" />
-            <div className="h-4 w-3/4 bg-slate-700/50 rounded" />
+            <div className="h-8 w-2/3 bg-white rounded mb-4" />
+            <div className="h-4 w-full bg-white/50 rounded mb-2" />
+            <div className="h-4 w-3/4 bg-white/50 rounded" />
           </div>
         </main>
       </div>

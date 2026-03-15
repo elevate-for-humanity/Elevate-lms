@@ -134,7 +134,7 @@ export default function AICareerCounseling() {
       <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-indigo-100">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-full mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6">
               <Sparkles className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -311,7 +311,7 @@ export default function AICareerCounseling() {
       <div className="bg-white border-b px-4 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 rounded-full p-2">
+            <div className="bg-white rounded-full p-2">
               <Briefcase className="w-5 h-5 text-white" />
             </div>
             <div>

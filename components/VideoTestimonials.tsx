@@ -172,7 +172,7 @@ export default function VideoTestimonials() {
                 >
                   <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
                     {/* Video Thumbnail */}
-                    <div className="relative aspect-video bg-gray-900 overflow-hidden">
+                    <div className="relative aspect-video bg-white overflow-hidden">
                       <Image
                         src={testimonial.thumbnail}
                         alt={testimonial.name}

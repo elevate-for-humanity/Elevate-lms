@@ -78,33 +78,33 @@ export function StreakTracker({
   const streakActive = isStreakActive();
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6">
+    <div className="bg-white rounded-lg p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className={`p-3 rounded-full ${streakActive ? "bg-brand-orange-500" : "bg-slate-700"}`}>
           <Flame className={`w-6 h-6 ${streakActive ? "text-white" : "text-slate-500"}`} />
         </div>
         <div>
-          <h3 className="text-2xl font-bold text-white">{currentStreak} Days</h3>
-          <p className="text-sm text-slate-400">Current Streak</p>
+          <h3 className="text-2xl font-bold text-slate-900">{currentStreak} Days</h3>
+          <p className="text-sm text-slate-500">Current Streak</p>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-slate-900 rounded-lg p-4">
-          <p className="text-2xl font-bold text-white">{longestStreak}</p>
-          <p className="text-xs text-slate-400">Longest Streak</p>
+        <div className="bg-white rounded-lg p-4">
+          <p className="text-2xl font-bold text-slate-900">{longestStreak}</p>
+          <p className="text-xs text-slate-500">Longest Streak</p>
         </div>
-        <div className="bg-slate-900 rounded-lg p-4">
-          <p className="text-2xl font-bold text-white">{totalActiveDays}</p>
-          <p className="text-xs text-slate-400">Total Active Days</p>
+        <div className="bg-white rounded-lg p-4">
+          <p className="text-2xl font-bold text-slate-900">{totalActiveDays}</p>
+          <p className="text-xs text-slate-500">Total Active Days</p>
         </div>
       </div>
 
       {/* Calendar View */}
       {recentDays.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             Last 7 Days
           </h4>
@@ -128,7 +128,7 @@ export function StreakTracker({
       )}
 
       {/* Motivation Message */}
-      <div className="mt-6 p-4 bg-brand-orange-500/10 border border-brand-orange-500/20 rounded-lg">
+      <div className="mt-6 p-4 bg-white/10 border border-brand-orange-500/20 rounded-lg">
         <p className="text-sm text-brand-orange-400">
           {streakActive
             ? currentStreak >= 7

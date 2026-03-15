@@ -58,7 +58,7 @@ export default function AIChatPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-brand-blue-600 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-6">
             <Sparkles className="w-5 h-5" />
@@ -86,12 +86,12 @@ export default function AIChatPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl border overflow-hidden">
             {/* Chat Header */}
-            <div className="bg-brand-blue-600 p-4 flex items-center gap-3">
+            <div className="bg-white p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <Bot className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Elevate AI Assistant</h3>
+                <h3 className="font-semibold text-slate-900">Elevate AI Assistant</h3>
                 <p className="text-brand-blue-200 text-sm">Always here to help</p>
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function AIChatPage() {
 
               {/* User Message */}
               <div className="flex gap-3 justify-end">
-                <div className="bg-brand-blue-600 text-white rounded-2xl rounded-tr-none p-4 max-w-md">
+                <div className="bg-white text-white rounded-2xl rounded-tr-none p-4 max-w-md">
                   <p>What certifications should I get for a healthcare career?</p>
                 </div>
               </div>
@@ -135,15 +135,15 @@ export default function AIChatPage() {
                   </p>
                   <ul className="mt-2 space-y-2 text-gray-600 text-sm">
                     <li className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span><strong>CNA (Certified Nursing Assistant)</strong> - Entry-level, high demand</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span><strong>CPR/First Aid</strong> - Required for most healthcare roles</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span><strong>Phlebotomy</strong> - Quick certification, good pay</span>
                     </li>
                   </ul>
@@ -214,7 +214,7 @@ export default function AIChatPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-brand-blue-100 mb-8">
@@ -233,7 +233,7 @@ export default function AIChatPage() {
       <ChatAssistantWrapper />
 
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

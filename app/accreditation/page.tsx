@@ -544,7 +544,7 @@ export default function AccreditationPage() {
                     {doc.status} →
                   </Link>
                 ) : (
-                  <span className="text-xs text-gray-400 mt-2 inline-block">{doc.status}</span>
+                  <span className="text-xs text-slate-500 mt-2 inline-block">{doc.status}</span>
                 )}
               </div>
             ))}
@@ -604,9 +604,9 @@ export default function AccreditationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your Training?
           </h2>
           <p className="text-brand-blue-100 mb-8">

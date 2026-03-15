@@ -232,7 +232,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                         goal.status === 'completed' ? 'bg-brand-green-100' : 'bg-yellow-100'
                       }`}>
                         {goal.status === 'completed' ? (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-slate-500 flex-shrink-0">•</span>
                         ) : (
                           <Target className="w-4 h-4 text-yellow-600" />
                         )}

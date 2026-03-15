@@ -163,10 +163,10 @@ export default function CondenserDiagram({ mode = 'explore', onComplete, forceDi
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="bg-slate-900 px-6 py-4">
+      <div className="bg-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <Wind className="w-5 h-5 text-brand-blue-300" />
             </div>
             <div>
@@ -193,7 +193,7 @@ export default function CondenserDiagram({ mode = 'explore', onComplete, forceDi
         {mode === 'identify' && (
           <div className="mt-3 flex items-center gap-3">
             <div className="flex-1 bg-white/10 rounded-full h-2">
-              <div className="bg-brand-green-500 h-2 rounded-full transition-all duration-500" style={{ width: `${(identified.size / CONDENSER_COMPONENTS.length) * 100}%` }} />
+              <div className="bg-white h-2 rounded-full transition-all duration-500" style={{ width: `${(identified.size / CONDENSER_COMPONENTS.length) * 100}%` }} />
             </div>
             <span className="text-white/70 text-xs">{identified.size}/{CONDENSER_COMPONENTS.length}</span>
           </div>

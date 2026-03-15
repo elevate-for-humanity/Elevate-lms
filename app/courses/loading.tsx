@@ -2,10 +2,10 @@ export default function Loading() {
   return (
     <div className="min-h-screen bg-white animate-pulse">
       {/* Hero skeleton */}
-      <div className="relative bg-slate-800 text-white py-16">
+      <div className="relative bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="h-10 w-64 bg-slate-600 rounded mb-2" />
-          <div className="h-6 w-96 bg-slate-700 rounded" />
+          <div className="h-10 w-64 bg-white rounded mb-2" />
+          <div className="h-6 w-96 bg-white rounded" />
         </div>
       </div>
 

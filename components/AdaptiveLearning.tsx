@@ -85,7 +85,7 @@ export function AdaptiveLearning({
       <Card className="  ">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-brand-orange-600 rounded-lg">
+            <div className="p-2 bg-white rounded-lg">
               <Brain className="text-white" size={24} />
             </div>
             <CardTitle>Your Learning Insights</CardTitle>
@@ -178,7 +178,7 @@ export function AdaptiveLearning({
                 <span className="text-sm text-brand-green-600">↑ 15%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-green-600" style={{ width: '85%' }} />
+                <div className="h-full bg-white" style={{ width: '85%' }} />
               </div>
             </div>
 
@@ -188,7 +188,7 @@ export function AdaptiveLearning({
                 <span className="text-sm text-brand-green-600">↑ 8%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-orange-600" style={{ width: '92%' }} />
+                <div className="h-full bg-white" style={{ width: '92%' }} />
               </div>
             </div>
 
@@ -198,7 +198,7 @@ export function AdaptiveLearning({
                 <span className="text-sm text-brand-orange-600">↓ 3%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-orange-600" style={{ width: '78%' }} />
+                <div className="h-full bg-white" style={{ width: '78%' }} />
               </div>
             </div>
           </div>

@@ -170,7 +170,7 @@ export default async function MentorDashboardPage() {
                     <div className="text-right">
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-teal-500 rounded-full" style={{ width: `${mentee.progress}%` }}></div>
+                          <div className="h-full bg-white rounded-full" style={{ width: `${mentee.progress}%` }}></div>
                         </div>
                         <span className="text-sm text-gray-600">{mentee.progress}%</span>
                       </div>

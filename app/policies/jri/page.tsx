@@ -28,10 +28,10 @@ export default function JRIPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/jri-hero.jpg" alt="Job Ready Indy" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Job Ready Indy</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Workforce training and career support for justice-involved individuals</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Job Ready Indy</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Workforce training and career support for justice-involved individuals</p>
           </div>
         </div>
       </section>
@@ -65,7 +65,7 @@ export default function JRIPage() {
                   'Committed to completing the training program',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -82,7 +82,7 @@ export default function JRIPage() {
                   'Job placement support',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}

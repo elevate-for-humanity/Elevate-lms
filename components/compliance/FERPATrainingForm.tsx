@@ -270,7 +270,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="text-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black mb-4">
                 Training Already Completed
               </h1>
@@ -314,7 +314,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
             <div
-              className="bg-brand-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-white h-2 rounded-full transition-all duration-300"
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
@@ -415,7 +415,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         {step === 2 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black">
                 FERPA Assessment Quiz
               </h1>
@@ -505,7 +505,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             {/* Score Display */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="text-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <h2 className="text-2xl font-bold text-black mb-2">
                   Assessment Passed!
                 </h2>
@@ -716,7 +716,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         {step === 4 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="text-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black mb-4">
                 Training Complete!
               </h1>

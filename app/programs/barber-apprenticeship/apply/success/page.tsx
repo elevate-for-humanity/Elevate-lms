@@ -10,25 +10,25 @@ export const metadata: Metadata = {
 
 export default function BarberApplySuccessPage() {
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-4xl font-black text-white mb-3">Payment Received</h1>
-          <p className="text-slate-300 text-lg">
+          <h1 className="text-4xl font-black text-slate-900 mb-3">Payment Received</h1>
+          <p className="text-slate-600 text-lg">
             Your enrollment in the Barber Apprenticeship program is confirmed.
           </p>
         </div>
 
         {/* Account creation CTA — required to access orientation and dashboard */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
-          <div className="bg-brand-blue-600 px-6 py-4">
+          <div className="bg-white px-6 py-4">
             <div className="flex items-center gap-3">
               <UserPlus className="w-6 h-6 text-white flex-shrink-0" />
               <div>
-                <h2 className="font-bold text-white text-lg leading-tight">Create your account</h2>
+                <h2 className="font-bold text-slate-900 text-lg leading-tight">Create your account</h2>
                 <p className="text-brand-blue-100 text-sm">Required to access orientation and your apprentice dashboard</p>
               </div>
             </div>
@@ -43,7 +43,7 @@ export default function BarberApplySuccessPage() {
             >
               Create Account &amp; Continue
             </Link>
-            <p className="text-center text-xs text-slate-400 mt-3">
+            <p className="text-center text-xs text-slate-500 mt-3">
               Already have an account?{' '}
               <Link href="/login?redirect=/programs/barber-apprenticeship/enrollment-success" className="text-brand-blue-600 hover:underline">
                 Sign in
@@ -73,8 +73,8 @@ export default function BarberApplySuccessPage() {
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-5 mb-6">
-          <p className="text-slate-300 text-sm text-center mb-4">Questions? We're here to help.</p>
+        <div className="bg-white rounded-xl p-5 mb-6">
+          <p className="text-slate-600 text-sm text-center mb-4">Questions? We're here to help.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="tel:3173143757"

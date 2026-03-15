@@ -198,7 +198,7 @@ export function ProgramPageTemplate({
 
       {/* Funding Banner */}
       {fundingAvailable && (
-        <section className="bg-brand-green-600 py-6">
+        <section className="bg-white py-6">
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
@@ -225,13 +225,13 @@ export function ProgramPageTemplate({
             {/* Included */}
             <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-brand-green-900 mb-6 flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Included in Program
               </h3>
               <ul className="space-y-4">
                 {included.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-brand-green-900">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -269,7 +269,7 @@ export function ProgramPageTemplate({
               <ul className="space-y-4">
                 {requirements.map((req, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-800">
-                    <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                       {i + 1}
                     </div>
                     <span>{req}</span>

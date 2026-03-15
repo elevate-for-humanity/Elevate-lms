@@ -151,7 +151,7 @@ export function TrialBanner({
                     }`}
                   >
                     {isComplete ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                     )}

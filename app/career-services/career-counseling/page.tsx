@@ -122,7 +122,7 @@ export default function CareerCounselingPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Initial Consultation</h3>
@@ -130,7 +130,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Assessment</h3>
@@ -138,7 +138,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Exploration</h3>
@@ -146,7 +146,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Action Plan</h3>
@@ -314,7 +314,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;

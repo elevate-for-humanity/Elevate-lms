@@ -302,7 +302,7 @@ export default async function CommunityPage() {
             {/* Join Form */}
             <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Join Community</h3>
@@ -326,7 +326,7 @@ export default async function CommunityPage() {
             {/* Inquiry Form */}
             <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                   <HelpCircle className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Have Questions?</h3>
@@ -345,9 +345,9 @@ export default async function CommunityPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Connect?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Connect?</h2>
           <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Connect with learners and professionals who support each other on their career journeys.
           </p>

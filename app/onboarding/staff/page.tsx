@@ -135,13 +135,13 @@ export default async function StaffOnboardingPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-slate-900 text-white py-10">
+      <div className="bg-white text-white py-10">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl font-bold mb-1">Welcome to Elevate, {firstName}!</h1>
           <p className="text-slate-400 text-sm mb-6">Complete the steps below to finish your onboarding. Required steps must be done before your first day.</p>
           <div className="flex items-center gap-4">
-            <div className="flex-1 bg-slate-700 rounded-full h-2.5">
-              <div className="bg-brand-green-500 h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
+            <div className="flex-1 bg-white rounded-full h-2.5">
+              <div className="bg-white h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-sm font-bold text-brand-green-400 whitespace-nowrap">
               {completedRequired}/{requiredSteps.length} required

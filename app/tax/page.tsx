@@ -126,19 +126,19 @@ export default function TaxServicesPage() {
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">No cost - completely free service</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">IRS-certified volunteer preparers</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">EITC, Child Tax Credit, Education Credits</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">E-file with direct deposit</span>
                   </li>
                 </ul>
@@ -186,19 +186,19 @@ export default function TaxServicesPage() {
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Same-day refund advances available</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Business & self-employment returns</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Complex tax situations welcome</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Multiple locations & online filing</span>
                   </li>
                 </ul>
@@ -334,7 +334,7 @@ export default function TaxServicesPage() {
               href="/tax/volunteer"
               className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-brand-green-500 hover:shadow-lg transition-all group"
             >
-              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-brand-green-600 transition-colors">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-white transition-colors">
                 <Users className="w-6 h-6 text-brand-green-600 group-hover:text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -352,7 +352,7 @@ export default function TaxServicesPage() {
               href="/documents/upload"
               className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition-all group"
             >
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-brand-blue-600 transition-colors">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-white transition-colors">
                 <FileCheck className="w-6 h-6 text-brand-blue-600 group-hover:text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -400,9 +400,9 @@ export default function TaxServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-brand-blue-900">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">
             Ready to File Your Taxes?
           </h2>
           <p className="text-xl text-brand-blue-100 mb-8">
@@ -431,7 +431,7 @@ export default function TaxServicesPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

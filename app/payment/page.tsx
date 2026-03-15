@@ -41,7 +41,7 @@ export default async function PaymentPage() {
         <Breadcrumbs items={[{ label: "Payment" }]} />
       </div>
 {/* Hero Section */}
-      <section className="bg-brand-blue-700 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -68,15 +68,15 @@ export default async function PaymentPage() {
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Instant enrollment
                   </li>
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     No additional fees
                   </li>
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Credit/debit cards accepted
                   </li>
                 </ul>
@@ -97,15 +97,15 @@ export default async function PaymentPage() {
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     4 interest-free payments
                   </li>
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Instant approval at checkout
                   </li>
                   <li className="flex items-center">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Klarna, Afterpay, or Zip
                   </li>
                 </ul>
@@ -130,15 +130,15 @@ export default async function PaymentPage() {
                   </p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       $1,743 setup fee + weekly payments
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Total program: $4,980
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       WIOA funding may cover full cost
                     </li>
                   </ul>

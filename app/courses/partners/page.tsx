@@ -83,7 +83,7 @@ export default async function PartnerCoursesPage() {
 
       </section>
 
-      <section className="bg-brand-blue-700 py-20">
+      <section className="bg-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
@@ -94,11 +94,11 @@ export default async function PartnerCoursesPage() {
               partners
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <div className="bg-brand-blue-700 px-6 py-3 rounded-lg">
+              <div className="bg-white px-6 py-3 rounded-lg">
                 <span className="text-3xl font-bold">{count || 0}</span>
                 <span className="text-sm ml-2">Courses Available</span>
               </div>
-              <div className="bg-brand-blue-700 px-6 py-3 rounded-lg">
+              <div className="bg-white px-6 py-3 rounded-lg">
                 <span className="text-3xl font-bold">
                   {providers?.length || 0}
                 </span>
@@ -251,25 +251,25 @@ export default async function PartnerCoursesPage() {
                   </p>
                   <ul className="space-y-4">
                     <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-black">
                         Funded training - no tuition, no hidden costs
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-black">
                         Industry-recognized certifications that employers value
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-black">
                         Job placement assistance and career support
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-black">
                         Flexible scheduling for working adults
                       </span>

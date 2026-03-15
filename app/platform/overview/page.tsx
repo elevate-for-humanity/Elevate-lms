@@ -57,7 +57,7 @@ export default async function PlatformLicensingPage() {
         <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero */}
-      <section className="bg-zinc-900    text-white py-20 md:py-32">
+      <section className="bg-white    text-white py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold mb-6">
@@ -74,19 +74,19 @@ export default async function PlatformLicensingPage() {
               <div className="grid md:grid-cols-4 gap-4 text-center text-sm">
                 <div>
                   <div className="text-2xl font-bold mb-1">MOU Network</div>
-                  <div className="text-white/80">Use our credentials</div>
+                  <div className="text-slate-600">Use our credentials</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold mb-1">Independent</div>
-                  <div className="text-white/80">Platform only</div>
+                  <div className="text-slate-600">Platform only</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold mb-1">Apprenticeship</div>
-                  <div className="text-white/80">RAPIDS only</div>
+                  <div className="text-slate-600">RAPIDS only</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold mb-1">À La Carte</div>
-                  <div className="text-white/80">Build custom</div>
+                  <div className="text-slate-600">Build custom</div>
                 </div>
               </div>
             </div>
@@ -127,14 +127,14 @@ export default async function PlatformLicensingPage() {
               <h3 className="text-xl font-bold mb-4">Federal Approvals</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">DOL Registered Sponsor</div>
                     <div className="text-black">RAPIDS: 2025-IN-132301</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">WIOA Eligible Provider</div>
                     <div className="text-black">
@@ -158,21 +158,21 @@ export default async function PlatformLicensingPage() {
               <h3 className="text-xl font-bold mb-4">State Approvals</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">ETPL Listed</div>
                     <div className="text-black">Provider ID: 10000949</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">Indiana DWD Listed</div>
                     <div className="text-black">INTraining: 10004621</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">WRG Approved</div>
                     <div className="text-black">State funding eligible</div>
@@ -194,7 +194,7 @@ export default async function PlatformLicensingPage() {
               <h3 className="text-xl font-bold mb-4">Official Partnerships</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">JRI Partner</div>
                     <div className="text-black">
@@ -203,14 +203,14 @@ export default async function PlatformLicensingPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">WorkOne Approved</div>
                     <div className="text-black">WIOA referrals</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <div className="font-semibold">SNAP E&T Partner</div>
                     <div className="text-black">SNAP recipients</div>
@@ -227,7 +227,7 @@ export default async function PlatformLicensingPage() {
             </div>
           </div>
 
-          <div className="bg-zinc-900   rounded-2xl p-8 text-white text-center">
+          <div className="bg-white   rounded-2xl p-8 text-white text-center">
             <div className="text-5xl font-bold mb-2">$300K - $650K</div>
             <div className="text-xl mb-4">
               Total Credential Value + 4-8 Years Saved
@@ -254,9 +254,9 @@ export default async function PlatformLicensingPage() {
 
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* License Type 1: Program Holder Network */}
-            <div className="bg-zinc-900   rounded-2xl shadow-2xl p-8 text-white relative border-4 border-brand-orange-400">
+            <div className="bg-white   rounded-2xl shadow-2xl p-8 text-white relative border-4 border-brand-orange-400">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>
@@ -268,15 +268,15 @@ export default async function PlatformLicensingPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Program Holder Network</h3>
-                  <p className="text-white/80">Join our umbrella via MOU</p>
+                  <p className="text-slate-600">Join our umbrella via MOU</p>
                 </div>
               </div>
 
               <div className="mb-6">
                 <div className="text-4xl font-bold mb-2">
-                  $4,000<span className="text-xl text-white/80">/mo</span>
+                  $4,000<span className="text-xl text-slate-600">/mo</span>
                 </div>
-                <div className="text-white/80">
+                <div className="text-slate-600">
                   Starting price (500 students)
                 </div>
               </div>
@@ -285,19 +285,19 @@ export default async function PlatformLicensingPage() {
                 <div className="font-bold mb-2">Use OUR Credentials:</div>
                 <div className="space-y-1 text-sm">
                   <div>
-                    <span className="text-slate-400 flex-shrink-0">•</span> ETPL
+                    <span className="text-slate-500 flex-shrink-0">•</span> ETPL
                     Provider: 10000949
                   </div>
                   <div>
-                    <span className="text-slate-400 flex-shrink-0">•</span> DOL RAPIDS:
+                    <span className="text-slate-500 flex-shrink-0">•</span> DOL RAPIDS:
                     2025-IN-132301
                   </div>
                   <div>
-                    <span className="text-slate-400 flex-shrink-0">•</span> INTraining:
+                    <span className="text-slate-500 flex-shrink-0">•</span> INTraining:
                     10004621
                   </div>
                   <div>
-                    <span className="text-slate-400 flex-shrink-0">•</span> WIOA, WRG,
+                    <span className="text-slate-500 flex-shrink-0">•</span> WIOA, WRG,
                     JRI, WorkOne, SNAP E&T
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export default async function PlatformLicensingPage() {
 
               <div className="bg-brand-green-50 rounded-lg p-4 mb-6 text-sm">
                 <div className="font-bold text-brand-green-900 mb-1">
-                  <span className="text-slate-400 flex-shrink-0">•</span> Best For:
+                  <span className="text-slate-500 flex-shrink-0">•</span> Best For:
                 </div>
                 <div className="text-brand-green-800">
                   Organizations with existing credentials or willing to get
@@ -466,7 +466,7 @@ export default async function PlatformLicensingPage() {
 
               <div className="bg-brand-blue-50 rounded-lg p-4 mb-6 text-sm">
                 <div className="font-bold text-brand-blue-900 mb-1">
-                  <span className="text-slate-400 flex-shrink-0">•</span> Best For:
+                  <span className="text-slate-500 flex-shrink-0">•</span> Best For:
                 </div>
                 <div className="text-brand-blue-800">
                   Organizations focused only on apprenticeships.
@@ -536,7 +536,7 @@ export default async function PlatformLicensingPage() {
 
               <div className="bg-white rounded-lg p-4 mb-6 text-sm">
                 <div className="font-bold text-black mb-1">
-                  <span className="text-slate-400 flex-shrink-0">•</span> Best For:
+                  <span className="text-slate-500 flex-shrink-0">•</span> Best For:
                 </div>
                 <div className="text-black">
                   Organizations with specific needs or smaller budgets.
@@ -623,9 +623,9 @@ export default async function PlatformLicensingPage() {
             </div>
 
             {/* Tier 2: Government Approved - MOST POPULAR */}
-            <div className="bg-zinc-900   rounded-2xl shadow-2xl border-4 border-brand-orange-400 p-6 relative transform lg:scale-105">
+            <div className="bg-white   rounded-2xl shadow-2xl border-4 border-brand-orange-400 p-6 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>
@@ -636,18 +636,18 @@ export default async function PlatformLicensingPage() {
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-slate-900">
                     Government Approved
                   </h3>
-                  <p className="text-sm text-white/80">WIOA/ETPL/WRG</p>
+                  <p className="text-sm text-slate-600">WIOA/ETPL/WRG</p>
                 </div>
               </div>
 
               <div className="mb-4">
                 <div className="text-3xl font-bold text-white mb-1">
-                  $4,000<span className="text-lg text-white/80">/mo</span>
+                  $4,000<span className="text-lg text-slate-600">/mo</span>
                 </div>
-                <div className="text-sm text-white/80">
+                <div className="text-sm text-slate-600">
                   Small (500 students)
                 </div>
               </div>
@@ -673,7 +673,7 @@ export default async function PlatformLicensingPage() {
 
               <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4 text-xs text-white">
                 <div className="font-semibold mb-1">$110K-$225K Value</div>
-                <div className="text-white/80">
+                <div className="text-slate-600">
                   ETPL + WIOA + State approvals
                 </div>
               </div>
@@ -908,7 +908,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-zinc-900   text-white">
+      <section className="py-16 bg-white   text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to License Our Platform?
@@ -930,7 +930,7 @@ export default async function PlatformLicensingPage() {
               Contact Sales
             </Link>
           </div>
-          <p className="mt-6 text-white/80">
+          <p className="mt-6 text-slate-600">
             <Phone className="inline w-4 h-4 mr-2" />
             (317) 314-3757
             <span className="mx-3">|</span>

@@ -239,7 +239,7 @@ export default function ProgramFinder() {
             className="text-center mb-12"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-semibold mb-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               Your Personalized Results
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -436,7 +436,7 @@ export default function ProgramFinder() {
                       {option.text}
                     </span>
                     {isSelected && (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     )}
                   </motion.button>
                 );

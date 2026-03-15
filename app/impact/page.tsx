@@ -65,7 +65,7 @@ export default async function ImpactPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Target className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -78,7 +78,7 @@ export default async function ImpactPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -91,7 +91,7 @@ export default async function ImpactPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -104,7 +104,7 @@ export default async function ImpactPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">

@@ -100,7 +100,7 @@ export default async function DonatePage() {
       </section>
 
       {/* Title */}
-      <section className="bg-teal-600 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-6">
             <Shield className="w-5 h-5" />
@@ -183,19 +183,19 @@ export default async function DonatePage() {
               <h3 className="font-semibold mb-4">Why Donate?</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-gray-600">100% of donations fund training programs</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-gray-600">Tax-deductible 501(c)(3) organization</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-gray-600">Direct impact on underserved communities</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-gray-600">Transparent reporting on fund usage</p>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default async function DonatePage() {
 
             {/* Total Raised */}
             {totalRaised > 0 && (
-              <div className="bg-teal-500 text-white rounded-xl p-6 text-center">
+              <div className="bg-white text-white rounded-xl p-6 text-center">
                 <TrendingUp className="w-10 h-10 mx-auto mb-3" />
                 <p className="text-teal-100 mb-1">Total Raised</p>
                 <p className="text-4xl font-bold">${totalRaised.toLocaleString()}</p>
@@ -279,7 +279,7 @@ export default async function DonatePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

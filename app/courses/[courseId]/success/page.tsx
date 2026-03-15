@@ -39,12 +39,12 @@ export default async function EnrollmentSuccessPage({
     .eq('id', params.courseId)
     .single();
   return (
-    <div className="min-h-screen bg-slate-700 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Message */}
         <div className="bg-white rounded-2xl border-2 border-brand-green-500 p-8 shadow-xl text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-4xl font-black text-black mb-4">

@@ -64,7 +64,7 @@ export default async function SupportPage() {
         <Image src="/images/pages/support-page-2.jpg" alt="Student support services" fill sizes="100vw" className="object-cover" priority />
       </section>
 
-      <div className="bg-brand-blue-600 text-white py-16">
+      <div className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Student Support Center</h1>
           <p className="text-xl text-brand-blue-100 max-w-2xl">
@@ -210,7 +210,7 @@ export default async function SupportPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="mt-16 bg-slate-900 rounded-2xl p-8 text-center">
+        <div className="mt-16 bg-white rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Still Need Help?</h2>
           <p className="text-slate-400 mb-6">Our support team is available Monday-Friday, 9am-5pm EST</p>
           <div className="flex flex-wrap gap-6 justify-center">

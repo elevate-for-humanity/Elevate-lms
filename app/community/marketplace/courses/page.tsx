@@ -77,7 +77,7 @@ export default function CommunityCoursesPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-brand-blue-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Community Courses</h1>
           <p className="text-brand-blue-100">Learn from peers and industry experts</p>
@@ -183,7 +183,7 @@ export default function CommunityCoursesPage() {
         </div>
 
         {/* Become Instructor CTA */}
-        <div className="mt-12 bg-brand-blue-600 rounded-xl p-8 text-white text-center">
+        <div className="mt-12 bg-white rounded-xl p-8 text-white text-center">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Share Your Knowledge</h2>
           <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">

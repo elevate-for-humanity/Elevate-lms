@@ -47,7 +47,7 @@ export default async function CookiesPage() {
       </div>
 
       {/* Hero Section - No Gradient */}
-      <section className="bg-slate-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Cookie Policy</h1>
           <p className="text-base md:text-lg text-slate-300">

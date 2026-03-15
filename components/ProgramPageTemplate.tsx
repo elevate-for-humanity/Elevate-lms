@@ -224,7 +224,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   key={index}
                   className="flex items-start gap-6 bg-white rounded-xl p-6 shadow-md"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                     {index + 1}
                   </div>
                   <div className="flex-1">

@@ -91,12 +91,12 @@ export default async function LicensePage() {
       </div>
 
       {/* HERO BANNER */}
-      <section className="bg-slate-900 py-12 sm:py-16">
+      <section className="bg-white py-12 sm:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4 sm:mb-6">
             License the Elevate LMS + Workforce Hub
           </h1>
-          <p className="text-base sm:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto">
             Self-operating workforce infrastructure that runs the entire learner lifecycle — from application to credential — without staff. Built for funded training, employer pipelines, and apprenticeships.
           </p>
 
@@ -117,14 +117,14 @@ export default async function LicensePage() {
             </Link>
           </div>
 
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-500 text-sm">
             Starting at ${startingPrice.toLocaleString()}/year
           </p>
         </div>
       </section>
 
       {/* Quick nav */}
-      <section className="py-3 bg-slate-800 border-b border-slate-700">
+      <section className="py-3 bg-white border-b border-slate-700">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/license/features" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
@@ -163,32 +163,32 @@ export default async function LicensePage() {
       </section>
 
       {/* Automated Self-Service Operations Section */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4 text-white">Automated, Self-Service Operations</h2>
-          <p className="text-lg text-slate-300 text-center mb-8 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900">Automated, Self-Service Operations</h2>
+          <p className="text-lg text-slate-600 text-center mb-8 max-w-3xl mx-auto">
             This platform operates as a self-service workforce system. Enrollment triggers automated workflows for eligibility, course assignment, progress tracking, compliance logging, credential issuance, and reporting. Staff intervention is required only for exceptions—not daily operations.
           </p>
           <div className="max-w-2xl mx-auto">
             <ul className="space-y-4">
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated enrollment orchestration</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Rules-based progress and hour tracking</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated nudges and interventions</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Auto-generated compliance and outcome reports</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Credential issuance with public verification</span>
               </li>
             </ul>
@@ -224,7 +224,7 @@ export default async function LicensePage() {
                 <ul className="space-y-3 mb-8">
                   {tier.features?.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
@@ -255,7 +255,7 @@ export default async function LicensePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {governanceFeatures.map((feature, index) => (
               <div key={index} className="flex items-start gap-3 bg-white rounded-lg p-5 border">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature}</span>
               </div>
             ))}
@@ -299,7 +299,7 @@ export default async function LicensePage() {
             <div className="flex flex-wrap justify-center items-center gap-8">
               {partners.map((partner: any) => (
                 <div key={partner.id} className="grayscale hover:grayscale-0 transition relative h-12 w-32 overflow-hidden">
-                  <span className="text-gray-400 font-medium">{partner.name}</span>
+                  <span className="text-slate-500 font-medium">{partner.name}</span>
                 </div>
               ))}
             </div>
@@ -308,9 +308,9 @@ export default async function LicensePage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Improve Your Workforce Programs?
           </h2>
           <p className="text-brand-orange-100 mb-8">

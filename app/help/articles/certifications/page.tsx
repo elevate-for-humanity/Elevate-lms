@@ -57,7 +57,7 @@ export default function CertificationsHelpPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-brand-blue-50 rounded-lg p-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h3 className="font-semibold mb-2">Earn Certificates</h3>
               <p className="text-sm text-gray-600">Complete courses and pass assessments to earn industry-recognized credentials.</p>
             </div>

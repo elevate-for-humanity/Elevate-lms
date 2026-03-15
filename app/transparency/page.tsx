@@ -89,7 +89,7 @@ export default function TransparencyPage() {
                   </div>
                   <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-2">
                     <div 
-                      className="h-full bg-brand-blue-600 rounded-full"
+                      className="h-full bg-white rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
@@ -137,7 +137,7 @@ export default function TransparencyPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {accreditations.map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="font-medium">{item}</span>
                 </div>
               ))}
@@ -174,7 +174,7 @@ export default function TransparencyPage() {
       </div>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Questions About Our Data?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

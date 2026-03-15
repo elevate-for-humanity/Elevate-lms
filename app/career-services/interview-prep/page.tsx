@@ -114,7 +114,7 @@ export default function InterviewPrepPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Schedule</h3>
@@ -122,7 +122,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Prepare</h3>
@@ -130,7 +130,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Practice</h3>
@@ -138,7 +138,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Feedback</h3>
@@ -256,7 +256,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Success Stats */}
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>

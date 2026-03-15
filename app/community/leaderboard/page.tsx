@@ -86,7 +86,7 @@ export default async function LeaderboardPage() {
               <div className="text-center -mt-8">
                 <div className="relative">
                   <Crown className="w-8 h-8 text-yellow-500 absolute -top-8 left-1/2 -translate-x-1/2" />
-                  <div className="w-24 h-24 rounded-full bg-yellow-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 border-4 border-yellow-400">
+                  <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 border-4 border-yellow-400">
                     {getInitial(topLearners![0]?.full_name)}
                   </div>
                 </div>
@@ -99,12 +99,12 @@ export default async function LeaderboardPage() {
 
               {/* 3rd Place */}
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-brand-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
+                <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
                   {getInitial(topLearners![2]?.full_name)}
                 </div>
                 <p className="font-bold text-gray-900">{topLearners![2]?.full_name || 'Learner'}</p>
                 <p className="text-gray-500 text-sm">{(topLearners![2]?.points || 0).toLocaleString()} pts</p>
-                <div className="mt-4 w-24 h-24 bg-amber-500 rounded-t-lg mx-auto flex items-center justify-center">
+                <div className="mt-4 w-24 h-24 bg-white rounded-t-lg mx-auto flex items-center justify-center">
                   <Medal className="w-10 h-10 text-amber-200" />
                 </div>
               </div>
@@ -132,7 +132,7 @@ export default async function LeaderboardPage() {
                   <div className="w-10 flex justify-center">
                     {getRankIcon(index + 1)}
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-brand-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-white font-medium flex-shrink-0">
                     {getInitial(learner.full_name)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -164,9 +164,9 @@ export default async function LeaderboardPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-yellow-500">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Climb the Ranks?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Climb the Ranks?</h2>
           <p className="text-yellow-100 mb-8 max-w-2xl mx-auto">
             Complete courses, log OJT hours, and earn certifications to gain points.
           </p>

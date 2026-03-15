@@ -274,7 +274,7 @@ export function OnboardingTour({
                     </>
                   ) : (
                     <>
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Get Started
                     </>
                   )}

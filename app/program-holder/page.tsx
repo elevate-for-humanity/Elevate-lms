@@ -58,7 +58,7 @@ export default function ProgramHolderLanding() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-teal-800">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-white">
         <Image
           src="/images/pages/program-holder-page-2.jpg"
           alt="Program Holder Portal"
@@ -348,7 +348,7 @@ export default function ProgramHolderLanding() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal-800">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Expand Your Training Programs?</h2>
           <p className="text-teal-100 mb-8">

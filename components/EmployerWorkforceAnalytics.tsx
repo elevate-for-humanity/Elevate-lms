@@ -151,7 +151,7 @@ export default function EmployerWorkforceAnalytics() {
                     <div className="flex-1">
                       <div className="bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-brand-green-600 h-2 rounded-full"
+                          className="bg-white h-2 rounded-full"
                           style={{ width: `${skill.supply}%` }}
                         />
                       </div>

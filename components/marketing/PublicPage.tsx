@@ -64,10 +64,10 @@ export default function PublicPage({
       {config.cta && (
         <section className="py-16 sm:py-24 bg-white border-t">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               {config.cta.title}
             </h2>
-            <p className="text-xl text-slate-300 mb-10">
+            <p className="text-xl text-slate-600 mb-10">
               {config.cta.description}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

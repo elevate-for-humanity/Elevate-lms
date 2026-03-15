@@ -184,7 +184,7 @@ export default async function LearnerDashboardPage() {
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Elevate LMS
               </Link>
-              <span className="text-gray-300">|</span>
+              <span className="text-slate-600">|</span>
               <span className="text-gray-600">Learner Portal</span>
             </div>
             <div className="flex items-center gap-4">
@@ -269,7 +269,7 @@ export default async function LearnerDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Completed</p>
@@ -469,7 +469,7 @@ export default async function LearnerDashboardPage() {
                   <div className="space-y-4">
                     {notifications.map((notification: any) => (
                       <div key={notification.id} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-brand-orange-500 rounded-full mt-2" />
+                        <div className="w-2 h-2 bg-white rounded-full mt-2" />
                         <div>
                           <p className="font-medium text-gray-900 text-sm">{notification.title}</p>
                           <p className="text-xs text-gray-500 line-clamp-2">{notification.message}</p>
@@ -487,7 +487,7 @@ export default async function LearnerDashboardPage() {
             </div>
 
             {/* Resources */}
-            <div className="bg-brand-orange-500 rounded-xl p-6 text-white">
+            <div className="bg-white rounded-xl p-6 text-white">
               <h3 className="font-semibold mb-2">Need Help?</h3>
               <p className="text-sm text-brand-orange-100 mb-4">
                 Our support team is here to help you succeed in your training.

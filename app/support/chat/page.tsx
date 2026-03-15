@@ -111,13 +111,13 @@ export default function LiveChatPage() {
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Chat" }]} />
       </div>
 {/* Header */}
-      <div className="bg-brand-blue-600 text-white py-4 px-4 shadow-md">
+      <div className="bg-white text-white py-4 px-4 shadow-md">
         <div className="max-w-3xl mx-auto flex items-center gap-4">
           <Link href="/support" className="p-2 hover:bg-brand-blue-700 rounded-lg transition">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-blue-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
@@ -227,7 +227,7 @@ export default function LiveChatPage() {
             <Send className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-center text-xs text-gray-400 mt-2 flex items-center justify-center gap-1">
+        <p className="text-center text-xs text-slate-500 mt-2 flex items-center justify-center gap-1">
           <Clock className="w-3 h-3" />
           Live agents available Mon-Fri 9am-5pm EST
         </p>

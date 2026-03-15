@@ -243,7 +243,7 @@ export default function WorkbooksPage() {
             >
               our contact form
             </a>
-            <span className="text-slate-400">|</span>
+            <span className="text-slate-500">|</span>
             <a
               href="/support"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"

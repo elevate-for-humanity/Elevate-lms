@@ -260,7 +260,7 @@ export default function EROQueuePage() {
               </>
             ) : (
               <>
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Sign Selected ({selectedIds.size})
               </>
             )}
@@ -279,7 +279,7 @@ export default function EROQueuePage() {
         <CardContent>
           {pendingReturns.length === 0 ? (
             <div className="text-center py-12">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <p className="text-lg font-medium">All caught up!</p>
               <p className="text-muted-foreground">No returns pending your signature</p>
             </div>

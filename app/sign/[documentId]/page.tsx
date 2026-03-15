@@ -144,7 +144,7 @@ export default function SignDocumentPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-md p-8">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Document Signed</h1>
           <p className="text-gray-600 mb-6">

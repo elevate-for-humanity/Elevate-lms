@@ -126,26 +126,26 @@ export default function CourseDiscussionsPage() {
                     </p>
                     <ul className="space-y-4">
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Funded training - no tuition, no hidden costs
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Industry-recognized certifications that employers
                           value
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Job placement assistance and career support
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Flexible scheduling for working adults
                         </span>

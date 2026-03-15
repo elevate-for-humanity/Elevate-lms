@@ -67,7 +67,7 @@ export default function BarberHistoryPage() {
       case 'approved':
         return (
           <span className="flex items-center gap-1 text-brand-green-400 text-xs">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             Approved
           </span>
         );
@@ -93,10 +93,10 @@ export default function BarberHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading history...</p>
+          <p className="text-slate-900">Loading history...</p>
         </div>
       </div>
     );
@@ -104,11 +104,11 @@ export default function BarberHistoryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/history"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -121,7 +121,7 @@ export default function BarberHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
@@ -129,19 +129,19 @@ export default function BarberHistoryPage() {
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Hour History</h1>
-            <p className="text-slate-400 text-sm">{entries.length} entries</p>
+            <h1 className="text-xl font-bold text-slate-900">Hour History</h1>
+            <p className="text-slate-500 text-sm">{entries.length} entries</p>
           </div>
         </div>
 
         {/* Summary */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-700/50 rounded-xl p-3">
-            <p className="text-slate-400 text-xs">Total Logged</p>
-            <p className="text-xl font-bold text-white">{totalHours} hrs</p>
+          <div className="bg-white/50 rounded-xl p-3">
+            <p className="text-slate-500 text-xs">Total Logged</p>
+            <p className="text-xl font-bold text-slate-900">{totalHours} hrs</p>
           </div>
-          <div className="bg-slate-700/50 rounded-xl p-3">
-            <p className="text-slate-400 text-xs">Approved</p>
+          <div className="bg-white/50 rounded-xl p-3">
+            <p className="text-slate-500 text-xs">Approved</p>
             <p className="text-xl font-bold text-brand-green-400">{approvedHours} hrs</p>
           </div>
         </div>
@@ -169,15 +169,15 @@ export default function BarberHistoryPage() {
       {/* Entries */}
       <main className="px-4 space-y-3">
         {filteredEntries.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-8 text-center">
+          <div className="bg-white rounded-xl p-8 text-center">
             <Clock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">
+            <p className="text-slate-500">
               {filter === 'all' ? 'No hours logged yet' : `No ${filter} entries`}
             </p>
           </div>
         ) : (
           filteredEntries.map((entry) => (
-            <div key={entry.id} className="bg-slate-800 rounded-xl p-4">
+            <div key={entry.id} className="bg-white rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-slate-500" />
@@ -192,14 +192,14 @@ export default function BarberHistoryPage() {
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   Submitted {new Date(entry.submittedAt).toLocaleDateString()}
                 </span>
                 <span className="text-2xl font-bold text-white">{entry.hours} hrs</span>
               </div>
 
               {entry.notes && (
-                <p className="text-slate-400 text-sm mt-2 pt-2 border-t border-slate-700">
+                <p className="text-slate-500 text-sm mt-2 pt-2 border-t border-slate-700">
                   {entry.notes}
                 </p>
               )}

@@ -197,7 +197,7 @@ export default function ApprenticeshipPage() {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-brand-green-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center flex-shrink-0">
                     <DollarSign className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
@@ -213,7 +213,7 @@ export default function ApprenticeshipPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-brand-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center flex-shrink-0">
                     <Users className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
@@ -228,7 +228,7 @@ export default function ApprenticeshipPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-brand-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center flex-shrink-0">
                     <Shield className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
@@ -243,7 +243,7 @@ export default function ApprenticeshipPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-brand-orange-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center flex-shrink-0">
                     <Briefcase className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
@@ -260,7 +260,7 @@ export default function ApprenticeshipPage() {
             </div>
 
             <div className="relative">
-              <div className="bg-slate-900 rounded-3xl p-12 text-slate-900">
+              <div className="bg-white rounded-3xl p-12 text-slate-900">
                 <h3 className="text-3xl font-bold mb-8">Program Details</h3>
 
                 <div className="space-y-6">
@@ -324,7 +324,7 @@ export default function ApprenticeshipPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-brand-blue-500 rounded-2xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
                 <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -332,26 +332,26 @@ export default function ApprenticeshipPage() {
               </h3>
               <ul className="space-y-3 text-black">
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Clipper techniques
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Scissor over comb
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Fades and tapers
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Traditional styles
                 </li>
               </ul>
             </div>
 
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-2xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
                 <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -359,26 +359,26 @@ export default function ApprenticeshipPage() {
               </h3>
               <ul className="space-y-3 text-black">
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Beard shaping
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Straight razor shaves
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Hot towel treatments
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Facial grooming
                 </li>
               </ul>
             </div>
 
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-brand-orange-500 rounded-2xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
                 <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
@@ -386,19 +386,19 @@ export default function ApprenticeshipPage() {
               </h3>
               <ul className="space-y-3 text-black">
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Client consultation
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Shop management
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Marketing yourself
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full"></div>
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                   Building clientele
                 </li>
               </ul>
@@ -435,7 +435,7 @@ export default function ApprenticeshipPage() {
                 6 months in."
               </p>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-slate-700 rounded-full"></div>
+                <div className="w-16 h-16 bg-white rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">James W.</div>
                   <div className="text-slate-500">Apprentice, 6 months</div>
@@ -458,7 +458,7 @@ export default function ApprenticeshipPage() {
                 debt, just skills."
               </p>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-slate-700 rounded-full"></div>
+                <div className="w-16 h-16 bg-white rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">DeAndre Williams</div>
                   <div className="text-slate-500">

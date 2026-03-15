@@ -85,7 +85,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
               <span className="inline-block bg-brand-green-700 text-white text-xs font-bold px-3 py-1 rounded">Next Level Jobs Eligible</span>
             )}
           </div>
-          <p className="text-slate-300 text-sm mb-4 max-w-2xl">{data.tagline}</p>
+          <p className="text-slate-600 text-sm mb-4 max-w-2xl">{data.tagline}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm border-t border-slate-700 pt-4">
             <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-500">Duration</div></div>
             <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-500">Total Hours</div></div>
@@ -162,7 +162,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
               )}
               <div className={`p-5 ${mod.image ? 'sm:col-span-3' : 'sm:col-span-4'}`}>
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase">{mod.week}</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase">{mod.week}</span>
                   <h3 className="font-bold text-slate-900">{mod.title}</h3>
                 </div>
                 <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-slate-700">
@@ -269,7 +269,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">{data.name}</h2>
-            <p className="text-slate-400 text-sm">{data.duration} · ${data.costPerParticipant.toLocaleString()}/participant</p>
+            <p className="text-slate-500 text-sm">{data.duration} · ${data.costPerParticipant.toLocaleString()}/participant</p>
           </div>
           <div className="flex gap-3">
             <Link href={`/apply?program=${data.slug}`} className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-slate-100 transition-colors">Apply Now</Link>

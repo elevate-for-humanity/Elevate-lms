@@ -72,7 +72,7 @@ export function AIInstructorWidget({
         >
           <MessageCircle className="w-8 h-8 text-white" />
           {speaking && (
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-green-500 rounded-full animate-ping" />
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full animate-ping" />
           )}
         </button>
       )}
@@ -88,7 +88,7 @@ export function AIInstructorWidget({
                   <span className="text-2xl">🎓</span>
                 </div>
                 {speaking && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-brand-green-500 rounded-full animate-pulse border-2 border-white" />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full animate-pulse border-2 border-white" />
                 )}
               </div>
               <div>

@@ -24,7 +24,7 @@ export default function CheckEligibilityPage() {
         <Breadcrumbs items={[{ label: "Check Eligibility" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-brand-blue-800 text-white py-16 px-4">
+      <section className="bg-white text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Check Eligibility (Before WorkOne)
@@ -62,7 +62,7 @@ export default function CheckEligibilityPage() {
           {/* You May Qualify */}
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               You may be a good fit if you:
             </h2>
             <ul className="space-y-4">
@@ -74,7 +74,7 @@ export default function CheckEligibilityPage() {
                 'Are interested in training that leads directly to employment',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 bg-brand-green-50 p-4 rounded-lg">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-800">{item}</span>
                 </li>
               ))}
@@ -124,7 +124,7 @@ export default function CheckEligibilityPage() {
                 { step: 4, text: 'Begin training and career support' },
               ].map((item) => (
                 <div key={item.step} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold flex-shrink-0">
                     {item.step}
                   </div>
                   <p className="text-gray-700">{item.text}</p>

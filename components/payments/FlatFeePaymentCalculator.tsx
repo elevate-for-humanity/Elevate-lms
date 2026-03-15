@@ -242,7 +242,7 @@ export function FlatFeePaymentCalculator({
                   </div>
                   <div className="text-sm text-slate-600">{plan.label}</div>
                   {selectedPlan === plan.months && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   )}
                 </button>
               ))}
@@ -250,7 +250,7 @@ export function FlatFeePaymentCalculator({
           </div>
         ) : downPaymentNum >= programFee ? (
           <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-4 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <div className="font-bold text-brand-green-800">Paying in Full!</div>
             <div className="text-sm text-brand-green-700">No monthly payments required</div>
           </div>

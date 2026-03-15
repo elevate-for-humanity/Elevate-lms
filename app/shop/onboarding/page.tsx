@@ -109,7 +109,7 @@ export default async function ShopOnboardingPage() {
 
           <div className="w-full bg-slate-200 rounded-full h-3">
             <div
-              className="bg-brand-blue-600 h-3 rounded-full transition-all"
+              className="bg-white h-3 rounded-full transition-all"
               style={{
                 width: `${
                   requiredDocs.length > 0
@@ -139,7 +139,7 @@ export default async function ShopOnboardingPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
                     {doc.approved ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <Clock className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
                     )}
@@ -210,7 +210,7 @@ export default async function ShopOnboardingPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               {onboarding?.handbook_ack ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -227,7 +227,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.reporting_trained ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -244,7 +244,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.apprentice_supervisor_assigned ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -261,7 +261,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.rapids_reporting_ready ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}

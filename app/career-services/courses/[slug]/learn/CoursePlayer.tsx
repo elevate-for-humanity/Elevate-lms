@@ -66,24 +66,24 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
             />
           ) : (
             <div className="text-center text-white">
-              <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                 <Play className="w-10 h-10" />
               </div>
               <p className="text-xl font-semibold mb-2">{currentModule?.title}</p>
-              <p className="text-gray-400">Click play to start the lesson</p>
+              <p className="text-slate-500">Click play to start the lesson</p>
             </div>
           )}
         </div>
 
         {/* Module Info */}
-        <div className="bg-gray-800 p-6">
+        <div className="bg-white p-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold text-white mb-1">
+                <h2 className="text-xl font-bold text-slate-900 mb-1">
                   {currentModule?.title}
                 </h2>
-                <p className="text-gray-400">{currentModule?.description}</p>
+                <p className="text-slate-500">{currentModule?.description}</p>
               </div>
               <div className="flex items-center gap-2 text-gray-400">
                 <Clock className="w-4 h-4" />
@@ -100,7 +100,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                     : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 {completedModules.includes(currentModule?.id) ? 'Completed' : 'Mark Complete'}
               </button>
 
@@ -119,16 +119,16 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
       </div>
 
       {/* Sidebar - Module List */}
-      <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
+      <div className="w-80 bg-white border-l border-gray-700 overflow-y-auto">
         {/* Progress */}
         <div className="p-4 border-b border-gray-700">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">Your Progress</span>
+            <span className="text-sm text-slate-500">Your Progress</span>
             <span className="text-sm font-medium text-white">{progress}%</span>
           </div>
-          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-white rounded-full overflow-hidden">
             <div 
-              className="h-full bg-brand-green-500 transition-all"
+              className="h-full bg-white transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -153,7 +153,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
               >
                 <div className="flex-shrink-0 mt-0.5">
                   {completedModules.includes(module.id) ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   ) : (
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-medium ${
                       currentModuleIndex === index ? 'border-white' : 'border-gray-500'

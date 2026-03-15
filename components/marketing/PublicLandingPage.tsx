@@ -59,8 +59,8 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
                 {config.hero.tag}
               </p>
             )}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">{config.hero.title}</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">{config.hero.subtitle}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">{config.hero.title}</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">{config.hero.subtitle}</p>
           </div>
         </div>
       </section>
@@ -95,7 +95,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {config.features.items.map((item) => (
                 <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-5 border border-slate-200">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-slate-700">{item}</p>
                 </div>
               ))}
@@ -112,7 +112,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
             <div className="space-y-6">
               {config.steps.items.map((s, i) => (
                 <div key={i} className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-brand-red-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{i + 1}</div>
+                  <div className="w-10 h-10 rounded-full bg-white text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{i + 1}</div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
                     <p className="text-slate-600">{s.desc}</p>
@@ -127,7 +127,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
       {/* CTA */}
       <section className={`py-16 sm:py-24 ${ctaBg}`}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{config.cta.heading}</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">{config.cta.heading}</h2>
           <p className="text-xl text-white/90 mb-10">{config.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href={config.cta.primaryHref} className="bg-white text-slate-900 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">

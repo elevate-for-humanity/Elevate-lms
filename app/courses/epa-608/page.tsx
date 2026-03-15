@@ -151,12 +151,12 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-extrabold text-white mb-3">
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-3">
             Ready to Get Certified?
           </h2>
-          <p className="text-lg text-slate-300 mb-8">
+          <p className="text-lg text-slate-600 mb-8">
             Apply in 5 minutes. If you qualify for WIOA funding, the course and exam are fully covered.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">

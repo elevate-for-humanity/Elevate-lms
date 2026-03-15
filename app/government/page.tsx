@@ -53,10 +53,10 @@ export default async function GovernmentPage() {
           <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/employer-hero.jpg"
             className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Solutions for Government Agencies</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Workforce Solutions for Government Agencies</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
               Partner with an ETPL-approved, WIOA-compliant training provider to deliver high-quality workforce development programs that meet federal requirements and produce measurable outcomes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -73,11 +73,11 @@ export default async function GovernmentPage() {
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Our Credentials</h3>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">ETPL Approved Provider</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">WIOA Title I Compliant</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">Registered Apprenticeship Sponsor</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">WRG Eligible Programs</span></div>
-              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">DOL Oversight Compliant</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">ETPL Approved Provider</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">WIOA Title I Compliant</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">Registered Apprenticeship Sponsor</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">WRG Eligible Programs</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-500">•</span><span className="text-slate-700">DOL Oversight Compliant</span></div>
             </div>
           </div>
         </div>
@@ -120,15 +120,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     WIOA Title I Adult & Dislocated Worker
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Youth Programs (OSY & ISY)
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Rapid Response Services
                   </li>
                 </ul>
@@ -156,15 +156,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Department of Workforce Development
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Department of Education
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Vocational Rehabilitation
                   </li>
                 </ul>
@@ -192,15 +192,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     DOL Apprenticeship Programs
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Reentry Programs (JRI)
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Veterans Programs (GI Bill, VR&E)
                   </li>
                 </ul>
@@ -327,7 +327,7 @@ export default async function GovernmentPage() {
                       <span className="font-bold text-brand-blue-600">87%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-brand-blue-600 h-3 rounded-full" style={{ width: '87%' }} />
+                      <div className="bg-white h-3 rounded-full" style={{ width: '87%' }} />
                     </div>
                   </div>
                   <div>
@@ -336,7 +336,7 @@ export default async function GovernmentPage() {
                       <span className="font-bold text-brand-green-600">92%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-brand-green-600 h-3 rounded-full" style={{ width: '92%' }} />
+                      <div className="bg-white h-3 rounded-full" style={{ width: '92%' }} />
                     </div>
                   </div>
                   <div>
@@ -345,7 +345,7 @@ export default async function GovernmentPage() {
                       <span className="font-bold text-brand-blue-600">78%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-brand-blue-600 h-3 rounded-full" style={{ width: '78%' }} />
+                      <div className="bg-white h-3 rounded-full" style={{ width: '78%' }} />
                     </div>
                   </div>
                   <div>
@@ -354,7 +354,7 @@ export default async function GovernmentPage() {
                       <span className="font-bold text-brand-orange-600">34%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-brand-orange-600 h-3 rounded-full" style={{ width: '34%' }} />
+                      <div className="bg-white h-3 rounded-full" style={{ width: '34%' }} />
                     </div>
                   </div>
                 </div>
@@ -509,9 +509,9 @@ export default async function GovernmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Ready to Partner?
           </h2>
           <p className="text-xl text-white/90 mb-8">

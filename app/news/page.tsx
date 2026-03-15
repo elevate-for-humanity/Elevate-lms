@@ -35,8 +35,8 @@ export default async function NewsPage() {
         
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">News &amp; Updates</h1>
-          <p className="text-slate-300 mt-1 text-sm max-w-xl">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">News &amp; Updates</h1>
+          <p className="text-slate-600 mt-1 text-sm max-w-xl">
             Program announcements, success stories, and workforce development news from Indianapolis.
           </p>
         </div>
@@ -79,8 +79,8 @@ export default async function NewsPage() {
                         </span>
                       )}
                       <h2 className="text-xl sm:text-2xl font-bold leading-snug">{featured.title}</h2>
-                      {featured.excerpt && <p className="text-slate-300 text-sm mt-1 line-clamp-2">{featured.excerpt}</p>}
-                      <p className="text-slate-400 text-xs mt-2 flex items-center gap-1">
+                      {featured.excerpt && <p className="text-slate-600 text-sm mt-1 line-clamp-2">{featured.excerpt}</p>}
+                      <p className="text-slate-500 text-xs mt-2 flex items-center gap-1">
                         <Calendar className="w-3 h-3" /> {formatPostDate(featured.published_at)}
                       </p>
                     </div>
@@ -110,7 +110,7 @@ export default async function NewsPage() {
                           {post.title}
                         </h3>
                         {post.excerpt && <p className="text-sm text-slate-500 mt-1 line-clamp-2">{post.excerpt}</p>}
-                        <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                           <Calendar className="w-3 h-3" /> {formatPostDate(post.published_at)}
                         </p>
                       </div>

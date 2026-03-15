@@ -109,7 +109,7 @@ export default function ContactPage() {
             
             {formState === 'success' ? (
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
                 <p className="text-gray-600 mb-4">
                   Thank you for contacting us. We&apos;ll get back to you within 24 hours.

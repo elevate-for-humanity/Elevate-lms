@@ -203,7 +203,7 @@ export function ProgramPageLocked({
       )}
 
       {/* 5. WHAT HAPPENS NEXT */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">What Happens Next</h2>
 

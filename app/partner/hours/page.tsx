@@ -231,7 +231,7 @@ export default async function PartnerHoursPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-white rounded-full overflow-hidden">
-                              <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                              <div className="h-full bg-white rounded-full" style={{ width: `${pct}%` }} />
                             </div>
                             <span className="text-xs text-gray-500 w-10 text-right">{pct}%</span>
                           </div>

@@ -69,7 +69,7 @@ export default function OnboardingFlow({
           <div className="mt-6">
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-blue-600 transition-all duration-500"
+                className="h-full bg-white transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -104,7 +104,7 @@ export default function OnboardingFlow({
                       }`}
                     >
                       {isComplete ? (
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                       ) : isCurrent ? (
                         <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                       ) : (
@@ -142,7 +142,7 @@ export default function OnboardingFlow({
                   }`}
                 >
                   {payrollComplete ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   ) : currentStep === documents.length ? (
                     <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   ) : (
@@ -264,7 +264,7 @@ function DocumentStep({
     return (
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
         <div className="text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <h2 className="text-2xl font-bold text-black mb-2">
             {document.title}
           </h2>
@@ -396,7 +396,7 @@ function PayrollSetupStep({
 
       {currentStatus === 'PENDING' || currentStatus === 'ACTIVE' ? (
         <div className="text-center py-8">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <h3 className="text-lg font-semibold text-black mb-2">
             Payroll Setup Complete
           </h3>

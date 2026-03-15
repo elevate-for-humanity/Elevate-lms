@@ -114,7 +114,7 @@ function SignedOutView() {
         <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
-          <h1 className="text-2xl font-bold text-white">Student Portal</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Student Portal</h1>
           <p className="text-brand-blue-200 text-sm mt-1">Sign in to view your program and progress</p>
         </div>
       </div>
@@ -125,7 +125,7 @@ function SignedOutView() {
           <Link href="/login" className="block w-full bg-brand-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-brand-blue-700 transition-colors">
             Sign In
           </Link>
-          <p className="text-xs text-slate-400 mt-4">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
+          <p className="text-xs text-slate-500 mt-4">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
         </div>
       </div>
     </div>
@@ -167,7 +167,7 @@ export default async function StudentPWAPage() {
         <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={36} height={36} className="mb-2" />
-          <h1 className="text-xl font-bold text-white">Welcome back, {firstName}</h1>
+          <h1 className="text-xl font-bold text-slate-900">Welcome back, {firstName}</h1>
           <p className="text-brand-blue-200 text-sm mt-0.5">{user.email}</p>
         </div>
       </div>
@@ -295,7 +295,7 @@ export default async function StudentPWAPage() {
         {activeCourses.length === 0 ? (
           <div className="bg-white rounded-xl border border-dashed border-slate-300 p-6 text-center">
             <p className="text-slate-500 text-sm mb-1">No courses assigned yet.</p>
-            <p className="text-slate-400 text-xs">
+            <p className="text-slate-500 text-xs">
               {hasProgram
                 ? 'Your courses will appear here once onboarding is complete.'
                 : 'Apply to a program to get started.'}
@@ -318,10 +318,10 @@ export default async function StudentPWAPage() {
                         {course?.duration_hours ? `${course.duration_hours} hrs` : 'Self-paced'} · Enrolled {new Date(enrollment.enrolled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     </div>
-                    <span className="text-slate-400 text-sm flex-shrink-0">→</span>
+                    <span className="text-slate-500 text-sm flex-shrink-0">→</span>
                   </div>
                   <div className="w-full bg-white rounded-full h-2">
-                    <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
+                    <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
                   </div>
                   <div className="text-xs text-slate-500 mt-1">{progress}% complete</div>
                 </Link>
@@ -377,7 +377,7 @@ export default async function StudentPWAPage() {
 
       {/* Footer */}
       <div className="px-4 mt-8 pb-8 text-center">
-        <p className="text-xs text-slate-400">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
+        <p className="text-xs text-slate-500">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
       </div>
     </div>
   );

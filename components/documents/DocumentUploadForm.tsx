@@ -116,7 +116,7 @@ export function DocumentUploadForm({ requirements }: Props) {
     return (
       <div className="max-w-2xl mx-auto p-8 bg-brand-green-50 border-2 border-brand-green-600 rounded-lg">
         <div className="flex items-center gap-4 mb-4">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <div>
             <h2 className="text-2xl font-bold text-brand-green-900">
               Document Uploaded!

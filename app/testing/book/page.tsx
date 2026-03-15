@@ -116,13 +116,13 @@ function BookingForm() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-slate-900 text-white">
+      <div className="bg-white text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
           <Link href="/testing" className="text-xs text-slate-400 hover:text-white mb-4 inline-flex items-center gap-1">
             ← Testing Center
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Book a Testing Session</h1>
-          <p className="text-slate-300 text-sm">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Book a Testing Session</h1>
+          <p className="text-slate-600 text-sm">
             Fill out the form below. We respond within 1 business day to confirm your session.
           </p>
         </div>
@@ -134,7 +134,7 @@ function BookingForm() {
           {/* Step 1 — Select exam */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
             <h2 className="font-extrabold text-slate-900 mb-1">1. Which exam do you need?</h2>
-            <p className="text-xs text-slate-400 mb-4">Select a certification provider. Available proctoring modes will update automatically.</p>
+            <p className="text-xs text-slate-500 mb-4">Select a certification provider. Available proctoring modes will update automatically.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {ALL_PROVIDERS.map((provider) => (
                 <button
@@ -156,7 +156,7 @@ function BookingForm() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">{provider.description}</p>
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">{provider.description}</p>
                 </button>
               ))}
             </div>
@@ -166,7 +166,7 @@ function BookingForm() {
           {selectedProvider && availableModes.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h2 className="font-extrabold text-slate-900 mb-1">2. How would you like to test?</h2>
-              <p className="text-xs text-slate-400 mb-4">
+              <p className="text-xs text-slate-500 mb-4">
                 Available modes for <strong>{selectedProvider.name}</strong> based on provider requirements.
               </p>
               <div className="flex flex-col gap-3">
@@ -190,13 +190,13 @@ function BookingForm() {
                       <div>
                         <span className="font-semibold text-sm text-slate-900">{label}</span>
                         {mode === 'inPerson' && (
-                          <p className="text-xs text-slate-400 mt-0.5">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
+                          <p className="text-xs text-slate-500 mt-0.5">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
                         )}
                         {mode === 'remoteProvider' && (
-                          <p className="text-xs text-slate-400 mt-0.5">The certifying organization controls the remote testing system. We facilitate access.</p>
+                          <p className="text-xs text-slate-500 mt-0.5">The certifying organization controls the remote testing system. We facilitate access.</p>
                         )}
                         {mode === 'remoteCenter' && (
-                          <p className="text-xs text-slate-400 mt-0.5">Elevate staff proctor the session live via video. Participants can test from any location.</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Elevate staff proctor the session live via video. Participants can test from any location.</p>
                         )}
                       </div>
                     </label>
@@ -277,7 +277,7 @@ function BookingForm() {
                 {submitting ? 'Sending...' : 'Submit Booking Request'}
               </button>
 
-              <p className="text-xs text-slate-400 text-center">
+              <p className="text-xs text-slate-500 text-center">
                 Or call us directly: <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold inline-flex items-center gap-1"><Phone className="w-3 h-3" />(317) 314-3757</a>
               </p>
             </div>
@@ -291,7 +291,7 @@ function BookingForm() {
 
 export default function BookTestingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><p className="text-slate-400 text-sm">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><p className="text-slate-500 text-sm">Loading...</p></div>}>
       <BookingForm />
     </Suspense>
   );

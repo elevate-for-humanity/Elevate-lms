@@ -7,7 +7,7 @@ export function BarberHero() {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden bg-slate-900">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden bg-white">
         <Image
           src="/images/pages/programs-barber-hero-new.jpg"
           alt="Barber apprentice cutting hair in a licensed barbershop"
@@ -18,7 +18,7 @@ export function BarberHero() {
         <div className="absolute inset-0 flex items-end">
           <div className="w-full bg-black/55 px-6 py-6">
             <div className="max-w-5xl mx-auto">
-              <h1 className="text-3xl md:text-5xl font-black text-white mb-2">Barber Apprenticeship Program</h1>
+              <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2">Barber Apprenticeship Program</h1>
               <p className="text-white/85 text-lg max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
             </div>
           </div>

@@ -65,7 +65,7 @@ export default function CareerGuidancePage() {
           <div className="space-y-6">
             {['Apply for mentorship and share your goals', 'Get matched with an experienced mentor in your field', 'Schedule regular sessions to discuss your career', 'Receive guidance, feedback, and support'].map((step, i) => (
               <div key={i} className="flex items-start bg-white rounded-lg p-6 shadow-sm">
-                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">{i + 1}</div>
+                <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">{i + 1}</div>
                 <p className="text-gray-700 pt-2">{step}</p>
               </div>
             ))}
@@ -73,7 +73,7 @@ export default function CareerGuidancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">Connect with a mentor who can help guide your career.</p>

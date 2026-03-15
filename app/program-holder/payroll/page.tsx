@@ -134,7 +134,7 @@ export default async function ProgramHolderPayrollPage() {
               <div className={`w-9 h-9 rounded-lg bg-${color}-100 flex items-center justify-center mb-3`}>
                 <Icon className={`w-4 h-4 text-${color}-600`} />
               </div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">{label}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">{label}</p>
               <p className="text-lg font-bold text-slate-900">{value}</p>
             </div>
           ))}
@@ -171,7 +171,7 @@ export default async function ProgramHolderPayrollPage() {
         <div className="bg-white rounded-xl border overflow-hidden mb-8">
           <div className="px-6 py-4 border-b flex items-center justify-between">
             <h2 className="font-semibold text-slate-900">Pay History</h2>
-            <span className="text-sm text-slate-400">{payStubs.length} records</span>
+            <span className="text-sm text-slate-500">{payStubs.length} records</span>
           </div>
           {payStubs.length === 0 ? (
             <div className="px-6 py-12 text-center text-slate-400">
@@ -198,7 +198,7 @@ export default async function ProgramHolderPayrollPage() {
                           ? `${new Date(run.pay_period_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date(run.pay_period_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
                           : fmtDate(stub.created_at)}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-500">
                         Pay date: {run ? fmtDate(run.pay_date) : '—'}
                         {run?.status && (
                           <span className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${
@@ -209,15 +209,15 @@ export default async function ProgramHolderPayrollPage() {
                     </div>
                     <div className="flex items-center gap-5 text-sm">
                       <div className="text-right">
-                        <p className="text-xs text-slate-400">Gross</p>
+                        <p className="text-xs text-slate-500">Gross</p>
                         <p className="font-semibold text-slate-900">{fmt(stub.gross_pay)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-slate-400">Taxes</p>
+                        <p className="text-xs text-slate-500">Taxes</p>
                         <p className="font-semibold text-slate-600">{fmt(taxes)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-slate-400">Net</p>
+                        <p className="text-xs text-slate-500">Net</p>
                         <p className="font-bold text-brand-green-700">{fmt(stub.net_pay)}</p>
                       </div>
                       <button title="Download" className="p-2 text-slate-400 hover:text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 transition">
@@ -254,10 +254,10 @@ export default async function ProgramHolderPayrollPage() {
                         {fmtDate(run.pay_period_start)} – {fmtDate(run.pay_period_end)}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400">Pay date: {fmtDate(run.pay_date)} · {run.employee_count ?? 0} employees</p>
+                    <p className="text-xs text-slate-500">Pay date: {fmtDate(run.pay_date)} · {run.employee_count ?? 0} employees</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-slate-400">Net</p>
+                    <p className="text-xs text-slate-500">Net</p>
                     <p className="font-bold text-brand-green-700">{fmt(run.total_net)}</p>
                   </div>
                 </div>

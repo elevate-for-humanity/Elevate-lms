@@ -53,15 +53,15 @@ export default function WorkOnePartnerPacketPage() {
             <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
           </video>
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
               <span className="px-4 py-2 bg-brand-green-500/20 border border-brand-green-400/30 rounded-full text-sm font-bold text-brand-green-300">Registered Apprenticeship Sponsor</span>
               <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">ETPL Approved</span>
               <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">WIOA | WRG Eligible</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">WorkOne Partner Packet</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">WorkOne Partner Packet</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
               Everything WorkOne regions need to refer participants to our ETPL-approved training programs and registered apprenticeships. We handle enrollment, training delivery, and outcome reporting with full transparency.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -158,28 +158,28 @@ export default function WorkOnePartnerPacketPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-6">What Makes Us Different</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Employer-Driven Model</div>
                       <div className="text-gray-600 text-sm">Training aligned with actual job requirements</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Compliance Built-In</div>
                       <div className="text-gray-600 text-sm">WIOA, FERPA, ADA, EEO compliant from day one</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Outcome-Focused</div>
                       <div className="text-gray-600 text-sm">Employment and wage gains, not just completions</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Automated Reporting</div>
                       <div className="text-gray-600 text-sm">Real-time data for case managers and funders</div>
@@ -216,7 +216,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Referral</h3>
                 <p className="text-gray-600 text-sm">
                   WorkOne case manager identifies eligible participant and submits referral through our online portal or via email.
@@ -229,7 +229,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Enrollment</h3>
                 <p className="text-gray-600 text-sm">
                   We complete intake, verify eligibility, and enroll participant in appropriate training program within 48 hours.
@@ -242,7 +242,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-packet-1.jpg" alt="Training" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Training</h3>
                 <p className="text-gray-600 text-sm">
                   Participant completes training with progress updates sent to case manager weekly. Support services available.
@@ -255,7 +255,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-packet-2.jpg" alt="Placement" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Placement</h3>
                 <p className="text-gray-600 text-sm">
                   Upon completion, we provide job placement assistance and report employment outcomes for WIOA performance measures.
@@ -350,7 +350,7 @@ export default function WorkOnePartnerPacketPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {['WIOA Title I (Adult)', 'WIOA Title I (DW)', 'WIOA Title I (Youth)', 'WRG (Workforce Ready Grant)', 'SNAP E&T', 'TANF', 'TAA', 'Veterans Benefits'].map((source, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-gray-700 text-sm">{source}</span>
                     </div>
                   ))}
@@ -368,7 +368,7 @@ export default function WorkOnePartnerPacketPage() {
                   { step: '4', title: 'Completion & Invoice', desc: 'Invoice submitted upon successful completion with credential documentation' },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{item.step}</div>
+                    <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{item.step}</div>
                     <div>
                       <div className="font-semibold text-gray-900">{item.title}</div>
                       <div className="text-gray-600 text-sm">{item.desc}</div>
@@ -382,9 +382,9 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-teal-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Refer Participants?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Ready to Refer Participants?</h2>
           <p className="text-xl text-white/90 mb-8">
             Contact our WorkOne liaison to set up your referral process or request additional information.
           </p>
@@ -398,7 +398,7 @@ export default function WorkOnePartnerPacketPage() {
               our contact form
             </a>
           </div>
-          <p className="text-white/70 text-sm mt-8">
+          <p className="text-slate-500 text-sm mt-8">
             Elevate for Humanity | 501(c)(3) Nonprofit | EIN: 93-3915599
           </p>
         </div>

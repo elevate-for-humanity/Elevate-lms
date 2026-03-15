@@ -69,7 +69,7 @@ export default function DirectDepositPage() {
               <p className="text-sm text-gray-600">FDIC insured and encrypted transfers</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <h3 className="font-bold text-gray-900 mb-2">No Fees</h3>
               <p className="text-sm text-gray-600">Direct deposit is completely free</p>
             </div>
@@ -93,7 +93,7 @@ export default function DirectDepositPage() {
             <div>
               <div className="space-y-8">
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     1
                   </div>
                   <div className="ml-4">
@@ -106,7 +106,7 @@ export default function DirectDepositPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     2
                   </div>
                   <div className="ml-4">
@@ -119,7 +119,7 @@ export default function DirectDepositPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     3
                   </div>
                   <div className="ml-4">
@@ -151,7 +151,7 @@ export default function DirectDepositPage() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <p className="font-semibold text-gray-900">Account Type</p>
                     <p className="text-sm text-gray-600">Checking or Savings designation</p>
@@ -294,7 +294,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-green-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to File Your Taxes?

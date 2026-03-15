@@ -258,47 +258,47 @@ export default function PartnersPage() {
       </section>
 
       {/* How Partnership Works */}
-      <section className="bg-slate-900 text-white">
+      <section className="bg-white text-white">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">How Partnership Works</h2>
-          <p className="text-lg text-slate-400 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-500 text-center mb-12 max-w-2xl mx-auto">
             A simple process to get started, whether you&apos;re an employer or workforce agency.
           </p>
           
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">1</span>
               </div>
-              <h3 className="font-bold text-white text-lg mb-2">Submit Inquiry</h3>
-              <p className="text-slate-400 text-sm">
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Submit Inquiry</h3>
+              <p className="text-slate-500 text-sm">
                 Complete our partner intake form with your organization details and goals.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">2</span>
               </div>
-              <h3 className="font-bold text-white text-lg mb-2">Discovery Call</h3>
-              <p className="text-slate-400 text-sm">
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Discovery Call</h3>
+              <p className="text-slate-500 text-sm">
                 Meet with our team to discuss alignment, needs, and partnership structure.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">3</span>
               </div>
-              <h3 className="font-bold text-white text-lg mb-2">Agreement</h3>
-              <p className="text-slate-400 text-sm">
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Agreement</h3>
+              <p className="text-slate-500 text-sm">
                 Sign partnership agreement outlining roles, expectations, and outcomes.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">4</span>
               </div>
-              <h3 className="font-bold text-white text-lg mb-2">Launch</h3>
-              <p className="text-slate-400 text-sm">
+              <h3 className="font-bold text-slate-900 text-lg mb-2">Launch</h3>
+              <p className="text-slate-500 text-sm">
                 Begin receiving candidates, referrals, or program support based on partnership type.
               </p>
             </div>
@@ -426,7 +426,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Become a Partner CTA */}
-      <section className="bg-brand-blue-700 text-white">
+      <section className="bg-white text-white">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Partner?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

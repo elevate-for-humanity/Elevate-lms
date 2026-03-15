@@ -233,7 +233,7 @@ export default function InstructorAnnouncementsPage() {
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900">{announcement.title}</h3>
                     <p className="text-gray-600 mt-2 whitespace-pre-wrap">{announcement.body}</p>
-                    <p className="text-sm text-gray-400 mt-4">
+                    <p className="text-sm text-slate-500 mt-4">
                       Posted {new Date(announcement.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',

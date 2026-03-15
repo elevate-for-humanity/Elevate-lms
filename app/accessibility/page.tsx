@@ -64,31 +64,31 @@ export default function AccessibilityPage() {
 
           <ul className="space-y-4 text-black">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>
                 Providing alternative formats for documents and materials when
                 requested
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>
                 Ensuring physical locations are accessible or providing
                 alternative arrangements
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Offering accommodations for program participation</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>
                 Working with partners to ensure accessible training environments
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Providing support services to address barriers</span>
             </li>
           </ul>
@@ -105,23 +105,23 @@ export default function AccessibilityPage() {
 
           <ul className="space-y-3 text-black">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Ensure proper heading structure and navigation</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Provide text alternatives for images</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Maintain sufficient color contrast</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Support keyboard navigation</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
               <span>Ensure compatibility with screen readers</span>
             </li>
           </ul>

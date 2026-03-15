@@ -74,7 +74,7 @@ export default async function AccountLicensesPage() {
                   <div className="flex items-center gap-2">
                     {license.status === 'active' ? (
                       <span className="flex items-center gap-1 text-brand-green-600 text-sm">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         Active
                       </span>
                     ) : (

@@ -125,7 +125,7 @@ export default async function StaffTrainingPage() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-3xl font-bold text-black">
                 {completedModules}
               </span>
@@ -166,7 +166,7 @@ export default async function StaffTrainingPage() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4">
             <div
-              className="bg-brand-blue-600 h-4 rounded-full transition-all duration-500"
+              className="bg-white h-4 rounded-full transition-all duration-500"
               style={{ width: `${completionPercentage}%` }}
             />
           </div>
@@ -227,7 +227,7 @@ export default async function StaffTrainingPage() {
                       )}
                     </div>
                     {module.isCompleted && (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     )}
                   </div>
 

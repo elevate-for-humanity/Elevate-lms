@@ -42,7 +42,7 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Discussions</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Discussions</h2>
         <div className="flex gap-2">
           <button
             onClick={() => setSortBy("recent")}
@@ -80,11 +80,11 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
                   {thread.is_pinned && (
                     <Pin className="w-4 h-4 text-brand-orange-400" />
                   )}
-                  <h3 className="text-lg font-semibold text-white hover:text-brand-orange-400 transition-colors">
+                  <h3 className="text-lg font-semibold text-slate-900 hover:text-brand-orange-400 transition-colors">
                     {thread.title}
                   </h3>
                 </div>
-                <p className="text-sm text-slate-400 line-clamp-2 mb-3">
+                <p className="text-sm text-slate-500 line-clamp-2 mb-3">
                   {thread.content}
                 </p>
                 <div className="flex items-center gap-4 text-xs text-slate-500">
@@ -111,9 +111,9 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
       </div>
 
       {threads.length === 0 && (
-        <div className="text-center py-12 bg-slate-800 rounded-lg">
+        <div className="text-center py-12 bg-white rounded-lg">
           <MessageSquare className="w-12 h-12 text-black mx-auto mb-4" />
-          <p className="text-slate-400">No discussions yet. Be the first to start one!</p>
+          <p className="text-slate-500">No discussions yet. Be the first to start one!</p>
         </div>
       )}
     </div>

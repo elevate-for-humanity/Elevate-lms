@@ -94,13 +94,13 @@ export default async function EmployerCompliancePage() {
       </div>
 
       {/* Header */}
-      <div className="bg-slate-800 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-slate-300" />
             <div>
               <h1 className="text-3xl font-bold">Compliance & Reporting</h1>
-              <p className="text-slate-300">Stay compliant with workforce development requirements</p>
+              <p className="text-slate-600">Stay compliant with workforce development requirements</p>
             </div>
           </div>
         </div>
@@ -157,12 +157,12 @@ export default async function EmployerCompliancePage() {
           {/* Quick Checklist */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span> Compliance Checklist
+              <span className="text-slate-500 flex-shrink-0">•</span> Compliance Checklist
             </h2>
             <div className="space-y-3">
               {quickChecklist.map((item, i) => (
                 <div key={i} className="flex items-start gap-3 p-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-sm text-gray-700">{item}</span>
                 </div>
               ))}

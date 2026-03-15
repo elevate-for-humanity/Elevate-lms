@@ -111,7 +111,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
           <p className="text-sm text-gray-500">Total Students</p>
         </div>
         <div className="bg-white rounded-lg p-4 border">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <p className="text-2xl font-bold">{presentCount}</p>
           <p className="text-sm text-gray-500">Present</p>
         </div>

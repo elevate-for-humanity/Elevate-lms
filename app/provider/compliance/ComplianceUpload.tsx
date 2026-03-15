@@ -141,7 +141,7 @@ export default function ComplianceUpload({ tenantId }: { tenantId: string }) {
         {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
         Submit Document
       </button>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-500">
         To attach a file, upload it to your organization's document storage and paste the link above.
       </p>
     </form>

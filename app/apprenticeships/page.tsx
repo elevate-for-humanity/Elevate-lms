@@ -57,16 +57,16 @@ const apprenticeships = (dbRows as any[]) || [];
         <Image src="/images/pages/apprenticeships-hero.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Zap className="w-4 h-4" /> USDOL Registered Programs
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
               Apprenticeships
             </h1>
             <p className="text-xl text-white/90 max-w-xl mb-4">
               Earn a paycheck from day one while learning a skilled trade. Real credentials. Real careers.
             </p>
-            <p className="text-sm text-white/70 max-w-xl mb-6">
+            <p className="text-sm text-slate-500 max-w-xl mb-6">
               Tuition and funding eligibility vary by program. See individual program pages for details.
             </p>
             <Link href="/start" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
@@ -77,7 +77,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* Benefits Strip */}
-      <section className="py-8 bg-slate-900">
+      <section className="py-8 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {benefits.map((b, i) => (
@@ -97,7 +97,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* What is an Apprenticeship */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -152,7 +152,7 @@ const apprenticeships = (dbRows as any[]) || [];
                   <div className="relative h-48">
                     <Image src={prog.image} alt={prog.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-xl font-bold text-white">{prog.name}</h3>
+                      <h3 className="text-xl font-bold text-slate-900">{prog.name}</h3>
                     </div>
                   </div>
                   <div className="p-6">
@@ -184,12 +184,12 @@ const apprenticeships = (dbRows as any[]) || [];
               <div key={i} className="group">
                 <div className="relative h-48 rounded-2xl overflow-hidden mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image src={step.image} alt={step.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {step.num}
                   </div>
                   <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white">{step.title}</h3>
-                    <p className="text-white/80 text-sm">{step.desc}</p>
+                    <h3 className="text-xl font-bold text-slate-900">{step.title}</h3>
+                    <p className="text-slate-600 text-sm">{step.desc}</p>
                   </div>
                 </div>
               </div>
@@ -214,7 +214,7 @@ const apprenticeships = (dbRows as any[]) || [];
               'Committed to learning',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="font-medium text-slate-700">{item}</span>
               </div>
             ))}
@@ -227,7 +227,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-white">
         {/* Registered Apprenticeship Authority */}
         <div className="max-w-5xl mx-auto px-4 mb-16">
           <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">
@@ -257,10 +257,10 @@ const apprenticeships = (dbRows as any[]) || [];
         </div>
 
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Start Your Apprenticeship
           </h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <p className="text-xl text-slate-600 mb-8">
             Real pay. Industry credentials. Funding options available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

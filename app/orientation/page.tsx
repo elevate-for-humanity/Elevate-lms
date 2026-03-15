@@ -156,9 +156,9 @@ export default async function OrientationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-red-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?
           </h2>
           <p className="text-brand-red-100 text-lg mb-8">

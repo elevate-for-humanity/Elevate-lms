@@ -148,7 +148,7 @@ export default async function ApprenticeCourseDetailPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-slate-900 text-white">
+      <div className="bg-white text-white">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <Link
             href="/apprentice"
@@ -158,17 +158,17 @@ export default async function ApprenticeCourseDetailPage({
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-black mb-2">{courseData.name}</h1>
-          <p className="text-slate-300">{courseData.description}</p>
+          <p className="text-slate-600">{courseData.description}</p>
 
           {/* Progress Bar */}
-          <div className="mt-6 bg-slate-800 rounded-lg p-4">
+          <div className="mt-6 bg-white rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-400">Course Progress</span>
+              <span className="text-sm text-slate-500">Course Progress</span>
               <span className="text-sm font-bold">{progressPercent}% Complete</span>
             </div>
-            <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-white rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-green-500 transition-all"
+                className="h-full bg-white transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -182,7 +182,7 @@ export default async function ApprenticeCourseDetailPage({
                 {Math.round(totalMinutes / 60)}h {totalMinutes % 60}m total
               </span>
               <span className="flex items-center gap-1">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 {completedCount} completed
               </span>
             </div>
@@ -225,7 +225,7 @@ export default async function ApprenticeCourseDetailPage({
                       }`}
                     >
                       {module.completed ? (
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                       ) : (
                         <span className="font-bold">{module.order_index}</span>
                       )}
@@ -247,7 +247,7 @@ export default async function ApprenticeCourseDetailPage({
                     <div>
                       {module.completed ? (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-medium">
-                          <span className="text-slate-400 flex-shrink-0">•</span>
+                          <span className="text-slate-500 flex-shrink-0">•</span>
                           Complete
                         </span>
                       ) : isCurrent ? (
@@ -259,7 +259,7 @@ export default async function ApprenticeCourseDetailPage({
                           Start
                         </Link>
                       ) : (
-                        <span className="text-slate-400 text-sm">Locked</span>
+                        <span className="text-slate-500 text-sm">Locked</span>
                       )}
                     </div>
                   </div>

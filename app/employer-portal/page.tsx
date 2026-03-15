@@ -138,7 +138,7 @@ export default async function EmployerPortalDashboard() {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-400 text-sm mb-3">No applications yet.</p>
+            <p className="text-slate-500 text-sm mb-3">No applications yet.</p>
             <Link href="/employer-portal/jobs/new" className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
               Post your first job <ArrowRight className="w-4 h-4" />
             </Link>

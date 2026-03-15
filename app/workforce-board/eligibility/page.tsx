@@ -56,10 +56,10 @@ export default function EligibilityPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/workforce-board-page-1.jpg" alt="WIOA eligibility information" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Eligibility</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Find out if you qualify for funded career training through the Workforce Innovation and Opportunity Act.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">WIOA Eligibility</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Find out if you qualify for funded career training through the Workforce Innovation and Opportunity Act.</p>
           </div>
         </div>
       </section>
@@ -73,7 +73,7 @@ export default function EligibilityPage() {
             <ul className="space-y-4">
               {ELIGIBLE.map((item) => (
                 <li key={item} className="flex items-start gap-3">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-gray-700">{item}</span>
                 </li>
               ))}
@@ -90,7 +90,7 @@ export default function EligibilityPage() {
           <div className="grid sm:grid-cols-2 gap-3">
             {PRIORITY_POPULATIONS.map((item) => (
               <div key={item} className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-3">
-                <div className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
+                <div className="w-2 h-2 bg-white rounded-full flex-shrink-0" />
                 <span className="text-gray-700 text-sm">{item}</span>
               </div>
             ))}
@@ -119,9 +119,9 @@ export default function EligibilityPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <HelpCircle className="w-10 h-10 mx-auto mb-4 text-white/80" />
+          <HelpCircle className="w-10 h-10 mx-auto mb-4 text-slate-600" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Not Sure If You Qualify?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">
             Attend a free orientation session or contact us. Our enrollment advisors will help determine your eligibility.

@@ -79,10 +79,10 @@ export default async function CalendarPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/calendar-hero.jpg" alt="Calendar and Schedule" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">My Calendar</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Your personal schedule and important dates</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">My Calendar</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Your personal schedule and important dates</p>
           </div>
         </div>
       </section>

@@ -55,7 +55,7 @@ export default function WorkforceBoardsPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Solutions</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.</p>
@@ -157,7 +157,7 @@ export default function WorkforceBoardsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-800 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Modernize Your Workforce Operations</h2>
           <p className="text-brand-blue-100 text-lg mb-8">See how our platform can streamline your WIOA compliance and improve participant outcomes.</p>

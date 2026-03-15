@@ -165,7 +165,7 @@ export default function PartnerOnboardingPage() {
   const requiredDocs = getRequiredDocs();
 
   return (
-    <div className="min-h-screen bg-slate-800">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -180,12 +180,12 @@ export default function PartnerOnboardingPage() {
 
       <div className="max-w-3xl mx-auto py-12 px-4">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-brand-blue-600/20 text-brand-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-white/20 text-brand-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Building2 className="w-4 h-4" />
             Partner Shop Onboarding
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Become a Partner Shop</h1>
-          <p className="text-slate-400">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Become a Partner Shop</h1>
+          <p className="text-slate-500">
             Complete onboarding and upload required documents to get started.
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function PartnerOnboardingPage() {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                 s < step ? 'bg-brand-green-500 text-white' : s === step ? 'bg-brand-blue-600 text-white' : 'bg-slate-700 text-slate-400'
               }`}>
-                {s < step ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
+                {s < step ? <span className="text-slate-500 flex-shrink-0">•</span> : s}
               </div>
               {s < 5 && <div className={`w-8 h-1 ${s < step ? 'bg-brand-green-500' : 'bg-slate-700'}`} />}
             </div>
@@ -429,7 +429,7 @@ export default function PartnerOnboardingPage() {
             ) : (
               <button onClick={handleSubmit} disabled={isSubmitting || !formData.agreedToTerms}
                 className="flex items-center gap-2 px-8 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 disabled:opacity-50">
-                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <span className="text-slate-400 flex-shrink-0">•</span></>}
+                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <span className="text-slate-500 flex-shrink-0">•</span></>}
               </button>
             )}
           </div>

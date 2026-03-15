@@ -144,7 +144,7 @@ export default function VoiceoverWithMusic({
       >
         <div className="relative">
           {/* Pulse ring - more visible */}
-          <div className="absolute -inset-2 rounded-full bg-brand-orange-500 animate-ping opacity-30" />
+          <div className="absolute -inset-2 rounded-full bg-white animate-ping opacity-30" />
           <div className="absolute -inset-1 rounded-full bg-brand-orange-400 animate-pulse opacity-40" />
           
           {/* Button - orange for visibility */}

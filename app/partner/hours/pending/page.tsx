@@ -201,7 +201,7 @@ export default function PartnerHoursPendingPage() {
               disabled={processing === 'bulk'}
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
             >
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               {processing === 'bulk' ? 'Processing...' : 'Approve All'}
             </button>
           )}
@@ -216,14 +216,14 @@ export default function PartnerHoursPendingPage() {
 
         {success && (
           <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <p className="text-brand-green-800">{success}</p>
           </div>
         )}
 
         {pendingHours.length === 0 ? (
           <div className="bg-white rounded-xl border p-12 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">All caught up!</h2>
             <p className="text-gray-600 mb-6">No pending hours to review.</p>
             <Link
@@ -304,7 +304,7 @@ export default function PartnerHoursPendingPage() {
                       disabled={processing === hour.id}
                       className="inline-flex items-center gap-1 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
                     >
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       {processing === hour.id ? 'Processing...' : 'Approve'}
                     </button>
                   </div>

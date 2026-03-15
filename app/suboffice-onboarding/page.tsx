@@ -41,7 +41,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* How You Get Paid - CRITICAL */}
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <DollarSign className="w-16 h-16 mx-auto mb-4" />
@@ -87,7 +87,7 @@ export default function SubofficeOnboardingPage() {
             </div>
           </div>
 
-          <div className="bg-yellow-500/20 border-2 border-yellow-300 rounded-lg p-6 mb-8">
+          <div className="bg-white/20 border-2 border-yellow-300 rounded-lg p-6 mb-8">
             <h4 className="text-xl font-bold mb-4 flex items-center">
               <AlertCircle className="w-6 h-6 mr-2" />
               IMPORTANT: IRS Payment Release Process
@@ -118,7 +118,7 @@ export default function SubofficeOnboardingPage() {
                 <span>Payment released to main office</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-brand-orange-500 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold mr-3">
                   5
                 </div>
                 <span>
@@ -128,7 +128,7 @@ export default function SubofficeOnboardingPage() {
             </div>
           </div>
 
-          <div className="bg-brand-red-500/20 border-2 border-brand-red-300 rounded-lg p-6">
+          <div className="bg-white/20 border-2 border-brand-red-300 rounded-lg p-6">
             <p className="text-lg">
               <strong>
                 If IRS delays or offsets a refund, your payout for that client
@@ -336,7 +336,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?

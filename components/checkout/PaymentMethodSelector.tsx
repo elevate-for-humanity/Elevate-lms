@@ -94,7 +94,7 @@ export default function PaymentMethodSelector({
                 : 'Maximum $2,500 limit'}
             </p>
           </div>
-          <div className="w-16 h-8 bg-purple-600 rounded flex items-center justify-center">
+          <div className="w-16 h-8 bg-white rounded flex items-center justify-center">
             <span className="text-white text-xs font-bold">Sezzle</span>
           </div>
         </div>

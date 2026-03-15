@@ -165,7 +165,7 @@ export default async function AnalyticsPage() {
                           <span className="font-semibold text-gray-900">{count} ({pct}%)</span>
                         </div>
                         <div className="h-3 bg-white rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-white rounded-full" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     );

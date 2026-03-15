@@ -38,10 +38,10 @@ export default function OrientationSchedulePage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/orientation-page-2.jpg" alt="Students attending orientation session" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Orientation Schedule</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Attend an orientation session before enrolling in any training program.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Orientation Schedule</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Attend an orientation session before enrolling in any training program.</p>
           </div>
         </div>
       </section>
@@ -89,7 +89,7 @@ export default function OrientationSchedulePage() {
               <ul className="space-y-4">
                 {WHAT_TO_EXPECT.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -123,7 +123,7 @@ export default function OrientationSchedulePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Attend Orientation?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

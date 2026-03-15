@@ -109,7 +109,7 @@ export default function IndianaOutcomesPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-slate-900 text-white py-16">
+      <div className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="w-6 h-6 text-brand-blue-400" />
@@ -118,7 +118,7 @@ export default function IndianaOutcomesPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Indiana Workforce Outcomes — 2026 Program Targets
           </h1>
-          <p className="text-slate-300 text-lg max-w-2xl">
+          <p className="text-slate-600 text-lg max-w-2xl">
             Grant-funded workforce training targets for 2026 cohorts in the Indianapolis region.
             Programs funded through WIOA, Workforce Ready Grant, and employer-sponsored workforce grants.
             Outcome data will be updated as cohorts complete.
@@ -188,7 +188,7 @@ export default function IndianaOutcomesPage() {
                 </div>
                 <div className="w-full bg-white rounded-full h-3">
                   <div 
-                    className="bg-brand-blue-600 h-3 rounded-full transition-all"
+                    className="bg-white h-3 rounded-full transition-all"
                     style={{ width: `${source.percentage}%` }}
                   />
                 </div>
@@ -202,19 +202,19 @@ export default function IndianaOutcomesPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Outcome Tracking Methodology</h2>
           <ul className="space-y-2 text-slate-700 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Completion rates measured at program end date, including extensions</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Employment tracked via employer verification and UI wage records at 6-month intervals</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Wage data reflects annualized earnings from primary employment</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Credential attainment includes state licenses, industry certifications, and apprenticeship completions</span>
             </li>
           </ul>

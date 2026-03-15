@@ -85,14 +85,14 @@ export default function EqualOpportunityPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-brand-blue-900 border-b border-brand-blue-800">
+      <div className="bg-white border-b border-brand-blue-800">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Equal Opportunity' }]} />
         </div>
       </div>
 
       {/* Hero */}
-      <section className="bg-brand-blue-800 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Scale className="w-8 h-8 text-brand-blue-300" />
@@ -200,7 +200,7 @@ export default function EqualOpportunityPage() {
               'Political Affiliation',
             ].map((item) => (
               <div key={item} className="flex items-center gap-2 text-gray-700">
-                <div className="w-2 h-2 bg-brand-blue-500 rounded-full" />
+                <div className="w-2 h-2 bg-white rounded-full" />
                 {item}
               </div>
             ))}
@@ -264,9 +264,9 @@ export default function EqualOpportunityPage() {
       </div>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Need Assistance or Have Questions?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Need Assistance or Have Questions?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
             Contact us for accommodations, to file a complaint, or for more information about our equal opportunity policies.
           </p>

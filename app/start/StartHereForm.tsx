@@ -156,7 +156,7 @@ export default function StartHereForm() {
           )}
         </button>
 
-        <p className="text-xs text-slate-400 text-center">
+        <p className="text-xs text-slate-500 text-center">
           Most students qualify for free training. We'll confirm your eligibility on the call.
         </p>
       </form>

@@ -33,7 +33,7 @@ export default async function EmployerApplicationSuccess() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green-100 text-brand-green-700 mb-4">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
         </div>
         <h1 className="text-3xl font-bold text-black mb-3">
           Application Submitted!

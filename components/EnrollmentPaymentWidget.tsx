@@ -50,16 +50,16 @@ export function EnrollmentPaymentWidget({
 
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <p className="text-sm font-semibold text-white">
+      <p className="text-sm font-semibold text-slate-900">
         Ready to Enroll in {programName}?
       </p>
-      <p className="mt-2 text-[11px] text-slate-300">
+      <p className="mt-2 text-[11px] text-slate-600">
         Choose your payment option below. You&apos;ll be redirected to Stripe
         for secure checkout.
       </p>
 
       {error && (
-        <div className="mt-3 rounded-md bg-brand-red-900/20 border border-brand-red-800 p-3">
+        <div className="mt-3 rounded-md bg-white/20 border border-brand-red-800 p-3">
           <p className="text-[11px] text-brand-red-300">{error}</p>
         </div>
       )}
@@ -81,7 +81,7 @@ export function EnrollmentPaymentWidget({
         </button>
       </div>
 
-      <p className="mt-3 text-[10px] text-slate-400">
+      <p className="mt-3 text-[10px] text-slate-500">
         NOTE: This widget requires Stripe to be configured with real product and
         price IDs in <span className="font-mono">lms-data/billingConfig.ts</span>.
         Until then, checkout will fail gracefully.

@@ -400,7 +400,7 @@ export default function TimeclockPage() {
             </div>
             <div className="w-full bg-brand-blue-200 rounded-full h-2">
               <div 
-                className="bg-brand-blue-600 h-2 rounded-full transition-all"
+                className="bg-white h-2 rounded-full transition-all"
                 style={{ width: `${Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100)}%` }}
               />
             </div>
@@ -475,7 +475,7 @@ export default function TimeclockPage() {
             }`}>
               <div className="flex items-center">
                 {geofence.withinGeofence ? (
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 ) : (
                   <AlertTriangle className="w-5 h-5 mr-2 text-brand-red-600" />
                 )}
@@ -585,7 +585,7 @@ export default function TimeclockPage() {
           {shift.clockOutAt && (
             <div className="mt-6 p-4 bg-brand-green-50 rounded-lg">
               <div className="flex items-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-sm font-medium text-brand-green-700">
                   Shift complete! Clocked out at {new Date(shift.clockOutAt).toLocaleTimeString()}
                 </span>

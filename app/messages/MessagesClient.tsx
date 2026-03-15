@@ -169,7 +169,7 @@ export default function MessagesClient({ userId, initialConversations, participa
                         <p className="font-medium text-gray-900 truncate">{other.full_name}</p>
                         <p className="text-sm text-gray-500 truncate">{conv.last_message_preview || 'No messages'}</p>
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-slate-500">
                         {conv.last_message_at ? formatTime(conv.last_message_at) : ''}
                       </span>
                     </button>

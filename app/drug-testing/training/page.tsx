@@ -185,7 +185,7 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-brand-blue-600 text-white">
+      <section className="py-12 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Need Help Choosing a Course?</h2>
           <p className="text-brand-blue-100 mb-6">Our team can help you determine which training is right for your needs.</p>

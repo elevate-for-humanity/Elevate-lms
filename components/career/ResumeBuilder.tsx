@@ -132,7 +132,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <FileText className="w-6 h-6 text-brand-orange-400" />
           Resume Builder
         </h2>
@@ -149,8 +149,8 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       </div>
 
       {/* Personal Information */}
-      <div className="bg-slate-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Personal Information</h3>
+      <div className="bg-white rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             type="text"
@@ -204,8 +204,8 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       </div>
 
       {/* Professional Summary */}
-      <div className="bg-slate-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Professional Summary</h3>
+      <div className="bg-white rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Professional Summary</h3>
         <textarea
           placeholder="Write a brief summary of your professional background and career goals..."
           value={resumeData.summary}
@@ -215,9 +215,9 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       </div>
 
       {/* Work Experience */}
-      <div className="bg-slate-800 rounded-lg p-6">
+      <div className="bg-white rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Work Experience</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Work Experience</h3>
           <button
             onClick={addWorkExperience}
             className="px-4 py-2 bg-brand-orange-500 text-white rounded-lg font-medium hover:bg-brand-orange-600 transition-colors flex items-center gap-2"
@@ -229,9 +229,9 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
 
         <div className="space-y-4">
           {resumeData.work_experience.map((exp, index) => (
-            <div key={index} className="bg-slate-900 rounded-lg p-4">
+            <div key={index} className="bg-white rounded-lg p-4">
               <div className="flex items-start justify-between mb-4">
-                <h4 className="text-white font-semibold">Experience {index + 1}</h4>
+                <h4 className="text-slate-900 font-semibold">Experience {index + 1}</h4>
                 <button
                   onClick={() => removeWorkExperience(index)}
                   className="text-brand-red-400 hover:text-brand-red-300"

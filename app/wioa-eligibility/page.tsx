@@ -24,7 +24,7 @@ export default function WIOAEligibilityPage() {
         <Image src="/images/pages/wioa-meeting.jpg" alt="WIOA funded career training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-2">
               Get Your Training Funded
             </h1>
             <p className="text-base sm:text-xl text-white/90 max-w-xl">
@@ -71,7 +71,7 @@ export default function WIOAEligibilityPage() {
               <div key={item.step} className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-[160px] sm:h-[180px] overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">
+                  <div className="absolute top-3 left-3 w-9 h-9 bg-white rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
                   </div>
                 </div>
@@ -214,10 +214,10 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-10 sm:py-14 bg-brand-blue-600">
+      <section className="py-10 sm:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Get Started?</h2>
-          <p className="text-white mb-6 text-sm sm:text-base">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Ready to Get Started?</h2>
+          <p className="text-slate-900 mb-6 text-sm sm:text-base">
             Register, schedule your WorkOne appointment, and start training in weeks.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

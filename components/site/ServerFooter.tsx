@@ -92,7 +92,7 @@ export default function ServerFooter() {
             <Image src="/logo.png" alt="Elevate for Humanity" width={32} height={32} className="w-8 h-8" />
             <span className="text-lg font-bold text-white">Elevate for Humanity</span>
           </div>
-          <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+          <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
             National workforce training platform connecting online technical instruction, industry credentials, and employer pathways. Programs aligned with EPA, CompTIA, PTCB, Microsoft, and OSHA certifications.
           </p>
           <div className="flex flex-wrap gap-4 mt-4 text-xs text-slate-500">
@@ -110,7 +110,7 @@ export default function ServerFooter() {
         <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
           {/* Column 1: Programs */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Programs</h3>
+            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Programs</h3>
             <ul className="space-y-3">
               {footerLinks.programs.map((link) => (
                 <li key={link.name}>
@@ -124,7 +124,7 @@ export default function ServerFooter() {
 
           {/* Column 2: Students */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Students</h3>
+            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Students</h3>
             <ul className="space-y-3">
               {footerLinks.students.map((link) => (
                 <li key={link.name}>
@@ -138,7 +138,7 @@ export default function ServerFooter() {
 
           {/* Column 3: Funding */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Funding</h3>
+            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Funding</h3>
             <ul className="space-y-3">
               {footerLinks.funding.map((link) => (
                 <li key={link.name}>
@@ -152,7 +152,7 @@ export default function ServerFooter() {
 
           {/* Column 4: Partners */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Partners</h3>
+            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Partners</h3>
             <ul className="space-y-3">
               {footerLinks.partners.map((link) => (
                 <li key={link.name}>
@@ -166,7 +166,7 @@ export default function ServerFooter() {
 
           {/* Column 5: Organization */}
           <div>
-            <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">Organization</h3>
+            <h3 className="font-semibold mb-4 text-slate-900 text-sm uppercase tracking-wide">Organization</h3>
             <ul className="space-y-3">
               {footerLinks.organization.map((link) => (
                 <li key={link.name}>
@@ -181,7 +181,7 @@ export default function ServerFooter() {
 
         {/* Footer CTA */}
         <div className="border-t border-slate-800 pt-8 pb-8 mb-8 text-center">
-          <p className="text-sm text-slate-400 mb-4">Ready to start your career? Explore funded training programs.</p>
+          <p className="text-sm text-slate-500 mb-4">Ready to start your career? Explore funded training programs.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors">
               Apply for Training
@@ -211,7 +211,7 @@ export default function ServerFooter() {
                 height={28}
                 className="w-7 h-7"
               />
-              <p className="text-slate-400 text-sm">
+              <p className="text-slate-500 text-sm">
                 © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute.
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function ServerFooter() {
                 { abbr: 'EPA 608', label: 'Certification Prep' },
                 { abbr: 'OSHA', label: 'Safety Training' },
               ].map((b) => (
-                <span key={b.abbr} className="inline-flex items-center text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                <span key={b.abbr} className="inline-flex items-center text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-600 border border-slate-700">
                   {b.abbr}
                 </span>
               ))}

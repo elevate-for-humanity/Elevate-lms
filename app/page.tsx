@@ -155,7 +155,7 @@ export default function HomePage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-xs font-bold text-brand-green-700">{p.salary}</p>
-                    <p className="text-[10px] text-slate-400">starting</p>
+                    <p className="text-[10px] text-slate-500">starting</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors flex-shrink-0" />
                 </Link>
@@ -215,11 +215,11 @@ export default function HomePage() {
       </section>
 
       {/* ── FUNDING ── */}
-      <section className="py-16 sm:py-20 bg-brand-red-600">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Most participants pay $0 for training</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Most participants pay $0 for training</h2>
             <p className="text-brand-red-100 leading-relaxed mb-10 max-w-2xl">
               Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants.
             </p>
@@ -233,7 +233,7 @@ export default function HomePage() {
               <StaggerItem key={f.label}>
                 <div className="bg-white/10 rounded-xl p-6 mb-4 last:mb-0">
                   <p className="text-brand-red-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
-                  <h3 className="text-white font-bold text-base mb-2">{f.label}</h3>
+                  <h3 className="text-slate-900 font-bold text-base mb-2">{f.label}</h3>
                   <p className="text-brand-red-100 text-sm leading-relaxed">{f.desc}</p>
                 </div>
               </StaggerItem>
@@ -317,7 +317,7 @@ export default function HomePage() {
                     <p className="text-slate-700 leading-relaxed mb-3">&ldquo;{t.quote}&rdquo;</p>
                     <div className="flex items-center gap-3 flex-wrap">
                       <p className="font-bold text-slate-900 text-sm">{t.name}</p>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-slate-600">·</span>
                       <p className="text-slate-500 text-sm">{t.program}</p>
                       <span className="text-brand-green-700 font-bold text-xs bg-brand-green-50 px-2 py-0.5 rounded-full">{t.salary}</span>
                     </div>

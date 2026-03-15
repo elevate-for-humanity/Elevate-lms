@@ -63,8 +63,8 @@ export default async function ClassroomPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {enrollments.map((enrollment: any) => (
                 <div key={enrollment.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
-                  <div className="h-40 bg-brand-blue-500 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-white/50" />
+                  <div className="h-40 bg-white flex items-center justify-center">
+                    <BookOpen className="w-16 h-16 text-slate-400" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-slate-900 mb-2">
@@ -82,7 +82,7 @@ export default async function ClassroomPage() {
                       </div>
                       <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-brand-green-500 rounded-full"
+                          className="h-full bg-white rounded-full"
                           style={{ width: `${enrollment.progress || 0}%` }}
                         />
                       </div>
@@ -122,8 +122,8 @@ export default async function ClassroomPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableCourses.slice(0, 3).map((course: any) => (
                 <div key={course.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
-                  <div className="h-32 bg-brand-green-500 flex items-center justify-center">
-                    <Award className="w-12 h-12 text-white/50" />
+                  <div className="h-32 bg-white flex items-center justify-center">
+                    <Award className="w-12 h-12 text-slate-400" />
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-slate-900 mb-2">{course.title}</h3>

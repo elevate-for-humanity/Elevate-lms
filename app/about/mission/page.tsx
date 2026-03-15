@@ -29,7 +29,7 @@ export default function MissionPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/mission-hero.jpg" alt="Elevate for Humanity mission — community empowerment through workforce training" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Mission</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Breaking the cycle of poverty through free workforce training and career placement</p>
@@ -159,7 +159,7 @@ export default function MissionPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-brand-orange-600 text-white">
+      <section className="py-16 md:py-24 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Join Our Mission

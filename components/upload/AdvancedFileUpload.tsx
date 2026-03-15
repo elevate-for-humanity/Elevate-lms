@@ -317,7 +317,7 @@ export function AdvancedFileUpload({
                     <div className="mt-2">
                       <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-brand-blue-500 transition-all duration-300"
+                          className="h-full bg-white transition-all duration-300"
                           style={{ width: `${uploadFile.progress}%` }}
                         />
                       </div>
@@ -341,7 +341,7 @@ export function AdvancedFileUpload({
                     <Loader2 className="h-5 w-5 text-brand-blue-500 animate-spin" />
                   )}
                   {uploadFile.status === 'success' && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   )}
                   {uploadFile.status === 'error' && (
                     <button

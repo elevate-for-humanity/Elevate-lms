@@ -10,7 +10,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
   if (!items.length) return null;
 
   return (
-    <section className="border-b border-slate-800 bg-slate-800">
+    <section className="border-b border-slate-800 bg-white">
       <div className="mx-auto max-w-6xl px-3 py-5 text-white md:px-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
@@ -20,7 +20,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
             <h2 className="text-base font-bold md:text-lg">
               Where Elevate Helps You Grow
             </h2>
-            <p className="mt-1 text-[11px] text-slate-300 md:text-xs">
+            <p className="mt-1 text-[11px] text-slate-600 md:text-xs">
               Beauty, healthcare, trades, business, tax/VITA and more, aligned
               with credential partners and real employers.
             </p>
@@ -50,7 +50,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
               </div>
               <div className="flex flex-1 flex-col px-3 py-2 text-[11px]">
                 <p className="font-semibold text-slate-100">{item.label}</p>
-                <p className="mt-1 line-clamp-3 text-slate-300">
+                <p className="mt-1 line-clamp-3 text-slate-600">
                   {item.description}
                 </p>
                 <div className="mt-auto pt-2">

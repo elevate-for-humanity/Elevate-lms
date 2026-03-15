@@ -95,7 +95,7 @@ export function PointsDisplay({
           <span className="text-brand-orange-100">Progress to Level {level + 1}</span>
           <span className="font-semibold">{pointsToNextLevel} points to go</span>
         </div>
-        <div className="w-full bg-brand-orange-700 rounded-full h-3">
+        <div className="w-full bg-white rounded-full h-3">
           <div
             className="bg-white rounded-full h-3 transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}

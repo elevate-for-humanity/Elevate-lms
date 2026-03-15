@@ -193,11 +193,11 @@ export default async function PartnerPortalPage() {
           <div className="space-y-3">
             {recentActivity.map((item: any) => (
               <div key={item.id} className="flex items-start gap-3 py-2 border-b last:border-0">
-                <div className="w-2 h-2 bg-brand-blue-500 rounded-full mt-2 flex-shrink-0" />
+                <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium capitalize">{item.action.replace(/_/g, ' ')}</p>
                   <p className="text-gray-500 text-xs">{item.entity_type}</p>
-                  <p className="text-gray-400 text-xs mt-1">
+                  <p className="text-slate-500 text-xs mt-1">
                     {new Date(item.created_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -206,7 +206,7 @@ export default async function PartnerPortalPage() {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-400 text-sm mb-3">No activity yet.</p>
+            <p className="text-slate-500 text-sm mb-3">No activity yet.</p>
             <Link href="/partner/onboarding" className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
               Start onboarding <ArrowRight className="w-4 h-4" />
             </Link>

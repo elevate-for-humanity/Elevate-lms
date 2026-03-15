@@ -36,7 +36,7 @@ export default function CertificationsPage() {
       </section>
 
       {/* Key Stats */}
-      <section className="py-10 bg-slate-900">
+      <section className="py-10 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
@@ -95,7 +95,7 @@ export default function CertificationsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-brand-red-600">
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Certified?</h2>
           <p className="text-xl text-white/90 mb-10">Apply in minutes. Most students start training within 2-4 weeks.</p>

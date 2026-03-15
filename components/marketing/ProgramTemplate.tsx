@@ -54,7 +54,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <span className="inline-flex items-center rounded-full bg-brand-orange-500 px-3 py-2 text-xs font-bold text-white animate-pulse">
                 🔥 NOW ENROLLING
               </span>
-              <p className="text-white font-semibold text-sm sm:text-base">
+              <p className="text-slate-900 font-semibold text-sm sm:text-base">
                 Free Career Training - 100% Government Funded • Start in 2 Weeks
               </p>
             </div>
@@ -82,12 +82,12 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-white mb-6">
                 <Award size={16} />
                 <span>No-Cost Training for Eligible Students</span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-light text-white mb-6 leading-tight">
+              <h1 className="text-5xl md:text-6xl font-light text-slate-900 mb-6 leading-tight">
                 {program.name}
               </h1>
 
@@ -179,7 +179,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 className="flex items-start gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-red-100 flex items-center justify-center">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -259,7 +259,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-brand-blue-600 h-3 rounded-full"
+                      className="bg-white h-3 rounded-full"
                       style={{
                         width: `${program.outcomes.certificationPass}%`,
                       }}
@@ -275,7 +275,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-purple-600 h-3 rounded-full"
+                      className="bg-white h-3 rounded-full"
                       style={{ width: `${program.outcomes.satisfaction}%` }}
                     />
                   </div>
@@ -321,7 +321,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.schedule.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -339,7 +339,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.requirements.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -359,7 +359,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.support.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

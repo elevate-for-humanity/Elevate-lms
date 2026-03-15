@@ -86,7 +86,7 @@ function CourseCard({ course }: { course: Course }) {
           </div>
           <div className="mt-1 h-1.5 rounded-full bg-slate-100">
             <div
-              className="h-1.5 rounded-full bg-brand-blue-500 transition-all"
+              className="h-1.5 rounded-full bg-white transition-all"
               style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
             />
           </div>

@@ -21,7 +21,7 @@ export default function ContractsPage() {
   return (
     <div className="bg-white">
       {/* Hero */}
-      <section className="bg-zinc-900    text-white py-20 md:py-32">
+      <section className="bg-white    text-white py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold mb-6">
@@ -34,7 +34,7 @@ export default function ContractsPage() {
               Grant-safe, audit-ready templates for workforce partnerships,
               employer agreements, and platform licensing.
             </p>
-            <div className="bg-brand-green-500/20 backdrop-blur-sm border border-brand-green-400/30 rounded-xl p-4">
+            <div className="bg-white/20 backdrop-blur-sm border border-brand-green-400/30 rounded-xl p-4">
               <p className="text-sm text-brand-green-400 font-bold">
                 • WIOA/WRG-Safe | • Audit-Ready | • DWD-Aligned Language
               </p>
@@ -304,7 +304,7 @@ export default function ContractsPage() {
             </p>
           </div>
 
-          <div className="bg-zinc-900   rounded-3xl p-8 md:p-12 border-2 border-brand-green-200">
+          <div className="bg-white   rounded-3xl p-8 md:p-12 border-2 border-brand-green-200">
             <div className="bg-white rounded-2xl p-6 md:p-8 border border-brand-green-200">
               <p className="text-lg text-black leading-relaxed italic">
                 "All fees charged under this agreement are for software access,
@@ -314,7 +314,7 @@ export default function ContractsPage() {
               </p>
             </div>
             <div className="mt-6 flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <p className="text-sm text-black">
                 This language protects your WIOA/WRG position and is exactly
                 what auditors expect to see.
@@ -382,7 +382,7 @@ export default function ContractsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-zinc-900   text-white">
+      <section className="py-20 bg-white   text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">Need Custom Contracts?</h2>
           <p className="text-xl mb-10 text-white/90">

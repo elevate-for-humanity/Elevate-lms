@@ -69,7 +69,7 @@ export default function VerifyEmailPage() {
 
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-brand-blue-900 mb-2 flex items-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             Next Steps:
           </h2>
           <ol className="text-sm text-brand-blue-800 space-y-2 ml-7">
@@ -82,7 +82,7 @@ export default function VerifyEmailPage() {
         {resent && (
           <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-4">
             <p className="text-brand-green-800 text-sm flex items-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               Verification email sent! Check your inbox.
             </p>
           </div>

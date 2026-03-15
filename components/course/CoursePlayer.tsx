@@ -71,7 +71,7 @@ export function CoursePlayer() {
         <div className="bg-black rounded-lg overflow-hidden aspect-video relative">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-white text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-orange-600 flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-brand-orange-700 transition-colors">
+              <div className="w-20 h-20 rounded-full bg-brand-orange-600 flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-white transition-colors">
                 {isPlaying ? (
                   <Pause
                     className="h-10 w-10"
@@ -100,8 +100,8 @@ export function CoursePlayer() {
                   <Play className="h-5 w-5" />
                 )}
               </button>
-              <div className="flex-1 h-1 bg-gray-600 rounded-full">
-                <div className="h-full w-1/3 bg-brand-orange-600 rounded-full" />
+              <div className="flex-1 h-1 bg-white rounded-full">
+                <div className="h-full w-1/3 bg-white rounded-full" />
               </div>
               <span className="text-white text-sm">
                 8:30 / {currentLesson.duration}

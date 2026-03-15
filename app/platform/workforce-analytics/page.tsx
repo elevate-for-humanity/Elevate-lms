@@ -64,7 +64,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/technology-hero.jpg" alt="Workforce Analytics" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Analytics</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Data-driven insights for better workforce outcomes. Track participants from enrollment to employment.</p>
@@ -165,7 +165,7 @@ export default function WorkforceAnalyticsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-indigo-700 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">See Your Data in Action</h2>
           <p className="text-indigo-100 text-lg mb-8">Schedule a demo to see how our analytics platform can transform your workforce reporting.</p>

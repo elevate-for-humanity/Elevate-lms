@@ -141,7 +141,7 @@ export default function ProgramHolderSetup() {
                       : 'bg-gray-300 text-black'
                   }`}
                 >
-                  {step > s ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
+                  {step > s ? <span className="text-slate-500 flex-shrink-0">•</span> : s}
                 </div>
                 {s < 5 && (
                   <div
@@ -337,7 +337,7 @@ export default function ProgramHolderSetup() {
                 </label>
                 {formData.syllabusFile && (
                   <div className="mt-4 flex items-center justify-center gap-2 text-brand-green-600">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{formData.syllabusFile.name}</span>
                   </div>
                 )}
@@ -520,7 +520,7 @@ export default function ProgramHolderSetup() {
                   </label>
                   {formData.bankDocument && (
                     <div className="mt-3 flex items-center justify-center gap-2 text-brand-green-600">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span>{formData.bankDocument.name}</span>
                     </div>
                   )}

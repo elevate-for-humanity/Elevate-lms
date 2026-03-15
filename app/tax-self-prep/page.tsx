@@ -238,7 +238,7 @@ export default async function TaxSelfPrepPage() {
 
               {/* Premier - Most Popular */}
               <div className="bg-white border-2 border-brand-orange-600 rounded-lg p-6 shadow-xl relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-orange-600 text-white text-xs font-bold rounded-full">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-white text-xs font-bold rounded-full">
                   MOST POPULAR
                 </div>
                 <div className="text-center mb-6">
@@ -535,7 +535,7 @@ export default async function TaxSelfPrepPage() {
       </ScrollReveal>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600 px-4">
+      <section className="py-20 bg-white px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
             Ready to do your taxes?
@@ -555,7 +555,7 @@ export default async function TaxSelfPrepPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

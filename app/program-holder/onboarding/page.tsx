@@ -111,34 +111,34 @@ export default async function ProgramHolderOnboarding() {
             </p>
             <ul className="space-y-3 text-black">
               <li className="flex items-start">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>
                   <strong>Enrolling students</strong> in approved training
                   programs
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>
                   <strong>Tracking student progress</strong> through the
                   platform
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>
                   <strong>Providing support</strong> to students during their
                   training
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>
                   <strong>Reporting outcomes</strong> and completion data
                 </span>
               </li>
               <li className="flex items-start">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span>
                   <strong>Maintaining compliance</strong> with program
                   requirements
@@ -535,7 +535,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Need Help?

@@ -89,7 +89,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
       {/* Earned Badges */}
       {earnedBadges.length > 0 && (
         <div>
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <Award className="w-6 h-6 text-brand-orange-400" />
             Your Badges ({earnedBadges.length})
           </h3>
@@ -102,10 +102,10 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
                 <div className="w-16 h-16 mx-auto mb-3 bg-white/20 rounded-full flex items-center justify-center">
                   <Award className="w-8 h-8 text-white" />
                 </div>
-                <h4 className="font-semibold text-white mb-1">{badge.name}</h4>
-                <p className="text-xs text-white/80 mb-2">{badge.description}</p>
+                <h4 className="font-semibold text-slate-900 mb-1">{badge.name}</h4>
+                <p className="text-xs text-slate-600 mb-2">{badge.description}</p>
                 {badge.earned_at && (
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-slate-500">
                     Earned {new Date(badge.earned_at).toLocaleDateString()}
                   </p>
                 )}
@@ -118,7 +118,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
       {/* Locked Badges */}
       {lockedBadges.length > 0 && (
         <div>
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <Lock className="w-6 h-6 text-slate-400" />
             Locked Badges ({lockedBadges.length})
           </h3>
@@ -126,16 +126,16 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
             {lockedBadges.map((badge) => (
               <div
                 key={badge.id}
-                className="bg-slate-800 rounded-lg p-4 text-center opacity-60 hover:opacity-100 transition-opacity"
+                className="bg-white rounded-lg p-4 text-center opacity-60 hover:opacity-100 transition-opacity"
               >
-                <div className="w-16 h-16 mx-auto mb-3 bg-slate-700 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-white rounded-full flex items-center justify-center">
                   <Lock className="w-8 h-8 text-slate-500" />
                 </div>
-                <h4 className="font-semibold text-white mb-1">{badge.name}</h4>
-                <p className="text-xs text-slate-400 mb-2">{badge.description}</p>
+                <h4 className="font-semibold text-slate-900 mb-1">{badge.name}</h4>
+                <p className="text-xs text-slate-500 mb-2">{badge.description}</p>
                 {badge.progress !== undefined && badge.progress_max && (
                   <div className="mt-2">
-                    <div className="w-full bg-slate-700 rounded-full h-2">
+                    <div className="w-full bg-white rounded-full h-2">
                       <div
                         className="bg-brand-orange-500 rounded-full h-2 transition-all"
                         style={{
@@ -143,7 +143,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
                         }}
                       />
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {badge.progress} / {badge.progress_max}
                     </p>
                   </div>

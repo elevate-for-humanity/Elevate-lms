@@ -129,7 +129,7 @@ export default function AgreementSigningForm({
   if (pendingAgreements.length === 0) {
     return (
       <div className="text-center py-8">
-        <span className="text-slate-400 flex-shrink-0">•</span>
+        <span className="text-slate-500 flex-shrink-0">•</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">All Agreements Signed</h3>
         <p className="text-gray-600">You have already accepted all required agreements.</p>
       </div>
@@ -168,7 +168,7 @@ export default function AgreementSigningForm({
                 >
                   <div className="flex items-center gap-3">
                     {isReviewed ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <Circle className="w-5 h-5 text-gray-400" />
                     )}

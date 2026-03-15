@@ -142,19 +142,19 @@ export function CalendarIntegration() {
               <h3 className="font-bold mb-4">Event Types</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-brand-blue-500 rounded" />
+                  <div className="w-3 h-3 bg-white rounded" />
                   <span>Classes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-brand-green-500 rounded" />
+                  <div className="w-3 h-3 bg-white rounded" />
                   <span>Meetings</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-brand-orange-500 rounded" />
+                  <div className="w-3 h-3 bg-white rounded" />
                   <span>Deadlines</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded" />
+                  <div className="w-3 h-3 bg-white rounded" />
                   <span>Events</span>
                 </div>
               </div>

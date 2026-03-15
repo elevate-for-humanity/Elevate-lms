@@ -41,13 +41,13 @@ export default function EnterpriseReviewPage() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">Request Submitted</h1>
-          <p className="text-gray-400 mb-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Request Submitted</h1>
+          <p className="text-slate-500 mb-8">
             Your enterprise review request has been received. Our team will evaluate your request 
             and contact you within 5 business days. Source-use licenses require approval and a 
             signed agreement before any access is granted.
@@ -61,7 +61,7 @@ export default function EnterpriseReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-16 px-4">
+    <div className="min-h-screen bg-white py-16 px-4">
       <Breadcrumbs
         items={[
           { label: 'Licenses', href: '/licenses' },
@@ -69,10 +69,10 @@ export default function EnterpriseReviewPage() {
         ]}
       />
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-4">
+        <h1 className="text-3xl font-bold text-slate-900 mb-4">
           Request Enterprise Review
         </h1>
-        <p className="text-gray-400 mb-4">
+        <p className="text-slate-500 mb-4">
           Enterprise Source-Use License — Starting at $75,000
         </p>
         <p className="text-gray-500 mb-8 text-sm">
@@ -213,7 +213,7 @@ export default function EnterpriseReviewPage() {
             />
           </div>
 
-          <div className="bg-gray-700 rounded-lg p-4 text-sm text-gray-300">
+          <div className="bg-white rounded-lg p-4 text-sm text-gray-300">
             <p className="font-semibold mb-2">By submitting this request, you acknowledge:</p>
             <ul className="space-y-1 text-gray-400">
               <li>• Source-use licenses do not grant ownership</li>

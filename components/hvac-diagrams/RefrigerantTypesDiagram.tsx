@@ -111,10 +111,10 @@ export default function RefrigerantTypesDiagram({ onComplete }: { onComplete?: (
   return (
     <div className="space-y-5">
 
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Core — Refrigerant Families</p>
         <h2 className="text-xl font-extrabold">CFC · HCFC · HFC · HFO</h2>
-        <p className="text-slate-400 text-sm mt-1">Tap each family to see ODP, GWP, phase-out status, and common refrigerants.</p>
+        <p className="text-slate-500 text-sm mt-1">Tap each family to see ODP, GWP, phase-out status, and common refrigerants.</p>
       </div>
 
       {/* ODP / GWP quick reference */}
@@ -170,8 +170,8 @@ export default function RefrigerantTypesDiagram({ onComplete }: { onComplete?: (
       {activeFamily && (
         <div className={`rounded-2xl border-2 ${activeFamily.border} overflow-hidden`}>
           <div className={`${activeFamily.headerBg} px-5 py-3`}>
-            <h3 className="text-white font-extrabold text-lg">{activeFamily.name} — {activeFamily.full}</h3>
-            <p className="text-white/80 text-xs mt-0.5">{activeFamily.atoms}</p>
+            <h3 className="text-slate-900 font-extrabold text-lg">{activeFamily.name} — {activeFamily.full}</h3>
+            <p className="text-slate-600 text-xs mt-0.5">{activeFamily.atoms}</p>
           </div>
           <div className={`${activeFamily.bg} p-5 space-y-4`}>
 

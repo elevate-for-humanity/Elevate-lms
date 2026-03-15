@@ -39,8 +39,8 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <span className="text-brand-green-300 font-medium text-sm uppercase tracking-wider">Community Services</span>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 mt-2">{state.communityServices.headline}</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">{state.communityServices.description}</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 mt-2">{state.communityServices.headline}</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">{state.communityServices.description}</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/contact" className="px-8 py-4 bg-white text-brand-green-700 font-bold rounded-lg hover:bg-brand-green-50 transition">Get Help Now</Link>
               <Link href={`/career-training-${state.slug}`} className="px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-500 transition">Career Training</Link>
@@ -79,7 +79,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
           <div className="flex flex-wrap gap-3 justify-center">
             {state.majorCities.map((city) => (
               <span key={city} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-gray-700 text-sm font-medium shadow-sm">
-                <span className="text-slate-400 flex-shrink-0">•</span> {city}
+                <span className="text-slate-500 flex-shrink-0">•</span> {city}
               </span>
             ))}
           </div>
@@ -89,7 +89,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
       {/* CTA */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-brand-green-600 text-white p-10 rounded-2xl text-center">
+          <div className="bg-white text-white p-10 rounded-2xl text-center">
             <Phone className="w-12 h-12 mx-auto mb-4 text-brand-green-200" />
             <h2 className="text-3xl font-bold mb-4">Need Support? We&apos;re Here to Help</h2>
             <p className="text-brand-green-100 text-lg mb-8 max-w-xl mx-auto">

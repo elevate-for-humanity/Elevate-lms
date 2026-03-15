@@ -106,41 +106,41 @@ export default function ShopLogHoursPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-slate-800 px-4 pt-12 pb-4 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/shop-owner" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
-          <h1 className="text-white font-bold text-xl">Log Apprentice Hours</h1>
+          <h1 className="text-slate-900 font-bold text-xl">Log Apprentice Hours</h1>
         </div>
       </header>
 
       <main className="px-4 py-6">
         {success ? (
-          <div className="bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            <h2 className="text-white font-bold text-xl mb-2">Hours Logged!</h2>
+          <div className="bg-white/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
+            <span className="text-slate-500 flex-shrink-0">•</span>
+            <h2 className="text-slate-900 font-bold text-xl mb-2">Hours Logged!</h2>
             <p className="text-brand-green-200">Training hours have been recorded and submitted.</p>
           </div>
         ) : apprentices.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-6 text-center">
+          <div className="bg-white rounded-xl p-6 text-center">
             <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-            <p className="text-white font-medium mb-2">No Apprentices</p>
-            <p className="text-slate-400 text-sm">You don't have any apprentices assigned yet.</p>
+            <p className="text-slate-900 font-medium mb-2">No Apprentices</p>
+            <p className="text-slate-500 text-sm">You don't have any apprentices assigned yet.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-brand-red-500/20 border border-brand-red-500/30 rounded-xl p-4 text-brand-red-200 text-sm">
+              <div className="bg-white/20 border border-brand-red-500/30 rounded-xl p-4 text-brand-red-200 text-sm">
                 {error}
               </div>
             )}
@@ -169,7 +169,7 @@ export default function ShopLogHoursPage() {
                       {apprentice.name}
                     </span>
                     {selectedApprentice === apprentice.id && (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     )}
                   </button>
                 ))}
@@ -248,7 +248,7 @@ export default function ShopLogHoursPage() {
                 onChange={(e) => setAttestation(e.target.checked)}
                 className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-brand-blue-600 focus:ring-brand-blue-500"
               />
-              <span className="text-slate-300 text-sm">
+              <span className="text-slate-600 text-sm">
                 I attest that the hours reported above are accurate and that the apprentice was under proper supervision during all training activities.
               </span>
             </label>
@@ -266,7 +266,7 @@ export default function ShopLogHoursPage() {
                 </>
               ) : (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   Submit Hours
                 </>
               )}

@@ -167,7 +167,7 @@ export default function UnifiedPaymentFlow({
                 <DollarSign className="w-6 h-6 text-brand-blue-600" />
               </div>
               {paymentType === 'full' && (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               )}
             </div>
             <h3 className="text-lg font-bold text-black mb-2">
@@ -196,7 +196,7 @@ export default function UnifiedPaymentFlow({
                   <Calendar className="w-6 h-6 text-brand-green-600" />
                 </div>
                 {paymentType === 'plan' && (
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 )}
               </div>
               <h3 className="text-lg font-bold text-black mb-2">
@@ -256,7 +256,7 @@ export default function UnifiedPaymentFlow({
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-bold text-black">{method.name}</h3>
                     {selectedMethod === method.id && (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     )}
                   </div>
                   <p className="text-sm text-black">{method.description}</p>

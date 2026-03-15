@@ -13,7 +13,7 @@ export function CourseOutline({ course, activeLessonId, onSelectLesson }: Props)
       <p className="text-[11px] font-semibold text-slate-100">
         Course Outline
       </p>
-      <p className="mt-1 text-[10px] text-slate-400">
+      <p className="mt-1 text-[10px] text-slate-500">
         Click a lesson to play the video or open the content.
       </p>
 
@@ -24,7 +24,7 @@ export function CourseOutline({ course, activeLessonId, onSelectLesson }: Props)
               {module.title}
             </p>
             {module.summary && (
-              <p className="mt-0.5 text-[10px] text-slate-400">
+              <p className="mt-0.5 text-[10px] text-slate-500">
                 {module.summary}
               </p>
             )}
@@ -45,7 +45,7 @@ export function CourseOutline({ course, activeLessonId, onSelectLesson }: Props)
                   >
                     <span className="flex-1">{lesson.title}</span>
                     {lesson.durationMinutes && (
-                      <span className="ml-2 text-[10px] text-slate-300">
+                      <span className="ml-2 text-[10px] text-slate-600">
                         {lesson.durationMinutes} min
                       </span>
                     )}

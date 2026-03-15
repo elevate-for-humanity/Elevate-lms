@@ -144,12 +144,12 @@ export default async function CandidatesPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-brand-green-500 flex items-center justify-center text-white text-xl font-bold">
+                        <div className="w-full h-full bg-white flex items-center justify-center text-white text-xl font-bold">
                           {candidate.name.charAt(0)}
                         </div>
                       )}
                       {candidate.available && (
-                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-brand-green-500 rounded-full border-2 border-white" />
+                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full border-2 border-white" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">

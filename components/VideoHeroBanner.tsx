@@ -80,7 +80,7 @@ export default function VideoHeroBanner({
           <span className="inline-block px-4 py-2 bg-brand-blue-600/90 text-white text-sm font-semibold rounded-full mb-6 backdrop-blur-sm">
             {subtitle}
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">{title}</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">{title}</h1>
           {description && <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl">{description}</p>}
           <div className={`flex flex-wrap gap-4 ${textPosition === 'center' ? 'justify-center' : ''}`}>
             {ctaText && ctaLink && (

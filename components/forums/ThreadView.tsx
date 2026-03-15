@@ -107,21 +107,21 @@ export function ThreadView({
   return (
     <div className="space-y-6">
       {/* Original Post */}
-      <div className="bg-slate-800 rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-white mb-4">{title}</h1>
+      <div className="bg-white rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-slate-900 mb-4">{title}</h1>
         <div className="flex items-center gap-2 text-sm text-slate-400 mb-4">
           <span>{authorName}</span>
           <span>•</span>
           <span>{new Date(createdAt).toLocaleDateString()}</span>
         </div>
         <div className="prose prose-invert max-w-none">
-          <p className="text-slate-300">{content}</p>
+          <p className="text-slate-600">{content}</p>
         </div>
       </div>
 
       {/* Replies */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
           {replies.length} Replies
         </h2>
@@ -139,7 +139,7 @@ export function ThreadView({
                   <span className="font-semibold text-white">{reply.author_name}</span>
                   {reply.is_solution && (
                     <span className="flex items-center gap-1 text-xs bg-brand-green-500/20 text-brand-green-400 px-2 py-2 rounded">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Solution
                     </span>
                   )}
@@ -147,7 +147,7 @@ export function ThreadView({
                     {new Date(reply.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-slate-300 mb-3">{reply.content}</p>
+                <p className="text-slate-600 mb-3">{reply.content}</p>
                 <button
                   onClick={() => onUpvote(reply.id)}
                   className="flex items-center gap-1 text-sm text-slate-400 hover:text-brand-orange-400 transition-colors"
@@ -162,8 +162,8 @@ export function ThreadView({
       </div>
 
       {/* Reply Form */}
-      <div className="bg-slate-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Add Your Reply</h3>
+      <div className="bg-white rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Add Your Reply</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             value={replyContent}

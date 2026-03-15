@@ -15,7 +15,7 @@ export function FinalCTA() {
                 For learners, employers, and partners who want more than
                 business-as-usual training.
               </p>
-              <p className="mt-3 text-sm text-slate-300">
+              <p className="mt-3 text-sm text-slate-600">
                 Elevate plugs into the systems you already work with — workforce
                 boards, courts, employers, and community partners. Together we
                 make sure funded training actually leads to outcomes.
@@ -36,7 +36,7 @@ export function FinalCTA() {
                   I&apos;m an employer or partner
                 </Link>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Starting in Marion County with approvals expanding as new
                 partners and locations come online.
               </p>

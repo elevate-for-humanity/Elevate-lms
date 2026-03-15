@@ -204,14 +204,14 @@ export default function StudyGuideClient() {
 
         {/* Cover */}
         <div className="text-center py-8 print:py-4">
-          <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold mb-4 print:hidden">
+          <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-1.5 rounded-full text-xs font-bold mb-4 print:hidden">
             <BookOpen className="w-3.5 h-3.5" />
             OFFICIAL STUDY GUIDE
           </div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">{sg('title')}</h1>
           <p className="text-lg text-slate-600 mb-1">{sg('subtitle')}</p>
           <p className="text-sm text-slate-500">{sg('school')}</p>
-          <p className="text-xs text-slate-400 mt-1">ETPL Program #10004322 · WIOA-Approved · Free to Enrolled Students</p>
+          <p className="text-xs text-slate-500 mt-1">ETPL Program #10004322 · WIOA-Approved · Free to Enrolled Students</p>
           <div className="mt-4 inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             {sg('warning')}

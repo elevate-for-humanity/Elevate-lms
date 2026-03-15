@@ -102,7 +102,7 @@ export default async function ApprenticePortalPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* NEXT REQUIRED ACTION - Always visible at top */}
-        <div className="bg-brand-blue-600 text-white rounded-xl p-6 mb-8 shadow-lg">
+        <div className="bg-white text-white rounded-xl p-6 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-brand-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>
@@ -135,7 +135,7 @@ export default async function ApprenticePortalPage() {
             <div className="flex-1">
               <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-brand-blue-600 rounded-full transition-all"
+                  className="h-full bg-white rounded-full transition-all"
                   style={{ width: `${Math.min((totalHours / requiredHours) * 100, 100)}%` }}
                 />
               </div>

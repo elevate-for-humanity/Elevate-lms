@@ -63,10 +63,10 @@ export default function ApprenticeshipStructurePage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               Master Compliance Document
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Apprenticeship & RTI Structure
             </h1>
           </div>
@@ -130,7 +130,7 @@ export default function ApprenticeshipStructurePage() {
               const Icon = item.icon;
               return (
                 <div key={item.level} className="flex gap-4 items-start bg-white rounded-lg p-4 border print:border-gray-300">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold print:bg-gray-900">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold print:bg-white">
                     {item.level}
                   </div>
                   <div className="flex-1">
@@ -187,7 +187,7 @@ export default function ApprenticeshipStructurePage() {
                       {p.registered ? (
                         <span className="text-brand-green-700 font-semibold">Yes</span>
                       ) : (
-                        <span className="text-gray-400">—</span>
+                        <span className="text-slate-500">—</span>
                       )}
                     </td>
                   </tr>

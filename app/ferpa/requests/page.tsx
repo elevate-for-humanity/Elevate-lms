@@ -203,7 +203,7 @@ export default async function FerpaRequestsPage() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{(requests?.length || 0) - pendingCount - reviewCount}</p>

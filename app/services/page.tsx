@@ -85,9 +85,9 @@ export default function ServicesPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/services-page-1.jpg" alt="Support Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Support Services</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Support Services</h1>
           </div>
         </div>
       </section>
@@ -126,9 +126,9 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-brand-blue-600">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
+          <h2 className="text-3xl font-bold text-slate-900 mb-6">
             Need Help?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

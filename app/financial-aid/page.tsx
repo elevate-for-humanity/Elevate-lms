@@ -189,7 +189,7 @@ export default function FinancialAidPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {steps.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-semibold mb-2">{item.title}</h3>
@@ -201,7 +201,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-green-700">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
           <p className="text-xl text-white/90 mb-8">

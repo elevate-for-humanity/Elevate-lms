@@ -57,7 +57,7 @@ export default function ModernLandingHero({
         <div className="space-y-3 mb-8">
           {features.map((feature, index) => (
             <div key={index} className="flex items-center gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-black">{feature}</span>
             </div>
           ))}

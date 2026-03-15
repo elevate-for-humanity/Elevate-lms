@@ -55,7 +55,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
               {enrollments && enrollments.length > 0 ? enrollments.map((e: any) => (
                 <tr key={e.id} className="hover:bg-white">
                   <td className="px-4 py-3"><p className="font-medium">{e.profiles?.full_name || 'Student'}</p><p className="text-sm text-gray-500">{e.profiles?.email}</p></td>
-                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-brand-blue-600 h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
+                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-white h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
                   <td className="px-4 py-3">{e.quiz_average || '-'}%</td>
                   <td className="px-4 py-3">{e.assignment_score || '-'}%</td>
                   <td className="px-4 py-3 font-medium">{e.final_grade || '-'}</td>

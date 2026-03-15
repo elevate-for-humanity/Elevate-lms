@@ -87,16 +87,16 @@ export default async function RiseFoundationPage() {
         
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
-            <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
+            <p className="text-sm md:text-base text-slate-600 uppercase tracking-wider mb-3">
               501(c)(3) Nonprofit Organization
             </p>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-2">
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-2">
               Selfish Inc.
             </h1>
-            <p className="text-xl md:text-2xl text-white/80 mb-4">
+            <p className="text-xl md:text-2xl text-slate-600 mb-4">
               Operating The Rise Foundation &middot; CurvatureBody Sculpting &middot; Meri-Go-Round Products
             </p>
-            <p className="text-lg text-white/70 max-w-2xl mb-8">
+            <p className="text-lg text-slate-500 max-w-2xl mb-8">
               Mental wellness counseling, body sculpting, holistic healing, free VITA tax preparation, 
               and community services. Serving Indianapolis families with compassion and dignity.
             </p>
@@ -120,7 +120,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* Entity Info Bar */}
-      <section className="bg-slate-900 text-white py-4">
+      <section className="bg-white text-white py-4">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
             <span className="flex items-center gap-2">
@@ -499,10 +499,10 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-800 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Support Our Mission</h2>
-          <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-slate-600 mb-8 max-w-2xl mx-auto">
             Your donation funds mental wellness services, community workshops, free tax preparation, and holistic healing programs for families in need. All services are confidential.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

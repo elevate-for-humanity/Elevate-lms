@@ -107,12 +107,12 @@ export default function FranchiseApplyPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-slate-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Request Franchise Information
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Fill out the form below and our franchise team will schedule a
             consultation to discuss your goals and the right package for you.
           </p>

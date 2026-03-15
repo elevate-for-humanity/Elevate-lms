@@ -25,7 +25,7 @@ export default function OutcomesMethodologyPage() {
         <Image src="/images/pages/outcomes-page-1.jpg" alt="Student outcomes and placement rates" fill sizes="100vw" className="object-cover" priority />
       </section>
 
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
             href="/admin/governance"
@@ -35,7 +35,7 @@ export default function OutcomesMethodologyPage() {
             Back to Governance
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>

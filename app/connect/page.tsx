@@ -90,7 +90,7 @@ export default function ConnectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-800">            <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-white">            <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Connect" }]} />
       </div>
 {/* Header */}
@@ -116,17 +116,17 @@ export default function ConnectPage() {
         {step === 'platform' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Keep Your Website, Add LMS Power
               </h1>
-              <p className="text-slate-300 text-lg">
+              <p className="text-slate-600 text-lg">
                 Stay on your current platform. We'll give you code to add courses, 
                 enrollments, and student management to your existing site.
               </p>
             </div>
 
             <div className="bg-white/5 backdrop-blur rounded-2xl p-8">
-              <h2 className="text-white font-bold mb-6">What platform is your site on?</h2>
+              <h2 className="text-slate-900 font-bold mb-6">What platform is your site on?</h2>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {PLATFORMS.filter(p => p.popular).map((p) => (
@@ -140,7 +140,7 @@ export default function ConnectPage() {
                     }`}
                   >
                     <span className="text-3xl">{p.icon}</span>
-                    <p className="text-white text-sm mt-2">{p.name}</p>
+                    <p className="text-slate-900 text-sm mt-2">{p.name}</p>
                   </button>
                 ))}
               </div>
@@ -157,7 +157,7 @@ export default function ConnectPage() {
                     }`}
                   >
                     <span className="text-2xl">{p.icon}</span>
-                    <p className="text-slate-300 text-sm mt-2">{p.name}</p>
+                    <p className="text-slate-600 text-sm mt-2">{p.name}</p>
                   </button>
                 ))}
               </div>
@@ -178,10 +178,10 @@ export default function ConnectPage() {
         {step === 'url' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Enter Your Website URL
               </h1>
-              <p className="text-slate-300">
+              <p className="text-slate-600">
                 We'll analyze your site to provide the best integration.
               </p>
             </div>
@@ -224,10 +224,10 @@ export default function ConnectPage() {
         {step === 'features' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 What Do You Want to Add?
               </h1>
-              <p className="text-slate-300">
+              <p className="text-slate-600">
                 Select the features you want on your site.
               </p>
             </div>
@@ -252,8 +252,8 @@ export default function ConnectPage() {
                       <Icon className={`w-6 h-6 ${selected ? 'text-white' : 'text-slate-400'}`} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-white font-bold">{feature.name}</p>
-                      <p className="text-slate-400 text-sm">{feature.description}</p>
+                      <p className="text-slate-900 font-bold">{feature.name}</p>
+                      <p className="text-slate-500 text-sm">{feature.description}</p>
                     </div>
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                       selected ? 'border-cyan-500 bg-cyan-500' : 'border-white/30'
@@ -287,13 +287,13 @@ export default function ConnectPage() {
         {/* Step 4: Generating */}
         {step === 'generating' && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-cyan-500/20 rounded-full mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6">
               <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
             </div>
-            <h2 className="text-3xl font-black text-white mb-4">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">
               Generating Your Integration...
             </h2>
-            <p className="text-slate-300">
+            <p className="text-slate-600">
               Creating custom code for {PLATFORMS.find(p => p.id === platform)?.name}
             </p>
           </div>
@@ -303,18 +303,18 @@ export default function ConnectPage() {
         {step === 'setup' && integration && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Integration Ready!
               </div>
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Add This to Your {integration.platform} Site
               </h1>
             </div>
 
             {/* API Credentials */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
-              <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+              <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-cyan-400" />
                 Your API Credentials
               </h3>
@@ -353,7 +353,7 @@ export default function ConnectPage() {
             {/* Embed Script */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-slate-900 font-bold flex items-center gap-2">
                   <Code className="w-5 h-5 text-cyan-400" />
                   Step 1: Add Embed Script
                 </h3>
@@ -371,7 +371,7 @@ export default function ConnectPage() {
                 </code>
               </pre>
               
-              <div className="mt-4 p-4 bg-brand-blue-500/10 rounded-lg">
+              <div className="mt-4 p-4 bg-white/10 rounded-lg">
                 <p className="text-brand-blue-300 text-sm font-medium mb-2">
                   {integration.platform} Instructions:
                 </p>
@@ -385,15 +385,15 @@ export default function ConnectPage() {
 
             {/* Components */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
-              <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+              <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-cyan-400" />
                 Step 2: Add Components Where You Want Them
               </h3>
               <div className="space-y-4">
                 {integration.components.map((comp, idx) => (
-                  <div key={idx} className="p-4 bg-slate-700 rounded-lg">
+                  <div key={idx} className="p-4 bg-white rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-white font-medium">{comp.name}</p>
+                      <p className="text-slate-900 font-medium">{comp.name}</p>
                       <button
                         onClick={() => copyToClipboard(comp.embedCode, `comp-${idx}`)}
                         className="text-slate-400 hover:text-white"
@@ -401,7 +401,7 @@ export default function ConnectPage() {
                         {copied === `comp-${idx}` ? <Check className="w-4 h-4 text-brand-green-400" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
-                    <p className="text-slate-400 text-sm mb-2">{comp.description}</p>
+                    <p className="text-slate-500 text-sm mb-2">{comp.description}</p>
                     <code className="block bg-slate-700 rounded px-3 py-2 text-cyan-400 text-sm font-mono">
                       {comp.embedCode}
                     </code>
@@ -413,12 +413,12 @@ export default function ConnectPage() {
             {/* Platform Specific */}
             {integration.platformSpecific.shortcodes && (
               <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
-                <h3 className="text-white font-bold mb-4">WordPress Shortcodes</h3>
+                <h3 className="text-slate-900 font-bold mb-4">WordPress Shortcodes</h3>
                 <div className="grid md:grid-cols-2 gap-3">
                   {integration.platformSpecific.shortcodes.map((sc: any, idx: number) => (
-                    <div key={idx} className="p-3 bg-slate-700 rounded-lg">
+                    <div key={idx} className="p-3 bg-white rounded-lg">
                       <code className="text-cyan-400 font-mono text-sm">{sc.code}</code>
-                      <p className="text-slate-400 text-xs mt-1">{sc.description}</p>
+                      <p className="text-slate-500 text-xs mt-1">{sc.description}</p>
                     </div>
                   ))}
                 </div>
@@ -426,8 +426,8 @@ export default function ConnectPage() {
             )}
 
             {/* Next Steps */}
-            <div className="bg-cyan-600/20 rounded-2xl p-6 border border-cyan-500/30">
-              <h3 className="text-white font-bold mb-4">Next Steps</h3>
+            <div className="bg-white/20 rounded-2xl p-6 border border-cyan-500/30">
+              <h3 className="text-slate-900 font-bold mb-4">Next Steps</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <a
                   href={integration.dashboardUrl}
@@ -437,8 +437,8 @@ export default function ConnectPage() {
                 >
                   <BarChart3 className="w-8 h-8 text-cyan-400" />
                   <div>
-                    <p className="text-white font-medium">Open Dashboard</p>
-                    <p className="text-slate-400 text-sm">Manage courses & students</p>
+                    <p className="text-slate-900 font-medium">Open Dashboard</p>
+                    <p className="text-slate-500 text-sm">Manage courses & students</p>
                   </div>
                   <ExternalLink className="w-4 h-4 text-slate-400 ml-auto" />
                 </a>
@@ -448,8 +448,8 @@ export default function ConnectPage() {
                 >
                   <CreditCard className="w-8 h-8 text-brand-green-400" />
                   <div>
-                    <p className="text-white font-medium">Upgrade Plan</p>
-                    <p className="text-slate-400 text-sm">Unlock all features</p>
+                    <p className="text-slate-900 font-medium">Upgrade Plan</p>
+                    <p className="text-slate-500 text-sm">Unlock all features</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 ml-auto" />
                 </Link>

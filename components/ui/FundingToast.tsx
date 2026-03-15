@@ -30,8 +30,8 @@ export default function FundingToast() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-3 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:px-0">
-      <div className="flex max-w-md items-start gap-3 rounded-2xl bg-slate-900/95 p-4 text-sm text-slate-50 shadow-xl ring-1 ring-slate-800">
-        <div className="mt-0.5 hidden h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-orange-500 text-xs font-bold sm:flex">
+      <div className="flex max-w-md items-start gap-3 rounded-2xl bg-white/95 p-4 text-sm text-slate-50 shadow-xl ring-1 ring-slate-800">
+        <div className="mt-0.5 hidden h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold sm:flex">
           $
         </div>
         <div className="space-y-1">

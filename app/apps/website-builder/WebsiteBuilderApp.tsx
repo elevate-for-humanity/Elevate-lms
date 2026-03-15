@@ -68,7 +68,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
     <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
-        <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
+        <div className="bg-white text-yellow-900 px-4 py-2 text-center text-sm font-medium">
           Trial: {trialDaysRemaining} days remaining. 
           <Link href="/store/apps/website-builder?upgrade=true" className="underline ml-2">Upgrade now</Link>
         </div>

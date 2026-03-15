@@ -284,7 +284,7 @@ export default function HandbookPage() {
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
+                  className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${(acknowledged.size / HANDBOOK_SECTIONS.length) * 100}%` }}
                 />
               </div>

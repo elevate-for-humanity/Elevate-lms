@@ -49,7 +49,7 @@ export default function SNAPETPartnerPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-brand-blue-900 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-4xl">
             <div className="inline-block bg-yellow-400 text-brand-blue-900 px-6 py-3 rounded-full font-bold text-sm mb-6">
@@ -270,7 +270,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* What We Provide */}
-      <section className="py-20 bg-slate-900 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
@@ -407,7 +407,7 @@ export default function SNAPETPartnerPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-xl font-bold mb-3">Intro Meeting</h3>
@@ -418,7 +418,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-bold mb-3">Program Mapping</h3>
@@ -429,7 +429,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-xl font-bold mb-3">Contract/MOU</h3>
@@ -440,7 +440,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-xl font-bold mb-3">First Referrals</h3>
@@ -470,14 +470,14 @@ export default function SNAPETPartnerPage() {
               <h3 className="text-2xl font-bold mb-6">Who We Serve</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                  <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">SNAP</div>
+                  <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">SNAP</div>
                   <div>
                     <p className="font-semibold text-slate-900">SNAP Participants</p>
                     <p className="text-sm text-slate-600">Voluntary enrollment. USDA FNS funded. We accept referrals directly and can refer eligible students back for additional support services.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                  <div className="w-10 h-10 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">TANF</div>
+                  <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">TANF</div>
                   <div>
                     <p className="font-semibold text-slate-900">TANF Participants</p>
                     <p className="text-sm text-slate-600">Mandatory program. Our credential-bearing programs satisfy work activity requirements. Attendance and progress reported on your schedule.</p>
@@ -551,7 +551,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-900 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Partner?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

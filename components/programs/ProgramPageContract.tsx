@@ -186,7 +186,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             )}
 
             {/* H1 */}
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-slate-900 drop-shadow-lg">
               {config.title}
             </h1>
 
@@ -252,7 +252,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-brand-green-50 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-brand-green-900 mb-4 flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Ideal Candidates
               </h3>
               <ul className="space-y-3">
@@ -283,7 +283,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* LEARNING OUTCOMES */}
-      <section className="bg-brand-blue-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8">What You Will Learn</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -311,7 +311,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Compliance & Readiness
               </h3>
               <ul className="space-y-2">
@@ -333,7 +333,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             <div className="space-y-8">
               {config.path.map((step, i) => (
                 <div key={i} className="flex gap-6 items-start">
-                  <div className="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-white text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
                     {step.step}
                   </div>
                   <div className="pt-3">
@@ -366,7 +366,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
                 <ul className="space-y-2">
                   {config.credential.usedFor.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       {item}
                     </li>
                   ))}

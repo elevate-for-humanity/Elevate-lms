@@ -115,8 +115,8 @@ export default function AIInstructor({
               }}
             />
             {isSpeaking && (
-              <div className="absolute inset-0 bg-brand-blue-500 bg-opacity-20 flex items-center justify-center">
-                <div className="w-3 h-3 bg-brand-blue-500 rounded-full animate-ping" />
+              <div className="absolute inset-0 bg-white bg-opacity-20 flex items-center justify-center">
+                <div className="w-3 h-3 bg-white rounded-full animate-ping" />
               </div>
             )}
           </div>
@@ -171,15 +171,15 @@ export default function AIInstructor({
             <div className="mt-2 flex items-center gap-2 text-sm text-brand-blue-600">
               <div className="flex gap-1">
                 <div
-                  className="w-1 h-4 bg-brand-blue-600 rounded animate-pulse"
+                  className="w-1 h-4 bg-white rounded animate-pulse"
                   style={{ animationDelay: '0ms' }}
                 />
                 <div
-                  className="w-1 h-4 bg-brand-blue-600 rounded animate-pulse"
+                  className="w-1 h-4 bg-white rounded animate-pulse"
                   style={{ animationDelay: '150ms' }}
                 />
                 <div
-                  className="w-1 h-4 bg-brand-blue-600 rounded animate-pulse"
+                  className="w-1 h-4 bg-white rounded animate-pulse"
                   style={{ animationDelay: '300ms' }}
                 />
               </div>

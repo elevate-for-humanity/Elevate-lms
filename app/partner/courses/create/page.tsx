@@ -147,7 +147,7 @@ export default function CreateCoursePage() {
               {message.includes('Error') ? (
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               ) : (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               )}
               <span>{message}</span>
             </div>

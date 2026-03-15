@@ -60,11 +60,11 @@ export default function HVACModule1Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Module header */}
-      <div className="bg-slate-900 text-white">
+      <div className="bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 py-10">
           <div className="text-sm font-medium text-brand-blue-400 mb-2">Module 1</div>
           <h1 className="text-3xl md:text-4xl font-bold">HVAC System Overview</h1>
-          <p className="mt-3 text-slate-300 text-lg max-w-2xl">
+          <p className="mt-3 text-slate-600 text-lg max-w-2xl">
             Learn the major components of a residential air conditioning condenser unit and how
             technicians inspect them during service calls.
           </p>

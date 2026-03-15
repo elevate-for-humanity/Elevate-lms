@@ -26,13 +26,13 @@ interface ShopData {
 // Public Landing Page Component
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="bg-slate-700 px-6 pt-16 pb-12 text-center">
+      <div className="bg-white px-6 pt-16 pb-12 text-center">
         <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Building2 className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-3xl font-black text-white mb-3">Partner Shop</h1>
+        <h1 className="text-3xl font-black text-slate-900 mb-3">Partner Shop</h1>
         <p className="text-brand-blue-200 text-lg max-w-xs mx-auto">
           Manage apprentices, log hours, and track training progress at your barbershop.
         </p>
@@ -40,33 +40,33 @@ function LandingPage() {
 
       {/* Features */}
       <div className="px-6 py-8 space-y-4">
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-brand-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <Clock className="w-5 h-5 text-brand-green-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Log Apprentice Hours</h3>
-            <p className="text-slate-400 text-sm">Record weekly training hours for your apprentices.</p>
+            <h3 className="text-slate-900 font-semibold">Log Apprentice Hours</h3>
+            <p className="text-slate-500 text-sm">Record weekly training hours for your apprentices.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <Users className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Manage Your Team</h3>
-            <p className="text-slate-400 text-sm">View all apprentices assigned to your shop.</p>
+            <h3 className="text-slate-900 font-semibold">Manage Your Team</h3>
+            <p className="text-slate-500 text-sm">View all apprentices assigned to your shop.</p>
           </div>
         </div>
 
-        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 bg-white rounded-xl p-4">
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
             <FileText className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Compliance Reports</h3>
-            <p className="text-slate-400 text-sm">Generate reports for RAPIDS and state requirements.</p>
+            <h3 className="text-slate-900 font-semibold">Compliance Reports</h3>
+            <p className="text-slate-500 text-sm">Generate reports for RAPIDS and state requirements.</p>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ function Dashboard({
   totalHoursThisWeek: number;
 }) {
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between mb-4">
@@ -126,7 +126,7 @@ function Dashboard({
             </div>
             <div>
               <p className="text-brand-blue-200 text-sm">Partner Shop</p>
-              <h1 className="text-white font-bold text-lg">{shop.name}</h1>
+              <h1 className="text-slate-900 font-bold text-lg">{shop.name}</h1>
             </div>
           </div>
           <div className="flex gap-2">
@@ -151,14 +151,14 @@ function Dashboard({
               <Users className="w-4 h-4 text-brand-blue-200" />
               <span className="text-brand-blue-200 text-xs">Active Apprentices</span>
             </div>
-            <p className="text-3xl font-bold text-white">{apprentices.length}</p>
+            <p className="text-3xl font-bold text-slate-900">{apprentices.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="w-4 h-4 text-brand-blue-200" />
               <span className="text-brand-blue-200 text-xs">Hours This Week</span>
             </div>
-            <p className="text-3xl font-bold text-white">{totalHoursThisWeek}</p>
+            <p className="text-3xl font-bold text-slate-900">{totalHoursThisWeek}</p>
           </div>
         </div>
       </header>
@@ -167,7 +167,7 @@ function Dashboard({
       <main className="px-4 py-6 space-y-6">
         {/* Pending Alert */}
         {pendingEntries > 0 && (
-          <div className="bg-amber-500/20 border border-amber-500/30 rounded-xl p-4">
+          <div className="bg-white/20 border border-amber-500/30 rounded-xl p-4">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-6 h-6 text-amber-400" />
               <div className="flex-1">
@@ -183,70 +183,70 @@ function Dashboard({
 
         {/* Quick Actions */}
         <div className="space-y-3">
-          <h2 className="text-white font-bold text-lg">Quick Actions</h2>
+          <h2 className="text-slate-900 font-bold text-lg">Quick Actions</h2>
           
           <Link href="/pwa/shop-owner/approve-hours" className="flex items-center gap-4 bg-amber-500/20 border border-amber-500/30 rounded-xl p-4 active:opacity-80">
-            <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Approve Hours</p>
+              <p className="text-slate-900 font-medium">Approve Hours</p>
               <p className="text-amber-300 text-sm">Review pending submissions</p>
             </div>
             <ChevronRight className="w-5 h-5 text-amber-400" />
           </Link>
 
           <Link href="/pwa/shop-owner/checkin" className="flex items-center gap-4 bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4 active:opacity-80">
-            <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <QrCode className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Check-In QR Code</p>
+              <p className="text-slate-900 font-medium">Check-In QR Code</p>
               <p className="text-brand-blue-300 text-sm">Display for apprentices</p>
             </div>
             <ChevronRight className="w-5 h-5 text-brand-blue-400" />
           </Link>
 
           <Link href="/pwa/shop-owner/log-hours" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-green-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Plus className="w-6 h-6 text-brand-green-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Log Apprentice Hours</p>
-              <p className="text-slate-400 text-sm">Record training hours</p>
+              <p className="text-slate-900 font-medium">Log Apprentice Hours</p>
+              <p className="text-slate-500 text-sm">Record training hours</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/shop-owner/apprentices" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <Users className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">My Apprentices</p>
-              <p className="text-slate-400 text-sm">View all apprentices</p>
+              <p className="text-slate-900 font-medium">My Apprentices</p>
+              <p className="text-slate-500 text-sm">View all apprentices</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/shop-owner/reports" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <FileText className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Reports</p>
-              <p className="text-slate-400 text-sm">Hours & compliance reports</p>
+              <p className="text-slate-900 font-medium">Reports</p>
+              <p className="text-slate-500 text-sm">Hours & compliance reports</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
 
           <Link href="/pwa/shop-owner/progress" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-amber-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Shop Progress</p>
-              <p className="text-slate-400 text-sm">Track team advancement</p>
+              <p className="text-slate-900 font-medium">Shop Progress</p>
+              <p className="text-slate-500 text-sm">Track team advancement</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
@@ -256,7 +256,7 @@ function Dashboard({
         {apprentices.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-bold text-lg">Apprentices</h2>
+              <h2 className="text-slate-900 font-bold text-lg">Apprentices</h2>
               <Link href="/pwa/shop-owner/apprentices" className="text-brand-blue-400 text-sm">View All</Link>
             </div>
             
@@ -267,27 +267,27 @@ function Dashboard({
                   href={`/pwa/shop-owner/apprentices/${apprentice.id}`}
                   className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
                 >
-                  <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                     <span className="text-brand-blue-400 font-bold text-lg">
                       {apprentice.name.charAt(0)}
                     </span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-white font-medium">{apprentice.name}</p>
-                    <p className="text-slate-400 text-sm">{apprentice.totalHours.toLocaleString()} total hours</p>
+                    <p className="text-slate-900 font-medium">{apprentice.name}</p>
+                    <p className="text-slate-500 text-sm">{apprentice.totalHours.toLocaleString()} total hours</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-white font-bold">{apprentice.weeklyHours}</p>
-                    <p className="text-slate-400 text-xs">this week</p>
+                    <p className="text-slate-900 font-bold">{apprentice.weeklyHours}</p>
+                    <p className="text-slate-500 text-xs">this week</p>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
         ) : (
-          <div className="bg-slate-800 rounded-xl p-6 text-center">
+          <div className="bg-white rounded-xl p-6 text-center">
             <Users className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">No apprentices assigned yet</p>
+            <p className="text-slate-500">No apprentices assigned yet</p>
             <p className="text-slate-500 text-sm mt-1">Apprentices will appear here once assigned to your shop</p>
           </div>
         )}
@@ -370,10 +370,10 @@ export default function ShopOwnerPWAHome() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading...</p>
+          <p className="text-slate-900">Loading...</p>
         </div>
       </div>
     );
@@ -387,11 +387,11 @@ export default function ShopOwnerPWAHome() {
   // Logged in but not a partner
   if (!isPartner || !shop) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Not a Partner</h1>
-          <p className="text-slate-400 mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Not a Partner</h1>
+          <p className="text-slate-500 mb-6">
             You're signed in but not registered as a partner shop.
           </p>
           <Link

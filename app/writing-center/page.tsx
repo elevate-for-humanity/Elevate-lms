@@ -202,7 +202,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Writing Help?</h2>
           <p className="text-lg text-brand-blue-100 mb-8">Log in to the LMS to submit a draft or book a live session with a writing tutor.</p>

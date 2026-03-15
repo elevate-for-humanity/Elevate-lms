@@ -135,7 +135,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
               </div>
               {promoApplied && (
                 <span className="flex items-center gap-1 text-brand-green-600 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   {promoApplied.promo.description} - Save ${promoApplied.discountAmount.toFixed(2)}
                 </span>
               )}
@@ -184,14 +184,14 @@ export function CourseDetailClient({ course }: { course: Course }) {
                 {promoApplied ? (
                   <>
                     <span className="text-xl font-bold text-brand-blue-600">${finalPrice.toFixed(0)}</span>
-                    <span className="text-gray-400 line-through">${Number(course.price).toFixed(0)}</span>
+                    <span className="text-slate-500 line-through">${Number(course.price).toFixed(0)}</span>
                     <span className="text-brand-green-600 text-sm">({promoApplied.promo.code} applied)</span>
                   </>
                 ) : (
                   <>
                     <span className="text-xl font-bold text-brand-blue-600">${Number(course.price).toFixed(0)}</span>
                     {course.original_price && (
-                      <span className="text-gray-400 line-through">${Number(course.original_price).toFixed(0)}</span>
+                      <span className="text-slate-500 line-through">${Number(course.original_price).toFixed(0)}</span>
                     )}
                   </>
                 )}

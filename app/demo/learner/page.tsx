@@ -46,7 +46,7 @@ export default function DemoLearnerPage() {
   return (
     <DemoPageShell title="My Dashboard" description="Welcome back, Marcus. Here's your training progress." portal="learner">
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
+        <div className="fixed top-20 right-4 z-50 bg-white text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
       )}
 
       <div className="space-y-6">
@@ -57,7 +57,7 @@ export default function DemoLearnerPage() {
             <div className="text-2xl font-bold text-gray-900">4</div>
             <div className="text-xs text-gray-500">Courses</div>
             <div className="mt-2 w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: '54%' }} />
+              <div className="h-full bg-white rounded-full" style={{ width: '54%' }} />
             </div>
             <div className="text-[10px] text-gray-400 mt-1">54% overall completion</div>
           </div>
@@ -66,7 +66,7 @@ export default function DemoLearnerPage() {
             <div className="text-2xl font-bold text-gray-900">{totalHours}</div>
             <div className="text-xs text-gray-500">of 2,000 Hours</div>
             <div className="mt-2 w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-brand-green-500 rounded-full" style={{ width: `${(totalHours / 2000) * 100}%` }} />
+              <div className="h-full bg-white rounded-full" style={{ width: `${(totalHours / 2000) * 100}%` }} />
             </div>
             <div className="text-[10px] text-gray-400 mt-1">{((totalHours / 2000) * 100).toFixed(0)}% complete</div>
           </div>
@@ -89,7 +89,7 @@ export default function DemoLearnerPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 text-sm">{c.name}</span>
-                    {c.status === 'Completed' && <span className="text-slate-400 flex-shrink-0">•</span>}
+                    {c.status === 'Completed' && <span className="text-slate-500 flex-shrink-0">•</span>}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5">
                     {c.status === 'Completed' ? `Grade: ${c.grade}` : c.nextLesson ? `Next: ${c.nextLesson}` : 'Ready to start'}
@@ -160,7 +160,7 @@ export default function DemoLearnerPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-gray-900">{h.hours}h</span>
                   {h.approved ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   ) : (
                     <Clock className="w-4 h-4 text-amber-500" />
                   )}

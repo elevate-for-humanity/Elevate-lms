@@ -148,7 +148,7 @@ export default function FileTree({ files, onFileSelect, selectedFile, filterCour
   };
 
   return (
-    <div className="h-full overflow-auto bg-slate-800 text-white">
+    <div className="h-full overflow-auto bg-white text-white">
       {fileTree.length === 0 ? (
         <div className="p-4 text-sm text-gray-400">
           {filterCourses ? 'No course files found' : 'No files found'}

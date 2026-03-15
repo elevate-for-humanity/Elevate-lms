@@ -44,12 +44,12 @@ function StatCard({ label, value, icon: Icon, color }: {
   color: string;
 }) {
   return (
-    <div className="bg-slate-800 rounded-xl p-4">
+    <div className="bg-white rounded-xl p-4">
       <div className={`w-10 h-10 ${color} rounded-lg flex items-center justify-center mb-3`}>
         <Icon className="w-5 h-5 text-white" />
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-slate-400 text-sm">{label}</p>
+      <p className="text-2xl font-bold text-slate-900">{value}</p>
+      <p className="text-slate-500 text-sm">{label}</p>
     </div>
   );
 }
@@ -119,10 +119,10 @@ export default function ShopOwnerReportsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading reports...</p>
+          <p className="text-slate-900">Loading reports...</p>
         </div>
       </div>
     );
@@ -130,11 +130,11 @@ export default function ShopOwnerReportsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/reports"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -151,14 +151,14 @@ export default function ShopOwnerReportsPage() {
   const { apprentices, summary } = data;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
-        <h1 className="text-2xl font-bold text-white mb-2">Reports</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Reports</h1>
         <p className="text-brand-blue-200">Hours tracking and compliance reports</p>
       </header>
 
       <div className="px-4 py-4">
-        <div className="flex gap-2 bg-slate-800 rounded-xl p-1">
+        <div className="flex gap-2 bg-white rounded-xl p-1">
           {(['week', 'month', 'quarter', 'year'] as ReportPeriod[]).map((p) => (
             <button
               key={p}
@@ -227,7 +227,7 @@ export default function ShopOwnerReportsPage() {
 
       <main className="px-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-white font-bold">Apprentice Details</h2>
+          <h2 className="text-slate-900 font-bold">Apprentice Details</h2>
           <button 
             onClick={() => handleExport(reportType === 'compliance' ? 'compliance' : 'hours')}
             className="flex items-center gap-2 text-brand-blue-400 text-sm"
@@ -238,27 +238,27 @@ export default function ShopOwnerReportsPage() {
         </div>
 
         {apprentices.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-8 text-center">
+          <div className="bg-white rounded-xl p-8 text-center">
             <Users className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">No apprentices assigned yet</p>
+            <p className="text-slate-500">No apprentices assigned yet</p>
           </div>
         ) : (
           apprentices.map((apprentice) => (
-            <div key={apprentice.id} className="bg-slate-800 rounded-xl overflow-hidden">
+            <div key={apprentice.id} className="bg-white rounded-xl overflow-hidden">
               <button
                 onClick={() => setExpandedApprentice(
                   expandedApprentice === apprentice.id ? null : apprentice.id
                 )}
                 className="w-full flex items-center gap-4 p-4"
               >
-                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                   <span className="text-brand-blue-400 font-bold text-lg">
                     {apprentice.name.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-white font-medium">{apprentice.name}</p>
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-slate-900 font-medium">{apprentice.name}</p>
+                  <p className="text-slate-500 text-sm">
                     {apprentice.totalHours.toLocaleString()} total hours
                   </p>
                 </div>
@@ -273,19 +273,19 @@ export default function ShopOwnerReportsPage() {
                   {reportType === 'hours' && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">This Week</span>
+                        <span className="text-slate-500">This Week</span>
                         <span className="text-white font-medium">{apprentice.weeklyHours} hrs</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">This {period.charAt(0).toUpperCase() + period.slice(1)}</span>
+                        <span className="text-slate-500">This {period.charAt(0).toUpperCase() + period.slice(1)}</span>
                         <span className="text-white font-medium">{apprentice.periodHours} hrs</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Total Hours</span>
+                        <span className="text-slate-500">Total Hours</span>
                         <span className="text-white font-medium">{apprentice.totalHours.toLocaleString()} hrs</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Last Log</span>
+                        <span className="text-slate-500">Last Log</span>
                         <span className="text-white font-medium">
                           {apprentice.lastLogDate 
                             ? new Date(apprentice.lastLogDate).toLocaleDateString()
@@ -298,21 +298,21 @@ export default function ShopOwnerReportsPage() {
                   {reportType === 'compliance' && (
                     <>
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-400">Status</span>
+                        <span className="text-slate-500">Status</span>
                         <ComplianceStatusBadge status={apprentice.complianceStatus} />
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Weekly Minimum (30 hrs)</span>
+                        <span className="text-slate-500">Weekly Minimum (30 hrs)</span>
                         <span className={apprentice.weeklyHours >= 30 ? 'text-brand-green-400' : 'text-amber-400'}>
                           {apprentice.weeklyHours >= 30 ? '• Met' : '⚠ Below'}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Hours Logged This Week</span>
+                        <span className="text-slate-500">Hours Logged This Week</span>
                         <span className="text-white font-medium">{apprentice.weeklyHours} hrs</span>
                       </div>
                       {apprentice.complianceStatus === 'warning' && (
-                        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-3">
+                        <div className="bg-white/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-3">
                           <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                           <p className="text-amber-200 text-sm">
                             Below minimum weekly hours. Ensure apprentice logs at least 30 hours per week.
@@ -320,7 +320,7 @@ export default function ShopOwnerReportsPage() {
                         </div>
                       )}
                       {apprentice.complianceStatus === 'non-compliant' && (
-                        <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-lg p-3 flex items-start gap-3">
+                        <div className="bg-white/10 border border-brand-red-500/30 rounded-lg p-3 flex items-start gap-3">
                           <AlertTriangle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
                           <p className="text-brand-red-200 text-sm">
                             Significantly below minimum hours. Immediate attention required.
@@ -333,31 +333,31 @@ export default function ShopOwnerReportsPage() {
                   {reportType === 'progress' && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Progress</span>
+                        <span className="text-slate-500">Progress</span>
                         <span className="text-white font-medium">
                           {apprentice.progress.toFixed(1)}%
                         </span>
                       </div>
-                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-brand-blue-500 rounded-full"
+                          className="h-full bg-white rounded-full"
                           style={{ width: `${Math.min(apprentice.progress, 100)}%` }}
                         />
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Hours Remaining</span>
+                        <span className="text-slate-500">Hours Remaining</span>
                         <span className="text-white font-medium">
                           {Math.max(0, apprentice.targetHours - apprentice.totalHours).toLocaleString()} hrs
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Start Date</span>
+                        <span className="text-slate-500">Start Date</span>
                         <span className="text-white font-medium">
                           {new Date(apprentice.startDate).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Est. Completion</span>
+                        <span className="text-slate-500">Est. Completion</span>
                         <span className="text-white font-medium">
                           {(() => {
                             const remaining = apprentice.targetHours - apprentice.totalHours;
@@ -388,18 +388,18 @@ export default function ShopOwnerReportsPage() {
       </main>
 
       <div className="px-4 py-6">
-        <h3 className="text-white font-bold mb-3">Export Reports</h3>
+        <h3 className="text-slate-900 font-bold mb-3">Export Reports</h3>
         <div className="space-y-2">
           <button 
             onClick={() => handleExport('hours')}
             className="w-full flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-10 h-10 bg-brand-green-500/20 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <FileText className="w-5 h-5 text-brand-green-400" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-white font-medium">Monthly Hours Report</p>
-              <p className="text-slate-400 text-sm">CSV format for USDOL submission</p>
+              <p className="text-slate-900 font-medium">Monthly Hours Report</p>
+              <p className="text-slate-500 text-sm">CSV format for USDOL submission</p>
             </div>
             <Download className="w-5 h-5 text-slate-500" />
           </button>
@@ -408,12 +408,12 @@ export default function ShopOwnerReportsPage() {
             onClick={() => handleExport('compliance')}
             className="w-full flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <FileText className="w-5 h-5 text-brand-blue-400" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-white font-medium">Compliance Summary</p>
-              <p className="text-slate-400 text-sm">PDF report with all apprentices</p>
+              <p className="text-slate-900 font-medium">Compliance Summary</p>
+              <p className="text-slate-500 text-sm">PDF report with all apprentices</p>
             </div>
             <Download className="w-5 h-5 text-slate-500" />
           </button>

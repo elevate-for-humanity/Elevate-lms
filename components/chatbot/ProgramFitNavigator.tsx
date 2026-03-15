@@ -78,12 +78,12 @@ export function ProgramFitNavigator({
       {/* Header */}
       <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 px-6 py-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white">
+          <h3 className="text-lg font-bold text-slate-900">
             Program Fit Navigator
           </h3>
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="p-1 text-white/80 hover:text-white transition-colors"
+            className="p-1 text-slate-600 hover:text-white transition-colors"
             aria-label="What is this?"
           >
             <HelpCircle className="w-5 h-5" />

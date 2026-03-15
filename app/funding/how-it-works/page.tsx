@@ -38,10 +38,10 @@ export default function FundingHowItWorksPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/funding-page-3.jpg" alt="How funding works for career training" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">How Funding Works</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">How Funding Works</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
           </div>
         </div>
       </section>
@@ -55,7 +55,7 @@ export default function FundingHowItWorksPage() {
               const Icon = s.icon;
               return (
                 <div key={s.step} className="text-center">
-                  <div className="w-14 h-14 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  <div className="w-14 h-14 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     {s.step}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
@@ -98,7 +98,7 @@ export default function FundingHowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to See If You Qualify?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

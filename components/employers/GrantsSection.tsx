@@ -106,7 +106,7 @@ export default function GrantsSection() {
         </div>
 
         {/* Summary callout */}
-        <div className="bg-slate-900 rounded-xl p-8 text-white">
+        <div className="bg-white rounded-xl p-8 text-white">
           <h3 className="text-xl font-bold mb-4">The Bottom Line for Employers</h3>
           <div className="grid md:grid-cols-3 gap-6 text-sm">
             <div>

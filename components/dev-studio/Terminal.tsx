@@ -23,7 +23,7 @@ export default function Terminal({ output, onClear }: TerminalProps) {
   return (
     <div className="h-full flex flex-col bg-black text-brand-green-400 font-mono text-sm">
       {/* Terminal Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-700">
+      <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-slate-700">
         <div className="flex items-center gap-2">
           <TerminalIcon className="w-4 h-4" />
           <span className="text-white font-semibold">Terminal</span>

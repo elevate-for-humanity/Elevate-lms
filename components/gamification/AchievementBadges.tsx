@@ -108,7 +108,7 @@ export function AchievementBadges() {
                 {badge.description}
               </p>
               {badge.earned && badge.earnedDate && (
-                <p className="text-xs text-white/70 mt-2">
+                <p className="text-xs text-slate-500 mt-2">
                   Earned {new Date(badge.earnedDate).toLocaleDateString()}
                 </p>
               )}

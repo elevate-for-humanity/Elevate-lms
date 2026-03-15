@@ -142,7 +142,7 @@ export function HostShopRequirements({
         {/* Section Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Building2 className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -227,7 +227,7 @@ export function HostShopRequirements({
             <div className="grid md:grid-cols-2 gap-4">
               {APPROVAL_STEPS.map((step) => (
                 <div key={step.step} className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                     {step.step}
                   </div>
                   <div>

@@ -311,7 +311,7 @@ export default async function AcademicIntegrityPage() {
           <div className="grid md:grid-cols-2 gap-4 sm:p-6">
             <div className="bg-brand-green-50 rounded-lg p-4 sm:p-6">
               <h3 className="font-bold text-brand-green-900 mb-4 flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Do's
               </h3>
               <ul className="space-y-2 text-brand-green-800 text-sm">
@@ -421,7 +421,7 @@ export default async function AcademicIntegrityPage() {
         </div>
 
         {/* Student Pledge */}
-        <div className="bg-slate-900 rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
+        <div className="bg-white rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-4">Academic Integrity Pledge</h2>
           <div className="bg-white/10 rounded-lg p-4 sm:p-6">
             <p className="text-brand-blue-100 italic mb-4">
@@ -488,7 +488,7 @@ export default async function AcademicIntegrityPage() {
           </div>
         </div>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

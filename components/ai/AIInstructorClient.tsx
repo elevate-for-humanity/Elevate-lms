@@ -150,9 +150,9 @@ export function AIInstructorClient({
         {isSpeaking && (
           <div className="mt-3 flex justify-center">
             <div className="flex gap-1">
-              <div className="w-1 h-4 bg-brand-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
-              <div className="w-1 h-4 bg-brand-blue-500 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-              <div className="w-1 h-4 bg-brand-blue-500 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+              <div className="w-1 h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+              <div className="w-1 h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+              <div className="w-1 h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         )}

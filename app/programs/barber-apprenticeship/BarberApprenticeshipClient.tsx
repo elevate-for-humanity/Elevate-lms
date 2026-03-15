@@ -142,7 +142,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
                 <h3 className="font-semibold text-slate-900">{item.cred.name}</h3>
                 <p className="text-xs text-brand-blue-600 font-medium mt-1">Issued by {item.cred.issuer}</p>
                 <p className="text-sm text-slate-600 mt-2">{item.cred.description}</p>
-                {item.cred.validity && <p className="text-xs text-slate-400 mt-2">Valid: {item.cred.validity}</p>}
+                {item.cred.validity && <p className="text-xs text-slate-500 mt-2">Valid: {item.cred.validity}</p>}
               </div>
             </div>
           ))}
@@ -152,18 +152,18 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ CTA: INQUIRY & ENROLLMENT ═══ */}
       <section className="bg-white py-12 border-t">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-3">Ready to Start?</h2>
-          <p className="text-slate-400 text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-3">Ready to Start?</h2>
+          <p className="text-slate-500 text-center max-w-2xl mx-auto mb-8">
             Choose the right path for where you are in the process.
           </p>
           <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Inquiry Application */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <div className="w-12 h-12 bg-brand-blue-600/20 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
                 <FileText className="w-6 h-6 text-brand-blue-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Inquiry Application</h3>
-              <p className="text-sm text-slate-400 mb-4">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Inquiry Application</h3>
+              <p className="text-sm text-slate-500 mb-4">
                 Not sure if this program is right for you? Submit an inquiry and a career advisor will
                 contact you to discuss eligibility, funding options, and next steps. No commitment required.
                 {' '}<Link href="/forms/barber-apprenticeship-inquiry" className="underline font-medium">Use the inquiry form →</Link>
@@ -177,11 +177,11 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </div>
             {/* Enrollment Application */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <div className="w-12 h-12 bg-brand-green-600/20 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
                 <ClipboardList className="w-6 h-6 text-brand-green-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Enrollment Application</h3>
-              <p className="text-sm text-slate-400 mb-4">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Enrollment Application</h3>
+              <p className="text-sm text-slate-500 mb-4">
                 Ready to enroll? Complete the full application to begin the admissions process.
                 Includes funding eligibility check, background information, and program agreement.
                 BNPL payment plans available.
@@ -288,7 +288,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               </div>
             ))}
           </div>
-          <p className="text-xs text-slate-400 mt-3">Source: {p.laborMarket.source}, {p.laborMarket.sourceYear}</p>
+          <p className="text-xs text-slate-500 mt-3">Source: {p.laborMarket.source}, {p.laborMarket.sourceYear}</p>
         </div>
       </section>
 

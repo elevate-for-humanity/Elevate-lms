@@ -22,12 +22,12 @@ export default function ApplyPage() {
               { label: 'Sanitation & Infection Control', href: '/programs/sanitation-infection-control' },
               { label: 'Apply' },
             ]}
-            className="text-white/80 mb-4"
+            className="text-slate-600 mb-4"
           />
           <span className="inline-block px-3 py-1 bg-brand-green-500 text-white text-sm font-semibold rounded-full mb-3">
             DOL REGISTERED APPRENTICESHIP
           </span>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Apply for Sanitation & Infection Control Apprenticeship</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Apply for Sanitation & Infection Control Apprenticeship</h1>
           <p className="text-white/90 mt-2">2Exclusive Apprenticeship Program - 32 Weeks with Paid OJT</p>
         </div>
       </section>
@@ -175,7 +175,7 @@ export default function ApplyPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="bg-slate-900 text-white rounded-xl p-6 text-center">
+        <div className="bg-white text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
             Call <a href="/support" className="text-brand-green-400 font-bold hover:underline">(317) 314-3757</a> or email{' '}

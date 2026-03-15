@@ -192,17 +192,17 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
               {/* Stats Row */}
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-brand-green-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
                   <span className="text-slate-600">On Track:</span>
                   <span className="font-medium text-slate-900">{cohort.on_track}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
                   <span className="text-slate-600">At Risk:</span>
                   <span className="font-medium text-slate-900">{cohort.at_risk}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-brand-blue-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
                   <span className="text-slate-600">Completed:</span>
                   <span className="font-medium text-slate-900">{cohort.completed}</span>
                 </div>
@@ -213,11 +213,11 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
                 <div className="mt-3">
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden flex">
                     <div 
-                      className="bg-brand-blue-500 rounded-full"
+                      className="bg-white rounded-full"
                       style={{ width: `${(cohort.completed / cohort.total) * 100}%` }}
                     />
                     <div 
-                      className="bg-brand-green-500"
+                      className="bg-white"
                       style={{ width: `${(cohort.on_track / cohort.total) * 100}%` }}
                     />
                     <div 

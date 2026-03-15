@@ -171,7 +171,7 @@ export default async function ProductsPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-gray-900">${product.price}</span>
                       {product.original_price && (
-                        <span className="text-sm text-gray-400 line-through">${product.original_price}</span>
+                        <span className="text-sm text-slate-500 line-through">${product.original_price}</span>
                       )}
                     </div>
                     <button

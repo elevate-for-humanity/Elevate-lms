@@ -112,10 +112,10 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-slate-900">
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-slate-300 mb-10">Apply online in minutes. No appointment needed.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
+          <p className="text-xl text-slate-600 mb-10">Apply online in minutes. No appointment needed.</p>
           <Link href="/start" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-xl transition hover:scale-105 shadow-lg">
             Apply Now
           </Link>

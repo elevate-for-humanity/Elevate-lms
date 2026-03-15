@@ -173,7 +173,7 @@ export default function DocumentsPage() {
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Documents Received</h2>
           <p className="text-gray-600">Your enrollment is being activated.</p>
@@ -208,7 +208,7 @@ export default function DocumentsPage() {
                     doc.uploaded ? 'bg-brand-green-100' : 'bg-white'
                   }`}>
                     {doc.uploaded ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <FileText className="w-5 h-5 text-gray-400" />
                     )}

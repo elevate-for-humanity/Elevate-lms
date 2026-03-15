@@ -44,12 +44,12 @@ export function LearningPathCard({
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-white mb-2">{name}</h3>
-          <p className="text-sm text-slate-400 line-clamp-2">{description}</p>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">{name}</h3>
+          <p className="text-sm text-slate-500 line-clamp-2">{description}</p>
         </div>
         {enrolled && (
           <div className="ml-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
         )}
       </div>
@@ -77,10 +77,10 @@ export function LearningPathCard({
       {enrolled && progress > 0 && (
         <div>
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-slate-400">Progress</span>
+            <span className="text-slate-500">Progress</span>
             <span className="text-white font-semibold">{progress}%</span>
           </div>
-          <div className="w-full bg-slate-700 rounded-full h-2">
+          <div className="w-full bg-white rounded-full h-2">
             <div
               className="bg-brand-orange-500 rounded-full h-2 transition-all"
               style={{ width: `${progress}%` }}

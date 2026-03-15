@@ -106,14 +106,14 @@ export default function DonationsPage() {
                 <div className="flex-1">
                   <p className="text-gray-900 font-medium">{level.impact}</p>
                 </div>
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-brand-red-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Other Ways to Give</h2>
           <div className="grid md:grid-cols-3 gap-8">

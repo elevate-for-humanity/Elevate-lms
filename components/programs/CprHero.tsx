@@ -127,7 +127,7 @@ export default function CprHero() {
             </p>
           ))}
           {activeLine === -1 && !playing && (
-            <p className="text-white/70 text-sm font-medium drop-shadow">
+            <p className="text-slate-500 text-sm font-medium drop-shadow">
               CPR &amp; First Aid — Train From Home
             </p>
           )}
@@ -154,7 +154,7 @@ export default function CprHero() {
       </div>
 
       {/* Price badge */}
-      <div className="absolute top-4 right-4 bg-brand-red-600 text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg">
+      <div className="absolute top-4 right-4 bg-white text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg">
         $130 · Live Instructor
       </div>
     </section>

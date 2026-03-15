@@ -46,7 +46,7 @@ export default async function SuccessStoriesPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/success-page-1.jpg" alt="Success Stories" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Success Stories</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Real outcomes from students who transformed their lives through workforce training.</p>
@@ -156,7 +156,7 @@ export default async function SuccessStoriesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Write Your Success Story?

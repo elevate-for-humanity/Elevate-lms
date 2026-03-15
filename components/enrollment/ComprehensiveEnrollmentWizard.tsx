@@ -377,7 +377,7 @@ export default function ComprehensiveEnrollmentWizard({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-brand-blue-600 h-3 rounded-full transition-all duration-300"
+                className="bg-white h-3 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -398,7 +398,7 @@ export default function ComprehensiveEnrollmentWizard({
                       'bg-gray-200 text-gray-500'
                     }`}>
                       {currentStep > step.id ? (
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                       ) : (
                         <StepIcon className="w-6 h-6" />
                       )}
@@ -706,7 +706,7 @@ export default function ComprehensiveEnrollmentWizard({
                 </>
               ) : (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   Complete Enrollment
                 </>
               )}

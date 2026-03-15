@@ -110,7 +110,7 @@ export default async function CompanyProfilePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Cover Image */}
-      <div className="relative h-64 bg-brand-blue-600 overflow-hidden">
+      <div className="relative h-64 bg-white overflow-hidden">
         {companyData.cover && (
           <Image
             src={companyData.cover}
@@ -153,7 +153,7 @@ export default async function CompanyProfilePage() {
                   )}
                   {companyData.verified ? (
                     <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-sm font-medium rounded-full flex items-center gap-1">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       Verified
                     </span>
                   ) : (
@@ -218,7 +218,7 @@ export default async function CompanyProfilePage() {
                 <p className="text-sm text-gray-600">WOTC Credits</p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <p className="text-2xl font-bold text-gray-900">{stats.avgTimeToHire}</p>
                 <p className="text-sm text-gray-600">Avg. Time to Hire</p>
               </div>
@@ -231,7 +231,7 @@ export default async function CompanyProfilePage() {
                 <div className="grid md:grid-cols-3 gap-4">
                   {companyData.benefits.map((benefit: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-gray-700">{benefit}</span>
                     </div>
                   ))}

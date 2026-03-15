@@ -288,8 +288,8 @@ export default function ApprenticeForm() {
         </div>
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply for Enrollment</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Apply for Enrollment</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
           </div>
         </div>
       </section>
@@ -299,7 +299,7 @@ export default function ApprenticeForm() {
           
           {/* Left Column - Payment Calculator */}
           <div className="lg:col-span-2">
-            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-white rounded-2xl p-6 text-white sticky top-8">
               <div className="flex items-center gap-3 mb-4">
                 <Calculator className="w-6 h-6" />
                 <h2 className="text-lg font-bold">Payment Calculator</h2>
@@ -369,7 +369,7 @@ export default function ApprenticeForm() {
               </div>
 
               {/* Payment Options */}
-              <div className="bg-brand-green-500/20 rounded-xl p-4 mt-4">
+              <div className="bg-white/20 rounded-xl p-4 mt-4">
                 <div className="text-center">
                   <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
                   <div className="text-sm text-white mt-2 space-y-1">

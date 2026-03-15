@@ -79,12 +79,12 @@ export default function BarberScoringSheetPage() {
       <div className="max-w-4xl mx-auto px-4 pb-8 print:px-6 print:pb-4">
         {BARBER_SECTIONS.map((section) => (
           <div key={section.section} className="mb-6 print:mb-4 print:break-inside-avoid">
-            <div className="bg-gray-900 text-white px-4 py-2 rounded-t print:rounded-none">
+            <div className="bg-white text-white px-4 py-2 rounded-t print:rounded-none">
               <div className="flex justify-between items-center">
                 <h2 className="font-bold text-sm print:text-[11px]">
                   Section {section.section}: {section.title}
                 </h2>
-                <span className="text-xs text-gray-300 print:text-[9px]">{section.items.length} competencies</span>
+                <span className="text-xs text-slate-600 print:text-[9px]">{section.items.length} competencies</span>
               </div>
             </div>
 
@@ -107,11 +107,11 @@ export default function BarberScoringSheetPage() {
                     <td className="p-2 border text-center print:p-1">{item.rtiHours > 0 ? `${item.rtiHours}h` : '—'}</td>
                     <td className="p-2 border text-center print:p-1">{item.ojtHours > 0 ? `${item.ojtHours}h` : '—'}</td>
                     <td className="p-2 border text-center print:p-1">
-                      <span className="print:hidden text-gray-400">___</span>
+                      <span className="print:hidden text-slate-500">___</span>
                       <span className="hidden print:inline">&nbsp;</span>
                     </td>
                     <td className="p-2 border print:p-1">
-                      <span className="print:hidden text-gray-400 text-xs">Notes</span>
+                      <span className="print:hidden text-slate-500 text-xs">Notes</span>
                     </td>
                   </tr>
                 ))}

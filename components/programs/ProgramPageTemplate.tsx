@@ -123,7 +123,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
           {program.highlights && program.highlights.length > 0 && (
             <div className="border-t border-gray-100 pt-12">
-              <p className="text-sm text-gray-400 uppercase tracking-wider mb-8">This program includes</p>
+              <p className="text-sm text-slate-500 uppercase tracking-wider mb-8">This program includes</p>
               <div className="grid md:grid-cols-3 gap-8">
                 {program.highlights.map((highlight, index) => (
                   <div key={index}>
@@ -171,7 +171,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step 1: Apply Online */}
             <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
               <div className="pt-4">
@@ -181,19 +181,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Fill out basic information and career goals</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Upload ID and proof of residency</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Schedule your enrollment appointment</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Get approved within 24-48 hours</span>
                   </li>
                 </ul>
@@ -208,7 +208,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 2: Complete Training */}
             <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border border-purple-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-purple-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 2
               </div>
               <div className="pt-4">
@@ -218,19 +218,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Attend instructor-led classroom sessions</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Complete hands-on clinical practice</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Pass skills assessments and exams</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Earn your state certification</span>
                   </li>
                 </ul>
@@ -245,7 +245,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 3: Start Working */}
             <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-8 border border-brand-green-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 3
               </div>
               <div className="pt-4">
@@ -255,19 +255,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Professional resume and cover letter</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Mock interviews and coaching</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">Direct introductions to hiring employers</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">90-day post-employment support</span>
                   </li>
                 </ul>
@@ -398,12 +398,12 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       )}
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-gray-900">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to get started?
           </h2>
-          <p className="text-gray-400 text-lg mb-8">
+          <p className="text-slate-500 text-lg mb-8">
             {program.fundingType === 'funded' 
               ? 'Free training for eligible Indiana residents. Check your eligibility in minutes.'
               : 'Self-pay program with payment options available.'}

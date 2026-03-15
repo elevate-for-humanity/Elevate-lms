@@ -205,7 +205,7 @@ export default function DotTestingPage() {
                     className="object-cover"
                   />
                   {test.popular && (
-                    <div className="absolute top-3 left-3 bg-brand-orange-500 text-slate-900 px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-3 left-3 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold">
                       MOST COMMON
                     </div>
                   )}
@@ -270,7 +270,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* Random Consortium */}
-      <section className="py-16 bg-gray-900 text-slate-900">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -315,7 +315,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-500 text-slate-900">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need DOT-Compliant Testing?</h2>
           <p className="text-xl text-brand-orange-100 mb-8">

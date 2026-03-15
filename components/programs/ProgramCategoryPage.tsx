@@ -113,7 +113,7 @@ export default function ProgramCategoryPage({
             <span className={`inline-block ${colors.badge} text-white text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
               {tagline}
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-4 leading-tight">
               {categoryName}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
@@ -157,7 +157,7 @@ export default function ProgramCategoryPage({
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
               {highlights.map((highlight, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-slate-700 font-medium">{highlight}</span>
                 </div>
               ))}
@@ -222,7 +222,7 @@ export default function ProgramCategoryPage({
       {/* CTA Section */}
       <section className={`py-16 ${colors.button.replace('hover:', '')}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to Start Your {categoryName} Career?
           </h2>
           <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">

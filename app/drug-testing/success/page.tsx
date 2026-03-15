@@ -17,7 +17,7 @@ export default function DrugTestingSuccessPage() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
         </div>
 
         <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
@@ -31,7 +31,7 @@ export default function DrugTestingSuccessPage() {
           <h2 className="text-lg font-bold mb-4">What Happens Next?</h2>
           <div className="text-left space-y-3">
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 1
               </div>
               <p className="text-black">
@@ -40,7 +40,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 2
               </div>
               <p className="text-black">
@@ -49,7 +49,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-white text-white rounded-full flex-shrink-0 text-sm font-bold">
                 3
               </div>
               <p className="text-black">
@@ -57,7 +57,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 4
               </div>
               <p className="text-black">

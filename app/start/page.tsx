@@ -54,7 +54,7 @@ export default function StartPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-slate-800 text-white">
+      <section className="relative overflow-hidden bg-white text-white">
         <Image
           src="/images/pages/how-it-works-hero.jpg"
           alt="Career training students"
@@ -71,7 +71,7 @@ export default function StartPage() {
             <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
               Start here. We&apos;ll guide you through funding and enrollment.
             </h1>
-            <p className="mt-5 text-lg text-gray-300">
+            <p className="mt-5 text-lg text-slate-600">
               One intake form. We figure out your eligibility, connect you with
               the right program, and move you toward enrollment — no runaround.
             </p>
@@ -168,9 +168,9 @@ export default function StartPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="bg-brand-red-600 py-12">
+      <section className="bg-white py-12">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-2xl font-bold text-white md:text-3xl">
+          <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">
             Ready to change your career?
           </h2>
           <p className="mt-3 text-brand-red-100">

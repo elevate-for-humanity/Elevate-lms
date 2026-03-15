@@ -160,7 +160,7 @@ export default function StartForm() {
 
         <div>
           <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
-            Phone <span className="text-gray-400">(optional)</span>
+            Phone <span className="text-slate-500">(optional)</span>
           </label>
           <input
             id="phone"
@@ -276,7 +276,7 @@ export default function StartForm() {
           {submitState.type === 'loading' ? 'Submitting...' : 'Start my application'}
         </button>
 
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-slate-500">
           Your information is secure and never shared without your consent.
         </p>
       </div>

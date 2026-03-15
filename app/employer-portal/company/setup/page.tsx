@@ -171,7 +171,7 @@ export default function CompanySetupPage() {
             <span className="text-sm font-bold text-brand-blue-600">{completion}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${completion}%` }} />
+            <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${completion}%` }} />
           </div>
         </div>
 

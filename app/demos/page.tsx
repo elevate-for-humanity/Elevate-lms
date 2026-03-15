@@ -99,10 +99,10 @@ export default function DemosPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/demos-hero.jpg" alt="Product Demos" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">See Elevate in Action</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Watch demos of our training platform or schedule a personalized walkthrough with our team. See how we help organizations train their workforce.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">See Elevate in Action</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Watch demos of our training platform or schedule a personalized walkthrough with our team. See how we help organizations train their workforce.</p>
           </div>
         </div>
       </section>
@@ -153,7 +153,7 @@ export default function DemosPage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-brand-blue-900/40 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-white/40 flex items-center justify-center">
                     <Link 
                       href={demo.demoUrl}
                       className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
@@ -161,7 +161,7 @@ export default function DemosPage() {
                       <Play className="w-10 h-10 text-brand-blue-600 ml-1" />
                     </Link>
                   </div>
-                  <div className="absolute top-4 right-4 bg-slate-800 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                  <div className="absolute top-4 right-4 bg-white text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {demo.duration}
                   </div>
@@ -175,7 +175,7 @@ export default function DemosPage() {
                   <div className="space-y-2 mb-6">
                     {demo.features.slice(0, 3).map((feature, idx) => (
                       <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         {feature}
                       </div>
                     ))}
@@ -200,7 +200,7 @@ export default function DemosPage() {
       </section>
 
       {/* Live Demo CTA */}
-      <section className="py-20 bg-brand-blue-700 text-white">
+      <section className="py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Users className="w-16 h-16 mx-auto mb-6 text-brand-blue-300" />
           <h2 className="text-3xl md:text-4xl font-black mb-4">

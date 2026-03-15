@@ -320,7 +320,7 @@ export function AdminReportingDashboard() {
               {monthlyData.map((value, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <div
-                    className="w-full bg-brand-blue-500 rounded-t transition-all hover:bg-brand-blue-600"
+                    className="w-full bg-white rounded-t transition-all hover:bg-brand-blue-600"
                     style={{ height: `${(value / 115) * 100}%` }}
                   />
                   <div className="text-xs text-gray-500 mt-2">

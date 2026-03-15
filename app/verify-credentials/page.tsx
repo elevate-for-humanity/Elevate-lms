@@ -225,7 +225,7 @@ export default function VerifyCredentialsPage() {
       {/* Quick Verification Box */}
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-brand-blue-600 text-white rounded-xl p-6 md:p-8">
+          <div className="bg-white text-white rounded-xl p-6 md:p-8">
             <h2 className="text-xl font-bold mb-4">Quick Verification</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>

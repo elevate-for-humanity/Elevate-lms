@@ -11,26 +11,26 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 7 — Career Pathways */}
-      <section className="py-16 bg-brand-red-600">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Career Pathways</h2>
-              <p className="text-white/80 mb-8">
+              <p className="text-slate-600 mb-8">
                 Graduates enter the workforce with industry-recognized credentials and documented competencies. Career pathways include licensed barber positions, shop management, and business ownership.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {CAREERS.map((career, i) => (
                   <div key={i} className="bg-white/10 rounded-xl p-4">
-                    <h3 className="font-bold text-white">{career.title}</h3>
-                    <p className="text-white/80 text-sm">{career.salary}/year</p>
-                    {career.demand && <p className="text-white/60 text-xs mt-1">{career.demand}</p>}
+                    <h3 className="font-bold text-slate-900">{career.title}</h3>
+                    <p className="text-slate-600 text-sm">{career.salary}/year</p>
+                    {career.demand && <p className="text-slate-500 text-xs mt-1">{career.demand}</p>}
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white mb-4">Industry Sectors</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Industry Sectors</h3>
               <div className="grid grid-cols-2 gap-3">
                 {['Licensed Barbershops', 'Salon & Spa', 'Hotel & Resort', 'Entertainment & Media', 'Sports Teams', 'Private Clients', 'Shop Ownership', 'Franchise Operations'].map((emp, i) => (
                   <div key={i} className="bg-white/20 rounded-lg px-4 py-3 text-white font-medium text-sm">

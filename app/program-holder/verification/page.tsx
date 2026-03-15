@@ -144,7 +144,7 @@ export default async function VerificationPage() {
             {isVerified ? (
               <div className="bg-brand-green-50 border-l-4 border-brand-green-500 p-6 mb-8">
                 <div className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <div>
                     <h3 className="text-lg font-semibold text-brand-green-900 mb-1">
                       Verification Complete
@@ -169,7 +169,7 @@ export default async function VerificationPage() {
                     </p>
                     <div className="w-full bg-brand-blue-200 rounded-full h-2 mt-3">
                       <div
-                        className="bg-brand-blue-600 h-2 rounded-full transition-all"
+                        className="bg-white h-2 rounded-full transition-all"
                         style={{ width: `${verificationProgress}%` }}
                       />
                     </div>
@@ -199,7 +199,7 @@ export default async function VerificationPage() {
                     }`}
                   >
                     {req.completed ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       <FileText className="h-10 w-10 text-slate-400 mr-3 flex-shrink-0 mt-0.5" />
                     )}

@@ -62,7 +62,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
       ) : posterImage ? (
         <img src={posterImage} alt="Program hero" className="absolute inset-0 w-full h-full object-cover" />
       ) : (
-        <div className="absolute inset-0 bg-slate-900" />
+        <div className="absolute inset-0 bg-white" />
       )}
       {voiceoverSrc && (
         <audio ref={audioRef} src={voiceoverSrc} preload="auto" aria-hidden="true" />

@@ -40,11 +40,11 @@ export default function WOTCPage() {
         </div>
       </div>
 
-      <section className="bg-slate-900 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4 text-brand-green-400" />
           <h1 className="text-4xl font-bold mb-4">Work Opportunity Tax Credit</h1>
-          <p className="text-xl text-slate-300">
+          <p className="text-xl text-slate-600">
             Earn $2,400–$9,600 per eligible hire while building your workforce.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function WOTCPage() {
           <div className="grid md:grid-cols-4 gap-6">
             {steps.map((step, i) => (
               <div key={step.title} className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-lg font-bold">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-3 text-lg font-bold">
                   {i + 1}
                 </div>
                 <h3 className="font-semibold text-slate-900 mb-2">{step.title}</h3>
@@ -135,9 +135,9 @@ export default function WOTCPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-slate-900 text-white rounded-xl p-8 text-center">
+        <section className="bg-white text-white rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-3">Hire Elevate Graduates &amp; Earn Tax Credits</h2>
-          <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
+          <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
             Our workforce development programs train candidates who may qualify for WOTC.
             We can help you identify eligible hires and navigate the certification process.
           </p>

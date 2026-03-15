@@ -154,7 +154,7 @@ export default function CosmetologyApplyPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-400 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Questions?{' '}
               <a href="tel:3173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</a>
               {' '}or{' '}

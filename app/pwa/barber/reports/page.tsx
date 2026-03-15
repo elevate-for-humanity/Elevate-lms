@@ -56,22 +56,22 @@ export default function BarberReportsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Reports</h1>
-            <p className="text-slate-400 text-sm">View and export your hours</p>
+            <h1 className="text-xl font-bold text-slate-900">Reports</h1>
+            <p className="text-slate-500 text-sm">View and export your hours</p>
           </div>
         </div>
       </header>
@@ -79,24 +79,24 @@ export default function BarberReportsPage() {
       <main className="px-4 py-6 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-brand-blue-400" />
-              <span className="text-slate-400 text-sm">Total Hours</span>
+              <span className="text-slate-500 text-sm">Total Hours</span>
             </div>
-            <p className="text-3xl font-bold text-white">{summary.totalHours}</p>
+            <p className="text-3xl font-bold text-slate-900">{summary.totalHours}</p>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-brand-green-400" />
-              <span className="text-slate-400 text-sm">This Month</span>
+              <span className="text-slate-500 text-sm">This Month</span>
             </div>
-            <p className="text-3xl font-bold text-white">{summary.thisMonth}</p>
+            <p className="text-3xl font-bold text-slate-900">{summary.thisMonth}</p>
           </div>
         </div>
 
         {/* Progress to Goal */}
-        <div className="bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4">
+        <div className="bg-white/20 border border-brand-blue-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-brand-blue-400" />
@@ -104,9 +104,9 @@ export default function BarberReportsPage() {
             </div>
             <span className="text-brand-blue-300 font-bold">{summary.milestoneProgress}%</span>
           </div>
-          <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-3 bg-white rounded-full overflow-hidden">
             <div 
-              className="h-full bg-brand-blue-500 rounded-full"
+              className="h-full bg-white rounded-full"
               style={{ width: `${summary.milestoneProgress}%` }}
             />
           </div>
@@ -116,19 +116,19 @@ export default function BarberReportsPage() {
         </div>
 
         {/* Status Breakdown */}
-        <div className="bg-slate-800 rounded-xl p-4">
-          <h2 className="text-white font-medium mb-4">Hours Status</h2>
+        <div className="bg-white rounded-xl p-4">
+          <h2 className="text-slate-900 font-medium mb-4">Hours Status</h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-400">Approved</span>
+              <span className="text-slate-500">Approved</span>
               <span className="text-brand-green-400 font-medium">{summary.approved} hrs</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-400">Pending Approval</span>
+              <span className="text-slate-500">Pending Approval</span>
               <span className="text-amber-400 font-medium">{summary.pendingApproval} hrs</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-400">This Week</span>
+              <span className="text-slate-500">This Week</span>
               <span className="text-white font-medium">{summary.thisWeek} hrs</span>
             </div>
           </div>
@@ -136,17 +136,17 @@ export default function BarberReportsPage() {
 
         {/* Report Actions */}
         <div className="space-y-3">
-          <h2 className="text-white font-medium">Export Reports</h2>
+          <h2 className="text-slate-900 font-medium">Export Reports</h2>
           
           <Link 
             href="/pwa/barber/reports/export"
             className="flex items-center gap-4 bg-brand-blue-600 rounded-xl p-4 active:bg-brand-blue-700"
           >
-            <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Download className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Export Hours Report</p>
+              <p className="text-slate-900 font-medium">Export Hours Report</p>
               <p className="text-brand-blue-200 text-sm">PDF, CSV, or Excel format</p>
             </div>
             <ChevronRight className="w-5 h-5 text-brand-blue-200" />
@@ -156,12 +156,12 @@ export default function BarberReportsPage() {
             href="/pwa/barber/history"
             className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <Calendar className="w-6 h-6 text-slate-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">View Hour History</p>
-              <p className="text-slate-400 text-sm">See all logged entries</p>
+              <p className="text-slate-900 font-medium">View Hour History</p>
+              <p className="text-slate-500 text-sm">See all logged entries</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>
@@ -170,12 +170,12 @@ export default function BarberReportsPage() {
             href="/pwa/barber/progress"
             className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-slate-400" />
             </div>
             <div className="flex-1">
-              <p className="text-white font-medium">Detailed Progress</p>
-              <p className="text-slate-400 text-sm">Charts and milestones</p>
+              <p className="text-slate-900 font-medium">Detailed Progress</p>
+              <p className="text-slate-500 text-sm">Charts and milestones</p>
             </div>
             <ChevronRight className="w-5 h-5 text-slate-500" />
           </Link>

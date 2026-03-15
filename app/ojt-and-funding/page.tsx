@@ -28,7 +28,7 @@ export default function OjtAndFundingPage() {
     <div className="min-h-screen bg-white">
 
       {/* Video hero */}
-      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-slate-900">
+      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-white">
         <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/ojt-and-funding-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover" />
       </section>
@@ -63,7 +63,7 @@ export default function OjtAndFundingPage() {
                 <div className="relative h-40 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-3 py-2">
-                    <h3 className="font-bold text-white text-sm leading-tight">{title}</h3>
+                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
                   </div>
                 </div>
                 <div className="p-4 flex-1">
@@ -86,7 +86,7 @@ export default function OjtAndFundingPage() {
                 <div className="relative h-44 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="400px" className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-white text-sm leading-tight">{title}</h3>
+                    <h3 className="font-bold text-slate-900 text-sm leading-tight">{title}</h3>
                   </div>
                 </div>
                 <div className="p-4 flex-1">
@@ -99,12 +99,12 @@ export default function OjtAndFundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">Ready to Reduce Your Hiring Costs?</h2>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Ready to Reduce Your Hiring Costs?</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-6">
                 Contact us to learn which incentives your business qualifies for and how to set up an OJT or apprenticeship agreement.
               </p>
               <div className="flex flex-wrap gap-3">

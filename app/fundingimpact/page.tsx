@@ -40,10 +40,10 @@ export default function FundingImpactPage() {
           <LazyVideo src="/videos/graduation-success.mp4" poster="/images/pages/funding-hero.jpg"
             className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">The Impact of Federal Workforce Funding</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">The Impact of Federal Workforce Funding</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
               Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -277,7 +277,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
                     MJ
                   </div>
                   <div>
@@ -308,7 +308,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
                     ST
                   </div>
                   <div>
@@ -338,7 +338,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-brand-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
                     DW
                   </div>
                   <div>
@@ -394,7 +394,7 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-indigo-50">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-indigo-50">
                   <Heart className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Family Stability</h3>
@@ -404,15 +404,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Reduced reliance on public assistance
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Improved child outcomes
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Generational wealth building
                   </li>
                 </ul>
@@ -429,7 +429,7 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-blue-50">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-blue-50">
                   <Building2 className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Employer Benefits</h3>
@@ -439,15 +439,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Pre-screened, trained candidates
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Reduced hiring costs
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Lower turnover rates
                   </li>
                 </ul>
@@ -464,7 +464,7 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-green-50">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-green-50">
                   <TrendingUp className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Economic Growth</h3>
@@ -474,15 +474,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Increased tax revenue
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Local spending boost
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     Reduced social service costs
                   </li>
                 </ul>
@@ -493,9 +493,9 @@ export default function FundingImpactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-indigo-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Be Part of the Impact
           </h2>
           <p className="text-xl text-white/90 mb-8">

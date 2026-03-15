@@ -423,7 +423,7 @@ export default function AIStudioPage() {
                             <Play className="w-5 h-5" />
                           </button>
                           <div className="flex-1 h-1 bg-gray-200 rounded-full">
-                            <div className="h-full w-0 bg-brand-blue-600 rounded-full" />
+                            <div className="h-full w-0 bg-white rounded-full" />
                           </div>
                         </div>
                       )}

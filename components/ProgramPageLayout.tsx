@@ -153,7 +153,7 @@ export default function ProgramPageLayout({
                 <div className="space-y-4">
                   {certifications.map((cert, index) => (
                     <div key={index} className="flex items-start bg-white rounded-xl p-4 shadow-sm">
-                      <div className="flex-shrink-0 w-8 h-8 bg-brand-green-500 rounded-full flex items-center justify-center mr-4">
+                      <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center mr-4">
                         <span className="text-slate-400 flex-shrink-0">•</span>
                       </div>
                       <span className="text-lg font-medium text-black">{cert}</span>

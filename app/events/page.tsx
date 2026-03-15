@@ -70,7 +70,7 @@ export default async function EventsPage() {
         </section>
       )}
 
-      <section className="bg-slate-900 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white">Want to host or sponsor an event?</h2>
           <p className="text-slate-400 mt-2 max-w-xl mx-auto text-sm">

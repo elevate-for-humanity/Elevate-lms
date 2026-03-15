@@ -121,7 +121,7 @@ export default function StudentProgressWidget() {
         {hasHours && (
           <div className="bg-brand-green-50 rounded-lg p-4 border border-brand-green-100">
             <div className="flex items-center gap-2 text-brand-green-700 mb-1">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="text-sm font-medium">Verified Hours</span>
             </div>
             <p className="text-3xl font-bold text-brand-green-800">
@@ -178,7 +178,7 @@ export default function StudentProgressWidget() {
             {program.required_hours && (
               <div className="h-2 bg-white rounded-full overflow-hidden mb-2">
                 <div
-                  className="h-full bg-brand-green-500 rounded-full transition-all"
+                  className="h-full bg-white rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>

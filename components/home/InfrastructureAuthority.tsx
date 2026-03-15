@@ -76,7 +76,7 @@ export default function InfrastructureAuthority() {
 
               {/* Partner logos */}
               <div className="mt-12 pt-8 border-t border-slate-200">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
                   Approved & Recognized By
                 </p>
                 <div className="flex items-center gap-8 flex-wrap">

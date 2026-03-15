@@ -110,7 +110,7 @@ export default function LessonSidebar({
                     {/* Lesson Number / Status */}
                     <div className="flex-shrink-0 mt-0.5">
                       {isCompleted ? (
-                        <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                           <span className="text-slate-400 flex-shrink-0">•</span>
                         </div>
                       ) : (
@@ -149,7 +149,7 @@ export default function LessonSidebar({
                     {/* Active Indicator */}
                     {isActive && (
                       <div className="flex-shrink-0">
-                        <div className="w-2 h-2 bg-brand-orange-600 rounded-full animate-pulse" />
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                       </div>
                     )}
                   </div>

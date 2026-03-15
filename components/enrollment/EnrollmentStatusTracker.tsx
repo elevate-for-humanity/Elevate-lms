@@ -63,7 +63,7 @@ export function EnrollmentStatusTracker({
         {/* Progress Line */}
         <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200" />
         <div 
-          className="absolute left-4 top-4 w-0.5 bg-brand-blue-500 transition-all duration-500"
+          className="absolute left-4 top-4 w-0.5 bg-white transition-all duration-500"
           style={{ height: `${(currentIndex / (STEPS.length - 1)) * 100}%` }}
         />
 
@@ -83,7 +83,7 @@ export function EnrollmentStatusTracker({
                   ${isCurrent ? 'bg-brand-blue-500 text-white ring-4 ring-brand-blue-100' : ''}
                   ${isPending ? 'bg-slate-100 text-slate-400 border border-slate-200' : ''}
                 `}>
-                  {isComplete && <span className="text-slate-400 flex-shrink-0">•</span>}
+                  {isComplete && <span className="text-slate-500 flex-shrink-0">•</span>}
                   {isCurrent && <Clock className="w-5 h-5" />}
                   {isPending && <Circle className="w-4 h-4" />}
                 </div>

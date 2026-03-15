@@ -51,10 +51,10 @@ export default function EcosystemPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">The Elevate Ecosystem</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">A connected network of learners, employers, training providers, and workforce boards working together to transform careers and communities.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">The Elevate Ecosystem</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">A connected network of learners, employers, training providers, and workforce boards working together to transform careers and communities.</p>
           </div>
         </div>
       </section>
@@ -107,7 +107,7 @@ export default function EcosystemPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

@@ -67,7 +67,7 @@ function IntakeForm() {
       <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Application Received</h1>
           <p className="text-lg text-slate-600 mb-2">
@@ -110,12 +110,12 @@ function IntakeForm() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-slate-900 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-2xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             Funding & Apprenticeship Intake
           </h1>
-          <p className="text-slate-300 text-lg">
+          <p className="text-slate-600 text-lg">
             This form screens your eligibility for workforce-funded training programs
             including WIOA, WRG, and JRI. Funding is not guaranteed and requires partner review.
           </p>

@@ -96,14 +96,14 @@ export function AIInstructorPanel({ instructor, programTitle }: AIInstructorPane
   return (
     <div className="flex h-[480px] flex-col rounded-xl border border-slate-800 bg-slate-950/80 text-xs">
       <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-950 px-3 py-2">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-base">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-base">
           {instructor.avatarEmoji || "🎓"}
         </div>
         <div>
           <p className="text-[11px] font-semibold text-slate-100">
             {instructor.name}
           </p>
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-500">
             {instructor.title}
           </p>
         </div>

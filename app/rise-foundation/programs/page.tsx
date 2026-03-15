@@ -103,7 +103,7 @@ export default function RiseFoundationProgramsPage() {
                   <span>{program.filled}/{program.spots}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-brand-orange-500 h-2 rounded-full" style={{ width: `${(program.filled / program.spots) * 100}%` }} />
+                  <div className="bg-white h-2 rounded-full" style={{ width: `${(program.filled / program.spots) * 100}%` }} />
                 </div>
               </div>
 

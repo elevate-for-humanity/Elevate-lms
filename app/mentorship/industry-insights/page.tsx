@@ -76,7 +76,7 @@ export default function IndustryInsightsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-indigo-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Industry Knowledge</h2>
           <p className="text-xl text-indigo-100 mb-8">Connect with mentors who have been where you want to go.</p>

@@ -416,7 +416,7 @@ export default function CertificateDownload({
       <div className="px-6 py-4 bg-gray-50 border-t">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <span>Verification Code: <code className="bg-gray-200 px-2 py-0.5 rounded">{certificate.verification_code}</code></span>
           </div>
           <div className="flex items-center gap-2">
@@ -424,7 +424,7 @@ export default function CertificateDownload({
               onClick={copyVerificationLink}
               className="flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-800"
             >
-              {copied ? <span className="text-slate-400 flex-shrink-0">•</span> : <Copy className="w-4 h-4" />}
+              {copied ? <span className="text-slate-500 flex-shrink-0">•</span> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy Link'}
             </button>
             <a

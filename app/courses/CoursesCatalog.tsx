@@ -58,7 +58,7 @@ export default function CoursesCatalog({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-brand-blue-700 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
@@ -352,7 +352,7 @@ export default function CoursesCatalog({
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">

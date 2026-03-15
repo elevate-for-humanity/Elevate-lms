@@ -78,7 +78,7 @@ export function VideoShell({
             <p className="text-[0.65rem] tracking-[0.2em] text-brand-orange-300 uppercase mb-1">
               Elevate for Humanity
             </p>
-            <h2 className="text-white font-semibold text-sm sm:text-base leading-tight line-clamp-2">
+            <h2 className="text-slate-900 font-semibold text-sm sm:text-base leading-tight line-clamp-2">
               {title}
             </h2>
           </div>

@@ -36,8 +36,8 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
               <MapPin className="w-5 h-5" />
               <span className="text-sm font-medium uppercase tracking-wider">Serving All of {state.name}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{state.careerTraining.headline}</h1>
-            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{state.careerTraining.description}</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">{state.careerTraining.headline}</h1>
+            <p className="text-lg text-slate-600 mb-6 max-w-3xl mx-auto">{state.careerTraining.description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/programs" className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white rounded-lg text-lg font-bold transition-colors">
                 Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
@@ -62,7 +62,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
           <div className="grid md:grid-cols-2 gap-6">
             {state.careerTraining.features.map((item) => (
               <div key={item} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -110,9 +110,9 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-green-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your Career Journey?
           </h2>
           <p className="text-brand-green-100 mb-8">

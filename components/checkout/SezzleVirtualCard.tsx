@@ -199,7 +199,7 @@ export default function SezzleVirtualCard({
 
         {/* Visa logo placeholder */}
         <div className="absolute bottom-6 right-6">
-          <CreditCard className="w-10 h-10 text-white/50" />
+          <CreditCard className="w-10 h-10 text-slate-400" />
         </div>
       </div>
 

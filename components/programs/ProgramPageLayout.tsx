@@ -407,7 +407,7 @@ export default function ProgramPageLayout({
                           <span className="font-bold text-brand-red-600">{item.hours} hours</span>
                         </div>
                         <div className="w-full bg-slate-100 rounded-full h-2.5">
-                          <div className="bg-brand-red-600 h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                          <div className="bg-white h-2.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     );
@@ -711,7 +711,7 @@ export default function ProgramPageLayout({
                 {c.steps.map((step, i) => (
                   <ScrollReveal key={step.title} delay={i * 100} direction="up">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                      <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                         {i + 1}
                       </div>
                       <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
@@ -736,7 +736,7 @@ export default function ProgramPageLayout({
                   <details key={faq.question} className="group bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
                     <summary className="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-slate-900 hover:text-brand-red-600 transition-colors text-sm">
                       {faq.question}
-                      <span className="ml-4 text-slate-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                      <span className="ml-4 text-slate-500 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
                     </summary>
                     <div className="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
                       {faq.answer}
@@ -751,10 +751,10 @@ export default function ProgramPageLayout({
 
       {/* ===== FINAL CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
+        <section className="py-14 sm:py-20 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
           <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
               Start This Credential Pathway
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-lg mx-auto">

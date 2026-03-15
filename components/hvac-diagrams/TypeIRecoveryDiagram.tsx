@@ -108,10 +108,10 @@ export default function TypeIRecoveryDiagram({ onComplete }: { onComplete?: () =
   return (
     <div className="space-y-5">
 
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type I — Small Appliances</p>
         <h2 className="text-xl font-extrabold">Recovery Decision Tree</h2>
-        <p className="text-slate-400 text-sm mt-1">Work through the decision tree to learn the correct recovery procedure for any Type I scenario.</p>
+        <p className="text-slate-500 text-sm mt-1">Work through the decision tree to learn the correct recovery procedure for any Type I scenario.</p>
       </div>
 
       {/* Breadcrumb */}
@@ -129,7 +129,7 @@ export default function TypeIRecoveryDiagram({ onComplete }: { onComplete?: () =
       {/* Current step */}
       <div className={`rounded-2xl overflow-hidden border-2 ${current.terminal ? 'border-slate-300' : 'border-slate-200'}`}>
         <div className={`px-5 py-3 ${current.terminal ? (current.terminalColor || 'bg-slate-800') : 'bg-slate-800'}`}>
-          <h3 className="text-white font-extrabold text-lg">{current.title}</h3>
+          <h3 className="text-slate-900 font-extrabold text-lg">{current.title}</h3>
         </div>
         <div className="p-5 space-y-4 bg-white">
           <p className="text-slate-700 text-sm leading-relaxed">{current.content}</p>

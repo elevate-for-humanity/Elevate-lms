@@ -49,7 +49,7 @@ export default function GoalSettingPage() {
               { letter: 'T', word: 'Time-bound', desc: 'Set deadlines to create urgency and focus' },
             ].map((item, i) => (
               <div key={i} className="flex items-center bg-brand-orange-50 rounded-lg p-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-4">{item.letter}</div>
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl mr-4">{item.letter}</div>
                 <div>
                   <h3 className="font-bold text-gray-900">{item.word}</h3>
                   <p className="text-gray-600 text-sm">{item.desc}</p>
@@ -83,7 +83,7 @@ export default function GoalSettingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-orange-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Set Goals That Matter</h2>
           <p className="text-xl text-brand-orange-100 mb-8">Work with a mentor to create your roadmap to success.</p>

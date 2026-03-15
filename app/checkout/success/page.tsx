@@ -23,7 +23,7 @@ function SuccessContent({
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="max-w-2xl w-full bg-white shadow-lg rounded-lg p-8 md:p-12">
         <div className="text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
 
           <h1 className="text-3xl font-bold text-black mb-4">
             Payment Successful!

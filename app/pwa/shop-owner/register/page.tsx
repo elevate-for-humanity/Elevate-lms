@@ -86,47 +86,47 @@ export default function ShopOwnerRegisterPage() {
   // Info Step
   if (step === 'info') {
     return (
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-white">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <Link href="/pwa/shop-owner" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
-            <h1 className="text-xl font-bold text-white">Become a Partner</h1>
+            <h1 className="text-xl font-bold text-slate-900">Become a Partner</h1>
           </div>
         </header>
 
         <main className="px-4 py-6 space-y-6">
-          <div className="bg-brand-blue-600/20 border border-brand-blue-500/30 rounded-xl p-6">
-            <div className="w-16 h-16 bg-brand-blue-500 rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-white/20 border border-brand-blue-500/30 rounded-xl p-6">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-4">
               <Building2 className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Partner Shop Program</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Partner Shop Program</h2>
             <p className="text-brand-blue-200 mb-4">
               Join our network of licensed barbershops training the next generation of barbers.
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Train apprentices at your shop
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Access to Milady curriculum
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Digital hour tracking & compliance
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Support from Elevate team
               </li>
             </ul>
           </div>
 
-          <div className="bg-slate-800 rounded-xl p-4">
-            <h3 className="text-white font-semibold mb-3">Requirements</h3>
+          <div className="bg-white rounded-xl p-4">
+            <h3 className="text-slate-900 font-semibold mb-3">Requirements</h3>
             <ul className="space-y-2 text-sm text-slate-400">
               <li>• Valid state barbershop license</li>
               <li>• At least one licensed barber on staff</li>
@@ -150,7 +150,7 @@ export default function ShopOwnerRegisterPage() {
   // Details Step
   if (step === 'details') {
     return (
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-white">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <button 
@@ -160,8 +160,8 @@ export default function ShopOwnerRegisterPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-white">Shop Details</h1>
-              <p className="text-slate-400 text-sm">Step 1 of 2</p>
+              <h1 className="text-xl font-bold text-slate-900">Shop Details</h1>
+              <p className="text-slate-500 text-sm">Step 1 of 2</p>
             </div>
           </div>
         </header>
@@ -289,7 +289,7 @@ export default function ShopOwnerRegisterPage() {
   // Confirmation Step
   if (step === 'confirm') {
     return (
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-white">
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <button 
@@ -299,48 +299,48 @@ export default function ShopOwnerRegisterPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-white">Confirm Details</h1>
-              <p className="text-slate-400 text-sm">Step 2 of 2</p>
+              <h1 className="text-xl font-bold text-slate-900">Confirm Details</h1>
+              <p className="text-slate-500 text-sm">Step 2 of 2</p>
             </div>
           </div>
         </header>
 
         <main className="px-4 py-6 space-y-6">
           {error && (
-            <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+            <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-brand-red-200 text-sm">{error}</p>
             </div>
           )}
 
-          <div className="bg-slate-800 rounded-xl p-4 space-y-3">
-            <h3 className="text-white font-semibold">Shop Information</h3>
+          <div className="bg-white rounded-xl p-4 space-y-3">
+            <h3 className="text-slate-900 font-semibold">Shop Information</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">Shop Name</span>
+                <span className="text-slate-500">Shop Name</span>
                 <span className="text-white">{shopData.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Owner</span>
+                <span className="text-slate-500">Owner</span>
                 <span className="text-white">{shopData.ownerName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Address</span>
+                <span className="text-slate-500">Address</span>
                 <span className="text-white text-right">
                   {shopData.address}<br />
                   {shopData.city}, {shopData.state} {shopData.zip}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Phone</span>
+                <span className="text-slate-500">Phone</span>
                 <span className="text-white">{shopData.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Email</span>
+                <span className="text-slate-500">Email</span>
                 <span className="text-white">{shopData.email}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">License #</span>
+                <span className="text-slate-500">License #</span>
                 <span className="text-white">{shopData.licenseNumber}</span>
               </div>
             </div>
@@ -353,7 +353,7 @@ export default function ShopOwnerRegisterPage() {
               onChange={(e) => setAgreedToTerms(e.target.checked)}
               className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-brand-blue-600 focus:ring-brand-blue-500"
             />
-            <span className="text-slate-300 text-sm">
+            <span className="text-slate-600 text-sm">
               I certify that the information provided is accurate and I agree to the partner program terms and conditions.
             </span>
           </label>
@@ -370,7 +370,7 @@ export default function ShopOwnerRegisterPage() {
               </>
             ) : (
               <>
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 Submit Application
               </>
             )}
@@ -382,13 +382,13 @@ export default function ShopOwnerRegisterPage() {
 
   // Success Step
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+          <span className="text-slate-500 flex-shrink-0">•</span>
         </div>
-        <h1 className="text-2xl font-bold text-white mb-4">Application Submitted!</h1>
-        <p className="text-slate-400 mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-4">Application Submitted!</h1>
+        <p className="text-slate-500 mb-8">
           Thank you for applying to become a partner shop. Our team will review your application and contact you within 2-3 business days.
         </p>
         <Link

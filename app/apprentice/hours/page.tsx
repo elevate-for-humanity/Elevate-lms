@@ -84,7 +84,7 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
             <div 
-              className="bg-brand-blue-600 h-4 rounded-full transition-all"
+              className="bg-white h-4 rounded-full transition-all"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

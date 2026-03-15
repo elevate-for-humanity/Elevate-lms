@@ -90,7 +90,7 @@ export default function NailTechDocumentsPage() {
 
       <div className="max-w-2xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div className="bg-brand-red-600 px-6 py-3">
+          <div className="bg-white px-6 py-3">
             <h2 className="text-lg font-bold text-slate-900">Required</h2>
           </div>
           <div className="p-6">

@@ -137,7 +137,7 @@ export default function MonthlyOJTEvaluationPage() {
         {/* Evaluation categories */}
         {EVAL_CATEGORIES.map((cat, ci) => (
           <div key={ci} className="mb-6 print:mb-4 print:break-inside-avoid">
-            <div className="bg-gray-900 text-white px-4 py-2 rounded-t print:rounded-none">
+            <div className="bg-white text-white px-4 py-2 rounded-t print:rounded-none">
               <h2 className="font-bold text-sm print:text-[11px]">{cat.category}</h2>
             </div>
             <table className="w-full border-collapse text-sm print:text-[10px]">

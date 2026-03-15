@@ -70,7 +70,7 @@ export default async function ProviderDashboardPage() {
           </div>
           <div className="w-full bg-brand-blue-200 rounded-full h-1.5 mb-4">
             <div
-              className="bg-brand-blue-600 h-1.5 rounded-full transition-all"
+              className="bg-white h-1.5 rounded-full transition-all"
               style={{ width: `${pct}%` }}
             />
           </div>

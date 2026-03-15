@@ -91,7 +91,7 @@ export default async function ApprenticeSkillsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
+        return <span className="text-slate-500 flex-shrink-0">•</span>;
       case 'in-progress':
         return <TrendingUp className="w-5 h-5 text-brand-blue-500" />;
       default:
@@ -134,7 +134,7 @@ export default async function ApprenticeSkillsPage() {
           </div>
           <div className="bg-gray-200 rounded-full h-4 mb-2">
             <div 
-              className="bg-brand-green-500 h-4 rounded-full transition-all" 
+              className="bg-white h-4 rounded-full transition-all" 
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -175,7 +175,7 @@ export default async function ApprenticeSkillsPage() {
           <h3 className="font-semibold mb-4">Status Legend</h3>
           <div className="flex flex-wrap gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Completed</span>
             </div>
             <div className="flex items-center gap-2">

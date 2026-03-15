@@ -194,7 +194,7 @@ export default function HostShopsPage() {
                 </li>
               </ul>
             </div>
-            <div className="bg-brand-orange-600 rounded-xl p-8 shadow-lg">
+            <div className="bg-white rounded-xl p-8 shadow-lg">
               <h3 className="font-bold text-xl mb-6 text-slate-900">What We Handle</h3>
               <ul className="space-y-4 text-slate-900">
                 <li className="flex items-start gap-3">
@@ -254,7 +254,7 @@ export default function HostShopsPage() {
         <div className="max-w-3xl mx-auto text-center">
           <Building2 className="w-16 h-16 mx-auto mb-6 text-slate-900" />
           <h2 className="text-3xl font-bold mb-4">Ready to Train the Next Generation?</h2>
-          <p className="text-slate-300 mb-8">
+          <p className="text-slate-600 mb-8">
             Join our network of approved host barbershops and help shape future barbers.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

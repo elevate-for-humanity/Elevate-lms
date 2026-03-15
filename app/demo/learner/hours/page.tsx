@@ -29,14 +29,14 @@ const hours = (dbRows as any[]) || [];
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="text-sm text-gray-500">Total Hours</div>
-              <div className="text-3xl font-bold text-gray-900">{totalHours} <span className="text-lg font-normal text-gray-400">/ {requiredHours}</span></div>
+              <div className="text-3xl font-bold text-gray-900">{totalHours} <span className="text-lg font-normal text-slate-500">/ {requiredHours}</span></div>
             </div>
             <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-blue-700">
               + Log Hours
             </button>
           </div>
           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-brand-green-500 rounded-full" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-white rounded-full" style={{ width: `${pct}%` }} />
           </div>
           <div className="text-xs text-gray-500 mt-1">{pct}% complete · {requiredHours - totalHours} hours remaining</div>
         </div>

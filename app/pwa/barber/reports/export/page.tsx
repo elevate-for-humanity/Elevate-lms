@@ -124,47 +124,47 @@ export default function ExportReportsPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md w-full">
-          <div className="w-20 h-20 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">Report Exported!</h1>
-          <p className="text-slate-400 mb-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Report Exported!</h1>
+          <p className="text-slate-500 mb-8">
             Your {FORMAT_OPTIONS.find(f => f.value === options.format)?.label} has been generated.
           </p>
           
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
+          <div className="bg-white rounded-xl p-4 mb-6">
             <div className="flex justify-center gap-4">
               {options.format === 'pdf' && (
                 <button
                   onClick={handlePrint}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                     <Printer className="w-5 h-5 text-brand-blue-400" />
                   </div>
-                  <span className="text-slate-300 text-sm">Print</span>
+                  <span className="text-slate-600 text-sm">Print</span>
                 </button>
               )}
               <button
                 onClick={handleEmail}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
               >
-                <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                   <Mail className="w-5 h-5 text-brand-blue-400" />
                 </div>
-                <span className="text-slate-300 text-sm">Email</span>
+                <span className="text-slate-600 text-sm">Email</span>
               </button>
               {'share' in navigator && (
                 <button
                   onClick={handleShare}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                     <Share2 className="w-5 h-5 text-brand-blue-400" />
                   </div>
-                  <span className="text-slate-300 text-sm">Share</span>
+                  <span className="text-slate-600 text-sm">Share</span>
                 </button>
               )}
             </div>
@@ -203,29 +203,29 @@ export default function ExportReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Export Report</h1>
-            <p className="text-slate-400 text-sm">Download your hours record</p>
+            <h1 className="text-xl font-bold text-slate-900">Export Report</h1>
+            <p className="text-slate-500 text-sm">Download your hours record</p>
           </div>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-6">
         {error && (
-          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-brand-red-200 text-sm">{error}</p>
           </div>
         )}
 
         {/* Format Selection */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="text-slate-400 text-sm mb-3 block">Export Format</label>
           <div className="space-y-2">
             {FORMAT_OPTIONS.map((format) => (
@@ -250,7 +250,7 @@ export default function ExportReportsPage() {
                   </div>
                 </div>
                 {options.format === format.value && (
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 )}
               </button>
             ))}
@@ -258,7 +258,7 @@ export default function ExportReportsPage() {
         </div>
 
         {/* Date Range */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <Calendar className="w-4 h-4" />
             Date Range
@@ -305,11 +305,11 @@ export default function ExportReportsPage() {
         </div>
 
         {/* Options */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="text-slate-400 text-sm mb-3 block">Report Options</label>
           <div className="space-y-3">
             <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">
-              <span className="text-slate-300">Group by category</span>
+              <span className="text-slate-600">Group by category</span>
               <input
                 type="checkbox"
                 checked={options.groupByCategory}
@@ -318,7 +318,7 @@ export default function ExportReportsPage() {
               />
             </label>
             <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">
-              <span className="text-slate-300">Include supervisor signatures</span>
+              <span className="text-slate-600">Include supervisor signatures</span>
               <input
                 type="checkbox"
                 checked={options.includeSignatures}
@@ -329,7 +329,7 @@ export default function ExportReportsPage() {
             {options.format === 'pdf' && (
               <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">
                 <div>
-                  <span className="text-slate-300">Include photo proof</span>
+                  <span className="text-slate-600">Include photo proof</span>
                   <p className="text-slate-500 text-xs">May increase file size</p>
                 </div>
                 <input

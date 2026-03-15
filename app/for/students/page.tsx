@@ -169,7 +169,7 @@ export default function StudentsPage() {
               },
             ].map((item: any) => (
               <div key={item.step} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-600 text-white text-2xl font-bold rounded-full mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-white text-white text-2xl font-bold rounded-full mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-black mb-2">
@@ -183,7 +183,7 @@ export default function StudentsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-zinc-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Start?</h2>
           <p className="text-xl mb-8">

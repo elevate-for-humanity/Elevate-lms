@@ -90,7 +90,7 @@ export default async function CourseDetailPage({
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-700 text-white">
+      <section className="bg-white text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -101,7 +101,7 @@ export default async function CourseDetailPage({
               )}
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">{course.title}</h1>
               <p className="text-xl text-brand-blue-200 mb-6">{course.subtitle}</p>
-              <p className="text-gray-300 mb-8">{course.description}</p>
+              <p className="text-slate-600 mb-8">{course.description}</p>
 
               <div className="flex flex-wrap gap-6 mb-8 text-sm">
                 <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export default async function CourseDetailPage({
                   <div>
                     <span className="text-4xl font-bold sezzle-hero-price">${Number(course.price).toFixed(0)}</span>
                     {course.original_price && (
-                      <span className="text-xl text-gray-400 line-through ml-3">
+                      <span className="text-xl text-slate-500 line-through ml-3">
                         ${Number(course.original_price).toFixed(0)}
                       </span>
                     )}
@@ -175,7 +175,7 @@ export default async function CourseDetailPage({
           <div className="grid md:grid-cols-2 gap-4">
             {sortedFeatures.map((feature: any, index: number) => (
               <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature.feature}</span>
               </div>
             ))}
@@ -259,7 +259,7 @@ export default async function CourseDetailPage({
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-slate-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Improve Your Career?</h2>
           <p className="text-brand-blue-100 mb-8">

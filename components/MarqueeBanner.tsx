@@ -4,7 +4,7 @@ export default function MarqueeBanner() {
   const text = "CAREER TRAINING • WIOA FUNDED • EARN WHILE YOU LEARN • JRI PROGRAMS • APPLY NOW • ";
   
   return (
-    <div className="bg-brand-red-600 text-white py-3 overflow-hidden">
+    <div className="bg-white text-white py-3 overflow-hidden">
       <div className="animate-marquee whitespace-nowrap flex">
         {[...Array(4)].map((_, i) => (
           <span key={i} className="mx-4 text-base sm:text-lg font-black tracking-wider">

@@ -192,7 +192,7 @@ export default async function FerpaReportsPage() {
                     >
                       Generate
                     </Link>
-                    <span className="text-gray-300">|</span>
+                    <span className="text-slate-600">|</span>
                     <button className="text-sm text-gray-600 hover:text-gray-900 font-medium inline-flex items-center gap-1">
                       <Download className="w-3 h-3" />
                       Export

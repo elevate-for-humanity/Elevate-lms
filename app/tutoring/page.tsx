@@ -131,7 +131,7 @@ export default function TutoringPage() {
               >
                 <div className="relative h-40 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">{item.step}</div>
+                  <div className="absolute top-3 left-3 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">{item.step}</div>
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-lg mb-1">{item.title}</h3>
@@ -202,7 +202,7 @@ export default function TutoringPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Help With Your Coursework?</h2>
           <p className="text-lg text-brand-blue-100 mb-8">Log in to the LMS to book a tutoring session, or contact support if you need assistance.</p>

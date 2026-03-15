@@ -66,8 +66,8 @@ function ProgramRubricSection({ rubric }: { rubric: ProgramRubric }) {
 
   return (
     <div className="print:break-before-page">
-      <div className="bg-brand-blue-600 rounded-t-xl px-6 py-4 print:bg-gray-900">
-        <h3 className="text-xl font-bold text-white">{rubric.program}</h3>
+      <div className="bg-white rounded-t-xl px-6 py-4 print:bg-white">
+        <h3 className="text-xl font-bold text-slate-900">{rubric.program}</h3>
         <p className="text-brand-blue-100 text-sm">{rubric.occupation}</p>
       </div>
       <div className="bg-white border-x border-b rounded-b-xl p-6 mb-2">
@@ -126,10 +126,10 @@ export default function CompetencyVerificationPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               Audit-Grade Assessment Documentation
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Competency Verification Matrix
             </h1>
           </div>

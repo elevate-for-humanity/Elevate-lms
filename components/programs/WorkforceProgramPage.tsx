@@ -143,7 +143,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
             <div className={`inline-flex items-center gap-2 ${c.bg} text-white px-4 py-2 rounded-full text-sm font-bold mb-4`}>
               <Award className="w-4 h-4" /> {program.structure.fundingNote}
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
               {program.title}
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mb-6">
@@ -394,9 +394,9 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
               <div className="grid grid-cols-2 gap-4">
                 {program.careers.map((career, i) => (
                   <div key={i} className="bg-white/10 rounded-xl p-4">
-                    <h3 className="font-bold text-white">{career.title}</h3>
+                    <h3 className="font-bold text-slate-900">{career.title}</h3>
                     <p className="text-slate-600 text-sm">{career.salary}/year</p>
-                    {career.demand && <p className="text-white/60 text-xs mt-1">{career.demand}</p>}
+                    {career.demand && <p className="text-slate-500 text-xs mt-1">{career.demand}</p>}
                   </div>
                 ))}
               </div>
@@ -486,10 +486,10 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       {/* CTA */}
       <section className="py-20 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Start Your {program.title} Career
           </h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <p className="text-xl text-slate-600 mb-8">
             {program.structure.fundingNote}. Apply today to check your eligibility.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

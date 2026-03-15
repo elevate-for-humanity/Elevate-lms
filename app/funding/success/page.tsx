@@ -37,12 +37,12 @@ export default async function FundingSuccessPage() {
 
       <div className="flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-600 rounded-full mb-6">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6">
+          <span className="text-slate-500 flex-shrink-0">•</span>
         </div>
 
         <h1 className="text-4xl font-bold text-black mb-4">
-          <span className="text-slate-400 flex-shrink-0">•</span> Funding Approved &
+          <span className="text-slate-500 flex-shrink-0">•</span> Funding Approved &
           Processed!
         </h1>
 
@@ -57,7 +57,7 @@ export default async function FundingSuccessPage() {
 
           <div className="text-left space-y-4">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -71,7 +71,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -85,7 +85,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>

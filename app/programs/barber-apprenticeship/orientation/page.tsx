@@ -22,15 +22,15 @@ export default function BarberOrientationPage() {
           <p>Upon successful completion of this program, you will be eligible to:</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Obtain your {config.licenseTitle} through the {config.licensingBody}</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Work legally as a licensed barber in the state of Indiana</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Earn {config.salaryRange} annually depending on location and clientele</span>
             </li>
           </ul>
@@ -126,19 +126,19 @@ export default function BarberOrientationPage() {
           <p>By continuing, you acknowledge:</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>This is a state-regulated apprenticeship program with legal requirements</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>You must complete all required hours and coursework to earn your license</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Your progress is tracked and reported to regulatory bodies</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Withdrawal or dismissal does not automatically entitle you to a refund</span>
             </li>
           </ul>
@@ -207,7 +207,7 @@ export default function BarberOrientationPage() {
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-brand-blue-600 transition-all duration-300"
+              className="h-full bg-white transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -218,12 +218,12 @@ export default function BarberOrientationPage() {
       <div className="max-w-3xl mx-auto px-6 py-12">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Section Header */}
-          <div className="bg-slate-900 px-6 py-4">
+          <div className="bg-white px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                 <CurrentIcon className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold text-slate-900">
                 {sections[currentSection].title}
               </h2>
             </div>

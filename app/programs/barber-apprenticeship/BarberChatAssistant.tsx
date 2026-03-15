@@ -216,7 +216,7 @@ export default function BarberChatAssistant() {
       {/* Header */}
       <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 text-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-brand-blue-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
             <Scissors className="w-4 h-4" />
           </div>
           <div>

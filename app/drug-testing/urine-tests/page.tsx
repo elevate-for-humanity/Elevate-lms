@@ -114,7 +114,7 @@ export default function UrineTestsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Urine Tests" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-brand-blue-900 text-white">
+      <section className="relative py-20 bg-white text-white">
         <div className="max-w-6xl mx-auto px-6">
           <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
@@ -156,7 +156,7 @@ export default function UrineTestsPage() {
                       className="object-cover"
                     />
                     {test.popular && (
-                      <div className="absolute top-4 left-4 bg-brand-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      <div className="absolute top-4 left-4 bg-white text-white px-3 py-1 rounded-full text-sm font-bold">
                         MOST POPULAR
                       </div>
                     )}
@@ -191,7 +191,7 @@ export default function UrineTestsPage() {
                       <ul className="grid md:grid-cols-2 gap-2">
                         {test.includes.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <span className="text-slate-400 flex-shrink-0">•</span>
+                            <span className="text-slate-500 flex-shrink-0">•</span>
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}
@@ -216,7 +216,7 @@ export default function UrineTestsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Help Choosing?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

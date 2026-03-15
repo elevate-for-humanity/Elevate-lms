@@ -45,7 +45,7 @@ export default async function LearningHubPage() {
         ]}
       />
       {/* Hero */}
-      <section className="bg-brand-green-600 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <GraduationCap className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-5xl font-bold mb-6">Learning Hub</h1>
@@ -131,7 +131,7 @@ export default async function LearningHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-green-600 text-white text-center">
+      <section className="py-16 bg-white text-white text-center">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
           <p className="text-xl mb-8">Access all your courses and resources in one place</p>
@@ -144,7 +144,7 @@ export default async function LearningHubPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

@@ -158,7 +158,7 @@ export default function ScheduleConsultationPage() {
                       <div className="font-semibold text-slate-900">{type.label}</div>
                       <div className="text-slate-500 text-sm">{type.desc}</div>
                     </div>
-                    <span className="text-slate-400 text-sm flex-shrink-0 ml-4">{type.duration}</span>
+                    <span className="text-slate-500 text-sm flex-shrink-0 ml-4">{type.duration}</span>
                   </div>
                 </button>
               ))}

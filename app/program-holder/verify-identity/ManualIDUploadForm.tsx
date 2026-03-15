@@ -99,7 +99,7 @@ export default function ManualIDUploadForm({
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h2 className="text-2xl font-bold text-brand-green-900 mb-2">
             Documents Uploaded Successfully!
@@ -135,7 +135,7 @@ export default function ManualIDUploadForm({
         <div className="mt-4 p-4 bg-brand-green-50 border-l-4 border-brand-green-400">
           <p className="text-sm text-brand-green-900">
             <strong>
-              <span className="text-slate-400 flex-shrink-0">•</span> FREE
+              <span className="text-slate-500 flex-shrink-0">•</span> FREE
             </strong>{' '}
             - No cost for manual verification
             <br />
@@ -179,7 +179,7 @@ export default function ManualIDUploadForm({
             >
               {idFrontFile ? (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {idFrontFile.name}
                   </p>
@@ -219,7 +219,7 @@ export default function ManualIDUploadForm({
             >
               {idBackFile ? (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {idBackFile.name}
                   </p>
@@ -261,7 +261,7 @@ export default function ManualIDUploadForm({
             >
               {selfieFile ? (
                 <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {selfieFile.name}
                   </p>

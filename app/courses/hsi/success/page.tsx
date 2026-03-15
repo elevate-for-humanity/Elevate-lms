@@ -54,7 +54,7 @@ export default async function HSISuccessPage({
       <section className="py-16 bg-brand-green-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Enrollment Confirmed!
@@ -146,25 +146,25 @@ export default async function HSISuccessPage({
             </h2>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Course Access:</strong> Your HSI course access is valid for 1 year from enrollment date.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Certification Valid:</strong> CPR/First Aid certifications are valid for 2 years.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Skills Session:</strong> For CPR certification, you'll need to complete an in-person or remote skills verification session.
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">
                   <strong>Certificate Download:</strong> Your digital certificate will be available immediately after passing.
                 </span>
@@ -213,12 +213,12 @@ export default async function HSISuccessPage({
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
             Explore More Training Opportunities
           </h2>
-          <p className="text-gray-300 mb-8">
+          <p className="text-slate-600 mb-8">
             Continue building your skills with our other free training programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

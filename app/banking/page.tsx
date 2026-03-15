@@ -72,7 +72,7 @@ export default async function BankingPage() {
               <span className="font-semibold">FDIC Insured</span>
             </div>
             <div className="flex items-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span className="font-semibold">IRS Approved</span>
             </div>
             <div className="flex items-center">
@@ -105,19 +105,19 @@ export default async function BankingPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Up to $6,000 advance</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>No credit check</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Same-day funding available</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Repaid from IRS refund</span>
                 </li>
               </ul>
@@ -142,19 +142,19 @@ export default async function BankingPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Fastest refund method</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Secure and reliable</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>No check cashing fees</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Track your refund status</span>
                 </li>
               </ul>
@@ -180,19 +180,19 @@ export default async function BankingPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>No bank account required</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Use anywhere Visa is accepted</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>ATM access nationwide</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>FDIC insured</span>
                 </li>
               </ul>
@@ -216,7 +216,7 @@ export default async function BankingPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -228,7 +228,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -240,7 +240,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -252,7 +252,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -286,7 +286,7 @@ export default async function BankingPage() {
                 </p>
               </div>
               <div>
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <p className="font-semibold">IRS Approved</p>
                 <p className="text-sm text-black">
                   Authorized e-file provider
@@ -361,7 +361,7 @@ export default async function BankingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?

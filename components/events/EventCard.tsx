@@ -50,7 +50,7 @@ export default function EventCard({ event, href, compact = false }: EventCardPro
     >
       {/* Date strip */}
       <div className="flex items-center gap-4 px-5 pt-5 pb-4 border-b border-slate-100">
-        <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-brand-blue-600 flex flex-col items-center justify-center text-white shadow-sm">
+        <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white flex flex-col items-center justify-center text-white shadow-sm">
           <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
             {new Date(event.start_date).toLocaleString('en-US', { month: 'short' })}
           </span>

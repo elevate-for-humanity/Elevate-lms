@@ -285,12 +285,12 @@ export default async function ProgramTrainingPage({
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400">Progress</p>
+                  <p className="text-xs text-slate-500">Progress</p>
                   <p className="text-lg font-bold text-slate-900">
                     {completedRequired}
-                    <span className="text-slate-400 text-sm font-normal">/{totalRequired}</span>
+                    <span className="text-slate-500 text-sm font-normal">/{totalRequired}</span>
                   </p>
-                  <p className="text-xs text-slate-400">required complete</p>
+                  <p className="text-xs text-slate-500">required complete</p>
                 </div>
               </div>
             )}
@@ -304,7 +304,7 @@ export default async function ProgramTrainingPage({
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 font-medium">No training items yet</p>
-            <p className="text-slate-400 text-sm mt-1">Check back soon or contact your advisor.</p>
+            <p className="text-slate-500 text-sm mt-1">Check back soon or contact your advisor.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -316,7 +316,7 @@ export default async function ProgramTrainingPage({
           </div>
         )}
 
-        <p className="text-xs text-slate-400 text-center mt-10">
+        <p className="text-xs text-slate-500 text-center mt-10">
           Questions about your program?{' '}
           <Link href="/contact" className="text-brand-blue-600 hover:underline">
             Contact your advisor
@@ -446,7 +446,7 @@ function ExternalCard({ item, index }: { item: ExternalItem; index: number }) {
           <span className="text-xs font-semibold uppercase tracking-wide text-teal-700">
             Partner Training
           </span>
-          <span className="text-xs text-slate-400">· {item.partner_name}</span>
+          <span className="text-xs text-slate-500">· {item.partner_name}</span>
         </div>
         <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">{item.title}</h3>
         {item.description && (

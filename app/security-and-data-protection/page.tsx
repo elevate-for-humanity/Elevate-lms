@@ -133,14 +133,14 @@ export default function SecurityAndDataProtectionPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-slate-900 text-white py-14">
+      <div className="bg-white text-white py-14">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-8 h-8 text-brand-red-400" />
             <span className="text-brand-red-400 font-semibold text-sm uppercase tracking-wider">Legal & Compliance</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Security & Data Protection Statement</h1>
-          <p className="text-slate-300 text-lg max-w-3xl">
+          <p className="text-slate-600 text-lg max-w-3xl">
             How Elevate for Humanity collects, protects, and handles participant, employer, and partner data. Effective January 1, 2025.
           </p>
           <p className="text-slate-500 text-sm mt-4">Last reviewed: May 2025 · Next review: November 2025</p>
@@ -215,12 +215,12 @@ export default function SecurityAndDataProtectionPage() {
         })}
 
         {/* Contact */}
-        <div className="bg-slate-900 text-white rounded-xl p-8">
+        <div className="bg-white text-white rounded-xl p-8">
           <div className="flex items-center gap-3 mb-4">
             <Mail className="w-6 h-6 text-brand-red-400" />
             <h2 className="text-xl font-bold">Contact Our Data Protection Officer</h2>
           </div>
-          <p className="text-slate-300 mb-6">
+          <p className="text-slate-600 mb-6">
             For data access requests, corrections, deletions, or questions about this statement, contact:
           </p>
           <div className="space-y-1 text-slate-300 text-sm mb-6">

@@ -66,7 +66,7 @@ export default async function StudentPortalSchedulePage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[260px] sm:h-[340px] overflow-hidden bg-slate-900">
+      <section className="relative h-[260px] sm:h-[340px] overflow-hidden bg-white">
         <Image
           src="/images/pages/student-portal-page-10.jpg"
           alt="Class schedule"
@@ -79,8 +79,8 @@ export default async function StudentPortalSchedulePage() {
         <div className="relative h-full flex items-end pb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
             <p className="text-brand-blue-300 text-xs font-bold uppercase tracking-widest mb-2">Student Portal</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">My Schedule</h1>
-            <p className="text-slate-300 text-sm sm:text-base max-w-xl">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2">My Schedule</h1>
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl">
               Your active courses, class times, locations, and upcoming appointments in one place.
             </p>
           </div>
@@ -118,11 +118,11 @@ export default async function StudentPortalSchedulePage() {
                   sizes="100vw"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/65" />
+                <div className="absolute inset-0 bg-white/65" />
                 <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
-                  <BookOpen className="w-12 h-12 text-white/50 mb-3" />
-                  <h3 className="text-xl font-bold text-white mb-2">No active enrollments</h3>
-                  <p className="text-slate-300 text-sm mb-5 max-w-sm">Enroll in a program to see your class schedule here.</p>
+                  <BookOpen className="w-12 h-12 text-slate-400 mb-3" />
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No active enrollments</h3>
+                  <p className="text-slate-600 text-sm mb-5 max-w-sm">Enroll in a program to see your class schedule here.</p>
                   <Link
                     href="/programs"
                     className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
@@ -149,7 +149,7 @@ export default async function StudentPortalSchedulePage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="font-bold text-white text-base leading-tight">{course?.title || 'Course'}</h3>
+                        <h3 className="font-bold text-slate-900 text-base leading-tight">{course?.title || 'Course'}</h3>
                       </div>
                       <div className="absolute top-3 right-3">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
@@ -182,7 +182,7 @@ export default async function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {!course?.schedule && !course?.location && !course?.instructor_name && (
-                        <p className="text-sm text-gray-400 italic">Schedule details not yet available — contact student services.</p>
+                        <p className="text-sm text-slate-500 italic">Schedule details not yet available — contact student services.</p>
                       )}
                     </div>
                   </div>
@@ -214,11 +214,11 @@ export default async function StudentPortalSchedulePage() {
                   sizes="100vw"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/65" />
+                <div className="absolute inset-0 bg-white/65" />
                 <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
-                  <Calendar className="w-12 h-12 text-white/50 mb-3" />
-                  <h3 className="text-xl font-bold text-white mb-2">No upcoming appointments</h3>
-                  <p className="text-slate-300 text-sm mb-5 max-w-sm">Need to speak with an advisor? Reach out to student services.</p>
+                  <Calendar className="w-12 h-12 text-slate-400 mb-3" />
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No upcoming appointments</h3>
+                  <p className="text-slate-600 text-sm mb-5 max-w-sm">Need to speak with an advisor? Reach out to student services.</p>
                   <Link
                     href="/contact"
                     className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-orange-600 transition-colors"
@@ -240,7 +240,7 @@ export default async function StudentPortalSchedulePage() {
                       sizes="64px"
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-brand-blue-600/80 flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center">
                       <span className="text-white text-[10px] font-bold leading-none">
                         {new Date(apt.scheduled_at).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
                       </span>
@@ -309,7 +309,7 @@ export default async function StudentPortalSchedulePage() {
                   <div>
                     <p className="font-medium">8888 Keystone Crossing, Suite 1300</p>
                     <p>Indianapolis, IN 46240</p>
-                    <p className="text-gray-400 text-xs mt-1">Appointment-only. Confirm your session before arriving.</p>
+                    <p className="text-slate-500 text-xs mt-1">Appointment-only. Confirm your session before arriving.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-700">
@@ -358,7 +358,7 @@ export default async function StudentPortalSchedulePage() {
                     sizes="(max-width: 640px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-slate-900/50 group-hover:bg-slate-900/40 transition-colors" />
+                  <div className="absolute inset-0 bg-slate-900/50 group-hover:bg-white/40 transition-colors" />
                   <div className="absolute inset-0 flex items-center justify-center px-2">
                     <span className="text-white font-bold text-sm text-center leading-tight">{link.label}</span>
                   </div>

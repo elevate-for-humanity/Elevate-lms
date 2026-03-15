@@ -50,15 +50,15 @@ export default function ENVCONFIGmdPage() {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>Free training for eligible participants</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>Industry-standard certifications</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>Career support and job placement</span>
                   </li>
                 </ul>
@@ -98,7 +98,7 @@ export default function ENVCONFIGmdPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

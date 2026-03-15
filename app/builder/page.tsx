@@ -228,18 +228,18 @@ export default function BuildPage() {
       <header className="border-b border-white/10 bg-slate-800 backdrop-blur sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold">Elevate AI</p>
-              <p className="text-slate-400 text-xs">Building your LMS</p>
+              <p className="text-slate-900 font-bold">Elevate AI</p>
+              <p className="text-slate-500 text-xs">Building your LMS</p>
             </div>
           </div>
           {siteData.organizationName && (
             <div className="text-right">
-              <p className="text-slate-400 text-xs">Building</p>
-              <p className="text-white font-medium">{siteData.organizationName}</p>
+              <p className="text-slate-500 text-xs">Building</p>
+              <p className="text-slate-900 font-medium">{siteData.organizationName}</p>
             </div>
           )}
         </div>
@@ -262,7 +262,7 @@ export default function BuildPage() {
               >
                 {message.role === 'ai' && (
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 mt-1">
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div className="space-y-3">
@@ -315,7 +315,7 @@ export default function BuildPage() {
           {/* Typing indicator */}
           {isTyping && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="flex gap-1 py-3">
@@ -329,7 +329,7 @@ export default function BuildPage() {
           {/* Generating animation */}
           {isGenerating && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="bg-white/5 rounded-2xl p-6 space-y-4">
@@ -361,8 +361,8 @@ export default function BuildPage() {
                   className="p-6"
                   style={{ backgroundColor: generatedSite.config.branding.primaryColor }}
                 >
-                  <p className="text-white/80 text-sm">Your new platform</p>
-                  <h2 className="text-white text-2xl font-bold">
+                  <p className="text-slate-600 text-sm">Your new platform</p>
+                  <h2 className="text-slate-900 text-2xl font-bold">
                     {generatedSite.config.branding.logoText}
                   </h2>
                 </div>
@@ -408,9 +408,9 @@ export default function BuildPage() {
               </div>
 
               {/* Upgrade CTA */}
-              <div className="mt-6 p-6 bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl">
+              <div className="mt-6 p-6 bg-white/20 border border-brand-green-500/30 rounded-xl">
                 <p className="text-brand-green-400 font-bold mb-2">Ready to launch?</p>
-                <p className="text-slate-300 text-sm mb-4">
+                <p className="text-slate-600 text-sm mb-4">
                   Upgrade to publish your site and start enrolling students.
                 </p>
                 <a
@@ -430,7 +430,7 @@ export default function BuildPage() {
 
       {/* Input */}
       {showInput && currentMessage?.inputType === 'text' && (
-        <div className="border-t border-white/10 bg-slate-800 backdrop-blur sticky bottom-0">
+        <div className="border-t border-white/10 bg-white backdrop-blur sticky bottom-0">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <form
               onSubmit={(e) => {

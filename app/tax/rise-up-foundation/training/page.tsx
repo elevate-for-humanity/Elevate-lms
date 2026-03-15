@@ -186,7 +186,7 @@ export default function TrainingPage() {
         <h2 className="text-2xl font-bold mb-4">Training Timeline</h2>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
               1
             </div>
             <div>
@@ -201,7 +201,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
               2
             </div>
             <div>
@@ -217,7 +217,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
               3
             </div>
             <div>
@@ -233,7 +233,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
               4
             </div>
             <div>
@@ -249,7 +249,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
               5
             </div>
             <div>

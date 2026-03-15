@@ -92,14 +92,14 @@ export default function ShopDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -107,8 +107,8 @@ export default function ShopDetailsPage() {
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-white">Shop Details</h1>
-              <p className="text-slate-400 text-sm">Edit your shop information</p>
+              <h1 className="text-xl font-bold text-slate-900">Shop Details</h1>
+              <p className="text-slate-500 text-sm">Edit your shop information</p>
             </div>
           </div>
           <button
@@ -128,21 +128,21 @@ export default function ShopDetailsPage() {
 
       <main className="px-4 py-6 space-y-6">
         {error && (
-          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-brand-red-200 text-sm">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-brand-green-500/10 border border-brand-green-500/30 rounded-xl p-4 flex items-start gap-3">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+          <div className="bg-white/10 border border-brand-green-500/30 rounded-xl p-4 flex items-start gap-3">
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <p className="text-brand-green-200 text-sm">Changes saved successfully</p>
           </div>
         )}
 
         {/* Basic Info */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-4">
+        <div className="bg-white rounded-xl p-4 space-y-4">
           <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
             <Building2 className="w-4 h-4" />
             Basic Information
@@ -180,7 +180,7 @@ export default function ShopDetailsPage() {
         </div>
 
         {/* Address */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-4">
+        <div className="bg-white rounded-xl p-4 space-y-4">
           <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
             <MapPin className="w-4 h-4" />
             Address
@@ -234,7 +234,7 @@ export default function ShopDetailsPage() {
         </div>
 
         {/* Contact */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-4">
+        <div className="bg-white rounded-xl p-4 space-y-4">
           <div className="flex items-center gap-3 text-slate-400 text-sm mb-2">
             <Phone className="w-4 h-4" />
             Contact Information
@@ -267,11 +267,11 @@ export default function ShopDetailsPage() {
           href="/pwa/shop-owner/checkin"
           className="flex items-center gap-4 bg-brand-blue-600/20 border border-brand-blue-500/30 rounded-xl p-4"
         >
-          <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-white font-medium">Check-In QR Code</p>
+            <p className="text-slate-900 font-medium">Check-In QR Code</p>
             <p className="text-brand-blue-300 text-sm">View and share your shop's check-in code</p>
           </div>
         </Link>

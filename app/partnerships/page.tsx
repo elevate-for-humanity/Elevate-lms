@@ -27,12 +27,12 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-slate-900 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-5xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-3">
             Workforce Partnerships
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl">
+          <p className="text-lg text-slate-600 max-w-2xl">
             ETPL-listed training provider serving Marion County and Central Indiana.
             Refer WIOA, WRG, and JRI participants directly. We handle enrollment, training, credentialing, and placement reporting.
           </p>
@@ -72,7 +72,7 @@ export default function PartnershipsPage() {
               { step: '4', title: 'Completion & Reporting', desc: 'We issue credentials, submit completion data to your agency, and provide job placement support including resume prep and employer matching.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">
+                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2 text-sm">{item.title}</h3>
@@ -134,7 +134,7 @@ export default function PartnershipsPage() {
                 <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
                 <div className="flex items-center gap-3 mt-2 text-xs text-slate-600">
                   <span>{p.duration}</span>
-                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-600">|</span>
                   <div className="flex gap-1">
                     {p.funding.split(', ').map((f) => (
                       <span key={f} className="bg-brand-green-100 text-brand-green-800 px-1.5 py-0.5 rounded text-[10px] font-bold">{f}</span>
@@ -153,7 +153,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-brand-blue-700 text-white">
+      <section className="py-12 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Set Up a Referral Pathway</h2>
           <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">

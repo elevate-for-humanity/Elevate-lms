@@ -47,17 +47,17 @@ export default function ClientPortalPage() {
         <Breadcrumbs items={[{ label: "Client Portal" }]} />
       </div>
 {/* Hero */}
-      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-slate-700 text-white">
+      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-white text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Building2 className="w-4 h-4" />
               For Organizations
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Client Portal
             </h1>
-            <p className="text-xl text-slate-300 mb-8">
+            <p className="text-xl text-slate-600 mb-8">
               Manage your organization's workforce development programs. Track employee progress, access reports, and maximize your training investment.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -107,7 +107,7 @@ export default function ClientPortalPage() {
               <ul className="space-y-4">
                 {benefits.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{benefit}</span>
                   </li>
                 ))}
@@ -131,7 +131,7 @@ export default function ClientPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-blue-600 text-white">
+      <section className="py-16 lg:py-24 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Already Have an Account?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

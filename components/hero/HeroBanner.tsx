@@ -74,10 +74,10 @@ export default function HeroBanner({
           <Image src={heroImageSrc} alt={heroImageAlt} fill priority sizes="100vw" className="object-cover" />
         )}
       </div>
-      <div className="bg-slate-900 py-10">
+      <div className="bg-white py-10">
         <div className="mx-auto w-full max-w-5xl px-4 md:px-8 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">{title}</h1>
-          <p className="mt-3 text-base text-slate-300 md:text-lg max-w-3xl mx-auto">{subtitle}</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{title}</h1>
+          <p className="mt-3 text-base text-slate-600 md:text-lg max-w-3xl mx-auto">{subtitle}</p>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
             {primaryCta && (
               <a href={primaryCta.href} className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm hover:bg-gray-100 transition-colors">
@@ -93,7 +93,7 @@ export default function HeroBanner({
           {trustIndicators.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-2 justify-center">
               {trustIndicators.map((indicator, i) => (
-                <span key={i} className="rounded-full bg-slate-700 px-3 py-2 text-xs font-medium text-slate-300">{indicator}</span>
+                <span key={i} className="rounded-full bg-slate-700 px-3 py-2 text-xs font-medium text-slate-600">{indicator}</span>
               ))}
             </div>
           )}

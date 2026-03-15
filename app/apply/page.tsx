@@ -167,8 +167,8 @@ export default async function ApplyPage({
                 className="object-cover"
               />
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h2 className="text-lg sm:text-xl font-bold text-white mb-2">Become a Program Holder</h2>
-                <p className="text-white text-sm leading-relaxed mb-3">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Become a Program Holder</h2>
+                <p className="text-slate-900 text-sm leading-relaxed mb-3">
                   Launch your own workforce training program on Elevate&apos;s platform.
                   We provide the LMS, curriculum, and compliance infrastructure.
                 </p>

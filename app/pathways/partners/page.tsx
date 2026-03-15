@@ -101,7 +101,7 @@ export default function PartnersPage() {
                 <div className="flex flex-col sm:flex-row">
                   <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
-                    <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
+                    <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
                       {s.step}
                     </div>
                   </div>
@@ -290,7 +290,7 @@ export default function PartnersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-brand-blue-900 text-white">
+      <section className="py-14 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up a Cohort?</h2>
           <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">

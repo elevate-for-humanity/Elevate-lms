@@ -122,7 +122,7 @@ export default function HoursTracker() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b border-gray-100">
               <div className="bg-brand-green-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-brand-green-700 mb-1">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-sm font-medium">Verified Hours</span>
                 </div>
                 <p className="text-3xl font-bold text-brand-green-800">
@@ -162,7 +162,7 @@ export default function HoursTracker() {
                 </div>
                 <div className="h-3 bg-white rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-brand-green-500 rounded-full transition-all"
+                    className="h-full bg-white rounded-full transition-all"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -205,7 +205,7 @@ export default function HoursTracker() {
                           <td className="py-3">
                             {entry.verified ? (
                               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-brand-green-100 text-brand-green-700">
-                                <span className="text-slate-400 flex-shrink-0">•</span>
+                                <span className="text-slate-500 flex-shrink-0">•</span>
                                 Verified
                               </span>
                             ) : (

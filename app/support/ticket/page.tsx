@@ -75,7 +75,7 @@ function SubmitTicketContent() {
         <div className="max-w-2xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
             <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-black mb-4">Ticket Submitted!</h1>
             <p className="text-gray-600 mb-2">Your ticket number is:</p>

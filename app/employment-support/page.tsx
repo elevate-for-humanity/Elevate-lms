@@ -118,7 +118,7 @@ export default function EmploymentSupportPage() {
               { step: '6', title: 'Start Working & Get Follow-Up Support', desc: 'Begin your new role with continued support to help you stay employed and advance.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -245,7 +245,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-brand-blue-600">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Ready to Start Your Career?

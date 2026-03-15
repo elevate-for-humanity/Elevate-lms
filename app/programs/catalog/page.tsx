@@ -88,8 +88,8 @@ export default async function ProgramCatalogPage({
 
       <div className="bg-white py-10 border-t">
         <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Program Catalog</h1>
-          <p className="text-slate-300 text-sm">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Program Catalog</h1>
+          <p className="text-slate-600 text-sm">
             {count ?? 0} program{(count ?? 0) !== 1 ? 's' : ''} from approved providers
             {wioaOnly ? ' · WIOA eligible' : ''}
             {category ? ` · ${category}` : ''}

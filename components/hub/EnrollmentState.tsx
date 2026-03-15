@@ -224,7 +224,7 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
               </div>
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+                  className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${enrollment.progress_percent}%` }}
                 />
               </div>

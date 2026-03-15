@@ -126,10 +126,10 @@ export default async function TalentPipelinePage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/employers-page-3.jpg" alt="Talent pipeline" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-6 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Build Your Talent Pipeline</h1>
-            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Build Your Talent Pipeline</h1>
+            <p className="text-lg text-slate-600 mb-6 max-w-3xl mx-auto">
               Access pre-trained, certified candidates ready to work. No recruitment fees, no hassle—just qualified talent for your open positions.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -141,7 +141,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-brand-orange-600 text-white">
+      <section className="py-12 bg-white text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
@@ -178,7 +178,7 @@ export default async function TalentPipelinePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {pipelineSteps.map((item) => (
               <div key={item.step} className="relative">
-                <div className="bg-brand-orange-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
+                <div className="bg-white text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -234,7 +234,7 @@ export default async function TalentPipelinePage() {
                 <ul className="space-y-2">
                   {industry.roles.map((role) => (
                     <li key={role} className="text-gray-600 flex items-center gap-2">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       {role}
                     </li>
                   ))}
@@ -246,7 +246,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Funding Info */}
-      <section className="py-16 md:py-24 bg-slate-900 text-white">
+      <section className="py-16 md:py-24 bg-white text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -254,26 +254,26 @@ export default async function TalentPipelinePage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Funded Through Workforce Grants
               </h2>
-              <p className="text-xl text-slate-300 mb-6">
+              <p className="text-xl text-slate-600 mb-6">
                 Our talent pipeline program is funded through WIOA, Next Level Jobs, and other 
                 workforce development grants. This means you get access to trained candidates 
                 at no cost to your organization.
               </p>
               <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-slate-300">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                <li className="flex items-center gap-3 text-slate-600">
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   No placement fees
                 </li>
-                <li className="flex items-center gap-3 text-slate-300">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                <li className="flex items-center gap-3 text-slate-600">
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   No training costs passed to employers
                 </li>
-                <li className="flex items-center gap-3 text-slate-300">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                <li className="flex items-center gap-3 text-slate-600">
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   Eligible for employer training grants
                 </li>
-                <li className="flex items-center gap-3 text-slate-300">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                <li className="flex items-center gap-3 text-slate-600">
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   On-the-job training reimbursement available
                 </li>
               </ul>
@@ -291,7 +291,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-brand-orange-600 text-white">
+      <section className="py-16 md:py-24 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Build Your Talent Pipeline?

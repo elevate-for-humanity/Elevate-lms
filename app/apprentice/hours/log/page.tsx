@@ -88,7 +88,7 @@ export default function LogApprenticeHoursPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Hours Logged!</h1>
           <p className="text-gray-600 mb-4">Your apprenticeship hours have been submitted for approval.</p>
           <p className="text-sm text-gray-500">Redirecting...</p>

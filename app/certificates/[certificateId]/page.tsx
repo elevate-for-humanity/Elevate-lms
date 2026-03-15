@@ -84,7 +84,7 @@ export default async function CertificateViewPage({ params }: Props) {
         {/* Verification Badge */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <span className="font-semibold">Verified Certificate</span>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default async function CertificateViewPage({ params }: Props) {
         {/* Certificate Card */}
         <div className="bg-white rounded-3xl shadow-xl border-4 border-brand-blue-100 overflow-hidden">
           {/* Header */}
-          <div className="bg-slate-700 text-white p-8 text-center">
+          <div className="bg-white text-white p-8 text-center">
             <Award className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
             <h1 className="text-3xl font-bold mb-2">Certificate of Completion</h1>
             <p className="text-brand-blue-200">Elevate for Humanity</p>
@@ -176,7 +176,7 @@ export default async function CertificateViewPage({ params }: Props) {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               Verification
             </h3>
             <p className="text-slate-600 text-sm mb-4">

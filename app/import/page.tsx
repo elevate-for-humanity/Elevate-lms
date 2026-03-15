@@ -92,7 +92,7 @@ export default function ImportSitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-800">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Import" }]} />
       </div>
@@ -114,10 +114,10 @@ export default function ImportSitePage() {
         {step === 'url' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Import Your Existing Website
               </h1>
-              <p className="text-slate-300 text-lg">
+              <p className="text-slate-600 text-lg">
                 We'll analyze your current site and recreate it on Elevate LMS - 
                 keeping your branding, content, and style.
               </p>
@@ -130,7 +130,7 @@ export default function ImportSitePage() {
                 </label>
                 <div className="flex gap-2">
                   <div className="flex-1 flex items-center bg-white/10 rounded-lg overflow-hidden border border-white/20 focus-within:border-brand-green-500">
-                    <span className="pl-4 text-slate-400">https://</span>
+                    <span className="pl-4 text-slate-500">https://</span>
                     <input
                       type="text"
                       value={url.replace(/^https?:\/\//, '')}
@@ -140,13 +140,13 @@ export default function ImportSitePage() {
                     />
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-slate-400">
+                <p className="mt-2 text-sm text-slate-500">
                   Enter your current training website or organization site
                 </p>
               </div>
 
               {error && (
-                <div className="flex items-start gap-3 p-4 bg-brand-red-500/20 border border-brand-red-500/50 rounded-lg">
+                <div className="flex items-start gap-3 p-4 bg-white/20 border border-brand-red-500/50 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-brand-red-200 font-medium">Import Failed</p>
@@ -165,7 +165,7 @@ export default function ImportSitePage() {
               </button>
 
               <div className="pt-6 border-t border-white/10">
-                <p className="text-slate-400 text-sm text-center mb-4">
+                <p className="text-slate-500 text-sm text-center mb-4">
                   Works with any website platform:
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 text-slate-500 text-sm">
@@ -185,25 +185,25 @@ export default function ImportSitePage() {
             {/* How it works */}
             <div className="grid md:grid-cols-3 gap-6 mt-12">
               <div className="text-center">
-                <div className="w-12 h-12 bg-brand-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Globe className="w-6 h-6 text-brand-green-400" />
                 </div>
-                <h3 className="text-white font-bold mb-1">1. Enter URL</h3>
-                <p className="text-slate-400 text-sm">Paste your current website address</p>
+                <h3 className="text-slate-900 font-bold mb-1">1. Enter URL</h3>
+                <p className="text-slate-500 text-sm">Paste your current website address</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Sparkles className="w-6 h-6 text-brand-blue-400" />
                 </div>
-                <h3 className="text-white font-bold mb-1">2. AI Analyzes</h3>
-                <p className="text-slate-400 text-sm">We extract your content, colors & style</p>
+                <h3 className="text-slate-900 font-bold mb-1">2. AI Analyzes</h3>
+                <p className="text-slate-500 text-sm">We extract your content, colors & style</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Circle className="w-6 h-6 text-brand-blue-400" />
                 </div>
-                <h3 className="text-white font-bold mb-1">3. Launch</h3>
-                <p className="text-slate-400 text-sm">Your site recreated on Elevate LMS</p>
+                <h3 className="text-slate-900 font-bold mb-1">3. Launch</h3>
+                <p className="text-slate-500 text-sm">Your site recreated on Elevate LMS</p>
               </div>
             </div>
           </div>
@@ -212,13 +212,13 @@ export default function ImportSitePage() {
         {/* Step 2: Analyzing */}
         {step === 'analyzing' && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-500/20 rounded-full mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6">
               <Loader2 className="w-10 h-10 text-brand-green-400 animate-spin" />
             </div>
-            <h2 className="text-3xl font-black text-white mb-4">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">
               Analyzing Your Website...
             </h2>
-            <p className="text-slate-300 mb-8">
+            <p className="text-slate-600 mb-8">
               {url}
             </p>
             <div className="space-y-3 text-sm text-slate-400 max-w-xs mx-auto text-left">
@@ -246,14 +246,14 @@ export default function ImportSitePage() {
         {step === 'review' && extracted && config && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
                 <Circle className="w-4 h-4" />
                 Import Successful!
               </div>
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 We Found Your Site
               </h1>
-              <p className="text-slate-300">
+              <p className="text-slate-600">
                 Review what we extracted and customize before launching.
               </p>
             </div>
@@ -271,29 +271,29 @@ export default function ImportSitePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/5 rounded-lg p-4 text-center">
                   <FileText className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">{extracted.pageCount}</p>
-                  <p className="text-slate-400 text-sm">Pages</p>
+                  <p className="text-2xl font-bold text-slate-900">{extracted.pageCount}</p>
+                  <p className="text-slate-500 text-sm">Pages</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
                   <Image className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">{extracted.imagesFound}</p>
-                  <p className="text-slate-400 text-sm">Images</p>
+                  <p className="text-2xl font-bold text-slate-900">{extracted.imagesFound}</p>
+                  <p className="text-slate-500 text-sm">Images</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
                   <Palette className="w-6 h-6 text-pink-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">{extracted.colorsDetected.length}</p>
-                  <p className="text-slate-400 text-sm">Colors</p>
+                  <p className="text-2xl font-bold text-slate-900">{extracted.colorsDetected.length}</p>
+                  <p className="text-slate-500 text-sm">Colors</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
                   <Navigation className="w-6 h-6 text-brand-green-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">{config.navigation.length}</p>
-                  <p className="text-slate-400 text-sm">Nav Items</p>
+                  <p className="text-2xl font-bold text-slate-900">{config.navigation.length}</p>
+                  <p className="text-slate-500 text-sm">Nav Items</p>
                 </div>
               </div>
 
               {/* Detected Colors */}
               <div className="mt-6">
-                <p className="text-slate-400 text-sm mb-2">Detected Colors:</p>
+                <p className="text-slate-500 text-sm mb-2">Detected Colors:</p>
                 <div className="flex gap-2 flex-wrap">
                   {extracted.colorsDetected.slice(0, 8).map((color, idx) => (
                     <div
@@ -309,7 +309,7 @@ export default function ImportSitePage() {
 
             {/* Customize Branding */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6 space-y-4">
-              <h3 className="text-white font-bold flex items-center gap-2">
+              <h3 className="text-slate-900 font-bold flex items-center gap-2">
                 <Palette className="w-5 h-5 text-pink-400" />
                 Customize Branding
               </h3>
@@ -393,14 +393,14 @@ export default function ImportSitePage() {
             {/* Programs Found */}
             {config.programs.length > 0 && (
               <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
-                <h3 className="text-white font-bold mb-4">Programs/Services Found</h3>
+                <h3 className="text-slate-900 font-bold mb-4">Programs/Services Found</h3>
                 <div className="space-y-2">
                   {config.programs.map((program, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
                       <Circle className="w-5 h-5 text-brand-green-400" />
                       <div>
-                        <p className="text-white font-medium">{program.name}</p>
-                        <p className="text-slate-400 text-sm">{program.description.slice(0, 80)}...</p>
+                        <p className="text-slate-900 font-medium">{program.name}</p>
+                        <p className="text-slate-500 text-sm">{program.description.slice(0, 80)}...</p>
                       </div>
                     </div>
                   ))}

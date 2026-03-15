@@ -92,7 +92,7 @@ export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
               ${className}
             `}
           >
-            <div className="w-2.5 h-2.5 bg-brand-orange-600 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity" />
+            <div className="w-2.5 h-2.5 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity" />
           </label>
         </div>
         {(label || helperText) && (

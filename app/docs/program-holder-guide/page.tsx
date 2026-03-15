@@ -48,7 +48,7 @@ export default function ProgramHolderGuidePage() {
               <ul className="space-y-2">
                 {section.items.map((item, j) => (
                   <li key={j} className="flex items-center gap-2 text-gray-600">
-                    <span className="text-slate-400 flex-shrink-0">•</span> {item}
+                    <span className="text-slate-500 flex-shrink-0">•</span> {item}
                   </li>
                 ))}
               </ul>

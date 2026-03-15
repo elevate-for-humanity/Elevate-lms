@@ -255,7 +255,7 @@ function AssessmentContent() {
             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {QUESTIONS.length - current - 1} remaining</span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
-            <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
+            <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>

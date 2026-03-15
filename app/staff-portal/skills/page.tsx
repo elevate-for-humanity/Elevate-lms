@@ -99,13 +99,13 @@ export default async function StaffSkillsPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-slate-900 text-white py-10">
+      <div className="bg-white text-white py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-2xl font-bold mb-1">Staff Skills Checklist</h1>
           <p className="text-slate-400 text-sm mb-6">Track your professional development and competencies</p>
           <div className="flex items-center gap-4">
-            <div className="flex-1 bg-slate-700 rounded-full h-3">
-              <div className="bg-brand-green-500 h-3 rounded-full transition-all" style={{ width: `${pct}%` }} />
+            <div className="flex-1 bg-white rounded-full h-3">
+              <div className="bg-white h-3 rounded-full transition-all" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-sm font-bold text-brand-green-400 w-16 text-right">{completedCount}/{totalSkills}</span>
           </div>
@@ -164,7 +164,7 @@ export default async function StaffSkillsPage() {
         })}
 
         {/* CTA */}
-        <div className="bg-brand-blue-600 rounded-xl p-6 text-white text-center">
+        <div className="bg-white rounded-xl p-6 text-white text-center">
           <Award className="w-10 h-10 mx-auto mb-3 opacity-80" />
           <h3 className="font-bold text-lg mb-1">Skills Verified by Supervisor?</h3>
           <p className="text-brand-blue-100 text-sm mb-4">Ask your manager to verify your completed skills in the admin portal.</p>

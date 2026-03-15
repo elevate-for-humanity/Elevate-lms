@@ -69,7 +69,7 @@ export default function AccessPausedPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-slate-500 mt-6">
           If you believe this is an error, please{' '}
           <Link href="/support/contact" className="text-brand-blue-600 hover:underline">
             contact support

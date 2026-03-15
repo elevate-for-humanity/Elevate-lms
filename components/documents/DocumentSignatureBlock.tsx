@@ -128,7 +128,7 @@ export function DocumentSignatureBlock({
     return (
       <div className="mt-12 border-t-2 border-brand-green-200 pt-8">
         <div className="flex items-center gap-3 bg-brand-green-50 border border-brand-green-200 rounded-xl p-5">
-          <div className="w-10 h-10 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
             <Check className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -263,7 +263,7 @@ export function DocumentSignatureBlock({
               : <><Check className="w-5 h-5" /> {buttonLabel}</>
             }
           </button>
-          <p className="text-xs text-slate-400 flex items-center gap-1.5">
+          <p className="text-xs text-slate-500 flex items-center gap-1.5">
             <Lock className="w-3 h-3" /> Signature, IP address, and timestamp recorded securely.
           </p>
         </div>

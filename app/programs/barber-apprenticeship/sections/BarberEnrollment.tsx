@@ -61,7 +61,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* Partner Shop Application CTA */}
-      <section className="py-12 bg-brand-orange-600">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="text-slate-900">
@@ -72,7 +72,7 @@ export function BarberEnrollment() {
               <p className="text-white/90 text-lg mb-2">
                 Become a partner training site and host apprentices in your shop. We handle the paperwork — you train the next generation.
               </p>
-              <ul className="text-white/80 text-sm space-y-1 mb-6">
+              <ul className="text-slate-600 text-sm space-y-1 mb-6">
                 <li>&#x2022; Get pre-screened, motivated apprentices</li>
                 <li>&#x2022; Zero administrative burden — we handle compliance</li>
                 <li>&#x2022; First pick to hire graduates</li>
@@ -88,7 +88,7 @@ export function BarberEnrollment() {
               </div>
             </div>
             <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-              <h3 className="text-white font-bold text-lg mb-4">Quick Application Checklist</h3>
+              <h3 className="text-slate-900 font-bold text-lg mb-4">Quick Application Checklist</h3>
               <div className="space-y-3">
                 {[
                   'Active Indiana barbershop license',
@@ -148,7 +148,7 @@ export function BarberEnrollment() {
             <div className="space-y-3">
               {ENROLLMENT_STEPS.map((step, i) => (
                 <div key={i} className="flex items-start gap-4 bg-white rounded-lg p-4 border border-slate-200">
-                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {i + 1}
                   </div>
                   <div>
@@ -179,17 +179,17 @@ export function BarberEnrollment() {
       {/* CTA */}
       <section className="py-20 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 bg-white text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-amber-900 rounded-full animate-pulse" />
             Classes Starting Late May – Early June 2025
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Join the Waitlist
           </h2>
-          <p className="text-xl text-slate-300 mb-4">
+          <p className="text-xl text-slate-600 mb-4">
             We are finalizing barbershop placement sites now. Submit your application to secure your spot — we will contact you as soon as placements are confirmed.
           </p>
-          <p className="text-slate-400 mb-8">
+          <p className="text-slate-500 mb-8">
             Pay in full, use a payment plan, or apply for Buy Now Pay Later with {BNPL_PROVIDER_NAMES}.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mb-6">

@@ -175,7 +175,7 @@ export default async function CourseDetailPage({
       />
 
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-slate-900">
+      <section className="relative overflow-hidden bg-white">
         <div className="absolute inset-0">
           <Image
             src={heroImage}
@@ -195,10 +195,10 @@ export default async function CourseDetailPage({
               </span>
             )}
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 leading-tight">
               {course.course_name}
             </h1>
-            <p className="text-lg text-slate-300 mb-8 leading-relaxed max-w-2xl">
+            <p className="text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl">
               {course.description}
             </p>
 
@@ -252,7 +252,7 @@ export default async function CourseDetailPage({
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2.5">
                   <div
-                    className="bg-brand-green-500 h-2.5 rounded-full transition-all"
+                    className="bg-white h-2.5 rounded-full transition-all"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -358,7 +358,7 @@ export default async function CourseDetailPage({
                               {lesson.title}
                             </span>
                             {lesson.duration_minutes && (
-                              <span className="text-xs text-slate-400 flex-shrink-0">
+                              <span className="text-xs text-slate-500 flex-shrink-0">
                                 {lesson.duration_minutes} min
                               </span>
                             )}
@@ -390,7 +390,7 @@ export default async function CourseDetailPage({
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-brand-blue-600 h-3 rounded-full transition-all"
+                      className="bg-white h-3 rounded-full transition-all"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>

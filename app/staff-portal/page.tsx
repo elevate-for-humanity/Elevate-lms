@@ -74,10 +74,10 @@ export default async function StaffPortalLanding() {
       <section className="relative h-[220px] sm:h-[260px]">
         <Image src="/images/pages/staff-portal-page-1.jpg" alt="Staff Portal" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end pb-8 px-6 max-w-6xl mx-auto w-full">
-          <h1 className="text-3xl font-bold text-white mb-1">
+          <h1 className="text-3xl font-bold text-slate-900 mb-1">
             {user && profile?.full_name ? `Welcome, ${profile.full_name.split(' ')[0]}` : 'Staff Portal'}
           </h1>
-          <p className="text-slate-300 text-sm">Elevate for Humanity · Staff &amp; Instructor Tools</p>
+          <p className="text-slate-600 text-sm">Elevate for Humanity · Staff &amp; Instructor Tools</p>
         </div>
       </section>
 
@@ -89,7 +89,7 @@ export default async function StaffPortalLanding() {
             <div className="px-6 py-4 border-b flex items-center justify-between">
               <div>
                 <h2 className="font-bold text-slate-900">Complete Your Onboarding</h2>
-                <p className="text-xs text-slate-400">{onboardingComplete}/{onboardingItems.length} steps done</p>
+                <p className="text-xs text-slate-500">{onboardingComplete}/{onboardingItems.length} steps done</p>
               </div>
               <Link href="/onboarding/staff"
                 className="text-sm text-brand-blue-600 hover:underline font-medium flex items-center gap-1">
@@ -123,7 +123,7 @@ export default async function StaffPortalLanding() {
                 <Icon className="w-5 h-5 text-slate-500 group-hover:text-brand-blue-600" />
               </div>
               <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">{label}</p>
-              <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
             </Link>
           ))}
         </div>

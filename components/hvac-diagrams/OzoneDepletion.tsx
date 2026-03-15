@@ -80,7 +80,7 @@ const STAGES: Stage[] = [
               <Molecule label="Cl•" color="bg-brand-red-500" size="lg" />
               <p className="text-[10px] text-brand-red-600 font-bold mt-1">Free chlorine</p>
             </div>
-            <span className="text-slate-400">+</span>
+            <span className="text-slate-500">+</span>
             <div className="flex items-center gap-1">
               <Molecule label="C" color="bg-slate-600" size="sm" />
               <Molecule label="F" color="bg-brand-blue-500" size="sm" />
@@ -102,7 +102,7 @@ const STAGES: Stage[] = [
             <Molecule label="Cl•" color="bg-brand-red-500" />
             <p className="text-[10px] text-slate-500 mt-1">Free Cl</p>
           </div>
-          <span className="text-slate-400 font-bold">+</span>
+          <span className="text-slate-500 font-bold">+</span>
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-1">
               <Molecule label="O" color="bg-brand-blue-600" size="sm" />
@@ -120,7 +120,7 @@ const STAGES: Stage[] = [
               </div>
               <p className="text-[10px] text-slate-500 mt-1">ClO</p>
             </div>
-            <span className="text-slate-400">+</span>
+            <span className="text-slate-500">+</span>
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-1">
                 <Molecule label="O" color="bg-slate-400" size="sm" />
@@ -148,7 +148,7 @@ const STAGES: Stage[] = [
             </div>
             <p className="text-[10px] text-slate-500 mt-1">ClO</p>
           </div>
-          <span className="text-slate-400 font-bold">+</span>
+          <span className="text-slate-500 font-bold">+</span>
           <div className="flex flex-col items-center">
             <Molecule label="O" color="bg-brand-blue-600" size="sm" />
             <p className="text-[10px] text-slate-500 mt-1">Free O</p>
@@ -158,7 +158,7 @@ const STAGES: Stage[] = [
             <Molecule label="Cl•" color="bg-brand-red-500" />
             <p className="text-[10px] text-brand-red-600 font-bold mt-1">Cl released again!</p>
           </div>
-          <span className="text-slate-400">+</span>
+          <span className="text-slate-500">+</span>
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-1">
               <Molecule label="O" color="bg-slate-400" size="sm" />
@@ -234,10 +234,10 @@ export default function OzoneDepletion({ onComplete }: Props) {
     <div className="space-y-5">
 
       {/* Header */}
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Core — Ozone Depletion</p>
         <h2 className="text-xl font-extrabold">How Chlorine Destroys Ozone</h2>
-        <p className="text-slate-400 text-sm mt-1">Step through the chain reaction that led to the Montreal Protocol and the CFC ban.</p>
+        <p className="text-slate-500 text-sm mt-1">Step through the chain reaction that led to the Montreal Protocol and the CFC ban.</p>
       </div>
 
       {/* Progress */}
@@ -255,9 +255,9 @@ export default function OzoneDepletion({ onComplete }: Props) {
       {/* Stage card */}
       {!completed ? (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="bg-brand-red-600 px-5 py-3">
-            <p className="text-white text-xs font-bold uppercase tracking-wider">Step {current.id} of {STAGES.length}</p>
-            <h3 className="text-white font-extrabold text-lg leading-snug">{current.title}</h3>
+          <div className="bg-white px-5 py-3">
+            <p className="text-slate-900 text-xs font-bold uppercase tracking-wider">Step {current.id} of {STAGES.length}</p>
+            <h3 className="text-slate-900 font-extrabold text-lg leading-snug">{current.title}</h3>
           </div>
 
           {/* Visual */}
@@ -284,7 +284,7 @@ export default function OzoneDepletion({ onComplete }: Props) {
           </div>
         </div>
       ) : (
-        <div className="bg-brand-green-900 rounded-2xl p-6 text-white space-y-4">
+        <div className="bg-white rounded-2xl p-6 text-white space-y-4">
           <h3 className="text-xl font-extrabold">Chain Reaction Complete ✓</h3>
           <p className="text-brand-green-200 text-sm leading-relaxed">
             You now understand why CFCs were banned. One chlorine atom destroys up to 100,000 ozone molecules

@@ -25,7 +25,7 @@ const courses = (dbRows as any[]) || [];
           <div key={i} className={`bg-white rounded-xl border p-5 ${c.status === 'Locked' ? 'opacity-60' : 'hover:shadow-sm'} transition`}>
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                {c.status === 'Completed' && <span className="text-slate-400 flex-shrink-0">•</span>}
+                {c.status === 'Completed' && <span className="text-slate-500 flex-shrink-0">•</span>}
                 {c.status === 'In Progress' && <Play className="w-5 h-5 text-brand-blue-500" />}
                 {c.status === 'Locked' && <Lock className="w-5 h-5 text-gray-400" />}
                 <div>

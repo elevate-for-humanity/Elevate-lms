@@ -83,7 +83,7 @@ export default async function ThankyouPage() {
       <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Thank You!
@@ -187,9 +187,9 @@ export default async function ThankyouPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
             Ready to Learn More?
           </h2>
           <p className="text-brand-blue-100 mb-8">

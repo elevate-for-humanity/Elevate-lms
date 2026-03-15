@@ -28,10 +28,10 @@ export default function WorkforcePartnersPage() {
         <Image src="/images/pages/workforce-partners-page-1.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Handshake className="w-4 h-4" /> Partner Network
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
               Workforce Partners
             </h1>
             <p className="text-xl text-white/90 max-w-xl mb-6">
@@ -107,7 +107,7 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* For WorkOne Staff */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -126,7 +126,7 @@ export default function WorkforcePartnersPage() {
                   'OJT training plans and internship agreements available',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -183,10 +183,10 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black text-white mb-4">Partner With Us</h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <h2 className="text-3xl font-black text-slate-900 mb-4">Partner With Us</h2>
+          <p className="text-xl text-slate-600 mb-8">
             Let's work together to connect more Hoosiers with career training and employment.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

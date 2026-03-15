@@ -72,11 +72,11 @@ export function ProgramPageVisual({ program }: Props) {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12">
           <Link 
             href={program.categoryHref}
-            className="inline-flex items-center text-white/80 text-sm mb-4 hover:text-white"
+            className="inline-flex items-center text-slate-600 text-sm mb-4 hover:text-white"
           >
             ← {program.category}
           </Link>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
             {program.title}
           </h1>
           <p className="text-xl text-white/90 mb-8 max-w-2xl">
@@ -98,8 +98,8 @@ export function ProgramPageVisual({ program }: Props) {
               <span className="text-white font-medium">{program.demand} Demand</span>
             </div>
             {program.fundingType === 'funded' && (
-              <div className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full border border-brand-green-400/50">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+              <div className="flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full border border-brand-green-400/50">
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-brand-green-300 font-medium">Free for Eligible</span>
               </div>
             )}
@@ -151,7 +151,7 @@ export function ProgramPageVisual({ program }: Props) {
                   {section.points.map((point, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-6 h-6 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                       </div>
                       <span className="text-slate-700 text-lg">{point}</span>
                     </div>
@@ -170,7 +170,7 @@ export function ProgramPageVisual({ program }: Props) {
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Career Opportunities
             </h2>
-            <p className="text-slate-400 text-lg">
+            <p className="text-slate-500 text-lg">
               Jobs you can get after completing this program
             </p>
           </div>
@@ -179,9 +179,9 @@ export function ProgramPageVisual({ program }: Props) {
             {program.careers.map((career, index) => (
               <div 
                 key={index}
-                className="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-brand-blue-500 transition"
+                className="bg-white rounded-xl p-6 border border-slate-700 hover:border-brand-blue-500 transition"
               >
-                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
                   <Briefcase className="w-6 h-6 text-brand-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{career.title}</h3>
@@ -208,7 +208,7 @@ export function ProgramPageVisual({ program }: Props) {
                 className="flex items-center gap-3 bg-slate-50 rounded-xl p-4"
               >
                 <div className="w-8 h-8 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 </div>
                 <span className="text-slate-700 font-medium">{req}</span>
               </div>
@@ -228,21 +228,21 @@ export function ProgramPageVisual({ program }: Props) {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">1</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Apply Online</h3>
               <p className="text-slate-600">Quick application takes 5 minutes</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">2</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Complete Training</h3>
               <p className="text-slate-600">Hands-on learning with certification</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">3</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Get Hired</h3>
@@ -253,9 +253,9 @@ export function ProgramPageVisual({ program }: Props) {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-blue-600">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to Start?
           </h2>
           <p className="text-brand-blue-100 text-lg mb-6">

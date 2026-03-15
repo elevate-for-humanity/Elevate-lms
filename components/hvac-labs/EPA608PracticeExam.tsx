@@ -180,7 +180,7 @@ export default function EPA608PracticeExam() {
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold text-slate-700">Question {currentIdx + 1} of {questions.length}</span>
           <div className="w-32 bg-slate-200 rounded-full h-2">
-            <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${(totalAnswered / questions.length) * 100}%` }} />
+            <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${(totalAnswered / questions.length) * 100}%` }} />
           </div>
         </div>
         <div className={`flex items-center gap-1.5 text-sm font-bold ${timeLeft < 120 ? 'text-red-600' : 'text-slate-600'}`}>

@@ -85,7 +85,7 @@ export default async function CourseLearnPage({
 
   if (!hasAccess) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-brand-red-600" />
@@ -114,7 +114,7 @@ export default async function CourseLearnPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -126,8 +126,8 @@ export default async function CourseLearnPage({
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-white font-semibold">{course.title}</h1>
-              <p className="text-gray-400 text-sm">{sortedModules.length} lessons</p>
+              <h1 className="text-slate-900 font-semibold">{course.title}</h1>
+              <p className="text-slate-500 text-sm">{sortedModules.length} lessons</p>
             </div>
           </div>
         </div>

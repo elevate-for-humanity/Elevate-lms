@@ -99,7 +99,7 @@ export default function CNAEnrollPage() {
         <Breadcrumbs items={[{ label: "Programs", href: "/programs" }, { label: "Enroll" }]} />
       </div>
 {/* Header */}
-      <div className="bg-brand-blue-600 text-white py-8">
+      <div className="bg-white text-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <Link href="/programs/cna" className="inline-flex items-center gap-2 text-brand-blue-100 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
@@ -328,7 +328,7 @@ export default function CNAEnrollPage() {
                           formData.paymentOption === 'payment-plan' ? 'border-brand-blue-600' : 'border-gray-300'
                         }`}>
                           {formData.paymentOption === 'payment-plan' && (
-                            <div className="w-3 h-3 bg-brand-blue-600 rounded-full" />
+                            <div className="w-3 h-3 bg-white rounded-full" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -365,7 +365,7 @@ export default function CNAEnrollPage() {
                           formData.paymentOption === 'full-payment' ? 'border-brand-blue-600' : 'border-gray-300'
                         }`}>
                           {formData.paymentOption === 'full-payment' && (
-                            <div className="w-3 h-3 bg-brand-blue-600 rounded-full" />
+                            <div className="w-3 h-3 bg-white rounded-full" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -487,11 +487,11 @@ export default function CNAEnrollPage() {
                   <span>Secure payment via Stripe</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>State-approved program</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Job placement support</span>
                 </div>
               </div>

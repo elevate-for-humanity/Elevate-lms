@@ -149,7 +149,7 @@ export default function NotificationBell() {
                           <p className="text-sm text-black mb-2">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-500">
                             {new Date(
                               notification.created_at
                             ).toLocaleDateString()}

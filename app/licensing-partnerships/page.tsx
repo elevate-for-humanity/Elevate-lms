@@ -133,7 +133,7 @@ export default function LicensingPartnershipsPage() {
                   <ul className="space-y-3 mb-6">
                     {type.benefits.map((benefit, bidx) => (
                       <li key={bidx} className="flex items-start gap-2">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black text-sm">{benefit}</span>
                       </li>
                     ))}
@@ -165,7 +165,7 @@ export default function LicensingPartnershipsPage() {
               const Icon = benefit.icon;
               return (
                 <div key={idx} className="text-center">
-                  <div className="w-20 h-20 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
                     <Icon className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-black mb-3">
@@ -188,7 +188,7 @@ export default function LicensingPartnershipsPage() {
 
           <div className="max-w-4xl mx-auto space-y-8">
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                 1
               </div>
               <div>
@@ -203,7 +203,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                 2
               </div>
               <div>
@@ -218,7 +218,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                 3
               </div>
               <div>
@@ -233,7 +233,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl">
                 4
               </div>
               <div>

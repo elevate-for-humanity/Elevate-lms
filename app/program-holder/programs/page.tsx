@@ -79,7 +79,7 @@ export default async function ProgramHolderProgramsPage() {
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-brand-green-500 rounded-full" style={{ width: `${program.completion}%` }} />
+                          <div className="h-full bg-white rounded-full" style={{ width: `${program.completion}%` }} />
                         </div>
                         <span className="text-sm text-gray-600">{program.completion}%</span>
                       </div>

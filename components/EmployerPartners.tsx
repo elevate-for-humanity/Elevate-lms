@@ -279,7 +279,7 @@ export default function EmployerPartners({
                 className="flex-shrink-0 w-64 bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
                     {partner.logo_url ? (
                       <Image src={partner.logo_url} alt={partner.name} width={32} height={32} className="rounded" />
                     ) : (
@@ -311,7 +311,7 @@ export default function EmployerPartners({
                 className="flex-shrink-0 w-64 bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 bg-brand-green-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
                     {partner.logo_url ? (
                       <Image src={partner.logo_url} alt={partner.name} width={32} height={32} className="rounded" />
                     ) : (

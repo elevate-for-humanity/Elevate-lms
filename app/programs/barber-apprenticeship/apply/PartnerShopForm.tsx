@@ -467,13 +467,13 @@ export default function PartnerShopForm() {
                 {hasSigned ? (
                   <p className="text-sm text-green-600 font-medium">Signature captured</p>
                 ) : (
-                  <p className="text-sm text-gray-400">Draw your signature above</p>
+                  <p className="text-sm text-slate-500">Draw your signature above</p>
                 )}
                 <button type="button" onClick={clearSignature} className="text-sm text-gray-500 hover:text-gray-700 underline">
                   Clear
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 By signing, you agree that this electronic signature is legally binding under the Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
               </p>
             </div>

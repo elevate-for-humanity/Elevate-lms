@@ -107,10 +107,10 @@ export default function PortalsPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="bg-slate-800 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Access Your Portal</h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
             Choose your portal below to access your personalized dashboard, resources, and tools.
             Each portal is designed to support your specific role in the Elevate community.
           </p>
@@ -124,7 +124,7 @@ export default function PortalsPage() {
               <span>24/7 Availability</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Real-Time Updates</span>
             </div>
           </div>
@@ -198,11 +198,11 @@ export default function PortalsPage() {
       </section>
 
       {/* Quick Access for Returning Users */}
-      <section className="py-16 bg-slate-900 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Returning User?</h2>
-            <p className="text-slate-400">Sign in directly to your portal dashboard</p>
+            <p className="text-slate-500">Sign in directly to your portal dashboard</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <Link

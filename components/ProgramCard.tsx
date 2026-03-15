@@ -33,7 +33,7 @@ export function ProgramCard({
           quality={100}
         />
         {badge && (
-          <div className="absolute top-4 right-4 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+          <div className="absolute top-4 right-4 bg-white text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
             {badge}
           </div>
         )}

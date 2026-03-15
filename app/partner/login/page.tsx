@@ -129,7 +129,7 @@ export default function PartnerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -140,7 +140,7 @@ export default function PartnerLoginPage() {
           <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Building className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Partner Portal</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Partner Portal</h1>
           <p className="text-brand-blue-200">Sign in to access your partner dashboard</p>
         </div>
 

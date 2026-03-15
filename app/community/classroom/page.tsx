@@ -127,8 +127,8 @@ export default async function ClassroomPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-brand-green-600 flex items-center justify-center">
-                          <BookOpen className="w-16 h-16 text-white/50" />
+                        <div className="absolute inset-0 bg-white flex items-center justify-center">
+                          <BookOpen className="w-16 h-16 text-slate-400" />
                         </div>
                       )}
                       {isFree ? (
@@ -184,9 +184,9 @@ export default async function ClassroomPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-green-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Learning?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Start Learning?</h2>
           <p className="text-brand-green-100 mb-8 max-w-2xl mx-auto">
             Join our community to access all free courses and unlock premium content.
           </p>

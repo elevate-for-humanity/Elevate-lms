@@ -58,10 +58,10 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-slate-900 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-5xl mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Training Provider Partnership</h1>
-          <p className="text-lg text-slate-300 max-w-3xl">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Training Provider Partnership</h1>
+          <p className="text-lg text-slate-600 max-w-3xl">
             Join our network of approved training providers. We connect you with WIOA-funded students, handle compliance reporting, and support your ETPL listing.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function TrainingProviderPage() {
               <div key={item.step} className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="33vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
+                  <div className="absolute top-3 left-3 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
                     {item.step}
                   </div>
                 </div>

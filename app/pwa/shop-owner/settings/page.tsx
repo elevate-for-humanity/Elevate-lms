@@ -59,28 +59,28 @@ export default function ShopOwnerSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/shop-owner" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
-          <h1 className="text-xl font-bold text-white">Settings</h1>
+          <h1 className="text-xl font-bold text-slate-900">Settings</h1>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-6">
         {/* Profile Section */}
         {user && (
-          <div className="bg-slate-800 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
                 <User className="w-7 h-7 text-brand-blue-400" />
               </div>
               <div>
-                <p className="text-white font-medium text-lg">{user.name}</p>
-                <p className="text-slate-400 text-sm">{user.email}</p>
+                <p className="text-slate-900 font-medium text-lg">{user.name}</p>
+                <p className="text-slate-500 text-sm">{user.email}</p>
                 {user.shopName && (
                   <p className="text-brand-blue-400 text-sm mt-1">{user.shopName}</p>
                 )}
@@ -92,13 +92,13 @@ export default function ShopOwnerSettingsPage() {
         {/* Shop Management */}
         <div>
           <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SHOP MANAGEMENT</h2>
-          <div className="bg-slate-800 rounded-xl overflow-hidden divide-y divide-slate-700">
+          <div className="bg-white rounded-xl overflow-hidden divide-y divide-slate-700">
             <Link href="/pwa/shop-owner/checkin" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
                 <QrCode className="w-5 h-5 text-brand-blue-400" />
                 <div className="text-left">
-                  <p className="text-white font-medium">Check-In QR Code</p>
-                  <p className="text-slate-400 text-sm">Display for apprentice check-ins</p>
+                  <p className="text-slate-900 font-medium">Check-In QR Code</p>
+                  <p className="text-slate-500 text-sm">Display for apprentice check-ins</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-500" />
@@ -107,8 +107,8 @@ export default function ShopOwnerSettingsPage() {
               <div className="flex items-center gap-4">
                 <Building2 className="w-5 h-5 text-slate-400" />
                 <div className="text-left">
-                  <p className="text-white font-medium">Shop Details</p>
-                  <p className="text-slate-400 text-sm">{shop?.name || 'Edit shop information'}</p>
+                  <p className="text-slate-900 font-medium">Shop Details</p>
+                  <p className="text-slate-500 text-sm">{shop?.name || 'Edit shop information'}</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-500" />
@@ -119,7 +119,7 @@ export default function ShopOwnerSettingsPage() {
         {/* Notifications */}
         <div>
           <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">NOTIFICATIONS</h2>
-          <div className="bg-slate-800 rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             {supported ? (
               <button
                 onClick={handleNotificationToggle}
@@ -133,8 +133,8 @@ export default function ShopOwnerSettingsPage() {
                     <BellOff className="w-5 h-5 text-slate-400" />
                   )}
                   <div className="text-left">
-                    <p className="text-white font-medium">Push Notifications</p>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-900 font-medium">Push Notifications</p>
+                    <p className="text-slate-500 text-sm">
                       {permission === 'denied' 
                         ? 'Blocked in browser settings' 
                         : subscribed 
@@ -166,7 +166,7 @@ export default function ShopOwnerSettingsPage() {
         {/* Appearance */}
         <div>
           <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">APPEARANCE</h2>
-          <div className="bg-slate-800 rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl overflow-hidden">
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="w-full flex items-center justify-between p-4 active:bg-slate-700"
@@ -178,8 +178,8 @@ export default function ShopOwnerSettingsPage() {
                   <Sun className="w-5 h-5 text-amber-400" />
                 )}
                 <div className="text-left">
-                  <p className="text-white font-medium">Dark Mode</p>
-                  <p className="text-slate-400 text-sm">{darkMode ? 'On' : 'Off'}</p>
+                  <p className="text-slate-900 font-medium">Dark Mode</p>
+                  <p className="text-slate-500 text-sm">{darkMode ? 'On' : 'Off'}</p>
                 </div>
               </div>
               <div className={`w-12 h-7 rounded-full p-1 transition-colors ${
@@ -196,18 +196,18 @@ export default function ShopOwnerSettingsPage() {
         {/* Support */}
         <div>
           <h2 className="text-slate-400 text-sm font-medium mb-3 px-1">SUPPORT</h2>
-          <div className="bg-slate-800 rounded-xl overflow-hidden divide-y divide-slate-700">
+          <div className="bg-white rounded-xl overflow-hidden divide-y divide-slate-700">
             <Link href="/support/help" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
                 <HelpCircle className="w-5 h-5 text-slate-400" />
-                <p className="text-white font-medium">Help Center</p>
+                <p className="text-slate-900 font-medium">Help Center</p>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-500" />
             </Link>
             <Link href="/privacy-policy" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
                 <Shield className="w-5 h-5 text-slate-400" />
-                <p className="text-white font-medium">Privacy Policy</p>
+                <p className="text-slate-900 font-medium">Privacy Policy</p>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-500" />
             </Link>

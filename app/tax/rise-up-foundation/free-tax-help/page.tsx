@@ -177,7 +177,7 @@ export default function FreeTaxHelpPage() {
 
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold">
               1
             </div>
             <div>
@@ -188,7 +188,7 @@ export default function FreeTaxHelpPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold">
               2
             </div>
             <div>
@@ -199,7 +199,7 @@ export default function FreeTaxHelpPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold">
               3
             </div>
             <div>
@@ -210,7 +210,7 @@ export default function FreeTaxHelpPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold">
               4
             </div>
             <div>

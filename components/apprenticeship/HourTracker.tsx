@@ -129,7 +129,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
           {isClockedIn ? (
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-700 px-4 py-2 rounded-full text-sm font-semibold">
-                <div className="w-2 h-2 bg-brand-green-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 Currently Clocked In
               </div>
               <div className="text-5xl font-bold text-black font-mono text-3xl md:text-4xl lg:text-5xl">
@@ -214,7 +214,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
                   className="flex items-center justify-between bg-slate-50 rounded-lg p-3 text-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                    <div className="w-2 h-2 bg-white rounded-full" />
                     <div>
                       <div className="font-semibold text-black">{session.activity}</div>
                       <div className="text-xs text-black">{session.date}</div>

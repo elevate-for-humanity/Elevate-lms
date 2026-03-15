@@ -46,7 +46,7 @@ export function HeroBanner({
         </div>
 
         {media && (
-          <div className="relative h-52 w-full flex-1 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg md:h-64">
+          <div className="relative h-52 w-full flex-1 overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-lg md:h-64">
             <Image
               src={media.imageSrc}
               alt={media.alt}

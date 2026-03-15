@@ -371,7 +371,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                       <p className="text-sm text-gray-600 mt-1">{mod.description}</p>
                     )}
                     {mod.duration && (
-                      <p className="text-xs text-gray-400 mt-1">{mod.duration}</p>
+                      <p className="text-xs text-slate-500 mt-1">{mod.duration}</p>
                     )}
                   </div>
                 </motion.div>
@@ -414,7 +414,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       )}
 
       {/* Career Path */}
-      <section className="py-16 bg-slate-800 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className={`inline-block bg-white/10 ${c.dark} text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
@@ -440,8 +440,8 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                 <div className={`text-3xl font-bold ${c.darkAccent} mb-2`}>{index + 1}</div>
                 <h3 className="font-bold mb-1">{step.title}</h3>
                 <p className={`${c.dark} font-semibold`}>{step.salary}</p>
-                <p className="text-sm text-slate-400">{step.time}</p>
-                <p className="text-sm text-slate-300 mt-2">{step.desc}</p>
+                <p className="text-sm text-slate-500">{step.time}</p>
+                <p className="text-sm text-slate-600 mt-2">{step.desc}</p>
               </motion.div>
             ))}
           </div>

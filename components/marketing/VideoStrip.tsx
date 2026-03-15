@@ -36,7 +36,7 @@ export function VideoStrip() {
           <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
             Short videos you can use for learners, employers, and partners.
           </p>
-          <p className="mt-3 text-sm text-slate-300">
+          <p className="mt-3 text-sm text-slate-600">
             These are perfect for QR codes on flyers, link-in-bio, and
             presentations. The goal: explain Elevate in real language, in under
             three minutes.
@@ -50,7 +50,7 @@ export function VideoStrip() {
               href={video.href}
               className="group flex flex-col rounded-3xl bg-slate-950/80 p-5 ring-1 ring-slate-800 transition hover:-translate-y-1 hover:ring-emerald-400/60"
             >
-              <div className="relative mb-4 overflow-hidden rounded-2xl bg-slate-900">
+              <div className="relative mb-4 overflow-hidden rounded-2xl bg-white">
                 <div className="aspect-video" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-semibold text-slate-950">
@@ -61,13 +61,13 @@ export function VideoStrip() {
                   </span>
                 </div>
               </div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                 {video.tag}
               </p>
               <h3 className="mt-2 text-base font-semibold text-slate-50">
                 {video.title}
               </h3>
-              <p className="mt-2 text-sm text-slate-300">{video.body}</p>
+              <p className="mt-2 text-sm text-slate-600">{video.body}</p>
             </Link>
           ))}
         </div>

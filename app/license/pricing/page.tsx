@@ -91,7 +91,7 @@ export default async function PricingPage() {
                 }`}
               >
                 {tier.featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-white px-4 py-2 rounded-full text-xs font-bold">
                     MOST POPULAR
                   </div>
                 )}
@@ -147,7 +147,7 @@ export default async function PricingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {PLATFORM_FEATURES.slice(0, 6).map((feature: any, index: number) => (
               <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <h3 className="font-semibold mb-2">{feature.name}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
               </div>
@@ -177,9 +177,9 @@ export default async function PricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?
           </h2>
           <p className="text-brand-orange-100 mb-8">

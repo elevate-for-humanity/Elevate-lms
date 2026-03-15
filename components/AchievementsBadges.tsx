@@ -201,7 +201,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               {/* Earned Badge Indicator */}
               {isEarned && (
                 <div className="absolute top-2 right-2">
-                  <div className="w-6 h-6 bg-brand-orange-600 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                     <Star className="w-4 h-4 text-white fill-white" />
                   </div>
                 </div>

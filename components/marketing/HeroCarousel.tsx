@@ -124,7 +124,7 @@ export function HeroCarousel() {
                     {activeSlide.secondaryCtaLabel}
                   </Link>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/80 px-3 py-2 text-xs text-zinc-200 ring-1 ring-zinc-700">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs text-zinc-200 ring-1 ring-zinc-700">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-orange-400 text-[10px] font-bold text-zinc-950">
                     ★
                   </span>
@@ -173,7 +173,7 @@ export function HeroCarousel() {
 
         {/* RIGHT: animated image panel */}
         <div className="flex-1">
-          <div className="relative rounded-3xl bg-zinc-900/60 p-3 shadow-2xl ring-1 ring-zinc-700/80 backdrop-blur">
+          <div className="relative rounded-3xl bg-white/60 p-3 shadow-2xl ring-1 ring-zinc-700/80 backdrop-blur">
             <div className="relative aspect-video overflow-hidden rounded-2xl">
               <AnimatePresence mode="wait">
                 <motion.div

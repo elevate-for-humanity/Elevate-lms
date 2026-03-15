@@ -43,7 +43,7 @@ export default async function TuitionPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-800 border-b border-slate-700">
+      <div className="bg-white border-b border-slate-700">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Tuition & Payment' }]} />
         </div>

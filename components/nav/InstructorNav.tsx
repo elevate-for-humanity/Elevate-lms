@@ -127,7 +127,7 @@ export default function InstructorNav() {
       {/* Logo/Brand */}
       <div className="mb-8">
         <Link href="/" aria-label="Link" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
             <svg
               className="w-6 h-6 text-white"
               fill="none"

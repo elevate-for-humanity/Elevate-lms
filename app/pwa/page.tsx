@@ -69,13 +69,13 @@ const APPS = [
 
 export default function PWAIndexPage() {
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <header className="bg-slate-800 px-6 pt-16 pb-8 text-center">
-        <div className="w-20 h-20 bg-brand-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg overflow-hidden">
+        <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg overflow-hidden">
           <Image src="/logo.png" alt="Elevate" width={48} height={48} />
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Elevate Apps</h1>
-        <p className="text-slate-400">Choose your app to get started</p>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Elevate Apps</h1>
+        <p className="text-slate-500">Choose your app to get started</p>
       </header>
 
       <main className="flex-1 px-4 py-6 space-y-3">
@@ -86,14 +86,14 @@ export default function PWAIndexPage() {
                 <Image src={app.image} alt={app.name} fill className="object-cover" sizes="56px" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-bold text-white truncate">{app.name}</h2>
-                <p className="text-slate-400 text-sm">{app.desc}</p>
+                <h2 className="text-lg font-bold text-slate-900 truncate">{app.name}</h2>
+                <p className="text-slate-500 text-sm">{app.desc}</p>
               </div>
               <span className="text-slate-500 text-lg">→</span>
             </div>
             <div className="px-4 pb-3 flex flex-wrap gap-1.5">
               {app.tags.map((tag) => (
-                <span key={tag} className="px-2.5 py-0.5 bg-slate-700 text-slate-300 rounded-full text-xs">{tag}</span>
+                <span key={tag} className="px-2.5 py-0.5 bg-slate-700 text-slate-600 rounded-full text-xs">{tag}</span>
               ))}
             </div>
           </Link>

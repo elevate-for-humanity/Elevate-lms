@@ -105,7 +105,7 @@ export default function CapitalReadinessCoursePage() {
 
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative bg-emerald-800 text-white py-20 lg:py-28">
+        <section className="relative bg-white text-white py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -153,13 +153,13 @@ export default function CapitalReadinessCoursePage() {
               </div>
 
               <div className="relative">
-                <div className="bg-emerald-700 rounded-2xl p-8 shadow-2xl">
-                  <div className="aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
+                <div className="bg-white rounded-2xl p-8 shadow-2xl">
+                  <div className="aspect-video bg-white rounded-lg flex items-center justify-center">
                     <div className="text-center">
-                      <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                         <Play className="w-8 h-8 text-white ml-1" />
                       </div>
-                      <p className="text-white font-medium">Course Preview</p>
+                      <p className="text-slate-900 font-medium">Course Preview</p>
                     </div>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ export default function CapitalReadinessCoursePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {outcomes.map((outcome, index) => (
                 <div key={index} className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span className="text-slate-700">{outcome}</span>
                 </div>
               ))}
@@ -217,17 +217,17 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* Who It's For */}
-        <section className="py-16 lg:py-24 bg-slate-900 text-white">
+        <section className="py-16 lg:py-24 bg-white text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-4">Who This Course Is For</h2>
-            <p className="text-center text-slate-400 mb-12">Designed for organizations seeking institutional credibility and funding access</p>
+            <p className="text-center text-slate-500 mb-12">Designed for organizations seeking institutional credibility and funding access</p>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {audiences.map((audience, index) => (
-                <div key={index} className="bg-slate-800 rounded-xl p-6">
+                <div key={index} className="bg-white rounded-xl p-6">
                   <Target className="w-8 h-8 text-emerald-400 mb-4" />
                   <h3 className="text-lg font-semibold mb-2">{audience.title}</h3>
-                  <p className="text-slate-400 text-sm">{audience.description}</p>
+                  <p className="text-slate-500 text-sm">{audience.description}</p>
                 </div>
               ))}
             </div>
@@ -252,9 +252,9 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 lg:py-24 bg-emerald-600">
+        <section className="py-16 lg:py-24 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to Build Institutional Trust?</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Build Institutional Trust?</h2>
             <p className="text-emerald-100 mb-8 max-w-xl mx-auto">
               Get the Capital Readiness Guide with integrated course access. 
               Start building systems that earn trust and unlock funding.

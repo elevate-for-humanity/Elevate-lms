@@ -33,7 +33,7 @@ export default async function EnrollmentPWAPage() {
         <Image src="/images/pages/demo-page-3.jpg" alt="Student enrollment" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
-          <h1 className="text-2xl font-bold text-white">Enrollment Center</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Enrollment Center</h1>
           <p className="text-brand-orange-200 text-sm mt-1">Apply, track status, and complete enrollment</p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default async function EnrollmentPWAPage() {
             { step: '4', title: 'Start Training', desc: 'Begin your program and track progress in the LMS' },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-3 bg-white rounded-xl border border-slate-200 p-3">
-              <div className="w-8 h-8 bg-brand-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
               <div>
                 <div className="font-semibold text-slate-900 text-sm">{s.title}</div>
                 <div className="text-xs text-slate-500">{s.desc}</div>
@@ -147,7 +147,7 @@ export default async function EnrollmentPWAPage() {
                   {prog.funding_eligible ? ' · Funding available' : ''}
                 </div>
               </div>
-              <span className="text-slate-400 text-sm">→</span>
+              <span className="text-slate-500 text-sm">→</span>
             </Link>
           ))}
         </div>

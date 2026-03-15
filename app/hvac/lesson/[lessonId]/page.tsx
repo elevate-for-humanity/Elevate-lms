@@ -102,21 +102,21 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
             </audio>
           </div>
         ) : diagramUrl ? (
-          <div className="relative w-full aspect-video bg-slate-900">
+          <div className="relative w-full aspect-video bg-white">
             <Image src={diagramUrl} alt={lesson.lessonTitle} fill className="object-contain" />
           </div>
         ) : null}
       </div>
 
       {/* ── Title + progress ── */}
-      <div className="bg-slate-900 border-b border-slate-800 px-4 py-4">
+      <div className="bg-white border-b border-slate-800 px-4 py-4">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold text-white">{lesson.lessonTitle}</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{lesson.lessonTitle}</h1>
           <div className="flex items-center gap-4 mt-1">
-            <span className="text-slate-400 text-sm">{lesson.module}</span>
+            <span className="text-slate-500 text-sm">{lesson.module}</span>
             <span className="text-slate-600 text-xs">Lesson {lesson.lessonOrder} of {moduleLessons.length}</span>
           </div>
-          <div className="mt-3 h-1 bg-slate-800 rounded-full">
+          <div className="mt-3 h-1 bg-white rounded-full">
             <div
               className="h-1 bg-sky-500 rounded-full"
               style={{ width: `${((moduleIdx + 1) / moduleLessons.length) * 100}%` }}
@@ -131,15 +131,15 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
         {lesson.keyConcept && (
           <div className="bg-sky-950 border-l-4 border-sky-400 rounded-r-2xl px-6 py-5">
             <p className="text-sky-400 text-xs font-bold uppercase tracking-widest mb-2">Key Concept</p>
-            <p className="text-white text-xl font-semibold leading-snug">{lesson.keyConcept}</p>
+            <p className="text-slate-900 text-xl font-semibold leading-snug">{lesson.keyConcept}</p>
           </div>
         )}
 
         {/* ── DIAGRAM ── */}
         {diagramUrl && (
           <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">System Diagram</p>
-            <div className="rounded-2xl overflow-hidden bg-slate-800 border border-slate-700">
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">System Diagram</p>
+            <div className="rounded-2xl overflow-hidden bg-white border border-slate-700">
               <Image
                 src={diagramUrl}
                 alt={`${lesson.lessonTitle} diagram`}
@@ -154,7 +154,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
         {/* ── LESSON CONTENT — scannable, not a wall of text ── */}
         {scriptParagraphs.length > 0 && (
           <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Lesson Content</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Lesson Content</p>
             <div className="space-y-4">
               {scriptParagraphs.map((para, i) => {
                 const isHeader = para.endsWith(':') && para.length < 80;
@@ -165,7 +165,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
                   return (
                     <ul key={i} className="space-y-2">
                       {para.split('\n').filter(Boolean).map((item, j) => (
-                        <li key={j} className="flex gap-3 text-slate-300 text-sm leading-relaxed">
+                        <li key={j} className="flex gap-3 text-slate-600 text-sm leading-relaxed">
                           <span className="text-sky-500 mt-1 flex-shrink-0">▸</span>
                           <span>{item.replace(/^[-•]\s*/, '')}</span>
                         </li>
@@ -173,7 +173,7 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
                     </ul>
                   );
                 }
-                return <p key={i} className="text-slate-300 text-sm leading-relaxed">{para}</p>;
+                return <p key={i} className="text-slate-600 text-sm leading-relaxed">{para}</p>;
               })}
             </div>
           </div>
@@ -198,14 +198,14 @@ export default async function HvacLessonPage({ params }: { params: Promise<{ les
         {/* ── KNOWLEDGE CHECK — interactive ── */}
         {quizQuestions && quizQuestions.length > 0 ? (
           <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
             <HvacQuizBlock questions={quizQuestions.slice(0, 5)} />
           </div>
         ) : lesson.quizQuestion ? (
           <div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-              <p className="text-white font-semibold mb-3">{lesson.quizQuestion}</p>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Knowledge Check</p>
+            <div className="bg-white border border-slate-700 rounded-2xl p-6">
+              <p className="text-slate-900 font-semibold mb-3">{lesson.quizQuestion}</p>
               <details className="cursor-pointer">
                 <summary className="text-sky-400 text-sm font-medium select-none">Show answer</summary>
                 <p className="text-green-300 text-sm mt-2">{lesson.quizAnswer}</p>

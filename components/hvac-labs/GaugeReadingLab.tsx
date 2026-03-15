@@ -71,7 +71,7 @@ export default function GaugeReadingLab() {
       </div>
 
       {/* Scenario Card */}
-      <div className="bg-slate-900 text-white rounded-xl p-6">
+      <div className="bg-white text-white rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-bold text-lg">{ex.title}</h4>
           <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${
@@ -82,16 +82,16 @@ export default function GaugeReadingLab() {
             {ex.difficulty}
           </span>
         </div>
-        <p className="text-sm text-slate-300 mb-4">{ex.refrigerant} &middot; {ex.systemType}</p>
+        <p className="text-sm text-slate-600 mb-4">{ex.refrigerant} &middot; {ex.systemType}</p>
 
         {/* Conditions */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-slate-800 rounded-lg p-3 text-center">
-            <p className="text-xs text-slate-400">Outdoor Temp</p>
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-slate-500">Outdoor Temp</p>
             <p className="text-2xl font-bold">{ex.outdoorTemp}°F</p>
           </div>
-          <div className="bg-slate-800 rounded-lg p-3 text-center">
-            <p className="text-xs text-slate-400">Indoor Temp</p>
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-slate-500">Indoor Temp</p>
             <p className="text-2xl font-bold">{ex.indoorTemp}°F</p>
           </div>
         </div>
@@ -108,12 +108,12 @@ export default function GaugeReadingLab() {
             <p className="text-3xl font-bold text-red-200">{ex.dischargePressure}</p>
             <p className="text-xs text-red-400">psig</p>
           </div>
-          <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 text-center">
-            <p className="text-xs text-slate-400 mb-1">Suction Line Temp</p>
+          <div className="bg-white border border-slate-600 rounded-lg p-4 text-center">
+            <p className="text-xs text-slate-500 mb-1">Suction Line Temp</p>
             <p className="text-3xl font-bold">{ex.suctionLineTemp}°F</p>
           </div>
-          <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 text-center">
-            <p className="text-xs text-slate-400 mb-1">Liquid Line Temp</p>
+          <div className="bg-white border border-slate-600 rounded-lg p-4 text-center">
+            <p className="text-xs text-slate-500 mb-1">Liquid Line Temp</p>
             <p className="text-3xl font-bold">{ex.liquidLineTemp}°F</p>
           </div>
         </div>

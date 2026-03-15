@@ -82,7 +82,7 @@ export default function GenerateSitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-800">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Generate" }]} />
       </div>
@@ -107,10 +107,10 @@ export default function GenerateSitePage() {
         {step === 'info' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Build Your Training Platform
               </h1>
-              <p className="text-slate-300 text-lg">
+              <p className="text-slate-600 text-lg">
                 AI will generate a complete LMS customized for your organization in seconds.
               </p>
             </div>
@@ -145,7 +145,7 @@ export default function GenerateSitePage() {
                       }`}
                     >
                       <span className="text-2xl">{type.icon}</span>
-                      <p className="text-white text-sm mt-1">{type.label}</p>
+                      <p className="text-slate-900 text-sm mt-1">{type.label}</p>
                     </button>
                   ))}
                 </div>
@@ -167,10 +167,10 @@ export default function GenerateSitePage() {
         {step === 'details' && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Tell Us More
               </h1>
-              <p className="text-slate-300 text-lg">
+              <p className="text-slate-600 text-lg">
                 Help AI create the perfect site for your needs.
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function GenerateSitePage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-brand-red-500/20 border border-brand-red-500/50 rounded-lg text-brand-red-200">
+                <div className="p-4 bg-white/20 border border-brand-red-500/50 rounded-lg text-brand-red-200">
                   {error}
                 </div>
               )}
@@ -259,13 +259,13 @@ export default function GenerateSitePage() {
         {/* Step 3: Generating */}
         {step === 'generating' && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-blue-500/20 rounded-full mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6">
               <Loader2 className="w-10 h-10 text-brand-blue-400 animate-spin" />
             </div>
-            <h2 className="text-3xl font-black text-white mb-4">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">
               Creating Your Platform...
             </h2>
-            <p className="text-slate-300">
+            <p className="text-slate-600">
               AI is generating your custom LMS configuration
             </p>
             <div className="mt-8 space-y-2 text-sm text-slate-400">
@@ -281,14 +281,14 @@ export default function GenerateSitePage() {
         {step === 'preview' && siteConfig && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
                 <Sparkles className="w-4 h-4" />
                 Site Generated!
               </div>
-              <h1 className="text-4xl font-black text-white mb-4">
+              <h1 className="text-4xl font-black text-slate-900 mb-4">
                 Your Platform is Ready
               </h1>
-              <p className="text-slate-300 text-lg">
+              <p className="text-slate-600 text-lg">
                 Preview your site below. Upgrade to launch it live.
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function GenerateSitePage() {
                   <span className="text-white font-bold text-xl">
                     {siteConfig.branding.logoText}
                   </span>
-                  <div className="flex gap-4 text-white/80 text-sm">
+                  <div className="flex gap-4 text-slate-600 text-sm">
                     {siteConfig.navigation.slice(0, 4).map((nav) => (
                       <span key={nav.label}>{nav.label}</span>
                     ))}
@@ -344,7 +344,7 @@ export default function GenerateSitePage() {
 
             {/* Actions */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-white mb-6 text-center">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 text-center">
                 Choose Your Plan to Launch
               </h3>
               
@@ -353,17 +353,17 @@ export default function GenerateSitePage() {
                   href={`/store/checkout?plan=starter_monthly&preview=${siteConfig.meta.previewId}`}
                   className="p-6 bg-white/10 hover:bg-white/20 rounded-xl text-center transition-colors"
                 >
-                  <p className="text-white font-bold text-lg">Starter</p>
-                  <p className="text-3xl font-black text-white my-2">$99<span className="text-lg">/mo</span></p>
-                  <p className="text-slate-400 text-sm">100 students</p>
+                  <p className="text-slate-900 font-bold text-lg">Starter</p>
+                  <p className="text-3xl font-black text-slate-900 my-2">$99<span className="text-lg">/mo</span></p>
+                  <p className="text-slate-500 text-sm">100 students</p>
                 </a>
                 
                 <a
                   href={`/store/checkout?plan=professional_monthly&preview=${siteConfig.meta.previewId}`}
                   className="p-6 bg-brand-blue-600 hover:bg-brand-blue-700 rounded-xl text-center transition-colors ring-2 ring-brand-blue-400"
                 >
-                  <p className="text-white font-bold text-lg">Professional</p>
-                  <p className="text-3xl font-black text-white my-2">$299<span className="text-lg">/mo</span></p>
+                  <p className="text-slate-900 font-bold text-lg">Professional</p>
+                  <p className="text-3xl font-black text-slate-900 my-2">$299<span className="text-lg">/mo</span></p>
                   <p className="text-brand-blue-200 text-sm">500 students</p>
                 </a>
                 
@@ -371,13 +371,13 @@ export default function GenerateSitePage() {
                   href={`/store/request-license?preview=${siteConfig.meta.previewId}`}
                   className="p-6 bg-white/10 hover:bg-white/20 rounded-xl text-center transition-colors"
                 >
-                  <p className="text-white font-bold text-lg">Enterprise</p>
-                  <p className="text-3xl font-black text-white my-2">Custom</p>
-                  <p className="text-slate-400 text-sm">Unlimited</p>
+                  <p className="text-slate-900 font-bold text-lg">Enterprise</p>
+                  <p className="text-3xl font-black text-slate-900 my-2">Custom</p>
+                  <p className="text-slate-500 text-sm">Unlimited</p>
                 </a>
               </div>
 
-              <p className="text-center text-slate-400 text-sm">
+              <p className="text-center text-slate-500 text-sm">
                 All plans include 14-day free trial. Your generated site will be saved.
               </p>
             </div>

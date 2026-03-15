@@ -78,7 +78,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               {badge && (
-                <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-white mb-6">
                   {badge}
                 </div>
               )}

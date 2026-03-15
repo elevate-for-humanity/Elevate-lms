@@ -25,12 +25,12 @@ export function HomeHero({ images }: HomeHeroProps) {
   const current = images[index];
 
   return (
-    <section className="relative overflow-hidden border-b border-slate-800 bg-slate-800">
+    <section className="relative overflow-hidden border-b border-slate-800 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-4 md:px-4 md:py-6">
         {/* IMAGE ON TOP FOR MOBILE */}
         <div className="md:hidden">
           <div className="relative mx-auto w-full max-w-md">
-            <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-800 aspect-[4/3]">
+            <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-white aspect-[4/3]">
               <Image
                 src={current.src}
                 alt={current.alt}
@@ -73,7 +73,7 @@ export function HomeHero({ images }: HomeHeroProps) {
                 See Funding & Stipends
               </Link>
             </div>
-            <p className="mt-1 text-[10px] text-slate-400">
+            <p className="mt-1 text-[10px] text-slate-500">
               JRI, WRG, WEX, OJT, apprenticeships, and employer sponsorship are
               braided together so you can focus on learning and earning.
             </p>
@@ -82,7 +82,7 @@ export function HomeHero({ images }: HomeHeroProps) {
           {/* IMAGE SIDE FOR DESKTOP / TABLET */}
           <div className="relative hidden md:block">
             <div className="relative h-full w-full max-w-xl md:ml-auto">
-              <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-800 aspect-[16/9]">
+              <div className="relative w-full overflow-hidden rounded-2xl border border-slate-800 bg-white aspect-[16/9]">
                 <Image
                   src={current.src}
                   alt={current.alt}

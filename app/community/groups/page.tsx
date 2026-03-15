@@ -83,7 +83,7 @@ export default async function GroupsPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-brand-blue-900 text-white py-12">
+      <div className="bg-white text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
@@ -197,8 +197,8 @@ export default async function GroupsPage() {
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         ) : (
-                          <div className="absolute inset-0 bg-brand-blue-600 flex items-center justify-center">
-                            <Users className="w-12 h-12 text-white/50" />
+                          <div className="absolute inset-0 bg-white flex items-center justify-center">
+                            <Users className="w-12 h-12 text-slate-400" />
                           </div>
                         )}
                         <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">

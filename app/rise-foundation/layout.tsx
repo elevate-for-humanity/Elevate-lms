@@ -11,7 +11,7 @@ export default function RiseFoundationLayout({ children }: { children: React.Rea
   return (
     <div>
       {/* DBA identity bar — appears on every Rise Foundation page */}
-      <div className="bg-slate-900 border-b border-slate-700 py-2 px-4 text-center text-xs text-slate-400">
+      <div className="bg-white border-b border-slate-700 py-2 px-4 text-center text-xs text-slate-400">
         <span className="text-white font-semibold">The Rise Foundation</span>
         {' '}is operated by{' '}
         <Link href="/rise-foundation" className="text-pink-400 font-semibold hover:underline">

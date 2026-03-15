@@ -120,9 +120,9 @@ export default function WorkOneLocator() {
 
         {/* Map Embed */}
         <div className="bg-slate-100 rounded-lg overflow-hidden shadow-xl">
-          <div className="p-6 bg-slate-900 text-white">
+          <div className="p-6 bg-white text-white">
             <h3 className="text-2xl font-bold mb-2">Interactive Map</h3>
-            <p className="text-slate-300">Click on any location to get directions</p>
+            <p className="text-slate-600">Click on any location to get directions</p>
           </div>
           <div className="relative h-[400px] sm:h-[500px]">
             <iframe

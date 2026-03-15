@@ -176,7 +176,7 @@ export default function ModerationDashboard() {
                 <p className="text-sm text-black">Approved</p>
                 <p className="text-2xl font-bold text-brand-green-600">{stats.approvedReports}</p>
               </div>
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
           </div>
 
@@ -283,7 +283,7 @@ export default function ModerationDashboard() {
                         className="text-brand-green-600 hover:text-brand-green-800"
                         title="Approve"
                       >
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                       </button>
                       <button
                         onClick={() => handleReview(report.id, 'remove')}

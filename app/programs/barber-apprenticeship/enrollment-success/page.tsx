@@ -85,15 +85,15 @@ export default async function EnrollmentSuccessPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
           
-          <h1 className="text-4xl font-black text-white mb-2">
+          <h1 className="text-4xl font-black text-slate-900 mb-2">
             You are now officially enrolled.
           </h1>
         </div>
@@ -141,7 +141,7 @@ export default async function EnrollmentSuccessPage() {
           Go to My Program Dashboard
         </Link>
 
-        <p className="text-slate-400 text-sm text-center mt-4">
+        <p className="text-slate-500 text-sm text-center mt-4">
           View your courses, track progress, and start learning.
         </p>
       </div>

@@ -125,10 +125,10 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
     <div className="space-y-6">
 
       {/* Header */}
-      <div className="bg-slate-900 rounded-2xl p-6 text-white">
+      <div className="bg-white rounded-2xl p-6 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">EPA Section 608</p>
         <h2 className="text-2xl font-extrabold mb-2">Certification Structure</h2>
-        <p className="text-slate-300 text-sm leading-relaxed">
+        <p className="text-slate-600 text-sm leading-relaxed">
           Pass all four sections to earn <span className="text-white font-bold">Universal Certification</span> — the credential employers require.
           Each section has 25 questions. You need 70% in each section independently.
         </p>
@@ -169,7 +169,7 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
               <Icon className={`w-6 h-6 mb-2 ${isActive ? s.color : 'text-slate-400'}`} />
               <p className={`font-extrabold text-lg ${isActive ? s.color : 'text-slate-900'}`}>{s.label}</p>
               <p className="text-xs text-slate-500 mt-0.5 leading-snug">{s.subtitle}</p>
-              <p className="text-xs font-semibold text-slate-400 mt-2">{s.questions} questions</p>
+              <p className="text-xs font-semibold text-slate-500 mt-2">{s.questions} questions</p>
             </button>
           );
         })}
@@ -209,7 +209,7 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
       )}
 
       {/* Universal cert callout */}
-      <div className="bg-brand-green-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3 mb-2">
           <CheckCircle className="w-6 h-6 text-brand-green-400 flex-shrink-0" />
           <p className="font-extrabold text-lg">Universal Certification</p>

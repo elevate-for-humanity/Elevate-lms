@@ -96,7 +96,7 @@ export default function PlatformPage() {
         <div className="absolute inset-0 z-10 flex items-center">
           <div className="max-w-6xl mx-auto px-6 w-full">
             <p className="text-xs uppercase tracking-widest text-brand-red-400 font-bold mb-3">Workforce Infrastructure</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 max-w-3xl leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 max-w-3xl leading-tight">
               Workforce Development Hub
             </h1>
             <p className="text-lg text-slate-200 max-w-2xl mb-8 leading-relaxed">
@@ -115,13 +115,13 @@ export default function PlatformPage() {
       </section>
 
       {/* ─── OPERATIONAL STATEMENT ─── */}
-      <section className="py-14 bg-slate-900">
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-4">What This Platform Is</p>
           <blockquote className="text-xl sm:text-2xl text-white font-medium leading-relaxed mb-6">
             &ldquo;Elevate operates a Workforce Development Hub that hosts training programs delivered by Elevate and approved partner institutions, connects learners to credential authorities, and provides employers and workforce agencies with a verified pipeline of credentialed talent.&rdquo;
           </blockquote>
-          <p className="text-slate-400 text-sm max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
             This is not a training website with a portal bolted on. It is shared infrastructure for multiple providers, credential authorities, employers, and workforce agencies — operating from a single coordinated system.
           </p>
         </div>
@@ -235,7 +235,7 @@ export default function PlatformPage() {
             {pipelineSteps.map((s, i) => (
               <div key={s.step} className="relative">
                 <div className="bg-white rounded-xl border border-slate-200 p-5 h-full">
-                  <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mb-3">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-white font-bold text-sm mb-3">
                     {s.step}
                   </div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{s.label}</h3>
@@ -274,21 +274,21 @@ export default function PlatformPage() {
       </section>
 
       {/* ─── GOVERNANCE & SECURITY ─── */}
-      <section className="py-16 sm:py-20 bg-slate-900">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-10">
             <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Governance & Security</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">Built for funders, auditors, and regulators</h2>
-            <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Built for funders, auditors, and regulators</h2>
+            <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">
               The platform is designed for organizations that operate under workforce funding agreements and must demonstrate compliance to state and federal agencies.
             </p>
           </div>
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-8">
+          <div className="bg-white rounded-xl border border-slate-700 p-8">
             <ul className="space-y-4">
               {governancePrinciples.map((g) => (
                 <li key={g} className="flex items-start gap-3">
                   <Lock className="w-4 h-4 text-brand-red-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-300 text-sm">{g}</span>
+                  <span className="text-slate-600 text-sm">{g}</span>
                 </li>
               ))}
             </ul>
@@ -302,9 +302,9 @@ export default function PlatformPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-16 sm:py-20 bg-brand-red-600">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
             Ready to operate on the platform?
           </h2>
           <p className="text-red-100 max-w-xl mx-auto mb-8 text-sm leading-relaxed">

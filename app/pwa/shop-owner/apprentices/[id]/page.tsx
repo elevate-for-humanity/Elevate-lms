@@ -101,10 +101,10 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading apprentice details...</p>
+          <p className="text-slate-900">Loading apprentice details...</p>
         </div>
       </div>
     );
@@ -112,11 +112,11 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/pwa/shop-owner/apprentices"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -133,7 +133,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
   const { apprentice, weeklyData, milestones } = data;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
@@ -141,7 +141,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">{apprentice.name}</h1>
+            <h1 className="text-xl font-bold text-slate-900">{apprentice.name}</h1>
             <p className="text-brand-blue-200 text-sm">Apprentice Details</p>
           </div>
           <ComplianceStatusBadge status={apprentice.complianceStatus} />
@@ -150,7 +150,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
         {/* Progress Card */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
           <div className="text-center mb-3">
-            <p className="text-4xl font-black text-white">{apprentice.totalHours.toLocaleString()}</p>
+            <p className="text-4xl font-black text-slate-900">{apprentice.totalHours.toLocaleString()}</p>
             <p className="text-brand-blue-200">of {apprentice.targetHours.toLocaleString()} hours</p>
           </div>
           
@@ -163,15 +163,15 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
           <div className="grid grid-cols-3 gap-2 text-center text-sm">
             <div>
-              <p className="text-white font-bold">{apprentice.progress.toFixed(1)}%</p>
+              <p className="text-slate-900 font-bold">{apprentice.progress.toFixed(1)}%</p>
               <p className="text-brand-blue-200 text-xs">Complete</p>
             </div>
             <div>
-              <p className="text-white font-bold">{apprentice.weeklyAvg}</p>
+              <p className="text-slate-900 font-bold">{apprentice.weeklyAvg}</p>
               <p className="text-brand-blue-200 text-xs">Hrs/Week Avg</p>
             </div>
             <div>
-              <p className="text-white font-bold">{apprentice.weeklyHours}</p>
+              <p className="text-slate-900 font-bold">{apprentice.weeklyHours}</p>
               <p className="text-brand-blue-200 text-xs">This Week</p>
             </div>
           </div>
@@ -180,8 +180,8 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
       <main className="px-4 py-6 space-y-6">
         {/* Contact Info */}
-        <div className="bg-slate-800 rounded-xl p-4 space-y-3">
-          <h2 className="text-white font-bold">Contact Information</h2>
+        <div className="bg-white rounded-xl p-4 space-y-3">
+          <h2 className="text-slate-900 font-bold">Contact Information</h2>
           
           {apprentice.email && (
             <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           
           <div className="flex items-center gap-3">
             <Calendar className="w-5 h-5 text-slate-500" />
-            <span className="text-slate-300">
+            <span className="text-slate-600">
               Started {new Date(apprentice.startDate).toLocaleDateString()}
             </span>
           </div>
@@ -211,7 +211,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           {apprentice.estimatedCompletion && (
             <div className="flex items-center gap-3">
               <TrendingUp className="w-5 h-5 text-slate-500" />
-              <span className="text-slate-300">
+              <span className="text-slate-600">
                 Est. completion: {new Date(apprentice.estimatedCompletion).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </span>
             </div>
@@ -220,7 +220,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
         {/* Milestones */}
         <div>
-          <h2 className="text-white font-bold mb-4">Milestones</h2>
+          <h2 className="text-slate-900 font-bold mb-4">Milestones</h2>
           <div className="space-y-3">
             {milestones.map((milestone) => (
               <div 
@@ -246,7 +246,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
                     </p>
                   </div>
                   {milestone.achieved && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   )}
                 </div>
               </div>
@@ -256,27 +256,27 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
 
         {/* Weekly History */}
         <div>
-          <h2 className="text-white font-bold mb-4">Recent Weeks</h2>
+          <h2 className="text-slate-900 font-bold mb-4">Recent Weeks</h2>
           {weeklyData.length > 0 ? (
             <div className="space-y-3">
               {weeklyData.map((week, index) => {
                 const weekDate = new Date(week.weekEnding);
                 return (
-                  <div key={index} className="bg-slate-800 rounded-xl p-4">
+                  <div key={index} className="bg-white rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-white font-medium">
+                        <p className="text-slate-900 font-medium">
                           Week of {weekDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </p>
-                        <p className="text-slate-400 text-sm capitalize">{week.status}</p>
+                        <p className="text-slate-500 text-sm capitalize">{week.status}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-white">{week.hours}</p>
-                        <p className="text-slate-400 text-sm">hours</p>
+                        <p className="text-2xl font-bold text-slate-900">{week.hours}</p>
+                        <p className="text-slate-500 text-sm">hours</p>
                       </div>
                     </div>
                     {week.notes && (
-                      <p className="text-slate-400 text-sm mt-2 pt-2 border-t border-slate-700">
+                      <p className="text-slate-500 text-sm mt-2 pt-2 border-t border-slate-700">
                         {week.notes}
                       </p>
                     )}
@@ -285,9 +285,9 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
               })}
             </div>
           ) : (
-            <div className="bg-slate-800 rounded-xl p-6 text-center">
+            <div className="bg-white rounded-xl p-6 text-center">
               <Clock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No hours logged yet</p>
+              <p className="text-slate-500">No hours logged yet</p>
             </div>
           )}
         </div>

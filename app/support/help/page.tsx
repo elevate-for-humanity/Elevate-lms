@@ -61,7 +61,7 @@ export default async function HelpCenterPage({
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Help" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-700 text-white py-16">
+      <section className="bg-white text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>
           <p className="text-xl text-brand-blue-100 mb-8">

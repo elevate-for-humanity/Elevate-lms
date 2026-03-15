@@ -153,7 +153,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               currentStep > step.id ? 'bg-brand-green-500 text-white' :
               currentStep === step.id ? 'bg-brand-orange-500 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
-              {currentStep > step.id ? <span className="text-slate-400 flex-shrink-0">•</span> : <step.icon className="w-5 h-5" />}
+              {currentStep > step.id ? <span className="text-slate-500 flex-shrink-0">•</span> : <step.icon className="w-5 h-5" />}
             </div>
             <span className={`ml-2 text-sm hidden sm:block ${currentStep === step.id ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
               {step.name}
@@ -348,7 +348,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
                   <ul className="text-sm text-gray-600 space-y-1">
                     {uploadedDocuments.map(doc => (
                       <li key={doc.id} className="flex items-center gap-2">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         {doc.file_name} ({doc.document_type})
                       </li>
                     ))}

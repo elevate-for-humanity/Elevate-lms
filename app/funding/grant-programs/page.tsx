@@ -224,7 +224,7 @@ export default function GrantProgramsPage() {
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 1
               </div>
               <h3 className="text-lg font-bold mb-2">Apply to Program</h3>
@@ -235,7 +235,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 2
               </div>
               <h3 className="text-lg font-bold mb-2">Check Eligibility</h3>
@@ -246,7 +246,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 3
               </div>
               <h3 className="text-lg font-bold mb-2">Start Training</h3>
@@ -279,7 +279,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Start Your Free Training?

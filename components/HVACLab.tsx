@@ -34,9 +34,9 @@ export default function HVACLab({ onAllIdentified }: HVACLabProps) {
   };
 
   return (
-    <div className="bg-slate-900 rounded-xl p-6">
-      <h3 className="text-white font-bold text-lg mb-2">HVAC System Component Lab</h3>
-      <p className="text-slate-400 text-sm mb-6">Click each component to identify it. Identify all 5 to complete the lab.</p>
+    <div className="bg-white rounded-xl p-6">
+      <h3 className="text-slate-900 font-bold text-lg mb-2">HVAC System Component Lab</h3>
+      <p className="text-slate-500 text-sm mb-6">Click each component to identify it. Identify all 5 to complete the lab.</p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {COMPONENTS.map(c => {
           const done = identified.has(c.id);
@@ -50,7 +50,7 @@ export default function HVACLab({ onAllIdentified }: HVACLabProps) {
                 {done && <CheckCircle className="w-4 h-4 text-brand-green-400 flex-shrink-0" />}
                 <span className={`font-bold text-sm ${done ? 'text-brand-green-300' : 'text-white'}`}>{c.label}</span>
               </div>
-              <p className="text-slate-400 text-xs">{c.desc}</p>
+              <p className="text-slate-500 text-xs">{c.desc}</p>
             </button>
           );
         })}

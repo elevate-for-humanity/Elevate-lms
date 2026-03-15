@@ -72,7 +72,7 @@ export default function CareerServicesPage() {
               { step: '5', title: 'Get Hired', desc: 'Interview, receive an offer, and start your new career.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -112,7 +112,7 @@ export default function CareerServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-brand-blue-600">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Start Your Career?</h2>
           <p className="text-white mb-6 text-sm">Apply for training and career services are included at no extra cost.</p>

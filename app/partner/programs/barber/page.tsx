@@ -225,7 +225,7 @@ export default function BarberPartnerPage() {
           </Link>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-brand-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
                 <Scissors className="w-7 h-7 text-white" />
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function BarberPartnerPage() {
         
         {success && (
           <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3 text-brand-green-700">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             {success}
           </div>
         )}
@@ -266,7 +266,7 @@ export default function BarberPartnerPage() {
             <div className="bg-white rounded-xl p-8 text-center border border-slate-200">
               <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <p className="text-slate-500">No apprentices assigned yet</p>
-              <p className="text-sm text-slate-400 mt-1">Apprentices will appear here once they are assigned to your shop</p>
+              <p className="text-sm text-slate-500 mt-1">Apprentices will appear here once they are assigned to your shop</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

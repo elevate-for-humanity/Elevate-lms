@@ -258,7 +258,7 @@ export default function HvacApplyPage() {
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Apply Now</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Building Technician with HVAC Fundamentals — 12 Weeks, 6 Credentials</p>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Building Technician with HVAC Fundamentals — 12 Weeks, 6 Credentials</p>
           </div>
         </div>
       </section>
@@ -272,7 +272,7 @@ export default function HvacApplyPage() {
 
           {/* Left Column - Program Info (pricing only shows for self-pay) */}
           <div className="lg:col-span-2">
-            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-white rounded-2xl p-6 text-white sticky top-8">
 
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">
@@ -314,7 +314,7 @@ export default function HvacApplyPage() {
                     </div>
                   </div>
 
-                  <div className="bg-brand-green-500/20 rounded-xl p-4">
+                  <div className="bg-white/20 rounded-xl p-4">
                     <div className="text-center">
                       <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
                       <div className="text-sm text-slate-600 mt-2 space-y-1 text-left">
@@ -331,7 +331,7 @@ export default function HvacApplyPage() {
 
               {/* Funding note — for non-self-pay */}
               {formData.fundingInterest && formData.fundingInterest !== 'self-pay' && (
-                <div className="bg-brand-green-500/20 rounded-xl p-4">
+                <div className="bg-white/20 rounded-xl p-4">
                   <div className="text-center">
                     <div className="text-brand-green-200 text-xs uppercase mb-1">Tuition</div>
                     <div className="text-2xl font-black">May be covered</div>
@@ -530,7 +530,7 @@ export default function HvacApplyPage() {
                         <p className="text-sm text-gray-600 mt-1">
                           ${PRICING.depositAmount.toLocaleString()} down today, then <strong>${structuredWeekly.toFixed(2)}/week</strong> for {weeksNeeded} weeks
                         </p>
-                        <p className="text-xs text-gray-400 mt-0.5">Minimum weekly payment — balance paid in full by program end</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Minimum weekly payment — balance paid in full by program end</p>
                       </button>
 
                       {/* Option 2: Custom weekly */}

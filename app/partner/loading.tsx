@@ -1,6 +1,6 @@
 export default function PartnerLoading() {
   return (
-    <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center px-4 animate-pulse">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 animate-pulse">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white/10 rounded-full mx-auto mb-4" />

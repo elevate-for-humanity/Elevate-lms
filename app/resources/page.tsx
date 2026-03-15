@@ -80,10 +80,10 @@ export default function ResourcesPage() {
         <Image src="/images/pages/resources-page-1.jpg" alt="Resource hub for students and partners" fill sizes="100vw" className="object-cover" priority />
       </section>
 
-      <section className="bg-slate-900 py-14 sm:py-20">
+      <section className="bg-white py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Resources</h1>
-          <p className="text-lg text-slate-300 max-w-2xl">Guides, tools, and links for students, employers, and partners.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">Resources</h1>
+          <p className="text-lg text-slate-600 max-w-2xl">Guides, tools, and links for students, employers, and partners.</p>
         </div>
       </section>
 

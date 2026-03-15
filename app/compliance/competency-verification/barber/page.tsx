@@ -97,13 +97,13 @@ function SectionBlock({ section }: { section: RubricSection }) {
 
   return (
     <div className="print:break-before-page">
-      <div className="bg-brand-blue-600 rounded-t-xl px-6 py-4 print:bg-gray-900 print:rounded-none">
+      <div className="bg-white rounded-t-xl px-6 py-4 print:bg-white print:rounded-none">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-brand-blue-200 text-xs font-medium uppercase tracking-wider print:text-gray-400">
               Section {section.section} of 6
             </p>
-            <h3 className="text-lg font-bold text-white mt-1">{section.title}</h3>
+            <h3 className="text-lg font-bold text-slate-900 mt-1">{section.title}</h3>
           </div>
           <div className="text-right text-xs text-brand-blue-200 print:text-gray-400">
             <p>{section.items.length} competencies</p>
@@ -150,10 +150,10 @@ export default function BarberCompetencyRubricPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
           <div className="max-w-6xl mx-auto">
-            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+            <p className="text-slate-600 text-sm font-medium uppercase tracking-wider mb-2">
               RAPIDS-Registered Apprenticeship Rubric
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
               Barber Apprenticeship Competency Rubric
             </h1>
           </div>

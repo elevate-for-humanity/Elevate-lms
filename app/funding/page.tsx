@@ -58,7 +58,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="WIOA workforce funding" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WIOA — Workforce Innovation & Opportunity Act</h3>
@@ -83,7 +83,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WRG — Workforce Ready Grant</h3>
@@ -108,7 +108,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-5.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-brand-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Job Ready Indy</h3>
@@ -133,7 +133,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] w-full overflow-hidden">
                 <Image src="/images/pages/jri-hero.jpg" alt="Job Ready Indy Indianapolis workforce initiative" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Indianapolis</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Indianapolis</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Ready Indy</h3>
@@ -158,7 +158,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="Vocational rehabilitation services" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">VR — Vocational Rehabilitation</h3>
@@ -183,7 +183,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="On-the-job training with employer" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-brand-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
+                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">OJT — On-the-Job Training</h3>
@@ -244,7 +244,7 @@ export default function FundingPage() {
               { step: '5', title: 'Start Training', desc: 'Begin your program with funding in place.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -267,10 +267,10 @@ export default function FundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-brand-blue-600">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Find Out What You Qualify For</h2>
-          <p className="text-white mb-6 text-sm">Register at Indiana Career Connect and schedule a WorkOne appointment to explore your funding options.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Find Out What You Qualify For</h2>
+          <p className="text-slate-900 mb-6 text-sm">Register at Indiana Career Connect and schedule a WorkOne appointment to explore your funding options.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">

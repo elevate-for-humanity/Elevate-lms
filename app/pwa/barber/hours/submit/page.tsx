@@ -101,13 +101,13 @@ export default function SubmitHoursPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <div className="w-20 h-20 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-slate-500 flex-shrink-0">•</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">Hours Submitted!</h1>
-          <p className="text-slate-400 mb-2">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Hours Submitted!</h1>
+          <p className="text-slate-500 mb-2">
             {submission.hours}h {submission.minutes}m of {CATEGORIES.find(c => c.value === submission.category)?.label}
           </p>
           <p className="text-slate-500 text-sm mb-8">
@@ -144,29 +144,29 @@ export default function SubmitHoursPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4">
           <Link href="/pwa/barber" className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white">Submit Hours</h1>
-            <p className="text-slate-400 text-sm">Log your training time</p>
+            <h1 className="text-xl font-bold text-slate-900">Submit Hours</h1>
+            <p className="text-slate-500 text-sm">Log your training time</p>
           </div>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-6">
         {error && (
-          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-white/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-brand-red-200 text-sm">{error}</p>
           </div>
         )}
 
         {/* Date Selection */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <Calendar className="w-4 h-4" />
             Date
@@ -181,7 +181,7 @@ export default function SubmitHoursPage() {
         </div>
 
         {/* Time Entry */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <Clock className="w-4 h-4" />
             Time Worked
@@ -197,7 +197,7 @@ export default function SubmitHoursPage() {
                   onChange={(e) => setSubmission(prev => ({ ...prev, hours: parseInt(e.target.value) || 0 }))}
                   className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
-                <span className="text-slate-400">hrs</span>
+                <span className="text-slate-500">hrs</span>
               </div>
             </div>
             <div className="flex-1">
@@ -211,14 +211,14 @@ export default function SubmitHoursPage() {
                   onChange={(e) => setSubmission(prev => ({ ...prev, minutes: parseInt(e.target.value) || 0 }))}
                   className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
-                <span className="text-slate-400">min</span>
+                <span className="text-slate-500">min</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Category Selection */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="text-slate-400 text-sm mb-3 block">Category</label>
           <div className="space-y-2">
             {CATEGORIES.map((cat) => (
@@ -241,7 +241,7 @@ export default function SubmitHoursPage() {
         </div>
 
         {/* Location */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <MapPin className="w-4 h-4" />
             Location (Optional)
@@ -256,7 +256,7 @@ export default function SubmitHoursPage() {
         </div>
 
         {/* Description */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <FileText className="w-4 h-4" />
             Description (Optional)
@@ -271,7 +271,7 @@ export default function SubmitHoursPage() {
         </div>
 
         {/* Photo Proof */}
-        <div className="bg-slate-800 rounded-xl p-4">
+        <div className="bg-white rounded-xl p-4">
           <label className="flex items-center gap-3 text-slate-400 text-sm mb-3">
             <Camera className="w-4 h-4" />
             Photo Proof (Optional)
@@ -305,7 +305,7 @@ export default function SubmitHoursPage() {
               onClick={handlePhotoCapture}
               className="w-full h-32 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-brand-blue-500 hover:text-brand-blue-400 transition-colors"
             >
-              <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                 <Image className="w-6 h-6" />
               </div>
               <span className="text-sm">Tap to add photo</span>
@@ -329,7 +329,7 @@ export default function SubmitHoursPage() {
             </>
           ) : (
             <>
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               Submit Hours
             </>
           )}

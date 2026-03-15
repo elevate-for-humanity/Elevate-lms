@@ -60,8 +60,8 @@ export default function StudentSupportPage() {
         <ProgramHeroBanner videoSrc="/videos/student-portal-hero.mp4" />
         <div className="absolute inset-0 z-10 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
-            <p className="text-sm uppercase tracking-wider text-white/70 mb-3">Elevate for Humanity</p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 max-w-3xl">
+            <p className="text-sm uppercase tracking-wider text-slate-500 mb-3">Elevate for Humanity</p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-4 max-w-3xl">
               Student Support Services
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mb-8">
@@ -107,7 +107,7 @@ export default function StudentSupportPage() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute bottom-3 left-4">
-                    <h3 className="text-lg font-bold text-white">{service.title}</h3>
+                    <h3 className="text-lg font-bold text-slate-900">{service.title}</h3>
                   </div>
                 </div>
                 <div className="p-5">
@@ -179,7 +179,7 @@ export default function StudentSupportPage() {
           className="object-cover"
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Start Your Career?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Ready to Start Your Career?</h2>
           <p className="text-brand-green-100 text-lg mb-8">Check your eligibility for funded career training programs. Most students pay $0 out of pocket.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

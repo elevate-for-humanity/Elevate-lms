@@ -176,7 +176,7 @@ export default function EnrollmentDocumentStep({
                   }`}
                 >
                   {uploaded ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                   ) : (
                     <FileText className="w-6 h-6 text-gray-400" />
                   )}
@@ -271,7 +271,7 @@ export default function EnrollmentDocumentStep({
 
       {allRequiredUploaded && (
         <div className="p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <div>
             <p className="font-medium text-brand-green-900">
               All required documents uploaded

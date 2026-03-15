@@ -244,7 +244,7 @@ export function TrialChecklist({
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             </div>
             <div className="text-left">
               <p className="font-semibold text-slate-900">Trial Setup Progress</p>
@@ -256,7 +256,7 @@ export function TrialChecklist({
           <div className="flex items-center gap-3">
             <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-blue-600 transition-all"
+                className="h-full bg-white transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -274,7 +274,7 @@ export function TrialChecklist({
       <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-lg font-bold text-slate-900">
               {orgType === 'school' ? 'School Setup Checklist' : 'Organization Setup Checklist'}
             </h3>
             <p className="text-brand-blue-100 text-sm mt-1">
@@ -289,7 +289,7 @@ export function TrialChecklist({
           </button>
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 h-2 bg-brand-blue-500/30 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-white/30 rounded-full overflow-hidden">
             <div
               className="h-full bg-white transition-all"
               style={{ width: `${progressPercent}%` }}
@@ -323,7 +323,7 @@ export function TrialChecklist({
                     }`}
                   >
                     {phaseCompleted === phaseTotal ? (
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     ) : (
                       phase
                     )}
@@ -364,7 +364,7 @@ export function TrialChecklist({
                           }`}
                         >
                           {isComplete ? (
-                            <span className="text-slate-400 flex-shrink-0">•</span>
+                            <span className="text-slate-500 flex-shrink-0">•</span>
                           ) : (
                             <Icon className="w-4 h-4 text-slate-400" />
                           )}

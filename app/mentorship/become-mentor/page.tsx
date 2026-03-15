@@ -19,11 +19,11 @@ export default function BecomeMentorPage() {
       </div>
 
       {/* Hero */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Heart className="w-12 h-12 text-brand-red-400 mx-auto mb-4" />
-          <h1 className="text-4xl font-black text-white mb-4">Become a Mentor</h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">Share your industry experience with students building new careers. A few hours a month can change someone&apos;s trajectory.</p>
+          <h1 className="text-4xl font-black text-slate-900 mb-4">Become a Mentor</h1>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">Share your industry experience with students building new careers. A few hours a month can change someone&apos;s trajectory.</p>
         </div>
       </section>
 
@@ -72,10 +72,10 @@ export default function BecomeMentorPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-black text-white mb-4">Ready to Make a Difference?</h2>
-          <p className="text-slate-300 mb-8">Fill out the mentor interest form and our team will reach out within a week.</p>
+          <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Make a Difference?</h2>
+          <p className="text-slate-600 mb-8">Fill out the mentor interest form and our team will reach out within a week.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/forms/host-shop-inquiry" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors">
               Apply to Mentor <ArrowRight className="w-5 h-5" />

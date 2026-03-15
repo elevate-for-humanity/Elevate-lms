@@ -262,7 +262,7 @@ export default function DigitalBinder({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-brand-blue-600 h-2 rounded-full"
+                  className="bg-white h-2 rounded-full"
                   style={{ width: `${(trackingData.hoursCompleted / trackingData.hoursRequired) * 100}%` }}
                 />
               </div>
@@ -275,7 +275,7 @@ export default function DigitalBinder({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-brand-green-600 h-2 rounded-full"
+                  className="bg-white h-2 rounded-full"
                   style={{ width: `${trackingData.attendanceRate}%` }}
                 />
               </div>
@@ -288,7 +288,7 @@ export default function DigitalBinder({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-purple-600 h-2 rounded-full"
+                  className="bg-white h-2 rounded-full"
                   style={{ width: `${trackingData.currentGrade}%` }}
                 />
               </div>
@@ -305,7 +305,7 @@ export default function DigitalBinder({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-indigo-600 h-3 rounded-full"
+                className="bg-white h-3 rounded-full"
                 style={{ width: `${(trackingData.assignmentsCompleted / trackingData.assignmentsTotal) * 100}%` }}
               />
             </div>

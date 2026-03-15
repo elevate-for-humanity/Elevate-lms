@@ -31,7 +31,7 @@ export default async function PaymentSuccessPage() {
   // Log payment success
   await db.from('page_views').insert({ page: 'payment_success' }).select();
   return (
-    <div className="min-h-screen bg-zinc-900  to-white py-20">
+    <div className="min-h-screen bg-white  to-white py-20">
       <div className="container mx-auto px-4 max-w-2xl text-center">
         <div className="bg-white rounded-2xl shadow-xl p-12">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">

@@ -23,7 +23,7 @@ const services = [
 
 function StatusIcon({ status }: { status: string }) {
   if (status === 'operational') {
-    return <span className="text-slate-400 flex-shrink-0">•</span>;
+    return <span className="text-slate-500 flex-shrink-0">•</span>;
   }
   if (status === 'degraded') {
     return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
@@ -70,7 +70,7 @@ export default function StatusPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             {allOperational ? (
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
             ) : (
               <AlertTriangle className="w-10 h-10" />
             )}

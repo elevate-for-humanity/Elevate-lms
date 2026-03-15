@@ -167,7 +167,7 @@ export function LiveMetrics() {
     <div className="space-y-8">
       {/* Verification Badge */}
       <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 flex items-center gap-3">
-        <span className="text-slate-400 flex-shrink-0">•</span>
+        <span className="text-slate-500 flex-shrink-0">•</span>
         <div>
           <p className="text-sm font-semibold text-brand-green-900">
             • Live Data Verified
@@ -218,7 +218,7 @@ export function LiveMetrics() {
         </div>
         <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
           <div
-            className="bg-brand-green-600 h-full rounded-full transition-all duration-1000"
+            className="bg-white h-full rounded-full transition-all duration-1000"
             style={{ width: `${metrics.metrics.completionRate}%` }}
           />
         </div>
@@ -243,7 +243,7 @@ export function LiveMetrics() {
                 key={index}
                 className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
               >
-                <div className="w-2 h-2 bg-brand-green-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-black truncate">
                     New enrollment: {activity.courseTitle}

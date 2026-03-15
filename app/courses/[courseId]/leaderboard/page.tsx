@@ -125,26 +125,26 @@ export default function CourseLeaderboardPage() {
                     </p>
                     <ul className="space-y-4">
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Funded training for eligible participants
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Industry-recognized certifications that employers
                           value
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Job placement assistance and career support
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span className="text-black">
                           Flexible scheduling for working adults
                         </span>
@@ -315,7 +315,7 @@ export default function CourseLeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
                     👑
                   </div>
                 </div>
@@ -346,7 +346,7 @@ export default function CourseLeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brand-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                     3
                   </div>
                 </div>

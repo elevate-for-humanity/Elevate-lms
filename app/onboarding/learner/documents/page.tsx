@@ -196,7 +196,7 @@ export default function DocumentsPage() {
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
+              className="h-full bg-white rounded-full transition-all duration-500"
               style={{ width: `${(REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length / REQUIRED_DOCUMENTS.filter(d => d.required).length) * 100}%` }}
             />
           </div>
@@ -297,7 +297,7 @@ export default function DocumentsPage() {
                       {isUploaded && <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded font-medium">Uploaded</span>}
                     </div>
                     <p className="text-gray-600 text-sm mb-2">{doc.description}</p>
-                    <p className="text-xs text-gray-400 mb-3">Accepted: {doc.acceptedFormats}</p>
+                    <p className="text-xs text-slate-500 mb-3">Accepted: {doc.acceptedFormats}</p>
 
                     <input
                       ref={(el) => { fileInputRefs.current[doc.type] = el; }}

@@ -102,15 +102,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Access 30+ training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Free for eligible participants</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Earn industry certifications</span>
                 </li>
               </ul>
@@ -137,15 +137,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Enroll and manage students</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Track student progress</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Generate compliance reports</span>
                 </li>
               </ul>
@@ -172,15 +172,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Access trained candidates</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Custom training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                   <span>Workforce development</span>
                 </li>
               </ul>
@@ -194,7 +194,7 @@ export default async function OnboardingPage() {
           </div>
         </div>
       </section>
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-white text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Get Started?

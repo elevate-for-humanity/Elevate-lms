@@ -104,7 +104,7 @@ function FeaturesSection({ section }: { section: MarketingSection }) {
 
 function CTASection({ section }: { section: MarketingSection }) {
   return (
-    <section className="py-16 bg-brand-blue-600">
+    <section className="py-16 bg-white">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-white mb-4">{section.heading}</h2>
         <p className="text-xl text-brand-blue-100 mb-8">{section.body}</p>
@@ -130,7 +130,7 @@ function StatsSection({ section }: { section: MarketingSection }) {
   }
 
   return (
-    <section className="py-16 bg-gray-900 text-white">
+    <section className="py-16 bg-white text-white">
       <div className="max-w-7xl mx-auto px-6">
         <h2 className="text-3xl font-bold mb-12 text-center">{section.heading}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

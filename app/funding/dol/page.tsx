@@ -102,7 +102,7 @@ const programs = (dbRows as any[]) || [];
       </section>
 
       {/* How to Enroll */}
-      <section className="py-14 sm:py-20 bg-slate-900 text-white">
+      <section className="py-14 sm:py-20 bg-white text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-8">How to Enroll</h2>
           <div className="grid sm:grid-cols-3 gap-8">
@@ -112,9 +112,9 @@ const programs = (dbRows as any[]) || [];
               { step: '3', title: 'Start Training', desc: 'Begin earning while you learn' },
             ].map((s) => (
               <div key={s.step}>
-                <div className="w-12 h-12 rounded-full bg-brand-red-600 text-white text-xl font-bold flex items-center justify-center mx-auto mb-4">{s.step}</div>
+                <div className="w-12 h-12 rounded-full bg-white text-white text-xl font-bold flex items-center justify-center mx-auto mb-4">{s.step}</div>
                 <h3 className="font-bold text-lg mb-2">{s.title}</h3>
-                <p className="text-slate-300 text-sm">{s.desc}</p>
+                <p className="text-slate-600 text-sm">{s.desc}</p>
               </div>
             ))}
           </div>

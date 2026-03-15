@@ -52,7 +52,7 @@ export default function QuickstartPage() {
         </div>
         <div className="mt-8 bg-brand-green-50 border border-brand-green-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <span className="text-slate-500 flex-shrink-0">•</span>
             <h3 className="font-semibold text-brand-green-900">You are ready!</h3>
           </div>
           <p className="text-brand-green-800">Once you complete these steps, you will have a fully functional training program ready to accept students.</p>

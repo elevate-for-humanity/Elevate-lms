@@ -80,7 +80,7 @@ export default function EnrollmentWizard({
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                   currentStep >= step.id ? 'bg-brand-blue-600 text-white' : 'bg-gray-200'
                 }`}>
-                  {currentStep > step.id ? <span className="text-slate-400 flex-shrink-0">•</span> : step.id}
+                  {currentStep > step.id ? <span className="text-slate-500 flex-shrink-0">•</span> : step.id}
                 </div>
                 <div className="text-xs mt-2 text-center">
                   <div className="font-semibold">{step.name}</div>

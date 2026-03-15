@@ -112,7 +112,7 @@ export default async function FeaturesPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-slate-900 text-white py-20">
+      <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Platform Features</h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
@@ -149,7 +149,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Automated Self-Service Operations */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4 text-white">Automated, Self-Service Operations</h2>
           <p className="text-lg text-slate-300 text-center mb-8 max-w-3xl mx-auto">
@@ -224,7 +224,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             See It In Action

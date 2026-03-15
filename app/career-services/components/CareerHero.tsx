@@ -28,7 +28,7 @@ export function CareerHero() {
   }, []);
 
   return (
-    <section className="relative h-[60svh] min-h-[380px] max-h-[640px] overflow-hidden bg-slate-900">
+    <section className="relative h-[60svh] min-h-[380px] max-h-[640px] overflow-hidden bg-white">
       <video ref={videoRef} loop playsInline preload="auto"
         className="absolute inset-0 w-full h-full object-cover">
         <source src="/videos/career-services-hero.mp4" type="video/mp4" />

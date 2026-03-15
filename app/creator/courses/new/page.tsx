@@ -45,7 +45,7 @@ export default function CreatorNewCoursePage() {
     return (
       <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <span className="text-slate-400 flex-shrink-0">•</span>
+          <span className="text-slate-500 flex-shrink-0">•</span>
           <h2 className="text-2xl font-bold mb-2">Course Created!</h2>
           <p className="text-black">Redirecting to course editor...</p>
         </div>

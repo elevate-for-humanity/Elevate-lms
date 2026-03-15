@@ -68,10 +68,10 @@ export default function ApprenticesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
-          <p className="text-white">Loading apprentices...</p>
+          <p className="text-slate-900">Loading apprentices...</p>
         </div>
       </div>
     );
@@ -79,11 +79,11 @@ export default function ApprenticesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Unable to Load</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/apprentices"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
@@ -102,7 +102,7 @@ export default function ApprenticesPage() {
   const pendingApprentices = apprentices.filter(a => a.status === 'pending');
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="bg-slate-800 px-4 pt-12 pb-4 safe-area-inset-top">
         <div className="flex items-center gap-4">
@@ -110,25 +110,25 @@ export default function ApprenticesPage() {
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
-            <h1 className="text-white font-bold text-xl">My Apprentices</h1>
-            <p className="text-slate-400 text-sm">{counts.active} active, {counts.pending} pending</p>
+            <h1 className="text-slate-900 font-bold text-xl">My Apprentices</h1>
+            <p className="text-slate-500 text-sm">{counts.active} active, {counts.pending} pending</p>
           </div>
         </div>
       </header>
 
       <main className="px-4 py-6 space-y-6">
         {apprentices.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-8 text-center">
+          <div className="bg-white rounded-xl p-8 text-center">
             <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white mb-2">No Apprentices Yet</h2>
-            <p className="text-slate-400">Apprentices will appear here once they are assigned to your shop.</p>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">No Apprentices Yet</h2>
+            <p className="text-slate-500">Apprentices will appear here once they are assigned to your shop.</p>
           </div>
         ) : (
           <>
             {/* Active Apprentices */}
             {activeApprentices.length > 0 && (
               <div>
-                <h2 className="text-white font-bold text-lg mb-4">Active</h2>
+                <h2 className="text-slate-900 font-bold text-lg mb-4">Active</h2>
                 <div className="space-y-3">
                   {activeApprentices.map((apprentice) => (
                     <Link 
@@ -137,15 +137,15 @@ export default function ApprenticesPage() {
                       className="block bg-slate-800 rounded-xl p-4 active:bg-slate-700"
                     >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-14 h-14 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                        <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
                           <span className="text-brand-blue-400 font-bold text-xl">
                             {apprentice.name.charAt(0)}
                           </span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-medium text-lg">{apprentice.name}</p>
+                          <p className="text-slate-900 font-medium text-lg">{apprentice.name}</p>
                           {apprentice.startDate && (
-                            <p className="text-slate-400 text-sm">
+                            <p className="text-slate-500 text-sm">
                               Started {new Date(apprentice.startDate).toLocaleDateString()}
                             </p>
                           )}
@@ -156,12 +156,12 @@ export default function ApprenticesPage() {
                       {/* Progress Bar */}
                       <div className="mb-3">
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-slate-400">Progress</span>
+                          <span className="text-slate-500">Progress</span>
                           <span className="text-white font-medium">{apprentice.progress.toFixed(1)}%</span>
                         </div>
-                        <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div className="h-2 bg-white rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-slate-700 rounded-full"
+                            className="h-full bg-white rounded-full"
                             style={{ width: `${Math.min(apprentice.progress, 100)}%` }}
                           />
                         </div>
@@ -171,11 +171,11 @@ export default function ApprenticesPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-slate-500" />
-                          <span className="text-slate-300 text-sm">{apprentice.totalHours.toLocaleString()} total hrs</span>
+                          <span className="text-slate-600 text-sm">{apprentice.totalHours.toLocaleString()} total hrs</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <TrendingUp className="w-4 h-4 text-slate-500" />
-                          <span className="text-slate-300 text-sm">{apprentice.weeklyAvg} hrs/week avg</span>
+                          <span className="text-slate-600 text-sm">{apprentice.weeklyAvg} hrs/week avg</span>
                         </div>
                       </div>
                     </Link>
@@ -187,7 +187,7 @@ export default function ApprenticesPage() {
             {/* Pending Apprentices */}
             {pendingApprentices.length > 0 && (
               <div>
-                <h2 className="text-white font-bold text-lg mb-4">Pending Assignment</h2>
+                <h2 className="text-slate-900 font-bold text-lg mb-4">Pending Assignment</h2>
                 <div className="space-y-3">
                   {pendingApprentices.map((apprentice) => (
                     <div 
@@ -195,13 +195,13 @@ export default function ApprenticesPage() {
                       className="bg-slate-800/50 rounded-xl p-4 border border-dashed border-slate-700"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-slate-700 rounded-full flex items-center justify-center">
+                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
                           <span className="text-slate-500 font-bold text-xl">
                             {apprentice.name.charAt(0)}
                           </span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-slate-300 font-medium text-lg">{apprentice.name}</p>
+                          <p className="text-slate-600 font-medium text-lg">{apprentice.name}</p>
                           <p className="text-slate-500 text-sm">Awaiting start date assignment</p>
                         </div>
                         <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-xs font-medium">

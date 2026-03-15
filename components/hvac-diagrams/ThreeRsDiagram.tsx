@@ -97,10 +97,10 @@ export default function ThreeRsDiagram({ onComplete }: { onComplete?: () => void
   return (
     <div className="space-y-5">
 
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Core — The Three R's</p>
         <h2 className="text-xl font-extrabold">Recover · Recycle · Reclaim</h2>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           The exam tests the exact legal difference between these three. Tap each one.
         </p>
       </div>
@@ -138,7 +138,7 @@ export default function ThreeRsDiagram({ onComplete }: { onComplete?: () => void
       {activeR && (
         <div className={`rounded-2xl border-2 ${activeR.border} ${activeR.light} overflow-hidden`}>
           <div className={`${activeR.color} px-5 py-3`}>
-            <h3 className="text-white font-extrabold text-lg">{activeR.word}</h3>
+            <h3 className="text-slate-900 font-extrabold text-lg">{activeR.word}</h3>
           </div>
           <div className="p-5 space-y-4">
             <p className="text-slate-700 text-sm leading-relaxed">{activeR.definition}</p>

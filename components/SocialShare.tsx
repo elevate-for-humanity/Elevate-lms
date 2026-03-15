@@ -82,7 +82,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   <Facebook className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm font-medium text-black">Facebook</span>
@@ -103,7 +103,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
-                <div className="w-8 h-8 bg-brand-blue-700 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   <Linkedin className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm font-medium text-black">LinkedIn</span>
@@ -114,7 +114,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 href={shareLinks.email}
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
-                <div className="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   <Mail className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm font-medium text-black">Email</span>
@@ -125,7 +125,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 onClick={copyToClipboard}
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition w-full"
               >
-                <div className="w-8 h-8 bg-brand-orange-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   {copied ? (
                     <Check className="w-4 h-4 text-white" />
                   ) : (

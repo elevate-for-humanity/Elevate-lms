@@ -45,7 +45,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
     <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
-        <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
+        <div className="bg-white text-yellow-900 px-4 py-2 text-center text-sm font-medium">
           Trial: {trialDaysRemaining} days remaining. 
           <Link href="/store/apps/sam-gov?upgrade=true" className="underline ml-2">Upgrade now</Link>
         </div>
@@ -103,7 +103,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               <div className="bg-white rounded-xl p-6 border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-500 text-sm">Active</span>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
+                  <span className="text-slate-500 flex-shrink-0">•</span>
                 </div>
                 <p className="text-3xl font-bold text-brand-green-600">{entities.filter(e => e.registration_status === 'active').length}</p>
               </div>

@@ -480,7 +480,7 @@ export default function SignMOUPage() {
                   'Select a compensation model first'
                 }
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Indiana minimum wage: $7.25/hr. Commission models must average at least minimum wage per pay period. Apprentices keep 100% of tips.
               </p>
             </div>
@@ -578,7 +578,7 @@ export default function SignMOUPage() {
           </Link>
         </div>
 
-        <p className="text-xs text-gray-400 mt-4">
+        <p className="text-xs text-slate-500 mt-4">
           By submitting, you agree that your electronic signature is legally binding under the
           Indiana Uniform Electronic Transactions Act (IC 26-2-8) and the federal ESIGN Act.
           A copy of the signed MOU will be emailed to you.

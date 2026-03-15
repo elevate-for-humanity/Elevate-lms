@@ -79,7 +79,7 @@ export default function Page() {
           <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg md:text-lg font-bold mb-4">
@@ -100,7 +100,7 @@ export default function Page() {
 
             {/* Step 2 */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg md:text-lg font-bold mb-4">
@@ -124,7 +124,7 @@ export default function Page() {
 
             {/* Step 3 */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg md:text-lg font-bold mb-4">

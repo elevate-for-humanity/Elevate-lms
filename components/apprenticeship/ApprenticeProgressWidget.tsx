@@ -184,11 +184,11 @@ export function ApprenticeProgressWidget({
         {/* Status Breakdown */}
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-brand-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-white rounded-full"></div>
             <span className="text-slate-600">Approved: {summary.approved_hours.toFixed(1)}h</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-white rounded-full"></div>
             <span className="text-slate-600">Pending: {summary.pending_hours.toFixed(1)}h</span>
           </div>
         </div>

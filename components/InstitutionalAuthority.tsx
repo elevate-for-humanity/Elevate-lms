@@ -129,7 +129,7 @@ export function CredentialPipeline() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
           {steps.map((s, i) => (
             <div key={s.step} className="flex items-center gap-3 md:flex-col md:text-center md:gap-2 flex-1">
-              <div className="w-10 h-10 rounded-full bg-brand-red-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                 {s.step}
               </div>
               <div>

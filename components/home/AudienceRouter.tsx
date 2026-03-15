@@ -116,11 +116,11 @@ export default function AudienceRouter() {
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-lg">{aud.label}</p>
-                    <p className={`text-sm mt-0.5 ${isActive ? 'text-white/70' : 'text-slate-500'}`}>
+                    <p className={`text-sm mt-0.5 ${isActive ? 'text-slate-500' : 'text-slate-500'}`}>
                       {aud.proof}
                     </p>
                   </div>
-                  <ChevronRight className={`w-5 h-5 transition-transform ${isActive ? 'rotate-90 text-white/50' : 'text-slate-400'}`} />
+                  <ChevronRight className={`w-5 h-5 transition-transform ${isActive ? 'rotate-90 text-slate-400' : 'text-slate-400'}`} />
                 </button>
               );
             })}
@@ -142,7 +142,7 @@ export default function AudienceRouter() {
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-6">
                     {audience.headline}
                   </h2>
-                  <p className="text-xl text-white/80 mb-8">
+                  <p className="text-xl text-slate-600 mb-8">
                     {audience.subtext}
                   </p>
 
@@ -151,7 +151,7 @@ export default function AudienceRouter() {
                     {audience.stats.map((stat, i) => (
                       <div key={i}>
                         <p className="text-3xl font-extrabold">{stat.value}</p>
-                        <p className="text-sm text-white/60 mt-1">{stat.label}</p>
+                        <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
                       </div>
                     ))}
                   </div>
@@ -189,7 +189,7 @@ export default function AudienceRouter() {
                     {audience.objections.map((obj, i) => (
                       <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
                         <p className="font-semibold text-white/90 text-sm">{obj.q}</p>
-                        <p className="text-white/70 text-sm mt-1">{obj.a}</p>
+                        <p className="text-slate-500 text-sm mt-1">{obj.a}</p>
                       </div>
                     ))}
                   </div>

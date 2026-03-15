@@ -66,7 +66,7 @@ export default async function MyCoursesPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-brand-blue-800 text-white py-12">
+      <section className="bg-white text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl font-bold mb-2">My Courses</h1>
           <p className="text-brand-blue-100">Continue learning and advancing your career</p>
@@ -106,7 +106,7 @@ export default async function MyCoursesPage() {
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-slate-800/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                    <div className="absolute inset-0 bg-white/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                       <div className="bg-white rounded-full p-4">
                         <Play className="w-8 h-8 text-brand-blue-600" fill="currentColor" />
                       </div>
@@ -121,7 +121,7 @@ export default async function MyCoursesPage() {
                         {purchase.course?.duration_hours} hours
                       </span>
                       <span className="flex items-center gap-1 text-brand-green-600">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         Purchased
                       </span>
                     </div>

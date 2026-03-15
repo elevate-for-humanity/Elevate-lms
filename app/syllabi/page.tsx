@@ -495,7 +495,7 @@ export default function SyllabiPage() {
               className="bg-white rounded-xl shadow-sm overflow-hidden"
             >
               {/* Program Header */}
-              <div className="bg-slate-900 text-white p-8">
+              <div className="bg-white text-white p-8">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">
                   {program.program}
                 </h2>
@@ -564,7 +564,7 @@ export default function SyllabiPage() {
                       <ul className="space-y-2">
                         {course.learningOutcomes.map((outcome, idx) => (
                           <li key={idx} className="flex items-start gap-3">
-                            <span className="text-slate-400 flex-shrink-0">•</span>
+                            <span className="text-slate-500 flex-shrink-0">•</span>
                             <span className="text-black">{outcome}</span>
                           </li>
                         ))}
@@ -657,19 +657,19 @@ export default function SyllabiPage() {
           </p>
           <ul className="space-y-2 text-black">
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Council on Occupational Education (COE) standards</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Industry certification requirements</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>State licensing board requirements</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="text-slate-500 flex-shrink-0">•</span>
               <span>Employer and workforce development needs</span>
             </li>
           </ul>
@@ -691,7 +691,7 @@ export default function SyllabiPage() {
             >
               our contact form
             </a>
-            <span className="text-slate-400">|</span>
+            <span className="text-slate-500">|</span>
             <a
               href="/support"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"

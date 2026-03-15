@@ -16,7 +16,7 @@ export default function TaxOperationsPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Tax Operations" }]} />
       </div>
-<div className="bg-gray-900 text-white py-12">
+<div className="bg-white text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
             <Link href="/" className="hover:text-white">Home</Link>
@@ -26,7 +26,7 @@ export default function TaxOperationsPage() {
             <span className="text-white">Tax Operations</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Tax Preparation and Refund Advance Operations</h1>
-          <p className="text-gray-300">Supersonic Fast Cash services, compliance, and operational procedures</p>
+          <p className="text-slate-600">Supersonic Fast Cash services, compliance, and operational procedures</p>
           <div className="flex items-center gap-6 mt-6 text-sm">
             <span className="flex items-center gap-2"><FileText className="w-4 h-4" />EFH-TAX-001</span>
             <span>Version 1.0</span>

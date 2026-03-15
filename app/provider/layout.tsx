@@ -62,7 +62,7 @@ export default async function ProviderLayout({
   return (
     <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
-      <aside className="w-56 bg-slate-900 flex-shrink-0 flex flex-col">
+      <aside className="w-56 bg-white flex-shrink-0 flex flex-col">
         <div className="px-4 py-5 border-b border-slate-700">
           <div className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">Provider Portal</div>
           <div className="text-white font-semibold text-sm truncate">{tenant.name}</div>

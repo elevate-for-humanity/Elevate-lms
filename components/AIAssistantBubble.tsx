@@ -167,7 +167,7 @@ export function AIAssistantBubble() {
               </div>
               <div>
                 <h3 className="font-bold text-lg">Elevate AI Assistant</h3>
-                <p className="text-xs text-white/80 flex items-center gap-1">
+                <p className="text-xs text-slate-600 flex items-center gap-1">
                   <span className="w-2 h-2 bg-brand-green-400 rounded-full animate-pulse" />
                   Online
                 </p>

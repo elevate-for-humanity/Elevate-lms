@@ -124,7 +124,7 @@ export default function JRIPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-48 md:h-64 flex items-center bg-slate-900 overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center bg-white overflow-hidden">
         <Image
           src="/images/pages/jri-page-1.jpg"
           alt="JRI Program participants"
@@ -136,7 +136,7 @@ export default function JRIPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-10 bg-slate-800">
+      <section className="py-10 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => {
@@ -199,7 +199,7 @@ export default function JRIPage() {
               <ul className="space-y-4">
                 {eligibilityRequirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <span className="text-gray-700">{req}</span>
                   </li>
                 ))}
@@ -313,9 +313,9 @@ export default function JRIPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-green-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your New Chapter?
           </h2>
           <p className="text-xl text-brand-green-100 mb-8">

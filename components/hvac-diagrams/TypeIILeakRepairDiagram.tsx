@@ -140,10 +140,10 @@ export default function TypeIILeakRepairDiagram({ onComplete }: { onComplete?: (
   return (
     <div className="space-y-5">
 
-      <div className="bg-slate-900 rounded-2xl p-5 text-white">
+      <div className="bg-white rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type II — High-Pressure Systems</p>
         <h2 className="text-xl font-extrabold">Leak Repair · Evacuation · Charging</h2>
-        <p className="text-slate-400 text-sm mt-1">The three most tested topics for Type II. Work through each tab.</p>
+        <p className="text-slate-500 text-sm mt-1">The three most tested topics for Type II. Work through each tab.</p>
       </div>
 
       {/* Tabs */}
@@ -171,7 +171,7 @@ export default function TypeIILeakRepairDiagram({ onComplete }: { onComplete?: (
           {LEAK_RATES.map((lr) => (
             <div key={lr.type} className={`rounded-2xl border ${lr.border} ${lr.light} overflow-hidden`}>
               <div className={`${lr.color} px-4 py-2.5 flex items-center justify-between`}>
-                <p className="text-white font-extrabold text-sm">{lr.type}</p>
+                <p className="text-slate-900 font-extrabold text-sm">{lr.type}</p>
                 <span className="bg-white/20 text-white font-extrabold text-lg px-3 py-0.5 rounded-full">{lr.trigger}</span>
               </div>
               <div className="p-4 space-y-2">
@@ -223,8 +223,8 @@ export default function TypeIILeakRepairDiagram({ onComplete }: { onComplete?: (
         <div className="space-y-3">
           {CHARGING_METHODS.map((m) => (
             <div key={m.method} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-              <div className="bg-slate-800 px-4 py-2.5">
-                <p className="text-white font-extrabold text-sm">{m.method}</p>
+              <div className="bg-white px-4 py-2.5">
+                <p className="text-slate-900 font-extrabold text-sm">{m.method}</p>
               </div>
               <div className="p-4 space-y-3">
                 <div>

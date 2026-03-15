@@ -166,7 +166,7 @@ export default async function CareerSafePage() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
               </div>
               <h3 className="text-lg font-semibold mb-2">Funded</h3>
               <p className="text-black">
@@ -220,7 +220,7 @@ export default async function CareerSafePage() {
                         <span>Certificate: {course.certificate}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-brand-green-600">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         <span>{course.price}</span>
                       </div>
                     </div>
@@ -294,7 +294,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?

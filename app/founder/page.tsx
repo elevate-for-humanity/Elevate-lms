@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/founder' },
   title: 'Elizabeth Greene - Founder | Elevate For Humanity',
   description:
-    'Elizabeth Greene is a U.S. military veteran, IRS Enrolled Agent, licensed barber, and the founder of Elevate for Humanity Career & Technical Institute in Indianapolis.',
+    'Elizabeth Greene is a U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent, licensed barber, and the founder of Elevate for Humanity Career & Technical Institute in Indianapolis.',
 };
 
 export default function FounderPage() {
@@ -54,7 +54,7 @@ export default function FounderPage() {
 
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
                 <p>
-                  Elizabeth Greene is a U.S. Army veteran and the founder of Elevate for Humanity
+                  Elizabeth Greene is a U.S. Army veteran (Unit Supply Specialist) and the founder of Elevate for Humanity
                   Career & Technical Institute — a workforce development organization in Indianapolis
                   serving justice-involved individuals, low-income families, veterans, and anyone
                   facing barriers to employment.
@@ -162,9 +162,11 @@ export default function FounderPage() {
                   'WIOA Funding Approved',
                   'JRI Funding Approved',
                   'Job Ready Indy Partner',
+                  'WorkOne Partner',
                   'PECOS / NPI Enrolled',
                   'ITAP / INDOT Registered',
                   'Indiana State Bidder',
+                  'SAM.gov Registered — Federal Government Contractor',
                   'CAGE Code: 0Q856',
                   'UEI: VX2GK5S8SZH8',
                 ].map((c) => (
@@ -182,11 +184,16 @@ export default function FounderPage() {
                 {[
                   'ByBlack Certified — U.S. Black Chambers / NAACP',
                   'EmployIndy Partner',
-                  'Choice Medical CNA School Partner',
-                  'Milady Partner',
+                  'WorkOne Partner',
+                  'Job Ready Indy Partner',
+                  'HSI (Health & Safety Institute) Affiliate',
+                  'CareerSafe OSHA Training Provider',
+                  'Milady Curriculum Partner',
                   'NRF Rise Up Provider',
+                  'Certiport Authorized Testing Center (CATC)',
+                  'Choice Medical CNA School Partner',
                   'Selfish Inc. — 501(c)(3) Nonprofit',
-                  'The Rise Foundation (DBA of Selfish Inc.)',
+                  'The Rise Foundation (DBA of Selfish Inc.) — VITA Free Tax Prep',
                   'SupersonicFastCash — Tax Software',
                 ].map((c) => (
                   <li key={c} className="flex items-start gap-2 text-slate-300 text-sm">

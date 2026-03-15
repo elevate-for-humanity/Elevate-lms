@@ -64,7 +64,7 @@ const solutions = [
       'Skills gap analysis',
       'ROI reporting',
     ],
-    cta: 'Contact Sales',
+    cta: 'Schedule a Demo',
     href: '/contact?topic=enterprise',
   },
   {
@@ -169,10 +169,10 @@ export default function SolutionsPage() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
                 <Link
-                  href="/contact?topic=enterprise"
+                  href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
                 >
-                  Contact Sales
+                  Schedule a Demo
                 </Link>
               </div>
             </div>
@@ -302,10 +302,10 @@ export default function SolutionsPage() {
               Try Interactive Demo
             </Link>
             <Link
-              href="/contact?topic=enterprise"
+              href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center bg-white text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-slate-100 transition"
             >
-              Contact Sales
+              Schedule a Demo
             </Link>
           </div>
         </div>

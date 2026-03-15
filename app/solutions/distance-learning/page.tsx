@@ -32,12 +32,6 @@ export default function DistanceLearningPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/solutions-page-1.jpg" alt="Distance learning solutions" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Distance Learning</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Deliver workforce training online, in-person, or hybrid — with the same quality and compliance.</p>
-          </div>
-        </div>
       </section>
 
       {/* Features */}
@@ -65,7 +59,7 @@ export default function DistanceLearningPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Bring Your Programs Online</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">See how Elevate supports distance learning for workforce training providers.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Request a Demo</Link>
+            <Link href="/demo/admin" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Try the Live Demo</Link>
             <Link href="/store/licensing" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">View Licensing</Link>
           </div>
         </div>

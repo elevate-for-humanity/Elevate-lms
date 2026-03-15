@@ -251,32 +251,36 @@ export default function LicensingPartnershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-6">
-            Ready to Partner With Us?
-          </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-8">
-            Join our network of training providers, employers, and community
-            organizations
+      <section className="py-16 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Ready to Partner With Us?</h2>
+          <p className="text-slate-600 mb-8 max-w-xl mx-auto">
+            Book a virtual meeting or apply online. All meetings are held via Zoom — a link is sent to your email automatically after booking.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://calendly.com/elevate4humanityedu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold text-base transition"
+            >
+              Book a Zoom Meeting <ArrowRight className="w-5 h-5" />
+            </a>
             <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-100 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:scale-105 transition-all"
+              href="/apply/program-holder"
+              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-slate-50 transition"
             >
               Apply to Partner
-              <ArrowRight className="w-6 h-6" />
             </Link>
-            <Link
-              href="/partner"
-              className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white hover:bg-white/10 px-10 py-5 rounded-xl text-lg font-black transition-all"
+            <a
+              href="tel:317-314-3757"
+              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-slate-50 transition"
             >
-              Learn More
-            </Link>
+              Call (317) 314-3757
+            </a>
           </div>
-          <p className="text-white/80 mt-6">
-            Questions? Contact us at (317) 314-3757
+          <p className="text-slate-500 text-sm mt-6">
+            Zoom link is sent automatically to your email after booking. No app download required.
           </p>
         </div>
       </section>

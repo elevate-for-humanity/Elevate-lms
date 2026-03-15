@@ -32,12 +32,6 @@ export default function K12Page() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/programs-hero-vibrant.jpg" alt="K-12 career pathways" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">K-12 Career Pathways</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Career and technical education solutions for high schools and school districts.</p>
-          </div>
-        </div>
       </section>
 
       {/* Pathways */}
@@ -64,7 +58,7 @@ export default function K12Page() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Partner With Your School District</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Contact us to discuss CTE partnerships, dual-credit agreements, and career pathway development.</p>
-          <Link href="/contact" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Contact Us</Link>
+          <Link href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Schedule a Meeting</Link>
         </div>
       </section>
     </div>

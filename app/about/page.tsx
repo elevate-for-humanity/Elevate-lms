@@ -412,7 +412,7 @@ export default function AboutPage() {
                 <p className="text-brand-red-600 font-semibold text-sm mb-4">{founder.title}</p>
                 <p className="text-sm text-gray-700 mb-4">{founder.bio}</p>
                 <p className="text-sm text-gray-700 mb-4">
-                  Elizabeth is a U.S. military veteran, IRS Enrolled Agent (EA) with an EFIN 
+                  Elizabeth is a U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA) with an EFIN 
                   and PTIN, and EPA 608 Certified Proctor through Mainstream Engineering. She 
                   is authorized to represent taxpayers before the IRS and to proctor EPA Section 
                   608 refrigerant handling exams. She also operates SupersonicFastCash, a tax 

@@ -24,12 +24,13 @@ export default function Page() {
 
           <div className="grid lg:grid-cols-5 gap-10 items-start">
             <div className="lg:col-span-2">
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
+              <div className="rounded-2xl overflow-hidden shadow-xl">
                 <Image
                   src="/images/team/elizabeth-greene.jpg"
                   alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
-                  fill
-                  className="object-cover"
+                  width={600}
+                  height={750}
+                  className="w-full h-auto object-cover object-top"
                   priority
                   sizes="(max-width: 1024px) 100vw, 40vw"
                 />
@@ -40,12 +41,12 @@ export default function Page() {
               <h1 className="text-3xl font-extrabold text-slate-900 mb-1">Elizabeth Greene</h1>
               <p className="text-brand-red-600 font-bold text-lg mb-6">Founder & Chief Executive Officer</p>
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
-                <p>Elizabeth Greene is a U.S. military veteran and the founder of Elevate for Humanity Career & Technical Institute, a workforce development organization in Indianapolis serving justice-involved individuals, low-income families, veterans, and anyone facing barriers to employment.</p>
+                <p>Elizabeth Greene is a U.S. Army veteran who served as a Unit Supply Specialist, and the founder of Elevate for Humanity Career & Technical Institute, a workforce development organization in Indianapolis serving justice-involved individuals, low-income families, veterans, and anyone facing barriers to employment.</p>
                 <p>She is an IRS Enrolled Agent (EA) holding both an EFIN and PTIN, authorized to represent taxpayers before the Internal Revenue Service. She is also a licensed barber through the Indiana Professional Licensing Agency, holds an Indiana Substitute Teacher License, and is OSHA 10-Hour Safety certified.</p>
                 <p>Elizabeth is a certified proctor for EPA Section 608 refrigerant handling exams through both the ESCO Group (Proctor ID: 358010) and Mainstream Engineering, allowing Elevate to administer EPA certification exams on-site. She also operates a Certiport Authorized Testing Center (CATC) for industry certifications including Microsoft Office Specialist, IC3, and IT Specialist credentials.</p>
-                <p>Under her leadership, Elevate for Humanity has secured approvals across federal, state, and local agencies. The organization is a U.S. Department of Labor Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), listed on the Eligible Training Provider List (ETPL), and approved as a Workforce Ready Grant (WRG) provider. Elevate is WIOA and JRI funding approved, and partners with EmployIndy, Choice Medical CNA School, Milady, and the National Retail Federation Foundation (NRF Rise Up).</p>
-                <p>The organization is enrolled in PECOS as a Medicare provider with a National Provider Identifier (NPI), registered as an Indiana State Bidder with a federal CAGE code, ITAP/INDOT registered, and ByBlack certified through the NAACP as a Black-owned business.</p>
-                <p>Elizabeth also founded SupersonicFastCash, a tax preparation software company, and the RISE Foundation, a 501(c)(3) nonprofit providing philanthropic support for workforce development initiatives.</p>
+                <p>Under her leadership, Elevate for Humanity has secured approvals across federal, state, and local agencies. The organization is a U.S. Department of Labor Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), listed on the Eligible Training Provider List (ETPL), and approved as a Workforce Ready Grant (WRG) provider. Elevate is WIOA and JRI approved, Job Ready Indy partner, WorkOne partner, EmployIndy partner, HSI (Health & Safety Institute) affiliate, CareerSafe OSHA training provider, Milady curriculum partner, NRF Rise Up provider, Certiport Authorized Testing Center (CATC), and Choice Medical CNA School partner.</p>
+                <p>The organization is enrolled in PECOS as a Medicare provider with a National Provider Identifier (NPI), registered as an Indiana State Bidder, SAM.gov registered (UEI: VX2GK5S8SZH8, CAGE: 0Q856) as a federal government contractor, ITAP/INDOT registered, and ByBlack certified through the U.S. Black Chambers / NAACP as a Black-owned business.</p>
+                <p>Elizabeth also founded SupersonicFastCash, a tax preparation software company, and Selfish Inc. — a 501(c)(3) nonprofit operating as The Rise Foundation — which provides VITA free tax preparation for Indianapolis families, mental wellness counseling, CurvatureBody Sculpting services, and community wellness programs.</p>
               </div>
             </div>
           </div>

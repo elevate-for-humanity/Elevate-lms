@@ -167,10 +167,10 @@ export default function PartnershipsPage() {
               Training Provider Partnership <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/contact?subject=Partnership%20Inquiry"
+              href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
-              Contact Us <ArrowRight className="w-4 h-4" />
+              Schedule a Meeting <ArrowRight className="w-4 h-4" />
             </Link>
             <a
               href="tel:317-314-3757"

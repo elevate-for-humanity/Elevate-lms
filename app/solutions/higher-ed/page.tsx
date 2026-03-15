@@ -32,12 +32,6 @@ export default function HigherEdPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/solutions-page-2.jpg" alt="Higher education training solutions" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Higher Education Solutions</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Workforce training infrastructure for colleges, universities, and continuing education programs.</p>
-          </div>
-        </div>
       </section>
 
       {/* Features */}

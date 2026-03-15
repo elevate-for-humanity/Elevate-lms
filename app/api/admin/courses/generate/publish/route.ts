@@ -6,7 +6,7 @@
  *   { course, program_id?, is_published? }  — legacy GeneratedCourse from /generate
  *   { draft, program_id?, is_published? }   — compiled draft from v2 course compiler
  *
- * Insert order: training_courses → training_lessons → completion_rules → program_courses
+ * Insert order: training_courses → training_lessons → curriculum_lessons (parallel, if program_id) → completion_rules → program_courses
  *
  * Schema verified against live DB (cuxzzpsyufcewtmicszk):
  *   completion_rules  — entity_type/entity_id (no direct course_id column)
@@ -280,6 +280,61 @@ async function publishCompiledDraft(
   const { error: lessonsErr } = await db.from('training_lessons').insert(lessonRows);
   if (lessonsErr) throw new Error(`training_lessons insert: ${lessonsErr.message}`);
 
+  // 2b. curriculum_lessons — parallel write so lms_lessons view serves these rows with priority.
+  // Only written when program_id is present (NOT NULL constraint on curriculum_lessons).
+  // The lms_lessons view returns curriculum_lessons rows first; training_lessons are the fallback.
+  if (draft.program_id) {
+    let clLessonNumber = 1;
+    const curriculumRows: Record<string, unknown>[] = [];
+
+    for (const mod of draft.modules) {
+      for (const lesson of mod.lessons) {
+        const slugBase = lesson.lesson_title
+          .toLowerCase().trim()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .slice(0, 80);
+        const lessonSlug = `${slugBase}-${clLessonNumber}`;
+
+        // key_terms: extract from narration_script if not explicitly provided.
+        // Stored as [{ term, definition }] jsonb.
+        const keyTerms: Array<{ term: string; definition: string }> = [];
+
+        curriculumRows.push({
+          program_id:      draft.program_id,
+          course_id:       courseId,
+          lesson_slug:     lessonSlug,
+          lesson_title:    lesson.lesson_title,
+          lesson_order:    clLessonNumber - 1,
+          module_order:    mod.module_order - 1,
+          module_title:    mod.module_title,
+          // script_text is the canonical content field for curriculum_lessons
+          script_text:     lesson.narration_script,
+          key_terms:       keyTerms,
+          duration_minutes: lesson.estimated_minutes,
+          status:          draft.auto_publish ? 'published' : 'draft',
+        });
+        clLessonNumber++;
+      }
+    }
+
+    const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
+    if (clErr) {
+      // Non-fatal: training_lessons already written. Log and continue.
+      logger.warn('curriculum_lessons parallel write failed (non-fatal)', {
+        courseId,
+        programId: draft.program_id,
+        error: clErr.message,
+      });
+    } else {
+      logger.info('curriculum_lessons parallel write succeeded', {
+        courseId,
+        programId: draft.program_id,
+        count: curriculumRows.length,
+      });
+    }
+  }
+
   // 3. completion_rules — entity_type/entity_id pattern (no direct course_id column)
   const { error: ruleErr } = await db.from('completion_rules').insert({
     entity_type: 'course',
@@ -409,6 +464,44 @@ async function _POST(req: NextRequest) {
 
     const { error: lessonsErr } = await db.from('training_lessons').insert(lessonRows);
     if (lessonsErr) throw new Error(`Lessons insert: ${lessonsErr.message}`);
+
+    // ── 2b. curriculum_lessons parallel write ───────────────────────────────
+    // Only when program_id is present (NOT NULL constraint on curriculum_lessons).
+    if (program_id) {
+      const curriculumRows = course.modules.flatMap((mod, modIdx) =>
+        mod.lessons.map((lesson) => {
+          const slugBase = lesson.title
+            .toLowerCase().trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .slice(0, 80);
+          return {
+            program_id,
+            course_id:       courseId,
+            lesson_slug:     `${slugBase}-${lesson.lesson_number}`,
+            lesson_title:    lesson.title,
+            lesson_order:    lesson.lesson_number - 1,
+            module_order:    modIdx,
+            module_title:    mod.title,
+            script_text:     lesson.content,
+            key_terms:       [] as Array<{ term: string; definition: string }>,
+            duration_minutes: lesson.duration_minutes,
+            status:          is_published ? 'published' : 'draft',
+          };
+        })
+      );
+
+      const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
+      if (clErr) {
+        logger.warn('curriculum_lessons parallel write failed (non-fatal)', {
+          courseId, programId: program_id, error: clErr.message,
+        });
+      } else {
+        logger.info('curriculum_lessons parallel write succeeded', {
+          courseId, programId: program_id, count: curriculumRows.length,
+        });
+      }
+    }
 
     // ── 3. Completion rule ──────────────────────────────────────────────────
     // entity_type/entity_id pattern — no direct course_id column on this table

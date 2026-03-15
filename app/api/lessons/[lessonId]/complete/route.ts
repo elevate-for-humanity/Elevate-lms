@@ -38,9 +38,10 @@ async function _POST(
     const supabase = admin || userClient; // admin bypasses RLS recursion
     const db = supabase;
 
-    // Get lesson to find course_id
+    // Get lesson to find course_id.
+    // lms_lessons is a view: curriculum_lessons (priority) UNION training_lessons (fallback).
     const { data: lesson, error: lessonError } = await db
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('id, course_id, title')
       .eq('id', lessonId)
       .single();
@@ -73,7 +74,7 @@ async function _POST(
 
     // Fetch lesson details for type-specific enforcement
     const { data: lessonDetail } = await db
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('content_type, duration_minutes')
       .eq('id', lessonId)
       .single();
@@ -167,9 +168,9 @@ async function _POST(
       lessonTitle: lesson.title,
     });
 
-    // Get updated course progress
+    // Get updated course progress — count via lms_lessons so curriculum and training lessons both count
     const { data: allLessons } = await db
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('id')
       .eq('course_id', lesson.course_id);
 
@@ -351,7 +352,7 @@ async function _DELETE(
 
     // Recalculate enrollment progress (same logic as POST handler)
     const { data: lessonRow } = await db
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('course_id')
       .eq('id', lessonId)
       .single();
@@ -360,7 +361,7 @@ async function _DELETE(
       const courseId = lessonRow.course_id;
 
       const { data: allLessons } = await db
-        .from('training_lessons')
+        .from('lms_lessons')
         .select('id')
         .eq('course_id', courseId);
 

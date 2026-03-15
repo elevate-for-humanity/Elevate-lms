@@ -137,17 +137,18 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900 text-white">
+      <section className="py-16 bg-white border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Become an Approved Provider</h2>
-          <p className="text-slate-300 mb-8">Apply to join our training provider network and start receiving funded student referrals.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Become an Approved Provider</h2>
+          <p className="text-slate-600 mb-3">Apply to join our training provider network and start receiving funded student referrals.</p>
+          <p className="text-slate-500 text-sm mb-8">Questions first? Call <a href="tel:317-314-3757" className="font-semibold text-brand-blue-600">(317) 314-3757</a> — most provider agreements are set up within a week.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/partners/join" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition text-lg">
-              Apply Now <ArrowRight className="w-5 h-5" />
+            <Link href="/apply/program-holder" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-base">
+              Apply as Training Provider <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/contact" className="bg-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-slate-100 transition text-lg">
-              Contact Us
-            </Link>
+            <a href="tel:317-314-3757" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 transition text-base">
+              Call (317) 314-3757
+            </a>
           </div>
         </div>
       </section>

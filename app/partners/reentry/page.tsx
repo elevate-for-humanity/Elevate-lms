@@ -50,9 +50,9 @@ export default function ReentryPartnerPage() {
       },
       cta: {
         heading: 'Partner on Reentry',
-        subtitle: 'Contact us to set up a referral pipeline for your reentry population.',
-        primaryLabel: 'Contact Us',
-        primaryHref: '/contact',
+        subtitle: 'Set up a referral pipeline for your reentry population. Call (317) 314-3757 or apply online.',
+        primaryLabel: 'Refer a Participant Now',
+        primaryHref: '/apply/intake',
         secondaryLabel: 'JRI Funding Info',
         secondaryHref: '/funding/jri',
         bgColor: 'bg-brand-green-700',

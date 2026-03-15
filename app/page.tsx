@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
+import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Credential Institute — Indianapolis, Indiana',
@@ -34,28 +34,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ─── HERO VIDEO ─── */}
-      <section className="relative w-full h-[55vh] sm:h-[65vh] md:h-[72vh] min-h-[300px] overflow-hidden">
-        <HomeHeroVideo />
-      </section>
-
-      {/* ─── HERO COPY (below video) ─── */}
-      <section className="bg-white border-b border-slate-100 py-10 sm:py-12">
-        <div className="max-w-3xl mx-auto px-6 text-center sm:text-left">
-          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight mb-5">
-            We train adults for real jobs — in weeks, not years.
-          </h1>
-          <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-lg text-sm sm:text-base">
-              Start Here — It&apos;s Free
-            </Link>
-            <Link href="/programs" className="border-2 border-slate-300 text-slate-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-all text-sm sm:text-base">
-              See All Programs
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ─── ROTATING HERO BANNER ─── */}
+      <RotatingHeroBanner />
 
       {/* ─── SECTION 1: WHO WE ARE ─── */}
       <section className="bg-white py-16 sm:py-20 border-b border-slate-100">
@@ -192,26 +172,29 @@ export default function HomePage() {
               </p>
             </div>
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="flex flex-col divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
             {PROGRAMS.map((p, i) => (
-              <ScrollReveal key={p.name} delay={i * 50}>
-                <Link href={p.href} className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-brand-red-300 transition-all flex flex-row h-full">
-                  {/* Image — fixed square, never cropped vertically */}
-                  <div className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32 self-center m-3 rounded-lg overflow-hidden">
+              <ScrollReveal key={p.name} delay={i * 40}>
+                <Link href={p.href} className="group bg-white hover:bg-slate-50 transition-colors flex flex-row items-center gap-4 px-4 py-3">
+                  {/* Image */}
+                  <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden">
                     <Image
                       src={p.image}
                       alt={p.name + ' training'}
                       fill
-                      sizes="128px"
+                      sizes="56px"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  {/* Text — right side */}
-                  <div className="py-4 pr-4 flex flex-col justify-center flex-1 min-w-0">
-                    <span className="inline-block bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 w-fit">{p.sector}</span>
-                    <h3 className="font-bold text-slate-900 text-sm leading-snug mb-1">{p.name}</h3>
-                    <p className="text-xs text-slate-500 mb-2">{p.duration}</p>
-                    <p className="text-xs text-brand-green-700 font-semibold">{p.salary} starting</p>
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-slate-900 text-sm leading-snug">{p.name}</h3>
+                    <p className="text-xs text-slate-500">{p.sector} · {p.duration}</p>
+                  </div>
+                  {/* Salary */}
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs font-bold text-brand-green-700">{p.salary}</p>
+                    <p className="text-[10px] text-slate-400">starting</p>
                   </div>
                 </Link>
               </ScrollReveal>

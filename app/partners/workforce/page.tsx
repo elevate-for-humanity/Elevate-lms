@@ -50,11 +50,11 @@ export default function WorkforcePage() {
       },
       cta: {
         heading: 'Ready to Partner?',
-        subtitle: 'Contact us to discuss workforce development partnership opportunities.',
-        primaryLabel: 'Contact Us',
-        primaryHref: '/contact',
-        secondaryLabel: 'View Programs',
-        secondaryHref: '/programs',
+        subtitle: 'Set up a referral agreement in minutes. Call (317) 314-3757 or apply online.',
+        primaryLabel: 'Start a Referral Partnership',
+        primaryHref: '/apply/intake',
+        secondaryLabel: 'Call (317) 314-3757',
+        secondaryHref: 'tel:317-314-3757',
       },
     }} />
   );

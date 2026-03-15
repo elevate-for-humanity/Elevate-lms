@@ -15,7 +15,11 @@ import {
   HVAC_MODULE_FIRST_LESSON as MODULE_FIRST_LESSON,
 } from '@/lib/courses/hvac-uuids';
 import { QuizPanel } from './QuizPanel';
-import { EPA_608_CORE, EPA_608_TYPE_I, EPA_608_TYPE_II, EPA_608_TYPE_III, getUniversalExam } from '@/lib/courses/hvac-quizzes';
+import {
+  EPA_608_CORE, EPA_608_TYPE_I, EPA_608_TYPE_II, EPA_608_TYPE_III,
+  EPA_608_EXAM_TYPE_I, EPA_608_EXAM_TYPE_II, EPA_608_EXAM_TYPE_III,
+  HVAC_MOCK_EXAM, MOCK_EXAM_TIME_LIMIT,
+} from '@/lib/courses/hvac-quizzes';
 import type { QuizQuestion } from '@/lib/courses/hvac-quizzes';
 import { CertificationTracker } from '@/components/lms/CertificationTracker';
 
@@ -156,12 +160,21 @@ function LessonDrawer({ module, index, done, onClose }: {
    ══════════════════════════════════════════════════════════════════ */
 
 /* ── Practice Quiz Section ── */
-const QUIZ_OPTIONS: { id: string; label: string; questions: QuizQuestion[]; desc: string }[] = [
-  { id: 'core', label: 'EPA 608 Core', questions: EPA_608_CORE, desc: '25 questions — ozone, Clean Air Act, refrigerant safety, recovery/recycling' },
-  { id: 'type1', label: 'EPA 608 Type I', questions: EPA_608_TYPE_I, desc: '25 questions — small appliances, self-contained recovery' },
-  { id: 'type2', label: 'EPA 608 Type II', questions: EPA_608_TYPE_II, desc: '25 questions — high-pressure systems, evacuation, leak detection' },
-  { id: 'type3', label: 'EPA 608 Type III', questions: EPA_608_TYPE_III, desc: '25 questions — low-pressure systems, chillers, purge units' },
-  { id: 'universal', label: 'Universal (Full Exam)', questions: getUniversalExam(), desc: '100 questions — all four sections combined, 70% per section to pass' },
+// Real EPA 608 exam: 25 Core + 25 Type-specific = 50 questions per section, 70% to pass.
+// Section exams (Type I/II/III) match this format exactly.
+// Practice banks (75q each) are for study — not timed.
+// Mock exam (100q, 120 min) mirrors the Universal exam.
+const QUIZ_OPTIONS: { id: string; label: string; questions: QuizQuestion[]; desc: string; timeLimit?: number; featured?: boolean }[] = [
+  // ── Section exams — real exam format ──────────────────────────────────
+  { id: 'exam-type1', label: 'Type I Section Exam', questions: EPA_608_EXAM_TYPE_I, desc: '50 questions — 25 Core + 25 Type I (small appliances). Real exam format, 60-minute limit.', timeLimit: 60, featured: true },
+  { id: 'exam-type2', label: 'Type II Section Exam', questions: EPA_608_EXAM_TYPE_II, desc: '50 questions — 25 Core + 25 Type II (high-pressure systems). Real exam format, 60-minute limit.', timeLimit: 60, featured: true },
+  { id: 'exam-type3', label: 'Type III Section Exam', questions: EPA_608_EXAM_TYPE_III, desc: '50 questions — 25 Core + 25 Type III (low-pressure chillers). Real exam format, 60-minute limit.', timeLimit: 60, featured: true },
+  { id: 'mock', label: 'Universal Mock Exam', questions: HVAC_MOCK_EXAM, desc: '100 questions — 25 per section, 120-minute limit. Matches the real EPA 608 Universal exam format.', timeLimit: MOCK_EXAM_TIME_LIMIT, featured: true },
+  // ── Practice banks — study mode, no time limit ────────────────────────
+  { id: 'core', label: 'Core Practice Bank', questions: EPA_608_CORE, desc: '100 questions — ozone, Clean Air Act, refrigerant types, recovery/recycling, safety, lubricants' },
+  { id: 'type1', label: 'Type I Practice Bank', questions: EPA_608_TYPE_I, desc: '100 questions — small appliances, hermetic systems, recovery efficiency, piercing valves' },
+  { id: 'type2', label: 'Type II Practice Bank', questions: EPA_608_TYPE_II, desc: '100 questions — high-pressure systems, evacuation, leak detection, charging, diagnostics' },
+  { id: 'type3', label: 'Type III Practice Bank', questions: EPA_608_TYPE_III, desc: '100 questions — low-pressure chillers, purge units, centrifugal compressors, water systems' },
 ];
 
 function PracticeQuizSection() {
@@ -174,25 +187,63 @@ function PracticeQuizSection() {
       <p className="text-sm text-slate-500 mb-6">Test your knowledge with EPA 608 practice exams. These match the format and difficulty of the proctored certification exam.</p>
 
       {!activeQuiz ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {QUIZ_OPTIONS.map(q => (
-            <button
-              key={q.id}
-              onClick={() => setActiveQuiz(q.id)}
-              className="bg-white border border-slate-200 rounded-xl p-5 text-left hover:border-brand-red-300 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-brand-red-50 rounded-lg flex items-center justify-center group-hover:bg-brand-red-100 transition-colors">
-                  <ClipboardCheck className="w-5 h-5 text-brand-red-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{q.label}</h3>
-                  <span className="text-[11px] text-slate-400">{q.questions.length} questions</span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">{q.desc}</p>
-            </button>
-          ))}
+        <div className="space-y-6">
+          {/* Exam-format quizzes — real EPA 608 format */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Section Exams — Real Exam Format</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {QUIZ_OPTIONS.filter(q => q.featured).map(q => (
+                <button
+                  key={q.id}
+                  onClick={() => setActiveQuiz(q.id)}
+                  className="bg-white border-2 border-brand-red-200 rounded-xl p-5 text-left hover:border-brand-red-400 hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center group-hover:bg-brand-red-200 transition-colors">
+                      <ClipboardCheck className="w-5 h-5 text-brand-red-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-slate-900 text-sm">{q.label}</h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] text-slate-500">{q.questions.length} questions</span>
+                        {q.timeLimit && (
+                          <span className="text-[11px] font-semibold text-brand-red-600 bg-brand-red-50 px-1.5 py-0.5 rounded">
+                            {q.timeLimit} min
+                          </span>
+                        )}
+                        <span className="text-[11px] font-semibold text-brand-green-700 bg-brand-green-50 px-1.5 py-0.5 rounded">70% to pass</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed">{q.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Practice banks — study mode */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Practice Banks — Study Mode</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {QUIZ_OPTIONS.filter(q => !q.featured).map(q => (
+                <button
+                  key={q.id}
+                  onClick={() => setActiveQuiz(q.id)}
+                  className="bg-white border border-slate-200 rounded-xl p-4 text-left hover:border-slate-300 hover:shadow-sm transition-all group"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                      <ClipboardCheck className="w-4 h-4 text-slate-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-800 text-xs">{q.label}</h3>
+                      <span className="text-[10px] text-slate-400">{q.questions.length} questions</span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{q.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       ) : active ? (
         <div>
@@ -206,6 +257,7 @@ function PracticeQuizSection() {
             questions={active.questions}
             lessonTitle={active.label}
             onPass={() => {}}
+            timeLimitMinutes={active.timeLimit}
           />
         </div>
       ) : null}

@@ -1,17 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { CheckCircle, XCircle, RotateCcw, Trophy } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { CheckCircle, XCircle, RotateCcw, Trophy, Clock } from 'lucide-react';
 import type { QuizQuestion } from '@/lib/courses/hvac-quizzes';
 
 export function QuizPanel({
   questions,
   lessonTitle,
   onPass,
+  timeLimitMinutes,
 }: {
   questions: QuizQuestion[];
   lessonTitle: string;
   onPass: () => void;
+  /** Optional countdown timer in minutes. When it reaches 0 the exam auto-submits. */
+  timeLimitMinutes?: number;
 }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -19,6 +22,31 @@ export function QuizPanel({
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
+  const [secondsLeft, setSecondsLeft] = useState(
+    timeLimitMinutes ? timeLimitMinutes * 60 : null
+  );
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Countdown timer
+  useEffect(() => {
+    if (secondsLeft === null || finished) return;
+    if (secondsLeft <= 0) {
+      setFinished(true);
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setSecondsLeft((s) => (s !== null ? s - 1 : null));
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [secondsLeft, finished]);
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const timerWarning = secondsLeft !== null && secondsLeft <= 300; // last 5 minutes
 
   const q = questions[current];
   const isCorrect = selected === q?.correctAnswer;
@@ -59,6 +87,7 @@ export function QuizPanel({
     setScore(0);
     setFinished(false);
     setAnswers(new Array(questions.length).fill(null));
+    setSecondsLeft(timeLimitMinutes ? timeLimitMinutes * 60 : null);
   };
 
   if (finished) {
@@ -111,9 +140,19 @@ export function QuizPanel({
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
             Question {current + 1} of {questions.length}
           </span>
-          <span className="text-xs text-slate-400">
-            {passingScore}/{questions.length} to pass
-          </span>
+          <div className="flex items-center gap-3">
+            {secondsLeft !== null && (
+              <span className={`flex items-center gap-1 text-xs font-mono font-bold px-2 py-1 rounded-lg ${
+                timerWarning ? 'bg-brand-red-50 text-brand-red-600' : 'bg-slate-100 text-slate-600'
+              }`}>
+                <Clock className="w-3 h-3" />
+                {formatTime(secondsLeft)}
+              </span>
+            )}
+            <span className="text-xs text-slate-400">
+              {passingScore}/{questions.length} to pass
+            </span>
+          </div>
         </div>
 
         {/* Question */}

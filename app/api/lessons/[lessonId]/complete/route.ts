@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -51,7 +52,7 @@ async function _POST(
     // Check if user is enrolled and approved
     const { data: enrollment } = await db
       .from('training_enrollments')
-      .select('id, status, approved_at')
+      .select('id, status, approved_at, program_id')
       .eq('user_id', user.id)
       .eq('course_id', lesson.course_id)
       .single();
@@ -246,6 +247,44 @@ async function _POST(
       }
     }
 
+    // Credential eligibility check: fires on every lesson completion.
+    // Only creates an exam_funding_authorization when the learner has met all
+    // domain coverage and completion rules. Non-fatal — lesson completion is
+    // already recorded above and must not be rolled back on eligibility errors.
+    let eligibilityResult: Awaited<ReturnType<typeof checkEligibilityAndAuthorize>> | null = null;
+    if (enrollment.program_id) {
+      // Resolve the primary credential for this program, then check eligibility.
+      // We do this here rather than inside the service to avoid an extra DB round-trip
+      // when the enrollment has no program_id (legacy enrollments without program linkage).
+      try {
+        const { data: primaryCredential } = await db
+          .from('program_credentials')
+          .select('credential_id')
+          .eq('program_id', enrollment.program_id)
+          .eq('is_primary', true)
+          .maybeSingle();
+
+        if (primaryCredential?.credential_id) {
+          eligibilityResult = await checkEligibilityAndAuthorize(
+            user.id,
+            primaryCredential.credential_id,
+            enrollment.program_id,
+          );
+
+          if (eligibilityResult.authorizationCreated) {
+            logger.info('[credential-pipeline] Exam funding authorization created on lesson completion', {
+              userId: user.id,
+              lessonId,
+              programId: enrollment.program_id,
+              credentialId: primaryCredential.credential_id,
+            });
+          }
+        }
+      } catch (eligErr) {
+        logger.error('[credential-pipeline] Eligibility check failed (non-fatal):', eligErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       lessonId,
@@ -258,6 +297,13 @@ async function _POST(
         progressPercent,
         courseCompleted,
       },
+      credentialEligibility: eligibilityResult
+        ? {
+            isEligible:           eligibilityResult.isEligible,
+            blockingReason:       eligibilityResult.blockingReason,
+            authorizationCreated: eligibilityResult.authorizationCreated,
+          }
+        : null,
     });
   } catch (error) {
     logger.error('Lesson complete API error:', error);

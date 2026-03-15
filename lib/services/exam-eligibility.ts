@@ -153,21 +153,21 @@ function parseV2Result(
   evaluatedAt: string,
   rows: any[]
 ): EligibilityResult {
-  const summaryRow = rows.find(r => r.domain_key === '__summary__');
-  const domainRows = rows.filter(r => r.domain_key !== '__summary__');
+  const summaryRow = rows.find(r => r.out_domain_key === '__summary__');
+  const domainRows = rows.filter(r => r.out_domain_key !== '__summary__');
 
   const domains: DomainEligibility[] = domainRows.map(r => ({
-    domainKey:        r.domain_key,
-    domainName:       r.domain_name,
-    weightPercent:    r.weight_percent ?? 0,
-    lessonsRequired:  r.lessons_required ?? 0,
-    lessonsCompleted: r.lessons_completed ?? 0,
-    isCovered:        r.is_domain_covered ?? false,
-    blockingReason:   r.blocking_reason ?? null,
+    domainKey:        r.out_domain_key,
+    domainName:       r.out_domain_name,
+    weightPercent:    r.out_weight_percent ?? 0,
+    lessonsRequired:  r.out_lessons_required ?? 0,
+    lessonsCompleted: r.out_lessons_completed ?? 0,
+    isCovered:        r.out_is_domain_covered ?? false,
+    blockingReason:   r.out_blocking_reason ?? null,
   }));
 
-  const isEligible = summaryRow?.is_domain_covered ?? false;
-  const blockingReason = summaryRow?.blocking_reason ?? null;
+  const isEligible = summaryRow?.out_is_domain_covered ?? false;
+  const blockingReason = summaryRow?.out_blocking_reason ?? null;
 
   return { learnerId, credentialId, programId, evaluatedAt, isEligible, blockingReason, domains };
 }
@@ -192,6 +192,10 @@ function ineligible(
  * Checks eligibility and, if eligible, creates an exam_funding_authorization
  * if one doesn't already exist. Called from the LMS completion handler.
  *
+ * Funding source is resolved from enrollment_funding_records — the canonical
+ * per-learner funding authority. program_credentials is NOT consulted for
+ * payer resolution; it only holds the exam fee amount as a program default.
+ *
  * Returns the eligibility result regardless of whether authorization was created.
  */
 export async function checkEligibilityAndAuthorize(
@@ -208,30 +212,76 @@ export async function checkEligibilityAndAuthorize(
   const db = createAdminClient();
   if (!db) return { ...result, authorizationCreated: false };
 
-  // Resolve default funding source from program_credentials
-  const { data: pc } = await db
-    .from('program_credentials')
-    .select('exam_fee_payer, exam_fee_cents')
-    .eq('program_id', programId)
-    .eq('credential_id', credentialId)
-    .maybeSingle();
-
-  const fundingSource = pc?.exam_fee_payer ?? 'self_pay';
-  const amountCents   = pc?.exam_fee_cents ?? 0;
-
-  // Upsert — idempotent, won't overwrite an existing approved/paid authorization
+  // Idempotency guard: skip if a non-denied authorization already exists.
+  // Statuses 'unresolved', 'pending', 'approved', 'paid', 'waived' all mean
+  // the authorization lifecycle is already in progress.
   const { data: existing } = await db
     .from('exam_funding_authorizations')
     .select('id, funding_status')
     .eq('learner_id', learnerId)
     .eq('credential_id', credentialId)
-    .is('credential_attempt_id', null)
+    .neq('funding_status', 'denied')
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (existing) {
-    // Already exists — don't overwrite
     return { ...result, authorizationCreated: false };
   }
+
+  // Resolve funding source from the learner's enrollment funding record.
+  // This is the single authority for who pays — not the credential, not the program.
+  const { data: efr } = await db
+    .from('enrollment_funding_records')
+    .select('funding_source, amount_cents, status')
+    .eq('learner_id', learnerId)
+    .eq('program_id', programId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Fall back to self_pay if no funding record exists yet.
+  // The authorization is still created so staff can update it later.
+  const fundingSource = efr?.funding_source ?? 'self_pay';
+
+  // Map enrollment_funding_records.funding_source to exam_funding_authorizations.funding_source.
+  // enrollment_funding_records uses workforce-specific values (wioa_title_i, jri, etc.);
+  // exam_funding_authorizations uses a simpler enum. Map non-self-pay sources to 'grant'
+  // unless they map to a more specific value.
+  const EFA_FUNDING_SOURCE_MAP: Record<string, string> = {
+    self_pay:              'self_pay',
+    employer_sponsored:    'employer',
+    scholarship:           'scholarship',
+    wioa_title_i:          'grant',
+    wioa_title_ii:         'grant',
+    workforce_ready_grant: 'grant',
+    jri:                   'grant',
+    job_ready_indy:        'grant',
+    dol_apprenticeship:    'grant',
+    pell_grant:            'grant',
+    other:                 'grant',
+  };
+  const efaFundingSource = EFA_FUNDING_SOURCE_MAP[fundingSource] ?? 'grant';
+
+  // Determine initial funding_status:
+  // - self_pay: unresolved (learner must pay via Stripe)
+  // - approved enrollment funding record: pending (staff will authorize)
+  // - no record or pending record: unresolved
+  const efrApproved = efr?.status === 'approved' || efr?.status === 'disbursed';
+  const fundingStatus = efaFundingSource === 'self_pay'
+    ? 'unresolved'
+    : efrApproved ? 'pending' : 'unresolved';
+
+  // Use exam fee from program_credentials as the amount default.
+  // This is a program-level default, not a per-learner override.
+  const { data: pc } = await db
+    .from('program_credentials')
+    .select('exam_fee_cents')
+    .eq('program_id', programId)
+    .eq('credential_id', credentialId)
+    .maybeSingle();
+
+  const amountCents = efr?.amount_cents ?? pc?.exam_fee_cents ?? null;
 
   const { error } = await db
     .from('exam_funding_authorizations')
@@ -239,9 +289,9 @@ export async function checkEligibilityAndAuthorize(
       learner_id:          learnerId,
       credential_id:       credentialId,
       program_id:          programId,
-      funding_source:      fundingSource,
-      funding_status:      fundingSource === 'self_pay' ? 'unresolved' : 'pending',
-      funded_amount_cents: amountCents > 0 ? amountCents : null,
+      funding_source:      efaFundingSource,
+      funding_status:      fundingStatus,
+      funded_amount_cents: amountCents,
     });
 
   if (error) {
@@ -250,7 +300,9 @@ export async function checkEligibilityAndAuthorize(
   }
 
   logger.info('Exam funding authorization created', {
-    learnerId, credentialId, programId, fundingSource,
+    learnerId, credentialId, programId,
+    fundingSource: efaFundingSource,
+    fundingStatus,
   });
 
   return { ...result, authorizationCreated: true };

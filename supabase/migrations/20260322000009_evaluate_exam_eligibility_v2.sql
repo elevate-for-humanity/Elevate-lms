@@ -40,13 +40,13 @@ CREATE OR REPLACE FUNCTION public.evaluate_exam_eligibility_v2(
   p_program_id  UUID
 )
 RETURNS TABLE (
-  domain_key        TEXT,
-  domain_name       TEXT,
-  weight_percent    INTEGER,
-  lessons_required  INTEGER,   -- lessons linked to this domain in curriculum
-  lessons_completed INTEGER,   -- lessons the learner has completed
-  is_domain_covered BOOLEAN,
-  blocking_reason   TEXT
+  out_domain_key        TEXT,
+  out_domain_name       TEXT,
+  out_weight_percent    INTEGER,
+  out_lessons_required  INTEGER,
+  out_lessons_completed INTEGER,
+  out_is_domain_covered BOOLEAN,
+  out_blocking_reason   TEXT
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -59,68 +59,61 @@ BEGIN
 
   -- ── 1. Domain coverage ──────────────────────────────────────────────────────
   RETURN QUERY
-  WITH domain_lessons AS (
-    -- All curriculum lessons linked to each domain for this program
+  WITH dl AS (
     SELECT
-      ced.domain_key,
-      ced.domain_name,
-      ced.weight_percent,
-      COUNT(cl.id)::INTEGER AS lessons_in_curriculum
+      ced.id            AS ced_id,
+      ced.domain_key    AS dkey,
+      ced.domain_name   AS dname,
+      ced.weight_percent AS wpct,
+      COUNT(cl.id)::INTEGER AS lesson_cnt
     FROM credential_exam_domains ced
     LEFT JOIN curriculum_lessons cl
       ON cl.credential_domain_id = ced.id
       AND cl.program_id = p_program_id
       AND cl.status = 'published'
     WHERE ced.credential_id = p_credential_id
-      AND ced.weight_percent > 0   -- skip informational domains
-    GROUP BY ced.domain_key, ced.domain_name, ced.weight_percent
+      AND ced.weight_percent > 0
+    GROUP BY ced.id, ced.domain_key, ced.domain_name, ced.weight_percent
   ),
-  learner_progress AS (
-    -- Lessons the learner has completed for this program
-    SELECT cl.credential_domain_id, COUNT(*)::INTEGER AS completed
+  lp AS (
+    SELECT cl.credential_domain_id AS dom_id, COUNT(*)::INTEGER AS done
     FROM curriculum_lessons cl
-    JOIN course_progress cp
-      ON cp.lesson_id = cl.id
-      AND cp.user_id = p_learner_id
-      AND cp.status = 'completed'
+    JOIN lesson_progress lpr
+      ON lpr.lesson_id = cl.id
+      AND lpr.user_id = p_learner_id
+      AND lpr.completed = true
     WHERE cl.program_id = p_program_id
     GROUP BY cl.credential_domain_id
   ),
-  domain_coverage AS (
+  dc AS (
     SELECT
-      dl.domain_key,
-      dl.domain_name,
-      dl.weight_percent,
-      dl.lessons_in_curriculum                                    AS lessons_required,
-      COALESCE(lp.completed, 0)                                   AS lessons_completed,
-      -- Domain is covered if learner completed at least 1 lesson in it
-      -- (or if no lessons exist yet for this domain — curriculum not generated)
+      dl.dkey,
+      dl.dname,
+      dl.wpct,
+      dl.lesson_cnt                                AS req,
+      COALESCE(lp.done, 0)                         AS done,
       CASE
-        WHEN dl.lessons_in_curriculum = 0 THEN true   -- no curriculum yet, non-blocking
-        ELSE COALESCE(lp.completed, 0) >= 1
-      END                                                         AS is_domain_covered,
+        WHEN dl.lesson_cnt = 0 THEN true
+        ELSE COALESCE(lp.done, 0) >= 1
+      END                                          AS covered,
       CASE
-        WHEN dl.lessons_in_curriculum = 0 THEN 'No curriculum generated for this domain yet'
-        WHEN COALESCE(lp.completed, 0) = 0 THEN 'No lessons completed in this domain'
+        WHEN dl.lesson_cnt = 0 THEN 'No curriculum generated for this domain yet'
+        WHEN COALESCE(lp.done, 0) = 0 THEN 'No lessons completed in this domain'
         ELSE NULL
-      END                                                         AS blocking_reason
-    FROM domain_lessons dl
-    LEFT JOIN learner_progress lp ON lp.credential_domain_id = (
-      SELECT id FROM credential_exam_domains
-      WHERE credential_id = p_credential_id AND domain_key = dl.domain_key
-      LIMIT 1
-    )
+      END                                          AS reason
+    FROM dl
+    LEFT JOIN lp ON lp.dom_id = dl.ced_id
   )
   SELECT
-    dc.domain_key,
-    dc.domain_name,
-    dc.weight_percent,
-    dc.lessons_required,
-    dc.lessons_completed,
-    dc.is_domain_covered,
-    dc.blocking_reason
-  FROM domain_coverage dc
-  ORDER BY dc.weight_percent DESC;
+    dc.dkey    AS out_domain_key,
+    dc.dname   AS out_domain_name,
+    dc.wpct    AS out_weight_percent,
+    dc.req     AS out_lessons_required,
+    dc.done    AS out_lessons_completed,
+    dc.covered AS out_is_domain_covered,
+    dc.reason  AS out_blocking_reason
+  FROM dc
+  ORDER BY dc.wpct DESC;
 
   -- ── 2. Completion rules check ────────────────────────────────────────────────
   -- Check all_modules rule: every published lesson must be completed
@@ -137,10 +130,10 @@ BEGIN
       WHERE cl.program_id = p_program_id
         AND cl.status = 'published'
         AND NOT EXISTS (
-          SELECT 1 FROM course_progress cp
-          WHERE cp.lesson_id = cl.id
-            AND cp.user_id = p_learner_id
-            AND cp.status = 'completed'
+          SELECT 1 FROM lesson_progress lp
+          WHERE lp.lesson_id = cl.id
+            AND lp.user_id = p_learner_id
+            AND lp.completed = true
         )
     ) THEN
       v_overall_eligible := false;
@@ -179,10 +172,20 @@ BEGIN
   END IF;
 
   -- ── 4. Write summary to learner_exam_eligibility ─────────────────────────────
-  -- Only write if the table exists (it may not on fresh installs before EPA migration)
+  -- Only write if the table exists AND the domain_key FK allows non-epa keys.
+  -- learner_exam_eligibility has a FK to epa_exam_domains which rejects '__summary__',
+  -- so we skip this write for non-EPA credentials to avoid FK violations.
+  -- The summary row is returned in step 5 regardless.
   IF EXISTS (
     SELECT 1 FROM information_schema.tables
     WHERE table_schema = 'public' AND table_name = 'learner_exam_eligibility'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints tc
+    JOIN information_schema.constraint_column_usage ccu
+      ON ccu.constraint_name = tc.constraint_name
+    WHERE tc.table_name = 'learner_exam_eligibility'
+      AND tc.constraint_type = 'FOREIGN KEY'
+      AND ccu.column_name = 'domain_key'
   ) THEN
     INSERT INTO learner_exam_eligibility
       (learner_id, credential_id, domain_key, sims_passed, sims_required,
@@ -204,13 +207,13 @@ BEGIN
 
   -- ── 5. Return summary row ────────────────────────────────────────────────────
   RETURN QUERY SELECT
-    '__summary__'::TEXT,
-    'Overall Eligibility'::TEXT,
-    100::INTEGER,
-    0::INTEGER,
-    0::INTEGER,
-    v_overall_eligible,
-    v_blocking;
+    '__summary__'::TEXT        AS out_domain_key,
+    'Overall Eligibility'::TEXT AS out_domain_name,
+    100::INTEGER               AS out_weight_percent,
+    0::INTEGER                 AS out_lessons_required,
+    0::INTEGER                 AS out_lessons_completed,
+    v_overall_eligible         AS out_is_domain_covered,
+    v_blocking                 AS out_blocking_reason;
 
 END;
 $$;

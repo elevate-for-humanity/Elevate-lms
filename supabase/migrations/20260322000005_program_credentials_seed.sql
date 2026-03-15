@@ -36,16 +36,16 @@ WITH prog AS (
   SELECT id, slug FROM public.programs
   WHERE slug IN (
     'hvac-technician',
-    'cna-certification',
+    'cna-cert',
     'medical-assistant',
     'phlebotomy-technician',
     'barber-apprenticeship',
     'cosmetology-apprenticeship',
-    'nail-technician-apprenticeship',
+    'nail-technician',
     'cdl-training',
-    'peer-recovery-coach',
+    'peer-recovery-specialist-jri',
     'drug-alcohol-specimen-collector',
-    'cybersecurity-fundamentals',
+    'cybersecurity',
     'tax-preparation'
   )
 )
@@ -71,12 +71,12 @@ VALUES
 
 -- ── CNA ───────────────────────────────────────────────────────────────────────
 -- Primary: Indiana CNA — state exam via Prometric, Elevate covers fee for WRG/JRI learners
-((SELECT id FROM prog WHERE slug='cna-certification'),
+((SELECT id FROM prog WHERE slug='cna-cert'),
  '00000000-0000-0000-0000-000000000107', true,  'elevate', 12500, 70,
  'Indiana State CNA exam via Prometric. Fee covered for WRG/JRI-funded learners.'),
 
 -- OSHA 10 included
-((SELECT id FROM prog WHERE slug='cna-certification'),
+((SELECT id FROM prog WHERE slug='cna-cert'),
  '00000000-0000-0000-0000-000000000102', false, 'elevate', 0, NULL,
  'OSHA 10-Hour completion card. Attendance-based.'),
 
@@ -126,7 +126,7 @@ VALUES
 
 -- ── Nail Technician ───────────────────────────────────────────────────────────
 -- Primary: Indiana Nail Technician License
-((SELECT id FROM prog WHERE slug='nail-technician-apprenticeship'),
+((SELECT id FROM prog WHERE slug='nail-technician'),
  '00000000-0000-0000-0000-000000000106', true,  'self_pay', 7500, 70,
  'Indiana PLA nail technician state board exam. Learner pays exam fee.'),
 
@@ -138,7 +138,7 @@ VALUES
 
 -- ── Peer Recovery Specialist ──────────────────────────────────────────────────
 -- Primary: Indiana PRS — ICAADA exam, Elevate covers for JRI learners
-((SELECT id FROM prog WHERE slug='peer-recovery-coach'),
+((SELECT id FROM prog WHERE slug='peer-recovery-specialist-jri'),
  '00000000-0000-0000-0000-000000000109', true,  'elevate', 7500, 70,
  'ICAADA Peer Recovery Specialist exam. Fee covered for JRI-funded learners.'),
 
@@ -150,12 +150,12 @@ VALUES
 
 -- ── Cybersecurity ─────────────────────────────────────────────────────────────
 -- Primary: CompTIA Security+ — self-pay, significant exam fee
-((SELECT id FROM prog WHERE slug='cybersecurity-fundamentals'),
+((SELECT id FROM prog WHERE slug='cybersecurity'),
  '00000000-0000-0000-0000-000000000113', true,  'self_pay', 40200, 75,
  'CompTIA Security+ SY0-701. $402 exam voucher. Learner self-pay unless employer/grant.'),
 
 -- OSHA 10 included
-((SELECT id FROM prog WHERE slug='cybersecurity-fundamentals'),
+((SELECT id FROM prog WHERE slug='cybersecurity'),
  '00000000-0000-0000-0000-000000000102', false, 'elevate', 0, NULL,
  'OSHA 10-Hour completion card. Attendance-based.'),
 
@@ -190,10 +190,10 @@ ON CONFLICT (program_id, credential_id) DO UPDATE SET
 WITH prog AS (
   SELECT id, slug FROM public.programs
   WHERE slug IN (
-    'hvac-technician', 'cna-certification', 'medical-assistant',
+    'hvac-technician', 'cna-cert', 'medical-assistant',
     'phlebotomy-technician', 'barber-apprenticeship', 'cosmetology-apprenticeship',
-    'nail-technician-apprenticeship', 'cdl-training', 'peer-recovery-coach',
-    'drug-alcohol-specimen-collector', 'cybersecurity-fundamentals', 'tax-preparation'
+    'nail-technician', 'cdl-training', 'peer-recovery-specialist-jri',
+    'drug-alcohol-specimen-collector', 'cybersecurity', 'tax-preparation'
   )
 )
 INSERT INTO public.completion_rules
@@ -209,11 +209,11 @@ VALUES
  'EPA 608 Universal exam must be passed before certificate issued.'),
 
 -- CNA: 80% attendance + all modules + state exam passed
-('program', (SELECT id FROM prog WHERE slug='cna-certification'), 'min_attendance', 80, true, true,
+('program', (SELECT id FROM prog WHERE slug='cna-cert'), 'min_attendance', 80, true, true,
  'Minimum 80% attendance required per Indiana SDOH CNA program standards.'),
-('program', (SELECT id FROM prog WHERE slug='cna-certification'), 'all_modules', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='cna-cert'), 'all_modules', NULL, true, true,
  'All CNA curriculum modules must be complete.'),
-('program', (SELECT id FROM prog WHERE slug='cna-certification'), 'primary_credential_passed', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='cna-cert'), 'primary_credential_passed', NULL, true, true,
  'Indiana State CNA exam (Prometric) must be passed.'),
 
 -- Medical Assistant: 80% attendance + all modules + NCCT exam passed
@@ -245,9 +245,9 @@ VALUES
  'Indiana cosmetology state board exam must be passed.'),
 
 -- Nail Tech: 450 hours + state exam
-('program', (SELECT id FROM prog WHERE slug='nail-technician-apprenticeship'), 'min_hours', 450, true, true,
+('program', (SELECT id FROM prog WHERE slug='nail-technician'), 'min_hours', 450, true, true,
  'Indiana PLA requires 450 clock hours for nail technician apprenticeship.'),
-('program', (SELECT id FROM prog WHERE slug='nail-technician-apprenticeship'), 'primary_credential_passed', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='nail-technician'), 'primary_credential_passed', NULL, true, true,
  'Indiana nail technician state board exam must be passed.'),
 
 -- CDL: all modules + skills test (practical)
@@ -257,11 +257,11 @@ VALUES
  'Indiana BMV CDL skills test (pre-trip, backing, road) must be passed.'),
 
 -- Peer Recovery: 80% attendance + all modules + ICAADA exam
-('program', (SELECT id FROM prog WHERE slug='peer-recovery-coach'), 'min_attendance', 80, true, true,
+('program', (SELECT id FROM prog WHERE slug='peer-recovery-specialist-jri'), 'min_attendance', 80, true, true,
  'Minimum 80% attendance required.'),
-('program', (SELECT id FROM prog WHERE slug='peer-recovery-coach'), 'all_modules', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='peer-recovery-specialist-jri'), 'all_modules', NULL, true, true,
  'All PRS curriculum modules must be complete.'),
-('program', (SELECT id FROM prog WHERE slug='peer-recovery-coach'), 'primary_credential_passed', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='peer-recovery-specialist-jri'), 'primary_credential_passed', NULL, true, true,
  'ICAADA PRS exam must be passed.'),
 
 -- DOT Collector: all modules + practical (observed collection)
@@ -271,9 +271,9 @@ VALUES
  'Observed mock collection practical assessment required.'),
 
 -- Cybersecurity: all modules + Security+ exam
-('program', (SELECT id FROM prog WHERE slug='cybersecurity-fundamentals'), 'all_modules', NULL, true, true,
+('program', (SELECT id FROM prog WHERE slug='cybersecurity'), 'all_modules', NULL, true, true,
  'All cybersecurity curriculum modules must be complete.'),
-('program', (SELECT id FROM prog WHERE slug='cybersecurity-fundamentals'), 'primary_credential_passed', NULL, false, true,
+('program', (SELECT id FROM prog WHERE slug='cybersecurity'), 'primary_credential_passed', NULL, false, true,
  'CompTIA Security+ exam recommended but not required for program certificate.'),
 
 -- Tax Prep: all modules + AFSP CE hours

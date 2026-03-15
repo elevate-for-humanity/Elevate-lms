@@ -30,8 +30,10 @@ ALTER TABLE public.certificates
 DO $$
 BEGIN
   IF EXISTS (
-    SELECT 1 FROM information_schema.tables
-    WHERE table_schema = 'public' AND table_name = 'program_completion'
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'program_completion'
+      AND column_name = 'status'
   ) THEN
     ALTER TABLE public.program_completion
       DROP CONSTRAINT IF EXISTS program_completion_status_check;
@@ -45,8 +47,10 @@ END $$;
 DO $$
 BEGIN
   IF EXISTS (
-    SELECT 1 FROM information_schema.tables
-    WHERE table_schema = 'public' AND table_name = 'course_progress'
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'course_progress'
+      AND column_name = 'status'
   ) THEN
     ALTER TABLE public.course_progress
       DROP CONSTRAINT IF EXISTS course_progress_status_check;

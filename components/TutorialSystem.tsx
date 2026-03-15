@@ -36,6 +36,7 @@ export function TutorialSystem({
   // Load progress on mount
   useEffect(() => {
     if (!userId || !tutorialId) return;
+
     async function loadProgress() {
       try {
         const response = await fetch(`/api/tutorials?action=progress&tutorialId=${tutorialId}`);
@@ -46,13 +47,17 @@ export function TutorialSystem({
             setCompletedSteps(data.progress.completedSteps);
           }
         }
-      } catch (error) { /* silent */ }
+      } catch (error) {
+        // Progress load failure is non-fatal — tutorial starts from step 0
+      }
     }
     loadProgress();
   }, [userId, tutorialId]);
 
   const handleNext = async () => {
     if (!tutorialId || !currentStep) return;
+
+    // Mark current step as completed via API
     try {
       await fetch('/api/tutorials', {
         method: 'POST',
@@ -64,7 +69,9 @@ export function TutorialSystem({
           stepIndex: currentStepIndex,
         }),
       });
-    } catch { /* silent */ }
+    } catch {
+      // Progress save failure is non-fatal
+    }
 
     setCompletedSteps([...completedSteps, currentStep.id]);
 
@@ -73,9 +80,14 @@ export function TutorialSystem({
         await fetch('/api/tutorials', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'complete', tutorialId }),
+          body: JSON.stringify({
+            action: 'complete',
+            tutorialId,
+          }),
         });
-      } catch { /* silent */ }
+      } catch {
+        // Completion save failure is non-fatal
+      }
       setIsVisible(false);
       onComplete?.();
     } else {
@@ -94,7 +106,7 @@ export function TutorialSystem({
     onClose?.();
   };
 
-  if (!isVisible || !tutorial?.steps?.length) return null;
+  if (!isVisible || !tutorial?.steps?.length || !currentStep) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">

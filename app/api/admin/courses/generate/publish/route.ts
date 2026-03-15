@@ -123,23 +123,46 @@ async function checkCoverageGate(
 
   // runAlignmentAudit takes slugs; resolve the program slug from the DB
   const db = createAdminClient();
-  if (!db) return null; // DB unavailable — fail open, log below
+  if (!db) {
+    // DB client unavailable — infrastructure failure, fail open
+    logger.error('coverage-gate: DB client unavailable, skipping audit', { programId });
+    return null;
+  }
 
-  const { data: prog } = await db
+  const { data: prog, error: progErr } = await db
     .from('programs')
     .select('slug')
     .eq('id', programId)
     .single();
 
+  if (progErr) {
+    // Network/DB error — infrastructure failure, fail open and log
+    logger.error('coverage-gate: program lookup failed, skipping audit', {
+      programId,
+      error: progErr.message,
+      code: progErr.code,
+    });
+    return null;
+  }
+
   if (!prog) {
-    logger.warn('coverage-gate: program not found', { programId });
-    return null; // unknown program — don't block, let FK constraint catch it
+    // Row not found — data integrity problem, fail closed
+    return (
+      `Publication blocked: program "${programId}" not found. ` +
+      `Verify the program_id is correct before publishing.`
+    );
   }
 
   const result = await runAlignmentAudit([prog.slug]);
   const programAudit = result.programs.find(p => p.programSlug === prog.slug);
 
-  if (!programAudit) return null; // program not active — skip gate
+  if (!programAudit) {
+    // Program exists but is not active — data integrity problem, fail closed
+    return (
+      `Publication blocked: program "${prog.slug}" is not active or has no credential mapping. ` +
+      `Activate the program and map a primary credential before publishing.`
+    );
+  }
 
   if (programAudit.isAligned) return null; // all clear
 

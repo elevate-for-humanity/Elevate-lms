@@ -90,10 +90,11 @@ async function _POST(
   if (holderErr || !holder) return safeError('Program holder not found', 403);
 
   // Load the course assignment and confirm it belongs to this holder.
-  // credential_id is used below to verify exam domains exist.
+  // credential_id: verify exam domains exist before accepting upload.
+  // program_id: verify holder is authorized for this program.
   const { data: row, error: rowErr } = await supabase
     .from('program_holder_courses')
-    .select('id, program_holder_id, credential_id')
+    .select('id, program_holder_id, credential_id, program_id')
     .eq('id', courseAssignmentId)
     .single();
 
@@ -101,6 +102,25 @@ async function _POST(
 
   if (row.program_holder_id !== holder.id) {
     return safeError('Forbidden', 403);
+  }
+
+  // Verify the holder is authorized for the program this course belongs to.
+  // program_holder_programs is the authorization table — a row must exist
+  // linking this holder to the program_id on the course assignment.
+  // This is defense-in-depth: the RLS policy on program_holder_courses already
+  // scopes reads to the holder's own rows, but an explicit check here ensures
+  // the program_id itself hasn't drifted from an authorized program.
+  if (row.program_id) {
+    const { data: authRow, error: authErr } = await supabase
+      .from('program_holder_programs')
+      .select('id')
+      .eq('program_holder_id', holder.id)
+      .eq('program_id', row.program_id)
+      .single();
+
+    if (authErr || !authRow) {
+      return safeError('Forbidden: not authorized for this program', 403);
+    }
   }
 
   // Reject uploads for credentials that have no exam domains defined.

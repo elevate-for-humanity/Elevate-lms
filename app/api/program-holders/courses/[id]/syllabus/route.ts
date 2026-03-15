@@ -13,12 +13,30 @@ const BUCKET = 'program-holder-syllabi';
 
 // Upload flow:
 //   1. Client uploads the file directly to Supabase Storage using the JS SDK.
-//      Path must be: {uid}/{program_holder_courses_id}/{filename}
+//      Path must be exactly: {uid}/{program_holder_courses_id}/{filename}
+//      (3 segments, no traversal, no subdirectories)
 //   2. Client POSTs { filePath, filename, usesCustomStructure, deliveryStructureNotes }
 //      to this route.
-//   3. Server validates ownership, confirms the object exists, then writes the
-//      bucket + path (not a URL) to program_holder_courses.
+//   3. Server validates ownership, confirms the object exists in BUCKET,
+//      then writes bucket + path (not a URL) to program_holder_courses.
 //   4. Signed URLs are generated on read — never stored in the DB.
+
+// Validates that filePath is exactly {uid}/{courseAssignmentId}/{filename}
+// with no extra segments, no traversal, and no bucket prefix.
+function validateStoragePath(
+  filePath: string,
+  uid: string,
+  courseAssignmentId: string,
+  filename: string
+): string | null {
+  const parts = filePath.split('/');
+  if (parts.length !== 3) return 'File path must have exactly 3 segments';
+  if (parts[0] !== uid) return 'File path uid segment does not match authenticated user';
+  if (parts[1] !== courseAssignmentId) return 'File path course segment does not match route id';
+  if (parts[2] !== filename) return 'File path filename segment does not match filename field';
+  if (parts.some((p) => p === '..' || p === '.' || p === '')) return 'Invalid path segment';
+  return null;
+}
 
 async function _POST(
   req: NextRequest,
@@ -58,11 +76,9 @@ async function _POST(
     return safeError('Missing required fields: filePath, filename', 400);
   }
 
-  // Enforce path convention: {uid}/{courseAssignmentId}/{filename}
-  const expectedPrefix = `${user.id}/${courseAssignmentId}/`;
-  if (!filePath.startsWith(expectedPrefix)) {
-    return safeError('Invalid file path', 400);
-  }
+  // Enforce path convention: exactly {uid}/{courseAssignmentId}/{filename}
+  const pathError = validateStoragePath(filePath, user.id, courseAssignmentId, filename as string);
+  if (pathError) return safeError(pathError, 400);
 
   // Resolve the holder row for this user
   const { data: holder, error: holderErr } = await supabase
@@ -73,10 +89,11 @@ async function _POST(
 
   if (holderErr || !holder) return safeError('Program holder not found', 403);
 
-  // Load the course assignment and confirm it belongs to this holder
+  // Load the course assignment and confirm it belongs to this holder.
+  // credential_id is used below to verify exam domains exist.
   const { data: row, error: rowErr } = await supabase
     .from('program_holder_courses')
-    .select('id, program_holder_id')
+    .select('id, program_holder_id, credential_id')
     .eq('id', courseAssignmentId)
     .single();
 
@@ -86,11 +103,33 @@ async function _POST(
     return safeError('Forbidden', 403);
   }
 
-  // Confirm the object actually landed in the bucket before recording it.
-  // list() on the folder prefix; match by exact filename.
+  // Reject uploads for credentials that have no exam domains defined.
+  // Without domains, alignment review has nothing to compare against and
+  // the curriculum generator cannot produce traceable lessons.
+  if (row.credential_id) {
+    const { count, error: domainErr } = await supabase
+      .from('credential_exam_domains')
+      .select('id', { count: 'exact', head: true })
+      .eq('credential_id', row.credential_id);
+
+    if (domainErr) return safeInternalError(domainErr, 'Domain check failed');
+
+    if (!count || count === 0) {
+      return safeError(
+        'This credential has no exam blueprint domains defined. ' +
+          'Contact an administrator before uploading a syllabus.',
+        422
+      );
+    }
+  }
+
+  // Confirm the object exists in BUCKET before recording it.
+  // list() scoped to the exact folder; match by filename only (no prefix tricks).
+  // This also implicitly validates the bucket — we never list from any other bucket.
+  const folder = `${user.id}/${courseAssignmentId}`;
   const { data: objectList, error: listErr } = await supabase.storage
     .from(BUCKET)
-    .list(`${user.id}/${courseAssignmentId}`, { search: filename as string });
+    .list(folder, { search: filename as string });
 
   if (listErr) return safeInternalError(listErr, 'Storage list failed');
 

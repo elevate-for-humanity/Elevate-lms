@@ -162,12 +162,18 @@ COMMIT;
 --   file_size_limit    = EXCLUDED.file_size_limit,
 --   allowed_mime_types = EXCLUDED.allowed_mime_types;
 --
--- -- Holders upload into their own uid-prefixed folder
+-- -- Holders upload into their own uid-prefixed folder.
+-- -- Restricted to users who have a program_holders row — prevents any
+-- -- authenticated user from writing to this bucket.
 -- CREATE POLICY "program holders upload own syllabi"
 --   ON storage.objects FOR INSERT TO authenticated
 --   WITH CHECK (
 --     bucket_id = 'program-holder-syllabi'
 --     AND split_part(name, '/', 1) = auth.uid()::text
+--     AND EXISTS (
+--       SELECT 1 FROM public.program_holders
+--       WHERE user_id = auth.uid()
+--     )
 --   );
 --
 -- -- Holders read their own files
@@ -176,6 +182,10 @@ COMMIT;
 --   USING (
 --     bucket_id = 'program-holder-syllabi'
 --     AND split_part(name, '/', 1) = auth.uid()::text
+--     AND EXISTS (
+--       SELECT 1 FROM public.program_holders
+--       WHERE user_id = auth.uid()
+--     )
 --   );
 --
 -- -- Holders can replace their own files
@@ -184,6 +194,10 @@ COMMIT;
 --   USING (
 --     bucket_id = 'program-holder-syllabi'
 --     AND split_part(name, '/', 1) = auth.uid()::text
+--     AND EXISTS (
+--       SELECT 1 FROM public.program_holders
+--       WHERE user_id = auth.uid()
+--     )
 --   );
 --
 -- -- Admin and staff can read all syllabi for review

@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-gray-50 animate-pulse">
+    <div className="min-h-screen bg-white animate-pulse">
       {/* Hero skeleton */}
       <div className="relative bg-slate-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
@@ -29,9 +29,9 @@ export default function Loading() {
             <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="h-48 bg-slate-200" />
               <div className="p-6">
-                <div className="h-5 w-16 bg-slate-100 rounded mb-2" />
+                <div className="h-5 w-16 bg-white rounded mb-2" />
                 <div className="h-6 w-48 bg-slate-200 rounded mb-2" />
-                <div className="h-4 w-full bg-slate-100 rounded mb-4" />
+                <div className="h-4 w-full bg-white rounded mb-4" />
                 <div className="h-4 w-24 bg-slate-200 rounded" />
               </div>
             </div>

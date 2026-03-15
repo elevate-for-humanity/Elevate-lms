@@ -74,7 +74,7 @@ export default function WritingCenterPage() {
 
   return (
     <>
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Student Portal', href: '/student-portal' },
@@ -100,7 +100,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* Two Options */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Two Ways to Get Help</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -157,7 +157,7 @@ export default function WritingCenterPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-slate-50 rounded-2xl overflow-hidden"
+                className="bg-white rounded-2xl overflow-hidden"
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image src={service.image} alt={service.title} fill className="object-cover" />
@@ -173,7 +173,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-4">
@@ -181,7 +181,7 @@ export default function WritingCenterPage() {
               <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-white transition"
                 >
                   <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
                   {openFaq === index ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />}
@@ -207,7 +207,7 @@ export default function WritingCenterPage() {
           <h2 className="text-3xl font-bold text-white mb-4">Need Writing Help?</h2>
           <p className="text-lg text-brand-blue-100 mb-8">Log in to the LMS to submit a draft or book a live session with a writing tutor.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/lms/help" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-xl hover:bg-gray-100 transition text-lg shadow-lg">
+            <Link href="/support" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-xl hover:bg-white transition text-lg shadow-lg">
               Go to LMS <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/contact" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white font-bold rounded-xl hover:bg-white/10 transition text-lg border-2 border-white">

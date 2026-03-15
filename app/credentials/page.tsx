@@ -44,7 +44,7 @@ const apprenticeshipCreds = [
 export default function CredentialsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Credentials' }]} />
         </div>
@@ -60,7 +60,7 @@ export default function CredentialsPage() {
           className="object-cover object-center opacity-50"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
+        
         <div className="relative h-full flex items-center">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
             <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Credential Pathways</p>
@@ -120,7 +120,7 @@ export default function CredentialsPage() {
       </div>
 
       {/* Layer nav */}
-      <div className="bg-slate-50 border-b border-slate-200">
+      <div className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap gap-3">
           {[
             { label: 'Layer 1 — Completion Certificates', href: '#layer-1', icon: FileCheck, color: 'text-brand-blue-600' },
@@ -135,7 +135,7 @@ export default function CredentialsPage() {
       </div>
 
       {/* Layer 1 — Completion Certificates */}
-      <section id="layer-1" className="py-14 bg-slate-50 border-b border-slate-100">
+      <section id="layer-1" className="py-14 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
             <FileCheck className="w-5 h-5 text-brand-blue-600" />
@@ -230,7 +230,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* HVAC resources */}
-      <section className="py-8 bg-slate-50 border-b border-slate-200">
+      <section className="py-8 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">HVAC Credential Resources</h2>
           <div className="flex flex-wrap gap-3">
@@ -259,7 +259,7 @@ export default function CredentialsPage() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
           <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-slate-50 transition-colors shadow-lg">
+            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-3.5 rounded-lg font-bold text-base hover:bg-white transition-colors shadow-lg">
               Apply Now
             </Link>
             <Link href="/programs" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-bold text-base hover:bg-white/10 transition-colors">

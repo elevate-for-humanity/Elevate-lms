@@ -65,7 +65,7 @@ export default function ApplicationStatusPage() {
           <h1 className="text-2xl font-bold mb-2">No Application Found</h1>
           <p className="text-gray-600 mb-6">You haven't submitted an application yet.</p>
           <Link
-            href="/lms/apply"
+            href="/apply"
             className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700"
           >
             Start Application
@@ -163,7 +163,7 @@ export default function ApplicationStatusPage() {
 
           {config.showEnrollButton && (
             <Link
-              href="/lms/enroll"
+              href="/learner/enroll"
               className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-emerald-700"
             >
               Proceed to Enrollment

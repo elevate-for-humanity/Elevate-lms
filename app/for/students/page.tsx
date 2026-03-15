@@ -75,7 +75,7 @@ export default function StudentsPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-black mb-12">
             Why Choose Us
@@ -140,7 +140,7 @@ export default function StudentsPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-black mb-12">
             How It Works
@@ -191,7 +191,7 @@ export default function StudentsPage() {
           </p>
           <Link
             href="/start"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition text-lg"
           >
             Apply Now
             <ArrowRight className="h-5 w-5" />

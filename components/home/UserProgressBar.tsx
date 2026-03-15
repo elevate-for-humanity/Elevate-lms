@@ -82,7 +82,7 @@ export default function UserProgressBar() {
               />
             </div>
             <Link
-              href="/lms/dashboard"
+              href="/learner/dashboard"
               className="inline-flex items-center justify-center bg-brand-green-600 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-green-700 transition-colors text-sm"
             >
               Continue Learning

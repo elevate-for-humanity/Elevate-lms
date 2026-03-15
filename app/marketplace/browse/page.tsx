@@ -43,7 +43,7 @@ export default async function MarketplaceBrowsePage() {
   const categories = ['All', ...new Set(itemList.map((i: any) => i.category).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace", href: "/marketplace" }, { label: "Browse" }]} />
       </div>
@@ -72,7 +72,7 @@ export default async function MarketplaceBrowsePage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   category === 'All'
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-white'
                 }`}
               >
                 {category}

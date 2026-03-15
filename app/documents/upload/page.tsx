@@ -118,8 +118,8 @@ export default function DocumentUploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Upload Documents' }]} />
         </div>
@@ -146,7 +146,7 @@ export default function DocumentUploadPage() {
                         ? 'bg-brand-green-50 border-brand-green-200'
                         : doc.required
                           ? 'bg-yellow-50 border-yellow-200'
-                          : 'bg-gray-50 border-gray-200'
+                          : 'bg-white border-gray-200'
                     }`}
                   >
                     <FileText className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
@@ -162,7 +162,7 @@ export default function DocumentUploadPage() {
                           <span className="text-xs bg-brand-green-100 text-brand-green-800 px-2 py-0.5 rounded-full">Uploaded</span>
                         )}
                         {!doc.required && !isUploaded && (
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Optional</span>
+                          <span className="text-xs bg-white text-gray-600 px-2 py-0.5 rounded-full">Optional</span>
                         )}
                       </div>
                       <p className="text-sm text-gray-600">{doc.description}</p>
@@ -200,7 +200,7 @@ export default function DocumentUploadPage() {
                     setSsnDisplay(formatSsn(digits));
                   }}
                   disabled={ssnSaved}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500 font-mono tracking-wider disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500 font-mono tracking-wider disabled:bg-white"
                 />
               </div>
               <Button type="button" className="px-6 py-2" disabled={ssnSaved} onClick={async () => {

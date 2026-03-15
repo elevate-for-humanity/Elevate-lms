@@ -29,7 +29,7 @@ export default async function EventsPage() {
           alt="Elevate for Humanity community events"
           fill className="object-cover" priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Events</h1>
@@ -77,8 +77,8 @@ export default async function EventsPage() {
             Partner with Elevate for Humanity to connect with workforce-ready talent and the Indianapolis community.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
-            <Link href="/contact" className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors">Contact Us</Link>
-            <Link href="/for/employers" className="border border-slate-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:border-white transition-colors">Employer Partnerships</Link>
+            <Link href="/contact" className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-white transition-colors">Contact Us</Link>
+            <Link href="/employer" className="border border-slate-500 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:border-white transition-colors">Employer Partnerships</Link>
           </div>
         </div>
       </section>

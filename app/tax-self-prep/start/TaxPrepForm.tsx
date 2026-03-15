@@ -176,7 +176,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
           {sections.map((section, idx) => (
             <button key={section.id} onClick={() => setActiveSection(section.id)}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left ${
-                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
+                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-white'
               }`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 completedSections.includes(section.id) ? 'bg-brand-green-500 text-white' :
@@ -192,7 +192,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
         </nav>
         
         <button onClick={saveDraft} disabled={isSaving}
-          className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+          className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 border rounded-lg hover:bg-white">
           <Save className="w-4 h-4" />
           {isSaving ? 'Saving...' : 'Save Progress'}
         </button>
@@ -295,7 +295,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
               <h2 className="text-xl font-semibold">Deductions</h2>
               <div className="space-y-4">
                 <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-                  formData.deductionType === 'standard' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
+                  formData.deductionType === 'standard' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-white'
                 }`}>
                   <input type="radio" name="deduction" value="standard"
                     checked={formData.deductionType === 'standard'}
@@ -306,7 +306,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                   </div>
                 </label>
                 <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-                  formData.deductionType === 'itemized' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
+                  formData.deductionType === 'itemized' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-white'
                 }`}>
                   <input type="radio" name="deduction" value="itemized"
                     checked={formData.deductionType === 'itemized'}
@@ -330,7 +330,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                   { key: 'educationCredits', label: 'Education Credits' },
                   { key: 'retirementCredit', label: 'Retirement Savings Credit' },
                 ].map(credit => (
-                  <label key={credit.key} className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label key={credit.key} className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-white">
                     <input type="checkbox"
                       checked={formData[credit.key as keyof typeof formData] as boolean}
                       onChange={e => updateField(credit.key, e.target.checked)}
@@ -356,7 +356,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
               </div>
               <div className="space-y-2">
                 {sections.slice(0, -1).map(section => (
-                  <div key={section.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={section.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                     <span>{section.name}</span>
                     {completedSections.includes(section.id) ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>

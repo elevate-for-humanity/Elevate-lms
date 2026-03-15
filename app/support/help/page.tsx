@@ -20,7 +20,7 @@ const categories = [
   { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-brand-blue-100 text-brand-blue-600' },
   { name: 'Account', slug: 'Account', color: 'bg-brand-orange-100 text-brand-orange-600' },
   { name: 'Career Services', slug: 'Career Services', color: 'bg-teal-100 text-teal-600' },
-  { name: 'General', slug: 'General', color: 'bg-gray-100 text-gray-600' },
+  { name: 'General', slug: 'General', color: 'bg-white text-gray-600' },
 ];
 
 async function getArticles(category?: string, search?: string) {
@@ -56,7 +56,7 @@ export default async function HelpCenterPage({
   const searchQuery = params.q;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Help" }]} />
       </div>
@@ -94,7 +94,7 @@ export default async function HelpCenterPage({
               className={`px-4 py-2 rounded-full font-medium transition ${
                 !activeCategory
                   ? 'bg-brand-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-white text-gray-700 hover:bg-gray-200'
               }`}
             >
               All Articles
@@ -106,7 +106,7 @@ export default async function HelpCenterPage({
                 className={`px-4 py-2 rounded-full font-medium transition ${
                   activeCategory === cat.slug
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-white text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {cat.name}
@@ -153,7 +153,7 @@ export default async function HelpCenterPage({
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className={`px-2 py-2 text-xs font-medium rounded ${
-                          categories.find(c => c.slug === article.category)?.color || 'bg-gray-100 text-gray-600'
+                          categories.find(c => c.slug === article.category)?.color || 'bg-white text-gray-600'
                         }`}>
                           {article.category}
                         </span>
@@ -190,7 +190,7 @@ export default async function HelpCenterPage({
             </Link>
             <a
               href="/support"
-              className="px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition"
+              className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition"
             >
               (317) 314-3757
             </a>

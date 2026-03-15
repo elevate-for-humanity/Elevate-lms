@@ -60,7 +60,7 @@ export default async function TransferHoursPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Apprentice Portal', href: '/apprentice' },

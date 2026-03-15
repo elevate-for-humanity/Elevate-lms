@@ -53,7 +53,7 @@ const certifications = [
 export default function InstructorTrainingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Resources', href: '/resources' },
@@ -83,17 +83,17 @@ export default function InstructorTrainingPage() {
             is required annually.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 mt-6">
-            <div className="text-center p-4 bg-slate-50 rounded-lg">
+            <div className="text-center p-4 bg-white rounded-lg">
               <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-2xl font-bold text-slate-900">16</p>
               <p className="text-sm text-slate-600">Onboarding Hours</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-lg">
+            <div className="text-center p-4 bg-white rounded-lg">
               <BookOpen className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-2xl font-bold text-slate-900">6</p>
               <p className="text-sm text-slate-600">Training Modules</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-lg">
+            <div className="text-center p-4 bg-white rounded-lg">
               <Award className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-2xl font-bold text-slate-900">8</p>
               <p className="text-sm text-slate-600">Annual CE Hours</p>
@@ -136,7 +136,7 @@ export default function InstructorTrainingPage() {
                   <span className="text-slate-900 font-medium">{cert.name}</span>
                 </div>
                 <span className={`text-xs font-semibold px-2 py-1 rounded ${
-                  cert.required ? 'bg-brand-red-50 text-brand-red-700' : 'bg-slate-100 text-slate-600'
+                  cert.required ? 'bg-brand-red-50 text-brand-red-700' : 'bg-white text-slate-600'
                 }`}>
                   {cert.required ? 'Required' : 'Recommended'}
                 </span>
@@ -145,7 +145,7 @@ export default function InstructorTrainingPage() {
           </div>
         </section>
 
-        <section className="bg-slate-50 rounded-xl p-8">
+        <section className="bg-white rounded-xl p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Interested in Teaching?</h2>
           <p className="text-slate-600 mb-6">
             We&apos;re looking for licensed professionals to teach in our career training programs.
@@ -161,7 +161,7 @@ export default function InstructorTrainingPage() {
             </Link>
             <a
               href="tel:3172968560"
-              className="inline-flex items-center gap-2 bg-white border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition"
+              className="inline-flex items-center gap-2 bg-white border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               <Phone className="w-4 h-4" /> (317) 296-8560
             </a>

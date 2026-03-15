@@ -38,7 +38,7 @@ export default async function LeaderboardPage() {
   const userRank = topLearners?.findIndex(l => l.id === user.id) ?? -1;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -118,7 +118,7 @@ export default async function LeaderboardPage() {
             {topLearners?.slice(3).map((learner: any, index: number) => (
               <div 
                 key={learner.id} 
-                className={`flex items-center gap-4 p-4 ${learner.id === user.id ? 'bg-brand-green-50' : 'hover:bg-slate-50'}`}
+                className={`flex items-center gap-4 p-4 ${learner.id === user.id ? 'bg-brand-green-50' : 'hover:bg-white'}`}
               >
                 <div className="w-8 text-center font-bold text-slate-500">
                   {index + 4}

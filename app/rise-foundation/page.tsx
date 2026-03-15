@@ -67,7 +67,7 @@ export default async function RiseFoundationPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Rise Foundation' }]} />
         </div>
@@ -84,7 +84,7 @@ export default async function RiseFoundationPage() {
           sizes="100vw"
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
+        
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full">
             <p className="text-sm md:text-base text-white/80 uppercase tracking-wider mb-3">
@@ -103,7 +103,7 @@ export default async function RiseFoundationPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/rise-foundation/get-involved"
-                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition text-lg"
+                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-white transition text-lg"
               >
                 Get Help Now
               </Link>
@@ -372,7 +372,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* Entity Structure */}
-      <section id="organization" className="py-16 bg-slate-50">
+      <section id="organization" className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-2">Our Organization</h2>
           <p className="text-center text-gray-500 mb-10 text-sm">Legal entity and operating names explained</p>
@@ -506,7 +506,7 @@ export default async function RiseFoundationPage() {
             Your donation funds mental wellness services, community workshops, free tax preparation, and holistic healing programs for families in need. All services are confidential.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Link href="/rise-foundation/donate" className="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition">
+            <Link href="/rise-foundation/donate" className="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-4 rounded-xl font-bold hover:bg-white transition">
               <Gift className="w-5 h-5" /> Donate Now
             </Link>
             <Link href="/rise-foundation/get-involved" className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition">

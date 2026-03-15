@@ -120,7 +120,7 @@ export default function CampaignsClient({
             {initialStudents.map((student: any) => (
               <label
                 key={student.id}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer"
               >
                 <input
                   type="checkbox"

@@ -21,7 +21,7 @@ export default async function CookiesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -40,7 +40,7 @@ export default async function CookiesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Cookie Policy' }]} />
         </div>
@@ -185,7 +185,7 @@ export default async function CookiesPage() {
             <p className="text-black mb-4">
               If you have questions about our use of cookies, please contact us:
             </p>
-            <div className="bg-slate-50 p-6 rounded-lg mb-8">
+            <div className="bg-white p-6 rounded-lg mb-8">
               <p className="text-black mb-2">
                 <strong>Elevate For Humanity</strong>
               </p>

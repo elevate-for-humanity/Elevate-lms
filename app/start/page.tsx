@@ -52,7 +52,7 @@ const PATHWAYS = [
 
 export default function StartPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-slate-800 text-white">
         <Image
@@ -152,7 +152,7 @@ export default function StartPage() {
               <Link
                 key={pathway.title}
                 href={pathway.href}
-                className="flex items-start gap-4 rounded-xl border border-gray-200 bg-gray-50 p-5 transition hover:border-brand-blue-300 hover:shadow-sm"
+                className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 transition hover:border-brand-blue-300 hover:shadow-sm"
               >
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-brand-blue-50 text-brand-blue-600">
                   <pathway.icon className="h-5 w-5" />
@@ -179,7 +179,7 @@ export default function StartPage() {
           <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
             <a
               href="#top"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 font-bold text-brand-red-600 transition hover:bg-gray-100"
+              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 font-bold text-brand-red-600 transition hover:bg-white"
             >
               Apply Now
             </a>

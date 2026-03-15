@@ -58,7 +58,7 @@ export default function K12Page() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Partner With Your School District</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Contact us to discuss CTE partnerships, dual-credit agreements, and career pathway development.</p>
-          <Link href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Schedule a Meeting</Link>
+          <Link href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Schedule a Meeting</Link>
         </div>
       </section>
     </div>

@@ -175,7 +175,7 @@ const PROGRAMS = [
 
 export default function PathwaysPage() {
   return (
-    <div className="bg-white">      <div className="bg-slate-50 border-b">
+    <div className="bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Pathways' }]} />
         </div>
@@ -211,7 +211,7 @@ export default function PathwaysPage() {
               pathway structure is the same.
             </p>
             <p>
-              Many of our programs are available at no cost to eligible participants through
+              Many of our programs are available through WIOA and state funding for eligible Indiana residents.
               WIOA (Workforce Innovation and Opportunity Act) funding administered by Indiana&apos;s
               Department of Workforce Development. Eligibility is determined through WorkOne
               career centers. For those who qualify, tuition, materials, certification exams,
@@ -222,7 +222,7 @@ export default function PathwaysPage() {
             <Link href="/start" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-7 py-3.5 rounded-lg font-bold transition inline-flex items-center">
               Check Your Eligibility <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/how-it-works" className="bg-white hover:bg-gray-50 text-brand-blue-700 border-2 border-brand-blue-200 px-7 py-3.5 rounded-lg font-bold transition">
+            <Link href="/how-it-works" className="bg-white hover:bg-white text-brand-blue-700 border-2 border-brand-blue-200 px-7 py-3.5 rounded-lg font-bold transition">
               See How It Works Step by Step
             </Link>
           </div>
@@ -230,7 +230,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── The 5 Stages (photo + deep description each) ── */}
-      <section className="py-14 bg-slate-50">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">How the Pathway Works</h2>
           <p className="text-gray-600 mb-10 max-w-3xl">
@@ -327,7 +327,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── How Programs Are Delivered ── */}
-      <section className="py-10 bg-slate-50 border-t border-gray-200">
+      <section className="py-10 bg-white border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">How Programs Are Delivered</h2>
           <div className="text-sm text-gray-700 space-y-3">
@@ -357,7 +357,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Who Is This For ── */}
-      <section className="py-14 bg-slate-50">
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Who Is This For?</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -424,7 +424,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Explore More ── */}
-      <section className="py-10 bg-slate-50">
+      <section className="py-10 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Explore the Pathway System</h2>
           <div className="grid sm:grid-cols-3 gap-4">

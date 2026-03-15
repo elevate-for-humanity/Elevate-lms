@@ -30,7 +30,7 @@ export default function InternshipAgreementPage() {
         </div>
 
         <div className="prose prose-slate max-w-none">
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mb-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Agreement Parties</h2>
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div>
@@ -109,7 +109,7 @@ export default function InternshipAgreementPage() {
           <h2 className="text-lg font-bold text-slate-900">7. Termination</h2>
           <p className="text-sm text-slate-700">Either party may terminate this agreement with 5 business days written notice. Grounds for immediate termination include violation of confidentiality, safety violations, or failure to meet attendance requirements.</p>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mt-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Signatures</h2>
             <div className="grid sm:grid-cols-2 gap-6 text-sm text-slate-600">
               <div>

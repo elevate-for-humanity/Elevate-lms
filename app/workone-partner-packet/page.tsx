@@ -33,7 +33,7 @@ export default function WorkOnePartnerPacketPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'WorkOne Partner Packet' }]} />
         </div>
@@ -65,7 +65,7 @@ export default function WorkOnePartnerPacketPage() {
               Everything WorkOne regions need to refer participants to our ETPL-approved training programs and registered apprenticeships. We handle enrollment, training delivery, and outcome reporting with full transparency.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-700 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-700 rounded-lg font-bold hover:bg-white transition-colors">
                 <Phone className="w-5 h-5 mr-2" />
                 Contact Us
               </Link>
@@ -76,7 +76,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Organization Overview */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Organization Overview</h3>
@@ -115,7 +115,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Who We Are with Image */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -267,7 +267,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Programs Available with Images */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -389,7 +389,7 @@ export default function WorkOnePartnerPacketPage() {
             Contact our WorkOne liaison to set up your referral process or request additional information.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/support" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+            <a href="/support" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-white transition-colors">
               <Phone className="w-5 h-5 mr-2" />
               (317) 314-3757
             </a>

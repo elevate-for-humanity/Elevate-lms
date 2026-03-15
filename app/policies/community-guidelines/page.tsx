@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function CommunityGuidelinesPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Community Guidelines" }]} />
       </div>
@@ -159,7 +159,7 @@ export default function CommunityGuidelinesPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Conflict Resolution</h2>
             
-            <div className="bg-gray-50 rounded-xl p-8 border-2 border-gray-200 mb-6">
+            <div className="bg-white rounded-xl p-8 border-2 border-gray-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">If You Experience or Witness Violations</h3>
               <div className="space-y-6">
                 <div className="flex gap-6">

@@ -48,7 +48,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             <Image src={images.hero} alt={program.name || program.heroTitle || 'Program'} fill className="object-cover" priority sizes="100vw" />
           </div>
         )}
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
               {program.name || program.heroTitle}
@@ -285,7 +285,7 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
         </div>
         <div className="absolute bottom-3 left-3 right-3">
           <h3 className="font-bold text-white">{label}</h3>
-          <p className="text-white/80 text-xs">{description}</p>
+          <p className="text-slate-600 text-xs">{description}</p>
         </div>
       </div>
     </div>

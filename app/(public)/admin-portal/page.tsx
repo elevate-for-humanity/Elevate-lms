@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function AdminPortalPublicPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Admin Portal' }]} />
         </div>
@@ -40,27 +40,27 @@ export default function AdminPortalPublicPage() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Portal Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">User Management</h3>
               <p className="text-slate-600">Manage students, instructors, employers, and partner accounts.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <BarChart3 className="w-10 h-10 text-brand-green-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Analytics & Reports</h3>
               <p className="text-slate-600">Track enrollments, completions, placements, and program performance.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Settings className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">System Configuration</h3>
               <p className="text-slate-600">Configure programs, courses, certifications, and platform settings.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Shield className="w-10 h-10 text-brand-red-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Compliance Management</h3>
               <p className="text-slate-600">WIOA reporting, audit trails, and regulatory compliance tools.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Lock className="w-10 h-10 text-amber-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Security & Access</h3>
               <p className="text-slate-600">Role-based access control, audit logs, and security settings.</p>
@@ -76,7 +76,7 @@ export default function AdminPortalPublicPage() {
           <p className="text-brand-blue-100 mb-6">Contact your system administrator to request access credentials.</p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-white transition-colors"
           >
             Contact Us
           </Link>

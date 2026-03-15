@@ -83,7 +83,7 @@ export default function SubOfficeAgreementPage() {
 
   if (signed) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-xl p-8 text-center">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -116,7 +116,7 @@ export default function SubOfficeAgreementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Sub Office Agreement" }]} />
       </div>
@@ -465,7 +465,7 @@ export default function SubOfficeAgreementPage() {
                 </button>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="bg-white p-4 rounded-lg mb-6">
                 <p className="text-sm text-black">
                   <strong>Digital Signature Acknowledgment:</strong> By signing
                   above, you acknowledge that:
@@ -496,7 +496,7 @@ export default function SubOfficeAgreementPage() {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-100 rounded-b-lg p-6 text-center text-sm text-black">
+        <div className="bg-white rounded-b-lg p-6 text-center text-sm text-black">
           <p>
             Supersonic Fast Cash | Licensed Enrolled Agent | IRS-Authorized Tax
             Professional

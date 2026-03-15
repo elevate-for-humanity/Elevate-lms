@@ -77,7 +77,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
           {settingsSections.map(section => (
             <button key={section.id} onClick={() => setActiveSection(section.id)}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
-                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
+                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-white'
               }`}>
               <section.icon className="w-5 h-5" />
               <span className="text-sm font-medium">{section.name}</span>
@@ -109,7 +109,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                 <div className="w-20 h-20 bg-brand-orange-100 rounded-full flex items-center justify-center">
                   <User className="w-10 h-10 text-brand-orange-600" />
                 </div>
-                <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Change Photo</button>
+                <button className="px-4 py-2 border rounded-lg hover:bg-white">Change Photo</button>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -127,7 +127,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input type="email" value={userEmail} disabled
-                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-500" />
+                    className="w-full px-3 py-2 border rounded-lg bg-white text-gray-500" />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
@@ -182,7 +182,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
               <div className="pt-4 border-t">
                 <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
                 <p className="text-sm text-gray-600 mb-3">Add an extra layer of security to your account</p>
-                <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Enable 2FA</button>
+                <button className="px-4 py-2 border rounded-lg hover:bg-white">Enable 2FA</button>
               </div>
             </div>
           )}
@@ -190,7 +190,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
           {activeSection === 'billing' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Billing & Payments</h2>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <p className="font-medium">Current Plan: <span className="text-brand-orange-600">{profile?.role === 'student' ? 'Student' : 'Pro'}</span></p>
               </div>
               <div>
@@ -199,7 +199,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                   <CreditCard className="w-6 h-6 text-gray-400" />
                   <span>No payment method on file</span>
                 </div>
-                <button className="mt-3 px-4 py-2 border rounded-lg hover:bg-gray-50">Add Payment Method</button>
+                <button className="mt-3 px-4 py-2 border rounded-lg hover:bg-white">Add Payment Method</button>
               </div>
             </div>
           )}

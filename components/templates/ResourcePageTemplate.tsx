@@ -76,7 +76,7 @@ export function ResourcePageTemplate({
       </div>
 
       {/* Header */}
-      <div className="bg-slate-900 text-white py-12">
+      <div className="bg-white py-12 border-t">
         <div className="max-w-4xl mx-auto px-4">
           
           <h1 className="text-3xl md:text-4xl font-bold mb-4">

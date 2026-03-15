@@ -74,12 +74,12 @@ export default async function TaxIntakePage() {
       case 'in_progress': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'pending': return 'bg-yellow-100 text-yellow-700';
       case 'cancelled': return 'bg-brand-red-100 text-brand-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-white text-gray-700';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>
@@ -146,7 +146,7 @@ export default async function TaxIntakePage() {
         {/* Intake Table */}
         <div className="bg-white rounded-xl border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Client</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Appointment</th>
@@ -158,7 +158,7 @@ export default async function TaxIntakePage() {
             <tbody className="divide-y">
               {intakes && intakes.length > 0 ? (
                 intakes.map((intake: any) => (
-                  <tr key={intake.id} className="hover:bg-gray-50">
+                  <tr key={intake.id} className="hover:bg-white">
                     <td className="px-4 py-4">
                       <p className="font-medium">{intake.client?.full_name || 'Unknown'}</p>
                       <p className="text-sm text-gray-500">{intake.client?.email}</p>

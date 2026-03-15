@@ -48,7 +48,7 @@ function PartnerCard({ partner }: { partner: TrainingPartner }) {
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
           <Icon className="w-5 h-5 text-slate-600" />
         </div>
         <div className="min-w-0">
@@ -191,7 +191,7 @@ export default function TrainingSitesPage() {
                     return (
                       <div
                         key={key}
-                        className="bg-slate-50 rounded-lg border border-slate-200 p-5"
+                        className="bg-white rounded-lg border border-slate-200 p-5"
                       >
                         <div className="flex items-center gap-3 mb-2">
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
@@ -212,7 +212,7 @@ export default function TrainingSitesPage() {
       </section>
 
       {/* Documentation Standards */}
-      <section className="py-10 bg-slate-50 border-t border-slate-200">
+      <section className="py-10 bg-white border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">
             <FileCheck className="w-5 h-5 inline-block mr-2 text-brand-blue-600" />
@@ -256,7 +256,7 @@ export default function TrainingSitesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/partners/join"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-slate-100 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-white transition"
               >
                 Partner With Us <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
@@ -272,7 +272,7 @@ export default function TrainingSitesPage() {
       </section>
 
       {/* Related Links */}
-      <section className="py-8 bg-slate-50 border-t border-slate-200">
+      <section className="py-8 bg-white border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center text-sm">
             <Link href="/disclosures/training-delivery" className="text-brand-red-600 hover:underline font-medium">

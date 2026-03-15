@@ -34,7 +34,7 @@ export default async function BookkeepingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -338,7 +338,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Benefits */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Why Professional Bookkeeping Matters
@@ -404,7 +404,7 @@ export default async function BookkeepingPage() {
                   className={`block text-center px-6 py-3 rounded-xl font-bold transition ${
                     plan.popular
                       ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700'
-                      : 'bg-gray-100 text-black hover:bg-gray-200'
+                      : 'bg-white text-black hover:bg-gray-200'
                   }`}
                 >
                   {plan.cta}
@@ -416,7 +416,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Process */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">How It Works</h2>
           <p className="text-xl text-gray-600 mb-12">
@@ -466,7 +466,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Frequently Asked Questions
@@ -499,7 +499,7 @@ export default async function BookkeepingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/contact"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-white transition"
             >
               Schedule Consultation
               <Calendar className="w-5 h-5" />
@@ -516,7 +516,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Contact Info */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>

@@ -64,7 +64,7 @@ export default function DemoEmployerPage() {
         </div>
 
         {/* Tab navigation */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+        <div className="flex gap-1 bg-white rounded-lg p-1 w-fit">
           {(['apprentices', 'candidates', 'incentives'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
               {t}
@@ -81,7 +81,7 @@ export default function DemoEmployerPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
+                  <tr className="text-left text-xs text-gray-500 border-b bg-white">
                     <th className="px-5 py-3 font-medium">Apprentice</th>
                     <th className="px-5 py-3 font-medium">Program</th>
                     <th className="px-5 py-3 font-medium">Progress</th>
@@ -92,7 +92,7 @@ export default function DemoEmployerPage() {
                 </thead>
                 <tbody>
                   {APPRENTICES.map(a => (
-                    <tr key={a.id} className="border-b last:border-0 hover:bg-gray-50">
+                    <tr key={a.id} className="border-b last:border-0 hover:bg-white">
                       <td className="px-5 py-3 font-medium text-gray-900">{a.name}</td>
                       <td className="px-5 py-3 text-gray-600">{a.program}</td>
                       <td className="px-5 py-3">
@@ -119,7 +119,7 @@ export default function DemoEmployerPage() {
                         ) : a.pendingHours > 0 && approvedHours.has(a.id) ? (
                           <span className="text-xs text-brand-green-600 flex items-center gap-1"><span className="text-slate-400 flex-shrink-0">•</span> Approved</span>
                         ) : (
-                          <button onClick={() => showToast(`Viewing ${a.name}'s profile`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
+                          <button onClick={() => showToast(`Viewing ${a.name}'s profile`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white transition flex items-center gap-1">
                             <Eye className="w-3 h-3" /> View
                           </button>
                         )}
@@ -167,7 +167,7 @@ export default function DemoEmployerPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
+                  <tr className="text-left text-xs text-gray-500 border-b bg-white">
                     <th className="px-5 py-3 font-medium">Incentive</th>
                     <th className="px-5 py-3 font-medium">Employee</th>
                     <th className="px-5 py-3 font-medium">Amount</th>
@@ -177,7 +177,7 @@ export default function DemoEmployerPage() {
                 </thead>
                 <tbody>
                   {INCENTIVES.map((inc, i) => (
-                    <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
+                    <tr key={i} className="border-b last:border-0 hover:bg-white">
                       <td className="px-5 py-3 font-medium text-gray-900">{inc.type}</td>
                       <td className="px-5 py-3 text-gray-600">{inc.employee}</td>
                       <td className="px-5 py-3 font-semibold text-gray-900">{inc.amount}</td>
@@ -190,7 +190,7 @@ export default function DemoEmployerPage() {
                       </td>
                       <td className="px-5 py-3">
                         {inc.status === 'Approved' && (
-                          <button onClick={() => showToast(`${inc.type} documentation downloaded`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
+                          <button onClick={() => showToast(`${inc.type} documentation downloaded`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white transition flex items-center gap-1">
                             <Download className="w-3 h-3" /> Docs
                           </button>
                         )}
@@ -206,7 +206,7 @@ export default function DemoEmployerPage() {
                 </tbody>
               </table>
             </div>
-            <div className="px-5 py-3 border-t bg-gray-50 flex justify-between text-sm">
+            <div className="px-5 py-3 border-t bg-white flex justify-between text-sm">
               <span className="text-gray-500">Total incentives earned</span>
               <span className="font-bold text-gray-900">{totalIncentives}</span>
             </div>

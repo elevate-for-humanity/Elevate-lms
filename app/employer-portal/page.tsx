@@ -67,7 +67,7 @@ export default async function EmployerPortalDashboard() {
             <PlusCircle className="w-4 h-4" /> Post a Job
           </Link>
           <Link href="/employer-portal/analytics"
-            className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition text-sm">
+            className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-gray-700 hover:bg-white transition text-sm">
             <BarChart3 className="w-4 h-4" /> Analytics
           </Link>
         </div>
@@ -129,7 +129,7 @@ export default async function EmployerPortalDashboard() {
                   app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   app.status === 'interview' ? 'bg-purple-100 text-purple-700' :
                   app.status === 'hired' ? 'bg-brand-green-100 text-brand-green-700' :
-                  'bg-gray-100 text-gray-700'
+                  'bg-white text-gray-700'
                 }`}>
                   {(app.status || 'pending').replace(/_/g, ' ')}
                 </span>

@@ -99,16 +99,16 @@ export default function TrainingProvidersPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/training-providers-page-1.jpg" alt="Training Providers Partnership" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Partner With Us to Deliver Workforce Training</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Join our network of approved training providers. We connect you with WIOA-funded students, handle enrollment paperwork, and help you grow your program.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Partner With Us to Deliver Workforce Training</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Join our network of approved training providers. We connect you with WIOA-funded students, handle enrollment paperwork, and help you grow your program.</p>
           </div>
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -158,7 +158,7 @@ export default function TrainingProvidersPage() {
                 />
                 
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="text-xl font-bold text-white mb-1">{program.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-1">{program.name}</h3>
                   <p className="text-gray-200 text-sm">{program.examples}</p>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -183,7 +183,7 @@ export default function TrainingProvidersPage() {
                 {requirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-4">
                     <div className="w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                     </div>
                     <span className="text-gray-700 text-lg">{req}</span>
                   </li>
@@ -223,7 +223,7 @@ export default function TrainingProvidersPage() {
               { step: 4, title: 'Receive Students', desc: 'Start receiving pre-screened, funded students.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                <div className="w-16 h-16 bg-brand-blue-600 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -235,7 +235,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
@@ -259,7 +259,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Ready to Grow Your Training Program?
@@ -270,14 +270,14 @@ export default function TrainingProvidersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/partners/training-provider"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
             >
               Apply to Partner
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition border-2 border-gray-200 text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-white transition border-2 border-gray-200 text-lg"
             >
               <Phone className="w-5 h-5" />
               Call (317) 314-3757

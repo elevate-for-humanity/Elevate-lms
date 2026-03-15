@@ -36,7 +36,7 @@ export default async function GradesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Grades" }]} />
         </div>
@@ -97,7 +97,7 @@ export default async function GradesPage() {
                       {items.map((item: any) => {
                         const studentProfile = item.profiles as any;
                         return (
-                          <tr key={item.id} className="hover:bg-gray-50">
+                          <tr key={item.id} className="hover:bg-white">
                             <td className="py-3">
                               <p className="font-medium text-gray-900">{studentProfile?.full_name || 'Unknown'}</p>
                               <p className="text-xs text-gray-500">{studentProfile?.email || ''}</p>
@@ -113,7 +113,7 @@ export default async function GradesPage() {
                               <span className={`text-xs font-medium px-2 py-1 rounded ${
                                 item.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' :
                                 item.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-800' :
-                                'bg-gray-100 text-gray-600'
+                                'bg-white text-gray-600'
                               }`}>{item.status}</span>
                             </td>
                           </tr>
@@ -139,7 +139,7 @@ export default async function GradesPage() {
               Contact support for questions about grades, assessments, or student progress.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/program-holder/support" className="bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50">
+              <Link href="/program-holder/support" className="bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-white">
                 Contact Support
               </Link>
               <Link href="/program-holder/dashboard" className="bg-brand-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white">

@@ -85,7 +85,7 @@ export default function EcosystemPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {howItConnects.map((item, i) => (
-              <div key={i} className="bg-gray-50 rounded-xl p-6 text-center border">
+              <div key={i} className="bg-white rounded-xl p-6 text-center border">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
@@ -97,7 +97,7 @@ export default function EcosystemPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Join Our Network</h2>
           <p className="text-gray-600 mb-8">Whether you are a training provider, employer, or community organization, there is a place for you in our ecosystem.</p>
@@ -114,7 +114,7 @@ export default function EcosystemPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

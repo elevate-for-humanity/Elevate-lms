@@ -50,7 +50,7 @@ export default function WorkKeysPage() {
       </div>
 
       {/* What is WorkKeys */}
-      <section className="py-14 bg-slate-50 border-b border-slate-100">
+      <section className="py-14 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="relative h-64 rounded-2xl overflow-hidden">
@@ -94,7 +94,7 @@ export default function WorkKeysPage() {
       </section>
 
       {/* Four levels */}
-      <section className="py-14 bg-slate-50 border-b border-slate-100">
+      <section className="py-14 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Credential Levels</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">NCRC Levels</h2>

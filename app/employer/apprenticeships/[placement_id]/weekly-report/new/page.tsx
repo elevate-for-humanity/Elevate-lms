@@ -23,7 +23,7 @@ export default async function NewWeeklyReportPage({
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -69,7 +69,7 @@ export default async function NewWeeklyReportPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-2xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <h1 className="text-3xl font-bold text-black mb-2">
@@ -163,7 +163,7 @@ export default async function NewWeeklyReportPage({
             <div className="pt-4 flex gap-4">
               <a
                 href="/employer/dashboard"
-                className="flex-1 px-6 py-3 border border-slate-300 text-black font-semibold rounded-lg hover:bg-slate-50 transition text-center"
+                className="flex-1 px-6 py-3 border border-slate-300 text-black font-semibold rounded-lg hover:bg-white transition text-center"
               >
                 Cancel
               </a>

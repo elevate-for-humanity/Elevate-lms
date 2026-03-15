@@ -66,7 +66,7 @@ export default function CreateProgramPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Partner Benefits</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -90,7 +90,7 @@ export default function CreateProgramPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to List Your Program?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Contact our partnerships team to get started.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/partners/join" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Partner Application</Link>
+            <Link href="/partners/join" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Partner Application</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>
           </div>
         </div>

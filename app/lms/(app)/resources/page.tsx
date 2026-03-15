@@ -197,7 +197,7 @@ export default async function ResourcesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Resources" }]} />
         </div>
@@ -217,7 +217,7 @@ export default async function ResourcesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Resources" }]} />
         </div>
@@ -319,7 +319,7 @@ export default async function ResourcesPage() {
             {downloadableResources.map((resource) => (
               <div
                 key={resource.title}
-                className="flex items-center justify-between p-4 hover:bg-gray-50"
+                className="flex items-center justify-between p-4 hover:bg-white"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
@@ -332,7 +332,7 @@ export default async function ResourcesPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-xs text-gray-500">{resource.fileType}</span>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                     <Download className="w-4 h-4" />
                     <span className="text-sm font-medium">Download</span>
                   </button>
@@ -360,7 +360,7 @@ export default async function ResourcesPage() {
                   Contact Support
                 </Link>
                 <Link
-                  href="/lms/help"
+                  href="/support"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-500 text-white rounded-lg font-semibold hover:bg-brand-blue-400 transition-colors"
                 >
                   <BookOpen className="w-5 h-5" />

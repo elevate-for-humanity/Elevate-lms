@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function OrientationPage() {
   return (
-    <div className="min-h-screen bg-gray-50">      <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-white">      <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Orientation' }]} />
       </div>
 
@@ -53,7 +53,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* Schedule Your Orientation */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 text-center">
             Schedule Your Orientation
@@ -85,7 +85,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">What You&apos;ll Learn in Orientation</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -123,28 +123,28 @@ export default async function OrientationPage() {
             What Students Say
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <p className="text-slate-700 mb-4 italic">
                 &quot;I thought I&apos;d be the oldest person there. I wasn&apos;t. I thought I&apos;d be behind.
                 I wasn&apos;t. Everyone starts somewhere. The instructors actually care.&quot;
               </p>
               <p className="text-sm font-semibold text-slate-900">— Marcus, CNA Graduate</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <p className="text-slate-700 mb-4 italic">
                 &quot;I had a record. I thought no one would hire me. But they helped me with my resume,
                 practiced interviews with me, and connected me with employers who gave me a chance.&quot;
               </p>
               <p className="text-sm font-semibold text-slate-900">— James, HVAC Technician</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <p className="text-slate-700 mb-4 italic">
                 &quot;I was working two part-time jobs with no benefits. Now I have a career. I have insurance.
                 I can actually plan for the future.&quot;
               </p>
               <p className="text-sm font-semibold text-slate-900">— Sarah, Medical Assistant</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <p className="text-slate-700 mb-4 italic">
                 &quot;The best part? No student loans. I graduated and started working the next week.
                 No debt hanging over me.&quot;

@@ -171,7 +171,7 @@ const PROGRAMS = [
 export default function OutcomesPage() {
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Pathways', href: '/pathways' }, { label: 'Outcomes & What You Can Expect' }]} />
         </div>
@@ -239,7 +239,7 @@ export default function OutcomesPage() {
                   <h3 className="font-bold text-gray-900 mb-3">Who hires you and what they pay</h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {p.whoHires.map((h) => (
-                      <div key={h.employer} className="bg-slate-50 rounded-lg p-3 border border-gray-100">
+                      <div key={h.employer} className="bg-white rounded-lg p-3 border border-gray-100">
                         <div className="font-semibold text-gray-900 text-sm">{h.employer}</div>
                         <div className="text-brand-blue-600 font-bold text-sm">{h.pay}</div>
                       </div>
@@ -267,7 +267,7 @@ export default function OutcomesPage() {
                   <Link href="/start" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition">
                     Apply Now
                   </Link>
-                  <Link href="/funding" className="bg-white hover:bg-gray-50 text-brand-blue-700 border-2 border-brand-blue-200 px-5 py-2.5 rounded-lg font-bold text-sm transition">
+                  <Link href="/funding" className="bg-white hover:bg-white text-brand-blue-700 border-2 border-brand-blue-200 px-5 py-2.5 rounded-lg font-bold text-sm transition">
                     Check Funding Eligibility
                   </Link>
                 </div>

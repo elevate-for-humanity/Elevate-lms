@@ -282,7 +282,7 @@ export default async function StudentDashboardOrchestrated() {
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                   Awaiting Approval
                 </div>
-                <div className="flex items-center gap-1.5 bg-slate-100 text-slate-500 px-3 py-1 rounded-full">
+                <div className="flex items-center gap-1.5 bg-white text-slate-500 px-3 py-1 rounded-full">
                   <span className="w-2 h-2 rounded-full bg-slate-300" />
                   Course Access Locked
                 </div>
@@ -336,7 +336,7 @@ export default async function StudentDashboardOrchestrated() {
                         {isActive ? 'Active' : pe.status === 'completed' ? 'Completed' : 'Pending'}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2 mb-1">
+                    <div className="w-full bg-white rounded-full h-2 mb-1">
                       <div
                         className={`h-2 rounded-full transition-all ${progPercent === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`}
                         style={{ width: `${progPercent}%` }}
@@ -406,7 +406,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="Orientation"
                     description="Get started with your training journey"
-                    href="/lms/orientation"
+                    href="/learner/orientation"
                     image={LMS_SECTION_CARDS.orientation}
                     badge={
                       !profile.orientation_completed ? 'Required' : undefined
@@ -457,7 +457,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="My Courses"
                     description={activeEnrollment?.status === 'pending_approval' ? 'Awaiting admin approval to begin' : `Continue learning (${courseProgress}% complete)`}
-                    href="/lms/courses"
+                    href="/learner/courses"
                     image={LMS_SECTION_CARDS.courses}
                     badge={courseProgress < 100 ? 'In Progress' : 'Complete'}
                   />
@@ -467,7 +467,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="Track Progress"
                     description="View your learning analytics"
-                    href="/lms/progress"
+                    href="/learner/progress"
                     image={LMS_SECTION_CARDS.progress}
                   />
                 )}
@@ -476,7 +476,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="My Certificates"
                     description="View and download your credentials"
-                    href="/lms/certificates"
+                    href="/learner/certificates"
                     image={LMS_SECTION_CARDS.certificates}
                   />
                 )}
@@ -495,7 +495,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="Job Placement"
                     description="Connect with employers"
-                    href="/lms/placement"
+                    href="/learner/placement"
                     image={LMS_SECTION_CARDS.placement}
                   />
                 )}
@@ -513,7 +513,7 @@ export default async function StudentDashboardOrchestrated() {
                   <SectionCard
                     title="Alumni Network"
                     description="Connect with graduates"
-                    href="/lms/alumni"
+                    href="/learner/alumni"
                     image={LMS_SECTION_CARDS.alumni}
                   />
                 )}

@@ -21,7 +21,7 @@ export default async function RefundPolicyPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -192,7 +192,7 @@ export default async function RefundPolicyPage() {
             <p className="text-black mb-4">
               For refund requests or questions about this policy:
             </p>
-            <div className="bg-slate-50 p-4 sm:p-6 rounded-lg mb-8">
+            <div className="bg-white p-4 sm:p-6 rounded-lg mb-8">
               <p className="text-black mb-2">
                 <strong>Elevate For Humanity</strong>
               </p>

@@ -21,7 +21,7 @@ export default async function PaymentCancelPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -39,7 +39,7 @@ export default async function PaymentCancelPage() {
       </div>
 <div className="container mx-auto px-4 max-w-2xl text-center">
         <div className="bg-white rounded-2xl shadow-xl p-12">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
             <XCircle className="w-12 h-12 text-black" />
           </div>
 

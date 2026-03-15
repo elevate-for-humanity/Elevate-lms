@@ -37,7 +37,7 @@ const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   deadline: { label: 'Deadline', color: 'bg-brand-red-100 text-brand-red-700' },
   review: { label: 'Review', color: 'bg-brand-orange-100 text-brand-orange-700' },
   notification: { label: 'Notification', color: 'bg-brand-green-100 text-brand-green-700' },
-  other: { label: 'Other', color: 'bg-gray-100 text-gray-700' },
+  other: { label: 'Other', color: 'bg-white text-gray-700' },
 };
 
 export default async function FerpaCalendarPage() {
@@ -46,7 +46,7 @@ export default async function FerpaCalendarPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -132,7 +132,7 @@ export default async function FerpaCalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -192,7 +192,7 @@ export default async function FerpaCalendarPage() {
                   {(events as CalendarEvent[]).map((event) => {
                     const typeConfig = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
                     return (
-                      <div key={event.id} className="px-6 py-4 hover:bg-gray-50">
+                      <div key={event.id} className="px-6 py-4 hover:bg-white">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-4">
                             <div className="w-12 text-center">

@@ -150,7 +150,7 @@ export default function BarberPartnerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
@@ -159,7 +159,7 @@ export default function BarberPartnerPage() {
   // Show onboarding required screen if not completed
   if (onboardingStatus && !onboardingStatus.completed) {
     return (
-      <div className="min-h-screen bg-slate-100">
+      <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-16">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -181,7 +181,7 @@ export default function BarberPartnerPage() {
               </Link>
               <Link
                 href="/partner-portal"
-                className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
+                className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-white text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Back to Dashboard
@@ -203,14 +203,14 @@ export default function BarberPartnerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-11.jpg" alt="Barber program" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Programs', href: '/partner/programs' }, { label: 'Barber' }]} />
         </div>
@@ -320,7 +320,7 @@ export default function BarberPartnerPage() {
               </div>
             ) : (
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-white border-b border-slate-200">
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Apprentice</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase">Week Ending</th>
@@ -332,7 +332,7 @@ export default function BarberPartnerPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {progressEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50">
+                    <tr key={entry.id} className="hover:bg-white">
                       <td className="px-6 py-4 text-sm text-slate-900">{entry.apprentice_name || 'Unknown'}</td>
                       <td className="px-6 py-4 text-sm text-slate-600">{new Date(entry.week_ending).toLocaleDateString()}</td>
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">{entry.hours_worked}</td>
@@ -341,7 +341,7 @@ export default function BarberPartnerPage() {
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           entry.status === 'verified' ? 'bg-brand-green-100 text-brand-green-700' :
                           entry.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                          'bg-slate-100 text-slate-600'
+                          'bg-white text-slate-600'
                         }`}>
                           {entry.status}
                         </span>
@@ -418,7 +418,7 @@ export default function BarberPartnerPage() {
                 <button
                   type="button"
                   onClick={() => setShowEntryForm(false)}
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50"
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-white"
                 >
                   Cancel
                 </button>

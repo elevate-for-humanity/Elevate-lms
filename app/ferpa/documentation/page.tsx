@@ -49,7 +49,7 @@ export default async function FerpaDocumentationPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -116,7 +116,7 @@ export default async function FerpaDocumentationPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -161,9 +161,9 @@ export default async function FerpaDocumentationPage() {
                 </div>
                 <div className="divide-y divide-gray-200">
                   {docs.map((doc) => (
-                    <div key={doc.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                    <div key={doc.id} className="px-6 py-4 flex items-center justify-between hover:bg-white">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                           <FileText className="w-5 h-5 text-gray-500" />
                         </div>
                         <div>
@@ -212,7 +212,7 @@ export default async function FerpaDocumentationPage() {
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 block"
+                className="px-6 py-4 flex items-center justify-between hover:bg-white block"
               >
                 <div>
                   <h3 className="font-medium text-gray-900">{resource.title}</h3>

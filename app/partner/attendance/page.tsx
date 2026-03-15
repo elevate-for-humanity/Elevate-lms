@@ -90,7 +90,7 @@ export default async function PartnerAttendancePage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-2.jpg" alt="Partner attendance" fill sizes="100vw" className="object-cover" priority />
       </section>
-      <div className="bg-slate-50 border-b -mx-4 -mt-6 px-4 py-3 mb-6">
+      <div className="bg-white border-b -mx-4 -mt-6 px-4 py-3 mb-6">
         <Breadcrumbs items={[{ label: 'Partner', href: '/partner-portal' }, { label: 'Attendance' }]} />
       </div>
 
@@ -161,7 +161,7 @@ export default async function PartnerAttendancePage() {
         </div>
         {sessions.length > 0 ? (
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Session</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
@@ -172,7 +172,7 @@ export default async function PartnerAttendancePage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {sessions.map((s: any) => (
-                <tr key={s.id} className="hover:bg-gray-50">
+                <tr key={s.id} className="hover:bg-white">
                   <td className="px-6 py-4 font-medium text-gray-900 capitalize">{s.title || 'Session'}</td>
                   <td className="px-6 py-4 text-gray-600 text-sm">
                     {s.date ? new Date(s.date).toLocaleDateString() : '—'}
@@ -184,7 +184,7 @@ export default async function PartnerAttendancePage() {
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       s.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                       s.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                      'bg-gray-100 text-gray-700'
+                      'bg-white text-gray-700'
                     }`}>
                       {s.status || 'recorded'}
                     </span>

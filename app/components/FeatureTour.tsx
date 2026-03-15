@@ -80,7 +80,7 @@ export default function FeatureTour() {
                 handleComplete();
               }
             }}
-            className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:bg-white transition"
           >
             {currentStep < features.length - 1 ? 'Next' : 'Done'}
           </button>

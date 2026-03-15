@@ -44,11 +44,11 @@ export default async function InstructorMessagesPage() {
   const messageList = messages || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Link href="/lms/messages" className="p-2 hover:bg-gray-100 rounded-lg">
+            <Link href="/learner/messages" className="p-2 hover:bg-white rounded-lg">
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <div>
@@ -67,7 +67,7 @@ export default async function InstructorMessagesPage() {
               const otherPerson = isFromMe ? msg.recipient : msg.sender;
               
               return (
-                <div key={msg.id} className="p-4 hover:bg-gray-50">
+                <div key={msg.id} className="p-4 hover:bg-white">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-brand-blue-600" />

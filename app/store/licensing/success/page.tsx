@@ -89,7 +89,7 @@ function SuccessContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -101,9 +101,9 @@ function SuccessContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Success Header */}
-      <section className="bg-slate-100 text-slate-900 py-16">
+      <section className="bg-white text-slate-900 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -120,19 +120,19 @@ function SuccessContent() {
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 -mt-8 relative z-10">
           <h2 className="text-2xl font-bold mb-6">Your Platform Details</h2>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-slate-50 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
               <div className="text-slate-600 text-sm mb-1">Organization</div>
               <div className="font-bold text-slate-900">
                 {tenantData?.organizationName || 'Your Organization'}
               </div>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
               <div className="text-slate-600 text-sm mb-1">Platform URL</div>
               <div className="font-bold text-brand-blue-600">
                 {tenantData?.subdomain || 'yourorg'}.elevateforhumanity.org
               </div>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
               <div className="text-slate-600 text-sm mb-1">Status</div>
               <div className="font-bold text-brand-green-600 flex items-center gap-2">
                 <span className="w-2 h-2 bg-brand-green-500 rounded-full"></span>
@@ -167,7 +167,7 @@ function SuccessContent() {
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    isComplete ? 'bg-brand-green-600 text-white' : 'bg-slate-100 text-slate-600'
+                    isComplete ? 'bg-brand-green-600 text-white' : 'bg-white text-slate-600'
                   }`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -255,7 +255,7 @@ function SuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />
     </div>
   );

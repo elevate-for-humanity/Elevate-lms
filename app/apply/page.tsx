@@ -181,7 +181,7 @@ export default async function ApplyPage({
         </div>
 
         {/* Support Bundle */}
-        <div className="bg-slate-50 rounded-2xl p-6 sm:p-10 border border-slate-100">
+        <div className="bg-white rounded-2xl p-6 sm:p-10 border border-slate-100">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 text-center">
             Every Applicant Gets a Support Bundle
           </h2>

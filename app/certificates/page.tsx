@@ -41,7 +41,7 @@ export default function CertificatesPage() {
       </section>
 
       {/* Verify Certificate */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center">
             <Shield className="h-16 w-16 text-brand-blue-600 mx-auto mb-6" />
@@ -201,7 +201,7 @@ export default function CertificatesPage() {
       </section>
 
       {/* Government Partners */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black text-black mb-6">

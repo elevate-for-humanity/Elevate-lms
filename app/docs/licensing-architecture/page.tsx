@@ -24,7 +24,7 @@ export default function LicensingArchitecturePage() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Payment & Provisioning Flow
           </h2>
-          <div className="bg-gray-50 rounded-lg p-6 font-mono text-sm">
+          <div className="bg-white rounded-lg p-6 font-mono text-sm">
             <pre className="whitespace-pre-wrap">
 {`1. Customer → /store/checkout
    ↓
@@ -82,7 +82,7 @@ export default function LicensingArchitecturePage() {
           </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action on Failure</th>
@@ -119,7 +119,7 @@ export default function LicensingArchitecturePage() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Audit Trail
           </h2>
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <h3 className="font-semibold mb-3">Tracked Events (provisioning_events)</h3>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-center gap-2">

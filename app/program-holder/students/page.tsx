@@ -58,7 +58,7 @@ export default async function ProgramHolderStudentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[
         { label: 'Program Holder', href: '/program-holder/dashboard' },
         { label: 'Students' },
@@ -78,7 +78,7 @@ export default async function ProgramHolderStudentsPage() {
         {students.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Program</th>
@@ -90,7 +90,7 @@ export default async function ProgramHolderStudentsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {students.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                  <tr key={student.id} className="hover:bg-white">
                     <td className="px-6 py-4">
                       <div>
                         <p className="font-medium text-gray-900">{student.name}</p>
@@ -111,7 +111,7 @@ export default async function ProgramHolderStudentsPage() {
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
                         student.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                         student.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                        'bg-gray-100 text-gray-700'
+                        'bg-white text-gray-700'
                       }`}>
                         {student.status}
                       </span>

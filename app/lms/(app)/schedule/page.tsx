@@ -21,7 +21,7 @@ export default async function SchedulePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Schedule" }]} />
         </div>
@@ -57,7 +57,7 @@ export default async function SchedulePage() {
     .eq('status', 'active');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Schedule" }]} />
         </div>
@@ -66,7 +66,7 @@ export default async function SchedulePage() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Schedule</h1>
             <Link
-              href="/lms/calendar"
+              href="/learner/calendar"
               className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
               View Calendar
@@ -81,7 +81,7 @@ export default async function SchedulePage() {
                 {enrollments.slice(0, 3).map((enrollment: any) => (
                   <div
                     key={enrollment.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg"
                   >
                     <div>
                       <p className="font-medium">
@@ -101,7 +101,7 @@ export default async function SchedulePage() {
             ) : (
               <p className="text-gray-600">
                 No scheduled activities for today.{' '}
-                <Link href="/lms/courses" className="text-brand-blue-600">
+                <Link href="/learner/courses" className="text-brand-blue-600">
                   Browse courses
                 </Link>
               </p>
@@ -120,7 +120,7 @@ export default async function SchedulePage() {
                   </p>
                 </div>
                 <Link
-                  href="/lms/assignments"
+                  href="/learner/assignments"
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                 >
                   View →
@@ -136,7 +136,7 @@ export default async function SchedulePage() {
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                 <div key={day} className="text-center">
                   <p className="text-sm font-medium text-gray-600 mb-2">{day}</p>
-                  <div className="h-20 bg-gray-50 rounded-lg flex items-center justify-center">
+                  <div className="h-20 bg-white rounded-lg flex items-center justify-center">
                     <span className="text-xs text-gray-400">-</span>
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export default async function SchedulePage() {
             </div>
             <p className="text-sm text-gray-600 mt-4 text-center">
               Your scheduled activities will appear here.{' '}
-              <Link href="/lms/calendar" className="text-brand-blue-600">
+              <Link href="/learner/calendar" className="text-brand-blue-600">
                 Open full calendar
               </Link>
             </p>

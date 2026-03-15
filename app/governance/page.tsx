@@ -47,7 +47,7 @@ export default function GovernancePage() {
         {/* Organizational Role Classification */}
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Organizational Role Classification</h2>
-          <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
             <table className="w-full text-left">
               <tbody className="divide-y divide-slate-200">
                 <tr>
@@ -135,10 +135,10 @@ export default function GovernancePage() {
           <Link href="/approvals" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
             Approvals &amp; Verification
           </Link>
-          <Link href="/apprenticeship-sponsor" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+          <Link href="/apprenticeship-sponsor" className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
             Apprenticeship Sponsor
           </Link>
-          <Link href="/programs" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+          <Link href="/programs" className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
             Browse Programs
           </Link>
         </section>

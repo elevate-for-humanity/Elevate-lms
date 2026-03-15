@@ -68,7 +68,7 @@ export default function WebDevelopmentPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Web Development</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Full-Stack Development Bootcamp</p>
@@ -77,7 +77,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Programs', href: '/programs' },
@@ -143,7 +143,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Curriculum */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-black mb-4">What You Will Learn</h2>
@@ -191,7 +191,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Career Outcomes */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-black mb-4">Career Opportunities</h2>

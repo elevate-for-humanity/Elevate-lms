@@ -84,7 +84,7 @@ const governancePrinciples = [
 export default function PlatformPage() {
   return (
     <div className="bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform' }]} />
         </div>
@@ -93,7 +93,7 @@ export default function PlatformPage() {
       {/* ─── HERO ─── */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] min-h-[320px] overflow-hidden">
         <ProgramHeroBanner videoSrc="/videos/lms-learning.mp4" />
-        <div className="absolute inset-0 z-10 flex items-center bg-slate-900/60">
+        <div className="absolute inset-0 z-10 flex items-center">
           <div className="max-w-6xl mx-auto px-6 w-full">
             <p className="text-xs uppercase tracking-widest text-brand-red-400 font-bold mb-3">Workforce Infrastructure</p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 max-w-3xl leading-tight">
@@ -189,7 +189,7 @@ export default function PlatformPage() {
       </section>
 
       {/* ─── PROVIDER GOVERNANCE ─── */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Provider Governance</p>
@@ -234,7 +234,7 @@ export default function PlatformPage() {
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
             {pipelineSteps.map((s, i) => (
               <div key={s.step} className="relative">
-                <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 h-full">
+                <div className="bg-white rounded-xl border border-slate-200 p-5 h-full">
                   <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mb-3">
                     {s.step}
                   </div>
@@ -253,7 +253,7 @@ export default function PlatformPage() {
       </section>
 
       {/* ─── WHO IT SERVES ─── */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Who It Serves</p>

@@ -108,7 +108,7 @@ export default function ShopCheckInPage() {
           <>
             {/* QR Code Display */}
             <div className="bg-white rounded-2xl p-6 text-center">
-              <div className="w-64 h-64 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center">
+              <div className="w-64 h-64 mx-auto mb-4 bg-white rounded-xl flex items-center justify-center">
                 {/* QR Code SVG - In production, use a QR library */}
                 <div className="relative">
                   <QrCode className="w-48 h-48 text-slate-800" />

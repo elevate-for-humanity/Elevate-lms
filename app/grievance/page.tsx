@@ -77,7 +77,7 @@ export default function GrievancePage() {
       </section>
 
       {/* Grounds for Grievance */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Grounds for Filing</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -120,7 +120,7 @@ export default function GrievancePage() {
       </section>
 
       {/* External Agencies */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">External Agencies</h2>
           <p className="text-gray-600 mb-4 text-sm">
@@ -137,7 +137,7 @@ export default function GrievancePage() {
       {/* EEO Notice */}
       <section className="py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-gray-100 border border-gray-200 rounded-xl p-6 text-sm text-gray-600">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-600">
             <p className="font-semibold text-gray-900 mb-2">Equal Opportunity Notice</p>
             <p>
               Elevate for Humanity is an equal opportunity employer/program. Auxiliary aids and services are available upon request to individuals with disabilities. TTY/TDD relay services are available by calling 711.

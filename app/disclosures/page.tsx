@@ -32,7 +32,7 @@ export default function DisclosuresPage() {
   return (
     <div className="min-h-screen bg-white prose-institutional">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Disclosures' }]} />
         </div>
@@ -50,31 +50,31 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-8 bg-gray-900">
+      <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-brand-orange-400">DOL</div>
-              <div className="text-gray-300 text-sm">Registered Sponsor</div>
+              <div className="text-slate-600 text-sm">Registered Sponsor</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-brand-orange-400">WIOA</div>
-              <div className="text-gray-300 text-sm">Approved Provider</div>
+              <div className="text-slate-600 text-sm">Approved Provider</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-brand-orange-400">ETPL</div>
-              <div className="text-gray-300 text-sm">Listed Training</div>
+              <div className="text-slate-600 text-sm">Listed Training</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-brand-orange-400">100%</div>
-              <div className="text-gray-300 text-sm">Compliant</div>
+              <div className="text-slate-600 text-sm">Compliant</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Institution Info Card */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -86,7 +86,7 @@ export default function DisclosuresPage() {
                   className="object-cover"
                 />
                 <div className="absolute bottom-4 left-4">
-                  <h3 className="text-2xl font-bold text-white">About Our Institution</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">About Our Institution</h3>
                 </div>
               </div>
               <div className="p-6">
@@ -116,7 +116,7 @@ export default function DisclosuresPage() {
                   className="object-cover"
                 />
                 <div className="absolute bottom-4 left-4">
-                  <h3 className="text-2xl font-bold text-white">Approvals & Registrations</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">Approvals & Registrations</h3>
                 </div>
               </div>
               <div className="p-6">
@@ -129,7 +129,7 @@ export default function DisclosuresPage() {
                     'Indiana DWD Partner'
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-gray-700">{item}</span>
                     </div>
                   ))}
@@ -310,7 +310,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Important Notices */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Important Notices</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -349,12 +349,12 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Complaint Process CTA */}
-      <section className="py-16 bg-gray-800">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-4">Have a Concern?</h2>
-              <p className="text-gray-300 text-lg mb-6">
+              <p className="text-slate-600 text-lg mb-6">
                 We take all complaints seriously. If you have a concern about our programs, 
                 policies, or services, we want to hear from you.
               </p>
@@ -364,8 +364,8 @@ export default function DisclosuresPage() {
                     <Mail className="w-5 h-5 text-brand-orange-400" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Email</p>
-                    <a href="/contact" className="text-white hover:text-brand-orange-400">
+                    <p className="text-slate-500 text-sm">Email</p>
+                    <a href="/contact" className="text-slate-900 hover:text-brand-orange-400">
                       our contact form
                     </a>
                   </div>
@@ -375,8 +375,8 @@ export default function DisclosuresPage() {
                     <Phone className="w-5 h-5 text-brand-orange-400" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Phone</p>
-                    <a href="/support" className="text-white hover:text-brand-orange-400">
+                    <p className="text-slate-500 text-sm">Phone</p>
+                    <a href="/support" className="text-slate-900 hover:text-brand-orange-400">
                       (317) 314-3757
                     </a>
                   </div>
@@ -385,17 +385,17 @@ export default function DisclosuresPage() {
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
               <h3 className="text-xl font-bold mb-4">File a Grievance</h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-slate-600 mb-6">
                 Our formal grievance process ensures your concerns are addressed promptly and fairly.
               </p>
               <Link
                 href="/grievance"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors w-full justify-center"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-slate-900 font-semibold rounded-lg transition-colors w-full justify-center"
               >
                 View Grievance Procedure
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <p className="text-gray-400 text-sm mt-4 text-center">
+              <p className="text-slate-500 text-sm mt-4 text-center">
                 Response within 10 business days
               </p>
             </div>
@@ -404,7 +404,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Footer Notice */}
-      <section className="py-8 bg-gray-100">
+      <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="font-semibold text-gray-900">
             This institution is an equal opportunity provider and employer.

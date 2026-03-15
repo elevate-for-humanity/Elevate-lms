@@ -144,7 +144,7 @@ export default function DiscussionsClient({
     });
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       <section className="mx-auto max-w-4xl px-4 py-10">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-black">

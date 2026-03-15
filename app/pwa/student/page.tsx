@@ -90,7 +90,7 @@ function statusColor(status: string) {
     converted: 'bg-brand-green-100 text-brand-green-700',
     scheduled: 'bg-brand-blue-100 text-brand-blue-700',
   };
-  return map[status] || 'bg-slate-100 text-slate-600';
+  return map[status] || 'bg-white text-slate-600';
 }
 
 function formatSlug(slug: string | null) {
@@ -109,7 +109,7 @@ const APPT_LABELS: Record<string, string> = {
 
 function SignedOutView() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="relative h-56 sm:h-64 overflow-hidden">
         <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
@@ -161,7 +161,7 @@ export default async function StudentPWAPage() {
   const hasCourses = activeCourses.length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-44 sm:h-52 overflow-hidden">
         <Image src="/images/pages/demo-page-6.jpg" alt="Students in classroom" fill className="object-cover" priority />
@@ -191,7 +191,7 @@ export default async function StudentPWAPage() {
       {/* Primary CTA — context-aware */}
       <div className="px-4 mt-5">
         {hasCourses ? (
-          <Link href="/lms/dashboard" className="block w-full bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-blue-700 transition-colors">
+          <Link href="/learner/dashboard" className="block w-full bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-blue-700 transition-colors">
             Resume Learning →
           </Link>
         ) : hasProgram && !onboardingDone ? (
@@ -248,7 +248,7 @@ export default async function StudentPWAPage() {
               { done: profile?.orientation_completed, label: 'Complete orientation', href: '/lms/orientation' },
             ].map((step, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${step.done ? 'bg-brand-green-100 text-brand-green-700' : 'bg-slate-100 text-slate-400'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${step.done ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-slate-400'}`}>
                   {step.done ? '✓' : i + 1}
                 </div>
                 {step.href && !step.done ? (
@@ -320,7 +320,7 @@ export default async function StudentPWAPage() {
                     </div>
                     <span className="text-slate-400 text-sm flex-shrink-0">→</span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div className="w-full bg-white rounded-full h-2">
                     <div className="bg-brand-blue-600 h-2 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
                   </div>
                   <div className="text-xs text-slate-500 mt-1">{progress}% complete</div>

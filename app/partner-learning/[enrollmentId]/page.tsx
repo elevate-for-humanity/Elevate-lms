@@ -70,7 +70,7 @@ export default async function PartnerLearningPage({ params }: Props) {
       case 'pending':
         return { icon: AlertCircle, Circle, color: 'text-amber-600 bg-amber-50', label: 'Pending Setup' };
       default:
-        return { icon: Clock, color: 'text-gray-600 bg-gray-50', label: status || 'Unknown' };
+        return { icon: Clock, color: 'text-gray-600 bg-white', label: status || 'Unknown' };
     }
   };
 
@@ -78,7 +78,7 @@ export default async function PartnerLearningPage({ params }: Props) {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 py-6">

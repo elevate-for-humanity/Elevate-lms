@@ -22,7 +22,7 @@ export default async function CompliancePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -48,7 +48,7 @@ export default async function CompliancePage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Compliance" }]} />
       </div>
-<section className="bg-slate-100 text-slate-900 py-20">
+<section className="bg-white text-slate-900 py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-5xl font-black mb-6">
@@ -60,7 +60,7 @@ export default async function CompliancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Compliance Standards</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -219,7 +219,7 @@ export default async function CompliancePage() {
               { title: 'PCI DSS', description: 'Payment card data security', status: 'Compliant' },
               { title: 'HIPAA Ready', description: 'Healthcare data protection', status: 'Available' },
             ].map((item, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-lg p-6">
+              <div key={idx} className="bg-white rounded-lg p-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold">{item.title}</h3>
                   <span className={`px-3 py-2 rounded-full text-xs font-bold ${
@@ -237,9 +237,9 @@ export default async function CompliancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-slate-100 rounded-2xl p-12 text-center">
+          <div className="bg-white rounded-2xl p-12 text-center">
             <Download className="w-16 h-16 text-brand-blue-600 mx-auto mb-6" />
             <h2 className="text-3xl font-bold mb-4">Download Complete Documentation</h2>
             <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
@@ -252,7 +252,7 @@ export default async function CompliancePage() {
               </button>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 transition border-2 border-brand-blue-600"
+                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition border-2 border-brand-blue-600"
               >
                 Request Compliance Audit
               </Link>

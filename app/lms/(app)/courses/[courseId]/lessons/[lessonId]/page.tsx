@@ -263,7 +263,7 @@ export default function LessonPage() {
 
   if (enrollmentBlocked) {
     return (
-      <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
+      <div className="flex items-center justify-center h-[100dvh] bg-white">
         <div className="text-center max-w-md">
           <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ClipboardList className="w-8 h-8 text-amber-600" />
@@ -276,7 +276,7 @@ export default function LessonPage() {
             Course access is locked until an admin approves your enrollment.
           </p>
           <Link
-            href="/lms/dashboard"
+            href="/learner/dashboard"
             className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700"
           >
             Back to Dashboard
@@ -289,7 +289,7 @@ export default function LessonPage() {
   if (!lesson) {
     if (loadTimeout) {
       return (
-        <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
+        <div className="flex items-center justify-center h-[100dvh] bg-white">
           <div className="text-center max-w-md">
             <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-6 h-6 text-brand-red-600" />
@@ -310,17 +310,17 @@ export default function LessonPage() {
     }
 
     return (
-      <div className="flex h-[100dvh] bg-slate-50">
+      <div className="flex h-[100dvh] bg-white">
         {/* Skeleton sidebar */}
         <aside className="hidden md:block w-80 bg-white border-r p-4">
           <div className="h-5 bg-slate-200 rounded w-3/4 mb-4 animate-pulse" />
-          <div className="h-2 bg-slate-100 rounded-full mb-6 animate-pulse" />
+          <div className="h-2 bg-white rounded-full mb-6 animate-pulse" />
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center gap-3 p-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
               <div className="flex-1">
                 <div className="h-4 bg-slate-200 rounded w-3/4 mb-1 animate-pulse" />
-                <div className="h-3 bg-slate-100 rounded w-1/2 animate-pulse" />
+                <div className="h-3 bg-white rounded w-1/2 animate-pulse" />
               </div>
             </div>
           ))}
@@ -337,7 +337,7 @@ export default function LessonPage() {
   }
 
   return (
-    <div className="flex h-[100dvh] bg-slate-50">
+    <div className="flex h-[100dvh] bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Lms", href: "/lms" }, { label: "[Lessonid]" }]} />
       </div>
@@ -411,7 +411,7 @@ export default function LessonPage() {
                   className="flex items-center gap-3 p-3 rounded-lg mb-2 opacity-40 cursor-not-allowed"
                   title="Complete the previous lesson first"
                 >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-slate-100 text-slate-400">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white text-slate-400">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -429,7 +429,7 @@ export default function LessonPage() {
                 className={`flex items-center gap-3 p-3 rounded-lg mb-2 transition ${
                   isCurrent
                     ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
-                    : 'hover:bg-slate-50'
+                    : 'hover:bg-white'
                 }`}
               >
                 <div
@@ -438,7 +438,7 @@ export default function LessonPage() {
                       ? 'bg-brand-green-100 text-brand-green-600'
                       : isCurrent
                         ? 'bg-brand-blue-100 text-brand-blue-600'
-                        : 'bg-slate-100 text-black'
+                        : 'bg-white text-black'
                   }`}
                 >
                   {lessonDone ? (
@@ -573,7 +573,7 @@ export default function LessonPage() {
           </div>
         ) : (
           /* Reading / text / video-without-file lesson — show rich content */
-          <div className="bg-slate-50 py-8">
+          <div className="bg-white py-8">
             <div className="max-w-4xl mx-auto px-4">
               <div className="bg-white rounded-xl p-8 shadow-sm">
                 {lesson.content ? (
@@ -670,7 +670,7 @@ export default function LessonPage() {
                 {lesson.resources.map((resource: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
@@ -742,8 +742,8 @@ export default function LessonPage() {
               aria-label="Previous Lesson"
               className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
                 hasPrevious
-                  ? 'bg-slate-100 hover:bg-slate-200 text-black'
-                  : 'bg-slate-50 text-slate-400 cursor-not-allowed'
+                  ? 'bg-white hover:bg-slate-200 text-black'
+                  : 'bg-white text-slate-400 cursor-not-allowed'
               }`}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -756,7 +756,7 @@ export default function LessonPage() {
               className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
                 hasNext
                   ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
-                  : 'bg-slate-50 text-slate-400 cursor-not-allowed'
+                  : 'bg-white text-slate-400 cursor-not-allowed'
               }`}
             >
               <span className="hidden sm:inline">Next Lesson</span>

@@ -46,7 +46,7 @@ export default async function CertificateViewPage({ params }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
         </div>
@@ -142,7 +142,7 @@ export default async function CertificateViewPage({ params }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="bg-slate-50 px-8 py-6">
+          <div className="bg-white px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="text-sm text-slate-600">
                 <p>Certificate ID: {certificate.id.slice(0, 8).toUpperCase()}</p>

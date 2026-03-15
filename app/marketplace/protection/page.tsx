@@ -70,7 +70,7 @@ export default function BuyerProtectionPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace", href: "/marketplace" }, { label: "Protection" }]} />
       </div>
@@ -155,7 +155,7 @@ export default function BuyerProtectionPage() {
           <div className="divide-y divide-gray-200">
             {faqs.map((faq, index) => (
               <details key={index} className="group">
-                <summary className="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-gray-50">
+                <summary className="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-white">
                   <span className="font-medium text-gray-900">{faq.question}</span>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-open:rotate-90 transition-transform" />
                 </summary>

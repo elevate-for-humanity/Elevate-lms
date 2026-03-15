@@ -16,6 +16,9 @@ export const dynamic = 'force-dynamic';
  * FOR QA/DEMO PURPOSES ONLY.
  */
 async function _POST() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 

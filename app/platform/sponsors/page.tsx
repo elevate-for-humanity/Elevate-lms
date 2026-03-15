@@ -32,7 +32,7 @@ export default async function SponsorLicensingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -73,7 +73,7 @@ export default async function SponsorLicensingPage() {
       />
 
       {/* Pricing Tiers */}
-      <section id="pricing" className="py-20 bg-slate-50">
+      <section id="pricing" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -244,7 +244,7 @@ export default async function SponsorLicensingPage() {
 
               <Link
                 href="/store/licensing"
-                className="block w-full bg-white text-indigo-600 hover:bg-slate-100 text-center px-6 py-4 rounded-xl font-bold transition"
+                className="block w-full bg-white text-indigo-600 hover:bg-white text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Get Started
               </Link>
@@ -378,7 +378,7 @@ export default async function SponsorLicensingPage() {
             ].map((addon, i) => (
               <div
                 key={i}
-                className="bg-slate-50 rounded-2xl p-6 border border-slate-200"
+                className="bg-white rounded-2xl p-6 border border-slate-200"
               >
                 <h3 className="font-bold text-black mb-2">{addon.title}</h3>
                 <div className="text-2xl font-bold text-brand-blue-600 mb-2">
@@ -501,7 +501,7 @@ export default async function SponsorLicensingPage() {
                   'One-click exports, monitoring bundles, immutable audit logs',
               },
             ].map((feature, i) => (
-              <div key={i} className="bg-slate-50 rounded-2xl p-6">
+              <div key={i} className="bg-white rounded-2xl p-6">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
@@ -516,7 +516,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-slate-100 border-t border-slate-200">
+      <section className="py-8 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-sm text-slate-600">
             Credentials and instructional partners may be provided by the licensee. 
@@ -537,7 +537,7 @@ export default async function SponsorLicensingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/store/licensing"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-slate-100 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-white px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
             >
               Get Started <ArrowRight className="w-5 h-5" />
             </Link>

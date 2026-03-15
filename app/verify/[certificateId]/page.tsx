@@ -113,7 +113,7 @@ export default async function VerifyCertificatePage({
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
@@ -289,7 +289,7 @@ export default async function VerifyCertificatePage({
             </div>
 
             {/* Verification Notice */}
-            <div className="bg-gray-100 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <p className="text-sm text-gray-600">
                 This certificate was verified on{' '}
                 <strong>

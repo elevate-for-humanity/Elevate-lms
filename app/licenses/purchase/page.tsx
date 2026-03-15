@@ -78,7 +78,7 @@ export default function PurchaseLicensePage() {
   const total = selectedLicenseData ? selectedLicenseData.price * quantity : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <Breadcrumbs
         items={[
           { label: 'Licenses', href: '/licenses' },

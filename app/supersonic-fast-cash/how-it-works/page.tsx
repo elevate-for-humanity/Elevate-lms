@@ -96,7 +96,7 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'SupersonicFastCash', href: '/supersonic-fast-cash' },
@@ -183,7 +183,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12">
             Why Choose SupersonicFastCash?

@@ -76,7 +76,7 @@ export default async function LearningPathsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Learning Paths" }]} />
         </div>
@@ -100,7 +100,7 @@ export default async function LearningPathsPage() {
     await getCachedUserData(user.id, supabase);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Learning Paths" }]} />
         </div>
@@ -193,12 +193,12 @@ export default async function LearningPathsPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/support"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
               >
                 Apply Now
               </Link>
               <Link
-                href="/lms/dashboard"
+                href="/learner/dashboard"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 Browse Programs

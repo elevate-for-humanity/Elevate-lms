@@ -97,7 +97,7 @@ export default function StateProgramsPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Explore Your Funding Options</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team will help match you with the right state funding program.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Attend Orientation</Link>
+            <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Attend Orientation</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>
           </div>
         </div>

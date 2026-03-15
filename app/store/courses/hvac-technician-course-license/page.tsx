@@ -102,7 +102,7 @@ export default function HvacCourseLicensePage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-12 bg-slate-50 border-b border-slate-200">
+      <section className="py-12 bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -134,7 +134,7 @@ export default function HvacCourseLicensePage() {
                 <span className="text-3xl font-black text-slate-900">Custom</span>
               </div>
               <p className="text-slate-600 text-sm mb-4">Statewide deployment, custom branding, SCORM/xAPI integration, and white-label options.</p>
-              <Link href="/contact?topic=hvac-course-license&tier=enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-2.5 rounded-lg hover:bg-slate-50 transition text-sm">
+              <Link href="/contact?topic=hvac-course-license&tier=enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-2.5 rounded-lg hover:bg-white transition text-sm">
                 Contact Us
               </Link>
             </div>
@@ -156,7 +156,7 @@ export default function HvacCourseLicensePage() {
               { icon: Users, title: 'Assessment Bank', desc: '400+ questions across all modules. Randomized quizzes, module exams, and a final certification readiness assessment.' },
               { icon: Clock, title: 'SCORM / xAPI Export', desc: 'Deploy in your existing LMS. Full SCORM 1.2 and xAPI (Tin Can) packages included with every license.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <div key={item.title} className="bg-white rounded-xl p-5 border border-slate-200">
                 <item.icon className="w-5 h-5 text-brand-red-600 mb-3" />
                 <h3 className="font-bold text-slate-900 mb-1.5 text-sm">{item.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
@@ -167,7 +167,7 @@ export default function HvacCourseLicensePage() {
       </section>
 
       {/* Module list */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Course curriculum</h2>
           <p className="text-slate-600 mb-8">16 modules · 94 lessons · 640 hours</p>

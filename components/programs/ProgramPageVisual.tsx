@@ -164,10 +164,10 @@ export function ProgramPageVisual({ program }: Props) {
       ))}
 
       {/* CAREER OUTCOMES - Visual cards */}
-      <section className="py-16 lg:py-24 bg-slate-900">
+      <section className="py-16 lg:py-24 bg-white border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Career Opportunities
             </h2>
             <p className="text-slate-400 text-lg">
@@ -184,7 +184,7 @@ export function ProgramPageVisual({ program }: Props) {
                 <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center mb-4">
                   <Briefcase className="w-6 h-6 text-brand-blue-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{career.title}</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{career.title}</h3>
                 <p className="text-brand-green-400 font-semibold">{career.salary}</p>
               </div>
             ))}

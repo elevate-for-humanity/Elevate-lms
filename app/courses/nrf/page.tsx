@@ -28,7 +28,7 @@ export default async function NrfPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -126,7 +126,7 @@ export default async function NrfPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },
@@ -189,7 +189,7 @@ export default async function NrfPage() {
       </section>
 
       {/* Courses Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Available Credentials
@@ -254,7 +254,7 @@ export default async function NrfPage() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Link
               href="/training/certifications"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">
                 Workforce Readiness
@@ -269,7 +269,7 @@ export default async function NrfPage() {
 
             <Link
               href="/training/certifications"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">
                 Business Startup & Marketing
@@ -304,7 +304,7 @@ export default async function NrfPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-white text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

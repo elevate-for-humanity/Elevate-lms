@@ -127,7 +127,7 @@ export default async function StaffOnboardingPage() {
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Onboarding' }, { label: 'Staff' }]} />
@@ -201,9 +201,9 @@ function StepRow({ step }: { step: any }) {
   const Icon = step.icon;
   return (
     <Link href={step.href}
-      className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition group">
+      className="flex items-center gap-4 px-5 py-4 hover:bg-white transition group">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-        step.done ? 'bg-brand-green-100' : 'bg-slate-100 group-hover:bg-brand-blue-100'
+        step.done ? 'bg-brand-green-100' : 'bg-white group-hover:bg-brand-blue-100'
       }`}>
         {step.done
           ? <CheckCircle className="w-5 h-5 text-brand-green-600" />

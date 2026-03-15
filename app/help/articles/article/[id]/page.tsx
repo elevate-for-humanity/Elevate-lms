@@ -51,7 +51,7 @@ export default async function HelpArticlePage({ params }: { params: Promise<{ id
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Help', href: '/help' },
@@ -73,10 +73,10 @@ export default async function HelpArticlePage({ params }: { params: Promise<{ id
           <div className="mt-8 pt-8 border-t">
             <p className="text-gray-700 mb-4">Was this article helpful?</p>
             <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-white">
                 <ThumbsUp className="w-5 h-5" /> Yes
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-white">
                 <ThumbsDown className="w-5 h-5" /> No
               </button>
               <div className="flex-1"></div>
@@ -89,7 +89,7 @@ export default async function HelpArticlePage({ params }: { params: Promise<{ id
           <h2 className="text-xl font-bold text-gray-900 mb-4">Related Articles</h2>
           <div className="bg-white rounded-xl shadow-sm divide-y">
             {relatedArticles.map((related) => (
-              <Link key={related.id} href={`/help/articles/article/${related.id}`} className="block p-4 hover:bg-gray-50">
+              <Link key={related.id} href={`/help/articles/article/${related.id}`} className="block p-4 hover:bg-white">
                 <span className="text-brand-blue-600 hover:underline">{related.title}</span>
               </Link>
             ))}

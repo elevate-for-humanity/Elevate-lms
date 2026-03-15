@@ -32,7 +32,7 @@ export default async function GradesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Grades" }]} />
         </div>
@@ -242,7 +242,7 @@ export default async function GradesPage() {
   const hasGrades = stats.totalAssignments > 0 || stats.totalQuizzes > 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Grades" }]} />
         </div>
@@ -359,7 +359,7 @@ export default async function GradesPage() {
                           return (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                              className="flex items-center justify-between p-3 bg-white rounded-lg"
                             >
                               <div className="flex items-center gap-3">
                                 <FileText className="w-5 h-5 text-slate-400" />
@@ -391,7 +391,7 @@ export default async function GradesPage() {
                         {course.quizzes.map((quiz, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                            className="flex items-center justify-between p-3 bg-white rounded-lg"
                           >
                             <div className="flex items-center gap-3">
                               <Circle className="w-5 h-5 text-slate-400" />
@@ -454,15 +454,15 @@ export default async function GradesPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/lms/assignments"
+                href="/learner/assignments"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 <FileText className="w-5 h-5" />
                 View Assignments
               </Link>
               <Link
-                href="/lms/quizzes"
-                className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition"
+                href="/learner/quizzes"
+                className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-white transition"
               >
                 <Circle className="w-5 h-5" />
                 Take Quizzes

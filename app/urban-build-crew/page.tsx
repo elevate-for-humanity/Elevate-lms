@@ -51,7 +51,7 @@ export default function UrbanBuildCrewPage() {
       <section className="py-16 bg-brand-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Build Your Future?</h2>
-          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-white text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply Now <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

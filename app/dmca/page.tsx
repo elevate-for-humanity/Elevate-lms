@@ -21,7 +21,7 @@ export default async function DMCAPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -111,7 +111,7 @@ export default async function DMCAPage() {
             <p className="text-black mb-4">
               Send DMCA notices to our designated Copyright Agent:
             </p>
-            <div className="bg-slate-50 p-6 rounded-lg mb-8">
+            <div className="bg-white p-6 rounded-lg mb-8">
               <p className="text-black mb-2">
                 <strong>Copyright Agent</strong>
               </p>
@@ -205,7 +205,7 @@ export default async function DMCAPage() {
             <p className="text-black mb-4">
               If you have questions about this DMCA policy or copyright issues:
             </p>
-            <div className="bg-slate-50 p-6 rounded-lg mb-8">
+            <div className="bg-white p-6 rounded-lg mb-8">
               <p className="text-black mb-2">
                 Email:{' '}
                 <a

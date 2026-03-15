@@ -30,7 +30,7 @@ export default function FundingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Workforce Funding' }]} />
         </div>
@@ -208,7 +208,7 @@ export default function FundingPage() {
       </section>
 
       {/* Self-Pay Options */}
-      <section className="py-8 sm:py-14 bg-slate-50">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Self-Pay Options</h2>
           <p className="text-slate-800 text-sm text-center mb-6 sm:mb-8">If you don&apos;t qualify for state or federal funding, we offer flexible payment options.</p>

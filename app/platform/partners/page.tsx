@@ -114,7 +114,7 @@ export default function PartnersPage() {
 
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 md:grid-cols-2">
-          <div className="relative h-[340px] w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+          <div className="relative h-[340px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
             <Image
               src="/images/pages/platform-page-4.jpg"
               alt="Employer and workforce partners"
@@ -156,7 +156,7 @@ export default function PartnersPage() {
                   <li>Alignment with employer demand and credential standards</li>
                 </ul>
                 <div className="mt-5">
-                  <Link href="/contact?type=agency" className="rounded-md border border-gray-300 px-5 py-2.5 font-semibold hover:bg-gray-50">
+                  <Link href="/contact?type=agency" className="rounded-md border border-gray-300 px-5 py-2.5 font-semibold hover:bg-white">
                     Agency Intake
                   </Link>
                 </div>
@@ -167,7 +167,7 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      <section className="bg-gray-50">
+      <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <h2 className="text-2xl md:text-3xl font-bold text-center">What partners get</h2>
 
@@ -210,7 +210,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Credential & Certification Partners */}
-      <section className="bg-gray-50">
+      <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
@@ -336,7 +336,7 @@ export default function PartnersPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-slate-50">
+      <section className="bg-white">
         <div className="mx-auto max-w-4xl px-6 py-16">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Partner FAQ</h2>
           <p className="text-lg text-gray-600 text-center mb-12">
@@ -436,7 +436,7 @@ export default function PartnersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/contact?type=employer" 
-              className="rounded-md bg-white px-8 py-4 text-brand-blue-700 font-bold hover:bg-gray-100"
+              className="rounded-md bg-white px-8 py-4 text-brand-blue-700 font-bold hover:bg-white"
             >
               Employer Partnership
             </Link>

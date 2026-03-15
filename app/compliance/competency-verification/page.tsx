@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 function RubricCard({ competency, index }: { competency: Competency; index: number }) {
   return (
     <div className="bg-white rounded-lg border overflow-hidden print:break-inside-avoid">
-      <div className="bg-slate-50 px-4 py-2 border-b flex items-center justify-between print:bg-gray-100">
+      <div className="bg-white px-4 py-2 border-b flex items-center justify-between print:bg-white">
         <span className="font-semibold text-gray-900 text-sm">{index + 1}. {competency.name}</span>
         <span className="text-xs text-gray-500">RTI: {competency.rtiHours}h | OJT: {competency.ojtHours}h</span>
       </div>
@@ -105,7 +105,7 @@ export default function CompetencyVerificationPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -167,7 +167,7 @@ export default function CompetencyVerificationPage() {
             ].map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={i} className="flex gap-3 items-start bg-slate-50 rounded-lg p-4 print:bg-white print:border">
+                <div key={i} className="flex gap-3 items-start bg-white rounded-lg p-4 print:bg-white print:border">
                   <Icon className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5 print:text-gray-700" />
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{item.role} — <span className="text-brand-blue-700 print:text-gray-700">{item.authority}</span></p>
@@ -187,7 +187,7 @@ export default function CompetencyVerificationPage() {
               { checkpoint: 'Final Competency Review', desc: 'All rubric competencies verified. Certification readiness determination.', evaluator: 'Credential Partner + Program Holder' },
               { checkpoint: 'Completion Documentation', desc: 'Credential issuance confirmed, placement support initiated, file closed.', evaluator: 'Elevate (Sponsor)' },
             ].map((item, i) => (
-              <div key={i} className="bg-slate-50 rounded-lg p-4 print:bg-white print:border">
+              <div key={i} className="bg-white rounded-lg p-4 print:bg-white print:border">
                 <p className="font-semibold text-gray-900 text-sm">{item.checkpoint}</p>
                 <p className="text-gray-600 text-xs mt-1">{item.desc}</p>
                 <p className="text-gray-500 text-xs mt-1">Evaluator: {item.evaluator}</p>
@@ -215,7 +215,7 @@ export default function CompetencyVerificationPage() {
       </section>
 
       {/* Program Rubrics */}
-      <section className="py-10 bg-slate-50 print:bg-white">
+      <section className="py-10 bg-white print:bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program Competency Rubrics</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -245,7 +245,7 @@ export default function CompetencyVerificationPage() {
             All program rubrics follow this standardized format. New programs must use the same
             structure before being added to the institutional catalog.
           </p>
-          <div className="bg-slate-50 rounded-lg p-5 border print:bg-white print:border-gray-300">
+          <div className="bg-white rounded-lg p-5 border print:bg-white print:border-gray-300">
             <div className="grid sm:grid-cols-2 gap-3 text-xs text-gray-700">
               {[
                 'Competency Name',
@@ -270,16 +270,16 @@ export default function CompetencyVerificationPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-10 bg-slate-50 print:hidden">
+      <section className="py-10 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
               Apprenticeship & RTI Structure
             </Link>
-            <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Credential Partner Registry
             </Link>
-            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructional Framework
             </Link>
             <PrintButton />

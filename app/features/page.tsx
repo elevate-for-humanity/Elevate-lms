@@ -45,13 +45,13 @@ const features = [
     icon: Shield,
     title: 'Secure Document Portal',
     desc: 'Upload IDs, transcripts, and certifications securely. Download completion certificates and credential verification letters.',
-    color: 'bg-slate-100 text-slate-600',
+    color: 'bg-white text-slate-600',
   },
 ];
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Features' }]} />
         </div>
@@ -84,7 +84,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Self-Service Highlight */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">

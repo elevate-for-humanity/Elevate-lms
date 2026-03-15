@@ -30,7 +30,7 @@ export default async function NotificationsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Notifications" }]} />
         </div>
@@ -86,7 +86,7 @@ export default async function NotificationsPage() {
       case 'message': return 'bg-brand-blue-100 text-brand-blue-600';
       case 'alert': return 'bg-brand-red-100 text-brand-red-600';
       case 'success': return 'bg-brand-green-100 text-brand-green-600';
-      default: return 'bg-slate-100 text-slate-600';
+      default: return 'bg-white text-slate-600';
     }
   };
 
@@ -118,7 +118,7 @@ export default async function NotificationsPage() {
   const olderNotifications = notifications.filter(n => new Date(n.created_at) < yesterday);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Notifications" }]} />
         </div>
@@ -132,12 +132,12 @@ export default async function NotificationsPage() {
           </div>
           <div className="mt-4 md:mt-0 flex gap-2">
             {unreadCount > 0 && (
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition">
                 <Check className="w-4 h-4" />
                 Mark All Read
               </button>
             )}
-            <Link href="/lms/settings/notifications" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+            <Link href="/lms/settings/notifications" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition">
               <Settings className="w-4 h-4" />
               Settings
             </Link>
@@ -158,7 +158,7 @@ export default async function NotificationsPage() {
                     return (
                       <div
                         key={notification.id}
-                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
+                        className={`p-4 hover:bg-white transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
                       >
                         <div className="flex items-start gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}>
@@ -204,7 +204,7 @@ export default async function NotificationsPage() {
                     return (
                       <div
                         key={notification.id}
-                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
+                        className={`p-4 hover:bg-white transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
                       >
                         <div className="flex items-start gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}>
@@ -242,7 +242,7 @@ export default async function NotificationsPage() {
                     return (
                       <div
                         key={notification.id}
-                        className="p-4 hover:bg-slate-50 transition"
+                        className="p-4 hover:bg-white transition"
                       >
                         <div className="flex items-start gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}>

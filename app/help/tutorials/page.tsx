@@ -233,7 +233,7 @@ export default async function TutorialsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -252,9 +252,9 @@ export default async function TutorialsPage() {
   const featuredTutorials = tutorials.filter((t) => t.featured);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Tutorials' }]} />
         </div>
@@ -330,7 +330,7 @@ export default async function TutorialsPage() {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 cat.id === 'all'
                   ? 'bg-brand-blue-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  : 'bg-white text-gray-600 hover:bg-white border border-gray-200'
               }`}
             >
               {cat.name} ({cat.count})

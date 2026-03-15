@@ -83,7 +83,7 @@ const colorClasses: Record<string, { bg: string; border: string; icon: string }>
 
 export default function EqualOpportunityPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-brand-blue-900 border-b border-brand-blue-800">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -273,7 +273,7 @@ export default function EqualOpportunityPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>

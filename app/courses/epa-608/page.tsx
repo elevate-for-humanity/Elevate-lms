@@ -35,7 +35,7 @@ export default function EPA608CoursePage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
@@ -72,7 +72,7 @@ export default function EPA608CoursePage() {
               { icon: Users, title: 'Retesting Available', desc: 'Exam fees and retesting policies vary by certifying organization.' },
               { icon: Clock, title: 'Certification Does Not Expire', desc: 'Once you pass, your EPA 608 certification is valid for life. No renewal required.' },
             ].map((item, i) => (
-              <div key={i} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-slate-50/50">
+              <div key={i} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-white/50">
                 <item.icon className="w-6 h-6 text-brand-blue-600 shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
@@ -85,7 +85,7 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* 15-Week Schedule */}
-      <section className="py-14 bg-slate-50">
+      <section className="py-14 bg-white">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">
             15-Week Course Schedule
@@ -126,7 +126,7 @@ export default function EPA608CoursePage() {
             About the EPA 608 Exam
           </h2>
           <div className="grid sm:grid-cols-2 gap-8">
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <div className="bg-white rounded-xl p-6 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-3">Exam Structure</h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> <strong>Core</strong> — 25 questions (must score 70%+)</li>
@@ -136,7 +136,7 @@ export default function EPA608CoursePage() {
               </ul>
               <p className="text-sm text-slate-600 mt-3">Pass all four sections to earn your <strong>Universal</strong> certification.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <div className="bg-white rounded-xl p-6 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-3">What You Should Know</h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exams proctored on-site through ESCO Institute and Mainstream Engineering</li>

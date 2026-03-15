@@ -135,14 +135,14 @@ export default function CompanySetupPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Company Setup" }]} />
 
       <div className="bg-white border-b">
@@ -291,7 +291,7 @@ export default function CompanySetupPage() {
 
           {/* Actions */}
           <div className="flex items-center justify-between">
-            <Link href="/employer-portal/company" className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            <Link href="/employer-portal/company" className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white transition">
               Cancel
             </Link>
             <button type="submit" disabled={saving}

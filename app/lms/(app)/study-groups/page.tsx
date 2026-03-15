@@ -68,7 +68,7 @@ export default async function StudyGroupsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Study Groups" }]} />
         </div>
@@ -157,7 +157,7 @@ export default async function StudyGroupsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Study Groups" }]} />
         </div>
@@ -282,7 +282,7 @@ export default async function StudyGroupsPage() {
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
                           <Users className="w-6 h-6 text-slate-600" />
                         </div>
                         <div>
@@ -322,7 +322,7 @@ export default async function StudyGroupsPage() {
                       disabled={isFull}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
                         isFull
-                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                          ? 'bg-white text-slate-400 cursor-not-allowed'
                           : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                       }`}
                     >
@@ -390,7 +390,7 @@ export default async function StudyGroupsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/learner/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

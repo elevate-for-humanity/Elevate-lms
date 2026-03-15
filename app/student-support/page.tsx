@@ -47,9 +47,9 @@ const services = [
 
 export default function StudentSupportPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Student Support' }]} />
         </div>
@@ -130,7 +130,7 @@ export default function StudentSupportPage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">Contact Support</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 text-center">
+            <div className="bg-white rounded-xl p-6 text-center">
               <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-gray-900 mb-1">Phone Support</h3>
               <a href="tel:+13173143757" className="text-brand-green-600 font-semibold hover:underline">(317) 314-3757</a>
@@ -142,7 +142,7 @@ export default function StudentSupportPage() {
                 Call Now
               </Link>
             </div>
-            <div className="bg-gray-50 rounded-xl p-6 text-center">
+            <div className="bg-white rounded-xl p-6 text-center">
               <MessageSquare className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-gray-900 mb-1">Live Chat</h3>
               <p className="text-gray-600">Available 24/7</p>
@@ -154,7 +154,7 @@ export default function StudentSupportPage() {
                 Start Chat
               </Link>
             </div>
-            <div className="bg-gray-50 rounded-xl p-6 text-center">
+            <div className="bg-white rounded-xl p-6 text-center">
               <Calendar className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-gray-900 mb-1">Schedule Meeting</h3>
               <p className="text-gray-600">Book a one-on-one</p>
@@ -184,7 +184,7 @@ export default function StudentSupportPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
             >
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>

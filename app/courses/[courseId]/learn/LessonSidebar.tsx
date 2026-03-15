@@ -51,7 +51,7 @@ export default function LessonSidebar({
             <h2 className="font-semibold text-black">Course Content</h2>
             <button
               onClick={onToggle}
-              className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition"
+              className="lg:hidden p-2 hover:bg-white rounded-lg transition"
             >
               <svg
                 className="w-5 h-5"
@@ -102,7 +102,7 @@ export default function LessonSidebar({
                     ${
                       isActive
                         ? 'bg-brand-orange-50 border-2 border-brand-orange-500'
-                        : 'hover:bg-slate-50 border-2 border-transparent'
+                        : 'hover:bg-white border-2 border-transparent'
                     }
                   `}
                 >
@@ -160,7 +160,7 @@ export default function LessonSidebar({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50">
+        <div className="p-4 border-t border-slate-200 bg-white">
           <div className="text-xs text-black text-center">
             {lessons.filter((l) => l.completed).length} of {lessons.length}{' '}
             lessons completed

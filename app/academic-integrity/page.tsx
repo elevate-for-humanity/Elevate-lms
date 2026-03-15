@@ -29,7 +29,7 @@ export default async function AcademicIntegrityPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -46,9 +46,9 @@ export default async function AcademicIntegrityPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Academic Integrity' }]} />
         </div>
@@ -292,7 +292,7 @@ export default async function AcademicIntegrityPage() {
             </div>
           </div>
 
-          <div className="mt-6 bg-slate-100 rounded-lg p-4">
+          <div className="mt-6 bg-white rounded-lg p-4">
             <p className="text-black text-sm">
               <strong>Note:</strong> Particularly egregious violations (such as
               falsifying clinical records, forging signatures, or systematic
@@ -360,7 +360,7 @@ export default async function AcademicIntegrityPage() {
           </p>
 
           <div className="space-y-4">
-            <div className="bg-slate-50 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
               <h3 className="font-semibold text-black mb-2">
                 When to Cite:
               </h3>
@@ -374,7 +374,7 @@ export default async function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-lg p-4">
+            <div className="bg-white rounded-lg p-4">
               <h3 className="font-semibold text-black mb-2">
                 Citation Formats:
               </h3>
@@ -495,7 +495,7 @@ export default async function AcademicIntegrityPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

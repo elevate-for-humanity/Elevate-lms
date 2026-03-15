@@ -40,7 +40,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Institutional Governance */}
-      <section className="py-12 bg-slate-50 border-b border-slate-200">
+      <section className="py-12 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 mb-3">Institutional Governance</h2>
@@ -82,7 +82,7 @@ export default function ApprovalsPage() {
 
           <div className="space-y-8">
             {/* INTraining */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -104,7 +104,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* ETPL */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -120,7 +120,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* WRG */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -136,7 +136,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* JRI */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -152,7 +152,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* ITAP */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -171,7 +171,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Federal Approvals */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Building2 className="w-12 h-12 text-brand-orange-600" />
@@ -237,7 +237,7 @@ export default function ApprovalsPage() {
 
           <div className="space-y-8">
             {/* Certiport */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-orange-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -280,7 +280,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* Milady RISE */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-orange-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -304,7 +304,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* CareerSafe */}
-            <div className="bg-slate-50 rounded-2xl p-8 border-l-4 border-brand-orange-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -323,7 +323,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Nonprofit & Diversity Certifications */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Users className="w-12 h-12 text-brand-blue-600" />
@@ -448,13 +448,13 @@ export default function ApprovalsPage() {
             </Link>
             <Link
               href="/programs"
-              className="px-8 py-4 bg-slate-100 text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
+              className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
             >
               View Programs
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-slate-100 text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
+              className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
             >
               Contact Us
             </Link>

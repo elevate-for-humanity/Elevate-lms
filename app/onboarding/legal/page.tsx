@@ -164,14 +164,14 @@ export default function LegalOnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -220,7 +220,7 @@ export default function LegalOnboardingPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    agreement.signed ? 'bg-brand-green-100' : 'bg-slate-100'
+                    agreement.signed ? 'bg-brand-green-100' : 'bg-white'
                   }`}>
                     {agreement.signed ? (
                       <Circle className="w-5 h-5 text-brand-green-600" />

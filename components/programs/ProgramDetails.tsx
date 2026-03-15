@@ -322,7 +322,7 @@ export function ProgramDetails({ program }: { program: Program }) {
       </section>
 
       {/* Second Hero Video - Centered Lower on Page */}
-      <section className="w-full bg-slate-900 py-16">
+      <section className="w-full bg-white py-16 border-t">
         <div className="mx-auto max-w-5xl px-4">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
             <video

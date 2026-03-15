@@ -150,7 +150,7 @@ export default async function ProgramTrainingPage({
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900">Program not found</h1>
           <Link href="/programs" className="text-brand-blue-600 hover:underline mt-4 inline-block">
@@ -236,7 +236,7 @@ export default async function ProgramTrainingPage({
   const progressPct = totalRequired > 0 ? Math.round((completedRequired / totalRequired) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-6">
@@ -259,7 +259,7 @@ export default async function ProgramTrainingPage({
                   </span>
                 )}
                 {program.category && (
-                  <span className="px-2 py-0.5 bg-slate-100 rounded-full text-xs font-medium text-slate-600">
+                  <span className="px-2 py-0.5 bg-white rounded-full text-xs font-medium text-slate-600">
                     {program.category}
                   </span>
                 )}
@@ -268,7 +268,7 @@ export default async function ProgramTrainingPage({
 
             {/* Progress ring */}
             {totalRequired > 0 && (
-              <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl px-5 py-3">
+              <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-3">
                 <div className="relative w-14 h-14">
                   <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
                     <circle cx="28" cy="28" r="22" fill="none" stroke="#e2e8f0" strokeWidth="5" />
@@ -341,7 +341,7 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
       item.enrolled ? 'border-brand-blue-200' : 'border-slate-200'
     }`}>
       {/* Cover image */}
-      <div className="relative h-44 w-full bg-slate-100">
+      <div className="relative h-44 w-full bg-white">
         <Image
           src={cover}
           alt={label}
@@ -383,7 +383,7 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
             </span>
           )}
           {c.category && (
-            <span className="px-2 py-0.5 bg-slate-100 rounded-full">{c.category}</span>
+            <span className="px-2 py-0.5 bg-white rounded-full">{c.category}</span>
           )}
         </div>
 
@@ -397,7 +397,7 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
               <ArrowRight className="w-4 h-4" />
             </Link>
           ) : (
-            <div className="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">
+            <div className="flex items-center justify-center gap-2 w-full py-2.5 bg-white text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">
               <Lock className="w-4 h-4" /> Not yet available
             </div>
           )}
@@ -417,7 +417,7 @@ function ExternalCard({ item, index }: { item: ExternalItem; index: number }) {
       item.completed ? 'border-green-200' : 'border-teal-200'
     }`}>
       {/* Cover image */}
-      <div className="relative h-44 w-full bg-slate-100">
+      <div className="relative h-44 w-full bg-white">
         <Image
           src={cover}
           alt={item.title}

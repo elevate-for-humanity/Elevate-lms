@@ -7,7 +7,7 @@ import { quiz } from '@/courses/hvac/module1/quiz1'
 const HVACLab = dynamic(() => import('@/components/HVACLab'), {
   ssr: false,
   loading: () => (
-    <div className="h-[500px] bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
+    <div className="h-[500px] bg-white rounded-xl flex items-center justify-center text-slate-500">
       Loading 3D equipment lab...
     </div>
   ),
@@ -66,7 +66,7 @@ export default function HVACModule1Page() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Module header */}
       <div className="bg-slate-900 text-white">
         <div className="max-w-4xl mx-auto px-4 py-10">
@@ -156,7 +156,7 @@ export default function HVACModule1Page() {
                 </summary>
                 <div className="px-5 pb-4">
                   <p className="text-sm text-slate-700 leading-relaxed">{comp.desc}</p>
-                  <div className="mt-3 rounded-lg bg-slate-50 border px-4 py-3">
+                  <div className="mt-3 rounded-lg bg-white border px-4 py-3">
                     <div className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
                       How technicians inspect it
                     </div>
@@ -251,7 +251,7 @@ export default function HVACModule1Page() {
                       {q.options.map((opt, optIdx) => {
                         const isSelected = selected === opt
                         const isAnswer = q.answer === opt
-                        let optClass = 'border-slate-200 bg-white hover:bg-slate-50'
+                        let optClass = 'border-slate-200 bg-white hover:bg-white'
                         if (isSelected && !showResult) optClass = 'border-brand-blue-500 bg-brand-blue-50'
                         if (showResult && isAnswer) optClass = 'border-green-500 bg-green-50'
                         if (showResult && isSelected && !isAnswer) optClass = 'border-red-400 bg-red-50'

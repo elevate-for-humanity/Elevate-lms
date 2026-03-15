@@ -121,13 +121,13 @@ export const NAV_ITEMS = [
   },
   {
     name: 'My Account',
-    href: '/signin',
+    href: '/login',
     subItems: [
-      { name: '— Students —', href: '/signin', isHeader: true },
-      { name: 'Sign In', href: '/signin' },
+      { name: '— Students —', href: '/login', isHeader: true },
+      { name: 'Sign In', href: '/login' },
       { name: 'My Dashboard', href: '/learner/dashboard' },
-      { name: 'My Courses', href: '/lms/dashboard' },
-      { name: '— Partners & Employers —', href: '/signin', isHeader: true },
+      { name: 'My Courses', href: '/learner/dashboard' },
+      { name: '— Partners & Employers —', href: '/login', isHeader: true },
       { name: 'Partner Login', href: '/partner/login' },
       { name: 'Employer Portal', href: '/apply/employer' },
       { name: '— New Here? —', href: '/apply', isHeader: true },

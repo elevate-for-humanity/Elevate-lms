@@ -283,10 +283,10 @@ export default function ApprenticeForm() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <LazyVideo src="/videos/barber-hero-final.mp4" poster="/images/pages/barber-hero-main.jpg"
+          <LazyVideo src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__3/video-7b329d1f-3f92-4ec5-acdf-9d2d7ff6de5f.mp4?Expires=2083752835src="/videos/barber-hero-final.mp4"Key-Pair-Id=K2ZDLYDZI2R1DFsrc="/videos/barber-hero-final.mp4"Signature=PwinNDJ~aDGbHoMI8-Hfr28QIj7s~0mwzn92P-muIHO0bW86~4gW6MzRyslLtk~TOzdfX8aTYA9OeGF-sbBPwCBUw8gTpXO6QvhwpJsFW5DiLHnEP6q6vCTvQ-jEpwV20izIuWVSpY-txGY7bDGHhkSq6-wP26b0J-lstFIMwxRHQjJ9rKmX9i4pzNruZJEQ2ILvO-LdWivm98j5TMLm09HgYzesifHFPPzUzNH7NlYwwvIO2-NtXWEuixrQFdJ2Zt4ocgdmqP9auvaeYr9hbS~F6k6CBybWLlnGoLggGkluqp1vFzt-eIslYgFKl8m4Du4UFJawNl3KmcyA9uTWtA__" poster="/images/pages/barber-hero-main.jpg"
             className="absolute inset-0 w-full h-full object-cover" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply for Enrollment</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
@@ -534,7 +534,7 @@ export default function ApprenticeForm() {
                     Do you have a barbershop for your training hours?
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white">
                       <input
                         type="radio"
                         name="hasHostShop"
@@ -545,7 +545,7 @@ export default function ApprenticeForm() {
                       />
                       <span className="text-black">Yes, I have a shop</span>
                     </label>
-                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white">
                       <input
                         type="radio"
                         name="hasHostShop"
@@ -779,7 +779,7 @@ export default function ApprenticeForm() {
                   )}
 
                   {/* Payment Methods Available */}
-                  <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                  <div className="bg-white rounded-xl p-4 mb-4">
                     <p className="text-sm text-black font-medium mb-3">Payment methods available at checkout:</p>
                     <div className="flex flex-wrap gap-2 justify-center mb-2">
                       <span className="px-3 py-1 bg-black text-white rounded-full text-xs font-bold">Card</span>

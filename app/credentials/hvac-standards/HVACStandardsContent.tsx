@@ -150,7 +150,7 @@ const OJT_COMPETENCIES = DOMAINS.reduce(
 
 export default function HVACStandardsContent() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-12">
@@ -221,7 +221,7 @@ export default function HVACStandardsContent() {
           <div className="bg-white rounded-lg border overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b">
+                <tr className="bg-white border-b">
                   <th className="text-left px-4 py-3 font-semibold text-gray-700">
                     Domain
                   </th>
@@ -255,7 +255,7 @@ export default function HVACStandardsContent() {
                 ))}
               </tbody>
               <tfoot>
-                <tr className="bg-gray-50 font-semibold">
+                <tr className="bg-white font-semibold">
                   <td className="px-4 py-3 text-gray-900">Total</td>
                   <td className="text-center px-4 py-3 text-gray-900">
                     {TOTAL_THEORY}
@@ -350,7 +350,7 @@ export default function HVACStandardsContent() {
                   <li>Remediation: additional practice + re-assessment</li>
                   <li>5 core performance checksheets required</li>
                 </ul>
-                <div className="mt-3 p-3 bg-gray-50 rounded text-xs">
+                <div className="mt-3 p-3 bg-white rounded text-xs">
                   <p className="font-medium text-gray-800 mb-1">Required Performance Checksheets:</p>
                   <ol className="list-decimal list-inside space-y-0.5">
                     <li>Brazing &amp; Soldering (Competency 5.6)</li>
@@ -378,7 +378,7 @@ export default function HVACStandardsContent() {
                   key={domain.code}
                   className="bg-white rounded-lg border overflow-hidden"
                 >
-                  <div className="px-6 py-4 border-b bg-gray-50 flex items-center gap-3">
+                  <div className="px-6 py-4 border-b bg-white flex items-center gap-3">
                     <Icon className="w-5 h-5 text-gray-600" />
                     <div>
                       <h3 className="font-bold text-gray-900">
@@ -396,7 +396,7 @@ export default function HVACStandardsContent() {
                         key={comp.code}
                         className="px-6 py-3 flex items-start gap-4 text-sm"
                       >
-                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 whitespace-nowrap mt-0.5">
+                        <span className="font-mono text-xs bg-white px-2 py-1 rounded text-gray-600 whitespace-nowrap mt-0.5">
                           {comp.code}
                         </span>
                         <div className="flex-1">
@@ -435,7 +435,7 @@ export default function HVACStandardsContent() {
                 { name: "Residential HVAC Certification Level 1", issuer: "Elevate for Humanity", type: "Program" },
                 { name: "Residential HVAC Certification Level 2", issuer: "Elevate for Humanity", type: "Program" },
               ].map((cred) => (
-                <div key={cred.name} className="flex items-start gap-3 p-3 bg-gray-50 rounded">
+                <div key={cred.name} className="flex items-start gap-3 p-3 bg-white rounded">
                   <CheckCircle2 className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium text-gray-900">{cred.name}</p>

@@ -45,9 +45,9 @@ export default async function StaffPortalAttendancePage() {
   const activeCohorts = cohorts || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Attendance' }]} />
         </div>
@@ -61,7 +61,7 @@ export default async function StaffPortalAttendancePage() {
           <Link href="/staff-portal/attendance/take" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             Take Attendance
           </Link>
-          <Link href="/staff-portal/attendance/export" className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+          <Link href="/staff-portal/attendance/export" className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-white">
             Export Report
           </Link>
         </div>
@@ -110,7 +110,7 @@ export default async function StaffPortalAttendancePage() {
                           record.status === 'present' ? 'bg-brand-green-100 text-brand-green-800' :
                           record.status === 'absent' ? 'bg-brand-red-100 text-brand-red-800' :
                           record.status === 'late' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-white text-gray-800'
                         }`}>
                           {record.status || 'N/A'}
                         </span>

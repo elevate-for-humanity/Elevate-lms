@@ -180,7 +180,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
     .filter(Boolean) as FAQ[];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 text-white pt-24 pb-16 lg:pt-32">
         <div className="max-w-7xl mx-auto px-4">
@@ -212,7 +212,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                    !selectedCategory ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
+                    !selectedCategory ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-white'
                   }`}
                 >
                   All Questions
@@ -222,7 +222,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.name)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      selectedCategory === cat.name ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
+                      selectedCategory === cat.name ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-white'
                     }`}
                   >
                     {cat.name}
@@ -362,7 +362,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                   helpfulVotes[faq.id] === 'yes'
                                     ? 'bg-brand-green-100 text-brand-green-700'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    : 'bg-white text-gray-600 hover:bg-gray-200'
                                 }`}
                               >
                                 <ThumbsUp className="w-4 h-4" />
@@ -373,7 +373,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                   helpfulVotes[faq.id] === 'no'
                                     ? 'bg-brand-red-100 text-brand-red-700'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    : 'bg-white text-gray-600 hover:bg-gray-200'
                                 }`}
                               >
                                 <ThumbsDown className="w-4 h-4" />
@@ -386,7 +386,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => printFaq(faq)}
-                              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg"
                               title="Print"
                             >
                               <Printer className="w-4 h-4" />
@@ -394,7 +394,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                             <div className="relative">
                               <button
                                 onClick={() => setShowShareMenu(showShareMenu === faq.id ? null : faq.id)}
-                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg"
                                 title="Share"
                               >
                                 <Share2 className="w-4 h-4" />

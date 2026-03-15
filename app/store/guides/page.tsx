@@ -78,7 +78,7 @@ export default function GuidesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Guides' }]} />
         </div>
@@ -106,7 +106,7 @@ export default function GuidesPage() {
             {categories.map((cat) => (
               <button 
                 key={cat.name}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-white text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200 transition-colors flex items-center gap-2"
               >
                 <cat.icon className="w-4 h-4" />
                 {cat.name}
@@ -210,7 +210,7 @@ export default function GuidesPage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="mb-6">
             <div className="flex justify-center gap-1 text-yellow-400 text-2xl mb-4">

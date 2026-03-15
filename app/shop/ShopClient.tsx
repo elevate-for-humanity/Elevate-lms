@@ -58,7 +58,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
               <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-brand-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-brand-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-white'}`}
               >
                 {cat}
               </button>

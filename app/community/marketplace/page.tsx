@@ -86,7 +86,7 @@ export default async function CommunityMarketplacePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -147,9 +147,9 @@ export default async function CommunityMarketplacePage() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white">
         {/* Breadcrumbs */}
-        <div className="bg-slate-50 border-b">
+        <div className="bg-white border-b">
           <div className="max-w-6xl mx-auto px-4 py-3">
             <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Marketplace' }]} />
           </div>
@@ -234,7 +234,7 @@ export default async function CommunityMarketplacePage() {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
-                <button className="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50">
+                <button className="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-white">
                   <Filter className="w-5 h-5" />
                   Filters
                 </button>
@@ -254,7 +254,7 @@ export default async function CommunityMarketplacePage() {
                   <Link
                     key={category.id}
                     href={`/community/marketplace/category/${category.id}`}
-                    className="group bg-slate-50 rounded-xl p-5 hover:bg-slate-100 transition"
+                    className="group bg-white rounded-xl p-5 hover:bg-white transition"
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${category.color}`}>
                       <IconComponent className="w-6 h-6" />
@@ -296,7 +296,7 @@ export default async function CommunityMarketplacePage() {
                     href={`/community/courses/${course.id}`}
                     className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all"
                   >
-                    <div className="aspect-video bg-slate-100 overflow-hidden relative">
+                    <div className="aspect-video bg-white overflow-hidden relative">
                       {course.thumbnail_url ? (
                         <Image
                           src={course.thumbnail_url}
@@ -394,7 +394,7 @@ export default async function CommunityMarketplacePage() {
                   <Link
                     key={product.id}
                     href={`/community/shop/products/${product.id}`}
-                    className="group bg-slate-50 rounded-2xl overflow-hidden hover:shadow-xl transition-all"
+                    className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all"
                   >
                     <div className="aspect-square bg-white overflow-hidden relative">
                       {product.images?.[0] ? (
@@ -441,7 +441,7 @@ export default async function CommunityMarketplacePage() {
                 ))}
               </div>
             ) : (
-              <div className="bg-slate-50 rounded-2xl p-16 text-center">
+              <div className="bg-white rounded-2xl p-16 text-center">
                 <ShoppingBag className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">No Products Yet</h3>
                 <p className="text-slate-600 mb-6">Start selling your products and tools to the community!</p>
@@ -480,7 +480,7 @@ export default async function CommunityMarketplacePage() {
               </Link>
               <Link
                 href="/shop/seller/register"
-                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-slate-100 transition"
+                className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-white transition"
               >
                 <ShoppingBag className="w-5 h-5" />
                 Open a Shop

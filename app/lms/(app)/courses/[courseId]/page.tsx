@@ -77,7 +77,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -155,7 +155,7 @@ export default async function CoursePage({ params }: { params: Params }) {
     .eq('course_id', courseId);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Course Header — video hero with separate audio narration */}
       <div className="relative overflow-hidden" style={{ minHeight: '380px' }}>
         <div className="absolute inset-0">
@@ -181,9 +181,9 @@ export default async function CoursePage({ params }: { params: Params }) {
           <div className="grid lg:grid-cols-3 gap-8 items-end">
             <div className="lg:col-span-2">
               <nav className="flex items-center gap-2 text-white/70 text-sm mb-5">
-                <Link href="/lms/dashboard" className="hover:text-white transition">Dashboard</Link>
+                <Link href="/learner/dashboard" className="hover:text-white transition">Dashboard</Link>
                 <ChevronRight className="w-4 h-4" />
-                <Link href="/lms/courses" className="hover:text-white transition">Courses</Link>
+                <Link href="/learner/courses" className="hover:text-white transition">Courses</Link>
                 <ChevronRight className="w-4 h-4" />
                 <span className="text-white font-medium">{course.course_name}</span>
               </nav>
@@ -237,7 +237,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                   />
                 </div>
               ) : (
-                <div className="h-40 bg-slate-100 rounded-xl flex items-center justify-center mb-4">
+                <div className="h-40 bg-white rounded-xl flex items-center justify-center mb-4">
                   <BookOpen className="w-12 h-12 text-slate-300" />
                 </div>
               )}
@@ -266,7 +266,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                       <span className="text-slate-600">Progress</span>
                       <span className="font-semibold">{progressPercentage}%</span>
                     </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-white rounded-full overflow-hidden">
                       <div
                         className="h-full bg-brand-blue-600 rounded-full transition-all"
                         style={{ width: `${progressPercentage}%` }}
@@ -319,7 +319,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             {/* Progress bar for enrolled students */}
             {enrollment && typedLessons.length > 0 && (
               <div className="mb-4">
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-white rounded-full overflow-hidden">
                   <div
                     className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
                     style={{ width: `${progressPercentage}%` }}
@@ -346,7 +346,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                     >
                       {isLocked ? (
                         <div className="flex items-center gap-4 p-4 cursor-not-allowed" title="Complete the previous lesson first">
-                          <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                             <Lock className="w-5 h-5 text-slate-400" />
                           </div>
                           <div className="flex-1">
@@ -359,7 +359,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                       ) : (
                         <Link
                           href={`/lms/courses/${courseId}/lessons/${lesson.id}`}
-                          className="flex items-center gap-4 p-4 hover:bg-slate-50 transition"
+                          className="flex items-center gap-4 p-4 hover:bg-white transition"
                         >
                           <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
                             <Image
@@ -425,7 +425,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                     <Link
                       key={quiz.id}
                       href={`/lms/quizzes/${quiz.id}`}
-                      className="flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0"
+                      className="flex items-center gap-4 p-4 hover:bg-white transition border-b border-slate-100 last:border-b-0"
                     >
                       <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
                         <FileText className="w-5 h-5 text-brand-blue-600" />

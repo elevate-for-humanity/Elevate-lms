@@ -92,9 +92,9 @@ export default async function ApprenticePortalPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apprentice Portal' }]} />
         </div>
@@ -167,7 +167,7 @@ export default async function ApprenticePortalPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Programs</h2>
             <div className="space-y-4">
               {enrollments.map((enrollment) => (
-                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                   <div>
                     <p className="font-medium text-gray-900">Program #{enrollment.course_id}</p>
                     <p className="text-sm text-gray-600">Status: {enrollment.status}</p>

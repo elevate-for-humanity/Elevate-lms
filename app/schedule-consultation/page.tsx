@@ -80,7 +80,7 @@ export default function ScheduleConsultationPage() {
 
   if (confirmed) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">&#x2714;</span>
@@ -112,7 +112,7 @@ export default function ScheduleConsultationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-[160px] sm:h-[200px] overflow-hidden">
         <Image src="/images/pages/schedule-consultation-page-1.jpg" alt="Schedule enrollment consultation" fill sizes="100vw" className="object-cover" priority />

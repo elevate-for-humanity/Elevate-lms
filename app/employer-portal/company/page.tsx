@@ -63,7 +63,7 @@ export default async function CompanyProfilePage() {
   // If no employer profile, show setup prompt
   if (!employer) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-sm p-8 text-center">
           <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Building className="w-8 h-8 text-brand-blue-600" />
@@ -108,7 +108,7 @@ export default async function CompanyProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Cover Image */}
       <div className="relative h-64 bg-brand-blue-600 overflow-hidden">
         {companyData.cover && (
@@ -135,7 +135,7 @@ export default async function CompanyProfilePage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               <div className="relative -mt-20 md:-mt-24">
-                <div className="w-[120px] h-[120px] rounded-xl border-4 border-white shadow-lg bg-gray-100 flex items-center justify-center">
+                <div className="w-[120px] h-[120px] rounded-xl border-4 border-white shadow-lg bg-white flex items-center justify-center">
                   <Building className="w-12 h-12 text-gray-400" />
                 </div>
                 <Link 
@@ -230,7 +230,7 @@ export default async function CompanyProfilePage() {
                 <h2 className="text-lg font-bold text-gray-900 mb-4">Benefits &amp; Perks</h2>
                 <div className="grid md:grid-cols-3 gap-4">
                   {companyData.benefits.map((benefit: string, index: number) => (
-                    <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700">{benefit}</span>
                     </div>
@@ -297,7 +297,7 @@ export default async function CompanyProfilePage() {
                 </Link>
                 <Link
                   href="/employer-portal/wotc"
-                  className="block w-full px-4 py-3 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition"
+                  className="block w-full px-4 py-3 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-white transition"
                 >
                   View WOTC Status
                 </Link>

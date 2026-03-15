@@ -68,9 +68,9 @@ export default function CommunityCoursesPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Marketplace', href: '/community/marketplace' }, { label: 'Courses' }]} />
         </div>
@@ -103,7 +103,7 @@ export default function CommunityCoursesPage() {
                   className={`px-4 py-2 rounded-lg whitespace-nowrap transition ${
                     index === 0
                       ? 'bg-brand-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {category}
@@ -177,7 +177,7 @@ export default function CommunityCoursesPage() {
 
         {/* Load More */}
         <div className="text-center mt-8">
-          <button className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
+          <button className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-medium hover:bg-white transition">
             Load More Courses
           </button>
         </div>
@@ -191,7 +191,7 @@ export default function CommunityCoursesPage() {
           </p>
           <Link
             href="/creator/dashboard"
-            className="bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block"
+            className="bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-white transition inline-block"
           >
             Become an Instructor
           </Link>

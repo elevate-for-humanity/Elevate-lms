@@ -179,7 +179,7 @@ export default function MultiSitePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-2xl p-6">
+              <div key={idx} className="bg-white rounded-2xl p-6">
                 <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
                   <benefit.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
@@ -192,7 +192,7 @@ export default function MultiSitePage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -259,7 +259,7 @@ export default function MultiSitePage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
@@ -292,7 +292,7 @@ export default function MultiSitePage() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {testimonials.map((testimonial, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-2xl p-8">
+              <div key={idx} className="bg-white rounded-2xl p-8">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />

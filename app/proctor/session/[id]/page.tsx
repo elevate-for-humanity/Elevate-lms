@@ -157,7 +157,7 @@ export default function SessionPage() {
           )}
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-3 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-3 py-2.5 border border-slate-200 rounded-lg hover:bg-white transition-colors"
           >
             <Printer className="w-4 h-4" />
           </button>
@@ -262,7 +262,7 @@ export default function SessionPage() {
               <button
                 onClick={markNoShow}
                 disabled={updating}
-                className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 px-4 py-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 px-4 py-3 border border-slate-200 rounded-lg hover:bg-white transition-colors"
               >
                 Mark No-Show
               </button>

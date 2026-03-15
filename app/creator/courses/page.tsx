@@ -44,7 +44,7 @@ export default function CreatorCoursesPage() {
     fetchCourses();
   }, []);
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Creator", href: "/creator" }, { label: "Courses" }]} />
       </div>
@@ -88,7 +88,7 @@ export default function CreatorCoursesPage() {
 
         <div className="bg-white rounded-xl border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Course</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Students</th>
@@ -100,7 +100,7 @@ export default function CreatorCoursesPage() {
             </thead>
             <tbody className="divide-y">
               {courses.map(course => (
-                <tr key={course.id} className="hover:bg-gray-50">
+                <tr key={course.id} className="hover:bg-white">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
@@ -130,7 +130,7 @@ export default function CreatorCoursesPage() {
                   </td>
                   <td className="px-4 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-600'
+                      course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-600'
                     }`}>
                       {course.status}
                     </span>
@@ -138,9 +138,9 @@ export default function CreatorCoursesPage() {
                   <td className="px-4 py-4 font-medium">${course.revenue.toLocaleString()}</td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <button className="p-1 hover:bg-gray-100 rounded"><Eye className="w-4 h-4 text-gray-500" /></button>
-                      <button className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
-                      <button className="p-1 hover:bg-gray-100 rounded"><Trash2 className="w-4 h-4 text-brand-red-500" /></button>
+                      <button className="p-1 hover:bg-white rounded"><Eye className="w-4 h-4 text-gray-500" /></button>
+                      <button className="p-1 hover:bg-white rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
+                      <button className="p-1 hover:bg-white rounded"><Trash2 className="w-4 h-4 text-brand-red-500" /></button>
                     </div>
                   </td>
                 </tr>

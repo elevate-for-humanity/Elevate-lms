@@ -22,7 +22,7 @@ export default async function ProgramHolderDocumentsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Documents" }]} />
         </div>
@@ -80,12 +80,12 @@ export default async function ProgramHolderDocumentsPage() {
     };
     return (
       styles[status as keyof typeof styles] ||
-      'bg-slate-100 text-black border-slate-300'
+      'bg-white text-black border-slate-300'
     );
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Documents" }]} />
         </div>
@@ -133,7 +133,7 @@ export default async function ProgramHolderDocumentsPage() {
                 return (
                   <div
                     key={req.id}
-                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       {uploaded ? (
@@ -177,7 +177,7 @@ export default async function ProgramHolderDocumentsPage() {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-white transition"
                 >
                   <div className="flex items-center gap-3">
                     {getStatusIcon(doc.status)}

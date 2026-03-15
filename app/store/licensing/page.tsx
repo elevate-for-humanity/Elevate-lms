@@ -60,7 +60,7 @@ export default function StoreLicensesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs + framing */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Store', href: '/store' },
@@ -154,7 +154,7 @@ export default function StoreLicensesPage() {
                     href={lic.ctaHref}
                     className={`block text-center px-6 py-3 rounded-lg font-bold transition-colors ${
                       lic.popular
-                        ? 'bg-white text-slate-900 hover:bg-slate-100'
+                        ? 'bg-white text-slate-900 hover:bg-white'
                         : 'bg-white text-slate-900 hover:bg-white'
                     }`}
                   >
@@ -189,7 +189,7 @@ export default function StoreLicensesPage() {
               { q: 'Can I use my own domain and branding?', a: 'Yes. All managed platform licenses include custom domain setup and full branding (logo, colors, email templates).' },
             ].map((faq) => (
               <details key={faq.q} className="group border border-slate-200 rounded-lg">
-                <summary className="flex items-center justify-between p-5 cursor-pointer font-semibold text-slate-900 hover:bg-slate-50">
+                <summary className="flex items-center justify-between p-5 cursor-pointer font-semibold text-slate-900 hover:bg-white">
                   {faq.q}
                   <svg className="w-5 h-5 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </summary>
@@ -201,7 +201,7 @@ export default function StoreLicensesPage() {
       </section>
 
       {/* Not sure? */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200">
+      <section className="py-12 bg-white border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Not sure which license fits?</h2>
           <p className="text-slate-800 mb-6">

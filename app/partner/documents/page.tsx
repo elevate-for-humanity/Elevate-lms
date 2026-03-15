@@ -109,14 +109,14 @@ export default function PartnerDocumentsPage() {
       rejected: 'bg-brand-red-100 text-brand-red-700',
       pending: 'bg-amber-100 text-amber-700',
       expired: 'bg-brand-red-100 text-brand-red-700',
-      missing: 'bg-slate-100 text-slate-600',
+      missing: 'bg-white text-slate-600',
     };
     return styles[status] || styles.missing;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
@@ -127,14 +127,14 @@ export default function PartnerDocumentsPage() {
   const progress = requiredDocs.length > 0 ? Math.round((completedDocs.length / requiredDocs.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-5.jpg" alt="Partner documents" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Documents' }]} />
         </div>

@@ -89,7 +89,7 @@ export default function CourseDiscussionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
@@ -181,7 +181,7 @@ export default function CourseDiscussionsPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-white text-lg shadow-2xl transition-all"
                   >
                     Apply Now
                   </Link>
@@ -201,7 +201,7 @@ export default function CourseDiscussionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },

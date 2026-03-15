@@ -4,7 +4,7 @@ import { FileText, Download, Printer, ArrowLeft } from 'lucide-react';
 
 export default function BrandingAddendumPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Contracts", href: "/contracts" }, { label: "Branding Addendum" }]} />
       </div>
@@ -22,7 +22,7 @@ export default function BrandingAddendumPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"><Printer className="w-4 h-4" /> Print</button>
+              <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-white"><Printer className="w-4 h-4" /> Print</button>
               <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"><Download className="w-4 h-4" /> Download PDF</button>
             </div>
           </div>

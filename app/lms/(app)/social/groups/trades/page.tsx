@@ -61,7 +61,7 @@ export default async function TradesGroupPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -83,7 +83,7 @@ export default async function TradesGroupPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -151,20 +151,20 @@ export default async function TradesGroupPage() {
                     <Users className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
-                <button className="flex-1 text-left px-4 py-3 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
+                <button className="flex-1 text-left px-4 py-3 bg-white rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
                   Share a project, ask for advice, or post a job tip...
                 </button>
               </div>
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white text-gray-600">
                   <FileText className="w-5 h-5 text-brand-orange-600" />
                   Article
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white text-gray-600">
                   <Zap className="w-5 h-5 text-yellow-600" />
                   Project
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white text-gray-600">
                   <MessageSquare className="w-5 h-5 text-brand-green-600" />
                   Question
                 </button>
@@ -183,7 +183,7 @@ export default async function TradesGroupPage() {
               </div>
               <div className="divide-y">
                 {recentDiscussions.map((post) => (
-                  <div key={post.id} className="p-4 hover:bg-gray-50">
+                  <div key={post.id} className="p-4 hover:bg-white">
                     <div className="flex gap-4">
                       <div className="w-10 h-10 bg-brand-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <Wrench className="w-5 h-5 text-brand-orange-500" />
@@ -255,7 +255,7 @@ export default async function TradesGroupPage() {
               <h3 className="font-semibold text-gray-900 mb-4">Group Resources</h3>
               <div className="space-y-3">
                 {groupResources.map((resource, i) => (
-                  <button key={i} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 text-left">
+                  <button key={i} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white text-left">
                     <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
                       <resource.icon className="w-5 h-5 text-brand-orange-600" />
                     </div>
@@ -278,7 +278,7 @@ export default async function TradesGroupPage() {
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="w-8 h-8 bg-gray-200 rounded-full border-2 border-white" />
                 ))}
-                <div className="w-8 h-8 bg-gray-100 rounded-full border-2 border-white flex items-center justify-center text-xs text-gray-600">
+                <div className="w-8 h-8 bg-white rounded-full border-2 border-white flex items-center justify-center text-xs text-gray-600">
                   +181
                 </div>
               </div>

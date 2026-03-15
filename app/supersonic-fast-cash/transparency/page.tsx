@@ -99,7 +99,7 @@ export default function TransparencyPage() {
               Some filers may be eligible to receive a portion of their expected tax refund 
               before the IRS issues the full refund.
             </p>
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
               <h3 className="font-medium text-gray-900 mb-3">Key points:</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• The advance is optional</li>
@@ -122,7 +122,7 @@ export default function TransparencyPage() {
             <p className="text-gray-700 mb-4">
               We use industry-standard safeguards to protect personal and tax information.
             </p>
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
               <h3 className="font-medium text-gray-900 mb-3">This includes:</h3>
               <ul className="space-y-2 text-gray-700">
                 <li>• Encrypted data transmission</li>
@@ -173,28 +173,28 @@ export default function TransparencyPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <Link 
                 href="/supersonic-fast-cash/legal/privacy"
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Privacy Policy</span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/legal/terms"
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Terms of Service</span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/support"
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">Support Center</span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
               </Link>
               <Link 
                 href="/supersonic-fast-cash/cash-advance"
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 hover:bg-white transition-colors"
               >
                 <span className="text-gray-700">About Refund Advances</span>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -206,7 +206,7 @@ export default function TransparencyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Ready to file?

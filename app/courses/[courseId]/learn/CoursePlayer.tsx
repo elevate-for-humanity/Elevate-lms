@@ -82,7 +82,7 @@ export default function CoursePlayer({
   }, [handleKeyDown]);
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
       <LessonSidebar
         lessons={lessons}
@@ -101,7 +101,7 @@ export default function CoursePlayer({
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition"
+                className="lg:hidden p-2 hover:bg-white rounded-lg transition"
               >
                 <svg
                   className="w-6 h-6"
@@ -134,8 +134,8 @@ export default function CoursePlayer({
                 />
               </div>
               <div className="hidden lg:flex items-center gap-1 text-xs text-slate-500">
-                <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-mono">←</kbd>
-                <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-mono">→</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-[10px] font-mono">←</kbd>
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-[10px] font-mono">→</kbd>
                 <span>to navigate</span>
               </div>
               <div className="text-sm text-black">

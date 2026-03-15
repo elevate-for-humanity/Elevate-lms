@@ -53,7 +53,7 @@ function CheckoutSuccessContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -68,7 +68,7 @@ function CheckoutSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20">
+    <div className="min-h-screen bg-white py-20">
       <div className="max-w-xl mx-auto px-4">
         {/* Success Header */}
         <div className="text-center mb-10">
@@ -183,7 +183,7 @@ function CheckoutSuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <Loader2 className="w-10 h-10 text-brand-green-500 animate-spin" />
     </div>
   );

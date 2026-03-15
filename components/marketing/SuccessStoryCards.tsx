@@ -82,7 +82,7 @@ export default function SuccessStoryCards() {
 
         <div className="text-center mt-12">
           <Link
-            href="/success-stories"
+            href="/testimonials"
             className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3 rounded-full font-bold hover:bg-brand-orange-700 transition"
           >
             Read More Success Stories

@@ -53,9 +53,9 @@ export default async function ApprenticeHoursPage() {
   const progressPercent = Math.min(Math.round((approvedHours / requiredHours) * 100), 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apprentice', href: '/apprentice' }, { label: 'Hours' }]} />
         </div>
@@ -142,7 +142,7 @@ export default async function ApprenticeHoursPage() {
         {/* Hours List */}
         {logs.length > 0 ? (
           <div className="bg-white rounded-xl border overflow-hidden">
-            <div className="px-6 py-4 border-b bg-gray-50">
+            <div className="px-6 py-4 border-b bg-white">
               <h2 className="font-semibold text-gray-900">Recent Entries</h2>
             </div>
             <div className="divide-y">
@@ -173,7 +173,7 @@ export default async function ApprenticeHoursPage() {
                 </div>
               ))}
             </div>
-            <div className="px-6 py-4 border-t bg-gray-50">
+            <div className="px-6 py-4 border-t bg-white">
               <Link href="/apprentice/hours/history" className="text-brand-blue-600 hover:underline text-sm">
                 View all entries →
               </Link>

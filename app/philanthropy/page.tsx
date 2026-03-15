@@ -19,7 +19,7 @@ const impactAreas = [
 
 export default function PhilanthropyPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Support Us' }]} />
         </div>
@@ -45,7 +45,7 @@ export default function PhilanthropyPage() {
       </section>
 
       {/* Impact Areas */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">Where Your Support Goes</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -74,7 +74,7 @@ export default function PhilanthropyPage() {
               { title: 'Employer Partnership', desc: 'Hire our graduates, host apprentices, or sponsor a training cohort.' },
               { title: 'Volunteer', desc: 'Mentor students, lead workshops, or assist with career services events.' },
             ].map((item) => (
-              <div key={item.title} className="flex items-start gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200">
+              <div key={item.title} className="flex items-start gap-4 p-5 bg-white rounded-xl border border-slate-200">
                 <div className="w-2 h-2 rounded-full bg-brand-red-600 mt-2.5 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-slate-900">{item.title}</h3>
@@ -92,7 +92,7 @@ export default function PhilanthropyPage() {
           <Heart className="w-10 h-10 text-white/80 mx-auto mb-4" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Make a Difference Today</h2>
           <p className="text-xl text-white/90 mb-10">Contact us to discuss how you can support workforce training in Indianapolis.</p>
-          <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">
+          <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-white transition hover:scale-105 shadow-lg">
             Contact Us <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

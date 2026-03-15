@@ -20,7 +20,7 @@ export default async function ReportsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -39,7 +39,7 @@ export default async function ReportsPage() {
     .limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Reports' }]} />
       </div>
@@ -61,7 +61,7 @@ export default async function ReportsPage() {
           {reports && reports.length > 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-white border-b">
                   <tr>
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700">Report</th>
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700 hidden md:table-cell">Type</th>
@@ -71,7 +71,7 @@ export default async function ReportsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {reports.map((report: any) => (
-                    <tr key={report.id} className="hover:bg-gray-50">
+                    <tr key={report.id} className="hover:bg-white">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <FileText className="w-5 h-5 text-gray-400" />
@@ -99,7 +99,7 @@ export default async function ReportsPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Reports Yet</h3>
               <p className="text-gray-600 mb-6">Reports will appear here as your programs generate data.</p>
               <Link
-                href="/lms/dashboard"
+                href="/learner/dashboard"
                 className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to Dashboard

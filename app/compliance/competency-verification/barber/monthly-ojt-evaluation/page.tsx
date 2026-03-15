@@ -71,7 +71,7 @@ export default function MonthlyOJTEvaluationPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -127,10 +127,10 @@ export default function MonthlyOJTEvaluationPage() {
         <div className="border rounded-lg p-3 mb-6 print:p-2 print:mb-4 print:border-gray-400">
           <p className="font-bold text-sm mb-2 print:text-[10px] print:mb-1">Rating Scale</p>
           <div className="grid grid-cols-4 gap-1 text-xs print:text-[9px] text-center">
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>1</strong> — Needs Improvement</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>2</strong> — Developing</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>3</strong> — Meets Standard</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>4</strong> — Exceeds Standard</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>1</strong> — Needs Improvement</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>2</strong> — Developing</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>3</strong> — Meets Standard</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>4</strong> — Exceeds Standard</div>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ export default function MonthlyOJTEvaluationPage() {
             </div>
             <table className="w-full border-collapse text-sm print:text-[10px]">
               <thead>
-                <tr className="bg-gray-100 print:bg-gray-50">
+                <tr className="bg-white print:bg-white">
                   <th className="text-left p-2 border font-semibold print:p-1">Evaluation Item</th>
                   <th className="text-center p-2 border font-semibold w-20 print:p-1">Rating (1–4)</th>
                   <th className="text-left p-2 border font-semibold w-40 print:p-1 print:w-28">Comments</th>
@@ -166,7 +166,7 @@ export default function MonthlyOJTEvaluationPage() {
           <h2 className="font-bold text-sm mb-3 print:text-[11px] print:mb-2">OJT Hours by Competency Category</h2>
           <table className="w-full border-collapse text-sm print:text-[10px]">
             <thead>
-              <tr className="bg-gray-100 print:bg-gray-50">
+              <tr className="bg-white print:bg-white">
                 <th className="text-left p-2 border font-semibold print:p-1">Category</th>
                 <th className="text-center p-2 border font-semibold w-24 print:p-1">Hours This Month</th>
                 <th className="text-center p-2 border font-semibold w-24 print:p-1">Cumulative Hours</th>
@@ -180,7 +180,7 @@ export default function MonthlyOJTEvaluationPage() {
                   <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 </tr>
               ))}
-              <tr className="font-semibold bg-gray-50">
+              <tr className="font-semibold bg-white">
                 <td className="p-2 border print:p-1">Total</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
@@ -245,15 +245,15 @@ export default function MonthlyOJTEvaluationPage() {
       </div>
 
       {/* Screen nav */}
-      <div className="py-8 bg-slate-50 print:hidden">
+      <div className="py-8 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4 flex flex-wrap gap-3">
           <Link href="/compliance/competency-verification/barber" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
             Barber Rubric Overview
           </Link>
-          <Link href="/compliance/competency-verification/barber/scoring-sheet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/scoring-sheet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Scoring Sheet
           </Link>
-          <Link href="/compliance/competency-verification/barber/final-signoff" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/final-signoff" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Final Sign-Off Form
           </Link>
         </div>

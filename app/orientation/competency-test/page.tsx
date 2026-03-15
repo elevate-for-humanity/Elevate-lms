@@ -64,7 +64,7 @@ export default function CompetencyTestPage() {
       </section>
 
       {/* What's Covered */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">What the Assessment Covers</h2>
           <ul className="space-y-4">
@@ -83,7 +83,7 @@ export default function CompetencyTestPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">The competency assessment is administered during your orientation session.</p>
-          <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">View Orientation Schedule</Link>
+          <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">View Orientation Schedule</Link>
         </div>
       </section>
     </div>

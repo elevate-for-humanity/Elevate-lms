@@ -34,7 +34,7 @@ export default async function AgenciesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
         </div>
@@ -93,7 +93,7 @@ export default async function AgenciesPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Partner Agencies' }]} />
         </div>
@@ -112,7 +112,7 @@ export default async function AgenciesPage() {
       </section>
 
       {/* Compliance Features */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Built for Government Compliance</h2>
           <div className="grid md:grid-cols-4 gap-8">
@@ -150,7 +150,7 @@ export default async function AgenciesPage() {
                 ))}
               </ul>
             </div>
-            <div className="bg-gray-100 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg p-6 text-center">
                   <Building2 className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
@@ -179,7 +179,7 @@ export default async function AgenciesPage() {
       </section>
 
       {/* Platform Governance & Operational Readiness */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">Platform Governance & Operational Readiness</h2>
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
@@ -206,7 +206,7 @@ export default async function AgenciesPage() {
 
       {/* Partners */}
       {partners && partners.length > 0 && (
-        <section className="py-12 bg-gray-50">
+        <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <h3 className="text-center text-gray-500 mb-8">Trusted by agencies across Indiana</h3>
             <div className="flex flex-wrap justify-center items-center gap-8">
@@ -231,7 +231,7 @@ export default async function AgenciesPage() {
             <h2 className="text-3xl font-bold text-center mb-12">Success Stories</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {caseStudies.map((study: any) => (
-                <div key={study.id} className="bg-gray-50 rounded-xl p-6">
+                <div key={study.id} className="bg-white rounded-xl p-6">
                   <h3 className="font-bold text-lg mb-2">{study.title}</h3>
                   <p className="text-gray-600 mb-4">{study.summary}</p>
                   {study.results && (
@@ -256,7 +256,7 @@ export default async function AgenciesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/store/demos"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Schedule Demo <ArrowRight className="w-5 h-5" />
             </Link>

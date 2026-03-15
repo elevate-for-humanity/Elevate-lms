@@ -22,7 +22,7 @@ export default function AIHubPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'AI Tools' }]} />
         </div>
@@ -195,7 +195,7 @@ export default function AIHubPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">
             How AI Helps You Learn
@@ -255,7 +255,7 @@ export default function AIHubPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/ai-tutor"
-              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition-colors"
             >
               Try AI Tutor Now
             </Link>

@@ -138,10 +138,10 @@ export default function CapitalReadinessSlidesPage() {
           {slides.map((slide, index) => (
             <div 
               key={slide.id}
-              className="bg-slate-100 rounded-2xl overflow-hidden shadow-xl"
+              className="bg-white rounded-2xl overflow-hidden shadow-xl"
             >
               {/* Slide Number */}
-              <div className="bg-slate-100/50 px-6 py-2 flex items-center justify-between">
+              <div className="bg-white/50 px-6 py-2 flex items-center justify-between">
                 <span className="text-sm text-slate-600">Slide {slide.id} of {slides.length}</span>
                 <span className="text-xs text-slate-600 uppercase tracking-wide">{slide.type}</span>
               </div>

@@ -177,7 +177,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               {post.tags.map((tag: string) => (
                 <span 
                   key={tag}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-full"
+                  className="px-3 py-2 bg-white text-gray-700 text-sm rounded-full"
                 >
                   {tag}
                 </span>
@@ -193,7 +193,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       </article>
 
       {relatedPosts.length > 0 && (
-        <section className="bg-gray-50 py-16">
+        <section className="bg-white py-16">
           <div className="max-w-7xl mx-auto px-6">
             <h2 className="text-2xl font-bold text-black mb-8">Related Articles</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -235,7 +235,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-100 transition"
+              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition"
             >
               Apply Now
             </Link>

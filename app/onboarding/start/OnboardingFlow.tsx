@@ -42,7 +42,7 @@ export default function OnboardingFlow({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 py-6">
@@ -100,7 +100,7 @@ export default function OnboardingFlow({
                           ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                           : isComplete
                             ? 'bg-brand-green-50 border border-brand-green-200 hover:bg-brand-green-100'
-                            : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
+                            : 'bg-white border border-slate-200 hover:bg-white'
                       }`}
                     >
                       {isComplete ? (
@@ -138,7 +138,7 @@ export default function OnboardingFlow({
                       ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                       : payrollComplete
                         ? 'bg-brand-green-50 border border-brand-green-200 hover:bg-brand-green-100'
-                        : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
+                        : 'bg-white border border-slate-200 hover:bg-white'
                   }`}
                 >
                   {payrollComplete ? (
@@ -303,7 +303,7 @@ function DocumentStep({
       <div className="p-6">
         <div className="prose prose-slate max-w-none">
           <div
-            className="bg-slate-50 border border-slate-200 rounded-lg p-6 max-h-96 overflow-y-auto"
+            className="bg-white border border-slate-200 rounded-lg p-6 max-h-96 overflow-y-auto"
             dangerouslySetInnerHTML={{
               __html: sanitizeRichHtml(document.content.replace(/\n/g, '<br />')),
             }}

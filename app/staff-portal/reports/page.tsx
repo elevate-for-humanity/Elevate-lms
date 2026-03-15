@@ -110,9 +110,9 @@ export default async function StaffReportsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Reports' }]} />
         </div>
@@ -181,12 +181,12 @@ export default async function StaffReportsPage() {
         <div className="bg-white rounded-xl border overflow-hidden">
           <div className="p-4 border-b flex justify-between items-center">
             <h2 className="font-semibold">Recent Enrollments</h2>
-            <button className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-lg hover:bg-white">
               <Download className="w-4 h-4" /> Export CSV
             </button>
           </div>
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Student</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Program</th>
@@ -198,7 +198,7 @@ export default async function StaffReportsPage() {
             <tbody className="divide-y">
               {recentEnrollments && recentEnrollments.length > 0 ? (
                 recentEnrollments.map((enrollment: any) => (
-                  <tr key={enrollment.id} className="hover:bg-gray-50">
+                  <tr key={enrollment.id} className="hover:bg-white">
                     <td className="px-4 py-3">
                       <p className="font-medium">{enrollment.student?.full_name || 'Unknown'}</p>
                       <p className="text-sm text-gray-500">{enrollment.student?.email}</p>
@@ -214,7 +214,7 @@ export default async function StaffReportsPage() {
                         enrollment.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                         enrollment.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
+                        'bg-white text-gray-700'
                       }`}>
                         {enrollment.status}
                       </span>

@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export default async function CommunityHubPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) { return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>; }
+  if (!supabase) { return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>; }
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get community groups
@@ -62,7 +62,7 @@ export default async function CommunityHubPage() {
   const displayGroups = groups && groups.length > 0 ? groups : defaultGroups;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Community', href: '/community' },
@@ -137,7 +137,7 @@ export default async function CommunityHubPage() {
                     <Link
                       key={discussion.id}
                       href={`/community/discussions/${discussion.id}`}
-                      className="block p-4 hover:bg-gray-50 transition"
+                      className="block p-4 hover:bg-white transition"
                     >
                       <h3 className="font-medium mb-1">{discussion.title}</h3>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -170,7 +170,7 @@ export default async function CommunityHubPage() {
                     <Link
                       key={event.id}
                       href={`/events/${event.id}`}
-                      className="block hover:bg-gray-50 p-2 -mx-2 rounded transition"
+                      className="block hover:bg-white p-2 -mx-2 rounded transition"
                     >
                       <div className="text-sm text-brand-blue-600 font-medium">
                         {new Date(event.date).toLocaleDateString()}

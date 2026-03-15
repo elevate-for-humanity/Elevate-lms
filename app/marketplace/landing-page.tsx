@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function MarketplaceLanding() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
@@ -24,7 +24,7 @@ export default function MarketplaceLanding() {
           <div className="flex gap-4 justify-center">
             <Link
               href="/marketplace/browse"
-              className="px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 flex items-center gap-2"
+              className="px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-white flex items-center gap-2"
             >
               Browse Marketplace
               <ArrowRight className="w-5 h-5" />
@@ -190,7 +190,7 @@ function CategoryCard({ title, count }: any) {
 
 function BenefitCard({ icon, title, description }: any) {
   return (
-    <div className="flex gap-4 p-6 border rounded-lg bg-gray-50">
+    <div className="flex gap-4 p-6 border rounded-lg bg-white">
       <div className="flex-shrink-0">{icon}</div>
       <div>
         <h3 className="text-xl font-bold mb-2">{title}</h3>

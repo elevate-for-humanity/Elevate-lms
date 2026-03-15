@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Terms of Service' }]} />
         </div>
@@ -111,7 +111,7 @@ export default function TermsOfServicePage() {
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">8. Contact</h2>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <p className="text-slate-700">
                 <strong>2Exclusive LLC-S</strong><br />
                 d/b/a Elevate for Humanity Career &amp; Technical Institute<br />

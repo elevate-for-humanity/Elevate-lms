@@ -39,7 +39,7 @@ export default async function MarketplaceSellersPage() {
   const sellerList = sellers || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace", href: "/marketplace" }, { label: "Sellers" }]} />
       </div>
@@ -85,7 +85,7 @@ export default async function MarketplaceSellersPage() {
                 </div>
                 <Link
                   href={`/marketplace/sellers/${seller.id}`}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-white text-sm font-medium"
                 >
                   View Store
                 </Link>

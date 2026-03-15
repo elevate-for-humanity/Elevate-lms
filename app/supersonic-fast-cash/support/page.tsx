@@ -105,7 +105,7 @@ export default function SupportPage() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
               <a 
@@ -116,7 +116,7 @@ export default function SupportPage() {
               </a>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <Mail className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
               <a 
@@ -127,7 +127,7 @@ export default function SupportPage() {
               </a>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Hours</h3>
               <p className="text-gray-600 text-sm">
@@ -140,7 +140,7 @@ export default function SupportPage() {
       </section>
 
       {/* FAQs */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
             Frequently Asked Questions
@@ -188,7 +188,7 @@ export default function SupportPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <Link 
               href="/supersonic-fast-cash/how-it-works"
-              className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
             >
               <span className="font-medium text-gray-900">How Tax Filing Works</span>
               <ArrowRight className="w-5 h-5 text-gray-400" />
@@ -196,7 +196,7 @@ export default function SupportPage() {
 
             <Link 
               href="/supersonic-fast-cash/pricing"
-              className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
             >
               <span className="font-medium text-gray-900">Pricing</span>
               <ArrowRight className="w-5 h-5 text-gray-400" />
@@ -204,7 +204,7 @@ export default function SupportPage() {
 
             <Link 
               href="/supersonic-fast-cash/cash-advance"
-              className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
             >
               <span className="font-medium text-gray-900">About Refund Advances</span>
               <ArrowRight className="w-5 h-5 text-gray-400" />
@@ -212,7 +212,7 @@ export default function SupportPage() {
 
             <Link 
               href="/supersonic-fast-cash/book-appointment"
-              className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
             >
               <span className="font-medium text-gray-900">Schedule Appointment</span>
               <ArrowRight className="w-5 h-5 text-gray-400" />

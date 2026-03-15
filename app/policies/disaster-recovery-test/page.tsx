@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function DisasterRecoveryTestPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: 'Policies', href: '/policies' }, { label: 'Disaster Recovery Test' }]} />
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12 mt-6">
@@ -40,7 +40,7 @@ export default function DisasterRecoveryTestPage() {
         </div>
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Test Overview</h2>
-        <div className="bg-gray-50 rounded-lg p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6">
           <dl className="grid md:grid-cols-2 gap-4 m-0">
             <div>
               <dt className="font-semibold text-gray-600">Test Type</dt>
@@ -117,7 +117,7 @@ export default function DisasterRecoveryTestPage() {
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Detailed Timeline</h2>
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
           <table className="w-full text-left">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 font-semibold text-black">Timestamp (UTC)</th>
                 <th className="px-4 py-3 font-semibold text-black">Event</th>
@@ -191,7 +191,7 @@ export default function DisasterRecoveryTestPage() {
           <strong> April 2026</strong>.
         </p>
 
-        <div className="bg-gray-50 border-l-4 border-gray-400 p-6 mt-8">
+        <div className="bg-white border-l-4 border-gray-400 p-6 mt-8">
           <p className="text-black mb-2">
             <strong>Related Documentation:</strong>
           </p>

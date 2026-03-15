@@ -83,7 +83,7 @@ export default async function AssignmentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -122,7 +122,7 @@ export default async function AssignmentsPage() {
                 <div key={assignment.id} className="bg-white rounded-xl border p-4 hover:shadow-md transition">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                         <FileText className="w-5 h-5 text-gray-600" />
                       </div>
                       <div>
@@ -165,7 +165,7 @@ export default async function AssignmentsPage() {
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No assignments</h2>
             <p className="text-gray-600 mb-6">You don't have any assignments yet.</p>
-            <Link href="/lms/courses" className="text-brand-blue-600 hover:underline">
+            <Link href="/learner/courses" className="text-brand-blue-600 hover:underline">
               View your courses
             </Link>
           </div>

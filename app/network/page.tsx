@@ -55,23 +55,23 @@ export default async function NetworkPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-900 py-14">
+      <section className="bg-white py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Provider Network</h1>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Provider Network</h1>
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
             Vetted training organizations, workforce agencies, and employers operating on the Elevate hub.
             Every provider is reviewed, approved, and held to outcome standards.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
             <Link
               href="/programs/catalog"
-              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-4 h-4" /> Browse Programs
             </Link>
             <Link
               href="/partners/apply"
-              className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white transition"
             >
               Apply to Join
             </Link>
@@ -103,7 +103,7 @@ export default async function NetworkPage() {
         <div className="max-w-5xl mx-auto px-4">
           {(tenants ?? []).length === 0 ? (
             <div className="text-center py-16">
-              <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <Building2 className="w-10 h-10 text-slate-600 mx-auto mb-3" />
               <p className="text-slate-500">No providers listed yet.</p>
               <Link href="/partners/apply" className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline">
                 Apply to be the first →
@@ -117,7 +117,7 @@ export default async function NetworkPage() {
                 return (
                   <div key={tenant.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition group">
                     {/* Logo / placeholder */}
-                    <div className="h-28 bg-slate-50 flex items-center justify-center border-b border-slate-100">
+                    <div className="h-28 bg-white flex items-center justify-center border-b border-slate-100">
                       {org?.logo_url ? (
                         <Image
                           src={org.logo_url}
@@ -140,7 +140,7 @@ export default async function NetworkPage() {
                       {org?.tagline && (
                         <p className="text-slate-500 text-xs mt-1 line-clamp-2">{org.tagline}</p>
                       )}
-                      <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
+                      <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
                         {(org?.city || org?.state) && (
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
@@ -166,7 +166,7 @@ export default async function NetworkPage() {
                             href={org.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-medium text-slate-500 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition"
+                            className="text-xs font-medium text-slate-500 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-white transition"
                           >
                             Website
                           </a>
@@ -182,7 +182,7 @@ export default async function NetworkPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-slate-50 border-t border-slate-100 py-14">
+      <section className="bg-white border-t border-slate-100 py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Join the Network</h2>
           <p className="text-slate-600 mb-6">
@@ -191,7 +191,7 @@ export default async function NetworkPage() {
           </p>
           <Link
             href="/partners/apply"
-            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-7 py-3.5 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-slate-900 px-7 py-3.5 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
           >
             Apply to Join
           </Link>

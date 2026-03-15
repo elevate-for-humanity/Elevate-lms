@@ -67,7 +67,7 @@ export function AssignmentSubmitForm({ assignmentId, assignmentTitle }: Assignme
             Attach File (optional)
           </label>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200">
+            <label className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200">
               <Upload className="w-4 h-4" />
               Choose File
               <input

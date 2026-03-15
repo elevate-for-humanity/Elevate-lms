@@ -64,7 +64,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
   return (
     <div className="space-y-6">
       {/* User Info Display */}
-      <div className="bg-slate-50 rounded-xl p-4">
+      <div className="bg-white rounded-xl p-4">
         <h3 className="font-semibold text-slate-900 mb-3">Enrolling as:</h3>
         <div className="space-y-2">
           <p className="text-slate-700">{userName || 'Student'}</p>

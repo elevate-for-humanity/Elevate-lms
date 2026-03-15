@@ -36,7 +36,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/hero-images/services-hero.jpg" alt={`Community Services in ${state.name}`} fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <span className="text-brand-green-300 font-medium text-sm uppercase tracking-wider">Community Services</span>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 mt-2">{state.communityServices.headline}</h1>

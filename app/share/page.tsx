@@ -80,7 +80,7 @@ export default function SharePage() {
       </section>
 
       {/* Quick Copy Link */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Share Link</h2>
           <p className="text-gray-600 mb-6">Copy this link and share it anywhere — social media, text message, or email.</p>

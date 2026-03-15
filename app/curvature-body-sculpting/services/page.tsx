@@ -214,7 +214,7 @@ export default function ServicesPage() {
                       <h4 className="font-semibold mb-2">Treatment Areas:</h4>
                       <div className="flex flex-wrap gap-2">
                         {service.areas.map((area) => (
-                          <span key={area} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                          <span key={area} className="px-3 py-1 bg-white text-gray-700 rounded-full text-sm">
                             {area}
                           </span>
                         ))}
@@ -239,7 +239,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Packages */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Body Sculpting Packages</h2>
@@ -270,7 +270,7 @@ export default function ServicesPage() {
                   className={`block text-center py-3 rounded-lg font-bold transition ${
                     pkg.popular
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   Get Started

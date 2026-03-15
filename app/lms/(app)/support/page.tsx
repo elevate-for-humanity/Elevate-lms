@@ -82,7 +82,7 @@ export default async function SupportPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Support" }]} />
         </div>
@@ -117,7 +117,7 @@ export default async function SupportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Support" }]} />
         </div>
@@ -169,7 +169,7 @@ export default async function SupportPage() {
               <div className="divide-y divide-slate-200">
                 {FAQ_ITEMS.map((item, index) => (
                   <details key={index} className="group">
-                    <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-50">
+                    <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-white">
                       <span className="font-medium text-slate-900">{item.question}</span>
                       <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
                     </summary>
@@ -179,7 +179,7 @@ export default async function SupportPage() {
                   </details>
                 ))}
               </div>
-              <div className="p-6 bg-slate-50 border-t border-slate-200">
+              <div className="p-6 bg-white border-t border-slate-200">
                 <Link href="/support/help" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
                   View All Help Articles →
                 </Link>
@@ -208,7 +208,7 @@ export default async function SupportPage() {
               <h3 className="font-bold text-slate-900 mb-4">Other Ways to Reach Us</h3>
               <div className="space-y-4">
                 <a href="/support" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
@@ -217,7 +217,7 @@ export default async function SupportPage() {
                   </div>
                 </a>
                 <a href="/contact" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
@@ -246,7 +246,7 @@ export default async function SupportPage() {
                 Our AI Tutor can help with course questions 24/7.
               </p>
               <Link
-                href="/lms/ai-tutor"
+                href="/learner/ai-tutor"
                 className="block w-full text-center bg-brand-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 Ask AI Tutor
@@ -262,14 +262,14 @@ export default async function SupportPage() {
                     <Link
                       key={ticket.id}
                       href={`/lms/support/tickets/${ticket.id}`}
-                      className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                      className="block p-3 bg-white rounded-lg hover:bg-white transition"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-slate-900 truncate">{ticket.subject}</span>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           ticket.status === 'open' ? 'bg-yellow-100 text-yellow-700' :
                           ticket.status === 'resolved' ? 'bg-brand-green-100 text-brand-green-700' :
-                          'bg-slate-100 text-slate-700'
+                          'bg-white text-slate-700'
                         }`}>
                           {ticket.status}
                         </span>

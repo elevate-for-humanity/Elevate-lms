@@ -75,7 +75,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
   const relatedArticles = await getRelatedArticles(article.category, slug);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "[Slug]" }]} />
       </div>
@@ -119,7 +119,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
                   {article.tags.map((tag: string) => (
                     <span
                       key={tag}
-                      className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-full"
+                      className="px-3 py-2 bg-white text-gray-700 text-sm rounded-full"
                     >
                       {tag}
                     </span>
@@ -136,7 +136,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
                   <ThumbsUp className="w-5 h-5" />
                   Yes, helpful
                 </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
+                <button className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
                   <ThumbsDown className="w-5 h-5" />
                   Not helpful
                 </button>
@@ -179,7 +179,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
               </Link>
               <a
                 href="/support"
-                className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition border border-gray-200"
+                className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-white transition border border-gray-200"
               >
                 (317) 314-3757
               </a>

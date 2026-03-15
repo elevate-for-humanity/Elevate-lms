@@ -236,7 +236,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                       <div className="flex gap-2">
                         <Link
                           href={`/career-services/courses/${course.slug}`}
-                          className="flex-1 text-center border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50"
+                          className="flex-1 text-center border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-white"
                         >
                           Details
                         </Link>

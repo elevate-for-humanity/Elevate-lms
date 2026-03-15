@@ -47,9 +47,9 @@ const programs = [
 
 export default function RiseFoundationProgramsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'RISE Foundation', href: '/rise-foundation' }, { label: 'Programs' }]} />
         </div>
@@ -90,7 +90,7 @@ export default function RiseFoundationProgramsPage() {
                 <p className="text-sm font-medium text-gray-700 mb-2">Eligibility:</p>
                 <div className="flex flex-wrap gap-2">
                   {program.eligibility.map((req, idx) => (
-                    <span key={idx} className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded">
+                    <span key={idx} className="flex items-center gap-1 text-xs bg-white px-2 py-1 rounded">
                       <span className="text-slate-400 flex-shrink-0">•</span> {req}
                     </span>
                   ))}

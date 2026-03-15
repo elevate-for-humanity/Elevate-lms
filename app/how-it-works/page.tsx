@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'How It Works' }]} />
         </div>
@@ -84,7 +84,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Inclusive Services Note */}
-      <section className="py-10 sm:py-14 bg-slate-50">
+      <section className="py-10 sm:py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">

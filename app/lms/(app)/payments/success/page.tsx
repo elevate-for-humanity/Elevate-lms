@@ -19,7 +19,7 @@ function SuccessContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-lg border p-8 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -34,7 +34,7 @@ function SuccessContent() {
             Your {type === 'down-payment' ? 'down payment' : 'payment'} for {programNames[program] || program} has been processed.
           </p>
 
-          <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+          <div className="bg-white rounded-xl p-4 mb-6 text-left">
             <h3 className="font-semibold mb-3">What happens next?</h3>
             <ul className="space-y-3 text-sm text-gray-600">
               <li className="flex items-start gap-3">
@@ -56,14 +56,14 @@ function SuccessContent() {
 
           <div className="space-y-3">
             <Link
-              href="/lms/dashboard"
+              href="/learner/dashboard"
               className="block w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
             >
               Go to Student Portal
             </Link>
             <Link
               href="/"
-              className="block w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50"
+              className="block w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-white"
             >
               Return to Home
             </Link>
@@ -92,7 +92,7 @@ export default function PaymentSuccessPage() {
 
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>

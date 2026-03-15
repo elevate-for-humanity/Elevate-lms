@@ -25,7 +25,7 @@ export default async function EnrollmentSuccessPage({
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -57,7 +57,7 @@ export default async function EnrollmentSuccessPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
@@ -220,14 +220,14 @@ export default async function EnrollmentSuccessPage({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/lms/courses"
+                href="/learner/courses"
                 className="flex-1 px-6 py-3 bg-brand-blue-600 text-white text-center rounded-lg hover:bg-brand-blue-700 transition-colors font-medium"
               >
                 Go to My Courses
               </Link>
               <Link
                 href="/learner/dashboard"
-                className="flex-1 px-6 py-3 border border-gray-300 text-black text-center rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-6 py-3 border border-gray-300 text-black text-center rounded-lg hover:bg-white transition-colors font-medium"
               >
                 View Dashboard
               </Link>

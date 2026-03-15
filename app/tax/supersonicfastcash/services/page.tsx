@@ -78,13 +78,13 @@ export default function ServicesPage() {
           </Link>
           <Link
             href="/tax/supersonicfastcash/documents"
-            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-white transition"
           >
             Upload Documents
           </Link>
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border font-semibold hover:bg-white transition"
           >
             Call support center
           </a>
@@ -362,13 +362,13 @@ export default function ServicesPage() {
           </Link>
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-white transition"
           >
             Call support center
           </a>
           <Link
             href="/supersonic-fast-cash"
-            className="px-6 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border font-semibold hover:bg-white transition"
           >
             View Full Details
           </Link>

@@ -179,7 +179,7 @@ export default function PartnerHandbookPage() {
       </section>
 
       {/* Table of Contents */}
-      <nav className="bg-slate-50 border-b py-6">
+      <nav className="bg-white border-b py-6">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Contents</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -244,7 +244,7 @@ export default function PartnerHandbookPage() {
               <ul className="mt-4 space-y-2 pl-1">
                 {section.items.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-700 text-[15px] leading-relaxed">
-                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                    <span className="w-6 h-6 rounded-full bg-white text-slate-500 text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -289,14 +289,14 @@ export default function PartnerHandbookPage() {
             </Link>
             <Link
               href="/partners/barbershop-apprenticeship/sign-mou"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-white"
             >
               <FileText className="w-5 h-5" />
               Sign the MOU
             </Link>
             <Link
               href="/partners/barbershop-apprenticeship/forms"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-white"
             >
               Required Forms
               <ArrowRight className="w-4 h-4" />

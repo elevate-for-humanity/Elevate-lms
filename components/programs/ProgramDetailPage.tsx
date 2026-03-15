@@ -72,7 +72,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         ))}
 
         {/* Hero content panel — below image, no overlay */}
-        <div className="bg-slate-900">
+        <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-1.5 text-xs text-white/50 mb-5">
@@ -82,7 +82,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   {b.href ? (
                     <Link href={b.href} className="hover:text-white/80 transition-colors">{b.label}</Link>
                   ) : (
-                    <span className="text-white/80 font-medium">{b.label}</span>
+                    <span className="text-slate-600 font-medium">{b.label}</span>
                   )}
                 </span>
               ))}
@@ -303,7 +303,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
-          <p className="text-white/80 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
+          <p className="text-slate-600 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
 
           {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">

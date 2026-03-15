@@ -272,7 +272,7 @@ export default function CoursesCatalogPage() {
   return (
     <div className="min-h-screen bg-white">
       {preview && <VideoModal url={preview.url} title={preview.title} onClose={() => setPreview(null)} />}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Courses' }]} />
         </div>
@@ -287,7 +287,7 @@ export default function CoursesCatalogPage() {
             style={{ minHeight: '420px' }}
           />
           {/* Solid scrim for text contrast */}
-          <div className="absolute inset-0 bg-black/45" />
+          
         </div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-16">
@@ -316,7 +316,7 @@ export default function CoursesCatalogPage() {
       </section>
 
       {/* ── ELEVATE FLAGSHIP PROGRAMS ───────────────────────────────── */}
-      <section className="py-14 bg-slate-50">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -401,7 +401,7 @@ export default function CoursesCatalogPage() {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                   category === cat
                     ? 'bg-brand-blue-600 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-white text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {cat}
@@ -418,7 +418,7 @@ export default function CoursesCatalogPage() {
                   <Image src={c.photo} alt={c.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width:640px) 100vw, 33vw" />
 
                   {/* Category badge */}
-                  <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[c.category] ?? 'bg-slate-100 text-slate-700'}`}>
+                  <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[c.category] ?? 'bg-white text-slate-700'}`}>
                     {c.category}
                   </span>
 
@@ -442,7 +442,7 @@ export default function CoursesCatalogPage() {
                   <p className="text-sm text-slate-600 leading-relaxed mb-3">{c.description}</p>
 
                   {/* Job + salary */}
-                  <div className="bg-slate-50 rounded-xl p-3 mb-3">
+                  <div className="bg-white rounded-xl p-3 mb-3">
                     <p className="text-xs text-slate-500 mb-0.5">Job you can get</p>
                     <p className="text-sm font-bold text-slate-900">{c.jobTitle}</p>
                     <p className="text-xs font-bold text-brand-green-700 mt-0.5">{c.salary}</p>

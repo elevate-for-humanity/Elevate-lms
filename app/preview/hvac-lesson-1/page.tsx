@@ -12,7 +12,7 @@ const VIDEO_URL =
 
 export default function HVACLesson1Preview() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">
           Welcome to HVAC Technician Training

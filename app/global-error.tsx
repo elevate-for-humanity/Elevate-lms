@@ -83,7 +83,7 @@ export default function GlobalError({
               
               <a
                 href="/"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-black rounded-lg hover:bg-gray-50 transition-all font-semibold"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-300 text-black rounded-lg hover:bg-white transition-all font-semibold"
               >
                 <Home className="h-5 w-5" />
                 Go to Homepage

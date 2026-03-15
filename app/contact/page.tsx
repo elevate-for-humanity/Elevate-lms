@@ -65,8 +65,8 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Contact Us' }]} />
         </div>
@@ -391,7 +391,7 @@ export default function ContactPage() {
             { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or contact us with your name and the program you applied for.' },
             { q: 'I\'m an employer - who do I contact?', a: 'Select "Employer Partnership" in the contact form or email us directly. Our employer relations team will reach out to discuss partnership opportunities.' },
           ].map((faq, i) => (
-            <details key={i} className="bg-slate-50 rounded-xl overflow-hidden group">
+            <details key={i} className="bg-white rounded-xl overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 {faq.q}
                 <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

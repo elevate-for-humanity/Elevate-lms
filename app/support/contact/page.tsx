@@ -38,10 +38,10 @@ export default function SupportContactPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/support-page-1.jpg" alt="Contact support" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Contact Support</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">We are here to help. Reach out through any of the channels below.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Contact Support</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">We are here to help. Reach out through any of the channels below.</p>
           </div>
         </div>
       </section>
@@ -66,7 +66,7 @@ export default function SupportContactPage() {
       </section>
 
       {/* Help Topics */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-8">
             <HelpCircle className="w-7 h-7 text-brand-blue-600" />

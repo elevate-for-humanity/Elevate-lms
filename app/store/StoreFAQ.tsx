@@ -51,7 +51,7 @@ export default function StoreFAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
+    <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
       <div className="max-w-3xl mx-auto px-6">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-10">
           Frequently Asked Questions

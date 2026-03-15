@@ -59,7 +59,7 @@ export function BarberPartnership() {
               'Cohort progress reporting available to partners',
               'Credential attainment records',
             ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+              <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
                 <span className="w-6 h-6 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{i + 1}</span>
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
@@ -69,7 +69,7 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 8 — Transfer Hours */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Transfer Hours &amp; Prior Training</h2>
           <p className="text-slate-600 mb-6 max-w-3xl">

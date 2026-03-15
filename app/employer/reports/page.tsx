@@ -18,7 +18,7 @@ export default async function EmployerReportsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -149,7 +149,7 @@ export default async function EmployerReportsPage() {
           <button className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700" aria-label="Action button">
             Export Report
           </button>
-          <button className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-slate-50" aria-label="Action button">
+          <button className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-white" aria-label="Action button">
             Schedule Report
           </button>
         </div>

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function DRTestReportPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Dr Test Report" }]} />
       </div>
@@ -108,7 +108,7 @@ export default function DRTestReportPage() {
             
             <div className="overflow-x-auto mb-8">
               <table className="min-w-full border border-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-4 py-3 text-left font-bold text-black border-b">Metric</th>
                     <th className="px-4 py-3 text-left font-bold text-black border-b">Target</th>

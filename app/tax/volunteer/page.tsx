@@ -92,7 +92,7 @@ export default function VolunteerPage() {
           </div>
 
           {/* Training Info */}
-          <div className="bg-gray-50 rounded-lg p-8">
+          <div className="bg-white rounded-lg p-8">
             <h3 className="text-2xl font-bold mb-6 text-center">Training Provided</h3>
             <p className="text-center text-black mb-8 max-w-3xl mx-auto">
               All volunteers receive free IRS-certified training. Training is available online and in-person, typically taking 20-40 hours depending on certification level.

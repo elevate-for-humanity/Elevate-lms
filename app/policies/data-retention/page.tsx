@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function DataRetentionPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Data Retention" }]} />
       </div>
@@ -176,7 +176,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Communication Records</h2>
             
-            <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 mb-6">
+            <div className="bg-white rounded-xl p-6 border-2 border-gray-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Email and Messages</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Student Communications:</strong> 7 years after last enrollment</li>

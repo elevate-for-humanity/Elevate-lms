@@ -74,13 +74,7 @@ export default function JoinPartnerPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-slate-900/60 flex flex-col justify-end p-6 md:p-10">
-          <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Join' }]} className="mb-3 text-white/70" />
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Become a Partner</h1>
-          <p className="text-white/80 mt-2 max-w-xl">
-            Workforce agencies, employers, training providers, and community organizations.
-          </p>
-        </div>
+      
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-12">

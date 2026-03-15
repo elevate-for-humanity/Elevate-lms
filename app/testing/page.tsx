@@ -95,7 +95,7 @@ const examCategories = [
 export default function TestingPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Testing & Credential Exams' }]} />
         </div>
@@ -113,7 +113,7 @@ export default function TestingPage() {
       </section>
 
       {/* Disclosure */}
-      <section className="py-8 bg-slate-50 border-b">
+      <section className="py-8 bg-white border-b">
         <div className="max-w-5xl mx-auto px-4">
           <div className="bg-white border border-slate-200 rounded-xl p-5">
             <p className="text-sm text-slate-700 leading-relaxed">
@@ -141,7 +141,7 @@ export default function TestingPage() {
                         <h3 className="text-xl font-bold text-slate-900">{cat.name}</h3>
                         <p className="text-sm text-slate-500">Provider: {cat.provider}</p>
                       </div>
-                      <span className="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full whitespace-nowrap">
+                      <span className="text-xs font-medium bg-white text-slate-600 px-3 py-1 rounded-full whitespace-nowrap">
                         {cat.access}
                       </span>
                     </div>
@@ -172,7 +172,7 @@ export default function TestingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-14 bg-slate-50">
+      <section className="py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -200,7 +200,7 @@ export default function TestingPage() {
             Credential exam results are documented and available for workforce partner reporting. All testing follows authorized proctoring protocols.
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+            <div className="bg-white rounded-xl p-5 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-2">Reporting</h3>
               <ul className="space-y-1 text-sm text-slate-700">
                 <li>Exam pass/fail results per participant</li>
@@ -209,7 +209,7 @@ export default function TestingPage() {
                 <li>PIRL-compatible outcome data</li>
               </ul>
             </div>
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+            <div className="bg-white rounded-xl p-5 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-2">Testing Protocols</h3>
               <ul className="space-y-1 text-sm text-slate-700">
                 <li>Photo ID verification required</li>

@@ -148,7 +148,7 @@ export default function CapitalReadinessGuidePage() {
       />
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-slate-100 text-slate-900 py-20 lg:py-28">
+      <section className="relative bg-white text-slate-900 py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -189,7 +189,7 @@ export default function CapitalReadinessGuidePage() {
             </div>
 
             <div className="relative">
-              <div className="bg-slate-100 rounded-2xl p-8 shadow-2xl">
+              <div className="bg-white rounded-2xl p-8 shadow-2xl">
                 <div className="aspect-[3/4] bg-white rounded-lg flex items-center justify-center">
                   <div className="text-center p-8">
                     <BookOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -204,7 +204,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-16 lg:py-24 bg-slate-50">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">What You Get</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -238,7 +238,7 @@ export default function CapitalReadinessGuidePage() {
                 ))}
               </ul>
             </div>
-            <div className="bg-slate-100 rounded-2xl p-8">
+            <div className="bg-white rounded-2xl p-8">
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <Building2 className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
@@ -268,7 +268,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Table of Contents */}
-      <section id="preview" className="py-16 lg:py-24 bg-slate-50">
+      <section id="preview" className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-4">What's Inside</h2>
           <p className="text-center text-slate-600 mb-12">10 chapters of practical, actionable guidance</p>
@@ -341,7 +341,7 @@ export default function CapitalReadinessGuidePage() {
       {/* Pricing */}
       <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-100 rounded-2xl p-8 lg:p-12 text-slate-900 text-center">
+          <div className="bg-white rounded-2xl p-8 lg:p-12 text-slate-900 text-center">
             <h2 className="text-3xl font-bold mb-4">Get the Guide</h2>
             <p className="text-brand-blue-100 mb-8 max-w-xl mx-auto">
               Start building institutional trust today. Includes the full ebook, integrated workbook, 
@@ -361,7 +361,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Enterprise */}
-      <section className="py-16 lg:py-24 bg-slate-50">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Award className="w-12 h-12 text-brand-blue-600 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Enterprise & Licensing</h2>

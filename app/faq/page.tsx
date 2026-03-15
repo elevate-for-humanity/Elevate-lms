@@ -63,8 +63,8 @@ export default function FAQPage() {
   const categories = [...new Set(faqs.map((faq: FAQ) => faq.category))];
 
   return (
-    <div className="min-h-screen bg-gray-50">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'FAQ' }]} />
         </div>
@@ -97,7 +97,7 @@ export default function FAQPage() {
             <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               How It Works
             </Link>
-            <Link href="/contact" className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+            <Link href="/contact" className="px-4 py-2 bg-white text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
               Contact Us
             </Link>
           </div>
@@ -112,7 +112,7 @@ export default function FAQPage() {
               <a 
                 key={cat} 
                 href={`#${cat}`} 
-                className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 capitalize"
+                className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-gray-700 hover:bg-white capitalize"
               >
                 {cat}
               </a>

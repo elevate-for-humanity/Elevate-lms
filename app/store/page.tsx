@@ -37,7 +37,7 @@ export default function StorePage() {
                 <Link href="/store/trial" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition">
                   Start 14-Day Free Trial <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="/demo/admin" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition">
+                <Link href="/demo/admin" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-white transition">
                   Try Full Demo — No Signup
                 </Link>
               </div>
@@ -51,7 +51,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ TRUST METRICS ============ */}
-      <section className="py-8 bg-slate-50 border-y border-slate-200">
+      <section className="py-8 bg-white border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
@@ -96,7 +96,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ PLATFORM SCREENSHOTS ============ */}
-      <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
+      <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">See what you&apos;re getting</h2>
           <p className="text-slate-600 text-center mb-10">Real screenshots from the platform. This is what your staff and students will use every day.</p>
@@ -179,7 +179,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ COMPLIANCE & TRUST ============ */}
-      <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
+      <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 justify-center mb-3">
             <Shield className="w-6 h-6 text-brand-red-600" />
@@ -225,7 +225,7 @@ export default function StorePage() {
             <div className="bg-white rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-4">
                 <span className="bg-brand-red-100 text-brand-red-700 text-xs font-bold px-3 py-1 rounded-full">16 Modules · 94 Lessons</span>
-                <span className="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">640 Hours</span>
+                <span className="bg-white text-slate-600 text-xs font-bold px-3 py-1 rounded-full">640 Hours</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">HVAC Technician Course</h3>
               <div className="mb-4">
@@ -256,7 +256,7 @@ export default function StorePage() {
               </Link>
               <Link
                 href="/course-preview/hvac-technician"
-                className="block text-center border border-slate-300 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-50 transition text-sm"
+                className="block text-center border border-slate-300 text-slate-700 font-semibold py-3 rounded-lg hover:bg-white transition text-sm"
               >
                 Preview Full Course Demo →
               </Link>
@@ -317,7 +317,7 @@ export default function StorePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/store/licensing/enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-50 transition">
+              <Link href="/store/licensing/enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-white transition">
                 View Enterprise License
               </Link>
               <p className="text-xs text-slate-400 mt-3 text-center">Stripe, {BNPL_CHECKOUT_LABEL} at checkout</p>
@@ -331,25 +331,25 @@ export default function StorePage() {
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
           <div className="flex flex-wrap gap-3">
-            <Link href="/store/courses" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/courses" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Certification Courses
             </Link>
-            <Link href="/store/digital" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/digital" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Digital Resources
             </Link>
-            <Link href="/store/ai-studio" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/ai-studio" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               AI Studio
             </Link>
-            <Link href="/store/apps/grants" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/apps/grants" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Grants App
             </Link>
-            <Link href="/store/apps/sam-gov" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/apps/sam-gov" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               SAM.gov Assistant
             </Link>
-            <Link href="/store/apps/website-builder" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/store/apps/website-builder" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Website Builder
             </Link>
-            <Link href="/creator/products" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
+            <Link href="/creator/products" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Creator Products
             </Link>
           </div>
@@ -370,7 +370,7 @@ export default function StorePage() {
             <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-8 py-3.5 rounded-lg transition">
               Start 14-Day Free Trial <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/demo/admin" className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 font-semibold px-8 py-3.5 rounded-lg hover:bg-slate-100 transition">
+            <Link href="/demo/admin" className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 font-semibold px-8 py-3.5 rounded-lg hover:bg-white transition">
               Try Full Demo First
             </Link>
           </div>

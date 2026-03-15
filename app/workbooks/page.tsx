@@ -87,9 +87,9 @@ const workbooks = [
 
 export default function WorkbooksPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Workbooks' }]} />
         </div>
@@ -187,7 +187,7 @@ export default function WorkbooksPage() {
         </div>
 
         {/* Additional Resources */}
-        <div className="mt-12 bg-slate-100 rounded-xl p-8">
+        <div className="mt-12 bg-white rounded-xl p-8">
           <h2 className="text-2xl font-bold text-black mb-4">
             Additional Resources
           </h2>
@@ -205,7 +205,7 @@ export default function WorkbooksPage() {
               </p>
             </Link>
             <Link
-              href="/lms/resources"
+              href="/learner/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
               <BookOpen className="w-8 h-8 text-brand-green-600 mb-3" />

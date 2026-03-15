@@ -84,7 +84,7 @@ export default function AnalyticsProPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Store', href: '/store' }, 
@@ -131,7 +131,7 @@ export default function AnalyticsProPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Built for Workforce Development</h2>
@@ -203,7 +203,7 @@ export default function AnalyticsProPage() {
               </ul>
               <Link
                 href="/store/add-ons/analytics-pro/checkout?plan=monthly"
-                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition"
+                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
               >
                 Start Monthly Plan — $424/mo
               </Link>
@@ -222,7 +222,7 @@ export default function AnalyticsProPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/store/add-ons/analytics-pro/checkout"
-              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Purchase Now — $1,497
               <ArrowRight className="w-5 h-5" />

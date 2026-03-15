@@ -15,7 +15,7 @@ export default async function BuilderPage() {
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -23,10 +23,10 @@ export default async function BuilderPage() {
   if (profile?.role !== 'instructor' && profile?.role !== 'admin') redirect('/unauthorized');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Builder</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/learner/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Builder</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Course Builder</h1>
           <p className="text-gray-600 mt-2">Create and customize course content</p>
         </div>
@@ -35,7 +35,7 @@ export default async function BuilderPage() {
             <h2 className="font-semibold mb-4">Content Blocks</h2>
             <div className="space-y-2">
               {['Text', 'Video', 'Quiz', 'Assignment', 'File'].map((block) => (
-                <div key={block} className="p-3 border rounded-lg cursor-move hover:bg-gray-50 flex items-center gap-2">
+                <div key={block} className="p-3 border rounded-lg cursor-move hover:bg-white flex items-center gap-2">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" /></svg>
                   <span className="text-sm">{block}</span>
                 </div>

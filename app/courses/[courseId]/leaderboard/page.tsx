@@ -81,7 +81,7 @@ export default function CourseLeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Breadcrumbs
           items={[
             { label: 'Courses', href: '/courses' },
@@ -180,7 +180,7 @@ export default function CourseLeaderboardPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-white text-lg shadow-2xl transition-all"
                   >
                     Apply Now
                   </Link>
@@ -200,7 +200,7 @@ export default function CourseLeaderboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },
@@ -233,7 +233,7 @@ export default function CourseLeaderboardPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'week'
                       ? 'bg-brand-blue-600 text-white'
-                      : 'bg-gray-100 text-black hover:bg-gray-200'
+                      : 'bg-white text-black hover:bg-gray-200'
                   }`}
                 >
                   This Week
@@ -243,7 +243,7 @@ export default function CourseLeaderboardPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'month'
                       ? 'bg-brand-blue-600 text-white'
-                      : 'bg-gray-100 text-black hover:bg-gray-200'
+                      : 'bg-white text-black hover:bg-gray-200'
                   }`}
                 >
                   This Month
@@ -253,7 +253,7 @@ export default function CourseLeaderboardPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'all'
                       ? 'bg-brand-blue-600 text-white'
-                      : 'bg-gray-100 text-black hover:bg-gray-200'
+                      : 'bg-white text-black hover:bg-gray-200'
                   }`}
                 >
                   All Time
@@ -362,7 +362,7 @@ export default function CourseLeaderboardPage() {
 
           {/* Full Leaderboard */}
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 bg-gray-50 border-b">
+            <div className="p-4 bg-white border-b">
               <h3 className="font-semibold text-black">Full Rankings</h3>
             </div>
             {leaderboard.length > 0 ? (
@@ -370,7 +370,7 @@ export default function CourseLeaderboardPage() {
                 {leaderboard.map((enstart) => (
                   <div
                     key={enstart.id}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-white transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 text-center">

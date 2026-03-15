@@ -120,7 +120,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Banner */}
       <section className="relative h-[200px] w-full overflow-hidden">
         <Image
@@ -224,16 +224,16 @@ function LoginForm() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Link
-                  href="/lms/dashboard"
+                  href="/learner/dashboard"
                   prefetch={false}
-                  className="text-center px-4 py-3 bg-slate-100 text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
+                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >
                   Student Portal
                 </Link>
                 <Link
                   href="/admin"
                   prefetch={false}
-                  className="text-center px-4 py-3 bg-slate-100 text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
+                  className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >
                   Admin Portal
                 </Link>
@@ -262,7 +262,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           Loading...
         </div>
       }

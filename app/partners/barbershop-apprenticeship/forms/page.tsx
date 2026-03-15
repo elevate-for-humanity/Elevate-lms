@@ -147,7 +147,7 @@ export default function RequiredFormsPage() {
   const categories = ['legal', 'compliance', 'insurance', 'training'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 pt-6">
         <Breadcrumbs items={[
           { label: 'Partners', href: '/partners/barbershop-apprenticeship' },

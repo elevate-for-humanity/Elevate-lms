@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function PayPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Pay" }]} />
       </div>
@@ -60,10 +60,10 @@ export default function PayPage() {
                   Start training immediately after payment.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">Visa</span>
-                  <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">Mastercard</span>
-                  <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">Amex</span>
-                  <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">ACH</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm">Visa</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm">Mastercard</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm">Amex</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm">ACH</span>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function PayPage() {
           {/* Other Payment Methods */}
           <div className="bg-white rounded-xl p-6 border border-slate-200">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
                 <CreditCard className="w-6 h-6 text-slate-600" />
               </div>
               <div className="flex-1">
@@ -104,7 +104,7 @@ export default function PayPage() {
                   <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full text-sm">Cash App</span>
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm">PayPal</span>
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm">Venmo</span>
-                  <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">Link</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-sm">Link</span>
                 </div>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function PayPage() {
         </div>
 
         {/* Benefits */}
-        <div className="mt-8 bg-slate-100 rounded-xl p-6">
+        <div className="mt-8 bg-white rounded-xl p-6">
           <h3 className="text-lg font-bold text-black mb-4">All Payments Include:</h3>
           <div className="grid md:grid-cols-2 gap-3">
             <div className="flex items-center gap-2">

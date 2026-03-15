@@ -99,7 +99,7 @@ const fundingSources = [
 export default function IndianaOutcomesPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'About', href: '/about' },
@@ -162,7 +162,7 @@ export default function IndianaOutcomesPage() {
               </thead>
               <tbody>
                 {programOutcomes.map((row) => (
-                  <tr key={row.program} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={row.program} className="border-b border-slate-100 hover:bg-white">
                     <td className="py-3 pr-4 font-medium text-slate-900">{row.program}</td>
                     <td className="py-3 px-4 text-right text-slate-700">{row.enrolled}</td>
                     <td className="py-3 px-4 text-right text-slate-700">{row.completed}</td>
@@ -186,7 +186,7 @@ export default function IndianaOutcomesPage() {
                   <span className="text-slate-700 font-medium">{source.name}</span>
                   <span className="text-slate-900 font-semibold">{source.percentage}%</span>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-3">
+                <div className="w-full bg-white rounded-full h-3">
                   <div 
                     className="bg-brand-blue-600 h-3 rounded-full transition-all"
                     style={{ width: `${source.percentage}%` }}
@@ -198,7 +198,7 @@ export default function IndianaOutcomesPage() {
         </section>
 
         {/* Methodology */}
-        <section className="mb-16 bg-slate-50 rounded-xl p-6 border border-slate-200">
+        <section className="mb-16 bg-white rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Outcome Tracking Methodology</h2>
           <ul className="space-y-2 text-slate-700 text-sm">
             <li className="flex items-start gap-2">
@@ -236,7 +236,7 @@ export default function IndianaOutcomesPage() {
             </Link>
             <Link
               href="/platform/partners"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-white transition-colors"
             >
               Partner With Us
             </Link>

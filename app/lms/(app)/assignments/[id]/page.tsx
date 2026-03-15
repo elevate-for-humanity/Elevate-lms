@@ -46,7 +46,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
         </div>
@@ -83,11 +83,11 @@ export default async function AssignmentDetailPage({ params }: Props) {
   const isGraded = submission?.grade !== null && submission?.grade !== undefined;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link
-          href="/lms/assignments"
+          href="/learner/assignments"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -141,7 +141,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-4 ${
                   isOverdue && !isSubmitted
                     ? 'bg-brand-red-50 text-brand-red-800'
-                    : 'bg-slate-50 text-slate-700'
+                    : 'bg-white text-slate-700'
                 }`}>
                   <Calendar className="w-5 h-5" />
                   <span>
@@ -176,7 +176,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                         href={attachment.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100"
+                        className="flex items-center gap-3 p-3 bg-white rounded-lg hover:bg-white"
                       >
                         <FileText className="w-5 h-5 text-slate-500" />
                         <span className="flex-1">{attachment.name}</span>
@@ -197,7 +197,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
               {isSubmitted ? (
                 <div className="space-y-4">
                   {/* Submission Details */}
-                  <div className="p-4 bg-slate-50 rounded-lg">
+                  <div className="p-4 bg-white rounded-lg">
                     <p className="text-sm text-slate-600 mb-1">Submitted on</p>
                     <p className="font-medium text-slate-900">
                       {new Date(submission.submitted_at).toLocaleString()}
@@ -207,7 +207,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                   {submission.content && (
                     <div>
                       <p className="text-sm text-slate-600 mb-2">Your Response</p>
-                      <div className="p-4 bg-slate-50 rounded-lg whitespace-pre-wrap">
+                      <div className="p-4 bg-white rounded-lg whitespace-pre-wrap">
                         {submission.content}
                       </div>
                     </div>

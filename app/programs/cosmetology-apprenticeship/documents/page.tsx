@@ -150,11 +150,11 @@ export default function CosmetologyDocumentsPage() {
   const canSubmit = governmentId?.status === 'complete';
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="bg-slate-900 text-white py-8">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white py-8 border-t">
         <div className="max-w-2xl mx-auto px-6">
           <h1 className="text-3xl font-black mb-2">Required Documents</h1>
-          <p className="text-slate-300">
+          <p className="text-slate-600">
             Upload your documents to complete enrollment and access your program.
           </p>
         </div>
@@ -163,7 +163,7 @@ export default function CosmetologyDocumentsPage() {
       <div className="max-w-2xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
           <div className="bg-purple-600 px-6 py-3">
-            <h2 className="text-lg font-bold text-white">Required</h2>
+            <h2 className="text-lg font-bold text-slate-900">Required</h2>
           </div>
           <div className="p-6">
             {requiredDocuments.map((doc) => (
@@ -179,7 +179,7 @@ export default function CosmetologyDocumentsPage() {
                 </div>
 
                 {governmentId ? (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
                     <FileText className="w-5 h-5 text-slate-400" />
                     <span className="flex-1 text-sm text-slate-700 truncate">
                       {governmentId.name}
@@ -215,7 +215,7 @@ export default function CosmetologyDocumentsPage() {
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
           <div className="bg-slate-600 px-6 py-3">
-            <h2 className="text-lg font-bold text-white">Optional (Can Submit Later)</h2>
+            <h2 className="text-lg font-bold text-slate-900">Optional (Can Submit Later)</h2>
           </div>
           <div className="p-6">
             {optionalDocuments.map((doc) => (
@@ -226,7 +226,7 @@ export default function CosmetologyDocumentsPage() {
                     <p className="text-sm text-slate-500">{doc.description}</p>
                   </div>
                 </div>
-                <label className="flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-300 hover:bg-slate-50 transition">
+                <label className="flex items-center justify-center gap-2 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-300 hover:bg-white transition">
                   <Upload className="w-4 h-4 text-slate-400" />
                   <span className="text-sm text-slate-500">Upload (optional)</span>
                   <input

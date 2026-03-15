@@ -91,10 +91,10 @@ export function CookieBanner() {
 
         {/* Additional Links */}
         <div className="mt-3 pt-3 border-t border-slate-700 flex flex-wrap gap-4 text-xs text-slate-400">
-          <Link href="/privacy" aria-label="Link" className="hover:text-white transition">
+          <Link href="/privacy-policy" aria-label="Link" className="hover:text-white transition">
             Privacy Policy
           </Link>
-          <Link href="/terms" aria-label="Link" className="hover:text-white transition">
+          <Link href="/terms-of-service" aria-label="Link" className="hover:text-white transition">
             Terms of Service
           </Link>
           <Link href="/cookies" aria-label="Link" className="hover:text-white transition">

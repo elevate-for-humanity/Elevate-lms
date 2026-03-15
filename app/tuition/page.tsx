@@ -26,7 +26,7 @@ export default async function TuitionPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -50,7 +50,7 @@ export default async function TuitionPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-slate-900 py-12 sm:py-16">
+      <section className="relative bg-white py-12 sm:py-16">
         <Image
           src="/images/pages/tuition-hero.jpg"
           alt="Tuition and Payment Options"
@@ -160,7 +160,7 @@ export default async function TuitionPage() {
             </div>
 
             {/* Pathway 3: Structured Student Tuition */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 sm:p-8">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-200 rounded-lg flex items-center justify-center">
                   <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600" />
@@ -211,7 +211,7 @@ export default async function TuitionPage() {
       </section>
 
       {/* Important Notes */}
-      <section className="py-12 sm:py-16 bg-slate-50">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             Important Notes
@@ -220,19 +220,19 @@ export default async function TuitionPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
             <ul className="space-y-3 text-slate-700">
               <li className="flex items-start gap-3">
-                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
                 <span>Funding pathways are determined prior to enrollment</span>
               </li>
               <li className="flex items-start gap-3">
-                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
                 <span>Payment terms are standardized and non-negotiable</span>
               </li>
               <li className="flex items-start gap-3">
-                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
                 <span>Enrollment and completion credentials require active good-standing status</span>
               </li>
               <li className="flex items-start gap-3">
-                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
                 <span>Our team will guide you through eligibility screening and documentation</span>
               </li>
             </ul>
@@ -241,7 +241,7 @@ export default async function TuitionPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-12 sm:py-16 bg-slate-50">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Tuition FAQ</h2>
           <div className="space-y-4">
@@ -256,7 +256,7 @@ export default async function TuitionPage() {
               <details key={i} className="bg-white rounded-xl overflow-hidden shadow-sm group">
                 <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                   {faq.q}
-                  <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-slate-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
@@ -280,7 +280,7 @@ export default async function TuitionPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/start"
-              className="inline-flex items-center justify-center gap-2 bg-brand-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-600 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
             >
               Apply Now
             </Link>

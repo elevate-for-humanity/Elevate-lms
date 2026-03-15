@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function OutcomesMethodologyPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Governance', href: '/governance' }, { label: 'Outcomes Methodology' }]} />
         </div>
@@ -71,7 +71,7 @@ export default function OutcomesMethodologyPage() {
             Metric Definitions
           </h2>
           <div className="space-y-6">
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-3">
                 <Users className="w-5 h-5 text-brand-blue-600" />
                 <h3 className="font-bold text-slate-900">&ldquo;Students Accepted&rdquo;</h3>
@@ -87,7 +87,7 @@ export default function OutcomesMethodologyPage() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-3">
                 <CheckCircle className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-slate-900">&ldquo;Job Placement Rate&rdquo;</h3>
@@ -107,7 +107,7 @@ export default function OutcomesMethodologyPage() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-3">
                 <Clock className="w-5 h-5 text-amber-600" />
                 <h3 className="font-bold text-slate-900">&ldquo;Days to Paycheck&rdquo;</h3>
@@ -130,7 +130,7 @@ export default function OutcomesMethodologyPage() {
           <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4">
             Data Sources
           </h2>
-          <div className="bg-slate-50 rounded-xl p-6">
+          <div className="bg-white rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <Database className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-bold text-slate-900">How We Collect Outcome Data</h3>
@@ -161,7 +161,7 @@ export default function OutcomesMethodologyPage() {
           <h2 className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4">
             Cohort Definition
           </h2>
-          <div className="bg-slate-50 rounded-xl p-6">
+          <div className="bg-white rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <Calendar className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-bold text-slate-900">Current Reporting Cohort</h3>

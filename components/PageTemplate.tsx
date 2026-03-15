@@ -76,7 +76,7 @@ export function PageTemplate({
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <ClickableImage src={heroImage} alt={heroImageAlt || title} fill priority sizes="100vw" objectFit="cover" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
@@ -211,7 +211,7 @@ export function PageTemplate({
 
       {/* CTA Section */}
       {finalCTA && (
-        <section className="py-16 bg-slate-900 text-white">
+        <section className="py-16 bg-white border-t">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold mb-4">{finalCTA.title}</h2>

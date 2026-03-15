@@ -40,7 +40,7 @@ const certs = (dbRows as any[]) || [];
                 <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                   c.status === 'Earned' ? 'bg-brand-green-100 text-brand-green-800' :
                   c.status === 'In Progress' ? 'bg-brand-blue-100 text-brand-blue-800' :
-                  'bg-gray-100 text-gray-500'
+                  'bg-white text-gray-500'
                 }`}>{c.status}</span>
                 {c.status === 'Earned' && (
                   <button className="p-2 text-gray-400 hover:text-gray-600"><Download className="w-4 h-4" /></button>

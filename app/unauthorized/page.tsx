@@ -19,7 +19,7 @@ export default async function UnauthorizedPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -31,7 +31,7 @@ export default async function UnauthorizedPage() {
   // Log unauthorized access attempt
   await db.from('audit_logs').insert({ action: 'unauthorized_access', event_type: 'security' }).select();
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 sm:p-12 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-red-100 rounded-full mb-6">
           <ShieldAlert className="w-10 h-10 text-brand-red-600" />

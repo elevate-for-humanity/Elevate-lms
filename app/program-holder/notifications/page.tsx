@@ -20,7 +20,7 @@ export default async function ProgramHolderNotificationsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Notifications" }]} />
         </div>
@@ -51,7 +51,7 @@ export default async function ProgramHolderNotificationsPage() {
   const unreadCount = notifications?.filter((n) => !n.read).length || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Notifications" }]} />
         </div>

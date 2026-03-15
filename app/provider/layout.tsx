@@ -44,7 +44,7 @@ export default async function ProviderLayout({
   if (!tenant || tenant.status === 'suspended') {
     // Suspended providers see a holding page, not the portal
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-md text-center px-4">
           <h1 className="text-xl font-bold text-slate-900 mb-2">Account Suspended</h1>
           <p className="text-slate-600 text-sm">
@@ -60,7 +60,7 @@ export default async function ProviderLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
       <aside className="w-56 bg-slate-900 flex-shrink-0 flex flex-col">
         <div className="px-4 py-5 border-b border-slate-700">

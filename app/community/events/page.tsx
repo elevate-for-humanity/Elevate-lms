@@ -32,7 +32,7 @@ export default async function CommunityEventsPage() {
           alt="Elevate community events and workshops"
           fill className="object-cover" priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Community</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Events &amp; Workshops</h1>
@@ -82,7 +82,7 @@ export default async function CommunityEventsPage() {
           <p className="text-slate-400 mt-2 text-sm max-w-lg mx-auto">
             Have an idea for a workshop or want to share your expertise with the community?
           </p>
-          <Link href="/contact" className="mt-5 inline-block bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors">
+          <Link href="/contact" className="mt-5 inline-block bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-white transition-colors">
             Get in touch
           </Link>
         </div>

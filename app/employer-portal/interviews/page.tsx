@@ -82,7 +82,7 @@ export default async function InterviewsPage() {
     });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Interviews" }]} />
 {/* Header */}
       <section className="bg-white border-b">
@@ -108,18 +108,18 @@ export default async function InterviewsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <button className="p-2 hover:bg-white rounded-lg">
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <h2 className="text-lg font-semibold">January 2025</h2>
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <button className="p-2 hover:bg-white rounded-lg">
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
             <div className="flex gap-2">
               <button className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 font-medium rounded-lg">Day</button>
-              <button className="px-4 py-2 hover:bg-gray-100 rounded-lg">Week</button>
-              <button className="px-4 py-2 hover:bg-gray-100 rounded-lg">Month</button>
+              <button className="px-4 py-2 hover:bg-white rounded-lg">Week</button>
+              <button className="px-4 py-2 hover:bg-white rounded-lg">Month</button>
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default async function InterviewsPage() {
                       }`}>
                         {interview.status}
                       </span>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg">
+                      <button className="p-2 hover:bg-white rounded-lg">
                         <MoreVertical className="w-5 h-5 text-gray-400" />
                       </button>
                     </div>
@@ -180,10 +180,10 @@ export default async function InterviewsPage() {
                         Join Call
                       </button>
                     )}
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                    <button className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition-colors">
                       Reschedule
                     </button>
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                    <button className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition-colors">
                       Cancel
                     </button>
                   </div>

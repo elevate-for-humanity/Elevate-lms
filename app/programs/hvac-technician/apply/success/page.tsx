@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function HvacApplicationSuccessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -27,7 +27,7 @@ export default function HvacApplicationSuccessPage() {
             We&apos;ve received your application and will be in touch soon.
           </p>
 
-          <div className="bg-gray-50 rounded-xl p-6 text-left mb-8">
+          <div className="bg-white rounded-xl p-6 text-left mb-8">
             <h2 className="font-semibold text-gray-900 mb-4">What Happens Next</h2>
             <div className="space-y-3">
               {[
@@ -62,7 +62,7 @@ export default function HvacApplicationSuccessPage() {
             </Link>
             <Link
               href="/support"
-              className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 border border-gray-300 hover:bg-white text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors"
             >
               <Phone className="w-4 h-4" /> Contact Us
             </Link>

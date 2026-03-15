@@ -45,7 +45,7 @@ export default function AnnouncementsFeed() {
   // Loading state - minimal skeleton
   if (loading) {
     return (
-      <section className="bg-gray-100 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-8">
             <Bell className="w-8 h-8 text-brand-orange-600" />
@@ -125,7 +125,7 @@ export default function AnnouncementsFeed() {
   };
 
   return (
-    <section className="bg-gray-100 py-16">
+    <section className="bg-white py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-3 mb-8">
           <Bell className="w-8 h-8 text-brand-orange-600" />

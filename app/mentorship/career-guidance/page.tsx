@@ -25,7 +25,7 @@ export default function CareerGuidancePage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Mentorship", href: "/mentorship" }, { label: "Career Guidance" }]} />
       </div>
-<div className="bg-gray-50 border-b">
+<div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -59,7 +59,7 @@ export default function CareerGuidancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How It Works</h2>
           <div className="space-y-6">

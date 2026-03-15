@@ -75,7 +75,7 @@ export default function VerificationApprovalsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Verification & Approvals' }]} />
         </div>
@@ -92,7 +92,7 @@ export default function VerificationApprovalsPage() {
         <div className="space-y-8">
           {verifications.map((section) => (
             <section key={section.category} className="border border-slate-200 rounded-xl overflow-hidden">
-              <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
+              <div className="bg-white px-5 py-3 border-b border-slate-200">
                 <h2 className="font-bold text-slate-900 text-sm uppercase tracking-wider">{section.category}</h2>
               </div>
               <div className="divide-y divide-slate-100">
@@ -108,7 +108,7 @@ export default function VerificationApprovalsPage() {
         </div>
 
         {/* Disclaimer */}
-        <div className="mt-10 bg-slate-50 border border-slate-200 rounded-lg p-5">
+        <div className="mt-10 bg-white border border-slate-200 rounded-lg p-5">
           <p className="text-xs text-slate-500 leading-relaxed">
             Information on this page is provided for verification purposes by workforce partners, reviewing agencies, and authorized parties. Registration and approval status is subject to change based on agency review cycles. For the most current status, contact the referenced agency directly. This page does not constitute a claim of institutional accreditation.
           </p>

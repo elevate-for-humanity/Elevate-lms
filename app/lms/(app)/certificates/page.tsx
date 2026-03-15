@@ -26,7 +26,7 @@ export default async function CertificatesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Certificates" }]} />
         </div>
@@ -66,7 +66,7 @@ export default async function CertificatesPage() {
     .order('completed_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <div className="min-h-screen bg-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Certificates" }]} />
         </div>
@@ -120,7 +120,7 @@ export default async function CertificatesPage() {
               automatically generated when you finish all course requirements.
             </p>
             <Link
-              href="/lms/courses"
+              href="/learner/courses"
               className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
             >
               View My Courses
@@ -157,7 +157,7 @@ export default async function CertificatesPage() {
                     {!t.pdf_url && t.certificate_id && (
                       <Link
                         href={`/certificates/${t.certificate_id}`}
-                        className="inline-flex items-center gap-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition"
+                        className="inline-flex items-center gap-1.5 border border-slate-300 hover:bg-white text-slate-700 text-sm font-medium px-4 py-2 rounded-lg transition"
                       >
                         View Certificate
                       </Link>

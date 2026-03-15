@@ -18,7 +18,7 @@ export default async function DIYInterviewPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -33,7 +33,7 @@ export default async function DIYInterviewPage() {
     .select('*')
     .order('order_index');
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="min-h-screen bg-white py-16">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Interview" }]} />
       </div>
@@ -101,19 +101,19 @@ export default async function DIYInterviewPage() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Filing Status</h3>
               <div className="space-y-2">
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-white cursor-pointer">
                   <input type="radio" name="filing_status" value="single" className="mr-3" />
                   <span>Single</span>
                 </label>
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-white cursor-pointer">
                   <input type="radio" name="filing_status" value="married_joint" className="mr-3" />
                   <span>Married Filing Jointly</span>
                 </label>
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-white cursor-pointer">
                   <input type="radio" name="filing_status" value="married_separate" className="mr-3" />
                   <span>Married Filing Separately</span>
                 </label>
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <label className="flex items-center p-4 border border-gray-300 rounded-lg hover:bg-white cursor-pointer">
                   <input type="radio" name="filing_status" value="head_of_household" className="mr-3" />
                   <span>Head of Household</span>
                 </label>
@@ -123,7 +123,7 @@ export default async function DIYInterviewPage() {
             <div className="flex justify-between pt-6 border-t">
               <Link
                 href="/supersonic-fast-cash/diy/start"
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white font-semibold transition-colors"
               >
                 Back
               </Link>

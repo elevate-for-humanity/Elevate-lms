@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function PartnershipsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partnerships' }]} />
         </div>
@@ -50,7 +50,7 @@ export default function PartnershipsPage() {
               { icon: Shield, title: 'Case Managers & Reentry', desc: 'JRI-approved provider. We accept referrals from probation, community corrections, and reentry coordinators. Progress reports sent on your schedule.' },
               { icon: Briefcase, title: 'Employers & OJT Hosts', desc: 'Host apprentices and OJT participants at your site. We provide trained candidates in HVAC, electrical, plumbing, barbering, healthcare, and CDL.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200">
                 <item.icon className="w-8 h-8 text-brand-blue-600 mb-3" />
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-sm text-slate-600">{item.desc}</p>
@@ -61,7 +61,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* How It Works for Partners */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">How Referrals Work</h2>
           <div className="grid md:grid-cols-4 gap-6">
@@ -96,7 +96,7 @@ export default function PartnershipsPage() {
               { label: 'Workforce Ready Grant', value: 'High-demand certification programs qualify for WRG through Next Level Jobs' },
               { label: 'Certificate Verification', value: 'All completions verifiable at elevateforhumanity.org/cert/verify' },
             ].map((item) => (
-              <div key={item.label} className="flex items-start gap-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+              <div key={item.label} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
                 <FileCheck className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-slate-900 text-sm">{item.label}</p>
@@ -115,7 +115,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Programs Available */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs Available for Referral</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -162,7 +162,7 @@ export default function PartnershipsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/partners/training"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Training Provider Partnership <ArrowRight className="w-4 h-4" />
             </Link>

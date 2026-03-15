@@ -114,14 +114,14 @@ export default function CreateCoursePage() {
   const selectedLicenseData = licenses.find(l => l.license_key === selectedLicense);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-4.jpg" alt="Create course" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Courses', href: '/partner/courses' }, { label: 'Create' }]} />
         </div>
@@ -291,7 +291,7 @@ export default function CreateCoursePage() {
                 <button
                   type="button"
                   onClick={() => window.history.back()}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>

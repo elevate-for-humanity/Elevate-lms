@@ -117,9 +117,9 @@ export default async function ApplicationSuccessPage({
   const config = isEnrolled ? ENROLLED_CONFIG : (ROLE_CONFIG[role] || ROLE_CONFIG.student);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Success' }]} />
         </div>
@@ -223,7 +223,7 @@ export default async function ApplicationSuccessPage({
             </Link>
             <Link
               href="/"
-              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-50 transition"
+              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-white transition"
             >
               Return Home
             </Link>

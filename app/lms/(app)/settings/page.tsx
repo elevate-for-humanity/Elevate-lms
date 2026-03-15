@@ -78,7 +78,7 @@ export default async function SettingsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Settings" }]} />
         </div>
@@ -112,7 +112,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Settings" }]} />
         </div>
@@ -195,10 +195,10 @@ export default async function SettingsPage() {
           <div className="divide-y divide-slate-200">
             <Link
               href="/lms/settings/billing"
-              className="flex items-center justify-between p-6 hover:bg-slate-50 transition"
+              className="flex items-center justify-between p-6 hover:bg-white transition"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                   <CreditCard className="w-5 h-5 text-slate-600" />
                 </div>
                 <div>
@@ -210,10 +210,10 @@ export default async function SettingsPage() {
             </Link>
             <Link
               href="/lms/settings/data"
-              className="flex items-center justify-between p-6 hover:bg-slate-50 transition"
+              className="flex items-center justify-between p-6 hover:bg-white transition"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                   <Shield className="w-5 h-5 text-slate-600" />
                 </div>
                 <div>

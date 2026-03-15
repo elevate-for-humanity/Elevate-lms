@@ -22,12 +22,12 @@ function StatusBadge({ status }: { status: string }) {
     ineligible: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: XCircle },
     enrolled_pending_approval: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock },
     paused: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: AlertCircle },
-    withdrawn: { bg: 'bg-slate-100', text: 'text-slate-700', icon: XCircle },
+    withdrawn: { bg: 'bg-white', text: 'text-slate-700', icon: XCircle },
     approved: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: CheckCircle },
     rejected: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: XCircle },
   };
 
-  const c = config[status] || { bg: 'bg-slate-100', text: 'text-slate-700', icon: Clock };
+  const c = config[status] || { bg: 'bg-white', text: 'text-slate-700', icon: Clock };
   const Icon = c.icon;
 
   return (
@@ -42,7 +42,7 @@ function StatusBadge({ status }: { status: string }) {
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof User; children: React.ReactNode }) {
   return (
     <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-3">
+      <div className="bg-white px-6 py-4 border-b border-slate-200 flex items-center gap-3">
         <Icon className="w-5 h-5 text-slate-600" />
         <h2 className="font-semibold text-slate-900">{title}</h2>
       </div>
@@ -69,7 +69,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-6">
@@ -78,7 +78,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
               <div className="text-sm text-slate-500 mb-1">Case File</div>
               <h1 className="text-2xl font-bold text-slate-900">{caseFile.profile.fullName}</h1>
               <div className="flex items-center gap-4 mt-2 text-sm text-slate-600">
-                <span className="font-mono bg-slate-100 px-2 py-0.5 rounded">{caseFile.caseNumber}</span>
+                <span className="font-mono bg-white px-2 py-0.5 rounded">{caseFile.caseNumber}</span>
                 <StatusBadge status={caseFile.caseStatus.status} />
               </div>
             </div>
@@ -160,7 +160,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
             </div>
           </div>
           {caseFile.eligibility.notes && (
-            <div className="mt-4 p-3 bg-slate-50 rounded-lg text-sm text-slate-600">
+            <div className="mt-4 p-3 bg-white rounded-lg text-sm text-slate-600">
               <div className="font-medium text-slate-700 mb-1">Advisor Notes</div>
               {caseFile.eligibility.notes}
             </div>
@@ -174,7 +174,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
           ) : (
             <div className="space-y-3">
               {caseFile.enrollments.map(enrollment => (
-                <div key={enrollment.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div key={enrollment.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div>
                     <div className="font-medium text-slate-900">{enrollment.programName}</div>
                     <div className="text-sm text-slate-500">
@@ -203,7 +203,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
           ) : (
             <div className="space-y-2">
               {caseFile.documents.map(doc => (
-                <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div key={doc.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div>
                     <div className="font-medium text-slate-900">{doc.name}</div>
                     <div className="text-sm text-slate-500">
@@ -224,7 +224,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
           ) : (
             <div className="space-y-2">
               {caseFile.credentials.map(cred => (
-                <div key={cred.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div key={cred.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div>
                     <div className="font-medium text-slate-900">{cred.name}</div>
                     <div className="text-sm text-slate-500">
@@ -294,7 +294,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Footer */}
-      <footer className="bg-slate-100 border-t border-slate-200 py-4 mt-8">
+      <footer className="bg-white border-t border-slate-200 py-4 mt-8">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-slate-500">
           Case file data is confidential. Access is logged and audited.
         </div>

@@ -78,7 +78,7 @@ export default async function LicenseeOnboardingPage() {
   const currentStep = steps.findIndex(s => !s.completed);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900">Welcome to Elevate For Humanity</h1>
@@ -98,7 +98,7 @@ export default async function LicenseeOnboardingPage() {
                       ? 'bg-brand-green-100 text-brand-green-600' 
                       : index === currentStep 
                         ? 'bg-brand-blue-100 text-brand-blue-600' 
-                        : 'bg-gray-100 text-gray-400'
+                        : 'bg-white text-gray-400'
                   }`}>
                     {step.completed ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
@@ -148,7 +148,7 @@ export default async function LicenseeOnboardingPage() {
                 };
                 
                 return (
-                  <div key={type} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={type} className="flex items-center justify-between p-4 bg-white rounded-lg">
                     <div className="flex items-center gap-3">
                       {accepted ? (
                         <span className="text-slate-400 flex-shrink-0">•</span>

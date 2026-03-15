@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function EmploymentSupportPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Support Services' }]} />
         </div>
@@ -103,7 +103,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Path to Employment — steps */}
-      <section className="py-8 sm:py-14 bg-slate-50">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">
             Your Path to Employment
@@ -177,7 +177,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Training + Support Connection */}
-      <section className="py-8 sm:py-14 bg-slate-50">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -234,7 +234,7 @@ export default function EmploymentSupportPage() {
       {/* Compliance Disclaimer */}
       <section className="py-6 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
+          <div className="rounded-xl bg-white border border-slate-200 p-4">
             <p className="text-sm text-slate-600">
               <strong>Disclosure:</strong> Elevate for Humanity provides employment assistance and employer connections.
               Job placement is not guaranteed and depends on participant readiness, local hiring demand, and employer

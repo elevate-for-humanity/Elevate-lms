@@ -486,7 +486,7 @@ export default function CurvatureShopPage() {
   }, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
@@ -558,7 +558,7 @@ export default function CurvatureShopPage() {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     selectedCategory === category
                       ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {categoryLabels[category] || category}
@@ -671,7 +671,7 @@ export default function CurvatureShopPage() {
               Learn About Selfish Inc.
             </Link>
             <Link
-              href="/vita"
+              href="/about"
               className="px-6 py-3 border border-white/30 text-white font-medium rounded-lg hover:bg-white/10 transition"
             >
               Free VITA Services

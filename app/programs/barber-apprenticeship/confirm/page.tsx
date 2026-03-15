@@ -43,7 +43,7 @@ function ConfirmContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Processing your response...</p>
@@ -53,7 +53,7 @@ function ConfirmContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
           {/* Header */}
@@ -90,7 +90,7 @@ function ConfirmContent() {
             )}
 
             {status === 'declined' && (
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-6">
+              <div className="bg-white border border-slate-200 rounded-lg p-5 mb-6">
                 <p className="text-sm text-slate-600">
                   If you change your mind or have questions about the program, we are here to help.
                   You can reapply at any time.
@@ -113,7 +113,7 @@ function ConfirmContent() {
           </div>
 
           {/* Footer */}
-          <div className="bg-slate-50 px-8 py-4 text-center border-t border-slate-200">
+          <div className="bg-white px-8 py-4 text-center border-t border-slate-200">
             <Link href="/programs/barber-apprenticeship" className="text-sm text-brand-blue-600 font-medium hover:underline">
               View Program Details
             </Link>
@@ -135,7 +135,7 @@ function ConfirmContent() {
 export default function BarberConfirmPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />
       </div>
     }>

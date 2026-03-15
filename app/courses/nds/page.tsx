@@ -23,7 +23,7 @@ export default async function NdsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -126,7 +126,7 @@ export default async function NdsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },
@@ -186,7 +186,7 @@ export default async function NdsPage() {
       </section>
 
       {/* Courses Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Available Courses
@@ -249,7 +249,7 @@ export default async function NdsPage() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Link
               href="/programs/cdl-training"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">CDL Training</h3>
               <p className="text-black mb-4">
@@ -260,7 +260,7 @@ export default async function NdsPage() {
 
             <Link
               href="/training/certifications"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">
                 Drug Collector Certification
@@ -293,7 +293,7 @@ export default async function NdsPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-brand-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-white text-brand-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

@@ -94,7 +94,7 @@ export default function CNAEnrollPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Programs", href: "/programs" }, { label: "Enroll" }]} />
       </div>
@@ -290,7 +290,7 @@ export default function CNAEnrollPage() {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex-1 border border-gray-300 py-3 rounded-lg font-bold hover:bg-gray-50"
+                      className="flex-1 border border-gray-300 py-3 rounded-lg font-bold hover:bg-white"
                     >
                       Back
                     </button>
@@ -404,7 +404,7 @@ export default function CNAEnrollPage() {
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="flex-1 border border-gray-300 py-3 rounded-lg font-bold hover:bg-gray-50"
+                      className="flex-1 border border-gray-300 py-3 rounded-lg font-bold hover:bg-white"
                     >
                       Back
                     </button>

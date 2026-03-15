@@ -23,7 +23,7 @@ export default async function FileManagerPage() {
   if (!user) redirect('/login?redirect=/file-manager');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'File Manager' }]} />
@@ -63,8 +63,8 @@ export default async function FileManagerPage() {
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Recent Files</h2>
             <div className="flex gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded"><Grid className="w-5 h-5 text-gray-600" /></button>
-              <button className="p-2 hover:bg-gray-100 rounded"><List className="w-5 h-5 text-gray-600" /></button>
+              <button className="p-2 hover:bg-white rounded"><Grid className="w-5 h-5 text-gray-600" /></button>
+              <button className="p-2 hover:bg-white rounded"><List className="w-5 h-5 text-gray-600" /></button>
             </div>
           </div>
           <div className="p-8 text-center">

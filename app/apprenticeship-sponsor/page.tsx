@@ -77,7 +77,7 @@ export default function ApprenticeshipSponsorPage() {
               { title: 'Compliance Reporting', desc: 'Submit required reports to USDOL, Indiana DWD, and applicable state agencies.' },
               { title: 'Quality Assurance', desc: 'Conduct site visits, monitor training quality, and enforce program standards.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-lg p-5 border border-slate-200">
+              <div key={item.title} className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-sm text-slate-600">{item.desc}</p>
               </div>
@@ -102,7 +102,7 @@ export default function ApprenticeshipSponsorPage() {
               </p>
               <p className="text-brand-red-700 text-xs mt-3 font-medium">Provided by: The Institute (Sponsor)</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+            <div className="bg-white border border-slate-200 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 text-lg mb-2">On-the-Job Training (OJT)</h3>
               <p className="text-slate-600 text-sm leading-relaxed">
                 Delivered at licensed employer partner locations operating under formal training agreements. OJT provides supervised practical experience under the direction of licensed professionals at approved training sites.
@@ -152,7 +152,7 @@ export default function ApprenticeshipSponsorPage() {
               <Link href="/partners/barbershop-apprenticeship" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2">
                 Barbershop Partner Program <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+              <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
                 Apply as Partner Site
               </Link>
             </div>
@@ -180,7 +180,7 @@ export default function ApprenticeshipSponsorPage() {
                 <p className="text-brand-red-100 text-sm">RTI delivery, curriculum, LMS, workforce enrollment</p>
               </div>
             </div>
-            <div className="bg-slate-100 rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-white rounded-xl p-5 flex items-center gap-4">
               <span className="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded">3</span>
               <div>
                 <p className="font-bold text-slate-900">Licensed Partner Training Sites — Employer Locations</p>
@@ -195,10 +195,10 @@ export default function ApprenticeshipSponsorPage() {
           <Link href="/governance" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
             Full Governance Structure
           </Link>
-          <Link href="/approvals" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+          <Link href="/approvals" className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
             Approvals &amp; Verification
           </Link>
-          <Link href="/programs/barber-apprenticeship" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
+          <Link href="/programs/barber-apprenticeship" className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors">
             Barber Apprenticeship Program
           </Link>
         </section>

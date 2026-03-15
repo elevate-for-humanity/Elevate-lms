@@ -42,7 +42,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
         <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
@@ -80,7 +80,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -164,7 +164,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               ) : (
                 <div className="divide-y">
                   {entities.map(entity => (
-                    <Link key={entity.id} href={`/apps/sam-gov/entity/${entity.id}`} className="p-4 hover:bg-gray-50 flex items-center justify-between">
+                    <Link key={entity.id} href={`/apps/sam-gov/entity/${entity.id}`} className="p-4 hover:bg-white flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">{entity.legal_name}</h3>
                         <p className="text-sm text-gray-500">{entity.uei || 'UEI not assigned'}</p>
@@ -173,7 +173,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           entity.registration_status === 'active' ? 'bg-brand-green-100 text-brand-green-800' :
                           entity.registration_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-white text-gray-800'
                         }`}>
                           {entity.registration_status}
                         </span>
@@ -195,7 +195,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             ) : (
               <div className="space-y-4">
                 {entities.map(entity => (
-                  <Link key={entity.id} href={`/apps/sam-gov/entity/${entity.id}`} className="block p-4 border rounded-lg hover:bg-gray-50">
+                  <Link key={entity.id} href={`/apps/sam-gov/entity/${entity.id}`} className="block p-4 border rounded-lg hover:bg-white">
                     <h3 className="font-bold">{entity.legal_name}</h3>
                     <p className="text-sm text-gray-500">Status: {entity.registration_status} | Step: {entity.current_step}/7</p>
                   </Link>

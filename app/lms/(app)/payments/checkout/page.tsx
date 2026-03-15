@@ -125,7 +125,7 @@ function CheckoutContent() {
   // ── Blocked (sponsored or pending) ─────────────────────────────────
   if (blockedMessage) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-lg w-full bg-white rounded-2xl shadow-lg border p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CreditCard className="w-8 h-8 text-brand-green-600" />
@@ -146,7 +146,7 @@ function CheckoutContent() {
   // ── Exam fee checkout UI ────────────────────────────────────────────
   if (attemptId) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-lg mx-auto px-4 py-12">
           <Link href="/lms/certification" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8">
             <ArrowLeft className="w-4 h-4" />
@@ -166,7 +166,7 @@ function CheckoutContent() {
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
-            <div className="bg-slate-50 rounded-xl p-4 mb-6 text-sm text-slate-600 flex items-start gap-2">
+            <div className="bg-white rounded-xl p-4 mb-6 text-sm text-slate-600 flex items-start gap-2">
               <Lock className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
               <span>Secured by Stripe. Your card details are never stored on our servers.</span>
             </div>
@@ -185,7 +185,7 @@ function CheckoutContent() {
 
   // ── Legacy enrollment checkout UI ───────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-lg mx-auto px-4 py-12">
         <Link href={`/programs/${program}-certification/enroll`} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8">
           <ArrowLeft className="w-4 h-4" />
@@ -258,7 +258,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-blue-600 border-t-transparent" />
       </div>
     }>

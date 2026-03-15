@@ -72,7 +72,7 @@ export default async function StateBoardExamPage() {
   const examFee = IPLA_EXAM_FEES[programSlug] || 50;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
       <Breadcrumbs
         items={[
           { label: 'Apprentice Portal', href: '/apprentice' },
@@ -124,7 +124,7 @@ export default async function StateBoardExamPage() {
 
         {/* Requirements Checklist */}
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50">
+          <div className="p-4 border-b border-slate-200 bg-white">
             <h3 className="font-bold text-black">Exam Eligibility Requirements</h3>
           </div>
           <div className="divide-y divide-slate-100">
@@ -175,7 +175,7 @@ export default async function StateBoardExamPage() {
                 </span>
               ) : (
                 <Link
-                  href="/lms/progress"
+                  href="/learner/progress"
                   className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full hover:bg-brand-blue-200"
                 >
                   Access Milady →
@@ -200,7 +200,7 @@ export default async function StateBoardExamPage() {
               </div>
               <Link
                 href="/apprentice/skills"
-                className="px-3 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-full hover:bg-slate-200"
+                className="px-3 py-2 bg-white text-slate-700 text-sm font-semibold rounded-full hover:bg-slate-200"
               >
                 View Skills →
               </Link>
@@ -275,7 +275,7 @@ export default async function StateBoardExamPage() {
               </div>
 
               {/* Exam Info */}
-              <div className="bg-slate-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h4 className="font-semibold text-black mb-3">Exam Information</h4>
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
@@ -303,7 +303,7 @@ export default async function StateBoardExamPage() {
                   href={examInfo.boardUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
                 >
                   <FileText className="w-4 h-4" />
                   IPLA Board Info
@@ -312,7 +312,7 @@ export default async function StateBoardExamPage() {
                   href={examInfo.examUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
                 >
                   <FileText className="w-4 h-4" />
                   Exam Requirements
@@ -321,14 +321,14 @@ export default async function StateBoardExamPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-slate-100 rounded-xl p-8 text-center">
+          <div className="bg-white rounded-xl p-8 text-center">
             <Lock className="w-12 h-12 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-slate-600 mb-2">Exam Scheduling Locked</h3>
             <p className="text-slate-500 mb-4">
               Complete all requirements above to unlock exam scheduling.
             </p>
             <Link
-              href="/lms/progress"
+              href="/learner/progress"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
             >
               View My Progress <ArrowRight className="w-4 h-4" />

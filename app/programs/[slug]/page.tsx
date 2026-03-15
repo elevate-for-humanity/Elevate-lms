@@ -298,7 +298,7 @@ export default async function ProgramDetailPage({
   // If program has minimal data (from simple JSON), render simple template
   if (!program.heroTitle || !program.whatYouLearn) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Breadcrumbs */}
         <div className="bg-white border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -314,7 +314,7 @@ export default async function ProgramDetailPage({
             <h1 className="text-3xl font-bold mb-6">{displayProgram.name}</h1>
             
             {/* Program Quick Facts */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-slate-50 rounded-lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-white rounded-lg">
               {displayProgram.duration && (
                 <div>
                   <p className="text-sm text-gray-500">Duration</p>
@@ -441,7 +441,7 @@ export default async function ProgramDetailPage({
 
   if (useVisualTemplate) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Breadcrumbs */}
         <div className="bg-white border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -472,7 +472,7 @@ export default async function ProgramDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}

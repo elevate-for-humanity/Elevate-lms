@@ -119,7 +119,7 @@ export default function TaxCalculatorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Calculator" }]} />
       </div>
@@ -600,7 +600,7 @@ export default function TaxCalculatorPage() {
               <div className="space-y-3">
                 <button
                   onClick={saveCalculation}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-gray-200 rounded-xl font-semibold transition"
                 >
                   <Save className="w-4 h-4" />
                   Save Calculation
@@ -608,7 +608,7 @@ export default function TaxCalculatorPage() {
 
                 <button
                   onClick={shareCalculation}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-gray-200 rounded-xl font-semibold transition"
                 >
                   <Share2 className="w-4 h-4" />
                   Share Results

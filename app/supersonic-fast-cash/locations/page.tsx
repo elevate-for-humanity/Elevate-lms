@@ -21,7 +21,7 @@ export default async function LocationsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -41,7 +41,7 @@ export default async function LocationsPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Locations" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">Visit Us or Meet Online</h1>
           <p className="text-xl text-black">
@@ -152,7 +152,7 @@ export default async function LocationsPage() {
                   href="https://www.google.com/maps/place/8888+Keystone+Crossing,+Indianapolis,+IN+46240"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Get Directions
                 </a>
@@ -160,7 +160,7 @@ export default async function LocationsPage() {
             </div>
 
             {/* Map */}
-            <div className="bg-gray-100 rounded-xl overflow-hidden h-[500px]">
+            <div className="bg-white rounded-xl overflow-hidden h-[500px]">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3063.8!2d-86.0!3d39.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMznCsDU0JzAwLjAiTiA4NsKwMDAnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890"
                 width="100%"
@@ -176,7 +176,7 @@ export default async function LocationsPage() {
       </section>
 
       {/* Virtual Services */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <Video className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
@@ -320,7 +320,7 @@ export default async function LocationsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-white transition-colors"
             >
               Book Appointment
             </Link>

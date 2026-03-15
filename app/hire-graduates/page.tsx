@@ -25,7 +25,7 @@ export default async function HireGraduatesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       <PageVideoHero
         videoSrc="/videos/employer-hero.mp4"
@@ -48,7 +48,7 @@ export default async function HireGraduatesPage() {
     .eq('status', 'job_ready')
     .limit(20);
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Hire Graduates" }]} />
       </div>
@@ -130,7 +130,7 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* FAQ for Employers */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Employer FAQ</h2>
           <div className="space-y-4">
@@ -169,7 +169,7 @@ export default async function HireGraduatesPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/contact?type=employer"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
               >
                 Request Candidates
               </Link>

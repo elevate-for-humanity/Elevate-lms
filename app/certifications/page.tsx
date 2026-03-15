@@ -21,7 +21,7 @@ export default function CertificationsPage() {
   ];
 
   return (
-    <div className="bg-white">      <div className="bg-slate-50 border-b">
+    <div className="bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Certifications' }]} />
         </div>
@@ -65,7 +65,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Certifications Matter</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -96,7 +96,7 @@ export default function CertificationsPage() {
               { q: 'Can I get certified without taking a full program?', a: 'Some certifications like OSHA 10/30 are standalone courses. Others require completing a full training program first. Contact us to discuss your goals.' },
               { q: 'Do I need prior experience to get certified?', a: 'No prior experience needed for most certifications. Our training programs prepare you from the basics through certification.' },
             ].map((faq, i) => (
-              <details key={i} className="bg-slate-50 rounded-xl overflow-hidden group">
+              <details key={i} className="bg-white rounded-xl overflow-hidden group">
                 <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                   {faq.q}
                   <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ export default function CertificationsPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>
-          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply Now <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

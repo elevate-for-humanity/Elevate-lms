@@ -302,7 +302,7 @@ export default async function LearnerOnboardingPage() {
                 </div>
                 <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
                   <p style="margin:0 0 4px">Elevate for Humanity Career &amp; Technical Institute</p>
-                  <p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+                  <p style="margin:0 0 4px">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
                   <p style="margin:0"><a href="${siteUrlInner}" style="color:#999;text-decoration:underline">www.elevateforhumanity.org</a> &nbsp;|&nbsp; (317) 314-3757</p>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export default async function LearnerOnboardingPage() {
   const nextStep = ONBOARDING_STEPS.find(s => !completedSteps.includes(s.id));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding' }, { label: 'Student Onboarding' }]} />
 
       {/* VIDEO HERO — full bleed, no text on top */}
@@ -364,7 +364,7 @@ export default async function LearnerOnboardingPage() {
                 <span className="text-slate-500">{completedSteps.length} of {ONBOARDING_STEPS.length} steps complete</span>
                 <span className="font-bold text-slate-700">{progress}%</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-white rounded-full overflow-hidden">
                 <div
                   className="h-full bg-brand-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
@@ -386,7 +386,7 @@ export default async function LearnerOnboardingPage() {
               <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Approved</h2>
               <p className="text-slate-500 text-sm">Your enrollment has been approved. Access your courses and begin training.</p>
             </div>
-            <Link href="/lms/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
               Go to Student Portal <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -402,7 +402,7 @@ export default async function LearnerOnboardingPage() {
               <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Activated!</h2>
               <p className="text-slate-500 text-sm">All steps complete. Check your email for confirmation, then head to your dashboard to start your courses.</p>
             </div>
-            <Link href="/lms/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
               Go to Dashboard <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -456,14 +456,14 @@ export default async function LearnerOnboardingPage() {
                   {/* Step content */}
                   <div className="flex-1 p-5 flex flex-col justify-center">
                     <div className="flex items-start gap-3">
-                      <div className="hidden sm:flex w-9 h-9 rounded-xl bg-slate-100 items-center justify-center flex-shrink-0">
+                      <div className="hidden sm:flex w-9 h-9 rounded-xl bg-white items-center justify-center flex-shrink-0">
                         <Icon className="w-4 h-4 text-slate-500" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-bold text-slate-900">{step.title}</h3>
                           {isComplete && (
-                            <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Done</span>
+                            <span className="text-[10px] font-semibold uppercase tracking-wider bg-white text-slate-500 px-2 py-0.5 rounded-full">Done</span>
                           )}
                         </div>
                         <p className="text-slate-500 text-sm leading-relaxed mb-3">{step.description}</p>

@@ -13,7 +13,7 @@ const sections = [
 export default function ProgramHolderGuidePage() {
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Docs", href: "/docs" }, { label: "Program Holder Guide" }]} />
       </div>
@@ -59,8 +59,8 @@ export default function ProgramHolderGuidePage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Need Help?</h2>
           <p className="text-gray-600 mb-4">Our support team is available to assist you with any questions.</p>
           <div className="flex gap-4">
-            <Link href="/contact" className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">Contact Support</Link>
-            <Link href="/docs" className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">Browse All Docs</Link>
+            <Link href="/contact" className="px-4 py-2 bg-white rounded-lg hover:bg-gray-200">Contact Support</Link>
+            <Link href="/docs" className="px-4 py-2 bg-white rounded-lg hover:bg-gray-200">Browse All Docs</Link>
           </div>
         </div>
       </div>

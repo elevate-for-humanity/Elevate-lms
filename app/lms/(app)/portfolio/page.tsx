@@ -25,7 +25,7 @@ export default async function PortfolioPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -62,7 +62,7 @@ export default async function PortfolioPage() {
     .order('completed_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -86,7 +86,7 @@ export default async function PortfolioPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 text-gray-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg hover:bg-white text-gray-700">
               <Share2 className="w-4 h-4" />
               Share Portfolio
             </button>
@@ -151,7 +151,7 @@ export default async function PortfolioPage() {
               {certificates && certificates.length > 0 ? (
                 <div className="divide-y">
                   {certificates.map((cert: any) => (
-                    <div key={cert.id} className="p-6 hover:bg-gray-50">
+                    <div key={cert.id} className="p-6 hover:bg-white">
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="font-medium text-gray-900">{cert.title}</h3>
@@ -167,13 +167,13 @@ export default async function PortfolioPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="View">
+                          <button className="p-2 hover:bg-white rounded-lg" title="View">
                             <Eye className="w-4 h-4 text-gray-600" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="Download">
+                          <button className="p-2 hover:bg-white rounded-lg" title="Download">
                             <Download className="w-4 h-4 text-gray-600" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="Share">
+                          <button className="p-2 hover:bg-white rounded-lg" title="Share">
                             <ExternalLink className="w-4 h-4 text-gray-600" />
                           </button>
                         </div>
@@ -189,7 +189,7 @@ export default async function PortfolioPage() {
                     Complete courses to earn certificates and credentials
                   </p>
                   <Link
-                    href="/lms/courses"
+                    href="/learner/courses"
                     className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                   >
                     Browse Courses →
@@ -209,7 +209,7 @@ export default async function PortfolioPage() {
               {completedCourses && completedCourses.length > 0 ? (
                 <div className="divide-y">
                   {completedCourses.map((enrollment: any) => (
-                    <div key={enrollment.id} className="p-6 hover:bg-gray-50">
+                    <div key={enrollment.id} className="p-6 hover:bg-white">
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="font-medium text-gray-900">
@@ -295,24 +295,24 @@ export default async function PortfolioPage() {
                   <Trophy className="w-5 h-5 text-yellow-600" />
                   Recent Badges
                 </h2>
-                <Link href="/lms/badges" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
+                <Link href="/learner/badges" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                   View All
                 </Link>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-center p-3 bg-white rounded-lg">
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Star className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <p className="text-xs text-gray-600">First Steps</p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 rounded-lg opacity-40">
+                <div className="text-center p-3 bg-white rounded-lg opacity-40">
                   <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Flame className="w-5 h-5 text-gray-400" />
                   </div>
                   <p className="text-xs text-gray-400">Locked</p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 rounded-lg opacity-40">
+                <div className="text-center p-3 bg-white rounded-lg opacity-40">
                   <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Trophy className="w-5 h-5 text-gray-400" />
                   </div>

@@ -38,7 +38,7 @@ export default async function JoinCommunityPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Join' }]} />
         </div>
@@ -69,7 +69,7 @@ export default async function JoinCommunityPage() {
 
       {/* Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="py-16 bg-slate-50">
+        <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">What Our Community Says</h2>
             <div className="grid md:grid-cols-2 gap-8">
@@ -110,7 +110,7 @@ export default async function JoinCommunityPage() {
             <Link href="/start" className="bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
               Apply Now
             </Link>
-            <Link href="/programs" className="border border-slate-300 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 transition">
+            <Link href="/programs" className="border border-slate-300 px-8 py-4 rounded-lg font-semibold hover:bg-white transition">
               Browse Programs
             </Link>
           </div>

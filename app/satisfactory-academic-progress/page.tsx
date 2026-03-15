@@ -88,7 +88,7 @@ export default function SAPPolicyPage() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse mt-4">
                   <thead>
-                    <tr className="bg-gray-100">
+                    <tr className="bg-white">
                       <th className="text-left p-3 border">Program</th>
                       <th className="text-left p-3 border">Published Length</th>
                       <th className="text-left p-3 border">Maximum Timeframe</th>
@@ -100,7 +100,7 @@ export default function SAPPolicyPage() {
                       <td className="p-3 border">12 months</td>
                       <td className="p-3 border">18 months</td>
                     </tr>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-white">
                       <td className="p-3 border">HVAC Technician</td>
                       <td className="p-3 border">9 months</td>
                       <td className="p-3 border">13.5 months</td>
@@ -110,7 +110,7 @@ export default function SAPPolicyPage() {
                       <td className="p-3 border">12 weeks</td>
                       <td className="p-3 border">18 weeks</td>
                     </tr>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-white">
                       <td className="p-3 border">CNA</td>
                       <td className="p-3 border">6 weeks</td>
                       <td className="p-3 border">9 weeks</td>
@@ -131,7 +131,7 @@ export default function SAPPolicyPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">SAP Evaluation Points</h2>
           
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               SAP is evaluated at the following points:
             </p>
@@ -203,7 +203,7 @@ export default function SAPPolicyPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">SAP Appeal Process</h2>
           
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               Students who fail to meet SAP may appeal if extenuating circumstances affected 
               their academic performance. Extenuating circumstances may include:
@@ -235,7 +235,7 @@ export default function SAPPolicyPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Re-establishing SAP</h2>
           
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               Students on Warning or Probation can return to Good Standing by:
             </p>
@@ -257,7 +257,7 @@ export default function SAPPolicyPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Incomplete Grades and Withdrawals</h2>
           
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Incomplete (I) Grades</h3>
               <p className="text-gray-700">
                 Incomplete grades count as attempted but not completed for pace calculations. 
@@ -266,7 +266,7 @@ export default function SAPPolicyPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Withdrawals (W)</h3>
               <p className="text-gray-700">
                 Withdrawn courses count as attempted but not completed for pace calculations. 
@@ -274,7 +274,7 @@ export default function SAPPolicyPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Repeated Coursework</h3>
               <p className="text-gray-700">
                 Students may repeat failed coursework once. Both attempts count toward 
@@ -308,7 +308,7 @@ export default function SAPPolicyPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

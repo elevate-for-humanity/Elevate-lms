@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ScormPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -37,10 +37,10 @@ export default async function ScormPage() {
   const progressMap = new Map((progressData || []).map((p: any) => [p.scorm_id, p]));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-brand-blue-600">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">SCORM Content</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/learner/dashboard" className="hover:text-brand-blue-600">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">SCORM Content</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">SCORM Content</h1>
           <p className="text-gray-600 mt-2">Interactive learning modules with embedded progress tracking</p>
         </div>
@@ -57,7 +57,7 @@ export default async function ScormPage() {
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isCompleted ? 'bg-brand-green-100' : 'bg-brand-blue-100'}`}>
                     <svg className={`w-5 h-5 ${isCompleted ? 'text-brand-green-600' : 'text-brand-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                   </div>
-                  <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">SCORM {pkg.scorm_version || '1.2'}</span>
+                  <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded">SCORM {pkg.scorm_version || '1.2'}</span>
                   {isCompleted && <span className="text-xs text-brand-green-700 bg-brand-green-100 px-2 py-1 rounded font-medium">Completed</span>}
                 </div>
                 <h3 className="font-semibold text-slate-900 mb-1">{pkg.title}</h3>
@@ -66,7 +66,7 @@ export default async function ScormPage() {
                 {pkg.duration_minutes && <p className="text-xs text-slate-400 mb-3">{pkg.duration_minutes} min</p>}
                 {pct > 0 && !isCompleted && (
                   <div className="mb-3">
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white rounded-full overflow-hidden">
                       <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="text-xs text-slate-500 mt-1">{pct}% complete</p>

@@ -20,7 +20,7 @@ export default async function InstructorSettingsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -45,14 +45,14 @@ export default async function InstructorSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/instructor-page-12.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Settings' }]} />
         </div>
@@ -148,7 +148,7 @@ export default async function InstructorSettingsPage() {
           </div>
           
           <div className="space-y-4">
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">New Enrollments</div>
                 <div className="text-sm text-gray-600">Get notified when students enroll in your courses</div>
@@ -156,7 +156,7 @@ export default async function InstructorSettingsPage() {
               <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">Student Messages</div>
                 <div className="text-sm text-gray-600">Get notified when students send you messages</div>
@@ -164,7 +164,7 @@ export default async function InstructorSettingsPage() {
               <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">Course Completions</div>
                 <div className="text-sm text-gray-600">Get notified when students complete your courses</div>

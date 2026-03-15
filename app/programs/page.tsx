@@ -41,6 +41,7 @@ export default function ProgramCatalogPage() {
       <PageVideoHero
         videoSrc="/videos/program-hero.mp4"
         posterSrc="/images/pages/programs-hero.jpg"
+        audioSrc="/audio/heroes/programs.mp3"
         posterAlt="Workforce training programs — trades, healthcare, technology"
         size="primary"
       />
@@ -61,9 +62,9 @@ export default function ProgramCatalogPage() {
       </div>
 
       {/* Stats bar */}
-      <section className="bg-slate-900 py-5">
+      <section className="bg-white py-5 border-b">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-white">
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-2 text-sm text-slate-900">
             <span><strong className="text-brand-blue-400">{ALL_PROGRAMS.length}</strong> Programs</span>
             <span><strong className="text-brand-blue-400">{totalCredentials}</strong> Industry Credentials</span>
             <span><strong className="text-brand-blue-400">{totalSectors}</strong> Sectors</span>
@@ -80,14 +81,14 @@ export default function ProgramCatalogPage() {
       />
 
       {/* CTA */}
-      <section className="bg-slate-900 py-12">
+      <section className="bg-white py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white">Not Sure Which Program Is Right for You?</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Not Sure Which Program Is Right for You?</h2>
           <p className="text-slate-400 mt-2 max-w-xl mx-auto">
             Talk to an advisor. We help you match your goals, schedule, and funding eligibility to the right training pathway.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
-            <Link href="/start" className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-colors">
+            <Link href="/start" className="bg-white text-slate-900 px-8 py-3 rounded-lg font-semibold text-sm hover:bg-white transition-colors">
               Apply Now
             </Link>
             <Link href="/for/students" className="bg-slate-700 text-white px-8 py-3 rounded-lg font-semibold text-sm hover:bg-slate-600 transition-colors">
@@ -105,10 +106,10 @@ export default function ProgramCatalogPage() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also Available</h2>
           <div className="flex flex-wrap gap-3">
-            <Link href="/programs/micro-programs" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+            <Link href="/programs/micro-programs" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
               Micro Programs &amp; Short Certifications
             </Link>
-            <Link href="/programs/federal-funded" className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
+            <Link href="/programs/federal-funded" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-blue-300 hover:text-brand-blue-700 transition-colors">
               Federally Funded Programs
             </Link>
           </div>
@@ -116,7 +117,7 @@ export default function ProgramCatalogPage() {
       </section>
 
       {/* Institutional footer */}
-      <section className="bg-slate-50 border-t py-8">
+      <section className="bg-white border-t py-8">
         <div className="max-w-6xl mx-auto px-4 text-xs text-slate-500 space-y-2">
           <p>Elevate for Humanity is an ETPL-listed training provider. Programs are eligible for WIOA, Next Level Jobs, and Workforce Ready Grant funding through Indiana DWD and local workforce boards.</p>
           <p>Salary data sourced from the U.S. Bureau of Labor Statistics, Occupational Outlook Handbook (2024). Actual earnings vary by employer, location, experience, and market conditions.</p>

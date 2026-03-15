@@ -283,7 +283,7 @@ export default function ManualIDUploadForm({
         </div>
 
         {/* Tips */}
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <p className="text-sm font-semibold text-black mb-2">
             📸 Photo Tips:
           </p>
@@ -309,7 +309,7 @@ export default function ManualIDUploadForm({
         </div>
       </form>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-6 p-4 bg-white rounded-lg">
         <p className="text-sm text-black">
           <strong>What we verify:</strong>
           <br />

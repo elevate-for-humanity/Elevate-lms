@@ -68,7 +68,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Scholarships & Financial Aid' }]} />
         </div>
@@ -262,7 +262,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12">How to Get Funded</h2>
           

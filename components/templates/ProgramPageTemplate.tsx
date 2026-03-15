@@ -98,77 +98,71 @@ export function ProgramPageTemplate({
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative w-full min-h-[70vh] flex items-center">
-        <div className="absolute inset-0 z-0">
-          {heroVideo ? (
-            <>
-              <video
-                ref={videoRef}
-                src={heroVideo}
-                poster={heroImage}
-                className="w-full h-full object-cover"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="metadata"
-              />            </>
-          ) : (
-            <Image
-              src={heroImage}
-              alt={title}
-              fill
-              className="object-cover"
-              priority
-            />
-          )}
-        </div>
+      {/* Hero Image — clean, no overlays */}
+      <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
+        {heroVideo ? (
+          <video
+            ref={videoRef}
+            src={heroVideo}
+            poster={heroImage}
+            className="w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <Image
+            src={heroImage}
+            alt={title}
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
+      </section>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-24">
-          {/* Badges */}
+      {/* Title + CTAs below hero in white */}
+      <section className="bg-white py-10 border-b">
+        <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {badges.map((badge, i) => (
-              <span 
+              <span
                 key={i}
-                className={`px-4 py-2 ${badge.color} text-white text-sm font-bold rounded-full shadow-lg`}
+                className={`px-3 py-1 ${badge.color} text-white text-sm font-semibold rounded-full`}
               >
                 {badge.text}
               </span>
             ))}
           </div>
-
-          <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl text-white drop-shadow-2xl">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
             {title}
             {subtitle && (
-              <span className="block text-xl md:text-2xl font-bold text-purple-300 mt-2">{subtitle}</span>
+              <span className="block text-xl font-semibold text-slate-600 mt-1">{subtitle}</span>
             )}
           </h1>
-
-          <p className="mt-6 max-w-2xl text-lg text-white/90 leading-relaxed">
-            {description}
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <p className="mt-4 max-w-2xl text-lg text-slate-600 leading-relaxed">{description}</p>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
             {enrollLink && (
               <Link
                 href={enrollLink}
-                className="inline-flex items-center justify-center rounded-xl bg-brand-green-600 px-8 py-4 text-lg font-bold text-white hover:bg-brand-green-700 transition-all shadow-xl"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-blue-600 px-6 py-3 text-base font-bold text-white hover:bg-brand-blue-700 transition-all"
               >
-                Enroll Now <ArrowRight className="ml-2 w-5 h-5" />
+                Enroll Now <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             )}
             <Link
               href={applyLink || `/apply?program=${slug}`}
-              className="inline-flex items-center justify-center rounded-xl bg-purple-600 px-8 py-4 text-lg font-bold text-white hover:bg-purple-700 transition-all shadow-xl"
+              className="inline-flex items-center justify-center rounded-lg border border-brand-blue-600 px-6 py-3 text-base font-bold text-brand-blue-600 hover:bg-brand-blue-50 transition-all"
             >
               Check Eligibility
             </Link>
             <a
               href={`tel:${contactPhone.replace(/\D/g, '')}`}
-              className="inline-flex items-center justify-center rounded-xl border-2 border-white bg-white/10 backdrop-blur-sm px-8 py-4 text-lg font-bold text-white hover:bg-white/20 transition-all"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-6 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all"
             >
-              <Phone className="mr-2 w-5 h-5" /> Call Us
+              <Phone className="mr-2 w-4 h-4" /> Call Us
             </a>
           </div>
         </div>
@@ -288,41 +282,38 @@ export function ProgramPageTemplate({
       </section>
 
       {/* Outcomes */}
-      <section className="py-16 bg-slate-900 text-white">
+      <section className="py-16 bg-white border-b">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-3xl font-bold mb-8 text-center">Career Outcomes</h2>
-          
+          <h2 className="text-3xl font-bold mb-8 text-center text-slate-900">Career Outcomes</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {outcomes.certifications && outcomes.certifications.length > 0 && (
-              <div className="bg-slate-800 rounded-2xl p-6">
-                <Award className="w-10 h-10 text-yellow-400 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Certifications</h3>
+              <div className="border border-slate-200 rounded-2xl p-6">
+                <Award className="w-10 h-10 text-brand-blue-600 mb-4" />
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Certifications</h3>
                 <ul className="space-y-2">
                   {outcomes.certifications.map((cert, i) => (
-                    <li key={i} className="text-slate-300">• {cert}</li>
+                    <li key={i} className="text-slate-600">• {cert}</li>
                   ))}
                 </ul>
               </div>
             )}
-            
             {outcomes.careerPaths && outcomes.careerPaths.length > 0 && (
-              <div className="bg-slate-800 rounded-2xl p-6">
-                <Users className="w-10 h-10 text-brand-green-400 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Career Paths</h3>
+              <div className="border border-slate-200 rounded-2xl p-6">
+                <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Career Paths</h3>
                 <ul className="space-y-2">
                   {outcomes.careerPaths.map((path, i) => (
-                    <li key={i} className="text-slate-300">• {path}</li>
+                    <li key={i} className="text-slate-600">• {path}</li>
                   ))}
                 </ul>
               </div>
             )}
-            
             {outcomes.averageSalary && (
-              <div className="bg-slate-800 rounded-2xl p-6">
-                <DollarSign className="w-10 h-10 text-brand-blue-400 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Earning Potential</h3>
-                <p className="text-3xl font-bold text-brand-green-400">{outcomes.averageSalary}</p>
-                <p className="text-slate-400 mt-2">Average annual salary</p>
+              <div className="border border-slate-200 rounded-2xl p-6">
+                <DollarSign className="w-10 h-10 text-brand-blue-600 mb-4" />
+                <h3 className="text-xl font-bold mb-4 text-slate-900">Earning Potential</h3>
+                <p className="text-3xl font-bold text-slate-900">{outcomes.averageSalary}</p>
+                <p className="text-slate-500 mt-2">Average annual salary</p>
               </div>
             )}
           </div>
@@ -335,23 +326,22 @@ export function ProgramPageTemplate({
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Investment</h2>
           <p className="text-gray-600 mb-8">Transparent pricing with flexible options</p>
           
-          <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-3xl p-8 text-white shadow-2xl">
-            <p className="text-purple-200 text-sm uppercase tracking-wide mb-2">Program Tuition</p>
-            <p className="text-5xl font-black mb-4">${price.toLocaleString()}</p>
+          <div className="border border-slate-200 rounded-2xl p-8">
+            <p className="text-slate-500 text-sm uppercase tracking-wide mb-2">Program Tuition</p>
+            <p className="text-5xl font-black mb-4 text-slate-900">${price.toLocaleString()}</p>
             {paymentPlan && (
-              <p className="text-purple-200 mb-6">{paymentPlan}</p>
+              <p className="text-slate-600 mb-6">{paymentPlan}</p>
             )}
-            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href={enrollLink || `/enroll/${slug}`}
-                className="bg-white text-purple-700 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition"
+                className="bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 Enroll & Pay
               </Link>
               <Link
                 href="/funding"
-                className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white/10 transition"
+                className="border border-brand-blue-600 text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-50 transition"
               >
                 Explore Funding Options
               </Link>
@@ -361,21 +351,20 @@ export function ProgramPageTemplate({
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gray-100">
+      <section className="py-16 bg-white border-t">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-gray-600 mb-8">Take the first step toward your new career</p>
-          
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
+          <p className="text-slate-600 mb-8">Take the first step toward your new career</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={applyLink || `/apply?program=${slug}`}
-              className="bg-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-700 transition inline-flex items-center justify-center"
+              className="bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition inline-flex items-center justify-center"
             >
               <FileText className="mr-2 w-5 h-5" /> Apply Now
             </Link>
             <a
               href={`tel:${contactPhone.replace(/\D/g, '')}`}
-              className="bg-gray-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-gray-800 transition inline-flex items-center justify-center"
+              className="border border-slate-300 text-slate-700 px-8 py-4 rounded-xl font-bold hover:bg-slate-50 transition inline-flex items-center justify-center"
             >
               <Phone className="mr-2 w-5 h-5" /> {contactPhone}
             </a>

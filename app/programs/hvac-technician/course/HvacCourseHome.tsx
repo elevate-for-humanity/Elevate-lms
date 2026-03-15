@@ -90,7 +90,7 @@ function LessonDrawer({ module, index, done, onClose }: {
         {/* Header image */}
         <div className="relative h-52 overflow-hidden">
           <Image src={MODULE_PHOTO[index] || MODULE_PHOTO[0]} alt={module.title} fill className="object-cover" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition shadow-lg">
+          <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-white transition shadow-lg">
             <X className="w-4 h-4" />
           </button>
           <div className="absolute bottom-5 left-5 right-5 text-white">
@@ -131,9 +131,9 @@ function LessonDrawer({ module, index, done, onClose }: {
               const isDone = done.includes(uuid);
               return (
                 <Link key={lesson.id} href={lessonUrlById(lesson.id)}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group">
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white transition group">
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold ${
-                    isDone ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-brand-blue-100 group-hover:text-brand-blue-700'
+                    isDone ? 'bg-green-500 text-white' : 'bg-white text-slate-500 group-hover:bg-brand-blue-100 group-hover:text-brand-blue-700'
                   }`}>
                     {isDone ? <CheckCircle className="w-4 h-4" /> : li + 1}
                   </div>
@@ -231,7 +231,7 @@ function PracticeQuizSection() {
                   className="bg-white border border-slate-200 rounded-xl p-4 text-left hover:border-slate-300 hover:shadow-sm transition-all group"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors">
                       <ClipboardCheck className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
@@ -375,7 +375,7 @@ export default function HvacCourseHome({
                 name: 'CPR / First Aid / AED',
                 issuer: 'ETPL Listed Training Provider',
                 desc: 'Emergency response certification valid for 2 years. Required by most HVAC employers for field positions.',
-                bg: 'bg-slate-50', border: 'border-slate-200', accent: 'text-slate-700', check: 'text-slate-500',
+                bg: 'bg-white', border: 'border-slate-200', accent: 'text-slate-700', check: 'text-slate-500',
               },
             ].map((cred) => (
               <div key={cred.name} className={`${cred.bg} ${cred.border} border rounded-2xl p-6`}>
@@ -563,7 +563,7 @@ export default function HvacCourseHome({
 
                     {mc > 0 && (
                       <div className="mt-3">
-                        <div className="w-full bg-slate-100 rounded-full h-1.5">
+                        <div className="w-full bg-white rounded-full h-1.5">
                           <div className="bg-green-500 h-1.5 rounded-full transition-all" style={{ width: `${pct}%` }} />
                         </div>
                       </div>

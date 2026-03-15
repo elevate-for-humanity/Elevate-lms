@@ -40,7 +40,7 @@ export default async function ClassroomPage() {
     .limit(6);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -80,7 +80,7 @@ export default async function ClassroomPage() {
                         <span className="text-slate-600">Progress</span>
                         <span className="font-medium">{enrollment.progress || 0}%</span>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-brand-green-500 rounded-full"
                           style={{ width: `${enrollment.progress || 0}%` }}

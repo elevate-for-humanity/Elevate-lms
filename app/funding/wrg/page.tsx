@@ -21,7 +21,7 @@ export default async function WrgPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -39,7 +39,7 @@ export default async function WrgPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'WRG' }]} />
         </div>
@@ -91,7 +91,7 @@ export default async function WrgPage() {
       </section>
 
       {/* What is WRG */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">What is WRG?</h2>
 
@@ -202,7 +202,7 @@ export default async function WrgPage() {
       </section>
 
       {/* Programs Covered */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             Which Programs Are WRG-Approved?
@@ -377,7 +377,7 @@ export default async function WrgPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             Common Questions
@@ -437,7 +437,7 @@ export default async function WrgPage() {
           </h2>
 
           <div className="space-y-8">
-            <div className="bg-slate-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <p className="text-lg text-black mb-4">
                 <strong>Maria, 34 - Medical Assistant</strong>
               </p>
@@ -448,7 +448,7 @@ export default async function WrgPage() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <p className="text-lg text-black mb-4">
                 <strong>David, 28 - HVAC Technician</strong>
               </p>
@@ -460,7 +460,7 @@ export default async function WrgPage() {
               </p>
             </div>
 
-            <div className="bg-slate-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <p className="text-lg text-black mb-4">
                 <strong>Tasha, 41 - Professional Esthetician</strong>
               </p>
@@ -486,7 +486,7 @@ export default async function WrgPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-10 py-5 bg-white text-brand-green-600 font-bold rounded-lg hover:bg-gray-100 transition-all text-lg shadow-xl"
+            className="inline-block px-10 py-5 bg-white text-brand-green-600 font-bold rounded-lg hover:bg-white transition-all text-lg shadow-xl"
           >
             Check My Eligibility
           </Link>

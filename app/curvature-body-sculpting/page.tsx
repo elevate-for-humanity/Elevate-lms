@@ -331,13 +331,13 @@ export default function CurvatureBodySculptingPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/vita"
+              href="/about"
               className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
             >
               Free Tax Services (VITA)
             </Link>
             <Link
-              href="/nonprofit"
+              href="/philanthropy"
               className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition"
             >
               Selfish Inc. Mental Wellness

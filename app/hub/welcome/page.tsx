@@ -173,7 +173,7 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Hub Sub-Pages Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Explore the Hub</h2>
@@ -265,7 +265,7 @@ export default async function HubWelcomePage() {
                   />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Apply for a Program</h3>
-                <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Many are fully funded.</p>
+                <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Funding may be available through WIOA and state programs.</p>
               </div>
             </div>
 

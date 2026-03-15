@@ -101,7 +101,7 @@ export default function TakeQuizPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
@@ -193,7 +193,7 @@ export default function TakeQuizPage({
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-white text-lg shadow-2xl transition-all"
                   >
                     Apply Now
                   </Link>
@@ -222,7 +222,7 @@ export default function TakeQuizPage({
   const progressPercent = Math.round((answeredCount / questions.length) * 100);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-8 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Courses", href: "/courses" }, { label: "Take" }]} />
       </div>
@@ -286,7 +286,7 @@ export default function TakeQuizPage({
                           ${
                             answers[question.id] === optionIndex
                               ? 'border-brand-orange-500 bg-brand-orange-50'
-                              : 'border-slate-200 hover:border-brand-orange-300 hover:bg-slate-50'
+                              : 'border-slate-200 hover:border-brand-orange-300 hover:bg-white'
                           }
                         `}
                         >

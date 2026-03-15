@@ -136,7 +136,7 @@ export default async function ProgramHolderAnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Analytics" }]} />
       </div>
@@ -160,7 +160,7 @@ export default async function ProgramHolderAnalyticsPage() {
               <option value="90d">Last 90 days</option>
               <option value="1y">Last year</option>
             </select>
-            <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-white">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -189,7 +189,7 @@ export default async function ProgramHolderAnalyticsPage() {
           {/* Chart Placeholder */}
           <div className="md:col-span-2 bg-white rounded-xl border p-6">
             <h2 className="font-semibold mb-4">Enrollment Trends</h2>
-            <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+            <div className="h-64 bg-white rounded-lg flex items-center justify-center">
               <div className="text-center">
                 <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                 <p className="text-gray-500">Enrollment data visualization</p>
@@ -228,7 +228,7 @@ export default async function ProgramHolderAnalyticsPage() {
             <h2 className="font-semibold">Program Performance</h2>
           </div>
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Program</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Enrollments</th>
@@ -238,7 +238,7 @@ export default async function ProgramHolderAnalyticsPage() {
             <tbody className="divide-y">
               {programStats.length > 0 ? (
                 programStats.map((program: any) => (
-                  <tr key={program.id} className="hover:bg-gray-50">
+                  <tr key={program.id} className="hover:bg-white">
                     <td className="px-4 py-4 font-medium">{program.name}</td>
                     <td className="px-4 py-4">{program.enrollments}</td>
                     <td className="px-4 py-4">

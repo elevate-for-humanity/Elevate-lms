@@ -27,7 +27,7 @@ export default async function AlumniPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Alumni" }]} />
         </div>
@@ -136,7 +136,7 @@ export default async function AlumniPage() {
             {alumni && alumni.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {alumni.map((member: any) => (
-                  <div key={member.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div key={member.id} className="flex items-center gap-3 p-3 bg-white rounded-lg">
                     <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                       {member.avatar_url ? (
                         <Image src={member.avatar_url} alt={member.full_name || 'Alumni member'} fill className="rounded-full object-cover" sizes="48px" />
@@ -186,12 +186,12 @@ export default async function AlumniPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-lg p-6">
+                <div className="bg-white rounded-lg p-6">
                   <p className="text-gray-700 italic mb-4">&quot;The program changed my life. I went from unemployed to earning $55K in just 6 months.&quot;</p>
                   <p className="font-semibold text-gray-900">Graduate</p>
                   <p className="text-sm text-gray-500">HVAC Graduate, 2025</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-6">
+                <div className="bg-white rounded-lg p-6">
                   <p className="text-gray-700 italic mb-4">&quot;The career services team helped me land my dream job. I am so grateful for this opportunity.&quot;</p>
                   <p className="font-semibold text-gray-900">Sarah M.</p>
                   <p className="text-sm text-gray-500">Medical Assistant Graduate, 2025</p>
@@ -242,7 +242,7 @@ export default async function AlumniPage() {
               <Link href="/lms/alumni/jobs" className="flex items-center gap-2 text-amber-700 hover:underline">
                 <Briefcase className="w-4 h-4" /> Job Board
               </Link>
-              <Link href="/lms/certificates" className="flex items-center gap-2 text-amber-700 hover:underline">
+              <Link href="/learner/certificates" className="flex items-center gap-2 text-amber-700 hover:underline">
                 <Award className="w-4 h-4" /> Certificates
               </Link>
             </div>

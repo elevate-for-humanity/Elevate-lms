@@ -74,7 +74,7 @@ export default function AddOnsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Add-Ons' }]} />
         </div>
@@ -201,7 +201,7 @@ export default function AddOnsPage() {
       </section>
 
       {/* More Add-Ons */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">More Add-Ons</h2>
@@ -239,7 +239,7 @@ export default function AddOnsPage() {
                       </Link>
                       <Link
                         href={item.href}
-                        className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-slate-50 transition"
+                        className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-white transition"
                       >
                         Details
                       </Link>
@@ -262,7 +262,7 @@ export default function AddOnsPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white transition-colors"
             >
               Contact Sales
             </Link>

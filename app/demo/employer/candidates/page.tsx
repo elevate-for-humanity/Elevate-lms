@@ -34,7 +34,7 @@ const candidates = (dbRows as any[]) || [];
             </div>
             <div className="flex flex-wrap gap-2 mb-3">
               {c.credentials.map((cr) => (
-                <span key={cr} className="flex items-center gap-1 bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                <span key={cr} className="flex items-center gap-1 bg-white text-gray-700 px-2 py-1 rounded text-xs">
                   <span className="text-slate-400 flex-shrink-0">•</span> {cr}
                 </span>
               ))}

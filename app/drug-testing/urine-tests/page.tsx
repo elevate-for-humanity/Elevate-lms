@@ -138,7 +138,7 @@ export default function UrineTestsPage() {
       </section>
 
       {/* Tests Grid */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid gap-8">
             {urineTests.map((test) => (
@@ -224,7 +224,7 @@ export default function UrineTestsPage() {
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-lg"
           >
             <Phone className="w-5 h-5" />
             (317) 314-3757

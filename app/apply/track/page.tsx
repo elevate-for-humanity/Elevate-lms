@@ -138,7 +138,7 @@ export default function TrackApplicationPage() {
   return (
     <div className="min-h-screen bg-zinc-900  via-white ">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Track' }]} />
         </div>

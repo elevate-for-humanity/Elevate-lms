@@ -2,7 +2,7 @@ import { BlogCardSkeleton, Skeleton } from '@/components/ui/skeleton';
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Skeleton */}
       <div className="bg-gradient-to-r from-brand-orange-600 to-brand-orange-500 py-16">
         <div className="max-w-7xl mx-auto px-4">

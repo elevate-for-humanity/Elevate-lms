@@ -87,7 +87,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* How Instant Tests Work */}
-      <section className="py-12 bg-gray-50 border-b">
+      <section className="py-12 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">How Instant Tests Work</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -187,7 +187,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* When to Use */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">When to Use Instant Tests</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -215,7 +215,7 @@ export default function InstantTestsPage() {
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-lg"
           >
             <Phone className="w-5 h-5" />
             (317) 314-3757

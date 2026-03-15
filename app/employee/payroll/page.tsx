@@ -88,7 +88,7 @@ export default async function EmployeePayrollPage() {
   const PayMethodIcon = PAY_METHOD_ICONS[payMethodKey] ?? Banknote;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Employee', href: '/employee' }, { label: 'Payroll' }]} />
@@ -103,7 +103,7 @@ export default async function EmployeePayrollPage() {
             <p className="text-slate-500 mt-1">Pay stubs, earnings history, and tax documents</p>
           </div>
           <Link href="/onboarding/payroll-setup"
-            className="flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm font-medium">
+            className="flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-white text-sm font-medium">
             <Settings className="w-4 h-4" /> Update Pay Method
           </Link>
         </div>
@@ -182,7 +182,7 @@ export default async function EmployeePayrollPage() {
                         Pay date: {run ? fmtDate(run.pay_date) : '—'}
                         {run?.status && (
                           <span className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${
-                            run.status === 'paid' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-slate-100 text-slate-600'
+                            run.status === 'paid' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-slate-600'
                           }`}>{run.status}</span>
                         )}
                       </p>

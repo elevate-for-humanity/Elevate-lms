@@ -110,9 +110,9 @@ export default function EnrollmentBookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Booking', href: '/booking' }, { label: 'Enrollment' }]} />
         </div>
@@ -314,7 +314,7 @@ export default function EnrollmentBookingPage() {
         )}
 
         {/* Help CTA */}
-        <div className="mt-8 bg-gray-100 rounded-xl p-6 text-center">
+        <div className="mt-8 bg-white rounded-xl p-6 text-center">
           <p className="text-gray-600 mb-2">Need help with your enrollment?</p>
           <a href="/faq" className="inline-flex items-center gap-2 text-xl font-bold text-brand-blue-600 hover:text-brand-blue-700">
             Visit our FAQ & Help Center →

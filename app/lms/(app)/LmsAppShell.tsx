@@ -14,7 +14,7 @@ interface LmsAppShellProps {
 
 export function LmsAppShell({ user, profile, children }: LmsAppShellProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <IdleTimeoutGuard />
       <LMSSidebar user={user} profile={profile} />
 

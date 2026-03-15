@@ -31,7 +31,7 @@ export default async function EnrollPage({ searchParams }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Enroll" }]} />
         </div>
@@ -97,7 +97,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   const availablePartnerCourses = partnerCourses?.filter(c => !enrolledPartnerIds.has(c.id)) || [];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Enroll" }]} />
         </div>
@@ -281,7 +281,7 @@ export default async function EnrollPage({ searchParams }: Props) {
               You&apos;re enrolled in all available courses. New courses will appear here when added to your program.
             </p>
             <Link
-              href="/lms/courses"
+              href="/learner/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               View My Courses
@@ -301,7 +301,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                 </p>
               </div>
               <Link
-                href="/lms/dashboard"
+                href="/learner/dashboard"
                 className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to Dashboard

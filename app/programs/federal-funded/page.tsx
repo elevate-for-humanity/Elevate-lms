@@ -94,7 +94,7 @@ export default function Page() {
                 { label: 'Technology', href: '/programs/technology', desc: 'IT Support, Cybersecurity, Web Dev' },
                 { label: 'CDL Training', href: '/programs/cdl-training', desc: 'Class A License in 3-6 weeks' },
               ].map((cat) => (
-                <Link key={cat.label} href={cat.href} className="bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all text-center group">
+                <Link key={cat.label} href={cat.href} className="bg-white rounded-xl p-5 border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all text-center group">
                   <h3 className="font-bold text-slate-900 group-hover:text-brand-red-600 transition-colors">{cat.label}</h3>
                   <p className="text-xs text-slate-500 mt-1">{cat.desc}</p>
                   <span className="text-brand-red-600 font-semibold text-sm mt-3 block group-hover:underline">View Programs →</span>

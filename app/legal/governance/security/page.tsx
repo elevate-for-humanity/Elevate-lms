@@ -47,7 +47,7 @@ export default function SecurityStatementPage() {
           </a>
         </div>
 
-        <nav className="bg-gray-50 rounded-lg p-6 mb-10">
+        <nav className="bg-white rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
             <li><a href="#purpose" className="text-brand-orange-600 hover:underline">1. Security Purpose & Principles</a></li>
@@ -108,7 +108,7 @@ export default function SecurityStatementPage() {
           <h3 className="text-lg font-semibold mt-6 mb-3">2.2 Sensitive Data Classification</h3>
           <table className="w-full border-collapse border mt-4">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="border p-3 text-left">Data Type</th>
                 <th className="border p-3 text-left">Classification</th>
                 <th className="border p-3 text-left">Protection Level</th>
@@ -116,9 +116,9 @@ export default function SecurityStatementPage() {
             </thead>
             <tbody>
               <tr><td className="border p-3">SSN</td><td className="border p-3">Highly Sensitive</td><td className="border p-3">Encrypted at rest, masked in UI</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Payment Data</td><td className="border p-3">Highly Sensitive</td><td className="border p-3">PCI-compliant tokenization via Stripe</td></tr>
+              <tr className="bg-white"><td className="border p-3">Payment Data</td><td className="border p-3">Highly Sensitive</td><td className="border p-3">PCI-compliant tokenization via Stripe</td></tr>
               <tr><td className="border p-3">Tax Documents</td><td className="border p-3">Sensitive</td><td className="border p-3">Encrypted storage, access logging</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Academic Records</td><td className="border p-3">Protected</td><td className="border p-3">Role-based access, FERPA compliance</td></tr>
+              <tr className="bg-white"><td className="border p-3">Academic Records</td><td className="border p-3">Protected</td><td className="border p-3">Role-based access, FERPA compliance</td></tr>
               <tr><td className="border p-3">Contact Info</td><td className="border p-3">Standard</td><td className="border p-3">Standard encryption, access controls</td></tr>
             </tbody>
           </table>
@@ -178,7 +178,7 @@ export default function SecurityStatementPage() {
           </h2>
           <table className="w-full border-collapse border">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="border p-3 text-left">Data Type</th>
                 <th className="border p-3 text-left">Retention Period</th>
                 <th className="border p-3 text-left">Deletion Method</th>
@@ -186,9 +186,9 @@ export default function SecurityStatementPage() {
             </thead>
             <tbody>
               <tr><td className="border p-3">Account Data</td><td className="border p-3">Duration of account + 3 years</td><td className="border p-3">Anonymization or deletion</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Academic Records</td><td className="border p-3">7 years after completion</td><td className="border p-3">Secure deletion</td></tr>
+              <tr className="bg-white"><td className="border p-3">Academic Records</td><td className="border p-3">7 years after completion</td><td className="border p-3">Secure deletion</td></tr>
               <tr><td className="border p-3">Tax Documents</td><td className="border p-3">7 years (IRS requirement)</td><td className="border p-3">Secure deletion</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Payment Records</td><td className="border p-3">7 years (financial compliance)</td><td className="border p-3">Secure deletion</td></tr>
+              <tr className="bg-white"><td className="border p-3">Payment Records</td><td className="border p-3">7 years (financial compliance)</td><td className="border p-3">Secure deletion</td></tr>
               <tr><td className="border p-3">Audit Logs</td><td className="border p-3">7 years</td><td className="border p-3">Secure deletion</td></tr>
             </tbody>
           </table>
@@ -233,7 +233,7 @@ export default function SecurityStatementPage() {
 
         <section id="contact" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Contact & Reporting</h2>
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="mb-2"><strong>Security Issues:</strong> our contact form</p>
             <p className="mb-2"><strong>Privacy Requests:</strong> our contact form</p>
             <p className="mb-2"><strong>Data Protection Officer:</strong> our contact form</p>
@@ -244,7 +244,7 @@ export default function SecurityStatementPage() {
         <section id="versioning" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Versioning & Review</h2>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
             <tbody><tr><td className="border p-3">1.0</td><td className="border p-3">January 2025</td><td className="border p-3">Initial authoritative version</td></tr></tbody>
           </table>
           <p className="text-gray-700"><strong>Review Schedule:</strong> Annually, or upon significant security events or regulatory changes.</p>

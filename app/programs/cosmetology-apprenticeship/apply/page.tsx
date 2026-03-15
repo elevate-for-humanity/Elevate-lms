@@ -46,7 +46,7 @@ export default function CosmetologyApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-xl mx-auto">
         <Link
           href="/programs/cosmetology-apprenticeship"
@@ -65,7 +65,7 @@ export default function CosmetologyApplyPage() {
           </div>
 
           {/* What to expect */}
-          <div className="bg-slate-50 rounded-xl p-4 mb-6 space-y-2">
+          <div className="bg-white rounded-xl p-4 mb-6 space-y-2">
             {[
               'Free to apply — no cost to submit',
               'Earn wages from day one of training',

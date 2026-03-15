@@ -24,7 +24,7 @@ export default async function GovernmentPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -41,7 +41,7 @@ export default async function GovernmentPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Government Programs' }]} />
         </div>
@@ -60,7 +60,7 @@ export default async function GovernmentPage() {
               Partner with an ETPL-approved, WIOA-compliant training provider to deliver high-quality workforce development programs that meet federal requirements and produce measurable outcomes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Schedule a Meeting</Link>
+              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-white transition-colors">Schedule a Meeting</Link>
               <Link href="/workone-partner-packet" className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 transition-colors border-2 border-white/30">View Partner Packet</Link>
             </div>
           </div>
@@ -68,7 +68,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Credentials */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Our Credentials</h3>
@@ -84,7 +84,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Who We Serve with Images */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -318,7 +318,7 @@ export default async function GovernmentPage() {
                   className="object-cover"
                 />
               </div>
-              <div className="bg-gray-50 rounded-2xl p-8">
+              <div className="bg-white rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Program Outcomes</h3>
                 <div className="space-y-6">
                   <div>
@@ -368,7 +368,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Why Partner With Us */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -522,7 +522,7 @@ export default async function GovernmentPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-white transition-colors"
             >
               <Phone className="w-5 h-5 mr-2" />
               (317) 314-3757

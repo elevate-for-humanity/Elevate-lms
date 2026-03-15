@@ -164,11 +164,11 @@ export function CopyrightFooter() {
         © 2025 Elevate for Humanity. All Rights Reserved.
       </p>
       <div className="flex justify-center gap-4 text-xs text-gray-400">
-        <a href="/terms" className="hover:text-white">
+        <a href="/terms-of-service" className="hover:text-white">
           Terms
         </a>
         <span>|</span>
-        <a href="/privacy" className="hover:text-white">
+        <a href="/privacy-policy" className="hover:text-white">
           Privacy
         </a>
         <span>|</span>

@@ -19,7 +19,7 @@ export default async function EmployerJobsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -54,7 +54,7 @@ export default async function EmployerJobsPage() {
   const closedJobs = jobs?.filter(j => j.status === 'closed') || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -111,7 +111,7 @@ export default async function EmployerJobsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-gray-600" />
               </div>
               <div>
@@ -220,7 +220,7 @@ function JobCard({ job, isDraft, isClosed }: { job: any; isDraft?: boolean; isCl
               </span>
             )}
             {isClosed && (
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span className="px-2 py-0.5 bg-white text-gray-600 text-xs rounded-full">
                 Closed
               </span>
             )}

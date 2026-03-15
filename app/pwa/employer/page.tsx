@@ -23,7 +23,7 @@ export default async function EmployerPWAPage() {
   const { programs, enrollments, completedEnrollments } = await getEmployerData();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-2.jpg" alt="Employer partnership" fill className="object-cover" priority />
@@ -60,10 +60,10 @@ export default async function EmployerPWAPage() {
           <Link href="/employer/opportunities" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
             Post Position →
           </Link>
-          <Link href="/employer-portal/candidates" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/employer-portal/candidates" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             View Candidates
           </Link>
-          <Link href="/contact" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/contact" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             Contact Us
           </Link>
         </div>

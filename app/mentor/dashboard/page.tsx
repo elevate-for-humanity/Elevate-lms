@@ -99,7 +99,7 @@ export default async function MentorDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-gray-900">Mentor Dashboard</h1>
@@ -130,7 +130,7 @@ export default async function MentorDashboardPage() {
             {upcomingSessions.length > 0 ? (
               <div className="space-y-4">
                 {upcomingSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={session.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">{session.mentee}</p>
                       <p className="text-sm text-gray-500">{session.topic}</p>
@@ -157,7 +157,7 @@ export default async function MentorDashboardPage() {
             {recentMentees.length > 0 ? (
               <div className="space-y-4">
                 {recentMentees.map((mentee) => (
-                  <div key={mentee.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={mentee.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
                         <span className="text-teal-600 font-medium">{mentee.name.charAt(0)}</span>

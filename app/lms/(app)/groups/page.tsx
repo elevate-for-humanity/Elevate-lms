@@ -31,7 +31,7 @@ export default async function GroupsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Groups" }]} />
         </div>
@@ -98,7 +98,7 @@ export default async function GroupsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Groups" }]} />
         </div>
@@ -114,7 +114,7 @@ export default async function GroupsPage() {
           <div className="mt-4 md:mt-0 flex gap-3">
             <Link
               href="/lms/study-groups"
-              className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 transition"
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white rounded-lg hover:bg-white transition"
             >
               <Search className="w-4 h-4" />
               Find Groups
@@ -203,7 +203,7 @@ export default async function GroupsPage() {
                   <div className="space-y-4">
                     {recentMessages.slice(0, 5).map((message) => (
                       <div key={message.id} className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
+                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
                           {message.profiles?.first_name?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -234,14 +234,14 @@ export default async function GroupsPage() {
                     Join a Group
                   </Link>
                   <Link
-                    href="/lms/messages"
+                    href="/learner/messages"
                     className="flex items-center gap-2 w-full px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Messages
                   </Link>
                   <Link
-                    href="/lms/calendar"
+                    href="/learner/calendar"
                     className="flex items-center gap-2 w-full px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition"
                   >
                     <Calendar className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default async function GroupsPage() {
                 <Search className="w-5 h-5" />
                 Find Groups
               </Link>
-              <button className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition">
+              <button className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-white transition">
                 <Plus className="w-5 h-5" />
                 Create Group
               </button>
@@ -276,7 +276,7 @@ export default async function GroupsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/learner/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

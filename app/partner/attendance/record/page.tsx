@@ -66,14 +66,14 @@ export default async function RecordAttendancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-3.jpg" alt="Record attendance" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Attendance', href: '/partner/attendance' }, { label: 'Record' }]} />
         </div>

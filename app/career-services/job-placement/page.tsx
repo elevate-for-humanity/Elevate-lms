@@ -19,7 +19,7 @@ export default function JobPlacementPage() {
 
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Job Placement' }]} />
         </div>
@@ -183,7 +183,7 @@ export default function JobPlacementPage() {
         </div>
       </section>
 
-      <section id="employers" className="bg-gray-50 py-16">
+      <section id="employers" className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Our Employer Partners
@@ -432,7 +432,7 @@ export default function JobPlacementPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl font-bold text-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl font-bold text-lg hover:bg-white transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />

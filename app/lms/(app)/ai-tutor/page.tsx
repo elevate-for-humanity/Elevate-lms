@@ -99,7 +99,7 @@ export default function AITutorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Ai Tutor" }]} />
       </div>
@@ -169,7 +169,7 @@ export default function AITutorPage() {
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
                       ? 'bg-brand-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-800'
+                      : 'bg-white text-slate-800'
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
@@ -181,7 +181,7 @@ export default function AITutorPage() {
                 <div className="w-8 h-8 rounded-full bg-brand-blue-100 text-brand-blue-600 flex items-center justify-center">
                   <Bot className="w-4 h-4" />
                 </div>
-                <div className="bg-slate-100 rounded-2xl px-4 py-3">
+                <div className="bg-white rounded-2xl px-4 py-3">
                   <Loader2 className="w-5 h-5 animate-spin text-brand-blue-600" />
                 </div>
               </div>
@@ -190,7 +190,7 @@ export default function AITutorPage() {
           </div>
 
           {/* Quick Prompts */}
-          <div className="border-t border-slate-200 p-4 bg-slate-50">
+          <div className="border-t border-slate-200 p-4 bg-white">
             <div className="flex gap-2 overflow-x-auto pb-2">
               {QUICK_PROMPTS.map((prompt, index) => (
                 <button

@@ -56,7 +56,7 @@ export default async function ProviderStaffPage() {
                     <div className="text-xs text-slate-400 mt-0.5">{member.email}</div>
                   )}
                 </div>
-                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded-full">
                   {ROLE_LABELS[member.role] ?? member.role}
                 </span>
               </div>

@@ -46,7 +46,7 @@ export default function EmployersPage() {
         size="marketing"
       />
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'For Employers' }]} />
         </div>
@@ -167,7 +167,7 @@ export default function EmployersPage() {
       <GrantsSection />
 
       {/* Why Partner — Talent Pipeline */}
-      <section className="py-16 bg-slate-50 border-y border-slate-200">
+      <section className="py-16 bg-white border-y border-slate-200">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
             What You Get When You Partner With Elevate
@@ -324,7 +324,7 @@ export default function EmployersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=employer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-white transition text-lg"
             >
               Contact Our Employer Team <ArrowRight className="w-5 h-5" />
             </Link>

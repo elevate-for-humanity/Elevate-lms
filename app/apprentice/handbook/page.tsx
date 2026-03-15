@@ -87,9 +87,9 @@ export default async function ApprenticeHandbookPage() {
   const displaySections = sections && sections.length > 0 ? sections : defaultSections;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apprentice', href: '/apprentice' }, { label: 'Handbook' }]} />
         </div>
@@ -137,7 +137,7 @@ export default async function ApprenticeHandbookPage() {
               <Link
                 key={section.id || index}
                 href={`/apprentice/handbook/${section.slug}`}
-                className="flex items-center justify-between p-6 hover:bg-gray-50 transition group"
+                className="flex items-center justify-between p-6 hover:bg-white transition group"
               >
                 <div className="flex items-center gap-4">
                   <span className="w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-bold">

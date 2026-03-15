@@ -61,7 +61,7 @@ export default async function JobPostingsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs" }]} />
 
       {/* Header */}
@@ -102,7 +102,7 @@ export default async function JobPostingsPage() {
                 <option>Paused</option>
                 <option>Closed</option>
               </select>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white flex items-center gap-2">
                 <Filter className="w-4 h-4" />
                 More Filters
               </button>
@@ -126,7 +126,7 @@ export default async function JobPostingsPage() {
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             job.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                             job.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-700'
+                            'bg-white text-gray-700'
                           }`}>
                             {job.status}
                           </span>
@@ -150,7 +150,7 @@ export default async function JobPostingsPage() {
                           </span>
                         </div>
                       </div>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg">
+                      <button className="p-2 hover:bg-white rounded-lg">
                         <MoreVertical className="w-5 h-5 text-gray-400" />
                       </button>
                     </div>
@@ -176,7 +176,7 @@ export default async function JobPostingsPage() {
                       </Link>
                       <Link
                         href={`/employer-portal/jobs/${job.id}/edit`}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition-colors flex items-center gap-2"
                       >
                         <Edit className="w-4 h-4" />
                         Edit

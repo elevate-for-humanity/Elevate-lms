@@ -18,7 +18,7 @@ export default function EnterpriseCapitalReadinessPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-white/10 bg-white/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -233,7 +233,7 @@ export default function EnterpriseCapitalReadinessPage() {
           </h2>
           
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-100"></div>
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-white"></div>
             
             <div className="space-y-8">
               {[
@@ -505,7 +505,7 @@ export default function EnterpriseCapitalReadinessPage() {
               </Link>
               <Link
                 href="/store/guides/capital-readiness"
-                className="px-8 py-3 border border-slate-300 hover:bg-slate-50 text-slate-900 font-semibold rounded-lg transition-colors border border-white/20"
+                className="px-8 py-3 border border-slate-300 hover:bg-white text-slate-900 font-semibold rounded-lg transition-colors border border-white/20"
               >
                 Back to Guide Overview
               </Link>

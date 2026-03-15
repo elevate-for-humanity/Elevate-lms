@@ -35,7 +35,7 @@ export default function CertificationsHelpPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <Breadcrumbs
         items={[
           { label: 'Help', href: '/help' },

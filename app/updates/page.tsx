@@ -72,7 +72,7 @@ export default async function UpdatesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -88,7 +88,7 @@ export default async function UpdatesPage() {
     .order('date', { ascending: false });
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Updates" }]} />
       </div>
@@ -144,7 +144,7 @@ export default async function UpdatesPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-sm text-gray-500">{update.date}</span>
-                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
+                    <span className="px-2 py-0.5 bg-white text-gray-600 rounded text-xs font-medium">
                       {update.category}
                     </span>
                   </div>

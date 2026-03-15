@@ -311,7 +311,7 @@ export default function TrainingPage() {
           </a>
           <Link
             href="/tax/rise-up-foundation/volunteer"
-            className="px-6 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border font-semibold hover:bg-white transition"
           >
             Back to Volunteer Info
           </Link>

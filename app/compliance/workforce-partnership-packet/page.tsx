@@ -46,7 +46,7 @@ export default function WorkforcePartnershipPacketPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white">
       {/* Breadcrumbs — hidden on print */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -133,7 +133,7 @@ export default function WorkforcePartnershipPacketPage() {
           </div>
 
           {/* Delivery Model Summary */}
-          <div className="bg-slate-50 rounded-lg p-6 border print:bg-white print:border-gray-300">
+          <div className="bg-white rounded-lg p-6 border print:bg-white print:border-gray-300">
             <h3 className="font-bold text-gray-900 mb-3">Delivery Model</h3>
             <p className="text-sm text-gray-700 leading-relaxed mb-4">
               Training is delivered through licensed credential partners and approved program
@@ -173,7 +173,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Program Catalog */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program Catalog</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -183,7 +183,7 @@ export default function WorkforcePartnershipPacketPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse print:text-[10px]">
               <thead>
-                <tr className="bg-white print:bg-gray-100">
+                <tr className="bg-white print:bg-white">
                   <th className="text-left p-2.5 font-semibold text-gray-900 border-b">Program</th>
                   <th className="text-left p-2.5 font-semibold text-gray-900 border-b">Duration</th>
                   <th className="text-left p-2.5 font-semibold text-gray-900 border-b">Format</th>
@@ -195,7 +195,7 @@ export default function WorkforcePartnershipPacketPage() {
               </thead>
               <tbody>
                 {PROGRAMS.map((p, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white/50' : 'bg-white'}>
                     <td className="p-2.5 font-medium text-gray-900 border-b">
                       {p.name}
                       {p.registered && <span className="ml-1 text-[10px] text-brand-green-700 font-semibold">(RAPIDS)</span>}
@@ -235,7 +235,7 @@ export default function WorkforcePartnershipPacketPage() {
             ].map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={i} className="bg-slate-50 rounded-lg p-4 border print:bg-white print:border-gray-300">
+                <div key={i} className="bg-white rounded-lg p-4 border print:bg-white print:border-gray-300">
                   <Icon className="w-5 h-5 text-brand-blue-600 mb-2 print:text-gray-700" />
                   <h3 className="font-semibold text-gray-900 text-sm mb-1">{item.title}</h3>
                   <p className="text-gray-600 text-xs">{item.desc}</p>
@@ -253,7 +253,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Cohort Timeline */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Cohort Setup Timeline</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -269,7 +269,7 @@ export default function WorkforcePartnershipPacketPage() {
               { day: 'Day 10–14', title: 'Cohort Launch', desc: 'Orientation, first RTI session, LMS access activated, progress tracking begins.' },
             ].map((step, i) => (
               <div key={i} className="flex gap-4 items-start bg-white rounded-lg p-4 border print:border-gray-300">
-                <div className="flex-shrink-0 w-20 text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded text-center print:bg-gray-100 print:text-gray-900">
+                <div className="flex-shrink-0 w-20 text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded text-center print:bg-white print:text-gray-900">
                   {step.day}
                 </div>
                 <div>
@@ -290,7 +290,7 @@ export default function WorkforcePartnershipPacketPage() {
             Competency-based assessment aligned to industry skill standards.
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-6 border print:bg-white print:border-gray-300">
+          <div className="bg-white rounded-lg p-6 border print:bg-white print:border-gray-300">
             <div className="space-y-4 text-sm">
               <div>
                 <p className="font-semibold text-gray-900 mb-1">Assessment Authority</p>
@@ -315,7 +315,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Partnership Inquiries</h2>
           <div className="bg-white rounded-lg border p-6 print:border-gray-300">
@@ -360,13 +360,13 @@ export default function WorkforcePartnershipPacketPage() {
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
               Apprenticeship & RTI Structure
             </Link>
-            <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Credential Partner Registry
             </Link>
-            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructional Framework
             </Link>
-            <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               WorkOne Partner Packet
             </Link>
             <PrintButton />

@@ -78,7 +78,7 @@ export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 
     <div className="flex flex-col h-full">
       {/* Logo / Brand */}
       <div className="flex items-center justify-between px-4 h-16 border-b border-slate-800">
-        <Link href="/lms/dashboard" className="flex items-center gap-2.5">
+        <Link href="/learner/dashboard" className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-brand-blue-500 rounded-lg flex items-center justify-center">
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
@@ -191,7 +191,7 @@ export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 
         >
           <Menu className="w-5 h-5" />
         </button>
-        <Link href="/lms/dashboard" className="flex items-center gap-2">
+        <Link href="/learner/dashboard" className="flex items-center gap-2">
           <GraduationCap className="w-5 h-5 text-brand-blue-400" />
           <span className="font-bold text-white text-sm">Elevate LMS</span>
         </Link>

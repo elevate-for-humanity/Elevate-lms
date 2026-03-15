@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function PartnersPage() {
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Pathways', href: '/pathways' }, { label: 'Partners & Cohort Training' }]} />
         </div>
@@ -44,7 +44,7 @@ export default function PartnersPage() {
       </section>
 
       {/* How a custom cohort works — step by step */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How a Custom Cohort Works</h2>
           <p className="text-gray-600 mb-8">
@@ -157,7 +157,7 @@ export default function PartnersPage() {
                 when: 'Sent monthly.',
               },
             ].map((r) => (
-              <div key={r.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5">
+              <div key={r.name} className="bg-white rounded-lg border border-gray-200 p-5">
                 <h3 className="font-bold text-gray-900 mb-2">{r.name}</h3>
                 <p className="text-sm text-gray-700 mb-2"><span className="font-semibold">What it includes:</span> {r.includes}</p>
                 <p className="text-sm text-gray-700"><span className="font-semibold">When you get it:</span> {r.when}</p>
@@ -168,7 +168,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Who partners with us */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Who Partners With Us</h2>
 
@@ -257,7 +257,7 @@ export default function PartnersPage() {
           </p>
           <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="text-left px-4 py-3 font-semibold text-gray-700">Program</th>
                   <th className="text-left px-4 py-3 font-semibold text-gray-700">Duration</th>
@@ -276,7 +276,7 @@ export default function PartnersPage() {
                   { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', duration: '12 weeks', credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA, JRI, Self-Pay' },
                   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', duration: '~18 months', credential: 'Indiana Barber License', funding: 'State Grant, Employer' },
                 ].map((r) => (
-                  <tr key={r.name} className="hover:bg-gray-50">
+                  <tr key={r.name} className="hover:bg-white">
                     <td className="px-4 py-3"><Link href={r.href} className="font-medium text-brand-blue-600 hover:text-brand-blue-700">{r.name}</Link></td>
                     <td className="px-4 py-3 text-gray-600">{r.duration}</td>
                     <td className="px-4 py-3 text-gray-600">{r.credential}</td>

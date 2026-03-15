@@ -115,7 +115,7 @@ const C = {
 export default function PartnersIndexPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partners' }]} />
         </div>
@@ -124,7 +124,7 @@ export default function PartnersIndexPage() {
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[260px] overflow-hidden">
         <Image src="/images/pages/partners-pub-page-7.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent" />
+        
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-8 max-w-5xl mx-auto">
           <p className="text-brand-blue-300 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">Partner With Elevate</h1>
@@ -155,7 +155,7 @@ export default function PartnersIndexPage() {
       </section>
 
       {/* Partner type cards */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4 flex flex-col gap-8">
           {PARTNER_TYPES.map((type) => {
             const c = C[type.color as keyof typeof C];
@@ -223,7 +223,7 @@ export default function PartnersIndexPage() {
             <a href="tel:317-314-3757" className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-colors">
               <Phone className="w-4 h-4" /> (317) 314-3757
             </a>
-            <Link href="/partners/join" className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-lg font-bold hover:bg-slate-50 transition-colors">
+            <Link href="/partners/join" className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-lg font-bold hover:bg-white transition-colors">
               General Partner Application <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

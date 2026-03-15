@@ -51,7 +51,7 @@ export default function GrantsAppPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Grants" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-100 text-slate-900 py-16 px-4">
+      <section className="bg-white text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -76,7 +76,7 @@ export default function GrantsAppPage() {
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart - $199/mo
                 </Link>
-                <button className="inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
+                <button className="inline-flex items-center gap-2 border border-slate-300 hover:bg-white text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
                   <Play className="w-5 h-5" />
                   Watch Demo
                 </button>
@@ -84,7 +84,7 @@ export default function GrantsAppPage() {
             </div>
             <div className="relative">
               <div className="bg-white rounded-2xl shadow-2xl p-4">
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <div className="aspect-video bg-white rounded-lg overflow-hidden">
                   <video
                     autoPlay
                     muted
@@ -102,7 +102,7 @@ export default function GrantsAppPage() {
       </section>
 
       {/* Grant Sources */}
-      <section className="py-12 px-4 bg-gray-50">
+      <section className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-gray-600 mb-6">Search grants from multiple sources</p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -178,7 +178,7 @@ export default function GrantsAppPage() {
                   href={`/store/cart?add=grants-${plan.name.toLowerCase()}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors ${
                     plan.popular 
-                      ? 'bg-white text-brand-green-600 hover:bg-gray-100' 
+                      ? 'bg-white text-brand-green-600 hover:bg-white' 
                       : 'bg-brand-green-600 text-white hover:bg-brand-green-700'
                   }`}
                 >
@@ -200,7 +200,7 @@ export default function GrantsAppPage() {
             <Link href="/store/cart?add=grants-org" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial
             </Link>
-            <Link href="/contact" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">
+            <Link href="/contact" className="border border-slate-300 hover:bg-white text-slate-900 px-8 py-4 rounded-lg font-bold">
               Schedule Demo
             </Link>
           </div>

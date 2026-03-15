@@ -97,7 +97,7 @@ export default function ProgramOwnerCampaignsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <Breadcrumbs
         items={[
           { label: 'Program Holder', href: '/program-holder/dashboard' },
@@ -168,7 +168,7 @@ export default function ProgramOwnerCampaignsPage() {
                 {myStudents.map((student: any) => (
                   <label
                     key={student.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-white cursor-pointer"
                   >
                     <input
                       type="checkbox"

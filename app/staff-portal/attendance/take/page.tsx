@@ -65,7 +65,7 @@ export default async function TakeAttendancePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -138,7 +138,7 @@ export default async function TakeAttendancePage() {
               <button className="px-4 py-2 text-sm bg-brand-green-100 text-brand-green-700 rounded-lg hover:bg-brand-green-200">
                 Mark All Present
               </button>
-              <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+              <button className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg hover:bg-gray-200">
                 Clear All
               </button>
             </div>
@@ -147,7 +147,7 @@ export default async function TakeAttendancePage() {
           {studentList.length > 0 ? (
             <div className="divide-y">
               {studentList.map((student: any, index: number) => (
-                <div key={student.id} className="p-4 hover:bg-gray-50">
+                <div key={student.id} className="p-4 hover:bg-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
@@ -178,15 +178,15 @@ export default async function TakeAttendancePage() {
                           <CheckCircle className="w-4 h-4" />
                           Present
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
                           <XCircle className="w-4 h-4" />
                           Absent
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
                           <AlertCircle className="w-4 h-4" />
                           Late
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white">
                           <Calendar className="w-4 h-4" />
                           Excused
                         </button>
@@ -236,7 +236,7 @@ export default async function TakeAttendancePage() {
 
           {/* Submit */}
           {studentList.length > 0 && (
-            <div className="p-6 border-t bg-gray-50 flex items-center justify-between">
+            <div className="p-6 border-t bg-white flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 <span className="font-medium text-gray-900">{studentList.length}</span> students • 
                 <span className="text-brand-green-600 ml-2">0 present</span> • 

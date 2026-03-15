@@ -18,7 +18,7 @@ export default async function LowIncomePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -57,9 +57,9 @@ export default async function LowIncomePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'WIOA Eligibility', href: '/wioa-eligibility' }, { label: 'Low Income' }]} />
         </div>
@@ -93,7 +93,7 @@ export default async function LowIncomePage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-white">
                   <th className="px-4 py-3 text-left font-semibold">Household Size</th>
                   <th className="px-4 py-3 text-right font-semibold">Annual Income</th>
                   <th className="px-4 py-3 text-right font-semibold">Monthly Income</th>
@@ -200,7 +200,7 @@ export default async function LowIncomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

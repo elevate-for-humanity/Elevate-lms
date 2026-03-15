@@ -24,7 +24,7 @@ export default async function HelpCategoryPage({ params }: Props) {
   const articles = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Help', href: '/help' },
@@ -37,7 +37,7 @@ export default async function HelpCategoryPage({ params }: Props) {
         <p className="text-gray-600 mb-8">{articles.length} articles in this category</p>
         <div className="bg-white rounded-xl shadow-sm divide-y">
           {articles.map((article) => (
-            <Link key={article.id} href={`/help/articles/article/${article.id}`} className="flex items-center justify-between p-6 hover:bg-gray-50">
+            <Link key={article.id} href={`/help/articles/article/${article.id}`} className="flex items-center justify-between p-6 hover:bg-white">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <FileText className="w-5 h-5 text-brand-blue-600" />

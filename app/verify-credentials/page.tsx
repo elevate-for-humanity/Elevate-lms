@@ -153,7 +153,7 @@ function CredentialCard({ credential }: { credential: VerifiableCredential }) {
       </div>
       
       {credential.idNumber && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-3 bg-white rounded-lg">
           <p className="text-sm text-gray-500 mb-1">Credential ID</p>
           <p className="font-mono text-sm font-medium text-gray-900">{credential.idNumber}</p>
         </div>
@@ -190,7 +190,7 @@ export default function VerifyCredentialsPage() {
   const fundingCredentials = credentials.filter(c => c.category === 'funding');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -352,7 +352,7 @@ export default function VerifyCredentialsPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <h3 className="font-bold text-gray-900 mb-4">Related Compliance Pages</h3>
               <div className="space-y-3">
                 <Link
@@ -390,7 +390,7 @@ export default function VerifyCredentialsPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-gray-100">
+      <section className="py-8 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5" />

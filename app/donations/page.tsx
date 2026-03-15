@@ -31,7 +31,7 @@ export default function DonationsPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Donate' }]} />
         </div>
@@ -59,7 +59,7 @@ export default function DonationsPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Make a Donation</h2>
           
-          <div className="bg-gray-50 rounded-xl p-8">
+          <div className="bg-white rounded-xl p-8">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
               {donationLevels.map((level, i) => (
                 <button key={i} className="bg-white border-2 border-gray-200 hover:border-brand-red-500 rounded-lg p-4 text-center transition">
@@ -94,7 +94,7 @@ export default function DonationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Your Impact</h2>
           <div className="space-y-4">
@@ -133,7 +133,7 @@ export default function DonationsPage() {
               <p className="text-brand-red-100 text-sm">Include Elevate in your estate planning</p>
             </div>
           </div>
-          <Link href="/contact" className="mt-8 inline-block bg-white hover:bg-gray-100 text-brand-red-700 px-8 py-4 rounded-lg text-lg font-bold transition">
+          <Link href="/contact" className="mt-8 inline-block bg-white hover:bg-white text-brand-red-700 px-8 py-4 rounded-lg text-lg font-bold transition">
             Contact Us to Learn More
           </Link>
         </div>

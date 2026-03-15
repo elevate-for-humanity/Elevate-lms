@@ -162,29 +162,29 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Quick Stats Bar */}
-      <section className="py-6 bg-slate-900">
+      <section className="py-6 bg-white border-t">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <Clock className="w-7 h-7 text-brand-blue-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">{program.structure.totalDuration}</div>
+              <div className="text-2xl font-bold text-slate-900">{program.structure.totalDuration}</div>
               <div className="text-slate-400 text-sm">Program Duration</div>
             </div>
             {program.structure.totalHours && (
               <div>
                 <BookOpen className="w-7 h-7 text-brand-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{program.structure.totalHours}</div>
+                <div className="text-2xl font-bold text-slate-900">{program.structure.totalHours}</div>
                 <div className="text-slate-400 text-sm">Training Hours</div>
               </div>
             )}
             <div>
               <DollarSign className="w-7 h-7 text-yellow-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">{program.structure.totalCost}</div>
+              <div className="text-2xl font-bold text-slate-900">{program.structure.totalCost}</div>
               <div className="text-slate-400 text-sm">Total Program Cost</div>
             </div>
             <div>
               <Award className="w-7 h-7 text-brand-blue-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">{program.credentials.length}</div>
+              <div className="text-2xl font-bold text-slate-900">{program.credentials.length}</div>
               <div className="text-slate-400 text-sm">Credentials Earned</div>
             </div>
           </div>
@@ -388,14 +388,14 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Career Pathways</h2>
-              <p className="text-white/80 mb-8">
+              <p className="text-slate-600 mb-8">
                 Graduates enter the workforce with industry-recognized credentials and documented competencies.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {program.careers.map((career, i) => (
                   <div key={i} className="bg-white/10 rounded-xl p-4">
                     <h3 className="font-bold text-white">{career.title}</h3>
-                    <p className="text-white/80 text-sm">{career.salary}/year</p>
+                    <p className="text-slate-600 text-sm">{career.salary}/year</p>
                     {career.demand && <p className="text-white/60 text-xs mt-1">{career.demand}</p>}
                   </div>
                 ))}
@@ -403,7 +403,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
             </div>
             {program.employers && program.employers.length > 0 && (
               <div>
-                <h3 className="text-xl font-bold text-white mb-4">Industry Employers</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Industry Employers</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {program.employers.map((emp, i) => (
                     <div key={i} className="bg-white/20 rounded-lg px-4 py-3 text-white font-medium text-sm">
@@ -484,7 +484,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             Start Your {program.title} Career

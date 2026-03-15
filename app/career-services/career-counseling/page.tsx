@@ -71,7 +71,7 @@ export default function CareerCounselingPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Career Counseling' }]} />
         </div>
@@ -114,7 +114,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Process */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Our Counseling Process
@@ -168,7 +168,7 @@ export default function CareerCounselingPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {assessments.map((assessment, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-6 flex items-start">
+              <div key={index} className="bg-white rounded-xl p-6 flex items-start">
                 <Circle className="w-6 h-6 text-brand-blue-600 mr-4 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">{assessment.name}</h3>
@@ -262,7 +262,7 @@ export default function CareerCounselingPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
+            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
               <div className="flex items-center mb-4">
                 <Users className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">In-Person Sessions</h3>
@@ -286,7 +286,7 @@ export default function CareerCounselingPage() {
               </ul>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
+            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
               <div className="flex items-center mb-4">
                 <MessageSquare className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">Virtual Sessions</h3>
@@ -342,7 +342,7 @@ export default function CareerCounselingPage() {
             </Link>
             <Link
               href="/career-services"
-              className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-white hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               View All Career Services
             </Link>

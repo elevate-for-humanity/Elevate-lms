@@ -121,10 +121,10 @@ export default function DotTestingPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/drug-testing-page-1.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">DOT Drug & Alcohol Testing</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">FMCSA-compliant testing for CDL drivers and DOT-regulated employees. Full compliance with 49 CFR Part 40.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">DOT Drug & Alcohol Testing</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">FMCSA-compliant testing for CDL drivers and DOT-regulated employees. Full compliance with 49 CFR Part 40.</p>
           </div>
         </div>
       </section>
@@ -164,8 +164,8 @@ export default function DotTestingPage() {
               </h3>
               <div className="grid gap-3">
                 {whoNeedsDot.map((item) => (
-                  <div key={item.role} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                  <div key={item.role} className="flex items-start gap-3 p-3 bg-white rounded-lg">
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     <div>
                       <div className="font-medium text-gray-900">{item.role}</div>
                       <div className="text-sm text-gray-600">{item.desc}</div>
@@ -205,7 +205,7 @@ export default function DotTestingPage() {
                     className="object-cover"
                   />
                   {test.popular && (
-                    <div className="absolute top-3 left-3 bg-brand-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-3 left-3 bg-brand-orange-500 text-slate-900 px-3 py-1 rounded-full text-xs font-bold">
                       MOST COMMON
                     </div>
                   )}
@@ -221,7 +221,7 @@ export default function DotTestingPage() {
                   <ul className="space-y-1 mb-4">
                     {test.includes.slice(0, 4).map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs text-gray-700">
-                        <span className="text-slate-400 flex-shrink-0">•</span>
+                        <span className="text-slate-500 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -229,7 +229,7 @@ export default function DotTestingPage() {
                   
                   <a
                     href="/support"
-                    className="block w-full text-center bg-brand-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-orange-600 transition text-sm"
+                    className="block w-full text-center bg-brand-orange-500 text-slate-900 px-4 py-2 rounded-lg font-bold hover:bg-brand-orange-600 transition text-sm"
                   >
                     Schedule Now
                   </a>
@@ -259,7 +259,7 @@ export default function DotTestingPage() {
               </p>
               <a
                 href="/support"
-                className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-red-600 text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition"
               >
                 <Phone className="w-4 h-4" />
                 Get Help Now
@@ -270,12 +270,12 @@ export default function DotTestingPage() {
       </section>
 
       {/* Random Consortium */}
-      <section className="py-16 bg-gray-900 text-white">
+      <section className="py-16 bg-gray-900 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-4">DOT Random Testing Consortium</h2>
-              <p className="text-gray-300 mb-6">
+              <p className="text-slate-600 mb-6">
                 Owner-operators and small fleets can join our random testing consortium to meet DOT requirements 
                 without the hassle of managing your own program.
               </p>
@@ -288,15 +288,15 @@ export default function DotTestingPage() {
                   'Clearinghouse reporting included',
                   'Affordable monthly rates',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-300">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                  <li key={item} className="flex items-center gap-3 text-slate-600">
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}
               </ul>
               <a
                 href="/support"
-                className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+                className="inline-flex items-center gap-2 bg-brand-orange-500 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
               >
                 <Phone className="w-5 h-5" />
                 Join Consortium
@@ -315,7 +315,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-orange-500 text-white">
+      <section className="py-16 bg-brand-orange-500 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need DOT-Compliant Testing?</h2>
           <p className="text-xl text-brand-orange-100 mb-8">
@@ -323,7 +323,7 @@ export default function DotTestingPage() {
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-lg"
           >
             <Phone className="w-5 h-5" />
             (317) 314-3757

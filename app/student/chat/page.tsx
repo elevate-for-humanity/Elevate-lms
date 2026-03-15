@@ -191,9 +191,9 @@ export default function StudentChatPage() {
   const selectedConvo = conversations.find(c => c.id === selectedConversation);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Student', href: '/student' }, { label: 'Chat' }]} />
         </div>
@@ -225,7 +225,7 @@ export default function StudentChatPage() {
                   <button
                     key={convo.id}
                     onClick={() => setSelectedConversation(convo.id)}
-                    className={`w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 text-left ${
+                    className={`w-full px-4 py-3 flex items-start gap-3 hover:bg-white text-left ${
                       selectedConversation === convo.id ? 'bg-brand-blue-50' : ''
                     }`}
                   >
@@ -277,13 +277,13 @@ export default function StudentChatPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg">
                       <Phone className="w-5 h-5" />
                     </button>
-                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg">
                       <Video className="w-5 h-5" />
                     </button>
-                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white rounded-lg">
                       <MoreVertical className="w-5 h-5" />
                     </button>
                   </div>
@@ -300,7 +300,7 @@ export default function StudentChatPage() {
                         className={`max-w-md px-4 py-2 rounded-2xl ${
                           message.sender === 'me'
                             ? 'bg-brand-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                            : 'bg-white text-gray-900'
                         }`}
                       >
                         <p>{message.text}</p>

@@ -22,7 +22,7 @@ export default async function NewReportPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
         </div>
@@ -66,7 +66,7 @@ export default async function NewReportPage() {
     .eq('status', 'active');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
         </div>
@@ -140,7 +140,7 @@ export default async function NewReportPage() {
                       {students.map((enrollment) => (
                         <div
                           key={enrollment.id}
-                          className="p-4 bg-slate-50 rounded-lg border border-slate-200"
+                          className="p-4 bg-white rounded-lg border border-slate-200"
                         >
                           <div className="font-medium text-black mb-2">
                             {enrollment.student?.first_name}{' '}
@@ -215,7 +215,7 @@ export default async function NewReportPage() {
                   </Link>
                   <Link
                     href="/program-holder/reports"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-slate-50 text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-white text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
                   >
                     Cancel
                   </Link>

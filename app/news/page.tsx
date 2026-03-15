@@ -32,7 +32,7 @@ export default async function NewsPage() {
           alt="Elevate for Humanity news and updates"
           fill className="object-cover" priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Elevate for Humanity</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">News &amp; Updates</h1>
@@ -49,7 +49,7 @@ export default async function NewsPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {posts.length === 0 ? (
           /* Empty state */
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 px-8 text-center">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 px-8 text-center">
             <Newspaper className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-600 font-medium">No articles published yet.</p>
             <p className="text-slate-500 text-sm mt-1">Follow us on social media for the latest updates.</p>
@@ -64,7 +64,7 @@ export default async function NewsPage() {
               {/* Featured post */}
               {featured && (
                 <Link href={`/news/${featured.slug}`} className="group block mb-10 rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="relative aspect-[16/7] overflow-hidden bg-slate-100">
+                  <div className="relative aspect-[16/7] overflow-hidden bg-white">
                     {featured.featured_image ? (
                       <Image src={featured.featured_image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
@@ -72,8 +72,7 @@ export default async function NewsPage() {
                         <Newspaper className="w-16 h-16 text-white/30" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
-                    <div className="absolute inset-x-6 bottom-6 text-white">
+                                        <div className="absolute inset-x-6 bottom-6 text-white">
                       {featured.category && (
                         <span className="inline-block bg-brand-blue-500/90 text-white text-xs font-semibold px-3 py-1 rounded-full mb-2">
                           {featured.category}
@@ -94,7 +93,7 @@ export default async function NewsPage() {
                 <div className="grid gap-6 sm:grid-cols-2">
                   {rest.map(post => (
                     <Link key={post.id} href={`/news/${post.slug}`} className="group block rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
-                      <div className="relative aspect-[16/9] bg-slate-100 overflow-hidden">
+                      <div className="relative aspect-[16/9] bg-white overflow-hidden">
                         {post.featured_image ? (
                           <Image src={post.featured_image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
@@ -128,7 +127,7 @@ export default async function NewsPage() {
                   <h3 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wide">Categories</h3>
                   <div className="flex flex-wrap gap-2">
                     {categories.map(cat => (
-                      <span key={cat} className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full">
+                      <span key={cat} className="inline-flex items-center gap-1 text-xs font-medium bg-white text-slate-700 px-3 py-1.5 rounded-full">
                         <Tag className="w-3 h-3" /> {cat}
                       </span>
                     ))}

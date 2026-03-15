@@ -72,7 +72,7 @@ export default function CatalogFilters({
           <button
             onClick={() => go(buildUrl(current, { category: '', page: '1' }))}
             className={`block w-full text-left text-sm px-2 py-1 rounded-lg transition ${
-              !current.category ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-slate-100'
+              !current.category ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-white'
             }`}
           >
             All Categories
@@ -82,7 +82,7 @@ export default function CatalogFilters({
               key={cat}
               onClick={() => go(buildUrl(current, { category: cat, page: '1' }))}
               className={`block w-full text-left text-sm px-2 py-1 rounded-lg transition ${
-                current.category === cat ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-slate-100'
+                current.category === cat ? 'bg-brand-blue-50 text-brand-blue-700 font-medium' : 'text-slate-600 hover:bg-white'
               }`}
             >
               {cat}

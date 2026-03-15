@@ -28,7 +28,7 @@ export default function ComplianceReportPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Report Submitted</h1>
@@ -40,9 +40,9 @@ export default function ComplianceReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Compliance', href: '/compliance' }, { label: 'Report' }]} />
         </div>

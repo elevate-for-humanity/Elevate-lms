@@ -151,7 +151,7 @@ export default function InstructorCredentialsPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Instructional Framework', href: '/instructional-framework' },
@@ -196,17 +196,17 @@ export default function InstructorCredentialsPage() {
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4 mb-10">
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <GraduationCap className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-gray-900">Credential Partners</p>
               <p className="text-xs text-gray-600 mt-1">State-approved or licensed instructional authorities</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <FileCheck className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-gray-900">Program Holders</p>
               <p className="text-xs text-gray-600 mt-1">Authorized RTI coordinators under licensed supervision</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <Award className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-gray-900">Subject Matter Experts</p>
               <p className="text-xs text-gray-600 mt-1">Supplemental instruction and mentoring</p>
@@ -247,7 +247,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* Per-Program Credential Details */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program-Specific Instructor Requirements</h2>
           <p className="text-gray-600 mb-8">
@@ -306,7 +306,7 @@ export default function InstructorCredentialsPage() {
                   </div>
 
                   {/* Credential Issued */}
-                  <div className="bg-slate-50 rounded-lg p-3">
+                  <div className="bg-white rounded-lg p-3">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                       Credential Issued
                     </p>
@@ -363,7 +363,7 @@ export default function InstructorCredentialsPage() {
             ))}
           </div>
 
-          <div className="mt-6 bg-slate-50 border rounded-lg p-4">
+          <div className="mt-6 bg-white border rounded-lg p-4">
             <p className="text-sm text-gray-700">
               <span className="font-semibold">Disclosure:</span> Specific provider names, MOU documents, and instructor credential files are maintained in internal compliance records and disclosed to authorized reviewers (ETPL, DWD, DOL, workforce boards) upon request.
             </p>
@@ -372,7 +372,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link
@@ -383,19 +383,19 @@ export default function InstructorCredentialsPage() {
             </Link>
             <Link
               href="/accreditation"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               Accreditation & Approvals
             </Link>
             <Link
               href="/workone-partner-packet"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               WorkOne Partner Packet
             </Link>
             <Link
               href="/pathways/training-model"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               How Training Works
             </Link>

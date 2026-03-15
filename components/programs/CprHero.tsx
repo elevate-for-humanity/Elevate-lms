@@ -91,7 +91,7 @@ export default function CprHero() {
   }
 
   return (
-    <section className="relative w-full h-[60vh] sm:h-[70vh] min-h-[400px] overflow-hidden bg-slate-900">
+    <section className="relative w-full h-[60vh] sm:h-[70vh] min-h-[400px] overflow-hidden">
       {/* Background photo */}
       <Image
         src="/images/pages/cpr-mannequin.jpg"

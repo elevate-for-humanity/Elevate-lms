@@ -40,7 +40,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
         <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
@@ -72,7 +72,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-brand-green-900' : 'text-brand-green-200 hover:bg-brand-green-700'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-white text-brand-green-900' : 'text-brand-green-200 hover:bg-brand-green-700'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -163,7 +163,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                       <div className="flex items-center gap-2">
                         <button 
                           onClick={() => saveGrant(grant.id)}
-                          className="p-2 rounded-lg hover:bg-gray-100"
+                          className="p-2 rounded-lg hover:bg-white"
                         >
                           <Bookmark className="w-5 h-5 text-gray-400" />
                         </button>
@@ -213,7 +213,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             ) : (
               <div className="space-y-4">
                 {applications.map(app => (
-                  <Link key={app.id} href={`/apps/grants/application/${app.id}`} className="block p-4 border rounded-lg hover:bg-gray-50">
+                  <Link key={app.id} href={`/apps/grants/application/${app.id}`} className="block p-4 border rounded-lg hover:bg-white">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold">{app.grant_title}</h3>
@@ -223,7 +223,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           app.status === 'awarded' ? 'bg-brand-green-100 text-brand-green-800' :
                           app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-800' :
-                          app.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                          app.status === 'draft' ? 'bg-white text-gray-800' :
                           'bg-yellow-100 text-yellow-800'
                         }`}>
                           {app.status}

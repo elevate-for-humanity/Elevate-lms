@@ -199,7 +199,7 @@ export default function HandbookAcknowledgePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -215,7 +215,7 @@ export default function HandbookAcknowledgePage() {
 
   if (alreadyAcknowledged) {
     return (
-      <div className="min-h-screen bg-slate-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -250,7 +250,7 @@ export default function HandbookAcknowledgePage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -270,7 +270,7 @@ export default function HandbookAcknowledgePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-3xl mx-auto px-4">
         {/* Back Link */}
         <Link
@@ -356,11 +356,11 @@ export default function HandbookAcknowledgePage() {
                   onClick={() =>
                     setExpandedSection(isExpanded ? null : section.id)
                   }
-                  className="w-full p-4 flex items-center gap-4 text-left hover:bg-slate-50 transition-colors"
+                  className="w-full p-4 flex items-center gap-4 text-left hover:bg-white transition-colors"
                 >
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isAcknowledged ? 'bg-brand-green-100' : 'bg-slate-100'
+                      isAcknowledged ? 'bg-brand-green-100' : 'bg-white'
                     }`}
                   >
                     {isAcknowledged ? (
@@ -402,7 +402,7 @@ export default function HandbookAcknowledgePage() {
                       </ul>
 
                       {/* Acknowledgment Checkbox */}
-                      <label className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors">
+                      <label className="flex items-start gap-3 p-3 bg-white rounded-lg cursor-pointer hover:bg-white transition-colors">
                         <input
                           type="checkbox"
                           checked={isAcknowledged}

@@ -91,8 +91,8 @@ export default async function ShopReportsPage() {
   }).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Shop', href: '/shop' }, { label: 'Reports' }]} />
         </div>
@@ -162,7 +162,7 @@ export default async function ShopReportsPage() {
               </div>
             ) : (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placement</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
@@ -174,7 +174,7 @@ export default async function ShopReportsPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {reports.map((report) => (
-                    <tr key={report.id} className="hover:bg-gray-50">
+                    <tr key={report.id} className="hover:bg-white">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{report.student_name}</div>
                       </td>
@@ -189,7 +189,7 @@ export default async function ShopReportsPage() {
                         <span className={`px-2 py-1 text-xs rounded ${
                           report.status === 'approved' ? 'bg-brand-green-100 text-brand-green-800' :
                           report.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-white text-gray-800'
                         }`}>
                           {report.status}
                         </span>

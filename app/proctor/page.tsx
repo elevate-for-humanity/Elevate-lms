@@ -100,7 +100,7 @@ export default function ProctorDashboard() {
         <div className="flex gap-2">
           <button
             onClick={fetchSessions}
-            className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-3 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-3 py-2.5 border border-slate-200 rounded-lg hover:bg-white transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -128,7 +128,7 @@ export default function ProctorDashboard() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 animate-pulse">
               <div className="h-4 bg-slate-200 rounded w-1/3 mb-3" />
-              <div className="h-3 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-white rounded w-1/2" />
             </div>
           ))}
         </div>

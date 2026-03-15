@@ -243,7 +243,7 @@ export default function BarberChatAssistant() {
       {!isMinimized && (
         <>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 h-[340px] bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 h-[340px] bg-white">
             {messages.map((msg, i) => (
               <div
                 key={i}

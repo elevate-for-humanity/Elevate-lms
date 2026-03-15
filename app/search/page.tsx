@@ -82,7 +82,7 @@ const quickLinks = [
 
 export default function SearchPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Search' }]} />
         </div>
@@ -128,7 +128,7 @@ export default function SearchPage() {
                   </h3>
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {prog.certs.map((cert) => (
-                      <span key={cert} className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-full">
+                      <span key={cert} className="text-xs bg-white text-slate-700 px-2 py-1 rounded-full">
                         {cert}
                       </span>
                     ))}
@@ -150,7 +150,7 @@ export default function SearchPage() {
       </section>
 
       {/* Quick Links */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Quick Links</h2>
           <p className="text-slate-600 mb-10">Common pages and resources.</p>
@@ -215,7 +215,7 @@ export default function SearchPage() {
       </section>
 
       {/* Employer Section */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="order-2 md:order-1">
@@ -260,7 +260,7 @@ export default function SearchPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               href="/start"
-              className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg"
+              className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-white transition hover:scale-105 shadow-lg"
             >
               Apply Now
             </Link>

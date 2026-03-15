@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function InstructorPortalLanding() {
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Instructor Portal' }]} />
         </div>
@@ -27,17 +27,17 @@ export default function InstructorPortalLanding() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/instructor-hero.jpg" alt="Instructor Portal" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Instructor Portal</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Manage your courses, track student progress, grade assignments, and communicate with learners.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Instructor Portal</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Manage your courses, track student progress, grade assignments, and communicate with learners.</p>
           </div>
         </div>
       </section>
 
       {/* Avatar Guide */}
 
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Portal Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,8 +104,8 @@ export default function InstructorPortalLanding() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Start Teaching</h2>
           <p className="text-lg text-slate-600 mb-8">Already an instructor? Sign in. Want to teach? Apply today.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login?redirect=/instructor/dashboard" className="px-8 py-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Sign In</Link>
-            <Link href="/apply?role=instructor" className="px-8 py-4 bg-slate-100 text-slate-900 font-bold rounded-lg hover:bg-slate-200">Become an Instructor</Link>
+            <Link href="/login?redirect=/instructor/dashboard" className="px-8 py-4 bg-indigo-600 text-slate-900 font-bold rounded-lg hover:bg-indigo-700">Sign In</Link>
+            <Link href="/apply?role=instructor" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200">Become an Instructor</Link>
           </div>
         </div>
       </section>

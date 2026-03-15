@@ -112,7 +112,7 @@ export default function ScheduleMeetingPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -121,7 +121,7 @@ export default function ScheduleMeetingPage() {
           <p className="text-gray-600 mb-6">
             Your {meetingType === 'virtual' ? 'virtual meeting' : 'phone call'} has been scheduled for:
           </p>
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
+          <div className="bg-white rounded-xl p-4 mb-6">
             <p className="font-semibold text-gray-900">{selectedDate && formatDateFull(selectedDate)}</p>
             <p className="text-gray-600">
               {TIME_SLOTS.find(s => s.time === selectedTime)?.display} (1 hour)
@@ -142,7 +142,7 @@ export default function ScheduleMeetingPage() {
             </Link>
             <Link
               href="/programs"
-              className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
+              className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-white transition"
             >
               Browse Programs
             </Link>
@@ -153,9 +153,9 @@ export default function ScheduleMeetingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Schedule', href: '/schedule' }, { label: 'Meeting' }]} />
         </div>
@@ -275,7 +275,7 @@ export default function ScheduleMeetingPage() {
                     className={`p-3 rounded-xl text-center transition ${
                       selectedDate?.toDateString() === date.toDateString()
                         ? 'bg-brand-blue-600 text-white'
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-900'
+                        : 'bg-white hover:bg-white text-gray-900'
                     }`}
                   >
                     <div className="text-xs font-medium opacity-75">
@@ -306,7 +306,7 @@ export default function ScheduleMeetingPage() {
                         className={`p-3 rounded-xl text-center font-medium transition ${
                           selectedTime === slot.time
                             ? 'bg-brand-blue-600 text-white'
-                            : 'bg-gray-50 hover:bg-gray-100 text-gray-900'
+                            : 'bg-white hover:bg-white text-gray-900'
                         }`}
                       >
                         {slot.display}
@@ -415,7 +415,7 @@ export default function ScheduleMeetingPage() {
               </div>
 
               {/* Summary */}
-              <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+              <div className="mt-6 p-4 bg-white rounded-xl">
                 <h4 className="font-semibold text-gray-900 mb-2">Meeting Summary</h4>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p><strong>Type:</strong> {meetingType === 'virtual' ? 'Virtual Meeting (Google Meet)' : 'Phone Call'}</p>

@@ -51,7 +51,7 @@ export default async function ReportsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
@@ -102,7 +102,7 @@ export default async function ReportsPage() {
                 { label: 'Credential Rate', value: performance.credentialRate, target: 60 },
                 { label: 'Measurable Skill Gains', value: performance.skillGains, target: 50 },
               ].map((m) => (
-                <div key={m.label} className="p-4 bg-gray-50 rounded-lg">
+                <div key={m.label} className="p-4 bg-white rounded-lg">
                   <p className="text-sm text-gray-600">{m.label}</p>
                   <p className="text-2xl font-bold mt-1">
                     {m.prefix || ''}{m.value != null ? (typeof m.value === 'number' ? (m.prefix ? m.value.toLocaleString() : `${Math.round(m.value)}%`) : m.value) : '—'}

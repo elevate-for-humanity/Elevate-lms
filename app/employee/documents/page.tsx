@@ -47,7 +47,7 @@ export default async function EmployeeDocumentsPage() {
   const displayCategories = categories && categories.length > 0 ? categories : defaultCategories;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Employee Portal', href: '/employee' },
@@ -86,7 +86,7 @@ export default async function EmployeeDocumentsPage() {
                   <Link
                     key={category.id}
                     href={`/employee/documents?category=${category.id}`}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                    className="flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-white"
                   >
                     <span className="flex items-center gap-2">
                       <Folder className="w-4 h-4" />
@@ -118,7 +118,7 @@ export default async function EmployeeDocumentsPage() {
               {documents && documents.length > 0 ? (
                 <div className="divide-y">
                   {documents.map((doc: any) => (
-                    <div key={doc.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
+                    <div key={doc.id} className="p-4 hover:bg-white flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <FileText className="w-10 h-10 text-brand-blue-500" />
                         <div>

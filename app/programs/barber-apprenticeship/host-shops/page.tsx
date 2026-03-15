@@ -169,7 +169,7 @@ export default function HostShopsPage() {
       </section>
 
       {/* Responsibilities */}
-      <section className="py-16 px-6 bg-slate-50">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-black">Host Shop Responsibilities</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -195,8 +195,8 @@ export default function HostShopsPage() {
               </ul>
             </div>
             <div className="bg-brand-orange-600 rounded-xl p-8 shadow-lg">
-              <h3 className="font-bold text-xl mb-6 text-white">What We Handle</h3>
-              <ul className="space-y-4 text-white">
+              <h3 className="font-bold text-xl mb-6 text-slate-900">What We Handle</h3>
+              <ul className="space-y-4 text-slate-900">
                 <li className="flex items-start gap-3">
                   <span className="font-bold text-xl">•</span>
                   <span className="text-lg">Apprenticeship structure & framework</span>
@@ -250,9 +250,9 @@ export default function HostShopsPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="py-16 px-6 bg-slate-900 text-white">
+      <section className="py-16 px-6 bg-white border-t">
         <div className="max-w-3xl mx-auto text-center">
-          <Building2 className="w-16 h-16 mx-auto mb-6 text-white" />
+          <Building2 className="w-16 h-16 mx-auto mb-6 text-slate-900" />
           <h2 className="text-3xl font-bold mb-4">Ready to Train the Next Generation?</h2>
           <p className="text-slate-300 mb-8">
             Join our network of approved host barbershops and help shape future barbers.
@@ -260,7 +260,7 @@ export default function HostShopsPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/forms/host-shop-inquiry"
-              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold transition hover:bg-gray-100"
+              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold transition hover:bg-white"
             >
               General Inquiry
             </Link>

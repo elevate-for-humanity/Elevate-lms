@@ -130,7 +130,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
     active: { text: 'Active', color: 'bg-brand-green-100 text-brand-green-700' },
     confirmed: { text: 'Active', color: 'bg-brand-green-100 text-brand-green-700' },
     completed: { text: 'Completed', color: 'bg-brand-blue-100 text-brand-blue-700' },
-    withdrawn: { text: 'Withdrawn', color: 'bg-gray-100 text-gray-600' },
+    withdrawn: { text: 'Withdrawn', color: 'bg-white text-gray-600' },
     pending: { text: 'Pending', color: 'bg-amber-100 text-amber-700' },
     paid: { text: 'Pending', color: 'bg-amber-100 text-amber-700' },
   };
@@ -138,7 +138,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   const status = statusLabel[enrollment.status] || statusLabel.pending;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
           { label: 'LMS', href: '/lms/dashboard' },
@@ -232,7 +232,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-full bg-gray-100 rounded-full h-2 mb-1">
+                <div className="w-full bg-white rounded-full h-2 mb-1">
                   <div
                     className={`h-2 rounded-full transition-all ${
                       course.percent === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
@@ -318,13 +318,13 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-3">
           <Link
-            href="/lms/dashboard"
+            href="/learner/dashboard"
             className="bg-white rounded-xl border p-4 hover:border-brand-blue-300 transition text-center"
           >
             <span className="text-sm font-medium text-gray-700">Back to Dashboard</span>
           </Link>
           <Link
-            href="/lms/certificates"
+            href="/learner/certificates"
             className="bg-white rounded-xl border p-4 hover:border-brand-blue-300 transition text-center"
           >
             <span className="text-sm font-medium text-gray-700">All Certificates</span>

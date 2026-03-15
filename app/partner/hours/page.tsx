@@ -82,13 +82,13 @@ export default async function PartnerHoursPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-6.jpg" alt="Training hours" fill sizes="100vw" className="object-cover" priority />
       </section>
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Partner', href: '/partner' },
@@ -209,7 +209,7 @@ export default async function PartnerHoursPage() {
             </h2>
             <div className="bg-white rounded-xl border overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Employer</th>
@@ -224,13 +224,13 @@ export default async function PartnerHoursPage() {
                       ? Math.round((p.total_hours_completed / p.total_hours_required) * 100)
                       : 0;
                     return (
-                      <tr key={p.id} className="hover:bg-gray-50">
+                      <tr key={p.id} className="hover:bg-white">
                         <td className="px-6 py-4 text-sm font-medium">{p.student_id?.slice(0, 8)}...</td>
                         <td className="px-6 py-4 text-sm text-gray-700">{p.employer_name}</td>
                         <td className="px-6 py-4 text-sm text-gray-700">{p.position_title}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-white rounded-full overflow-hidden">
                               <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${pct}%` }} />
                             </div>
                             <span className="text-xs text-gray-500 w-10 text-right">{pct}%</span>
@@ -241,7 +241,7 @@ export default async function PartnerHoursPage() {
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
                             p.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                             p.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                            'bg-gray-100 text-gray-700'
+                            'bg-white text-gray-700'
                           }`}>{p.status}</span>
                         </td>
                       </tr>

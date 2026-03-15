@@ -208,7 +208,7 @@ export default function FounderPage() {
       </section>
 
       {/* Quote */}
-      <section className="py-14 bg-slate-50 border-y border-slate-100">
+      <section className="py-14 bg-white border-y border-slate-100">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <blockquote className="text-xl sm:text-2xl text-slate-800 italic leading-relaxed">
             &ldquo;Every person — regardless of their past — deserves access to quality education,
@@ -270,7 +270,7 @@ export default function FounderPage() {
           <h2 className="text-3xl font-bold text-white mb-4">Start Your Career</h2>
           <p className="text-white/80 text-lg mb-8">Explore funded training programs or apply today.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/programs" className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
+            <Link href="/programs" className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition">
               Explore Programs
             </Link>
             <Link href="/start" className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition">

@@ -46,7 +46,7 @@ export default function TrainingProviderPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Training Provider' }]} />
         </div>
@@ -88,7 +88,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -146,7 +146,7 @@ export default function TrainingProviderPage() {
             <Link href="/apply/program-holder" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-base">
               Apply as Training Provider <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:317-314-3757" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 transition text-base">
+            <a href="tel:317-314-3757" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-base">
               Call (317) 314-3757
             </a>
           </div>

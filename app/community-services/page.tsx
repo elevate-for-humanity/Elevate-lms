@@ -85,7 +85,7 @@ const services = (dbRows as any[]) || [];
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How Our Community Ecosystem Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
@@ -180,7 +180,7 @@ const services = (dbRows as any[]) || [];
           </div>
           <Link
             href="/wioa-eligibility"
-            className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition"
+            className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-white transition"
           >
             Register at Indiana Career Connect <ArrowRight className="w-5 h-5" />
           </Link>
@@ -204,7 +204,7 @@ const services = (dbRows as any[]) || [];
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-white transition"
             >
               <MapPin className="w-5 h-5" />
               Find a Location

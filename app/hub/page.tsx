@@ -60,7 +60,7 @@ export default async function HubPage() {
   const isAdmin = profile?.role === 'admin' || profile?.role === 'staff' || profile?.role === 'program_holder';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <HubNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

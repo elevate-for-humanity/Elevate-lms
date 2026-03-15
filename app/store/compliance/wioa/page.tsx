@@ -121,7 +121,7 @@ export default function WIOACompliancePage() {
       />
 
       {/* Breadcrumb Navigation */}
-      <nav className="bg-gray-100 border-b border-gray-200">
+      <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-12 text-sm">
             <Link href="/" className="text-gray-600 hover:text-black flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function WIOACompliancePage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-16 bg-gray-50">
+      <section id="how-it-works" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-black mb-8 text-center">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
@@ -275,7 +275,7 @@ export default function WIOACompliancePage() {
                     className={`block text-center py-3 rounded-lg font-bold transition ${
                       plan.popular
                         ? 'bg-brand-green-600 text-white hover:bg-brand-green-700'
-                        : 'bg-gray-100 text-black hover:bg-gray-200'
+                        : 'bg-white text-black hover:bg-gray-200'
                     }`}
                   >
                     {plan.cta}
@@ -302,7 +302,7 @@ export default function WIOACompliancePage() {
                     <Download className="w-5 h-5" />
                     Download Checklist
                   </button>
-                  <button className="inline-flex items-center gap-2 bg-gray-100 text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
+                  <button className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
                     <FileText className="w-5 h-5" />
                     Eligibility Guide
                   </button>

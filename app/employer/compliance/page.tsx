@@ -86,7 +86,7 @@ export default async function EmployerCompliancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Employer', href: '/employer' }, { label: 'Compliance' }]} />
@@ -123,7 +123,7 @@ export default async function EmployerCompliancePage() {
               <p className="text-gray-600 text-sm mb-4">{area.description}</p>
               <div className="flex flex-wrap gap-2">
                 {area.actions.map((action, j) => (
-                  <Link key={j} href={action.href} className="text-sm px-4 py-2 bg-gray-50 rounded-lg hover:bg-brand-blue-50 hover:text-brand-blue-600 transition font-medium">
+                  <Link key={j} href={action.href} className="text-sm px-4 py-2 bg-white rounded-lg hover:bg-brand-blue-50 hover:text-brand-blue-600 transition font-medium">
                     {action.label}
                   </Link>
                 ))}
@@ -140,7 +140,7 @@ export default async function EmployerCompliancePage() {
             </h2>
             <div className="space-y-3">
               {upcomingDeadlines.map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={i} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div className="flex items-center gap-3">
                     <AlertCircle className={`w-4 h-4 ${item.priority === 'high' ? 'text-brand-red-500' : 'text-yellow-500'}`} />
                     <div>
@@ -178,7 +178,7 @@ export default async function EmployerCompliancePage() {
             <Link href="/contact" className="text-sm px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium">
               Contact Compliance Team
             </Link>
-            <Link href="/store/compliance" className="text-sm px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 transition font-medium">
+            <Link href="/store/compliance" className="text-sm px-4 py-2 bg-white border rounded-lg hover:bg-white transition font-medium">
               View Compliance Tools
             </Link>
           </div>

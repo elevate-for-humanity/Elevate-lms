@@ -22,7 +22,7 @@ export default async function CompliancePage() {
   const programCredentials = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Compliance & Credentials' }]} />
         </div>
@@ -57,7 +57,7 @@ export default async function CompliancePage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Program-to-Credential Mapping</h2>
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-gray-900">Program</th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-900">Credential</th>
@@ -67,7 +67,7 @@ export default async function CompliancePage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {programCredentials.map((row, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
+                  <tr key={i} className="hover:bg-white">
                     <td className="px-4 py-3 font-medium text-gray-900">{row.program}</td>
                     <td className="px-4 py-3 text-gray-700">{row.credential}</td>
                     <td className="px-4 py-3 text-gray-600">{row.issuer}</td>
@@ -145,22 +145,22 @@ export default async function CompliancePage() {
               level of care.
             </p>
             <div className="grid sm:grid-cols-2 gap-4 mt-4">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Encryption</h3>
                 <p className="text-sm">All data is encrypted in transit (TLS 1.2+) and at rest. SSNs are
                   hashed immediately upon submission — plain-text SSNs are never stored or displayed.</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Access Controls</h3>
                 <p className="text-sm">Documents are stored in private storage buckets with row-level security.
                   Access is restricted to authorized compliance staff through role-based permissions.</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Audit Trail</h3>
                 <p className="text-sm">All document access and administrative actions are logged in an immutable
                   audit trail. Access events include timestamp, user identity, and action performed.</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Short-Lived Access</h3>
                 <p className="text-sm">When staff review documents, temporary access URLs are generated on demand
                   and expire within 60 seconds. No permanent document links are stored in the system.</p>
@@ -187,15 +187,15 @@ export default async function CompliancePage() {
               OJT reimbursement rates, work experience stipends, and internship wage structures are governed by local board policy — not set by Elevate. All placements require approval from the assigned WorkOne career advisor or case manager before training begins.
             </p>
             <div className="grid sm:grid-cols-3 gap-4 mt-4">
-              <Link href="/compliance/internship-agreement" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+              <Link href="/compliance/internship-agreement" className="bg-white rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
                 <h3 className="font-semibold text-gray-900 text-sm">Internship Agreement</h3>
                 <p className="text-xs text-gray-500 mt-1">Structured work-based learning placement template</p>
               </Link>
-              <Link href="/compliance/ojt-training-plan" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+              <Link href="/compliance/ojt-training-plan" className="bg-white rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
                 <h3 className="font-semibold text-gray-900 text-sm">OJT Training Plan</h3>
                 <p className="text-xs text-gray-500 mt-1">Skills schedule, evaluation timeline, compliance notes</p>
               </Link>
-              <Link href="/compliance/internship-evaluation" className="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
+              <Link href="/compliance/internship-evaluation" className="bg-white rounded-lg p-4 border border-slate-200 hover:shadow-md transition block">
                 <h3 className="font-semibold text-gray-900 text-sm">Evaluation Form</h3>
                 <p className="text-xs text-gray-500 mt-1">Supervisor competency assessment (midpoint + final)</p>
               </Link>

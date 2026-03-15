@@ -31,7 +31,7 @@ export default async function RiseFoundationEventsPage() {
           alt="Rise Foundation community events"
           fill className="object-cover" priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-300 mb-1">Rise Foundation</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Events &amp; Programs</h1>

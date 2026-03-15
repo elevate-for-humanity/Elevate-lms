@@ -172,7 +172,7 @@ export default function PartnerOnboardingPage() {
         <Image src="/images/pages/partner-page-9.jpg" alt="Partner onboarding" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Onboarding' }]} />
         </div>
@@ -377,7 +377,7 @@ export default function PartnerOnboardingPage() {
                 <FileText className="w-5 h-5 text-brand-blue-600" />
                 Review & Submit
               </h2>
-              <div className="bg-slate-50 rounded-lg p-6 space-y-4">
+              <div className="bg-white rounded-lg p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div><p className="text-sm text-slate-500">Shop Name</p><p className="font-medium">{formData.shopName}</p></div>
                   <div><p className="text-sm text-slate-500">Contact</p><p className="font-medium">{formData.ownerName}</p></div>

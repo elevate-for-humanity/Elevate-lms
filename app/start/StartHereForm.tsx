@@ -77,7 +77,7 @@ export default function StartHereForm() {
           A career advisor will reach out within one business day to walk you through
           funding options and next steps. No paperwork yet — just a conversation.
         </p>
-        <div className="bg-slate-50 rounded-xl p-4 text-left space-y-2 text-sm text-slate-700">
+        <div className="bg-white rounded-xl p-4 text-left space-y-2 text-sm text-slate-700">
           <p className="font-semibold text-slate-900 mb-1">What happens next:</p>
           <p>1. Advisor calls or emails you within 1 business day</p>
           <p>2. We check your eligibility for free training funding</p>

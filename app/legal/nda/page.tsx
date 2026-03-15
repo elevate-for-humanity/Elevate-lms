@@ -199,7 +199,7 @@ export default function NDAPage() {
 
         </div>
 
-        <div className="mt-8 bg-slate-50 border border-slate-200 rounded-xl p-6">
+        <div className="mt-8 bg-white border border-slate-200 rounded-xl p-6">
           <p className="text-sm text-slate-600">
             This Non-Disclosure Agreement is incorporated by reference into all Elevate for Humanity
             partner agreements, MOUs, Program Holder agreements, and barbershop apprenticeship agreements.

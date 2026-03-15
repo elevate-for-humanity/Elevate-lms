@@ -88,7 +88,7 @@ export default async function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community' }]} />
         </div>
@@ -133,7 +133,7 @@ export default async function CommunityPage() {
             </Link>
             <Link
               href="/community/discussions"
-              className="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
             >
               <MessageSquare className="w-5 h-5" />
               Browse Discussions
@@ -143,7 +143,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6">
             {[
@@ -173,7 +173,7 @@ export default async function CommunityPage() {
               <Link
                 key={index}
                 href={feature.href}
-                className="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl p-6 hover:shadow-md transition-shadow"
               >
                 <feature.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
@@ -188,7 +188,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Discussion Categories */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Popular Discussions</h2>
@@ -237,7 +237,7 @@ export default async function CommunityPage() {
               { title: "Monthly Networking Mixer", frequency: "Monthly", image: "/images/pages/comp-home-pathways-support.jpg" },
               { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "/images/pages/comp-home-pathways-support.jpg" }
             ].map((event, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl overflow-hidden">
+              <div key={index} className="bg-white rounded-xl overflow-hidden">
                 <div className="relative h-40 overflow-hidden">
                   <Image
                     src={event.image}
@@ -260,7 +260,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Why Join */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Join the Community?</h2>
           
@@ -300,7 +300,7 @@ export default async function CommunityPage() {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Join Form */}
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
@@ -324,7 +324,7 @@ export default async function CommunityPage() {
             </div>
 
             {/* Inquiry Form */}
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
                   <HelpCircle className="w-5 h-5 text-white" />

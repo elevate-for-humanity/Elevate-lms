@@ -32,7 +32,7 @@ export default async function DOLFundingPage() {
 const programs = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'DOL Apprenticeship' }]} />
         </div>
@@ -68,7 +68,7 @@ const programs = (dbRows as any[]) || [];
       </section>
 
       {/* Benefits */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-6">Apprenticeship Benefits</h2>
           <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 border border-slate-200">
@@ -89,7 +89,7 @@ const programs = (dbRows as any[]) || [];
           <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">Programs registered with the U.S. Department of Labor.</p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {programs.map((p) => (
-              <Link key={p.name} href={p.href} className="flex items-center justify-between p-5 bg-slate-50 rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group">
+              <Link key={p.name} href={p.href} className="flex items-center justify-between p-5 bg-white rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group">
                 <div>
                   <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">{p.name}</h3>
                   <p className="text-sm text-slate-500">{p.duration}</p>
@@ -118,7 +118,7 @@ const programs = (dbRows as any[]) || [];
               </div>
             ))}
           </div>
-          <Link href="/start" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition">
+          <Link href="/start" className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition">
             Apply Now
           </Link>
         </div>

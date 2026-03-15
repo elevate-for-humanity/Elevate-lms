@@ -47,7 +47,7 @@ export default async function BlogPage() {
   const [featured, ...rest] = posts;
 
   return (
-    <div className="min-h-screen bg-gray-50">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Blog' }]} />
         </div>
@@ -69,7 +69,7 @@ export default async function BlogPage() {
               href={`/blog/${featured.slug}`}
               className="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden md:flex hover:shadow-md transition-shadow"
             >
-              <div className="md:w-1/2 relative h-64 md:h-auto bg-slate-100 overflow-hidden">
+              <div className="md:w-1/2 relative h-64 md:h-auto bg-white overflow-hidden">
                 <Image
                   src={featured.image}
                   alt={featured.title}
@@ -117,7 +117,7 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="relative h-48 bg-slate-100 overflow-hidden">
+                  <div className="relative h-48 bg-white overflow-hidden">
                     <Image
                       src={post.image}
                       alt={post.title}

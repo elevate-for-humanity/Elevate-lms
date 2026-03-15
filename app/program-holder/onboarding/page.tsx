@@ -33,7 +33,7 @@ export default async function ProgramHolderOnboarding() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -88,7 +88,7 @@ export default async function ProgramHolderOnboarding() {
             </Link>
             <Link
               href="/program-holder/onboarding"
-              className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 border-2 border-slate-300 text-lg transition-all"
+              className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-white border-2 border-slate-300 text-lg transition-all"
             >
               Apply as Program Holder
             </Link>
@@ -97,7 +97,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* What is a Program Holder */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-6">
             What is a Program Holder?
@@ -225,7 +225,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* Platform Navigation */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
             Navigating Your Dashboard
@@ -398,7 +398,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* Resources */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
             Resources & Support
@@ -547,7 +547,7 @@ export default async function ProgramHolderOnboarding() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/program-holder/onboarding"
-              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg transition-all"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg transition-all"
             >
               Apply Now
             </Link>

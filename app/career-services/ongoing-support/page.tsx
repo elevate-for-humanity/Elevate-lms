@@ -16,7 +16,7 @@ export default async function OngoingSupportPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
   }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -84,8 +84,8 @@ export default async function OngoingSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Ongoing Support' }]} />
         </div>
@@ -156,7 +156,7 @@ export default async function OngoingSupportPage() {
                 <h2 className="text-xl font-semibold mb-4">Your Support History</h2>
                 <div className="space-y-3">
                   {supportHistory.map((session: any) => (
-                    <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={session.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
                         <p className="font-medium">{session.type}</p>
                         <p className="text-sm text-gray-500">
@@ -201,7 +201,7 @@ export default async function OngoingSupportPage() {
               {events && events.length > 0 ? (
                 <div className="space-y-3">
                   {events.map((event: any) => (
-                    <div key={event.id} className="p-3 bg-gray-50 rounded-lg">
+                    <div key={event.id} className="p-3 bg-white rounded-lg">
                       <div className="flex items-center gap-2 text-pink-600 text-sm mb-1">
                         <Calendar className="w-4 h-4" />
                         {new Date(event.start_date).toLocaleDateString()}
@@ -222,7 +222,7 @@ export default async function OngoingSupportPage() {
             </div>
 
             {/* Related Services */}
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <h3 className="font-semibold mb-3">Related Services</h3>
               <div className="space-y-2 text-sm">
                 <Link href="/career-services/job-placement" className="block text-pink-600 hover:underline">

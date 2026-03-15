@@ -152,7 +152,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
           <div className="flex gap-4">
             <label className={`flex-1 flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-              !formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
+              !formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-white'
             }`}>
               <input type="radio" name="visibility" checked={!formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: false })}
@@ -164,7 +164,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
               </div>
             </label>
             <label className={`flex-1 flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-              formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
+              formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-white'
             }`}>
               <input type="radio" name="visibility" checked={formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: true })}

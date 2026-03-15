@@ -31,7 +31,7 @@ export default async function PartnerPortalLayout({
   const isAdmin = ['admin', 'super_admin'].includes(profile?.role || '');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <div className="font-semibold text-gray-900">Partner Portal</div>

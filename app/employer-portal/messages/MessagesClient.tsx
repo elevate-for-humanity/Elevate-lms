@@ -173,7 +173,7 @@ export default function MessagesClient({ conversations: initialConversations, cu
                     <button
                       key={conv.id}
                       onClick={() => setActiveConvId(conv.id)}
-                      className={`w-full text-left p-4 border-b hover:bg-gray-50 transition ${
+                      className={`w-full text-left p-4 border-b hover:bg-white transition ${
                         conv.id === activeConvId ? 'bg-brand-blue-50' : ''
                       }`}
                     >
@@ -214,7 +214,7 @@ export default function MessagesClient({ conversations: initialConversations, cu
                         <p className="text-sm text-gray-500">{activeConv.other_role}</p>
                       </div>
                     </div>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg">
+                    <button className="p-2 hover:bg-white rounded-lg">
                       <MoreVertical className="w-5 h-5 text-gray-500" />
                     </button>
                   </div>
@@ -237,7 +237,7 @@ export default function MessagesClient({ conversations: initialConversations, cu
                               <div className={`px-4 py-3 rounded-2xl ${
                                 isMe
                                   ? 'bg-brand-blue-600 text-white rounded-br-md'
-                                  : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                                  : 'bg-white text-gray-900 rounded-bl-md'
                               }`}>
                                 <p>{msg.content}</p>
                               </div>
@@ -255,7 +255,7 @@ export default function MessagesClient({ conversations: initialConversations, cu
 
                   <div className="p-4 border-t">
                     <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="flex items-center gap-3">
-                      <button type="button" className="p-2 hover:bg-gray-100 rounded-lg">
+                      <button type="button" className="p-2 hover:bg-white rounded-lg">
                         <Paperclip className="w-5 h-5 text-gray-500" />
                       </button>
                       <input

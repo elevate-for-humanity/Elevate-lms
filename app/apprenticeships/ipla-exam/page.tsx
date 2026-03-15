@@ -71,7 +71,7 @@ export default function IPLAExamSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[280px] max-h-[400px]">
         <Image
@@ -282,7 +282,7 @@ export default function IPLAExamSignup() {
             <CreditCard className="w-6 h-6" />
             Payment
           </h2>
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <div className="bg-white rounded-lg p-6 mb-6">
             <div className="space-y-2 mb-4">
               <div className="flex justify-between items-center">
                 <span className="text-base">IPLA Application Fee</span>

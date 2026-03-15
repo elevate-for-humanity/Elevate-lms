@@ -19,7 +19,7 @@ export default async function StudentHandbookPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
   }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -54,9 +54,9 @@ export default async function StudentHandbookPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Student Handbook' }]} />
         </div>
@@ -68,10 +68,10 @@ export default async function StudentHandbookPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/student-handbook-page-1.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Student Handbook</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Your complete guide to policies, procedures, and expectations during your training program.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Student Handbook</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Your complete guide to policies, procedures, and expectations during your training program.</p>
           </div>
         </div>
       </section>
@@ -94,12 +94,12 @@ export default async function StudentHandbookPage() {
             {handbook?.file_url ? (
               <a
                 href={handbook.file_url}
-                className="flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700"
+                className="flex items-center gap-2 bg-brand-blue-600 text-slate-900 px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700"
               >
                 <Download className="w-4 h-4" /> Download PDF
               </a>
             ) : (
-              <button className="flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700">
+              <button className="flex items-center gap-2 bg-brand-blue-600 text-slate-900 px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700">
                 <Download className="w-4 h-4" /> Download PDF
               </button>
             )}
@@ -114,7 +114,7 @@ export default async function StudentHandbookPage() {
               <Link
                 key={section.title}
                 href={`#section-${index + 1}`}
-                className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition group"
+                className="flex items-center gap-4 p-4 rounded-lg hover:bg-white transition group"
               >
                 <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center group-hover:bg-brand-blue-100">
                   <section.icon className="w-5 h-5 text-brand-blue-600" />
@@ -123,7 +123,7 @@ export default async function StudentHandbookPage() {
                   <h3 className="font-medium">{section.title}</h3>
                   <p className="text-sm text-gray-500">{section.description}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600" />
+                <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-brand-blue-600" />
               </Link>
             ))}
           </div>
@@ -271,7 +271,7 @@ export default async function StudentHandbookPage() {
                 { title: 'Barrier Removal', desc: 'Case management support for transportation, childcare, housing, and other barriers. WIOA-funded students may be eligible for supportive services.' },
                 { title: 'Technology Support', desc: 'Help with LMS access, device issues, and software. Contact your coordinator or use the platform help desk.' },
               ].map((s) => (
-                <div key={s.title} className="p-4 bg-gray-50 rounded-lg">
+                <div key={s.title} className="p-4 bg-white rounded-lg">
                   <h3 className="font-semibold mb-1">{s.title}</h3>
                   <p className="text-sm text-gray-600">{s.desc}</p>
                 </div>
@@ -334,7 +334,7 @@ export default async function StudentHandbookPage() {
               </label>
               <button
                 type="submit"
-                className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-blue-700"
+                className="bg-brand-blue-600 text-slate-900 px-6 py-2 rounded-lg font-medium hover:bg-brand-blue-700"
               >
                 Acknowledge
               </button>

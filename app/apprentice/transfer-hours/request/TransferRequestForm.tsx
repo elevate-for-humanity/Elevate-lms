@@ -336,7 +336,7 @@ export default function TransferRequestForm({
                 <div className="flex items-start gap-4">
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      uploaded ? 'bg-brand-green-100' : 'bg-gray-100'
+                      uploaded ? 'bg-brand-green-100' : 'bg-white'
                     }`}
                   >
                     {uploaded ? (
@@ -380,8 +380,8 @@ export default function TransferRequestForm({
                           htmlFor={`file-${docType.type}`}
                           className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
                             isUploading
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                              ? 'bg-white text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-700 hover:bg-white'
                           }`}
                         >
                           {isUploading ? (
@@ -419,7 +419,7 @@ export default function TransferRequestForm({
       <div className="flex justify-end gap-4">
         <a
           href="/apprentice/transfer-hours"
-          className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+          className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition"
         >
           Cancel
         </a>

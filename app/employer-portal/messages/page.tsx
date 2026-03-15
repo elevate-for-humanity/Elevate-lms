@@ -59,7 +59,7 @@ export default async function EmployerMessagesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Employer Portal', href: '/employer-portal' }, { label: 'Messages' }]} />
       <MessagesClient
         conversations={enrichedConversations}

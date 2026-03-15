@@ -163,7 +163,7 @@ export default function SolutionsPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/demo/admin"
-                  className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition shadow-xl"
+                  className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition shadow-xl"
                 >
                   Get Interactive Demo
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -202,7 +202,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* Solutions Grid */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-black mb-4">
@@ -303,7 +303,7 @@ export default function SolutionsPage() {
             </Link>
             <Link
               href="https://calendly.com/elevate4humanityedu" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-white text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-slate-100 transition"
+              className="inline-flex items-center justify-center bg-white text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
             >
               Schedule a Demo
             </Link>
@@ -318,7 +318,7 @@ export default function SolutionsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

@@ -16,7 +16,7 @@ export default async function HvacCoursePage() {
   const course = getCourseBySlug('hvac-technician');
   if (!course) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <p className="text-slate-600">Course data not available.</p>
       </div>
     );

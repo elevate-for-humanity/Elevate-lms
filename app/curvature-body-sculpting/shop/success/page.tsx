@@ -44,7 +44,7 @@ export default function OrderSuccessPage({
           
           <Link
             href="/curvature-body-sculpting"
-            className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+            className="flex items-center justify-center gap-2 w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition"
           >
             <Home className="w-4 h-4" />
             Back to Curvature

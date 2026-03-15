@@ -37,7 +37,7 @@ export default async function LocationsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -55,7 +55,7 @@ export default async function LocationsPage() {
 
   if (error || !locations || locations.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Locations</h1>
@@ -74,7 +74,7 @@ export default async function LocationsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Locations' }]} />
         </div>
@@ -225,7 +225,7 @@ export default async function LocationsPage() {
         )}
 
         {/* FAQ */}
-        <section className="bg-slate-50 rounded-2xl p-8 mb-8">
+        <section className="bg-white rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Locations FAQ</h2>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
@@ -257,7 +257,7 @@ export default async function LocationsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition"
+              className="px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-white transition"
             >
               Schedule a Visit
             </Link>

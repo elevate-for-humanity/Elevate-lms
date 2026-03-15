@@ -64,7 +64,7 @@ export default async function EmployerSettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Settings" }]} />
 <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -83,7 +83,7 @@ export default async function EmployerSettingsPage() {
           {settingsSections.map((section) => (
             <div key={section.id} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                   <section.icon className="w-5 h-5 text-gray-600" />
                 </div>
                 <div>
@@ -111,7 +111,7 @@ export default async function EmployerSettingsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                 <Bell className="w-5 h-5 text-gray-600" />
               </div>
               <div>
@@ -121,7 +121,7 @@ export default async function EmployerSettingsPage() {
             </div>
             <div className="space-y-3">
               {['New candidate applications', 'WOTC status updates', 'Program announcements'].map((item) => (
-                <label key={item} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+                <label key={item} className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
                   <span className="text-gray-700">{item}</span>
                   <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-green-600 rounded" />
                 </label>

@@ -99,7 +99,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
 
   if (step === 'done') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-10 text-center">
           <CheckCircle2 className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Payroll Setup Complete</h2>
@@ -114,7 +114,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-2xl mx-auto px-4 py-5 flex items-center gap-4">
@@ -155,14 +155,14 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}>
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    payMethod === id ? 'bg-brand-blue-600' : 'bg-slate-100'
+                    payMethod === id ? 'bg-brand-blue-600' : 'bg-white'
                   }`}>
                     <Icon className={`w-6 h-6 ${payMethod === id ? 'text-white' : 'text-slate-500'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-slate-900">{label}</span>
-                      {note && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{note}</span>}
+                      {note && <span className="text-xs bg-white text-slate-500 px-2 py-0.5 rounded-full">{note}</span>}
                     </div>
                     <p className="text-sm text-slate-500 mt-0.5">{desc}</p>
                   </div>
@@ -223,7 +223,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep('method')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+              <button onClick={() => setStep('method')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-white">Back</button>
               <button onClick={() => setStep('w9')}
                 disabled={!banking.bankName || !banking.routingNumber || !banking.accountNumber}
                 className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50">
@@ -275,7 +275,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep(payMethod === 'direct_deposit' ? 'banking' : 'method')}
-                className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+                className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-white">Back</button>
               <button onClick={() => setStep('review')} disabled={!w9Uploaded}
                 className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50">
                 Continue <ChevronRight className="w-4 h-4" />
@@ -319,7 +319,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
               </div>
             )}
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep('w9')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">Back</button>
+              <button onClick={() => setStep('w9')} className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-white">Back</button>
               <button onClick={submit} disabled={submitting}
                 className="flex-1 flex items-center justify-center gap-2 bg-brand-green-600 text-white font-semibold py-3 rounded-xl hover:bg-brand-green-700 disabled:opacity-50">
                 {submitting ? 'Submitting…' : 'Submit Payroll Setup'}

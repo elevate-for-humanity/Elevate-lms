@@ -70,7 +70,7 @@ export default function TrainingPage() {
       </section>
 
       {/* What's Included */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">What Every Program Includes</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -97,7 +97,7 @@ export default function TrainingPage() {
             Attend an orientation to learn about programs and check your eligibility for funded training.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Orientation Schedule</Link>
+            <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Orientation Schedule</Link>
             <Link href="/programs" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">All Programs</Link>
           </div>
         </div>

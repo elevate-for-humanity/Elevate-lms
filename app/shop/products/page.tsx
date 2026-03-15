@@ -38,7 +38,7 @@ export default async function ProductsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Database connection failed.</p>
@@ -75,9 +75,9 @@ export default async function ProductsPage() {
   const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Shop', href: '/shop' }, { label: 'Products' }]} />
         </div>
@@ -99,7 +99,7 @@ export default async function ProductsPage() {
                   className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
                 />
               </div>
-              <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-white">
                 <Filter className="w-4 h-4" />
                 Filter
               </button>
@@ -125,7 +125,7 @@ export default async function ProductsPage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   category === 'All'
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-white'
                 }`}
               >
                 {category}
@@ -139,7 +139,7 @@ export default async function ProductsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-40 bg-gray-100 flex items-center justify-center relative">
+                <div className="h-40 bg-white flex items-center justify-center relative">
                   <Package className="w-16 h-16 text-gray-300" />
                   {!product.in_stock && (
                     <div className="absolute inset-0 flex items-center justify-center">

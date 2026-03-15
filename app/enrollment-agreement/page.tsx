@@ -16,7 +16,7 @@ export default function EnrollmentAgreementPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Enrollment Agreement' }]} />
         </div>
@@ -50,7 +50,7 @@ export default function EnrollmentAgreementPage() {
         {/* Section 1: Parties */}
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Parties to This Agreement</h2>
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="text-gray-700 mb-4"><strong>School:</strong></p>
             <p className="text-gray-700 mb-1">2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
             <p className="text-gray-700 mb-1">8888 Keystone Crossing, Suite 1300</p>
@@ -273,7 +273,7 @@ export default function EnrollmentAgreementPage() {
         {/* Section 10: Electronic Agreement */}
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Electronic Agreement</h2>
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               By completing the online enrollment process and clicking "I Agree" or similar 
               acknowledgment, you confirm that:
@@ -323,7 +323,7 @@ export default function EnrollmentAgreementPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

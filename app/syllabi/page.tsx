@@ -443,7 +443,7 @@ const syllabi = [
 
 export default function SyllabiPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Syllabi" }]} />
       </div>
@@ -619,7 +619,7 @@ export default function SyllabiPage() {
               </div>
 
               {/* Program Footer */}
-              <div className="bg-slate-50 p-6 border-t border-slate-200">
+              <div className="bg-white p-6 border-t border-slate-200">
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href={`/programs/${program.slug}`}

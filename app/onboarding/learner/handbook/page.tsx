@@ -224,19 +224,19 @@ export default function HandbookPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* VIDEO HERO — full bleed, no text on top */}
       <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
         <video src="/videos/elevate-overview-with-narration.mp4" autoPlay loop playsInline className="w-full h-full object-cover" />
       </div>
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Onboarding', href: '/onboarding/learner' },
@@ -261,7 +261,7 @@ export default function HandbookPage() {
 
         {alreadyAcknowledged && (
           <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
-            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center flex-shrink-0">
               <BookOpen className="w-7 h-7 text-slate-500" />
             </div>
             <div className="flex-1 text-center sm:text-left">
@@ -301,9 +301,9 @@ export default function HandbookPage() {
                     <button
                       type="button"
                       onClick={() => toggleExpand(section.id)}
-                      className="w-full p-4 flex items-center gap-3 text-left hover:bg-gray-50"
+                      className="w-full p-4 flex items-center gap-3 text-left hover:bg-white"
                     >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-blue-100' : 'bg-gray-100'}`}>
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAcked ? 'bg-brand-blue-100' : 'bg-white'}`}>
                         {isAcked ? <CheckCircle2 className="w-4 h-4 text-brand-blue-600" /> : <BookOpen className="w-4 h-4 text-gray-400" />}
                       </div>
                       <span className={`flex-1 font-semibold ${isAcked ? 'text-brand-blue-900' : 'text-gray-900'}`}>
@@ -314,10 +314,10 @@ export default function HandbookPage() {
 
                     {isExpanded && (
                       <div className="border-t border-gray-100 px-4 pb-4">
-                        <div className="bg-slate-50 rounded-lg p-4 mt-3 mb-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                        <div className="bg-white rounded-lg p-4 mt-3 mb-4 text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                           {section.content}
                         </div>
-                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 border border-gray-200">
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-white border border-gray-200">
                           <input
                             type="checkbox"
                             checked={isAcked}

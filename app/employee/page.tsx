@@ -46,7 +46,7 @@ export default async function EmployeePortalPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Employee Portal' },

@@ -20,7 +20,7 @@ export default async function UploadDocumentPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -48,7 +48,7 @@ export default async function UploadDocumentPage() {
     .eq('role', 'employer');
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <section className="bg-white border-b py-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">

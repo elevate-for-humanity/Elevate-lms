@@ -46,7 +46,7 @@ export default async function FerpaRecordsSearchPage({
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -129,7 +129,7 @@ export default async function FerpaRecordsSearchPage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -233,7 +233,7 @@ export default async function FerpaRecordsSearchPage({
             {results.length > 0 ? (
               <div className="divide-y divide-gray-200">
                 {results.map((student) => (
-                  <div key={student.id} className="px-6 py-4 hover:bg-gray-50">
+                  <div key={student.id} className="px-6 py-4 hover:bg-white">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">

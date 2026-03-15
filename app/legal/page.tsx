@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function LegalPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Legal" }]} />
       </div>
@@ -46,7 +46,7 @@ export default function LegalPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <Link
                     href="/privacy-policy"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -65,7 +65,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/terms-of-service"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -84,7 +84,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/cookies"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -103,7 +103,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/refund-policy"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -129,7 +129,7 @@ export default function LegalPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <Link
                     href="/legal/creator-agreement"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -148,7 +148,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/legal/marketplace-terms"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -167,7 +167,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/legal/mou"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -186,7 +186,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/legal/nda"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -205,7 +205,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/legal/non-compete"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -231,7 +231,7 @@ export default function LegalPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <Link
                     href="/accessibility"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -250,7 +250,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/dmca"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -269,7 +269,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/copyright"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -288,7 +288,7 @@ export default function LegalPage() {
                   </Link>
                   <Link
                     href="/compliance"
-                    className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center p-3 rounded-lg hover:bg-white transition-colors"
                   >
                     <svg
                       className="w-5 h-5 text-brand-blue-600 mr-3"
@@ -313,7 +313,7 @@ export default function LegalPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-16 bg-gray-100">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Questions?</h2>

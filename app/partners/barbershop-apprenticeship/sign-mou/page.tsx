@@ -316,7 +316,7 @@ export default function SignMOUPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-sm border p-8 text-center">
           <CheckCircle2 className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">MOU Signed Successfully</h1>
@@ -333,7 +333,7 @@ export default function SignMOUPage() {
             </Link>
             <Link
               href="/partners/barbershop-apprenticeship"
-              className="block w-full px-6 py-3 text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+              className="block w-full px-6 py-3 text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-white"
             >
               Back to Partner Page
             </Link>
@@ -344,7 +344,7 @@ export default function SignMOUPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 pt-6">
         <Breadcrumbs items={[
           { label: 'Partners', href: '/partners/barbershop-apprenticeship' },
@@ -572,7 +572,7 @@ export default function SignMOUPage() {
           </button>
           <Link
             href="/partners/barbershop-apprenticeship"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-white"
           >
             Cancel
           </Link>
@@ -593,7 +593,7 @@ export default function SignMOUPage() {
           <div className="flex gap-3">
             <Link
               href="/partners/barbershop-apprenticeship/forms"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 text-sm whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-white text-sm whitespace-nowrap"
             >
               Required Forms
             </Link>

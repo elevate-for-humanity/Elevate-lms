@@ -95,7 +95,7 @@ const performanceThresholds = [
 export default function ProvidersPage() {
   return (
     <div className="bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Provider Requirements' }]} />
         </div>
@@ -155,7 +155,7 @@ export default function ProvidersPage() {
                 desc: 'Programs operating under WIOA, Workforce Ready Grant, JRI, or DOL Registered Apprenticeship must comply with those programs\' documentation and reporting requirements. Non-compliance results in program suspension pending remediation.',
               },
             ].map((control) => (
-              <div key={control.title} className="bg-slate-50 rounded-xl border border-slate-200 p-6">
+              <div key={control.title} className="bg-white rounded-xl border border-slate-200 p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <control.icon className="w-5 h-5 text-brand-red-600" />
@@ -172,7 +172,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── ELIGIBILITY ─── */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Eligibility</p>
@@ -268,7 +268,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── PERFORMANCE THRESHOLDS ─── */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Ongoing Performance</p>
@@ -280,7 +280,7 @@ export default function ProvidersPage() {
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
+                <tr className="bg-white border-b border-slate-200">
                   <th className="text-left px-5 py-3 font-bold text-slate-700">Metric</th>
                   <th className="text-left px-5 py-3 font-bold text-slate-700">Minimum</th>
                 </tr>
@@ -315,7 +315,7 @@ export default function ProvidersPage() {
               { icon: Award, title: 'Credential Pathway Tools', desc: 'Exam scheduling coordination, credential record storage, and verification link management.' },
               { icon: Building2, title: 'Employer Pipeline Access', desc: 'Connect graduates to the Elevate employer network. Post hiring needs and track placement outcomes.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-xl border border-slate-200 p-5">
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
                 <div className="flex items-start gap-3">
                   <item.icon className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <div>

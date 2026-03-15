@@ -133,7 +133,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
-                activeTab === tab.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
+                activeTab === tab.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-white'
               }`}>
               <tab.icon className="w-5 h-5" />
               <span className="text-sm font-medium">{tab.name}</span>
@@ -166,7 +166,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input type="email" value={profileData.email} disabled
-                    className="w-full px-3 py-2 border rounded-lg bg-gray-50 text-gray-500" />
+                    className="w-full px-3 py-2 border rounded-lg bg-white text-gray-500" />
                   <p className="text-xs text-gray-500 mt-1">Contact support to change email</p>
                 </div>
                 <div>
@@ -273,7 +273,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                   { key: 'emailReports', label: 'Monthly reports', desc: 'Receive monthly performance summary reports' },
                   { key: 'emailMarketing', label: 'Marketing updates', desc: 'Receive news about new programs and features' },
                 ].map(item => (
-                  <label key={item.key} className="flex items-start gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label key={item.key} className="flex items-start gap-4 p-4 border rounded-lg cursor-pointer hover:bg-white">
                     <input type="checkbox" 
                       checked={notifications[item.key as keyof typeof notifications]}
                       onChange={e => setNotifications({ ...notifications, [item.key]: e.target.checked })}
@@ -312,7 +312,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                 <div className="pt-4 border-t">
                   <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
                   <p className="text-sm text-gray-600 mb-3">Add an extra layer of security to your account</p>
-                  <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                  <button className="px-4 py-2 border rounded-lg hover:bg-white">
                     Enable 2FA
                   </button>
                 </div>

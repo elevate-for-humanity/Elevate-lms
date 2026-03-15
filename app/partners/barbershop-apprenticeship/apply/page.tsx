@@ -184,7 +184,7 @@ export default function BarbershopPartnerApplyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Barbershop', href: '/partners/barbershop-apprenticeship' }, { label: 'Apply' }]} />
       </div>
@@ -301,7 +301,7 @@ export default function BarbershopPartnerApplyPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-600" />
+                    <input type="text" value="Indiana" disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-600" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ZIP *</label>
@@ -349,7 +349,7 @@ export default function BarbershopPartnerApplyPage() {
                     regardless of compensation model (hourly or hybrid). Sole commission is not permitted.
                   </p>
                   <div className="flex gap-4">
-                    <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                    <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                       <input type="radio" name="apprenticesOnPayroll" value="yes" checked={formData.apprenticesOnPayroll === 'yes'} onChange={e => updateField('apprenticesOnPayroll', e.target.value)} required className="text-brand-blue-600" />
                       <span className="text-gray-700">Yes — apprentices will be on our payroll</span>
                     </label>
@@ -364,7 +364,7 @@ export default function BarbershopPartnerApplyPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Compensation Model *</label>
                   <div className="grid md:grid-cols-3 gap-2">
                     {compensationModels.map(model => (
-                      <label key={model.value} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <label key={model.value} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                         <input type="radio" name="compensationModel" value={model.value} checked={formData.compensationModel === model.value} onChange={e => updateField('compensationModel', e.target.value)} required className="text-brand-blue-600" />
                         <span className="text-gray-700">{model.label}</span>
                       </label>
@@ -404,7 +404,7 @@ export default function BarbershopPartnerApplyPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Workers&apos; Compensation Status *</label>
                   <div className="space-y-2">
                     {workersCompOptions.map(opt => (
-                      <label key={opt.value} className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <label key={opt.value} className="flex items-start gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                         <input type="radio" name="workersCompStatus" value={opt.value} checked={formData.workersCompStatus === opt.value} onChange={e => updateField('workersCompStatus', e.target.value)} required className="mt-0.5 text-brand-blue-600" />
                         <span className="text-gray-700 text-sm">{opt.label}</span>
                       </label>
@@ -459,7 +459,7 @@ export default function BarbershopPartnerApplyPage() {
                     </span>
                   </label>
                 </div>
-                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" checked={formData.consentAcknowledged} onChange={e => updateField('consentAcknowledged', e.target.checked)} className="mt-1" />
                     <span className="text-sm text-gray-700">
@@ -510,7 +510,7 @@ export default function BarbershopPartnerApplyPage() {
               <button type="submit" disabled={loading} className="flex-1 inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-50 transition-colors">
                 {loading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...</> : 'Submit Application'}
               </button>
-              <Link href="/docs/Indiana-Barbershop-Apprenticeship-MOU" className="inline-flex items-center justify-center px-6 py-4 border border-gray-300 rounded-lg font-medium hover:bg-gray-50" target="_blank">
+              <Link href="/docs/Indiana-Barbershop-Apprenticeship-MOU" className="inline-flex items-center justify-center px-6 py-4 border border-gray-300 rounded-lg font-medium hover:bg-white" target="_blank">
                 <Download className="w-5 h-5 mr-2" /> View MOU
               </Link>
             </div>

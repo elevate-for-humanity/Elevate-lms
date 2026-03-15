@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function TrainingModelPage() {
   return (
     <div className="bg-white min-h-screen">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Pathways', href: '/pathways' }, { label: 'How Training Works' }]} />
         </div>
@@ -54,7 +54,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* Three training formats */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Three Ways We Deliver Training</h2>
 
@@ -155,7 +155,7 @@ export default function TrainingModelPage() {
               { day: 'Thursday', am: 'Classroom: Customer service, job site professionalism, industry overview', pm: 'Lab: Timed skill assessments, practice certification exam' },
               { day: 'Friday', am: 'Online: Review lessons on the learning platform, take practice quizzes, study for certification exam', pm: 'Career services: Resume workshop, interview practice, or employer meet-and-greet (scheduled periodically)' },
             ].map((d) => (
-              <div key={d.day} className="bg-slate-50 rounded-lg border border-gray-200 p-4">
+              <div key={d.day} className="bg-white rounded-lg border border-gray-200 p-4">
                 <h3 className="font-bold text-gray-900 text-sm mb-2">{d.day}</h3>
                 <div className="grid sm:grid-cols-2 gap-2 text-sm text-gray-700">
                   <div><span className="font-semibold text-gray-800">Morning:</span> {d.am}</div>
@@ -168,7 +168,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* How we track your progress */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How We Track Your Progress</h2>
           <p className="text-gray-600 mb-8">
@@ -227,7 +227,7 @@ export default function TrainingModelPage() {
               { title: 'Personal barrier (transportation, childcare, housing)', desc: 'Our team connects you with supportive services — transportation assistance, childcare referrals, emergency resources. Many of these services are available through your WIOA case manager or community partners.' },
               { title: 'Need to pause', desc: 'If you need to take a break for a serious reason, we work with you and your funding source to pause and resume in the next cohort. You do not lose your progress.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-lg border border-gray-200 p-4">
+              <div key={item.title} className="bg-white rounded-lg border border-gray-200 p-4">
                 <h3 className="font-bold text-gray-900 text-sm mb-1">{item.title}</h3>
                 <p className="text-sm text-gray-700">{item.desc}</p>
               </div>
@@ -237,7 +237,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* Cohort timeline example */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Example: 12-Week Skilled Trades Program Timeline</h2>
           <p className="text-gray-600 mb-6 text-sm">

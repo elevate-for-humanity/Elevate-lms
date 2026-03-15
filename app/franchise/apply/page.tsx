@@ -62,7 +62,7 @@ export default function FranchiseApplyPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-20 text-center">
           <CheckCircle className="w-16 h-16 text-brand-green-600 mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-slate-900 mb-4">
@@ -85,7 +85,7 @@ export default function FranchiseApplyPage() {
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-100 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-white transition"
             >
               Contact Us
             </Link>
@@ -96,7 +96,7 @@ export default function FranchiseApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[

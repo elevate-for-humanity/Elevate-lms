@@ -20,7 +20,7 @@ export default async function TaxInformationPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -40,7 +40,7 @@ export default async function TaxInformationPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Tax Information" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-gray-100 py-16">
+      <section className="relative bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">
             Tax Information
@@ -152,7 +152,7 @@ export default async function TaxInformationPage() {
       </section>
 
       {/* Tax Rates */}
-      <section id="tax-rates" className="py-20 bg-gray-50">
+      <section id="tax-rates" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
             <TrendingUp className="w-12 h-12 text-brand-green-600" />
@@ -295,7 +295,7 @@ export default async function TaxInformationPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="px-10 py-5 bg-white text-brand-blue-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
+              className="px-10 py-5 bg-white text-brand-blue-600 font-black rounded-xl hover:bg-white transition-all transform hover:scale-105 uppercase shadow-lg"
             >
               Get Started
             </Link>

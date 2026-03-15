@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function WIOAEligibilityPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'WIOA Funding' }]} />
         </div>
@@ -97,7 +97,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* What's Covered — 4 visual cards */}
-      <section className="py-10 sm:py-14 bg-slate-50">
+      <section className="py-10 sm:py-14 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             What WIOA Covers
@@ -140,7 +140,7 @@ export default function WIOAEligibilityPage() {
               'Justice-involved individuals',
               'Low-income households',
             ].map((item) => (
-              <div key={item} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+              <div key={item} className="flex items-center gap-3 bg-white rounded-lg px-4 py-3">
                 <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
@@ -161,7 +161,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* Other Funding — 3 cards */}
-      <section className="py-10 sm:py-14 bg-slate-50">
+      <section className="py-10 sm:py-14 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             Other Funding Options
@@ -199,7 +199,7 @@ export default function WIOAEligibilityPage() {
               { q: 'What if I have a criminal record?', a: 'You can still qualify. JRI funding is specifically for justice-involved individuals.' },
               { q: 'What programs are eligible?', a: 'Healthcare, Skilled Trades, CDL, IT, Barbering, and more.' },
             ].map((faq) => (
-              <details key={faq.q} className="bg-slate-50 rounded-lg border border-slate-200 group">
+              <details key={faq.q} className="bg-white rounded-lg border border-slate-200 group">
                 <summary className="p-4 cursor-pointer font-semibold text-slate-900 text-sm flex justify-between items-center">
                   {faq.q}
                   <svg className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

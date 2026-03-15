@@ -62,7 +62,7 @@ const steps = [
 export default function FinancialAidPage() {
   return (
     <div className="min-h-screen bg-white prose-institutional">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Financial Aid' }]} />
         </div>
@@ -80,7 +80,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* Quick Links to Related Pages */}
-      <section className="py-8 bg-gray-50 border-b">
+      <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
@@ -183,7 +183,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">How to Get Started</h2>
           <div className="grid md:grid-cols-4 gap-8">

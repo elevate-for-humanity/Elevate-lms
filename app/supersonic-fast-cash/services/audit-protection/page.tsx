@@ -115,7 +115,7 @@ export default function AuditProtectionPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coverageIncludes.map((item, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-2xl p-6 text-center">
+              <div key={idx} className="bg-white rounded-2xl p-6 text-center">
                 <div className="w-14 h-14 bg-brand-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-7 h-7 text-brand-red-600" />
                 </div>
@@ -128,7 +128,7 @@ export default function AuditProtectionPage() {
       </section>
 
       {/* What's Covered */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -180,7 +180,7 @@ export default function AuditProtectionPage() {
 
           <div className="space-y-6">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-xl p-6">
+              <div key={idx} className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
                 <p className="text-gray-600">{faq.answer}</p>
               </div>

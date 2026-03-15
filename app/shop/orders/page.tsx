@@ -46,7 +46,7 @@ export default async function OrderHistoryPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Database connection failed.</p>
@@ -118,9 +118,9 @@ export default async function OrderHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Shop', href: '/shop' }, { label: 'Orders' }]} />
         </div>
@@ -142,7 +142,7 @@ export default async function OrderHistoryPage() {
 
               return (
                 <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                  <div className="px-6 py-4 bg-white border-b border-gray-200">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <p className="font-semibold text-gray-900">{order.order_number}</p>
@@ -163,7 +163,7 @@ export default async function OrderHistoryPage() {
                       {order.items.map((item, index) => (
                         <div key={index} className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
                               <Package className="w-6 h-6 text-gray-400" />
                             </div>
                             <div>
@@ -177,7 +177,7 @@ export default async function OrderHistoryPage() {
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <div className="px-6 py-4 bg-white border-t border-gray-200">
                     <div className="flex flex-wrap gap-3">
                       <Link
                         href={`/shop/orders/${order.id}`}

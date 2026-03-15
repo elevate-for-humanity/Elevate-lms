@@ -70,8 +70,8 @@ export default function NewMessagePage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="bg-slate-50 border-b">
+    <div className="bg-white min-h-screen">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Messages', href: '/messages' }, { label: 'New Message' }]} />
         </div>

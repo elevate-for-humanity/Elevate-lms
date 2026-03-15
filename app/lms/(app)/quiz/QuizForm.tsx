@@ -103,7 +103,7 @@ export function QuizForm({ quizId, quizTitle, questions }: QuizFormProps) {
             ))}
           </div>
 
-          <div className="p-6 border-t bg-gray-50">
+          <div className="p-6 border-t bg-white">
             <button
               type="submit"
               disabled={submitting || answeredCount < totalQuestions}

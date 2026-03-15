@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function ENVCONFIGmdPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Docs", href: "/docs" }, { label: "Env_Config.Md" }]} />
       </div>
@@ -111,7 +111,7 @@ export default function ENVCONFIGmdPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/contact"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
               >
                 Apply Now
               </Link>

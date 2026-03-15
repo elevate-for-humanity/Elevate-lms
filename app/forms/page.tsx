@@ -94,7 +94,7 @@ export default function FormsPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <p className="text-gray-600 mb-4">Need a form not listed here? Contact our enrollment team.</p>
           <Link href="/contact" className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition">Contact Us</Link>

@@ -53,7 +53,7 @@ export default async function HoursHistoryPage() {
   const progressPercent = Math.round((approvedHours / targetHours) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <Breadcrumbs
         items={[
           { label: 'Apprentice Portal', href: '/apprentice' },
@@ -123,7 +123,7 @@ export default async function HoursHistoryPage() {
             <h2 className="font-semibold">Hours Log</h2>
           </div>
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Date</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Hours</th>
@@ -135,7 +135,7 @@ export default async function HoursHistoryPage() {
             <tbody className="divide-y">
               {hoursLog && hoursLog.length > 0 ? (
                 hoursLog.map((entry: any) => (
-                  <tr key={entry.id} className="hover:bg-gray-50">
+                  <tr key={entry.id} className="hover:bg-white">
                     <td className="px-4 py-3 text-sm">
                       {new Date(entry.work_date).toLocaleDateString()}
                     </td>

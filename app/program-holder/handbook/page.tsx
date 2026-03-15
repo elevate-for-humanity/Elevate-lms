@@ -21,7 +21,7 @@ export default async function ProgramHolderHandbookPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -289,7 +289,7 @@ export default async function ProgramHolderHandbookPage() {
         </div>
 
         {/* Acknowledgement Form */}
-        <div className="bg-slate-50 rounded-xl p-8 border-2 border-slate-200">
+        <div className="bg-white rounded-xl p-8 border-2 border-slate-200">
           <div className="flex items-start gap-4 mb-6">
             <BookOpen className="w-8 h-8 text-slate-600 flex-shrink-0 mt-1" />
             <div>

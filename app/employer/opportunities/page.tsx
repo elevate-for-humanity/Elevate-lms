@@ -19,7 +19,7 @@ export default async function OpportunitiesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -39,7 +39,7 @@ export default async function OpportunitiesPage() {
     .limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <section className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -68,7 +68,7 @@ export default async function OpportunitiesPage() {
           {opportunities && opportunities.length > 0 ? (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-white border-b">
                   <tr>
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700">Position</th>
                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-700 hidden md:table-cell">Location</th>
@@ -78,12 +78,12 @@ export default async function OpportunitiesPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {opportunities.map((opp: any) => (
-                    <tr key={opp.id} className="hover:bg-gray-50">
+                    <tr key={opp.id} className="hover:bg-white">
                       <td className="px-6 py-4 font-medium text-gray-900">{opp.title || 'Untitled Position'}</td>
                       <td className="px-6 py-4 text-gray-600 text-sm hidden md:table-cell">{opp.location || '—'}</td>
                       <td className="px-6 py-4 hidden md:table-cell">
                         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                          opp.status === 'active' ? 'bg-brand-green-50 text-brand-green-700' : 'bg-gray-100 text-gray-600'
+                          opp.status === 'active' ? 'bg-brand-green-50 text-brand-green-700' : 'bg-white text-gray-600'
                         }`}>
                           {opp.status || 'draft'}
                         </span>

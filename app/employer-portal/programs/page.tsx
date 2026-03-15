@@ -22,7 +22,7 @@ export default async function EmployerProgramsPage() {
 const programs = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
 <div className="relative h-64 bg-brand-blue-800 overflow-hidden">
         <Image
@@ -80,7 +80,7 @@ const programs = (dbRows as any[]) || [];
                       <p className="text-sm text-gray-500 mb-2">Eligibility</p>
                       <div className="flex flex-wrap gap-2">
                         {program.eligibility.map((item, i) => (
-                          <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          <span key={i} className="px-2 py-1 bg-white text-gray-700 text-xs rounded">
                             {item}
                           </span>
                         ))}
@@ -113,7 +113,7 @@ const programs = (dbRows as any[]) || [];
             </div>
             <Link
               href="/contact"
-              className="mt-4 md:mt-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold"
+              className="mt-4 md:mt-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-white transition font-semibold"
             >
               Schedule Consultation <ArrowRight className="w-4 h-4" />
             </Link>

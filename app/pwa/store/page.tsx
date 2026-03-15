@@ -25,7 +25,7 @@ export default async function StorePWAPage() {
   const featured = products.filter((p: any) => p.is_featured);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-5.jpg" alt="Elevate Store" fill className="object-cover" priority />
@@ -43,7 +43,7 @@ export default async function StorePWAPage() {
             All ({products.length})
           </Link>
           {categories.map((cat: string) => (
-            <Link key={cat} href={`/store?category=${cat}`} className="bg-white border border-slate-200 text-slate-700 rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap flex-shrink-0 hover:bg-slate-50">
+            <Link key={cat} href={`/store?category=${cat}`} className="bg-white border border-slate-200 text-slate-700 rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap flex-shrink-0 hover:bg-white">
               {cat.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())} ({products.filter((p: any) => p.category === cat).length})
             </Link>
           ))}
@@ -57,7 +57,7 @@ export default async function StorePWAPage() {
           <div className="grid grid-cols-2 gap-3">
             {featured.slice(0, 4).map((product: any) => (
               <Link key={product.id} href={`/store/${product.slug || product.id}`} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="relative h-28 bg-slate-100 overflow-hidden">
+                <div className="relative h-28 bg-white overflow-hidden">
                   {product.image_url ? (
                     <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                   ) : (
@@ -88,7 +88,7 @@ export default async function StorePWAPage() {
         <div className="space-y-2">
           {products.map((product: any) => (
             <Link key={product.id} href={`/store/${product.slug || product.id}`} className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-3 hover:border-brand-red-300">
-              <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {product.image_url ? (
                   <Image src={product.image_url} alt={product.name} width={48} height={48} className="object-cover w-full h-full" />
                 ) : (

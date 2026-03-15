@@ -9,8 +9,8 @@ export default function PartnerLoading() {
         </div>
         <div className="bg-white rounded-xl p-8">
           <div className="space-y-6">
-            <div className="h-12 bg-slate-100 rounded-lg" />
-            <div className="h-12 bg-slate-100 rounded-lg" />
+            <div className="h-12 bg-white rounded-lg" />
+            <div className="h-12 bg-white rounded-lg" />
             <div className="h-12 bg-brand-blue-100 rounded-lg" />
           </div>
         </div>

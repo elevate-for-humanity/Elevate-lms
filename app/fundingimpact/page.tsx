@@ -28,7 +28,7 @@ export default function FundingImpactPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Funding Impact' }]} />
         </div>
@@ -47,7 +47,7 @@ export default function FundingImpactPage() {
               Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/start" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
+              <Link href="/start" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-white transition-colors">Apply for Free Training</Link>
               <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors border-2 border-white/30">Check Your Eligibility</Link>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function FundingImpactPage() {
       </section>
 
       {/* Impact Stats with Images */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -254,7 +254,7 @@ export default function FundingImpactPage() {
       </section>
 
       {/* Success Stories with Photos */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -505,7 +505,7 @@ export default function FundingImpactPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-white transition-colors"
             >
               Check Eligibility
             </Link>

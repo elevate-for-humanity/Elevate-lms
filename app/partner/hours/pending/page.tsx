@@ -156,7 +156,7 @@ export default function PartnerHoursPendingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-pulse" />
           <p className="text-gray-600">Loading pending hours...</p>
@@ -166,13 +166,13 @@ export default function PartnerHoursPendingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-7.jpg" alt="Pending hours" fill sizes="100vw" className="object-cover" priority />
       </section>
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Partner', href: '/partner' },
@@ -228,7 +228,7 @@ export default function PartnerHoursPendingPage() {
             <p className="text-gray-600 mb-6">No pending hours to review.</p>
             <Link
               href="/partner/hours"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-200"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Hours
@@ -284,7 +284,7 @@ export default function PartnerHoursPendingPage() {
                     </div>
 
                     {hour.notes && (
-                      <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                      <div className="bg-white rounded-lg p-3 mb-4">
                         <p className="text-sm text-gray-700">{hour.notes}</p>
                       </div>
                     )}

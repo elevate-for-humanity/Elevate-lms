@@ -116,7 +116,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
     : notifications;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -138,7 +138,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
             )}
             <Link
               href="/account/settings/notifications"
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg"
             >
               <Settings className="w-5 h-5" />
             </Link>
@@ -152,7 +152,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               filter === 'all' 
                 ? 'bg-gray-900 text-white' 
-                : 'bg-white text-gray-700 border hover:bg-gray-50'
+                : 'bg-white text-gray-700 border hover:bg-white'
             }`}
           >
             All
@@ -162,7 +162,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               filter === 'unread' 
                 ? 'bg-gray-900 text-white' 
-                : 'bg-white text-gray-700 border hover:bg-gray-50'
+                : 'bg-white text-gray-700 border hover:bg-white'
             }`}
           >
             Unread ({unreadCount})
@@ -183,7 +183,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 hover:bg-gray-50 transition ${
+                  className={`p-4 hover:bg-white transition ${
                     !notification.is_read ? 'bg-brand-blue-50/50' : ''
                   }`}
                 >

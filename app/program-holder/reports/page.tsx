@@ -30,7 +30,7 @@ export default async function ReportsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
         </div>
@@ -91,7 +91,7 @@ export default async function ReportsPage() {
   const approvedReports = reports?.filter((r) => r.status === 'approved') || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
         </div>
@@ -200,7 +200,7 @@ export default async function ReportsPage() {
                       {reports.map((report) => (
                         <tr
                           key={report.id}
-                          className="border-b hover:bg-slate-50 transition-colors"
+                          className="border-b hover:bg-white transition-colors"
                         >
                           <td className="py-3 px-4 font-medium text-black">
                             {new Date(report.week_ending).toLocaleDateString()}
@@ -215,7 +215,7 @@ export default async function ReportsPage() {
                                   ? 'bg-brand-green-100 text-brand-green-800'
                                   : report.status === 'pending'
                                     ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-gray-100 text-black'
+                                    : 'bg-white text-black'
                               }`}
                             >
                               {report.status}

@@ -103,7 +103,7 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="min-h-screen bg-white py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-2xl shadow-lg p-12">
             <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -132,7 +132,7 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Careers", href: "/careers" }, { label: "[Id]" }]} />
       </div>

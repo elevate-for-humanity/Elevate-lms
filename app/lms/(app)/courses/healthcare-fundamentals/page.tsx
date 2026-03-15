@@ -91,7 +91,7 @@ export default function HealthcareFundamentalsCoursePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'LMS', href: '/lms' }, { label: 'Courses', href: '/lms' }, { label: 'Healthcare Fundamentals' }]} />
         </div>
@@ -134,13 +134,13 @@ export default function HealthcareFundamentalsCoursePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/start"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-2xl"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-colors shadow-2xl"
                 >
                   Enroll Now
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
-                  href="/lms/dashboard"
+                  href="/learner/dashboard"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-colors"
                 >
                   Access Course (Login)
@@ -191,7 +191,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* Course Features */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             What's Included
@@ -254,7 +254,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             What You'll Learn
@@ -333,7 +333,7 @@ export default function HealthcareFundamentalsCoursePage() {
             Your Instructor
           </h2>
 
-          <div className="max-w-4xl mx-auto bg-gray-50 rounded-2xl p-8 md:p-12">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl p-8 md:p-12">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="w-32 h-32 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <Users className="w-16 h-16 text-white" />
@@ -370,13 +370,13 @@ export default function HealthcareFundamentalsCoursePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:bg-gray-100 transition-all"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:bg-white transition-all"
             >
               Enroll Now
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link
-              href="/lms/dashboard"
+              href="/learner/dashboard"
               className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-10 py-5 rounded-xl text-lg font-black hover:bg-white/10 transition-all"
             >
               View All Courses

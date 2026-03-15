@@ -108,7 +108,7 @@ export default function AIStudioPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Ai Studio" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden bg-slate-100">
+      <section className="relative min-h-[500px] flex items-center overflow-hidden bg-white">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-72 h-72 bg-pink-500 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-brand-blue-500 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -162,7 +162,7 @@ export default function AIStudioPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-100 rounded-full" />
+                  <div className="w-10 h-10 bg-white rounded-full" />
                   <div>
                     <p className="text-slate-900 font-semibold">Instructor</p>
                     <p className="text-brand-blue-300 text-sm">AI Healthcare Instructor</p>
@@ -175,7 +175,7 @@ export default function AIStudioPage() {
       </section>
 
       {/* Capabilities */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black text-gray-900 mb-4">
@@ -249,7 +249,7 @@ export default function AIStudioPage() {
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors mb-6 ${
                     plan.popular
                       ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      : 'bg-white text-gray-900 hover:bg-gray-200'
                   }`}
                 >
                   {plan.cta}
@@ -270,7 +270,7 @@ export default function AIStudioPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-100">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Zap className="w-16 h-16 text-yellow-400 mx-auto mb-6" />
           <h2 className="text-4xl font-black text-slate-900 mb-6">

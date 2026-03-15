@@ -158,7 +158,7 @@ export default function SupersonicSeoIndexingPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             {enforcementMethods.map((method, index) => (
-              <div key={index} className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <div key={index} className="bg-white rounded-xl p-5 border border-slate-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                     <Code className="w-4 h-4 text-emerald-600" />
@@ -172,7 +172,7 @@ export default function SupersonicSeoIndexingPage() {
         </section>
 
         {/* Technical Details */}
-        <section className="mb-12 bg-slate-50 rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Technical Implementation</h2>
           <div className="space-y-4 text-slate-700">
             <p>
@@ -211,19 +211,19 @@ export default function SupersonicSeoIndexingPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/admin/governance/operational-controls"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Operational Controls
             </Link>
             <Link
               href="/admin/governance/authoritative-docs"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Authoritative Documents
             </Link>
             <Link
               href="/supersonic-fast-cash/services/tax-preparation"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Tax Preparation
             </Link>

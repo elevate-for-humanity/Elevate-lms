@@ -33,7 +33,7 @@ export function ProgramHero({ program }: { program: Program }) {
 
   return (
     <>
-      <section className="relative bg-slate-900">
+      <section className="relative bg-transparent">
         <div className="relative w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px] overflow-hidden">
           {hasVideo ? (
             <>

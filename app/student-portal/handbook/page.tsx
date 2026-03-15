@@ -34,10 +34,10 @@ export default function StudentHandbookPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/student-portal-page-5.jpg" alt="Student handbook" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Student Handbook</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Policies, procedures, and resources for all Elevate students.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Student Handbook</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Policies, procedures, and resources for all Elevate students.</p>
           </div>
         </div>
       </section>
@@ -75,14 +75,14 @@ export default function StudentHandbookPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Questions About Policies?</h2>
           <p className="text-gray-600 mb-6">Contact your enrollment advisor or reach out to our support team.</p>
           <Link
             href="/support"
-            className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+            className="bg-brand-blue-600 text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
           >
             Contact Support
           </Link>

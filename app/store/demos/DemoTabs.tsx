@@ -112,7 +112,7 @@ export default function DemoTabs() {
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex flex-wrap gap-1 bg-slate-100 rounded-xl p-1 mb-6">
+      <div className="flex flex-wrap gap-1 bg-white rounded-xl p-1 mb-6">
         {DEMOS.map(demo => (
           <button
             key={demo.id}
@@ -215,7 +215,7 @@ export default function DemoTabs() {
             </Link>
             <Link
               href="/store/trial"
-              className="flex items-center justify-center gap-2 w-full border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-50 transition"
+              className="flex items-center justify-center gap-2 w-full border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-white transition"
             >
               Start 14-Day Trial <ArrowRight className="w-4 h-4" />
             </Link>

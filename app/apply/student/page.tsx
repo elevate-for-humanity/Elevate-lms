@@ -37,7 +37,7 @@ export default async function StudentApplicationPage({
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         <Image src="/images/pages/apply-page-4.jpg" alt="Student application" fill sizes="100vw" className="object-cover" priority />
@@ -73,7 +73,7 @@ export default async function StudentApplicationPage({
       </section>
 
       {/* Other application types */}
-      <section className="bg-slate-50 border-t border-slate-200">
+      <section className="bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <p className="text-slate-600 text-sm mb-3">Not a student?</p>
           <div className="flex flex-wrap justify-center gap-4">

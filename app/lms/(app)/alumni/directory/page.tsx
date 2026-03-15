@@ -44,7 +44,7 @@ export default async function AlumniDirectoryPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Database connection failed.</p>
@@ -81,13 +81,13 @@ export default async function AlumniDirectoryPage() {
     .eq('is_mentor', true);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/lms/dashboard" className="hover:text-gray-700">LMS</Link>
+            <Link href="/learner/dashboard" className="hover:text-gray-700">LMS</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/lms/alumni" className="hover:text-gray-700">Alumni</Link>
+            <Link href="/learner/alumni" className="hover:text-gray-700">Alumni</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900 font-medium">Directory</span>
           </nav>
@@ -105,7 +105,7 @@ export default async function AlumniDirectoryPage() {
                   className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
                 />
               </div>
-              <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-white">
                 <Filter className="w-4 h-4" />
                 Filter
               </button>
@@ -192,7 +192,7 @@ export default async function AlumniDirectoryPage() {
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                   <a
                     href={`mailto:${person.email}`}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-white"
                   >
                     <Mail className="w-4 h-4" />
                     Contact

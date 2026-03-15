@@ -83,7 +83,7 @@ export default function MOUPage() {
           <p className="text-lg text-gray-600 mb-8">
             Your Memorandum of Understanding has been digitally signed and recorded. You will receive a confirmation email.
           </p>
-          <div className="bg-gray-50 rounded-xl p-6 max-w-md mx-auto mb-8 text-left">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-auto mb-8 text-left">
             <p className="text-sm text-gray-600"><strong>Shop:</strong> {shopName}</p>
             <p className="text-sm text-gray-600"><strong>Partner:</strong> {partnerName}</p>
             <p className="text-sm text-gray-600"><strong>Supervisor:</strong> {supervisorName}</p>
@@ -93,7 +93,7 @@ export default function MOUPage() {
             <Link href="/partner/onboarding" className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700">
               Continue to Partner Onboarding →
             </Link>
-            <Link href="/partners/barbershop-apprenticeship" className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50">
+            <Link href="/partners/barbershop-apprenticeship" className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-white">
               Back to Partner Info
             </Link>
           </div>
@@ -108,7 +108,7 @@ export default function MOUPage() {
         <Breadcrumbs items={[{ label: 'Docs', href: '/docs' }, { label: 'Indiana Barbershop Apprenticeship MOU' }]} />
       </div>
 
-      <div className="print:hidden bg-gray-100 py-4 border-b">
+      <div className="print:hidden bg-white py-4 border-b">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
           <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Info
@@ -287,7 +287,7 @@ export default function MOUPage() {
                 </div>
               )}
 
-              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+              <div className="bg-white rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-bold text-gray-900">Worksite Partner Information</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
@@ -301,7 +301,7 @@ export default function MOUPage() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+              <div className="bg-white rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-bold text-gray-900">Supervising Barber</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
@@ -315,7 +315,7 @@ export default function MOUPage() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+              <div className="bg-white rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-bold text-gray-900">Compensation Model *</h3>
                 <div className="grid md:grid-cols-3 gap-3">
                   {[

@@ -37,7 +37,7 @@ const incentives = (dbRows as any[]) || [];
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
+            <tr className="text-left text-xs text-gray-500 border-b bg-white">
               <th className="px-5 py-3 font-medium">Type</th>
               <th className="px-5 py-3 font-medium">Apprentice</th>
               <th className="px-5 py-3 font-medium">Amount</th>
@@ -47,7 +47,7 @@ const incentives = (dbRows as any[]) || [];
           </thead>
           <tbody>
             {incentives.map((inc, i) => (
-              <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
+              <tr key={i} className="border-b last:border-0 hover:bg-white">
                 <td className="px-5 py-3 font-medium text-gray-900">{inc.type}</td>
                 <td className="px-5 py-3 text-gray-600">{inc.apprentice}</td>
                 <td className="px-5 py-3 font-semibold text-gray-900">{inc.amount}</td>

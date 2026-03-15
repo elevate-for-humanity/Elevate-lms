@@ -30,7 +30,7 @@ export default function GrantProgramsPage() {
 
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Grant Programs' }]} />
         </div>
@@ -50,7 +50,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* What is ETPL/WRG */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             What Does ETPL Approved Mean?
@@ -176,7 +176,7 @@ export default function GrantProgramsPage() {
                       <strong>Delivery:</strong> {program.delivery}
                     </p>
                     {program.price && (
-                      <div className="bg-slate-50 rounded p-3 mt-3">
+                      <div className="bg-white rounded p-3 mt-3">
                         <p className="text-sm font-semibold text-black mb-1">
                           Self-Pay Option (if funding not available):
                         </p>
@@ -216,7 +216,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
             How to Apply for Free Training
@@ -290,7 +290,7 @@ export default function GrantProgramsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/start"
-              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
             >
               Check Eligibility
             </Link>

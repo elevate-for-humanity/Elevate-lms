@@ -11,7 +11,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending_review: 'bg-yellow-100 text-yellow-700',
   approved: 'bg-brand-blue-100 text-brand-blue-700',
   rejected: 'bg-red-100 text-red-700',
-  draft: 'bg-slate-100 text-slate-500',
+  draft: 'bg-white text-slate-500',
 };
 
 export default async function ProviderProgramsPage() {
@@ -72,7 +72,7 @@ export default async function ProviderProgramsPage() {
                     {prog.seats_available != null && <span>{prog.seats_available} seats</span>}
                   </div>
                 </div>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[displayStatus] ?? 'bg-slate-100 text-slate-500'}`}>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[displayStatus] ?? 'bg-white text-slate-500'}`}>
                   {displayStatus.replace('_', ' ')}
                 </span>
               </div>

@@ -145,7 +145,9 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const body = await parseBody<Record<string, any>>(request);
+    // Read raw body once — needed for Stripe signature verification
+    const rawBody = await request.text();
+    const body: Record<string, any> = rawBody ? JSON.parse(rawBody) : {};
     const { action } = body;
 
     // Webhook handling (no auth required)
@@ -158,9 +160,8 @@ async function _POST(request: NextRequest) {
         );
       }
 
-      const payload = await request.text();
       const event = verifyWebhookSignature(
-        payload,
+        rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET!
       );

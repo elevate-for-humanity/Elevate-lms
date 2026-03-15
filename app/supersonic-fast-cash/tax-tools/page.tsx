@@ -26,7 +26,7 @@ export default async function TaxToolsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -47,7 +47,7 @@ export default async function TaxToolsPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Tax Tools" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-gray-100 py-16">
+      <section className="relative bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">
             Tax Tools & Calculators
@@ -164,7 +164,7 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-gray-50 rounded-2xl p-6 border-2 border-gray-300 hover:border-gray-500 transition-all transform hover:scale-105"
+              className="group bg-white rounded-2xl p-6 border-2 border-gray-300 hover:border-gray-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-2xl font-black text-black">All Forms</h3>
@@ -183,7 +183,7 @@ export default async function TaxToolsPage() {
       </section>
 
       {/* Due Dates */}
-      <section id="due-dates" className="py-20 bg-gray-50">
+      <section id="due-dates" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
             <Calendar className="w-12 h-12 text-brand-green-600" />
@@ -417,7 +417,7 @@ export default async function TaxToolsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="px-10 py-5 bg-white text-brand-green-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
+              className="px-10 py-5 bg-white text-brand-green-600 font-black rounded-xl hover:bg-white transition-all transform hover:scale-105 uppercase shadow-lg"
             >
               Get Started
             </Link>

@@ -53,7 +53,7 @@ export default function OjtAndFundingPage() {
       </div>
 
       {/* OJT benefits */}
-      <section className="py-14 bg-slate-50 border-b border-slate-100">
+      <section className="py-14 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">On-the-Job Training</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">OJT Benefits for Employers</h2>

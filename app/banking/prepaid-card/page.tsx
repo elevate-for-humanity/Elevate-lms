@@ -29,7 +29,7 @@ export default function PrepaidCardPage() {
         <Breadcrumbs items={[{ label: "Banking", href: "/banking" }, { label: "Prepaid Card" }]} />
       </div>
 {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -153,7 +153,7 @@ export default function PrepaidCardPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             How to Get Your Card
@@ -215,7 +215,7 @@ export default function PrepaidCardPage() {
                   <td className="px-6 py-4">Monthly Maintenance Fee</td>
                   <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
-                <tr className="bg-gray-50">
+                <tr className="bg-white">
                   <td className="px-6 py-4">In-Network ATM Withdrawal</td>
                   <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
@@ -223,7 +223,7 @@ export default function PrepaidCardPage() {
                   <td className="px-6 py-4">Out-of-Network ATM Withdrawal</td>
                   <td className="px-6 py-4 text-right">$2.50</td>
                 </tr>
-                <tr className="bg-gray-50">
+                <tr className="bg-white">
                   <td className="px-6 py-4">Purchase Transactions</td>
                   <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
@@ -231,7 +231,7 @@ export default function PrepaidCardPage() {
                   <td className="px-6 py-4">Balance Inquiry (ATM)</td>
                   <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
-                <tr className="bg-gray-50">
+                <tr className="bg-white">
                   <td className="px-6 py-4">Overdraft Fee</td>
                   <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0 (No overdraft)</td>
                 </tr>
@@ -306,7 +306,7 @@ export default function PrepaidCardPage() {
           </h2>
 
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">How long does it take to get my card?</h3>
               <p className="text-gray-600">
                 Cards are typically mailed within 7-10 business days. You can also pick up your card 
@@ -314,7 +314,7 @@ export default function PrepaidCardPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Can I reload my card after the refund?</h3>
               <p className="text-gray-600">
                 Yes! You can reload your card with direct deposit from your employer, cash loads at 
@@ -322,7 +322,7 @@ export default function PrepaidCardPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What if my card is lost or stolen?</h3>
               <p className="text-gray-600">
                 Call the number on the back of your card immediately to report it. Your card will be 
@@ -330,7 +330,7 @@ export default function PrepaidCardPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Can I use the card internationally?</h3>
               <p className="text-gray-600">
                 Yes, the card can be used anywhere Visa is accepted worldwide. Foreign transaction 
@@ -353,7 +353,7 @@ export default function PrepaidCardPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="bg-white hover:bg-gray-100 text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-white text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />
             </Link>

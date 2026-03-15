@@ -173,7 +173,7 @@ export function TrialBanner({
                 Schedule onboarding call
               </Link>
               <Link
-                href="/support/documentation"
+                href="/support"
                 className={`text-sm ${accentColor} hover:underline`}
               >
                 View documentation

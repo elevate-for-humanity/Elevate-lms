@@ -195,7 +195,7 @@ export function ScormPlayerWrapper({
             <span className="text-slate-500 capitalize">{status.replace('_', ' ')}</span>
             <span className="font-medium">{progress}%</span>
           </div>
-          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-white rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${isCompleted ? 'bg-brand-green-500' : 'bg-brand-blue-600'}`}
               style={{ width: `${progress}%` }}

@@ -95,7 +95,7 @@ export default function BarberOrientationPage() {
       content: (
         <div className="space-y-4">
           <p>Your enrollment includes the following payment structure:</p>
-          <div className="bg-slate-50 p-4 rounded-lg space-y-3">
+          <div className="bg-white p-4 rounded-lg space-y-3">
             <div className="flex justify-between">
               <span>Program Total</span>
               <span className="font-bold">{formatCurrency(config.tuition.total)}</span>
@@ -193,7 +193,7 @@ export default function BarberOrientationPage() {
   const progress = ((currentSection + 1) / sections.length) * 100;
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-white">
       {/* Progress Bar */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-6 py-4">
@@ -237,7 +237,7 @@ export default function BarberOrientationPage() {
           {/* Acknowledgment Checkbox (only on last section) */}
           {isLastSection && (
             <div className="px-6 pb-6">
-              <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+              <label className="flex items-start gap-3 p-4 bg-white rounded-lg cursor-pointer hover:bg-white transition">
                 <input
                   type="checkbox"
                   checked={acknowledged}

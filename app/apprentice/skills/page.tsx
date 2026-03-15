@@ -106,12 +106,12 @@ export default async function ApprenticeSkillsPage() {
       case 'in-progress':
         return 'bg-brand-blue-100 text-brand-blue-700';
       default:
-        return 'bg-gray-100 text-gray-600';
+        return 'bg-white text-gray-600';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Apprentice Portal', href: '/apprentice' },
@@ -155,7 +155,7 @@ export default async function ApprenticeSkillsPage() {
               </div>
               <div className="divide-y">
                 {category.skills?.map((skill: any, skillIndex: number) => (
-                  <div key={skillIndex} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                  <div key={skillIndex} className="p-4 flex items-center justify-between hover:bg-white">
                     <div className="flex items-center gap-4">
                       {getStatusIcon(skill.status || skill.progress?.[0]?.status)}
                       <span className="font-medium">{skill.name}</span>

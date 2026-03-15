@@ -25,7 +25,7 @@ export default function OJTHoursLogPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[10px]">
       {/* Screen nav */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -79,7 +79,7 @@ export default function OJTHoursLogPage() {
           <h2 className="font-bold text-sm mb-2 print:text-[10px] print:mb-1">Daily OJT Hours</h2>
           <table className="w-full border-collapse text-sm print:text-[9px]">
             <thead>
-              <tr className="bg-gray-900 text-white print:bg-gray-100 print:text-gray-900">
+              <tr className="bg-gray-900 text-white print:bg-white print:text-gray-900">
                 <th className="p-2 border font-semibold text-left w-24 print:p-1">Date</th>
                 <th className="p-2 border font-semibold text-center w-16 print:p-1">Start</th>
                 <th className="p-2 border font-semibold text-center w-16 print:p-1">End</th>
@@ -90,7 +90,7 @@ export default function OJTHoursLogPage() {
             </thead>
             <tbody>
               {rows.map((i) => (
-                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50 print:bg-white'}>
+                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-white/50 print:bg-white'}>
                   <td className="p-1.5 border print:p-1">&nbsp;</td>
                   <td className="p-1.5 border text-center print:p-1">&nbsp;</td>
                   <td className="p-1.5 border text-center print:p-1">&nbsp;</td>
@@ -108,7 +108,7 @@ export default function OJTHoursLogPage() {
           <h2 className="font-bold text-sm mb-2 print:text-[10px] print:mb-1">Monthly Hours by Competency Category</h2>
           <table className="w-full border-collapse text-sm print:text-[9px]">
             <thead>
-              <tr className="bg-gray-100 print:bg-gray-50">
+              <tr className="bg-white print:bg-white">
                 <th className="p-2 border font-semibold text-left print:p-1">Competency Category</th>
                 <th className="p-2 border font-semibold text-center w-28 print:p-1">Hours This Month</th>
                 <th className="p-2 border font-semibold text-center w-28 print:p-1">Cumulative Total</th>
@@ -122,7 +122,7 @@ export default function OJTHoursLogPage() {
                   <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 </tr>
               ))}
-              <tr className="font-semibold bg-gray-50">
+              <tr className="font-semibold bg-white">
                 <td className="p-2 border print:p-1">TOTAL</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
@@ -194,15 +194,15 @@ export default function OJTHoursLogPage() {
       </div>
 
       {/* Screen nav */}
-      <div className="py-8 bg-slate-50 print:hidden">
+      <div className="py-8 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4 flex flex-wrap gap-3">
           <Link href="/compliance/competency-verification/barber" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
             Barber Rubric Overview
           </Link>
-          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Monthly OJT Evaluation
           </Link>
-          <Link href="/compliance/competency-verification/barber/supervisor-verification" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/supervisor-verification" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Supervisor Verification
           </Link>
         </div>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function GradebookPage({ params }: { params: { courseId: string } }) {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -22,7 +22,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
   const { data: enrollments } = await db.from('program_enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -41,7 +41,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
         </div>
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
@@ -53,7 +53,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
             </thead>
             <tbody className="divide-y">
               {enrollments && enrollments.length > 0 ? enrollments.map((e: any) => (
-                <tr key={e.id} className="hover:bg-gray-50">
+                <tr key={e.id} className="hover:bg-white">
                   <td className="px-4 py-3"><p className="font-medium">{e.profiles?.full_name || 'Student'}</p><p className="text-sm text-gray-500">{e.profiles?.email}</p></td>
                   <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-brand-blue-600 h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
                   <td className="px-4 py-3">{e.quiz_average || '-'}%</td>

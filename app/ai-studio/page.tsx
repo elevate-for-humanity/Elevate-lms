@@ -193,7 +193,7 @@ export default function AIStudioPage() {
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-brand-blue-600 text-white shadow-lg'
-                    : 'bg-white text-black hover:bg-gray-50 border border-gray-200'
+                    : 'bg-white text-black hover:bg-white border border-gray-200'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -411,14 +411,14 @@ export default function AIStudioPage() {
                       )}
 
                       {(asset.type === 'video' || asset.type === 'avatar') && (
-                        <div className="relative w-full h-32 bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+                        <div className="relative w-full h-32 bg-white rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                           <Play className="w-8 h-8 text-black" />
                         </div>
                       )}
 
                       {(asset.type === 'voiceover' ||
                         asset.type === 'music') && (
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg mb-2">
+                        <div className="flex items-center gap-2 p-3 bg-white rounded-lg mb-2">
                           <button className="text-brand-blue-600 hover:text-brand-blue-700" aria-label="Action button">
                             <Play className="w-5 h-5" />
                           </button>

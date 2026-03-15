@@ -21,7 +21,7 @@ function SuccessContent() {
   }, [examCode]);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -42,7 +42,7 @@ function SuccessContent() {
               : 'Your exam request has been submitted. Your voucher will be assigned within 1-2 business days.'}
           </p>
 
-          <div className="bg-slate-50 rounded-xl p-6 text-left mb-6 space-y-4">
+          <div className="bg-white rounded-xl p-6 text-left mb-6 space-y-4">
             <h2 className="font-semibold text-slate-900">What Happens Next</h2>
             <div className="space-y-3">
               {[

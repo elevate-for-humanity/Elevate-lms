@@ -71,7 +71,7 @@ export default function StoreDigitalPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-100">
+              <div className="relative aspect-video bg-white">
                 <Image src="/images/pages/store-digital-hero.jpg" alt="AI Studio Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -85,7 +85,7 @@ export default function StoreDigitalPage() {
               </div>
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-100">
+              <div className="relative aspect-video bg-white">
                 <Image src="/images/pages/store-digital-detail1.jpg" alt="SAM.gov Assistant Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -99,7 +99,7 @@ export default function StoreDigitalPage() {
               </div>
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-100">
+              <div className="relative aspect-video bg-white">
                 <Image src="/images/pages/store-digital-detail2.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -185,7 +185,7 @@ export default function StoreDigitalPage() {
               <Link
                 key={product.id}
                 href={`/store/digital/${product.slug}`}
-                className="bg-slate-50 rounded-xl p-6 hover:shadow-lg transition-all group border border-slate-100"
+                className="bg-white rounded-xl p-6 hover:shadow-lg transition-all group border border-slate-100"
               >
                 <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
                   <FileText className="w-6 h-6 text-amber-600" />
@@ -210,7 +210,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Platform Tools */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
             <Building2 className="w-8 h-8 text-brand-blue-600" />

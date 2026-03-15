@@ -22,7 +22,7 @@ export default async function DocumentationPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Documentation" }]} />
         </div>
@@ -103,7 +103,7 @@ export default async function DocumentationPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Documentation" }]} />
         </div>
@@ -151,7 +151,7 @@ export default async function DocumentationPage() {
                     <Link
                       key={item.name}
                       href={item.url}
-                      className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors group"
+                      className="flex items-center justify-between p-4 bg-white hover:bg-white rounded-lg border border-slate-200 transition-colors group"
                     >
                       <div className="flex items-center gap-3">
                         <Download className="h-5 w-5 text-slate-400 group-hover:text-brand-blue-600 transition-colors" />

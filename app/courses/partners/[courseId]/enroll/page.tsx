@@ -119,7 +119,7 @@ export default function EnrollPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto"></div>
           <p className="mt-4 text-black">Loading course details...</p>
@@ -130,7 +130,7 @@ export default function EnrollPage({
 
   if (error && !course) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow-sm border border-brand-red-200 p-8 text-center">
           <div className="text-brand-red-600 text-5xl mb-4">
             <AlertTriangle className="w-5 h-5 inline-block" />
@@ -153,7 +153,7 @@ export default function EnrollPage({
   if (!course) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Courses", href: "/courses" }, { label: "Enroll" }]} />
       </div>
@@ -215,7 +215,7 @@ export default function EnrollPage({
 
             {/* Course Info */}
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+              <div className="flex items-center gap-3 p-4 bg-white rounded-lg">
                 <Clock className="w-5 h-5 text-brand-blue-600" />
                 <div>
                   <div className="text-sm text-black">Duration</div>
@@ -224,7 +224,7 @@ export default function EnrollPage({
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+              <div className="flex items-center gap-3 p-4 bg-white rounded-lg">
                 <BookOpen className="w-5 h-5 text-brand-blue-600" />
                 <div>
                   <div className="text-sm text-black">Format</div>
@@ -299,7 +299,7 @@ export default function EnrollPage({
               </button>
               <Link
                 href="/courses/partners"
-                className="px-8 py-4 bg-slate-100 text-black font-semibold rounded-lg hover:bg-slate-200 transition-colors text-center"
+                className="px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-slate-200 transition-colors text-center"
               >
                 Cancel
               </Link>

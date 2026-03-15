@@ -375,7 +375,7 @@ export default function BuildPage() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {generatedSite.config.programs.slice(0, 3).map((p: any, i: number) => (
-                      <span key={i} className="px-3 py-1 bg-slate-100 rounded-full text-sm text-slate-700">
+                      <span key={i} className="px-3 py-1 bg-white rounded-full text-sm text-slate-700">
                         {p.name}
                       </span>
                     ))}

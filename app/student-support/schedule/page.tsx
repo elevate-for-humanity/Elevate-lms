@@ -21,7 +21,7 @@ export default async function SchedulePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
             <Link href="/" className="hover:text-brand-orange-600">Home</Link>
@@ -69,7 +69,7 @@ export default async function SchedulePage() {
     .limit(5);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>

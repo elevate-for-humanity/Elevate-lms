@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function InquirySuccessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="flex justify-center mb-6">
           <span className="text-slate-400 flex-shrink-0">•</span>
@@ -25,7 +25,7 @@ export default function InquirySuccessPage() {
           Our team will contact you within 1-2 business days.
         </p>
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <div className="bg-white rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-gray-900 mb-3">What's Next?</h2>
           <ul className="text-left text-gray-600 space-y-2">
             <li>• Check your email for confirmation</li>

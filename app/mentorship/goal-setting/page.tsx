@@ -18,7 +18,7 @@ export default function GoalSettingPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Mentorship", href: "/mentorship" }, { label: "Goal Setting" }]} />
       </div>
-<div className="bg-gray-50 border-b">
+<div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -60,7 +60,7 @@ export default function GoalSettingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What We Help With</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -87,7 +87,7 @@ export default function GoalSettingPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Set Goals That Matter</h2>
           <p className="text-xl text-brand-orange-100 mb-8">Work with a mentor to create your roadmap to success.</p>
-          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-white text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

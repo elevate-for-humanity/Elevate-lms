@@ -28,7 +28,7 @@ export default async function VerificationPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Verification" }]} />
         </div>
@@ -118,7 +118,7 @@ export default async function VerificationPage() {
   const verificationProgress = (requiredCompleted / requiredTotal) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Verification" }]} />
         </div>
@@ -195,7 +195,7 @@ export default async function VerificationPage() {
                     className={`flex items-start p-4 rounded-lg border-2 ${
                       req.completed
                         ? 'bg-brand-green-50 border-brand-green-200'
-                        : 'bg-slate-50 border-slate-200'
+                        : 'bg-white border-slate-200'
                     }`}
                   >
                     {req.completed ? (
@@ -238,7 +238,7 @@ export default async function VerificationPage() {
                 </Link>
                 <Link
                   href="/program-holder/dashboard"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-slate-50 text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-white text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
                 >
                   Back to Dashboard
                 </Link>

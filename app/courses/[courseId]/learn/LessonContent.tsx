@@ -94,7 +94,7 @@ export default function LessonContent({
         <button
           onClick={onPrevious}
           disabled={!onPrevious}
-          className="flex items-center gap-2 px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="flex items-center gap-2 px-6 py-3 border border-slate-300 rounded-lg hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <svg
             className="w-5 h-5"

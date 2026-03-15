@@ -90,7 +90,7 @@ export default function TrainingDeliveryDisclosure() {
                   approved employer partner locations. Training sites are selected based on program
                   requirements, licensing standards, and geographic accessibility.
                 </p>
-                <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <div className="bg-white rounded-lg p-4 border border-slate-200">
                   <h4 className="text-sm font-semibold text-slate-800 mb-2">Training Sites by Program Type</h4>
                   <ul className="text-sm text-slate-600 space-y-2">
                     <li className="flex gap-2">
@@ -162,7 +162,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Credentials */}
-      <section className="py-10 bg-slate-50 border-t border-slate-200">
+      <section className="py-10 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Credential Issuance</h2>
           <p className="text-sm text-slate-600 mb-3">
@@ -209,7 +209,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Employer Partner Documentation */}
-      <section className="py-10 bg-slate-50 border-t border-slate-200">
+      <section className="py-10 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Employer Partner Documentation</h2>
           <p className="text-sm text-slate-600 mb-3">
@@ -245,7 +245,7 @@ export default function TrainingDeliveryDisclosure() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-slate-100 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-white transition"
             >
               Contact Us <ArrowRight className="ml-2 w-4 h-4" />
             </Link>

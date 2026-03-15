@@ -194,7 +194,7 @@ export default async function SitemapPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -211,9 +211,9 @@ export default async function SitemapPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-white">
         {/* Breadcrumbs */}
-        <div className="bg-slate-50 border-b">
+        <div className="bg-white border-b">
           <div className="max-w-6xl mx-auto px-4 py-3">
             <Breadcrumbs items={[{ label: 'Site Map' }]} />
           </div>
@@ -267,7 +267,7 @@ export default async function SitemapPage() {
               </Link>
               <Link
                 href="/support/help"
-                className="px-6 py-3 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition"
+                className="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition"
               >
                 Help Center
               </Link>

@@ -248,7 +248,7 @@ export default function OrgInvitesPage() {
                     setInviteRole('member');
                     setError(null);
                   }}
-                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-black shadow-sm hover:bg-gray-50"
+                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-black shadow-sm hover:bg-white"
                 >
                   Cancel
                 </button>
@@ -270,7 +270,7 @@ export default function OrgInvitesPage() {
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-3 py-3.5 text-left text-sm font-semibold text-black">
                       Email

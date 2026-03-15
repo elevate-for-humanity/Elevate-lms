@@ -198,7 +198,7 @@ export default function UploadDocumentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Upload Documents" }]} />
       </div>
@@ -368,7 +368,7 @@ export default function UploadDocumentsPage() {
                     )}
                     <button
                       onClick={() => removeFile(file.name)}
-                      className="p-1 hover:bg-gray-100 rounded"
+                      className="p-1 hover:bg-white rounded"
                       disabled={file.status === 'uploading'}
                     >
                       <X className="w-5 h-5 text-black" />
@@ -397,7 +397,7 @@ export default function UploadDocumentsPage() {
               <div key={category.category} className="border border-gray-200 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setExpandedCategory(expandedCategory === category.category ? null : category.category)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                  className="w-full flex items-center justify-between p-4 bg-white hover:bg-white transition-colors text-left"
                 >
                   <div>
                     <h4 className="font-semibold text-black">{category.category}</h4>
@@ -411,7 +411,7 @@ export default function UploadDocumentsPage() {
                     <ul className="space-y-3">
                       {category.documents.map((doc) => (
                         <li key={doc.id} className="flex items-start gap-3">
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${doc.required ? 'bg-brand-red-100' : 'bg-gray-100'}`}>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${doc.required ? 'bg-brand-red-100' : 'bg-white'}`}>
                             {doc.required ? (
                               <span className="text-brand-red-600 text-xs font-bold">!</span>
                             ) : (

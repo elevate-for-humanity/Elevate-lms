@@ -123,7 +123,7 @@ function CheckoutForm({
       </div>
 
       {/* Inline terms summary */}
-      <div className="mt-4 bg-slate-50 rounded-lg p-4 text-xs text-slate-500 space-y-1">
+      <div className="mt-4 bg-white rounded-lg p-4 text-xs text-slate-500 space-y-1">
         <p><strong className="text-slate-700">License terms:</strong> Month-to-month after initial purchase. Cancel anytime with 30-day notice.</p>
         <p><strong className="text-slate-700">Data ownership:</strong> You own your data. Full export (CSV + JSON) available at any time.</p>
         <p><strong className="text-slate-700">Onboarding:</strong> Included in setup fee. Your branded instance launches within 2 weeks.</p>
@@ -197,7 +197,7 @@ export default function LicenseCheckoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600" />
       </div>
     );
@@ -208,7 +208,7 @@ export default function LicenseCheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link

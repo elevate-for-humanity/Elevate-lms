@@ -64,7 +64,7 @@ export default async function CandidatesPage() {
   const filters = ['All Candidates', 'Healthcare', 'Skilled Trades', 'Transportation', 'Business'];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Candidates" }]} />
 {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
@@ -96,7 +96,7 @@ export default async function CandidatesPage() {
                 <option>HVAC Training</option>
                 <option>CDL Training</option>
               </select>
-              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-white flex items-center gap-2">
                 <Filter className="w-4 h-4" />
                 Filters
               </button>
@@ -107,7 +107,7 @@ export default async function CandidatesPage() {
               <button
                 key={index}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                  index === 0 ? 'bg-brand-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  index === 0 ? 'bg-brand-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {filter}
@@ -181,7 +181,7 @@ export default async function CandidatesPage() {
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     {candidate.skills.slice(0, 3).map((skill, index) => (
-                      <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                      <span key={index} className="px-2 py-1 bg-white text-gray-700 text-xs rounded-full">
                         {skill}
                       </span>
                     ))}
@@ -194,7 +194,7 @@ export default async function CandidatesPage() {
                     >
                       View Profile
                     </Link>
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-white transition-colors">
                       <MessageSquare className="w-5 h-5" />
                     </button>
                   </div>

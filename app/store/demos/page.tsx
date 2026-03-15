@@ -56,7 +56,7 @@ const demos = [
 export default function StoreDemosPage() {
 
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform', href: '/store' }, { label: 'Demos' }]} />
         </div>
@@ -78,7 +78,7 @@ export default function StoreDemosPage() {
             <Link href="/demo/admin" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
               <Play className="w-5 h-5" /> Open Admin Demo
             </Link>
-            <Link href="/store/trial" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition">
+            <Link href="/store/trial" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition">
               Start 14-Day Trial
             </Link>
           </div>
@@ -127,7 +127,7 @@ export default function StoreDemosPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-slate-50 border-t border-slate-200">
+      <section className="py-14 bg-white border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Ready to set up your own?</h2>
           <p className="text-slate-700 mb-6">

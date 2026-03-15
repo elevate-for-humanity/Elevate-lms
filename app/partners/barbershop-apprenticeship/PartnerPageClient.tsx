@@ -16,7 +16,7 @@ export default function PartnerPageClient() {
 
       {/* Video Hero — no text overlay */}
       <VideoHero
-        videoSrc="/videos/barber-hero-final.mp4"
+        videoSrc="https://cms-artifacts.artlist.io/content/generated-video-v1/video__3/video-7b329d1f-3f92-4ec5-acdf-9d2d7ff6de5f.mp4?Expires=2083752835videoSrc="/videos/barber-hero-final.mp4"Key-Pair-Id=K2ZDLYDZI2R1DFvideoSrc="/videos/barber-hero-final.mp4"Signature=PwinNDJ~aDGbHoMI8-Hfr28QIj7s~0mwzn92P-muIHO0bW86~4gW6MzRyslLtk~TOzdfX8aTYA9OeGF-sbBPwCBUw8gTpXO6QvhwpJsFW5DiLHnEP6q6vCTvQ-jEpwV20izIuWVSpY-txGY7bDGHhkSq6-wP26b0J-lstFIMwxRHQjJ9rKmX9i4pzNruZJEQ2ILvO-LdWivm98j5TMLm09HgYzesifHFPPzUzNH7NlYwwvIO2-NtXWEuixrQFdJ2Zt4ocgdmqP9auvaeYr9hbS~F6k6CBybWLlnGoLggGkluqp1vFzt-eIslYgFKl8m4Du4UFJawNl3KmcyA9uTWtA__"
         posterSrc="/images/pages/barber-hero-main.jpg"
         posterAlt="Barber apprentice training in a barbershop"
       />
@@ -83,7 +83,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* What You Need to Know */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">What Partner Shops Need to Know</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -125,7 +125,7 @@ export default function PartnerPageClient() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-bold text-gray-900">{item.title}</h3>
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{item.time}</span>
+                    <span className="text-xs bg-white text-gray-600 px-2 py-0.5 rounded-full">{item.time}</span>
                   </div>
                   <p className="text-gray-600 text-sm">{item.desc}</p>
                 </div>
@@ -136,7 +136,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
@@ -153,7 +153,7 @@ export default function PartnerPageClient() {
               { q: 'What do I need to provide for my application?', a: 'Your shop license number, supervising barber\'s license info, your shop logo, and photos of the inside and outside of your shop.' },
             ].map((item, i) => (
               <details key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden group">
-                <summary className="px-6 py-4 cursor-pointer font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+                <summary className="px-6 py-4 cursor-pointer font-semibold text-gray-900 hover:bg-white transition-colors">
                   {item.q}
                 </summary>
                 <div className="px-6 pb-4 text-gray-600 text-sm">

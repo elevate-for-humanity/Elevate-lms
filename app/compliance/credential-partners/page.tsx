@@ -103,7 +103,7 @@ export default function CredentialPartnersPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -150,19 +150,19 @@ export default function CredentialPartnersPage() {
 
           {/* Summary Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-brand-blue-600">6</p>
               <p className="text-xs text-gray-600 mt-1">Programs Covered</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-brand-blue-600">100%</p>
               <p className="text-xs text-gray-600 mt-1">MOU Required</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-brand-blue-600">100%</p>
               <p className="text-xs text-gray-600 mt-1">State/Federal Approved</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 text-center">
+            <div className="bg-white rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-brand-blue-600">6</p>
               <p className="text-xs text-gray-600 mt-1">Credential Types</p>
             </div>
@@ -171,7 +171,7 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Registry Cards */}
-      <section className="py-10 bg-slate-50">
+      <section className="py-10 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Per-Program Credential Partners</h2>
 
@@ -220,7 +220,7 @@ export default function CredentialPartnersPage() {
                   </div>
 
                   {partner.notes && (
-                    <div className="bg-slate-50 rounded-lg p-3 mt-3">
+                    <div className="bg-white rounded-lg p-3 mt-3">
                       <p className="text-xs text-gray-600">
                         <span className="font-medium">Note:</span> {partner.notes}
                       </p>
@@ -258,19 +258,19 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-10 bg-slate-50">
+      <section className="py-10 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
               Apprenticeship & RTI Structure
             </Link>
-            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructional Framework
             </Link>
-            <Link href="/instructor-credentials" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructor-credentials" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructor Credentials
             </Link>
-            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Workforce Partnership Packet
             </Link>
           </div>

@@ -37,7 +37,7 @@ export default function InternshipEvaluationPage() {
         </div>
 
         <div className="prose prose-slate max-w-none">
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mb-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Evaluation Details</h2>
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div>
@@ -59,7 +59,7 @@ export default function InternshipEvaluationPage() {
           <div className="space-y-6">
             {competencies.map((comp) => (
               <div key={comp.area} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
+                <div className="bg-white px-5 py-3 border-b border-slate-200">
                   <h3 className="font-bold text-slate-900 text-sm">{comp.area}</h3>
                 </div>
                 <div className="p-4">
@@ -101,7 +101,7 @@ export default function InternshipEvaluationPage() {
           </div>
 
           <h2 className="text-lg font-bold text-slate-900 mt-8">Supervisor Comments</h2>
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+          <div className="bg-white border border-slate-200 rounded-lg p-5">
             <p className="text-sm text-slate-500 mb-2">Strengths observed:</p>
             <div className="h-16 border-b border-slate-300 mb-4" />
             <p className="text-sm text-slate-500 mb-2">Areas for improvement:</p>
@@ -118,7 +118,7 @@ export default function InternshipEvaluationPage() {
             <p>☐ Recommend additional training before placement</p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mt-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Signatures</h2>
             <div className="grid sm:grid-cols-2 gap-6 text-sm text-slate-600">
               <div>

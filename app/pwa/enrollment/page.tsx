@@ -27,7 +27,7 @@ export default async function EnrollmentPWAPage() {
   const freePrograms = programs.filter((p: any) => p.is_free || p.funding_eligible);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-3.jpg" alt="Student enrollment" fill className="object-cover" priority />
@@ -65,10 +65,10 @@ export default async function EnrollmentPWAPage() {
       {/* Quick Actions */}
       <div className="px-4 mt-4">
         <div className="grid grid-cols-2 gap-3">
-          <Link href="/wioa-eligibility" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/wioa-eligibility" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             Check Eligibility
           </Link>
-          <Link href="/funding" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/funding" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             Funding Options
           </Link>
         </div>
@@ -100,7 +100,7 @@ export default async function EnrollmentPWAPage() {
                 app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
                 app.status === 'enrolled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                 app.status === 'pending' || !app.status ? 'bg-amber-100 text-amber-700' :
-                'bg-slate-100 text-slate-600'
+                'bg-white text-slate-600'
               }`}>
                 {app.status || 'new'}
               </span>

@@ -20,7 +20,7 @@ export default function CareerServicesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services' }]} />
         </div>
@@ -29,6 +29,7 @@ export default function CareerServicesPage() {
       <PageVideoHero
         videoSrc="/videos/career-services-hero.mp4"
         posterSrc="/images/pages/career-services-hero.jpg"
+        audioSrc="/audio/heroes/career-services.mp3"
         posterAlt="Career services — job placement and coaching"
         size="marketing"
       />
@@ -59,7 +60,7 @@ export default function CareerServicesPage() {
       </section>
 
       {/* Your Journey — step by step */}
-      <section className="py-8 sm:py-14 bg-slate-50">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">Your Path to Employment</h2>
           <div className="space-y-3">
@@ -90,7 +91,7 @@ export default function CareerServicesPage() {
       </section>
 
       {/* Virtual Career Fair */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <VirtualCareerFair />
         </div>
@@ -104,7 +105,7 @@ export default function CareerServicesPage() {
       </section>
 
       {/* WorkOne Locator */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <WorkOneLocator />
         </div>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function EligibilityQuizPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Eligibility", href: "/eligibility" }, { label: "Quiz" }]} />
       </div>
@@ -63,7 +63,7 @@ export default function EligibilityQuizPage() {
       </div>
 
       {/* FAQ */}
-      <div className="bg-slate-50 py-12 px-4">
+      <div className="bg-white py-12 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Common Questions</h2>
           <div className="space-y-4">

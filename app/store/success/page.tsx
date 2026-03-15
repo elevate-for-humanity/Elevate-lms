@@ -30,7 +30,7 @@ export default async function StoreSuccessPage({
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -87,7 +87,7 @@ export default async function StoreSuccessPage({
     .limit(5);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -104,7 +104,7 @@ export default async function StoreSuccessPage({
           </p>
 
           {order && (
-            <div className="bg-gray-50 rounded-xl p-6 mb-8 text-left">
+            <div className="bg-white rounded-xl p-6 mb-8 text-left">
               <h2 className="font-semibold mb-4">Order Details</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -128,7 +128,7 @@ export default async function StoreSuccessPage({
               <h2 className="font-semibold mb-4 text-left">Your Items</h2>
               <div className="space-y-3">
                 {orderItems.map((item: any) => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                     <div className="flex items-center gap-3">
                       <Package className="w-8 h-8 text-gray-400" />
                       <div className="text-left">
@@ -159,7 +159,7 @@ export default async function StoreSuccessPage({
                   <a
                     key={purchase.id}
                     href={purchase.product.download_url}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-white"
                   >
                     <span>{purchase.product.name}</span>
                     <Download className="w-5 h-5 text-brand-green-600" />
@@ -183,7 +183,7 @@ export default async function StoreSuccessPage({
             </Link>
             <Link
               href="/shop/orders"
-              className="inline-flex items-center justify-center gap-2 border border-gray-300 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50"
+              className="inline-flex items-center justify-center gap-2 border border-gray-300 px-6 py-3 rounded-lg font-semibold hover:bg-white"
             >
               View All Orders <ArrowRight className="w-4 h-4" />
             </Link>

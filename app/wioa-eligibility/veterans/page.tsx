@@ -19,7 +19,7 @@ export default async function VeteransPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -73,9 +73,9 @@ export default async function VeteransPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'WIOA Eligibility', href: '/wioa-eligibility' }, { label: 'Veterans' }]} />
         </div>
@@ -86,10 +86,10 @@ export default async function VeteransPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/about-hero.jpg" alt="Veterans Priority Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Priority for Veterans</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Expedited services and priority enrollment for those who served</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">WIOA Priority for Veterans</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Expedited services and priority enrollment for those who served</p>
           </div>
         </div>
       </section>
@@ -131,7 +131,7 @@ export default async function VeteransPage() {
           <ul className="space-y-3">
             {qualifications.map((qual, index) => (
               <li key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{qual}</span>
               </li>
             ))}
@@ -144,7 +144,7 @@ export default async function VeteransPage() {
           <ul className="space-y-3">
             {requiredDocuments.map((doc, index) => (
               <li key={index} className="flex items-start gap-3">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="text-slate-500 flex-shrink-0">•</span>
                 <span className="text-gray-700">{doc}</span>
               </li>
             ))}
@@ -191,7 +191,7 @@ export default async function VeteransPage() {
         )}
 
         {/* CTA */}
-        <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-slate-900">
           <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
           <p className="text-brand-blue-100 mb-6">
             Apply today and receive priority processing as a veteran.
@@ -199,13 +199,13 @@ export default async function VeteransPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
               (317) 314-3757

@@ -59,7 +59,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Info Banner */}
-      <section className="py-8 bg-slate-50 border-y border-slate-200">
+      <section className="py-8 bg-white border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start gap-4">
             <Info className="w-6 h-6 text-brand-blue-500 flex-shrink-0 mt-1" />
@@ -107,7 +107,7 @@ export default function SourceUseLicensePage() {
             </div>
 
             {/* License Scope */}
-            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
+            <div className="bg-white rounded-2xl p-8 border border-slate-200">
               <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-slate-500" />
                 License Scope
@@ -149,14 +149,14 @@ export default function SourceUseLicensePage() {
       />
 
       {/* Restrictions */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">License Restrictions</h2>
           
           <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-500 font-bold">1</span>
                 </div>
                 <div>
@@ -169,7 +169,7 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-500 font-bold">2</span>
                 </div>
                 <div>
@@ -182,7 +182,7 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-500 font-bold">3</span>
                 </div>
                 <div>
@@ -195,7 +195,7 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-500 font-bold">4</span>
                 </div>
                 <div>
@@ -208,7 +208,7 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-500 font-bold">5</span>
                 </div>
                 <div>
@@ -239,7 +239,7 @@ export default function SourceUseLicensePage() {
               </p>
             </div>
             
-            <div className="bg-slate-50 rounded-xl p-6 mb-8 text-left">
+            <div className="bg-white rounded-xl p-6 mb-8 text-left">
               <h4 className="text-slate-900 font-semibold mb-3">What&apos;s Included</h4>
               <ul className="text-slate-700 text-sm space-y-2">
                 <li>• Full source code access for internal deployment</li>
@@ -261,7 +261,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Comparison */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Compare License Types</h2>
           
@@ -310,7 +310,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Implementation Timeline */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Implementation Timeline</h2>
           <div className="grid md:grid-cols-4 gap-6">

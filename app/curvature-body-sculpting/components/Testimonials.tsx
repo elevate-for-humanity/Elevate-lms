@@ -143,7 +143,7 @@ export default function Testimonials() {
             {visibleReviews.map((review, index) => (
               <div
                 key={index}
-                className="bg-gray-50 rounded-2xl p-6 relative"
+                className="bg-white rounded-2xl p-6 relative"
               >
                 <Quote className="absolute top-4 right-4 w-8 h-8 text-purple-200" />
                 <div className="flex items-center gap-1 mb-3">
@@ -176,7 +176,7 @@ export default function Testimonials() {
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
               onClick={prevPage}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+              className="p-2 rounded-full bg-white hover:bg-gray-200 transition"
               aria-label="Previous reviews"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />
@@ -195,7 +195,7 @@ export default function Testimonials() {
             </div>
             <button
               onClick={nextPage}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+              className="p-2 rounded-full bg-white hover:bg-gray-200 transition"
               aria-label="Next reviews"
             >
               <ChevronRight className="w-5 h-5 text-gray-600" />

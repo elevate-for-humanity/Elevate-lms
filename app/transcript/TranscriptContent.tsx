@@ -151,7 +151,7 @@ const TOTAL_OJT = DOMAINS.reduce((s, d) => s + d.ojtHours, 0);
 
 export default function TranscriptContent() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Print button — screen only */}
       <div className="print:hidden max-w-4xl mx-auto px-6 pt-8 flex justify-end">
         <button
@@ -325,7 +325,7 @@ export default function TranscriptContent() {
                                 ? "bg-amber-50 text-amber-700"
                                 : comp.type === "Partner Cert"
                                   ? "bg-purple-50 text-purple-700"
-                                  : "bg-gray-50 text-gray-600"
+                                  : "bg-white text-gray-600"
                             }`}
                           >
                             {comp.type}

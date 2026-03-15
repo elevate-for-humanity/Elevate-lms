@@ -39,7 +39,7 @@ export default async function ScormPage({ params }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -85,7 +85,7 @@ export default async function ScormPage({ params }: Props) {
       : null);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
+    <div className="flex flex-col h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">

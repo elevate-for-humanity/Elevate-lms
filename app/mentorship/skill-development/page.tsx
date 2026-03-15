@@ -24,7 +24,7 @@ export default function SkillDevelopmentPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Mentorship", href: "/mentorship" }, { label: "Skill Development" }]} />
       </div>
-<div className="bg-gray-50 border-b">
+<div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -46,7 +46,7 @@ export default function SkillDevelopmentPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Skills We Help Develop</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {skills.map((skill, i) => (
-              <div key={i} className="bg-gray-50 rounded-xl p-6">
+              <div key={i} className="bg-white rounded-xl p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{skill.category}</h3>
                 <ul className="space-y-3">
                   {skill.examples.map((example, j) => (
@@ -62,7 +62,7 @@ export default function SkillDevelopmentPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Personalized Learning Plans</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -92,7 +92,7 @@ export default function SkillDevelopmentPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Start Building Your Skills</h2>
           <p className="text-xl text-brand-green-100 mb-8">Get matched with a mentor who can help you grow.</p>
-          <Link href="/start" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

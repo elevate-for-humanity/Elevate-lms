@@ -286,7 +286,7 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
       {/* Performance Items */}
       <table className="w-full border-2 border-gray-900 text-sm">
         <thead>
-          <tr className="bg-gray-100 print:bg-gray-100">
+          <tr className="bg-white print:bg-white">
             <th className="border border-gray-400 px-2 py-2 text-left w-8">
               #
             </th>
@@ -390,7 +390,7 @@ export default function ChecksheetsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Screen view: index */}
       <div className="print:hidden">
         <div className="max-w-4xl mx-auto px-6 py-12">

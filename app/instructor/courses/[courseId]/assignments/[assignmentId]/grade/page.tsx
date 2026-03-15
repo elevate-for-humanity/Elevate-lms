@@ -21,7 +21,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <p className="text-gray-600">Service Unavailable</p>
       </div>
     );

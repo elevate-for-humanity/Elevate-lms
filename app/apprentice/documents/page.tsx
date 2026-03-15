@@ -53,7 +53,7 @@ export default async function ApprenticeDocumentsPage() {
   const displayDocuments = documents && documents.length > 0 ? documents : defaultDocuments;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Apprentice Portal', href: '/apprentice' },
@@ -82,7 +82,7 @@ export default async function ApprenticeDocumentsPage() {
               {displayDocuments.length > 0 ? (
                 <div className="divide-y">
                   {displayDocuments.map((doc: any) => (
-                    <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                    <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-white">
                       <div className="flex items-center gap-4">
                         <FileText className="w-10 h-10 text-brand-blue-500" />
                         <div>

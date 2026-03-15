@@ -21,7 +21,7 @@ export default async function PaymentPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -36,7 +36,7 @@ export default async function PaymentPage() {
     .select('*')
     .order('order_index');
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Payment" }]} />
       </div>
@@ -172,7 +172,7 @@ export default async function PaymentPage() {
               <div className="grid md:grid-cols-3 gap-6">
                 <Link
                   href="/funding"
-                  className="text-center p-4 rounded-lg hover:bg-gray-50 transition-colors border"
+                  className="text-center p-4 rounded-lg hover:bg-white transition-colors border"
                 >
                   <h3 className="font-semibold mb-2">WIOA Funding</h3>
                   <p className="text-sm text-gray-600">
@@ -181,7 +181,7 @@ export default async function PaymentPage() {
                 </Link>
                 <Link
                   href="/grants"
-                  className="text-center p-4 rounded-lg hover:bg-gray-50 transition-colors border"
+                  className="text-center p-4 rounded-lg hover:bg-white transition-colors border"
                 >
                   <h3 className="font-semibold mb-2">Grants</h3>
                   <p className="text-sm text-gray-600">
@@ -190,7 +190,7 @@ export default async function PaymentPage() {
                 </Link>
                 <Link
                   href="/check-eligibility"
-                  className="text-center p-4 rounded-lg hover:bg-gray-50 transition-colors border"
+                  className="text-center p-4 rounded-lg hover:bg-white transition-colors border"
                 >
                   <h3 className="font-semibold mb-2">Check Eligibility</h3>
                   <p className="text-sm text-gray-600">
@@ -204,7 +204,7 @@ export default async function PaymentPage() {
       </section>
 
       {/* Help Section */}
-      <section className="py-16 bg-gray-100">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Need Help?</h2>

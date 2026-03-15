@@ -19,7 +19,7 @@ export default async function ClientPortalPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -60,7 +60,7 @@ export default async function ClientPortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="mb-12">
@@ -149,7 +149,7 @@ export default async function ClientPortalPage() {
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : appointment.status === 'completed'
                                   ? 'bg-brand-blue-100 text-brand-blue-700'
-                                  : 'bg-gray-100 text-black'
+                                  : 'bg-white text-black'
                           }`}
                         >
                           {appointment.status}
@@ -233,7 +233,7 @@ export default async function ClientPortalPage() {
                               ? 'bg-brand-green-100 text-brand-green-700'
                               : doc.status === 'pending_review'
                                 ? 'bg-yellow-100 text-yellow-700'
-                                : 'bg-gray-100 text-black'
+                                : 'bg-white text-black'
                           }`}
                         >
                           {doc.status.replace('_', ' ')}
@@ -241,7 +241,7 @@ export default async function ClientPortalPage() {
                       </div>
                     </div>
                   </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Action button">
+                  <button className="p-2 hover:bg-white rounded-lg transition-colors" aria-label="Action button">
                     <Download className="w-5 h-5 text-black" />
                   </button>
                 </div>

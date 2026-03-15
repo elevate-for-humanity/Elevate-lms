@@ -68,7 +68,7 @@ export default async function TuitionFeesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Tuition & Fees' }]} />
         </div>
@@ -125,7 +125,7 @@ export default async function TuitionFeesPage() {
                 </tr>
               ) : (
                 programs.map((program: any, index: number) => (
-                  <tr key={program.name} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <tr key={program.name} className={index % 2 === 0 ? 'bg-white' : 'bg-white'}>
                     <td className="p-4 font-medium text-gray-900">{program.name}</td>
                     <td className="p-4 text-gray-700">{program.duration}</td>
                     <td className="p-4 text-right text-gray-900">${program.tuition.toLocaleString()}</td>
@@ -165,14 +165,14 @@ export default async function TuitionFeesPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Payment Options</h2>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Pay in Full</h3>
               <p className="text-gray-700 text-sm">
                 Pay the full tuition amount at enrollment. No additional fees.
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Payment Plan</h3>
               <p className="text-gray-700 text-sm">
                 Split your tuition into monthly payments. Down payment required at enrollment. 
@@ -180,7 +180,7 @@ export default async function TuitionFeesPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Workforce Funding</h3>
               <p className="text-gray-700 text-sm">
                 Eligible programs may be funded through WIOA or WRG. Contact your local 
@@ -194,7 +194,7 @@ export default async function TuitionFeesPage() {
         <section className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Additional Information</h2>
           
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <h3 className="font-bold text-gray-900 mb-4">What's Included in Tuition</h3>
             <ul className="text-gray-700 space-y-2">
               <li>• All instruction (online and in-person)</li>
@@ -205,7 +205,7 @@ export default async function TuitionFeesPage() {
             </ul>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-6 mt-4">
+          <div className="bg-white rounded-lg p-6 mt-4">
             <h3 className="font-bold text-gray-900 mb-4">Not Included in Tuition</h3>
             <ul className="text-gray-700 space-y-2">
               <li>• Third-party certification exam fees (listed above)</li>
@@ -236,7 +236,7 @@ export default async function TuitionFeesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

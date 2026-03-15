@@ -63,12 +63,12 @@ const colorClasses = {
 export default function AppsPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Apps" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-100 text-slate-900 py-16 px-4">
+      <section className="bg-white text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Apps & Tools</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">

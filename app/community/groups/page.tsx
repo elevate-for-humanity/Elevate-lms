@@ -74,9 +74,9 @@ export default async function GroupsPage() {
   const groupList = groups || [];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Groups' }]} />
         </div>
@@ -245,10 +245,10 @@ export default async function GroupsPage() {
                     <li key={index}>
                       <Link
                         href={`/community/groups?category=${encodeURIComponent(category.name)}`}
-                        className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition"
+                        className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white transition"
                       >
                         <span className="text-gray-700">{category.name}</span>
-                        <span className="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded">
+                        <span className="bg-white text-gray-600 text-sm px-2 py-1 rounded">
                           {category.count}
                         </span>
                       </Link>

@@ -63,7 +63,7 @@ export default async function StaffPortalLanding() {
   const onboardingComplete = onboardingItems.filter(i => i.done).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal' }]} />
@@ -99,7 +99,7 @@ export default async function StaffPortalLanding() {
             <div className="divide-y">
               {onboardingItems.map(item => (
                 <Link key={item.label} href={item.href}
-                  className="flex items-center gap-4 px-6 py-3.5 hover:bg-slate-50 transition">
+                  className="flex items-center gap-4 px-6 py-3.5 hover:bg-white transition">
                   {item.done
                     ? <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                     : <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />}
@@ -119,7 +119,7 @@ export default async function StaffPortalLanding() {
           {quickLinks.map(({ label, href, icon: Icon, desc }) => (
             <Link key={href} href={href}
               className="bg-white rounded-xl border p-4 flex flex-col items-center text-center hover:border-brand-blue-300 hover:bg-brand-blue-50 transition group">
-              <div className="w-10 h-10 bg-slate-100 group-hover:bg-brand-blue-100 rounded-xl flex items-center justify-center mb-2 transition">
+              <div className="w-10 h-10 bg-white group-hover:bg-brand-blue-100 rounded-xl flex items-center justify-center mb-2 transition">
                 <Icon className="w-5 h-5 text-slate-500 group-hover:text-brand-blue-600" />
               </div>
               <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">{label}</p>
@@ -139,7 +139,7 @@ export default async function StaffPortalLanding() {
                 Sign In
               </Link>
               <Link href="/onboarding/staff"
-                className="px-6 py-3 bg-slate-100 text-slate-900 font-bold rounded-xl hover:bg-slate-200">
+                className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200">
                 New Staff Onboarding
               </Link>
             </div>

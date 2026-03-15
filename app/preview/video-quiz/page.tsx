@@ -79,7 +79,7 @@ export default function VideoQuizPreview() {
   const videoWatchGateMet = videoProgress >= 60;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4">
         <h1 className="text-xl font-bold text-slate-900">HVAC Lesson Preview — Video + Quiz</h1>

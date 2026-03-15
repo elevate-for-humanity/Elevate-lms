@@ -59,7 +59,7 @@ export default function FederalCompliancePage() {
                 </p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <p className="text-black mb-6">
                 Our programs are designed to meet WIOA requirements for eligible training providers and workforce development activities.
               </p>
@@ -107,7 +107,7 @@ export default function FederalCompliancePage() {
                 </p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <p className="text-black mb-6">
                 We protect student education records in accordance with FERPA requirements.
               </p>
@@ -155,7 +155,7 @@ export default function FederalCompliancePage() {
                 </p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <p className="text-black mb-6">
                 Our platform and programs are accessible to individuals with disabilities.
               </p>
@@ -203,7 +203,7 @@ export default function FederalCompliancePage() {
                 </p>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <p className="text-black mb-6">
                 Elevate for Humanity is an equal opportunity provider and does not discriminate on the basis of:
               </p>
@@ -304,7 +304,7 @@ export default function FederalCompliancePage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>

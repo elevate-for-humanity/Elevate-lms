@@ -34,7 +34,7 @@ export default async function AnalyticsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Analytics" }]} />
         </div>
@@ -139,7 +139,7 @@ export default async function AnalyticsPage() {
   const maxActivity = Math.max(...weeklyActivity, 1);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Analytics" }]} />
         </div>
@@ -245,7 +245,7 @@ export default async function AnalyticsPage() {
               {courseProgress.length > 0 ? (
                 <div className="space-y-4">
                   {courseProgress.map((course) => (
-                    <div key={course.id} className="p-4 bg-slate-50 rounded-xl">
+                    <div key={course.id} className="p-4 bg-white rounded-xl">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium text-slate-900">{course.course_name}</h3>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -356,22 +356,22 @@ export default async function AnalyticsPage() {
               <h3 className="font-bold text-slate-900 mb-4">Quick Links</h3>
               <div className="space-y-2">
                 <Link
-                  href="/lms/progress"
-                  className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                  href="/learner/progress"
+                  className="flex items-center gap-2 p-3 bg-white rounded-lg hover:bg-white transition"
                 >
                   <TrendingUp className="w-4 h-4 text-brand-blue-600" />
                   <span className="text-slate-700">View Progress</span>
                 </Link>
                 <Link
-                  href="/lms/grades"
-                  className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                  href="/learner/grades"
+                  className="flex items-center gap-2 p-3 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Award className="w-4 h-4 text-brand-green-600" />
                   <span className="text-slate-700">View Grades</span>
                 </Link>
                 <Link
                   href="/lms/achievements"
-                  className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                  className="flex items-center gap-2 p-3 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Zap className="w-4 h-4 text-yellow-600" />
                   <span className="text-slate-700">Achievements</span>

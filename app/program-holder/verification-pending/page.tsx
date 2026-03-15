@@ -25,7 +25,7 @@ export default async function VerificationPendingPage() {
   const firstName = profile?.first_name || '';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -60,7 +60,7 @@ export default async function VerificationPendingPage() {
             </Link>
             <Link
               href="/program-holder/onboarding"
-              className="block w-full px-4 py-3 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-center"
+              className="block w-full px-4 py-3 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-white transition text-center"
             >
               Back to Onboarding
             </Link>

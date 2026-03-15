@@ -154,7 +154,7 @@ export default function NewExamSession() {
                   ? 'bg-brand-blue-600 text-white'
                   : i < stepIdx
                     ? 'bg-brand-blue-50 text-brand-blue-700 hover:bg-brand-blue-100'
-                    : 'bg-slate-100 text-slate-400'
+                    : 'bg-white text-slate-400'
               }`}
             >
               {s.icon}
@@ -357,7 +357,7 @@ export default function NewExamSession() {
                 />
               </div>
 
-              <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
+              <label className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.idVerified}
@@ -454,7 +454,7 @@ export default function NewExamSession() {
               <button
                 type="button"
                 onClick={back}
-                className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-white transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>

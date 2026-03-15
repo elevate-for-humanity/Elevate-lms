@@ -199,7 +199,7 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="font-medium mb-2">Drag and drop your tax documents</p>
               <p className="text-sm text-gray-500 mb-4">W-2s, 1099s, and other income documents</p>
-              <button type="button" className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+              <button type="button" className="px-4 py-2 bg-white rounded-lg hover:bg-gray-200">
                 Browse Files
               </button>
             </div>

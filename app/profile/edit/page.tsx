@@ -50,7 +50,7 @@ export default async function EditProfilePage() {
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-2xl mx-auto">
         <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Edit Profile' }]} />
         <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"><ArrowLeft className="w-4 h-4" /> Back to Onboarding</Link>

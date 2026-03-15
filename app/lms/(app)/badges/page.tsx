@@ -132,7 +132,7 @@ export default async function BadgesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Badges" }]} />
         </div>
@@ -207,7 +207,7 @@ export default async function BadgesPage() {
   const totalBadges = badges.length;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Badges" }]} />
         </div>
@@ -297,7 +297,7 @@ export default async function BadgesPage() {
                     key={badge.id}
                     className="bg-white rounded-xl border border-slate-200 p-6 text-center opacity-75 hover:opacity-100 transition"
                   >
-                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 relative">
                       <IconComponent className="w-8 h-8 text-slate-400" />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Lock className="w-4 h-4 text-slate-500" />
@@ -308,7 +308,7 @@ export default async function BadgesPage() {
                     
                     {/* Progress bar */}
                     <div className="mt-3">
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div
                           className={`h-full ${colors.bg.replace('100', '500')} rounded-full transition-all`}
                           style={{ width: `${progress}%` }}
@@ -331,7 +331,7 @@ export default async function BadgesPage() {
               Complete courses and certifications to earn badges. Your achievements will appear here.
             </p>
             <Link
-              href="/lms/courses"
+              href="/learner/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
@@ -342,7 +342,7 @@ export default async function BadgesPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/learner/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Dashboard
           </Link>
         </div>

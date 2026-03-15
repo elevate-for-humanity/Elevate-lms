@@ -16,7 +16,7 @@ export default function BarberScoringSheetPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -62,12 +62,12 @@ export default function BarberScoringSheetPage() {
         <div className="border rounded-lg p-3 print:p-2 print:border-gray-400">
           <p className="font-bold text-sm mb-2 print:text-[10px] print:mb-1">Scoring Scale</p>
           <div className="grid grid-cols-6 gap-1 text-xs print:text-[9px] text-center">
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>0</strong><br />Not Demonstrated</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>1</strong><br />Needs Direct Supervision</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>2</strong><br />Developing</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>3</strong><br />Competent (Job-Ready)</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>4</strong><br />Advanced</div>
-            <div className="border rounded py-1 bg-gray-50 print:bg-white"><strong>5</strong><br />Independent Mastery</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>0</strong><br />Not Demonstrated</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>1</strong><br />Needs Direct Supervision</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>2</strong><br />Developing</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>3</strong><br />Competent (Job-Ready)</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>4</strong><br />Advanced</div>
+            <div className="border rounded py-1 bg-white print:bg-white"><strong>5</strong><br />Independent Mastery</div>
           </div>
           <p className="text-xs text-gray-500 mt-2 print:text-[9px] print:mt-1">
             Minimum passing standard: Score of 3 (Competent) in all core competencies. Sanitation failures require automatic remediation.
@@ -90,7 +90,7 @@ export default function BarberScoringSheetPage() {
 
             <table className="w-full border-collapse text-sm print:text-[10px]">
               <thead>
-                <tr className="bg-gray-100 print:bg-gray-50">
+                <tr className="bg-white print:bg-white">
                   <th className="text-left p-2 border font-semibold w-8 print:p-1">ID</th>
                   <th className="text-left p-2 border font-semibold print:p-1">Competency</th>
                   <th className="text-center p-2 border font-semibold w-12 print:p-1">RTI</th>
@@ -172,15 +172,15 @@ export default function BarberScoringSheetPage() {
       </div>
 
       {/* Screen nav */}
-      <div className="py-8 bg-slate-50 print:hidden">
+      <div className="py-8 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4 flex flex-wrap gap-3">
           <Link href="/compliance/competency-verification/barber" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
             Barber Rubric Overview
           </Link>
-          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Monthly OJT Evaluation
           </Link>
-          <Link href="/compliance/competency-verification/barber/final-signoff" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/final-signoff" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Final Sign-Off Form
           </Link>
         </div>

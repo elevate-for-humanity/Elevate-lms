@@ -35,7 +35,7 @@ export default async function WioaPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'WIOA' }]} />
         </div>
@@ -80,7 +80,7 @@ export default async function WioaPage() {
       </section>
 
       {/* What is WIOA */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">What is WIOA?</h2>
 
@@ -207,7 +207,7 @@ export default async function WioaPage() {
       </section>
 
       {/* How to Qualify */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             How Do I Qualify?
@@ -360,7 +360,7 @@ export default async function WioaPage() {
       </section>
 
       {/* Real Stories */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
             Real WIOA Success Stories
@@ -422,7 +422,7 @@ export default async function WioaPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-block px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-100 transition-all text-lg shadow-xl"
+              className="inline-block px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition-all text-lg shadow-xl"
             >
               Contact Us
             </Link>

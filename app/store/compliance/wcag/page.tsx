@@ -76,7 +76,7 @@ export default function WCAGCompliancePage() {
       />
 
       {/* Breadcrumb */}
-      <nav className="bg-gray-100 border-b border-gray-200">
+      <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-12 text-sm">
             <Link href="/" className="text-gray-600 hover:text-black flex items-center gap-1">
@@ -140,7 +140,7 @@ export default function WCAGCompliancePage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16 bg-gray-50">
+      <section id="pricing" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-black mb-8 text-center">Accessibility Pricing</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -161,7 +161,7 @@ export default function WCAGCompliancePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/store/licensing" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-brand-blue-600 text-white' : 'bg-gray-100 text-black'}`}>
+                <Link href="/store/licensing" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-brand-blue-600 text-white' : 'bg-white text-black'}`}>
                   Get Started
                 </Link>
               </div>

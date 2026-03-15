@@ -43,7 +43,7 @@ export function SupersonicHeader() {
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/services"
-                  className="block px-4 py-3 hover:bg-gray-50 hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-white hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
                 >
                   👨‍
                   <Briefcase className="w-5 h-5 inline-block" /> Professional
@@ -72,7 +72,7 @@ export function SupersonicHeader() {
               <div className="absolute top-full left-0 mt-2 bg-white text-black shadow-2xl rounded-xl p-2 hidden group-hover:block w-64 border border-gray-100">
                 <Link
                   href="/supersonic-fast-cash/tax-information"
-                  className="block px-4 py-3 hover:bg-gray-50 hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-white hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
                 >
                   <BookOpen className="w-5 h-5 inline-block" /> Tax Information
                 </Link>
@@ -84,19 +84,19 @@ export function SupersonicHeader() {
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/calculator"
-                  className="block px-4 py-3 hover:bg-gray-50 hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-white hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
                 >
                   🧮 Refund Calculator
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/tools/refund-tracker"
-                  className="block px-4 py-3 hover:bg-gray-50 hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-white hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
                 >
                   📍 Track Refund
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/upload-documents"
-                  className="block px-4 py-3 hover:bg-gray-50 hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-white hover:text-brand-blue-600 rounded-lg transition-colors font-semibold"
                 >
                   📤 Upload Documents
                 </Link>

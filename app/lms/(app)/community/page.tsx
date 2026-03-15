@@ -19,7 +19,7 @@ export default async function CommunityPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Community" }]} />
         </div>
@@ -39,7 +39,7 @@ export default async function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Community" }]} />
         </div>
@@ -50,7 +50,7 @@ export default async function CommunityPage() {
           {/* Quick Links */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Link
-              href="/lms/forums"
+              href="/learner/forums"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -75,7 +75,7 @@ export default async function CommunityPage() {
             </Link>
 
             <Link
-              href="/lms/groups"
+              href="/learner/groups"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
@@ -100,7 +100,7 @@ export default async function CommunityPage() {
             </Link>
 
             <Link
-              href="/lms/leaderboard"
+              href="/learner/leaderboard"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -129,7 +129,7 @@ export default async function CommunityPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
             <div className="space-y-4">
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-brand-blue-600 font-semibold">C</span>
                 </div>
@@ -139,7 +139,7 @@ export default async function CommunityPage() {
                     Join the conversation in our forums
                   </p>
                   <Link
-                    href="/lms/forums"
+                    href="/learner/forums"
                     className="text-sm text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     View Forums →
@@ -154,32 +154,32 @@ export default async function CommunityPage() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Featured Groups</h2>
               <Link
-                href="/lms/groups"
+                href="/learner/groups"
                 className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
               >
                 View All →
               </Link>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-white rounded-lg">
                 <h3 className="font-medium mb-1">General Discussion</h3>
                 <p className="text-sm text-gray-600 mb-2">
                   Connect with all learners
                 </p>
                 <Link
-                  href="/lms/groups"
+                  href="/learner/groups"
                   className="text-sm text-brand-blue-600"
                 >
                   Join Group
                 </Link>
               </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-white rounded-lg">
                 <h3 className="font-medium mb-1">Study Partners</h3>
                 <p className="text-sm text-gray-600 mb-2">
                   Find study partners for your courses
                 </p>
                 <Link
-                  href="/lms/groups"
+                  href="/learner/groups"
                   className="text-sm text-brand-blue-600"
                 >
                   Join Group

@@ -15,7 +15,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -25,7 +25,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
   const { data: enrollment } = await db.from('training_enrollments').select('*').eq('course_id', courseId).eq('user_id', user.id).single();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Link href={`/courses/${courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
@@ -41,7 +41,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
               <h2 className="font-semibold mb-4">Course Content</h2>
               <div className="space-y-2">
                 {lessons && lessons.length > 0 ? lessons.map((lesson: any, i: number) => (
-                  <Link key={lesson.id} href={`/courses/${courseId}/lessons/${lesson.id}`} className="block p-2 rounded hover:bg-gray-50">
+                  <Link key={lesson.id} href={`/courses/${courseId}/lessons/${lesson.id}`} className="block p-2 rounded hover:bg-white">
                     <div className="flex items-center gap-2">
                       <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center text-xs">{i + 1}</span>
                       <span className="text-sm">{lesson.title}</span>

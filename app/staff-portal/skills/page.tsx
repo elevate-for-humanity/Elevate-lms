@@ -91,7 +91,7 @@ export default async function StaffSkillsPage() {
   const pct = totalSkills > 0 ? Math.round((completedCount / totalSkills) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Skills' }]} />
@@ -118,7 +118,7 @@ export default async function StaffSkillsPage() {
           const catCompleted = cat.skills.filter(s => completedIds.has(s.id)).length;
           return (
             <div key={cat.id} className="bg-white rounded-xl border overflow-hidden">
-              <div className="px-6 py-4 border-b bg-slate-50 flex items-center gap-4">
+              <div className="px-6 py-4 border-b bg-white flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-lg bg-${cat.color}-100 flex items-center justify-center`}>
                   <cat.icon className={`w-5 h-5 text-${cat.color}-600`} />
                 </div>
@@ -138,7 +138,7 @@ export default async function StaffSkillsPage() {
                   return (
                     <div key={skill.id} className="px-6 py-3.5 flex items-center gap-4">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        done ? 'bg-brand-green-100' : 'bg-slate-100'
+                        done ? 'bg-brand-green-100' : 'bg-white'
                       }`}>
                         {done
                           ? <CheckCircle className="w-4 h-4 text-brand-green-600" />

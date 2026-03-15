@@ -21,7 +21,7 @@ export default async function TraumaRecoveryPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -67,7 +67,7 @@ export default async function TraumaRecoveryPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Rise Foundation', href: '/rise-foundation' }, { label: 'Trauma Recovery' }]} />
         </div>
@@ -137,7 +137,7 @@ export default async function TraumaRecoveryPage() {
             <h2 className="text-2xl font-bold mb-6">Stories of Healing</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {testimonials.map((testimonial: any) => (
-                <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6">
+                <div key={testimonial.id} className="bg-white rounded-xl p-6">
                   <p className="text-gray-600 italic mb-4">"{testimonial.content}"</p>
                   <div className="font-semibold">{testimonial.name}</div>
                 </div>

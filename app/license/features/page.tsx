@@ -22,7 +22,7 @@ export default async function FeaturesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -105,7 +105,7 @@ export default async function FeaturesPage() {
   return (
     <div>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'License', href: '/license' }, { label: 'Features' }]} />
         </div>
@@ -183,7 +183,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Highlights */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How Our Programs Work</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -215,7 +215,7 @@ export default async function FeaturesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             {['Salesforce', 'Workday', 'ADP', 'Zoom', 'Google Workspace', 'Microsoft 365'].map((integration) => (
-              <span key={integration} className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700">
+              <span key={integration} className="bg-white px-4 py-2 rounded-lg text-gray-700">
                 {integration}
               </span>
             ))}

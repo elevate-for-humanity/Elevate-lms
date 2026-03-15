@@ -49,7 +49,7 @@ export default async function EnrollProgramPage({ params }: Props) {
     .join(' ');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-3xl mx-auto px-4">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
@@ -65,21 +65,21 @@ export default async function EnrollProgramPage({ params }: Props) {
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Program Details</h2>
                   <div className="grid md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-lg">
                       <Clock className="w-5 h-5 text-brand-blue-600" />
                       <div>
                         <p className="text-sm text-gray-500">Duration</p>
                         <p className="font-medium">{course.duration || '8-16 weeks'}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-lg">
                       <Award className="w-5 h-5 text-brand-blue-600" />
                       <div>
                         <p className="text-sm text-gray-500">Certification</p>
                         <p className="font-medium">Industry Recognized</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-lg">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       <div>
                         <p className="text-sm text-gray-500">Cost</p>
@@ -125,7 +125,7 @@ export default async function EnrollProgramPage({ params }: Props) {
                   </Link>
                   <Link
                     href={`/programs/${programSlug}`}
-                    className="flex-1 border border-gray-300 text-gray-700 text-center py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition"
+                    className="flex-1 border border-gray-300 text-gray-700 text-center py-3 px-6 rounded-lg font-semibold hover:bg-white transition"
                   >
                     View Program Details
                   </Link>
@@ -145,7 +145,7 @@ export default async function EnrollProgramPage({ params }: Props) {
                   </Link>
                   <Link
                     href="/programs"
-                    className="border border-gray-300 text-gray-700 py-3 px-8 rounded-lg font-semibold hover:bg-gray-50 transition"
+                    className="border border-gray-300 text-gray-700 py-3 px-8 rounded-lg font-semibold hover:bg-white transition"
                   >
                     Browse Programs
                   </Link>

@@ -55,7 +55,7 @@ export default async function ForEmployersPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'For Employers' }]} />
         </div>
@@ -73,7 +73,7 @@ export default async function ForEmployersPage() {
             <Link href="/employer-portal" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-2.5 rounded-lg font-bold transition text-sm">
               <Building2 className="w-4 h-4" /> Employer Portal
             </Link>
-            <Link href="/employers/post-job" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-bold hover:bg-slate-50 transition text-sm">
+            <Link href="/employers/post-job" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-bold hover:bg-white transition text-sm">
               Post a Job — Free
             </Link>
           </div>
@@ -165,7 +165,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="space-y-8">
@@ -230,7 +230,7 @@ export default async function ForEmployersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/employer-portal"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-white transition text-lg"
             >
               <Building2 className="w-5 h-5" />
               Employer Portal

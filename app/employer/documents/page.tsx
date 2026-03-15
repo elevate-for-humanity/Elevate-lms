@@ -21,7 +21,7 @@ export default async function EmployerDocumentsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -76,12 +76,12 @@ export default async function EmployerDocumentsPage() {
     };
     return (
       styles[status as keyof typeof styles] ||
-      'bg-slate-100 text-black border-slate-300'
+      'bg-white text-black border-slate-300'
     );
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <section className="bg-white border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">
@@ -126,7 +126,7 @@ export default async function EmployerDocumentsPage() {
                 return (
                   <div
                     key={req.id}
-                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       {uploaded ? (
@@ -170,7 +170,7 @@ export default async function EmployerDocumentsPage() {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-white transition"
                 >
                   <div className="flex items-center gap-3">
                     {getStatusIcon(doc.status)}

@@ -69,7 +69,7 @@ export default async function CoursesPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Courses' }]} />
         </div>
@@ -90,7 +90,7 @@ export default async function CoursesPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             {[
@@ -230,7 +230,7 @@ export default async function CoursesPage() {
             {microClasses.map((course) => (
               <div
                 key={course.id}
-                className="bg-slate-50 rounded-xl p-6 hover:shadow-lg transition-all border border-slate-100"
+                className="bg-white rounded-xl p-6 hover:shadow-lg transition-all border border-slate-100"
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-bold rounded-full">
@@ -275,7 +275,7 @@ export default async function CoursesPage() {
       </section>
 
       {/* Partner course catalogs */}
-      <section className="py-8 bg-slate-50 border-t border-slate-100">
+      <section className="py-8 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Course Catalogs by Provider</h2>
           <div className="flex flex-wrap gap-3">
@@ -302,7 +302,7 @@ export default async function CoursesPage() {
       </section>
 
       {/* COURSE COMPLETION TRACKING */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CourseCompletionTracking />
         </div>

@@ -53,7 +53,7 @@ export default async function ProgramStudentsPage({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 border-b bg-gray-50">
+                <tr className="text-left text-gray-500 border-b bg-white">
                   <th className="px-4 py-3 font-medium">Student</th>
                   <th className="px-4 py-3 font-medium text-center">Progress</th>
                   <th className="px-4 py-3 font-medium text-center">Status</th>
@@ -63,7 +63,7 @@ export default async function ProgramStudentsPage({
               </thead>
               <tbody className="divide-y">
                 {students.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
+                  <tr key={s.id} className="hover:bg-white">
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-900">{s.name}</p>
                       <p className="text-xs text-gray-500">{s.email}</p>
@@ -81,7 +81,7 @@ export default async function ProgramStudentsPage({
                         s.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' :
                         s.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-800' :
                         s.status === 'pending' ? 'bg-amber-100 text-amber-800' :
-                        'bg-gray-100 text-gray-600'
+                        'bg-white text-gray-600'
                       }`}>{s.status}</span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-xs">

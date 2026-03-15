@@ -226,7 +226,7 @@ export default function EnterpriseReviewPage() {
           <button
             type="submit"
             disabled={status === 'submitting'}
-            className="w-full bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="w-full bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors disabled:opacity-50"
           >
             {status === 'submitting' ? 'Submitting...' : 'Submit Enterprise Review Request'}
           </button>

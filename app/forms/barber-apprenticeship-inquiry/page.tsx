@@ -50,7 +50,7 @@ export default function BarberApprenticeshipInquiryPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-white py-12 px-4">
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-sm p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -71,7 +71,7 @@ export default function BarberApprenticeshipInquiryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Forms", href: "/forms" }, { label: "Barber Apprenticeship Inquiry" }]} />
       </div>

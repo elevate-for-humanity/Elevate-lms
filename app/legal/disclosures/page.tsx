@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function DisclosuresPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Disclosures" }]} />
       </div>
@@ -142,7 +142,7 @@ export default function DisclosuresPage() {
               Using this platform does not make you a partner, affiliate, representative, or agent of Elevate For Humanity. You are a customer licensing software. Nothing more.
             </p>
 
-            <div className="mt-12 pt-8 border-t border-gray-200 bg-gray-50 -mx-8 md:-mx-12 px-8 md:px-12 pb-8 -mb-8 md:-mb-12 rounded-b-xl">
+            <div className="mt-12 pt-8 border-t border-gray-200 bg-white -mx-8 md:-mx-12 px-8 md:px-12 pb-8 -mb-8 md:-mb-12 rounded-b-xl">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Acknowledgment</h2>
               <p className="text-gray-700 mb-4">
                 By using the Elevate For Humanity platform, you acknowledge that:

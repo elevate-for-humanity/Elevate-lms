@@ -26,7 +26,7 @@ export default async function CareerCoursesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <p>Unable to load courses. Please try again later.</p>
       </div>
     );
@@ -47,9 +47,9 @@ export default async function CareerCoursesPage() {
   const individualCourses = courses?.filter((c: any) => !c.is_bundle) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Courses' }]} />
         </div>

@@ -30,9 +30,9 @@ export default async function AccountLicensesPage() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Account', href: '/account' }, { label: 'Licenses' }]} />
         </div>
@@ -68,7 +68,7 @@ export default async function AccountLicensesPage() {
                       {license.license_type || 'Platform License'}
                     </h3>
                     <p className="text-gray-600 text-sm mt-1">
-                      License Key: <code className="bg-gray-100 px-2 py-1 rounded">{license.license_key}</code>
+                      License Key: <code className="bg-white px-2 py-1 rounded">{license.license_key}</code>
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

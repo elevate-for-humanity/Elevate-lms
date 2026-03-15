@@ -167,7 +167,7 @@ export default function ThreadDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
@@ -176,7 +176,7 @@ export default function ThreadDetailPage() {
   if (!thread) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Programs", href: "/programs" }, { label: "[Threadid]" }]} />
       </div>
@@ -242,7 +242,7 @@ export default function ThreadDetailPage() {
           {replies.map((reply) => (
             <div key={reply.id} className="bg-white rounded-xl border p-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-gray-600" />
                 </div>
                 <div className="flex-1">
@@ -265,7 +265,7 @@ export default function ThreadDetailPage() {
           ))}
 
           {replies.length === 0 && (
-            <div className="bg-gray-50 rounded-xl p-8 text-center">
+            <div className="bg-white rounded-xl p-8 text-center">
               <p className="text-gray-500">No replies yet. Be the first to respond!</p>
             </div>
           )}
@@ -295,7 +295,7 @@ export default function ThreadDetailPage() {
             </form>
           </div>
         ) : (
-          <div className="bg-gray-50 rounded-xl border p-6 text-center">
+          <div className="bg-white rounded-xl border p-6 text-center">
             {!user ? (
               <p className="text-gray-600">
                 <Link href="/login" className="text-brand-blue-600 font-semibold">Sign in</Link> to reply to this discussion.

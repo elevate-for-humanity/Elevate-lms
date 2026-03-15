@@ -139,7 +139,7 @@ export default async function EmployeeHandbookPage() {
     .maybeSingle();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Employee', href: '/employee' }, { label: 'Handbook' }]} />
@@ -180,7 +180,7 @@ export default async function EmployeeHandbookPage() {
           <div className="divide-y">
             {HANDBOOK_SECTIONS.map((s, i) => (
               <a key={s.id} href={`#${s.id}`}
-                className="flex items-center gap-4 px-6 py-3 hover:bg-slate-50 transition group">
+                className="flex items-center gap-4 px-6 py-3 hover:bg-white transition group">
                 <span className="text-sm text-slate-400 w-6">{i + 1}</span>
                 <s.icon className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-500" />
                 <span className="flex-1 text-sm font-medium text-slate-700 group-hover:text-brand-blue-700">{s.title}</span>
@@ -194,7 +194,7 @@ export default async function EmployeeHandbookPage() {
         <div className="space-y-6">
           {HANDBOOK_SECTIONS.map((section, i) => (
             <div key={section.id} id={section.id} className="bg-white rounded-xl border overflow-hidden scroll-mt-6">
-              <div className="px-6 py-5 border-b bg-slate-50 flex items-center gap-4">
+              <div className="px-6 py-5 border-b bg-white flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-lg bg-${section.color}-100 flex items-center justify-center`}>
                   <section.icon className={`w-5 h-5 text-${section.color}-600`} />
                 </div>

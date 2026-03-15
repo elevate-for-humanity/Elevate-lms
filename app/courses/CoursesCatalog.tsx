@@ -56,7 +56,7 @@ export default function CoursesCatalog({
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-brand-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
@@ -71,7 +71,7 @@ export default function CoursesCatalog({
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/contact"
-                className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-white transition-colors"
               >
                 Apply Now
               </Link>
@@ -363,7 +363,7 @@ export default function CoursesCatalog({
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition-colors"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors"
             >
               Apply for Free Training
             </Link>

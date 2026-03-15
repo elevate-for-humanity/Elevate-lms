@@ -236,7 +236,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
             ) : (
               <div className="space-y-3">
                 {programs.map(program => (
-                  <label key={program.id} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                  <label key={program.id} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-white ${
                     formData.programId === program.id ? 'border-brand-orange-500 bg-brand-orange-50' : ''
                   }`}>
                     <input type="radio" name="program" value={program.id} checked={formData.programId === program.id}
@@ -260,7 +260,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
             <h2 className="text-xl font-semibold mb-4">Funding Source</h2>
             <div className="space-y-3">
               {fundingTypes.map(type => (
-                <label key={type.value} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                <label key={type.value} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-white ${
                   formData.fundingType === type.value ? 'border-brand-orange-500 bg-brand-orange-50' : ''
                 }`}>
                   <input type="radio" name="funding" value={type.value} checked={formData.fundingType === type.value}
@@ -281,7 +281,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               onRemove={handleDocumentRemove}
             />
             {!isApprenticeshipProgram && (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg">
                 <p className="text-gray-600 text-sm">
                   No documents required for this program. You can proceed to the next step.
                 </p>
@@ -323,7 +323,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Review Enrollment</h2>
             <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Student Information</h3>
                 <p className="text-sm text-gray-600">{formData.firstName} {formData.lastName}</p>
                 <p className="text-sm text-gray-600">{formData.email}</p>
@@ -332,17 +332,17 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
                   <p className="text-sm text-gray-600">{formData.city}, {formData.state} {formData.zipCode}</p>
                 )}
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Program</h3>
                 <p className="text-sm text-gray-600">{selectedProgram?.name || 'No program selected'}</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Funding</h3>
                 <p className="text-sm text-gray-600">
                   {fundingTypes.find(f => f.value === formData.fundingType)?.label || 'Not specified'}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-white rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Documents</h3>
                 {uploadedDocuments.length > 0 ? (
                   <ul className="text-sm text-gray-600 space-y-1">
@@ -358,7 +358,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
                 )}
               </div>
               {formData.caseManagerName && (
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-white rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2">Case Manager</h3>
                   <p className="text-sm text-gray-600">{formData.caseManagerName}</p>
                   {formData.caseManagerEmail && <p className="text-sm text-gray-600">{formData.caseManagerEmail}</p>}

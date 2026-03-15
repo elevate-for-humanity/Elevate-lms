@@ -21,7 +21,7 @@ export default async function ThankyouPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -71,9 +71,9 @@ export default async function ThankyouPage() {
   const displayNextSteps = nextSteps && nextSteps.length > 0 ? nextSteps : defaultNextSteps;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Thank You' }]} />
         </div>
@@ -102,7 +102,7 @@ export default async function ThankyouPage() {
       </section>
 
       {/* Next Steps */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Next Steps</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -126,7 +126,7 @@ export default async function ThankyouPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <a 
               href="/support" 
-              className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
+              className="flex items-center gap-4 bg-white rounded-xl p-6 hover:bg-white transition"
             >
               <Phone className="w-8 h-8 text-brand-blue-600" />
               <div>
@@ -136,7 +136,7 @@ export default async function ThankyouPage() {
             </a>
             <a 
               href="/contact" 
-              className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
+              className="flex items-center gap-4 bg-white rounded-xl p-6 hover:bg-white transition"
             >
               <Mail className="w-8 h-8 text-brand-blue-600" />
               <div>
@@ -146,7 +146,7 @@ export default async function ThankyouPage() {
             </a>
             <Link 
               href="/booking" 
-              className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
+              className="flex items-center gap-4 bg-white rounded-xl p-6 hover:bg-white transition"
             >
               <Calendar className="w-8 h-8 text-brand-blue-600" />
               <div>
@@ -160,7 +160,7 @@ export default async function ThankyouPage() {
 
       {/* Suggested Programs */}
       {programs && programs.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4">
             <h2 className="text-2xl font-bold text-center mb-8">Explore Our Programs</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -198,7 +198,7 @@ export default async function ThankyouPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/programs"
-              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-white transition"
             >
               View All Programs
             </Link>

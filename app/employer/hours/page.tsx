@@ -59,12 +59,12 @@ export default async function EmployerHoursPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/employer-page-1.jpg" alt="Employer hours management" fill sizes="100vw" className="object-cover" priority />
       </section>
 
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Employer', href: '/employer' },

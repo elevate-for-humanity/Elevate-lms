@@ -116,7 +116,7 @@ export default async function CaseManagerDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-900 text-white px-6 py-8">
         <div className="max-w-6xl mx-auto">
@@ -164,7 +164,7 @@ export default async function CaseManagerDashboardPage() {
                 <li key={p.id}>
                   <Link
                     href={`/case-manager/participants/${p.id}`}
-                    className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition"
+                    className="flex items-center justify-between px-5 py-3 hover:bg-white transition"
                   >
                     <div>
                       <p className="font-medium text-slate-900 text-sm">{p.full_name ?? 'Unknown'}</p>
@@ -191,7 +191,7 @@ export default async function CaseManagerDashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
+                  <tr className="bg-white border-b border-slate-100">
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Participant</th>
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Program</th>
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Funding</th>
@@ -201,7 +201,7 @@ export default async function CaseManagerDashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {recentEnrollments.map((e: any) => (
-                    <tr key={e.id} className="hover:bg-slate-50">
+                    <tr key={e.id} className="hover:bg-white">
                       <td className="px-5 py-3">
                         <Link
                           href={`/case-manager/participants/${e.user?.id}`}
@@ -216,7 +216,7 @@ export default async function CaseManagerDashboardPage() {
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
                           e.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700'
                           : e.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700'
-                          : 'bg-slate-100 text-slate-600'
+                          : 'bg-white text-slate-600'
                         }`}>
                           {e.status}
                         </span>

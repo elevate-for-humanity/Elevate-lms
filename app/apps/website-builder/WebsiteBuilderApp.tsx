@@ -65,7 +65,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Trial Banner */}
       {subscription.status === 'trial' && trialDaysRemaining > 0 && (
         <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
@@ -207,7 +207,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
                         selectedTemplate === template.id ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="w-full aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
+                      <div className="w-full aspect-video bg-white rounded mb-3 flex items-center justify-center">
                         <Layout className="w-8 h-8 text-gray-400" />
                       </div>
                       <h4 className="font-bold">{template.name}</h4>

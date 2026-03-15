@@ -21,7 +21,7 @@ export default async function CreatorProductsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -50,7 +50,7 @@ export default async function CreatorProductsPage() {
     }, {}) || {};
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-8 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Creator", href: "/creator" }, { label: "Products" }]} />
       </div>
@@ -103,11 +103,11 @@ export default async function CreatorProductsPage() {
             {products.map((product) => {
               const salesCount = salesByProduct[product.id] || 0;
               const statusColors = {
-                draft: 'bg-gray-100 text-black',
+                draft: 'bg-white text-black',
                 pending_review: 'bg-yellow-100 text-yellow-700',
                 approved: 'bg-brand-green-100 text-brand-green-700',
                 rejected: 'bg-brand-red-100 text-brand-red-700',
-                archived: 'bg-gray-100 text-black',
+                archived: 'bg-white text-black',
               };
 
               return (
@@ -181,7 +181,7 @@ export default async function CreatorProductsPage() {
                     <div className="flex gap-2">
                       <Link
                         href={`/creator/products/${product.id}/edit`}
-                        className="flex-1 text-center border border-gray-300 text-black py-2 rounded hover:bg-gray-50 transition text-sm"
+                        className="flex-1 text-center border border-gray-300 text-black py-2 rounded hover:bg-white transition text-sm"
                       >
                         Edit
                       </Link>

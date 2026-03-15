@@ -94,7 +94,7 @@ export default async function SelectSchedulePage() {
   if (!user) redirect('/login');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* VIDEO HERO — getting started, full bleed */}
       <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>

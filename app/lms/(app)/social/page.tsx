@@ -24,7 +24,7 @@ export default async function SocialPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -46,7 +46,7 @@ export default async function SocialPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -95,15 +95,15 @@ export default async function SocialPage() {
             <div className="bg-white rounded-xl p-4 shadow-sm border">
               <h3 className="font-semibold text-gray-900 mb-3">Quick Links</h3>
               <nav className="space-y-1">
-                <Link href="/lms/social/connections" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700">
+                <Link href="/lms/social/connections" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white text-gray-700">
                   <UserPlus className="w-5 h-5 text-gray-400" />
                   Find Connections
                 </Link>
-                <Link href="/lms/social/groups" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700">
+                <Link href="/lms/social/groups" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white text-gray-700">
                   <Users className="w-5 h-5 text-gray-400" />
                   Study Groups
                 </Link>
-                <Link href="/lms/social/trending" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700">
+                <Link href="/lms/social/trending" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white text-gray-700">
                   <TrendingUp className="w-5 h-5 text-gray-400" />
                   Trending Topics
                 </Link>
@@ -123,16 +123,16 @@ export default async function SocialPage() {
                     <Users className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
-                <button className="flex-1 text-left px-4 py-3 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
+                <button className="flex-1 text-left px-4 py-3 bg-white rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
                   Share an update or achievement...
                 </button>
               </div>
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white text-gray-600">
                   <ImageIcon className="w-5 h-5 text-brand-green-600" />
                   Photo
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white text-gray-600">
                   <MessageSquare className="w-5 h-5 text-brand-blue-600" />
                   Article
                 </button>
@@ -159,7 +159,7 @@ export default async function SocialPage() {
                 </Link>
                 <Link
                   href="/lms/social/groups"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white border rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white border rounded-lg hover:bg-white text-gray-700 font-medium"
                 >
                   <Users className="w-5 h-5" />
                   Browse Groups
@@ -207,15 +207,15 @@ export default async function SocialPage() {
             <div className="bg-white rounded-xl p-4 shadow-sm border">
               <h3 className="font-semibold text-gray-900 mb-4">Popular Groups</h3>
               <div className="space-y-3">
-                <Link href="/lms/social/groups/healthcare" className="block p-3 rounded-lg hover:bg-gray-50">
+                <Link href="/lms/social/groups/healthcare" className="block p-3 rounded-lg hover:bg-white">
                   <div className="font-medium text-gray-900">Healthcare Professionals</div>
                   <div className="text-sm text-gray-500">234 members</div>
                 </Link>
-                <Link href="/lms/social/groups/trades" className="block p-3 rounded-lg hover:bg-gray-50">
+                <Link href="/lms/social/groups/trades" className="block p-3 rounded-lg hover:bg-white">
                   <div className="font-medium text-gray-900">Skilled Trades Network</div>
                   <div className="text-sm text-gray-500">189 members</div>
                 </Link>
-                <Link href="/lms/social/groups/career" className="block p-3 rounded-lg hover:bg-gray-50">
+                <Link href="/lms/social/groups/career" className="block p-3 rounded-lg hover:bg-white">
                   <div className="font-medium text-gray-900">Career Changers</div>
                   <div className="text-sm text-gray-500">156 members</div>
                 </Link>

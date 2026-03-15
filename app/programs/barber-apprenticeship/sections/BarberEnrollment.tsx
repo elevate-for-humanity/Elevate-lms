@@ -8,7 +8,7 @@ export function BarberEnrollment() {
   return (
     <>
       {/* Section 10 — Tuition, Funding & Payment */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition, Funding &amp; Payment Options</h2>
           <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
@@ -64,7 +64,7 @@ export function BarberEnrollment() {
       <section className="py-12 bg-brand-orange-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="text-white">
+            <div className="text-slate-900">
               <div className="flex items-center gap-3 mb-4">
                 <Scissors className="w-8 h-8" />
                 <h2 className="text-2xl md:text-3xl font-black">Own a Barbershop?</h2>
@@ -79,7 +79,7 @@ export function BarberEnrollment() {
                 <li>&#x2022; Recognition as an approved training site</li>
               </ul>
               <div className="flex flex-wrap gap-3">
-                <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-white transition-colors">
                   Apply as Partner Shop <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-white/20 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/30 transition-colors border border-white/40">
@@ -114,7 +114,7 @@ export function BarberEnrollment() {
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 text-center mb-4">Eligibility &amp; Enrollment</h2>
 
           {/* Eligibility */}
-          <div className="max-w-2xl mx-auto mb-10 bg-slate-50 p-6 rounded-xl border border-slate-200">
+          <div className="max-w-2xl mx-auto mb-10 bg-white p-6 rounded-xl border border-slate-200">
             <h3 className="font-bold text-slate-900 mb-3">Eligibility Requirements</h3>
             <div className="space-y-2">
               {ELIGIBILITY.map((req, i) => (
@@ -127,7 +127,7 @@ export function BarberEnrollment() {
           </div>
 
           {/* Funding info */}
-          <div className="max-w-2xl mx-auto mb-10 bg-slate-50 p-6 rounded-xl border border-slate-200">
+          <div className="max-w-2xl mx-auto mb-10 bg-white p-6 rounded-xl border border-slate-200">
             <h3 className="font-bold text-slate-900 mb-3">Funding Sources</h3>
             <div className="space-y-3">
               <p className="text-sm text-slate-700">
@@ -147,7 +147,7 @@ export function BarberEnrollment() {
             <h3 className="font-bold text-xl text-slate-900 text-center mb-6">How to Enroll</h3>
             <div className="space-y-3">
               {ENROLLMENT_STEPS.map((step, i) => (
-                <div key={i} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <div key={i} className="flex items-start gap-4 bg-white rounded-lg p-4 border border-slate-200">
                   <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {i + 1}
                   </div>
@@ -163,7 +163,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* Section 12 — Compliance & Workforce Alignment */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
             <div className="flex items-start gap-3">
@@ -177,7 +177,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-amber-900 rounded-full animate-pulse" />

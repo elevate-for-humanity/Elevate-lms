@@ -138,7 +138,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
               <p className="text-slate-600">{learner.email}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  learner.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-800'
+                  learner.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-white text-gray-800'
                 }`}>
                   {learner.status || 'Active'}
                 </span>
@@ -148,7 +148,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
           <div className="flex gap-2">
             <Link
               href={`/cm/learners/${id}/message`}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50"
+              className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-white"
             >
               <MessageSquare className="w-4 h-4" />
               Message
@@ -226,7 +226,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
             {goals && goals.length > 0 ? (
               <div className="space-y-3">
                 {goals.slice(0, 5).map((goal: any) => (
-                  <div key={goal.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div key={goal.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         goal.status === 'completed' ? 'bg-brand-green-100' : 'bg-yellow-100'
@@ -247,7 +247,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       goal.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' :
                       goal.status === 'in_progress' ? 'bg-brand-blue-100 text-brand-blue-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-white text-gray-800'
                     }`}>
                       {goal.status?.replace('_', ' ')}
                     </span>
@@ -281,7 +281,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                     </div>
                     <p className="text-slate-700">{note.content}</p>
                     {note.type && (
-                      <span className="inline-block mt-2 px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
+                      <span className="inline-block mt-2 px-2 py-0.5 bg-white text-slate-600 rounded text-xs">
                         {note.type}
                       </span>
                     )}
@@ -291,7 +291,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
             ) : (
               <p className="text-slate-500 text-center py-4">No case notes</p>
             )}
-            <button className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
+            <button className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-white">
               <FileText className="w-4 h-4" />
               Add Case Note
             </button>
@@ -305,7 +305,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
             {enrollments && enrollments.length > 0 ? (
               <div className="space-y-3">
                 {enrollments.map((enrollment: any) => (
-                  <div key={enrollment.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div key={enrollment.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                     <div>
                       <p className="font-medium text-slate-900">
                         {enrollment.programs?.name || enrollment.courses?.title || 'Unknown'}
@@ -393,7 +393,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                     href={doc.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg"
+                    className="flex items-center gap-3 p-2 hover:bg-white rounded-lg"
                   >
                     <FileText className="w-5 h-5 text-slate-500" />
                     <span className="text-sm text-slate-700 truncate">{doc.name}</span>
@@ -411,21 +411,21 @@ export default async function CMLearnerDetailPage({ params }: Props) {
             <div className="space-y-2">
               <Link
                 href={`/cm/learners/${id}/assessment`}
-                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg"
+                className="w-full flex items-center gap-3 p-3 hover:bg-white rounded-lg"
               >
                 <Target className="w-5 h-5 text-slate-500" />
                 <span>Run Assessment</span>
               </Link>
               <Link
                 href={`/cm/learners/${id}/enroll`}
-                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg"
+                className="w-full flex items-center gap-3 p-3 hover:bg-white rounded-lg"
               >
                 <BookOpen className="w-5 h-5 text-slate-500" />
                 <span>Enroll in Program</span>
               </Link>
               <Link
                 href={`/cm/learners/${id}/schedule`}
-                className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg"
+                className="w-full flex items-center gap-3 p-3 hover:bg-white rounded-lg"
               >
                 <Calendar className="w-5 h-5 text-slate-500" />
                 <span>Schedule Meeting</span>

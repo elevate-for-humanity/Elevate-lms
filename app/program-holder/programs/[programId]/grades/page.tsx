@@ -71,7 +71,7 @@ export default async function ProgramGradesPage({
                 {items.map((item: any) => {
                   const profile = item.profiles as any;
                   return (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id} className="hover:bg-white">
                       <td className="py-3">
                         <p className="font-medium text-gray-900">{profile?.full_name || 'Unknown'}</p>
                         <p className="text-xs text-gray-500">{profile?.email || ''}</p>
@@ -82,7 +82,7 @@ export default async function ProgramGradesPage({
                         <span className={`text-xs font-medium px-2 py-1 rounded ${
                           item.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' :
                           item.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-800' :
-                          'bg-gray-100 text-gray-600'
+                          'bg-white text-gray-600'
                         }`}>{item.status}</span>
                       </td>
                     </tr>

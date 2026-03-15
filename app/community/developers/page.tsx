@@ -21,7 +21,7 @@ export default async function DevelopersPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -55,9 +55,9 @@ export default async function DevelopersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Developers' }]} />
         </div>
@@ -90,13 +90,13 @@ export default async function DevelopersPage() {
               </h2>
               <div className="bg-white rounded-xl border divide-y">
                 {apiEndpoints.map((endpoint, index) => (
-                  <div key={index} className="p-4 hover:bg-gray-50">
+                  <div key={index} className="p-4 hover:bg-white">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold">{endpoint.name}</h3>
                         <p className="text-sm text-gray-600">{endpoint.description}</p>
                       </div>
-                      <code className="text-sm bg-slate-100 px-3 py-1 rounded font-mono">
+                      <code className="text-sm bg-white px-3 py-1 rounded font-mono">
                         {endpoint.path}
                       </code>
                     </div>
@@ -151,7 +151,7 @@ const client = new ElevateClient({
                     >
                       <h3 className="font-bold mb-2">{example.title}</h3>
                       <p className="text-gray-600 text-sm mb-3">{example.description}</p>
-                      <span className="text-xs bg-slate-100 px-2 py-1 rounded">
+                      <span className="text-xs bg-white px-2 py-1 rounded">
                         {example.language}
                       </span>
                     </Link>
@@ -212,7 +212,7 @@ const client = new ElevateClient({
             </section>
 
             {/* Support */}
-            <section className="bg-slate-100 rounded-xl p-6">
+            <section className="bg-white rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Need Help?</h3>
               <p className="text-gray-600 text-sm mb-4">
                 Our developer support team is here to help with integration questions.

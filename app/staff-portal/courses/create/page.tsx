@@ -97,7 +97,7 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -244,7 +244,7 @@ export default function CreateCoursePage() {
             <Link href="/staff-portal/courses" className="px-6 py-3 text-gray-600 hover:text-gray-900">Cancel</Link>
             <div className="flex gap-4">
               <button type="button" onClick={(e) => handleSubmit(e, true)} disabled={isSubmitting}
-                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 disabled:opacity-50">
+                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white text-gray-700 disabled:opacity-50">
                 Save as Draft
               </button>
               <button type="submit" disabled={isSubmitting}

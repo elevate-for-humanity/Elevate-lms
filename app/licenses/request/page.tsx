@@ -40,7 +40,7 @@ export default function LicenseRequestPage() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -58,7 +58,7 @@ export default function LicenseRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
+    <div className="min-h-screen bg-white py-16 px-4">
       <Breadcrumbs
         items={[
           { label: 'Licenses', href: '/licenses' },
@@ -197,7 +197,7 @@ export default function LicenseRequestPage() {
             />
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+          <div className="bg-white rounded-lg p-4 text-sm text-gray-600">
             By submitting this request, you acknowledge that licensing requires an active subscription 
             and that non-payment results in platform lockout.
           </div>

@@ -199,7 +199,7 @@ export function HoursApprovalQueue() {
                   </div>
 
                   {entry.notes && (
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-sm text-gray-700">{entry.notes}</p>
                     </div>
                   )}

@@ -242,7 +242,7 @@ export default function DocumentUploadPage() {
                   )}
                   <button
                     onClick={() => removeFile(file.name)}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-white rounded"
                     disabled={file.status === 'uploading'}
                   >
                     <X className="w-4 h-4 text-black" />
@@ -391,7 +391,7 @@ export default function DocumentUploadPage() {
           </a>
           <Link
             href="/tax/book-appointment"
-            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-gray-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-white transition"
           >
             Book Appointment Online
           </Link>

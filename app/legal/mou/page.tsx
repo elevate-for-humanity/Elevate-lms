@@ -35,7 +35,7 @@ export default function MOUPage() {
         </DocumentSection>
 
         <DocumentSection heading="Parties" number={2}>
-          <div className="bg-slate-50 p-4 rounded-lg mb-3">
+          <div className="bg-white p-4 rounded-lg mb-3">
             <p>
               <strong>Elevate for Humanity</strong><br />
               Registered Apprenticeship Sponsor<br />
@@ -120,7 +120,7 @@ export default function MOUPage() {
 
         <DocumentSection heading="Contact Information" number={10}>
           <p>For questions regarding this Memorandum of Understanding:</p>
-          <div className="bg-slate-50 p-4 rounded-lg">
+          <div className="bg-white p-4 rounded-lg">
             <p>
               <strong>Elevate for Humanity</strong><br />
               Email: info@elevateforhumanity.org<br />

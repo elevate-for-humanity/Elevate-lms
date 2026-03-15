@@ -58,8 +58,8 @@ export default function EnrollmentDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-24 bg-gray-100 rounded"></div>
-          <div className="h-24 bg-gray-100 rounded"></div>
+          <div className="h-24 bg-white rounded"></div>
+          <div className="h-24 bg-white rounded"></div>
         </div>
       </div>
     );
@@ -160,7 +160,7 @@ export default function EnrollmentDashboard() {
                         <span>Progress</span>
                         <span>{enrollment.progress}%</span>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-white rounded-full overflow-hidden">
                         <div
                           className="h-full bg-brand-blue-500 rounded-full transition-all"
                           style={{ width: `${enrollment.progress}%` }}

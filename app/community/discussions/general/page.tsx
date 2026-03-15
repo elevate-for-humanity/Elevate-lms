@@ -47,9 +47,9 @@ export default async function GeneralDiscussionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Discussions', href: '/community/discussions' }, { label: 'General' }]} />
         </div>
@@ -78,9 +78,9 @@ export default async function GeneralDiscussionsPage() {
           {discussions && discussions.length > 0 ? (
             discussions.map((discussion: any) => (
               <Link key={discussion.id} href={`/community/discussions/${discussion.id}`}
-                className="block p-4 hover:bg-gray-50 transition">
+                className="block p-4 hover:bg-white transition">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                     {discussion.author?.avatar_url ? (
                       <Image src={discussion.author.avatar_url} alt="Author avatar" width={40} height={40} className="w-full h-full rounded-full object-cover" />
                     ) : (

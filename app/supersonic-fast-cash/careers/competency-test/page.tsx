@@ -408,7 +408,7 @@ export default function CompetencyTest() {
 
   if (!started) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h1 className="text-3xl font-bold mb-6">
@@ -483,7 +483,7 @@ export default function CompetencyTest() {
   if (submitted) {
     const passed = score >= 80;
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-8">
@@ -596,7 +596,7 @@ export default function CompetencyTest() {
   const progress = ((currentQuestion + 1) / COMPETENCY_QUESTIONS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Competency Test" }]} />
       </div>
@@ -703,7 +703,7 @@ export default function CompetencyTest() {
                       ? 'bg-brand-green-600 text-white'
                       : answers[index] !== -1
                         ? 'bg-brand-green-100 text-brand-green-700 border border-brand-green-300'
-                        : 'bg-gray-100 text-black border border-gray-300'
+                        : 'bg-white text-black border border-gray-300'
                   }`}
                 >
                   {index + 1}

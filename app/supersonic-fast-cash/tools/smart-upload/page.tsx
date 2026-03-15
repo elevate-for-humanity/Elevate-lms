@@ -223,7 +223,7 @@ export default function SmartUploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Smart Upload" }]} />
       </div>
@@ -331,7 +331,7 @@ export default function SmartUploadPage() {
               >
                 <div className="flex items-start gap-6">
                   {/* Preview */}
-                  <div className="relative w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="relative w-32 h-32 bg-white rounded-lg overflow-hidden flex-shrink-0">
                     {file.file.type.startsWith('image/') ? (
                       <Image
                         src={file.preview}
@@ -387,7 +387,7 @@ export default function SmartUploadPage() {
                         )}
                         <button
                           onClick={() => removeFile(file.id)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition"
+                          className="p-2 hover:bg-white rounded-lg transition"
                         >
                           <Trash2 className="w-4 h-4 text-black" />
                         </button>

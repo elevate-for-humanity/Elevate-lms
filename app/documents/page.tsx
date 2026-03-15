@@ -64,7 +64,7 @@ export default async function DocumentsPage() {
   const categories = ['All', ...new Set(uniqueDocuments.map(d => d.category || 'Uncategorized'))];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-6xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>
@@ -91,7 +91,7 @@ export default async function DocumentsPage() {
           <div className="flex gap-2 overflow-x-auto">
             {categories.slice(0, 6).map(cat => (
               <button key={cat}
-                className="px-4 py-2 rounded-lg text-sm whitespace-nowrap bg-white border hover:bg-gray-50">
+                className="px-4 py-2 rounded-lg text-sm whitespace-nowrap bg-white border hover:bg-white">
                 {cat}
               </button>
             ))}
@@ -100,7 +100,7 @@ export default async function DocumentsPage() {
 
         <div className="bg-white rounded-xl border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Document</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Category</th>
@@ -112,7 +112,7 @@ export default async function DocumentsPage() {
             <tbody className="divide-y">
               {uniqueDocuments.length > 0 ? (
                 uniqueDocuments.map((doc: any) => (
-                  <tr key={doc.id} className="hover:bg-gray-50">
+                  <tr key={doc.id} className="hover:bg-white">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <FileText className={`w-5 h-5 ${getFileIcon(doc.mime_type)}`} />
@@ -123,7 +123,7 @@ export default async function DocumentsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="px-2 py-1 bg-gray-100 rounded text-sm">{doc.category || 'General'}</span>
+                      <span className="px-2 py-1 bg-white rounded text-sm">{doc.category || 'General'}</span>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
                       {doc.file_size ? `${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
@@ -136,11 +136,11 @@ export default async function DocumentsPage() {
                         {doc.url && (
                           <>
                             <a href={doc.url} target="_blank" rel="noopener noreferrer"
-                              className="p-2 hover:bg-gray-100 rounded" title="Preview">
+                              className="p-2 hover:bg-white rounded" title="Preview">
                               <Eye className="w-4 h-4 text-gray-500" />
                             </a>
                             <a href={doc.url} download
-                              className="p-2 hover:bg-gray-100 rounded" title="Download">
+                              className="p-2 hover:bg-white rounded" title="Download">
                               <Download className="w-4 h-4 text-gray-500" />
                             </a>
                           </>

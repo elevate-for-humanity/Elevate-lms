@@ -263,7 +263,7 @@ function LegalAgreementsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading agreements...</p>
@@ -274,7 +274,7 @@ function LegalAgreementsContent() {
 
   if (missingAgreements.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-brand-green-600" />
@@ -287,7 +287,7 @@ function LegalAgreementsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] overflow-hidden bg-slate-900">
@@ -299,7 +299,7 @@ function LegalAgreementsContent() {
           className="object-cover opacity-40"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
+        
         <div className="relative h-full flex items-end pb-8">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 w-full">
             <p className="text-brand-blue-300 text-xs font-bold uppercase tracking-widest mb-2">Onboarding</p>
@@ -346,7 +346,7 @@ function LegalAgreementsContent() {
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
                     isSigned ? 'bg-brand-green-50 border-brand-green-200 text-brand-green-700'
                     : isCurrent ? 'bg-brand-blue-50 border-brand-blue-300 text-brand-blue-700'
-                    : 'bg-slate-50 border-slate-200 text-slate-500'
+                    : 'bg-white border-slate-200 text-slate-500'
                   }`}
                 >
                   {isSigned
@@ -380,7 +380,7 @@ function LegalAgreementsContent() {
               sizes="(max-width: 768px) 100vw, 672px"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+            
             <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end gap-4">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 border border-white/30">
                 <AgreementIcon className="w-6 h-6 text-white" />
@@ -497,7 +497,7 @@ function LegalAgreementsContent() {
             )}
 
             {/* Acknowledgment */}
-            <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+            <label className="flex items-start gap-3 cursor-pointer p-4 bg-white rounded-xl border border-slate-200 hover:bg-white transition-colors">
               <input
                 type="checkbox"
                 checked={acknowledged}
@@ -552,7 +552,7 @@ function LegalAgreementsContent() {
             <div key={badge.label} className="relative rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-20">
                 <Image src={badge.img} alt={badge.label} fill sizes="33vw" className="object-cover" />
-                <div className="absolute inset-0 bg-slate-900/60" />
+                
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white text-xs font-bold text-center px-2 leading-tight">{badge.label}</span>
                 </div>
@@ -569,7 +569,7 @@ function LegalAgreementsContent() {
 export default function LegalAgreementsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading...</p>

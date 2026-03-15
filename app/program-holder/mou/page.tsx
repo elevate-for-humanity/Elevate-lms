@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 export default async function ProgramHolderMOUPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   const { data: mou } = await db.from('mous').select('*').eq('user_id', user.id).single();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/program-holder" className="hover:text-primary">Program Holder</Link></li><li>/</li><li className="text-gray-900 font-medium">MOU</li></ol></nav>
@@ -45,7 +45,7 @@ export default async function ProgramHolderMOUPage() {
             </div>
             <div className="flex gap-4">
               <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Download MOU</button>
-              <button className="border px-4 py-2 rounded-lg hover:bg-gray-50">Request Amendment</button>
+              <button className="border px-4 py-2 rounded-lg hover:bg-white">Request Amendment</button>
             </div>
           </div>
         ) : (

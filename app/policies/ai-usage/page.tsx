@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function AIUsagePage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Ai Usage" }]} />
       </div>
@@ -112,7 +112,7 @@ export default function AIUsagePage() {
             </ul>
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">How to Disclose</h3>
-            <div className="bg-gray-50 rounded-lg p-6 border-2 border-gray-200 mb-6">
+            <div className="bg-white rounded-lg p-6 border-2 border-gray-200 mb-6">
               <p className="text-black mb-4">
                 Include a statement with your submission:
               </p>

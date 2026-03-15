@@ -63,7 +63,7 @@ export default async function ProgramHolderPayrollPage() {
   const verificationStatus = payoutProfile?.verification_status ?? 'unverified';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -81,7 +81,7 @@ export default async function ProgramHolderPayrollPage() {
             <p className="text-slate-500 text-sm mt-1">Manage your pay method, view earnings, and run payroll for your staff</p>
           </div>
           <Link href="/program-holder/payroll"
-            className="flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm font-medium">
+            className="flex items-center gap-2 border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-white text-sm font-medium">
             <Settings className="w-4 h-4" /> Payout Settings
           </Link>
         </div>
@@ -154,7 +154,7 @@ export default async function ProgramHolderPayrollPage() {
                   : 'bg-white hover:border-brand-blue-300 hover:bg-brand-blue-50'
               }`}>
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                primary ? 'bg-brand-blue-500' : 'bg-slate-100 group-hover:bg-brand-blue-100'
+                primary ? 'bg-brand-blue-500' : 'bg-white group-hover:bg-brand-blue-100'
               }`}>
                 <Icon className={`w-5 h-5 ${primary ? 'text-white' : 'text-slate-500 group-hover:text-brand-blue-600'}`} />
               </div>
@@ -202,7 +202,7 @@ export default async function ProgramHolderPayrollPage() {
                         Pay date: {run ? fmtDate(run.pay_date) : '—'}
                         {run?.status && (
                           <span className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${
-                            run.status === 'paid' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-slate-100 text-slate-600'
+                            run.status === 'paid' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-slate-600'
                           }`}>{run.status}</span>
                         )}
                       </p>
@@ -248,7 +248,7 @@ export default async function ProgramHolderPayrollPage() {
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                         run.status === 'paid' ? 'bg-brand-green-100 text-brand-green-700' :
                         run.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-slate-100 text-slate-600'
+                        'bg-white text-slate-600'
                       }`}>{run.status}</span>
                       <span className="text-sm font-semibold text-slate-900">
                         {fmtDate(run.pay_period_start)} – {fmtDate(run.pay_period_end)}

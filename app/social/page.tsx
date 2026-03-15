@@ -242,7 +242,7 @@ export default function SocialMediaPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Social' }]} />
         </div>
@@ -263,7 +263,7 @@ export default function SocialMediaPage() {
       </section>
 
       {/* Social Platform Cards */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
@@ -393,7 +393,7 @@ export default function SocialMediaPage() {
       </section>
 
       {/* Recent Posts Feed */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
@@ -411,7 +411,7 @@ export default function SocialMediaPage() {
                 className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                     <post.icon className="w-5 h-5 text-slate-700" />
                   </div>
                   <div>
@@ -467,7 +467,7 @@ export default function SocialMediaPage() {
                 href={platform.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-full font-medium hover:bg-slate-100 transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-full font-medium hover:bg-white transition-all hover:scale-105"
               >
                 <platform.icon className="w-5 h-5" />
                 {platform.name}

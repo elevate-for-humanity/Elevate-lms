@@ -29,9 +29,9 @@ export default function PayrollHistoryPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Employee', href: '/employee' }, { label: 'Payroll', href: '/employee/payroll' }, { label: 'History' }]} />
         </div>
@@ -55,7 +55,7 @@ export default function PayrollHistoryPage() {
               <option value="2025">2025</option>
               <option value="2024">2024</option>
             </select>
-            <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center">
+            <button className="bg-white hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center">
               <Download className="w-4 h-4 mr-2" />
               Export All
             </button>
@@ -88,7 +88,7 @@ export default function PayrollHistoryPage() {
         {/* Pay History Table */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Pay Period</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Pay Date</th>
@@ -100,7 +100,7 @@ export default function PayrollHistoryPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {payHistory.map((pay) => (
-                <tr key={pay.id} className="hover:bg-gray-50">
+                <tr key={pay.id} className="hover:bg-white">
                   <td className="px-6 py-4 text-gray-900 font-medium">{pay.period}</td>
                   <td className="px-6 py-4 text-gray-600">{pay.date}</td>
                   <td className="px-6 py-4 text-right text-gray-600">{pay.hours}</td>

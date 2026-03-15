@@ -55,7 +55,7 @@ export default function CreateOrgPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "(Dashboard)", href: "/(dashboard)" }, { label: "Create" }]} />
       </div>
@@ -121,7 +121,7 @@ export default function CreateOrgPage() {
                 URL Slug
               </label>
               <div className="mt-1 flex rounded-md shadow-sm">
-                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-black text-sm">
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-white text-black text-sm">
                   elevatecareertraining.com/org/
                 </span>
                 <input

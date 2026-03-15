@@ -144,7 +144,7 @@ export default async function ProviderDashboardPage() {
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   prog.published && prog.is_active ? 'bg-green-100 text-green-700'
                   : prog.status === 'pending_review' ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-slate-100 text-slate-500'
+                  : 'bg-white text-slate-500'
                 }`}>
                   {prog.published && prog.is_active ? 'Published'
                     : prog.status === 'pending_review' ? 'Under Review'

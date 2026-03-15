@@ -21,7 +21,7 @@ export default async function PartnerCoursesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -62,7 +62,7 @@ export default async function PartnerCoursesPage() {
     ) || {};
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },
@@ -197,7 +197,7 @@ export default async function PartnerCoursesPage() {
 
                 {partnerCourses.length > 6 && (
                   <div className="mt-6 text-center">
-                    <button className="px-6 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200" aria-label="Action button">
+                    <button className="px-6 py-2 bg-white text-black rounded-lg hover:bg-gray-200" aria-label="Action button">
                       View All {partnerCourses.length} {partnerName} Courses
                     </button>
                   </div>

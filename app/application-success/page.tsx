@@ -21,7 +21,7 @@ export default async function ApplicationSuccessPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -33,9 +33,9 @@ export default async function ApplicationSuccessPage() {
   // Log success page visit
   await db.from('page_views').insert({ page: 'application_success' }).select();
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Success' }]} />
         </div>
@@ -56,7 +56,7 @@ export default async function ApplicationSuccessPage() {
           One of two things happens: you'll be approved and receive your next step to enroll, or we'll send you a request for any missing items and your application pauses until it's provided.
         </p>
 
-        <div className="rounded-xl border bg-gray-50 p-6 text-left mb-8">
+        <div className="rounded-xl border bg-white p-6 text-left mb-8">
           <h2 className="text-lg font-semibold text-black mb-4">
             Next: Review & Enrollment Steps
           </h2>
@@ -114,7 +114,7 @@ export default async function ApplicationSuccessPage() {
           </a>
           <Link
             href="/"
-            className="block w-full rounded-xl border px-6 py-3 text-center font-semibold text-black hover:bg-gray-50"
+            className="block w-full rounded-xl border px-6 py-3 text-center font-semibold text-black hover:bg-white"
           >
             Return to Home
           </Link>

@@ -53,7 +53,7 @@ const tocItems = [
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Privacy Policy' }]} />
         </div>
@@ -176,7 +176,7 @@ export default function PrivacyPolicyPage() {
             <Section id="info-sharing" number="04" title="Information Sharing & Disclosure">
               <p>We do <strong>not</strong> sell personal information to third parties. We may share information with:</p>
 
-              <div className="bg-slate-50 rounded-lg p-5 space-y-3">
+              <div className="bg-white rounded-lg p-5 space-y-3">
                 <div>
                   <p className="font-semibold text-slate-900">Workforce Development Agencies</p>
                   <p className="text-sm">Indiana DWD, WorkOne, EmployIndy — as required for WIOA, WRG, and JRI funding compliance and outcome reporting.</p>
@@ -260,7 +260,7 @@ export default function PrivacyPolicyPage() {
               <p>Our website uses the following types of cookies:</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-white">
                     <tr>
                       <th className="text-left p-3 font-semibold border-b">Type</th>
                       <th className="text-left p-3 font-semibold border-b">Purpose</th>
@@ -319,7 +319,7 @@ export default function PrivacyPolicyPage() {
             <Section id="data-retention" number="09" title="Data Retention">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-white">
                     <tr>
                       <th className="text-left p-3 font-semibold border-b">Data Type</th>
                       <th className="text-left p-3 font-semibold border-b">Retention Period</th>
@@ -397,7 +397,7 @@ export default function PrivacyPolicyPage() {
               <p>We use the following third-party services that may process your data:</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-white">
                     <tr>
                       <th className="text-left p-3 font-semibold border-b">Service</th>
                       <th className="text-left p-3 font-semibold border-b">Purpose</th>
@@ -470,7 +470,7 @@ export default function PrivacyPolicyPage() {
 
             {/* 14 Contact */}
             <Section id="contact" number="14" title="Contact Information">
-              <div className="bg-slate-50 rounded-xl p-6 not-prose">
+              <div className="bg-white rounded-xl p-6 not-prose">
                 <p className="font-bold text-slate-900 text-lg mb-1">{LEGAL_ENTITY}</p>
                 <p className="text-slate-500 text-sm mb-3">d/b/a {ORG_NAME}</p>
                 <div className="grid sm:grid-cols-2 gap-4 text-sm text-slate-700">

@@ -61,7 +61,7 @@ export default function ResumeBuildingPage() {
 
   return (
     <div className="bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Resume Building' }]} />
         </div>
@@ -89,7 +89,7 @@ export default function ResumeBuildingPage() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition">
+            <div className="bg-white rounded-xl p-8 text-center hover:shadow-lg transition">
               <FileText className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Resume Review</h3>
               <p className="text-gray-600 mb-4">
@@ -107,7 +107,7 @@ export default function ResumeBuildingPage() {
               <p className="text-brand-green-600 font-bold">Most Popular</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition">
+            <div className="bg-white rounded-xl p-8 text-center hover:shadow-lg transition">
               <Target className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">ATS Optimization</h3>
               <p className="text-gray-600 mb-4">
@@ -120,7 +120,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Resume Sections */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Essential Resume Sections
@@ -172,7 +172,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Common Mistakes */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Common Resume Mistakes to Avoid
@@ -274,7 +274,7 @@ export default function ResumeBuildingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Get Started <ArrowRight className="ml-2 w-5 h-5" />
             </Link>

@@ -14,15 +14,15 @@ export const metadata: Metadata = {
 
 export default async function AdaptivePage() {
   const supabase = await createClient();
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Adaptive Learning</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/learner/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Adaptive Learning</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Adaptive Learning</h1>
           <p className="text-gray-600 mt-2">Personalized learning path based on your progress</p>
         </div>
@@ -38,13 +38,13 @@ export default async function AdaptivePage() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-lg font-semibold mb-4">Recommended Next Steps</h2>
           <div className="space-y-4">
-            <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+            <div className="p-4 border rounded-lg hover:bg-white cursor-pointer">
               <div className="flex items-center justify-between">
                 <div><p className="font-medium">Complete Module 3 Quiz</p><p className="text-sm text-gray-500">Based on your progress</p></div>
                 <span className="text-brand-blue-600">→</span>
               </div>
             </div>
-            <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+            <div className="p-4 border rounded-lg hover:bg-white cursor-pointer">
               <div className="flex items-center justify-between">
                 <div><p className="font-medium">Review: Data Analysis Basics</p><p className="text-sm text-gray-500">Strengthen your foundation</p></div>
                 <span className="text-brand-blue-600">→</span>

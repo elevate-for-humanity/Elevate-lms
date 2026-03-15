@@ -31,7 +31,7 @@ const steps = [
 export default function WOTCPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Employer Portal', href: '/employer-portal' },
@@ -107,7 +107,7 @@ export default function WOTCPage() {
               'Tax-exempt organizations can claim WOTC against payroll taxes for qualified veterans',
               'Credits can be carried back 1 year or forward 20 years',
             ].map((req) => (
-              <div key={req} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+              <div key={req} className="flex items-start gap-3 p-3 bg-white rounded-lg">
                 <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-slate-700 text-sm">{req}</span>
               </div>

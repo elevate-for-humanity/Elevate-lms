@@ -36,11 +36,12 @@ export default function HomeHeroVideo() {
         fill priority sizes="100vw"
         className="object-cover object-center"
       />
+      {/* Video hidden on mobile — saves bandwidth, avoids autoplay issues */}
       <video
         ref={videoRef}
         loop playsInline preload="auto"
         poster="/images/pages/home-hero-video.jpg"
-        className="absolute inset-0 w-full h-full object-cover object-center"
+        className="absolute inset-0 w-full h-full object-cover object-center hidden md:block"
       >
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>

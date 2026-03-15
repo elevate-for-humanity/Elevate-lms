@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ChatPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -65,10 +65,10 @@ export default async function ChatPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Chat</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/learner/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li className="text-gray-900 font-medium">Chat</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
           <p className="text-gray-600 mt-2">Connect with instructors and classmates</p>
         </div>
@@ -78,7 +78,7 @@ export default async function ChatPage() {
             <div className="divide-y">
               {conversationList.length > 0 ? (
                 conversationList.map((conv, idx) => (
-                  <div key={conv.partnerId} className={`p-4 hover:bg-gray-50 cursor-pointer ${idx === 0 ? 'bg-brand-blue-50' : ''}`}>
+                  <div key={conv.partnerId} className={`p-4 hover:bg-white cursor-pointer ${idx === 0 ? 'bg-brand-blue-50' : ''}`}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
                         <span className="text-brand-blue-600 font-medium">{conv.initials}</span>
@@ -110,7 +110,7 @@ export default async function ChatPage() {
                       m.recipient_id === conversationList[0]?.partnerId
                     ).slice(0, 20).reverse().map((msg: any) => (
                       <div key={msg.id} className={`flex ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`rounded-lg p-3 max-w-xs ${msg.sender_id === user.id ? 'bg-brand-blue-600 text-white' : 'bg-gray-100'}`}>
+                        <div className={`rounded-lg p-3 max-w-xs ${msg.sender_id === user.id ? 'bg-brand-blue-600 text-white' : 'bg-white'}`}>
                           <p className="text-sm">{msg.content}</p>
                         </div>
                       </div>

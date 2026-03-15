@@ -23,7 +23,7 @@ export default async function ShopOnboardingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -71,9 +71,9 @@ export default async function ShopOnboardingPage() {
   const pendingDocs = requiredDocs.filter((d) => !d.approved);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Shop', href: '/shop' }, { label: 'Onboarding' }]} />
         </div>
@@ -349,7 +349,7 @@ export default async function ShopOnboardingPage() {
         </div>
 
         {/* Hour Tracking Clarification */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
           <h3 className="text-lg font-bold text-black mb-3">
             Hour Tracking Clarification
           </h3>

@@ -103,7 +103,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, idx) => (
@@ -146,7 +146,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Advance Tiers */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
@@ -191,7 +191,7 @@ export default function RefundAdvancePage() {
 
           <div className="space-y-6">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-xl p-6">
+              <div key={idx} className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
                 <p className="text-gray-600">{faq.answer}</p>
               </div>

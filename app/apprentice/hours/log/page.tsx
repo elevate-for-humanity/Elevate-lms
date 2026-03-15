@@ -86,7 +86,7 @@ export default function LogApprenticeHoursPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Hours Logged!</h1>
@@ -98,9 +98,9 @@ export default function LogApprenticeHoursPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apprentice', href: '/apprentice' }, { label: 'Hours', href: '/apprentice/hours' }, { label: 'Log Hours' }]} />
         </div>

@@ -14,15 +14,15 @@ export const metadata: Metadata = {
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     active: 'bg-brand-green-100 text-brand-green-700',
-    closed: 'bg-slate-100 text-slate-700',
-    archived: 'bg-slate-100 text-slate-500',
+    closed: 'bg-white text-slate-700',
+    archived: 'bg-white text-slate-500',
     pending: 'bg-amber-100 text-amber-700',
     eligible: 'bg-brand-green-100 text-brand-green-700',
     ineligible: 'bg-brand-red-100 text-brand-red-700',
   };
 
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors[status] || 'bg-slate-100 text-slate-700'}`}>
+    <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors[status] || 'bg-white text-slate-700'}`}>
       {status.replace(/_/g, ' ').toUpperCase()}
     </span>
   );
@@ -40,7 +40,7 @@ export default async function CaseFilesListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-6">
@@ -63,7 +63,7 @@ export default async function CaseFilesListPage() {
                 className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50">
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-white">
               <Filter className="w-4 h-4" />
               Filters
             </button>
@@ -101,7 +101,7 @@ export default async function CaseFilesListPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
+                <tr className="bg-white border-b border-slate-200">
                   <th className="text-left py-3 px-4 font-semibold text-slate-900 text-sm">Case #</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-900 text-sm">Participant</th>
                   <th className="text-left py-3 px-4 font-semibold text-slate-900 text-sm">Program</th>
@@ -120,7 +120,7 @@ export default async function CaseFilesListPage() {
                   </tr>
                 ) : (
                   cases.map(caseFile => (
-                    <tr key={caseFile.id} className="hover:bg-slate-50">
+                    <tr key={caseFile.id} className="hover:bg-white">
                       <td className="py-3 px-4">
                         <span className="font-mono text-sm text-slate-600">{caseFile.caseNumber}</span>
                       </td>

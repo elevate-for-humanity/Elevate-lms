@@ -170,7 +170,7 @@ export default async function LearnerDashboardPage() {
   const userName = profile?.full_name || user.email?.split('@')[0] || 'Learner';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -323,7 +323,7 @@ export default async function LearnerDashboardPage() {
                     return (
                     <div key={enrollment.id} className="p-6">
                       <div className="flex gap-4">
-                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-20 h-20 bg-white rounded-lg overflow-hidden flex-shrink-0">
                             <div className="w-full h-full flex items-center justify-center">
                               <GraduationCap className="w-8 h-8 text-gray-400" />
                             </div>
@@ -363,7 +363,7 @@ export default async function LearnerDashboardPage() {
                   
                 ) : (
                   <div className="p-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
                       <BookOpen className="w-8 h-8 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Programs</h3>
@@ -385,29 +385,29 @@ export default async function LearnerDashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Link
-                  href="/lms/dashboard"
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  href="/learner/dashboard"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Video className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">My Courses</span>
                 </Link>
                 <Link
                   href="/certificates"
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Award className="w-8 h-8 text-brand-green-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Certificates</span>
                 </Link>
                 <Link
                   href="/achievements"
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
                 >
                   <Trophy className="w-8 h-8 text-yellow-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Achievements</span>
                 </Link>
                 <Link
                   href="/contact"
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  className="flex flex-col items-center p-4 bg-white rounded-lg hover:bg-white transition"
                 >
                   <HelpCircle className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Get Help</span>

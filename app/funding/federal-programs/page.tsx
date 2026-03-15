@@ -104,7 +104,7 @@ export default function FederalProgramsPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Find Out If You Qualify</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team can help determine which funding sources apply to your situation.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/workforce-board/eligibility" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Check Eligibility</Link>
+            <Link href="/workforce-board/eligibility" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg">Check Eligibility</Link>
             <Link href="/contact" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">Contact Us</Link>
           </div>
         </div>

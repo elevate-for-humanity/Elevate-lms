@@ -14,7 +14,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Banner */}
-      <section className="bg-slate-900 py-16">
+      <section className="bg-white py-16 border-t">
         <div className="max-w-4xl mx-auto px-6">
           <Breadcrumbs
             items={[
@@ -34,7 +34,7 @@ export default function ApplyPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Program Quick Facts */}
-        <div className="bg-slate-50 rounded-2xl p-6 mb-8">
+        <div className="bg-white rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Program Quick Facts</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export default function ApplyPage() {
         {/* Application Deadlines */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Application Deadlines</h2>
-          <div className="bg-slate-50 rounded-xl p-6">
+          <div className="bg-white rounded-xl p-6">
             <p className="text-slate-700 mb-4">New cohorts start every quarter. Apply at least 30 days before your desired start date.</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-4 text-center border border-slate-200">
@@ -137,7 +137,7 @@ export default function ApplyPage() {
         {/* Two Options */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Option 1: Get More Information */}
-          <div className="bg-slate-50 rounded-2xl p-8 text-center">
+          <div className="bg-white rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

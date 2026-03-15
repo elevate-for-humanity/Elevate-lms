@@ -215,7 +215,7 @@ export default function StudentPortalPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Student Portal" }]} />
       </div>
@@ -236,7 +236,7 @@ export default function StudentPortalPage() {
       {/* Avatar Guide */}
 
       {/* My Enrollments - Shows for logged-in users */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <EnrollmentDashboard />
           <StudentProgressWidget />
@@ -315,7 +315,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* Student Resources */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">
             Student Resources
@@ -369,7 +369,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Frequently Asked Questions
@@ -391,7 +391,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-slate-700">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-black mb-6">
             Questions? Contact Us
@@ -402,7 +402,7 @@ export default function StudentPortalPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-white transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />

@@ -18,7 +18,7 @@ export default async function TrainingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -70,7 +70,7 @@ export default async function TrainingPage() {
                 Learn More About Careers
               </Link>
             </div>
-            <div className="bg-gray-50 rounded-lg p-8">
+            <div className="bg-white rounded-lg p-8">
               <h3 className="text-xl font-semibold mb-4">Training Includes</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">

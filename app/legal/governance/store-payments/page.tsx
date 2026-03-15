@@ -47,7 +47,7 @@ export default function StorePaymentsPage() {
           </a>
         </div>
 
-        <nav className="bg-gray-50 rounded-lg p-6 mb-10">
+        <nav className="bg-white rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
             <li><a href="#purpose" className="text-brand-blue-600 hover:underline">1. Purpose & Scope</a></li>
@@ -89,7 +89,7 @@ export default function StorePaymentsPage() {
           <h3 className="text-lg font-semibold mt-6 mb-3">2.1 Product Categories</h3>
           <table className="w-full border-collapse border mb-4">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="border p-3 text-left">Category</th>
                 <th className="border p-3 text-left">Description</th>
                 <th className="border p-3 text-left">Delivery</th>
@@ -97,11 +97,11 @@ export default function StorePaymentsPage() {
             </thead>
             <tbody>
               <tr><td className="border p-3">Digital Templates</td><td className="border p-3">Spreadsheets, documents, planners</td><td className="border p-3">Instant download</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">E-books & Guides</td><td className="border p-3">PDF guides, workbooks</td><td className="border p-3">Instant download</td></tr>
+              <tr className="bg-white"><td className="border p-3">E-books & Guides</td><td className="border p-3">PDF guides, workbooks</td><td className="border p-3">Instant download</td></tr>
               <tr><td className="border p-3">Software Tools</td><td className="border p-3">Calculators, apps, plugins</td><td className="border p-3">Download or web access</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Courses</td><td className="border p-3">Self-paced learning programs</td><td className="border p-3">LMS access</td></tr>
+              <tr className="bg-white"><td className="border p-3">Courses</td><td className="border p-3">Self-paced learning programs</td><td className="border p-3">LMS access</td></tr>
               <tr><td className="border p-3">Bundles</td><td className="border p-3">Combined products at discount</td><td className="border p-3">Per component</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Subscriptions</td><td className="border p-3">Recurring access to content/services</td><td className="border p-3">Ongoing access</td></tr>
+              <tr className="bg-white"><td className="border p-3">Subscriptions</td><td className="border p-3">Recurring access to content/services</td><td className="border p-3">Ongoing access</td></tr>
             </tbody>
           </table>
           
@@ -158,12 +158,12 @@ export default function StorePaymentsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">4.1 License Types</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">License</th><th className="border p-3 text-left">Permitted Use</th><th className="border p-3 text-left">Restrictions</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">License</th><th className="border p-3 text-left">Permitted Use</th><th className="border p-3 text-left">Restrictions</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Personal</td><td className="border p-3">Individual, non-commercial use</td><td className="border p-3">No resale, no commercial use, single user</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Commercial</td><td className="border p-3">Business use, client work</td><td className="border p-3">No resale as-is, attribution may be required</td></tr>
+              <tr className="bg-white"><td className="border p-3">Commercial</td><td className="border p-3">Business use, client work</td><td className="border p-3">No resale as-is, attribution may be required</td></tr>
               <tr><td className="border p-3">Extended</td><td className="border p-3">Unlimited commercial use, derivative works</td><td className="border p-3">No resale of original, per-product terms</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Team/Enterprise</td><td className="border p-3">Multiple users within organization</td><td className="border p-3">Named users or seat-based, no external sharing</td></tr>
+              <tr className="bg-white"><td className="border p-3">Team/Enterprise</td><td className="border p-3">Multiple users within organization</td><td className="border p-3">Named users or seat-based, no external sharing</td></tr>
             </tbody>
           </table>
           
@@ -223,12 +223,12 @@ export default function StorePaymentsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">6.1 Refund Policy by Product Type</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Product Type</th><th className="border p-3 text-left">Refund Policy</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Product Type</th><th className="border p-3 text-left">Refund Policy</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Digital Downloads</td><td className="border p-3">No refunds after download (disclosed at purchase)</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Courses</td><td className="border p-3">14 days if &lt;20% completed</td></tr>
+              <tr className="bg-white"><td className="border p-3">Courses</td><td className="border p-3">14 days if &lt;20% completed</td></tr>
               <tr><td className="border p-3">Subscriptions</td><td className="border p-3">No partial refunds; cancel anytime for future billing</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Bundles</td><td className="border p-3">Per component policy; partial refunds possible</td></tr>
+              <tr className="bg-white"><td className="border p-3">Bundles</td><td className="border p-3">Per component policy; partial refunds possible</td></tr>
             </tbody>
           </table>
           
@@ -268,10 +268,10 @@ export default function StorePaymentsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">7.2 Revenue Share</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Creator Type</th><th className="border p-3 text-left">Creator Share</th><th className="border p-3 text-left">Platform Share</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Creator Type</th><th className="border p-3 text-left">Creator Share</th><th className="border p-3 text-left">Platform Share</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Standard Creator</td><td className="border p-3">70%</td><td className="border p-3">30%</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Premium Creator (high volume)</td><td className="border p-3">80%</td><td className="border p-3">20%</td></tr>
+              <tr className="bg-white"><td className="border p-3">Premium Creator (high volume)</td><td className="border p-3">80%</td><td className="border p-3">20%</td></tr>
               <tr><td className="border p-3">Exclusive Content</td><td className="border p-3">85%</td><td className="border p-3">15%</td></tr>
             </tbody>
           </table>
@@ -296,12 +296,12 @@ export default function StorePaymentsPage() {
         <section id="responsibilities" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Roles & Responsibilities</h2>
           <table className="w-full border-collapse border">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Director of Operations</td><td className="border p-3">Overall store governance, pricing strategy, vendor relationships</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Finance Team</td><td className="border p-3">Payment processing, tax compliance, creator payouts</td></tr>
+              <tr className="bg-white"><td className="border p-3">Finance Team</td><td className="border p-3">Payment processing, tax compliance, creator payouts</td></tr>
               <tr><td className="border p-3">Content Team</td><td className="border p-3">Product review, catalog management, quality assurance</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Customer Support</td><td className="border p-3">Refund requests, purchase issues, dispute resolution</td></tr>
+              <tr className="bg-white"><td className="border p-3">Customer Support</td><td className="border p-3">Refund requests, purchase issues, dispute resolution</td></tr>
               <tr><td className="border p-3">Legal/Compliance</td><td className="border p-3">Licensing terms, regulatory compliance, dispute escalation</td></tr>
             </tbody>
           </table>
@@ -310,7 +310,7 @@ export default function StorePaymentsPage() {
         <section id="versioning" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Versioning & Review</h2>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
             <tbody><tr><td className="border p-3">1.0</td><td className="border p-3">January 2025</td><td className="border p-3">Initial authoritative version</td></tr></tbody>
           </table>
           <p className="text-gray-700"><strong>Review Schedule:</strong> Annually, or upon significant changes to payment processing, tax requirements, or product offerings.</p>

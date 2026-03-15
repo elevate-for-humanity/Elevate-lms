@@ -75,7 +75,7 @@ export default function CommunityHubPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Community Hub" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-slate-100">
+      <section className="relative py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-slate-900">
@@ -99,7 +99,7 @@ export default function CommunityHubPage() {
                 </Link>
                 <Link
                   href="#pricing"
-                  className="px-8 py-4 border-2 border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition"
+                  className="px-8 py-4 border-2 border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-white transition"
                 >
                   See Payment Options
                 </Link>
@@ -176,7 +176,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Perfect For</h2>
@@ -238,7 +238,7 @@ export default function CommunityHubPage() {
               </ul>
               <Link
                 href="/store/add-ons/community-hub/checkout?plan=monthly"
-                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition"
+                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
               >
                 Start Monthly Plan — $549/mo
               </Link>
@@ -297,7 +297,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Stats + Write a Review */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Community Hub by the Numbers</h2>
@@ -337,7 +337,7 @@ export default function CommunityHubPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/store/add-ons/community-hub"
-              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-gray-100 transition"
+              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-white transition"
             >
               Get Community Hub — $1,997
             </Link>

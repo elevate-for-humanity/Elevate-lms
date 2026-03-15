@@ -30,7 +30,7 @@ export default async function ProgramHolderLicensePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -83,7 +83,7 @@ export default async function ProgramHolderLicensePage() {
           </div>
           <Link
             href="/apply/program-holder"
-            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
           >
             Apply to Join Network →
           </Link>
@@ -91,7 +91,7 @@ export default async function ProgramHolderLicensePage() {
       </section>
 
       {/* Credentials Included */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-black mb-4">
@@ -308,7 +308,7 @@ export default async function ProgramHolderLicensePage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-black mb-4">Pricing</h2>
@@ -463,7 +463,7 @@ export default async function ProgramHolderLicensePage() {
           </p>
           <Link
             href="/apply/program-holder"
-            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
           >
             Apply Now →
           </Link>

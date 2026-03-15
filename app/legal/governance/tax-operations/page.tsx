@@ -47,7 +47,7 @@ export default function TaxOperationsPage() {
           </a>
         </div>
 
-        <nav className="bg-gray-50 rounded-lg p-6 mb-10">
+        <nav className="bg-white rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
             <li><a href="#purpose" className="text-brand-red-600 hover:underline">1. Purpose & Scope</a></li>
@@ -92,7 +92,7 @@ export default function TaxOperationsPage() {
           <h3 className="text-lg font-semibold mt-6 mb-3">2.1 Tax Preparation Services</h3>
           <table className="w-full border-collapse border mb-4">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="border p-3 text-left">Service</th>
                 <th className="border p-3 text-left">Description</th>
                 <th className="border p-3 text-left">Delivery</th>
@@ -100,9 +100,9 @@ export default function TaxOperationsPage() {
             </thead>
             <tbody>
               <tr><td className="border p-3">Basic Return (1040)</td><td className="border p-3">W-2 income, standard deduction</td><td className="border p-3">Same day</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Standard Return</td><td className="border p-3">W-2, 1099, itemized deductions</td><td className="border p-3">1-2 days</td></tr>
+              <tr className="bg-white"><td className="border p-3">Standard Return</td><td className="border p-3">W-2, 1099, itemized deductions</td><td className="border p-3">1-2 days</td></tr>
               <tr><td className="border p-3">Complex Return</td><td className="border p-3">Self-employment, rental, investments</td><td className="border p-3">2-5 days</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">State Returns</td><td className="border p-3">All 50 states supported</td><td className="border p-3">With federal</td></tr>
+              <tr className="bg-white"><td className="border p-3">State Returns</td><td className="border p-3">All 50 states supported</td><td className="border p-3">With federal</td></tr>
               <tr><td className="border p-3">Amended Returns</td><td className="border p-3">Corrections to prior filings</td><td className="border p-3">3-5 days</td></tr>
             </tbody>
           </table>
@@ -124,12 +124,12 @@ export default function TaxOperationsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">3.1 Preparer Requirements</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Requirement</th><th className="border p-3 text-left">Description</th><th className="border p-3 text-left">Verification</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Requirement</th><th className="border p-3 text-left">Description</th><th className="border p-3 text-left">Verification</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">PTIN</td><td className="border p-3">Preparer Tax Identification Number</td><td className="border p-3">Annual renewal verified</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">AFSP or Credential</td><td className="border p-3">Annual Filing Season Program or EA/CPA</td><td className="border p-3">Certificate on file</td></tr>
+              <tr className="bg-white"><td className="border p-3">AFSP or Credential</td><td className="border p-3">Annual Filing Season Program or EA/CPA</td><td className="border p-3">Certificate on file</td></tr>
               <tr><td className="border p-3">Background Check</td><td className="border p-3">Criminal and credit check</td><td className="border p-3">Prior to onboarding</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Continuing Education</td><td className="border p-3">18 hours annually (AFSP)</td><td className="border p-3">Completion certificates</td></tr>
+              <tr className="bg-white"><td className="border p-3">Continuing Education</td><td className="border p-3">18 hours annually (AFSP)</td><td className="border p-3">Completion certificates</td></tr>
             </tbody>
           </table>
           
@@ -161,12 +161,12 @@ export default function TaxOperationsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">4.2 Loan Terms</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Feature</th><th className="border p-3 text-left">Details</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Feature</th><th className="border p-3 text-left">Details</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Loan Amounts</td><td className="border p-3">$250, $500, $1,000, $2,500, $5,000</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Interest Rate</td><td className="border p-3">0% APR (no interest charged)</td></tr>
+              <tr className="bg-white"><td className="border p-3">Interest Rate</td><td className="border p-3">0% APR (no interest charged)</td></tr>
               <tr><td className="border p-3">Fees</td><td className="border p-3">$0 loan fee (tax prep fees separate)</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Repayment</td><td className="border p-3">Automatic from IRS refund</td></tr>
+              <tr className="bg-white"><td className="border p-3">Repayment</td><td className="border p-3">Automatic from IRS refund</td></tr>
               <tr><td className="border p-3">Funding Time</td><td className="border p-3">Same day or next business day</td></tr>
             </tbody>
           </table>
@@ -200,22 +200,22 @@ export default function TaxOperationsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">5.1 Tax Preparation Fees</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Service</th><th className="border p-3 text-left">Fee Range</th><th className="border p-3 text-left">Notes</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Service</th><th className="border p-3 text-left">Fee Range</th><th className="border p-3 text-left">Notes</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Basic Federal Return</td><td className="border p-3">$50 - $100</td><td className="border p-3">W-2 only, standard deduction</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Standard Federal Return</td><td className="border p-3">$100 - $200</td><td className="border p-3">Multiple income sources</td></tr>
+              <tr className="bg-white"><td className="border p-3">Standard Federal Return</td><td className="border p-3">$100 - $200</td><td className="border p-3">Multiple income sources</td></tr>
               <tr><td className="border p-3">Complex Federal Return</td><td className="border p-3">$200 - $400</td><td className="border p-3">Self-employment, Schedule C</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">State Return</td><td className="border p-3">$40 - $75</td><td className="border p-3">Per state</td></tr>
+              <tr className="bg-white"><td className="border p-3">State Return</td><td className="border p-3">$40 - $75</td><td className="border p-3">Per state</td></tr>
               <tr><td className="border p-3">Amended Return</td><td className="border p-3">$75 - $150</td><td className="border p-3">Corrections to prior year</td></tr>
             </tbody>
           </table>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">5.2 Bank Product Fees</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Product</th><th className="border p-3 text-left">Fee</th><th className="border p-3 text-left">Description</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Product</th><th className="border p-3 text-left">Fee</th><th className="border p-3 text-left">Description</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Refund Advance</td><td className="border p-3">$0</td><td className="border p-3">No-fee loan</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Refund Transfer</td><td className="border p-3">$35 - $50</td><td className="border p-3">Pay fees from refund</td></tr>
+              <tr className="bg-white"><td className="border p-3">Refund Transfer</td><td className="border p-3">$35 - $50</td><td className="border p-3">Pay fees from refund</td></tr>
               <tr><td className="border p-3">Prepaid Card</td><td className="border p-3">$0 - $10</td><td className="border p-3">Optional card for refund</td></tr>
             </tbody>
           </table>
@@ -279,10 +279,10 @@ export default function TaxOperationsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">7.2 Error Resolution</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Error Type</th><th className="border p-3 text-left">Resolution</th><th className="border p-3 text-left">Client Communication</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Error Type</th><th className="border p-3 text-left">Resolution</th><th className="border p-3 text-left">Client Communication</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Minor (no financial impact)</td><td className="border p-3">Correct and refile if needed</td><td className="border p-3">Notify client</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Moderate (small financial impact)</td><td className="border p-3">Amended return, fee waived</td><td className="border p-3">Explain and apologize</td></tr>
+              <tr className="bg-white"><td className="border p-3">Moderate (small financial impact)</td><td className="border p-3">Amended return, fee waived</td><td className="border p-3">Explain and apologize</td></tr>
               <tr><td className="border p-3">Major (significant impact)</td><td className="border p-3">Amended return, penalty coverage</td><td className="border p-3">Manager contact, remediation plan</td></tr>
             </tbody>
           </table>
@@ -297,12 +297,12 @@ export default function TaxOperationsPage() {
             8. Roles & Responsibilities
           </h2>
           <table className="w-full border-collapse border">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Tax Operations Manager</td><td className="border p-3">Overall tax operations, IRS relationships, EFIN management</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Quality Review Manager</td><td className="border p-3">Return review process, error tracking, preparer coaching</td></tr>
+              <tr className="bg-white"><td className="border p-3">Quality Review Manager</td><td className="border p-3">Return review process, error tracking, preparer coaching</td></tr>
               <tr><td className="border p-3">Tax Preparers</td><td className="border p-3">Return preparation, client communication, continuing education</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Client Services</td><td className="border p-3">Scheduling, document collection, status updates</td></tr>
+              <tr className="bg-white"><td className="border p-3">Client Services</td><td className="border p-3">Scheduling, document collection, status updates</td></tr>
               <tr><td className="border p-3">Compliance Officer</td><td className="border p-3">Regulatory compliance, audit response, policy updates</td></tr>
             </tbody>
           </table>
@@ -311,7 +311,7 @@ export default function TaxOperationsPage() {
         <section id="versioning" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Versioning & Review</h2>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
             <tbody><tr><td className="border p-3">1.0</td><td className="border p-3">January 2025</td><td className="border p-3">Initial authoritative version</td></tr></tbody>
           </table>
           <p className="text-gray-700"><strong>Review Schedule:</strong> Annually before tax season, or upon IRS regulatory changes.</p>

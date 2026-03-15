@@ -14,7 +14,7 @@ function CancelContent() {
   const product = searchParams.get("product");
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -38,7 +38,7 @@ function CancelContent() {
             {product && (
               <Link
                 href={`/store/guides/${product}`}
-                className="flex items-center justify-center gap-2 w-full border border-slate-300 hover:bg-slate-50 text-slate-900 py-4 rounded-xl font-semibold transition-colors border border-white/20"
+                className="flex items-center justify-center gap-2 w-full border border-slate-300 hover:bg-white text-slate-900 py-4 rounded-xl font-semibold transition-colors border border-white/20"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Return to Product

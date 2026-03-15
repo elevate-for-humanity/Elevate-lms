@@ -98,7 +98,7 @@ function IntakeForm() {
             <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
               Browse Programs
             </Link>
-            <Link href="/" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors text-center">
+            <Link href="/" className="bg-white hover:bg-slate-200 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors text-center">
               Back to Home
             </Link>
           </div>
@@ -256,7 +256,7 @@ function IntakeForm() {
             </div>
 
             {/* Disclaimer */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
+            <div className="bg-white border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
               By submitting this form, you authorize 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute) to review your
               eligibility for workforce-funded training programs. Funding eligibility is determined
               by our workforce partners and is not guaranteed. Your information will be kept

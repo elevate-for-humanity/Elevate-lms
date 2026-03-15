@@ -264,7 +264,7 @@ export default function SupersonicCompliancePage() {
           <div className="flex justify-center gap-4">
             <Link 
               href="/admin/governance"
-              className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+              className="px-6 py-3 bg-white text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
             >
               Back to Index
             </Link>

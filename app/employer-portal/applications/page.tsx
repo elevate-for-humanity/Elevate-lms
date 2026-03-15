@@ -92,7 +92,7 @@ export default async function ApplicationsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Applications" }]} />
 {/* Header */}
       <section className="bg-white border-b">
@@ -155,7 +155,7 @@ export default async function ApplicationsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             {applications.map((app, index) => (
-              <div key={app.id} className={`flex items-center gap-4 p-4 hover:bg-gray-50 ${index !== applications.length - 1 ? 'border-b border-gray-100' : ''}`}>
+              <div key={app.id} className={`flex items-center gap-4 p-4 hover:bg-white ${index !== applications.length - 1 ? 'border-b border-gray-100' : ''}`}>
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
                     src={app.candidate.image}
@@ -188,13 +188,13 @@ export default async function ApplicationsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg" title="View">
+                  <button className="p-2 hover:bg-white rounded-lg" title="View">
                     <Eye className="w-5 h-5 text-gray-400" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg" title="Message">
+                  <button className="p-2 hover:bg-white rounded-lg" title="Message">
                     <MessageSquare className="w-5 h-5 text-gray-400" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg" title="Schedule">
+                  <button className="p-2 hover:bg-white rounded-lg" title="Schedule">
                     <Calendar className="w-5 h-5 text-gray-400" />
                   </button>
                   <Link

@@ -12,7 +12,7 @@ export default function InstitutionalGovernancePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Institutional Governance' }]} />
         </div>
@@ -32,7 +32,7 @@ export default function InstitutionalGovernancePage() {
           {/* Governance Structure Diagram */}
           <section className="mb-12">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Organizational Structure</h2>
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 sm:p-8">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">
               <div className="flex flex-col items-center gap-0">
                 {/* Level 1 */}
                 <div className="w-full max-w-md bg-slate-900 text-white rounded-lg px-6 py-4 text-center">
@@ -74,7 +74,7 @@ export default function InstitutionalGovernancePage() {
           {/* Legal Entity */}
           <section className="mb-10">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Legal Entity</h2>
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+            <div className="bg-white border border-slate-200 rounded-lg p-5">
               <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
                 <div>
                   <dt className="text-slate-500 text-xs uppercase tracking-wider">Legal Name</dt>
@@ -116,19 +116,19 @@ export default function InstitutionalGovernancePage() {
           <section className="mb-10">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Governance Framework</h2>
             <div className="space-y-4 text-sm text-slate-700">
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+              <div className="bg-white border border-slate-200 rounded-lg p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Program Sponsorship</h3>
                 <p>2Exclusive LLC-S serves as the sponsor of record for all Registered Apprenticeship programs. The sponsor oversees apprenticeship standards, curriculum alignment, apprentice registration, hour tracking, and compliance reporting in accordance with U.S. DOL Office of Apprenticeship requirements.</p>
               </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+              <div className="bg-white border border-slate-200 rounded-lg p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Instructional Delivery</h3>
                 <p>Elevate for Humanity Career &amp; Training Institute delivers related technical instruction (RTI) through its learning management system (LMS) and in-person classroom sessions. All instructional content is aligned with occupation-specific competency standards and documented per program requirements.</p>
               </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+              <div className="bg-white border border-slate-200 rounded-lg p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Training Sites</h3>
                 <p>On-the-job training (OJT) is completed at sponsor-approved licensed employer and partner locations operating under formal training agreements. Each participating employer is documented in RAPIDS with an Employer Acceptance Agreement.</p>
               </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
+              <div className="bg-white border border-slate-200 rounded-lg p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Compliance &amp; Reporting</h3>
                 <p>The organization maintains documented compliance with WIOA performance standards, DOL apprenticeship regulations (29 CFR Part 29/30), Indiana Professional Licensing Agency requirements, and applicable state workforce board guidelines. Progress reporting, credential attainment, and employment outcomes are tracked and available to authorized reviewing agencies.</p>
               </div>
@@ -162,7 +162,7 @@ export default function InstitutionalGovernancePage() {
             <p className="text-sm text-slate-600 mb-4">The following RTI providers are registered in RAPIDS under Program 2025-IN-132301.</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-                <thead className="bg-slate-100">
+                <thead className="bg-white">
                   <tr>
                     <th className="text-left px-4 py-2.5 font-semibold text-slate-700">Occupation</th>
                     <th className="text-left px-4 py-2.5 font-semibold text-slate-700">RTI Provider</th>

@@ -170,7 +170,7 @@ export default function DocumentsPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -185,7 +185,7 @@ export default function DocumentsPage() {
   const allUploaded = documents.every(doc => doc.uploaded);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -205,7 +205,7 @@ export default function DocumentsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                    doc.uploaded ? 'bg-brand-green-100' : 'bg-gray-100'
+                    doc.uploaded ? 'bg-brand-green-100' : 'bg-white'
                   }`}>
                     {doc.uploaded ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
@@ -231,7 +231,7 @@ export default function DocumentsPage() {
                 ) : (
                   <label className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors ${
                     uploading === doc.id
-                      ? 'bg-gray-100 text-gray-400'
+                      ? 'bg-white text-gray-400'
                       : 'bg-brand-blue-50 text-brand-blue-600 hover:bg-brand-blue-100'
                   }`}>
                     {uploading === doc.id ? (

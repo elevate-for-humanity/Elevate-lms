@@ -27,14 +27,14 @@ export default function PartnerSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-13.jpg" alt="Partner settings" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Settings' }]} />
         </div>
@@ -141,7 +141,7 @@ export default function PartnerSettingsPage() {
                 { key: 'outcomeAlerts', label: 'Outcome Alerts', desc: 'When students complete or exit programs' },
                 { key: 'referralConfirmations', label: 'Referral Confirmations', desc: 'Confirmation when referrals are received' },
               ].map((item) => (
-                <div key={item.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={item.key} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div>
                     <p className="font-medium text-gray-900">{item.label}</p>
                     <p className="text-sm text-gray-500">{item.desc}</p>

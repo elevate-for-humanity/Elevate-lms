@@ -103,7 +103,7 @@ export default function RefundTrackerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Refund Tracker" }]} />
       </div>
@@ -339,7 +339,7 @@ export default function RefundTrackerPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <button
                 onClick={() => setRefundStatus(null)}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-gray-200 rounded-xl font-semibold transition"
               >
                 <Search className="w-4 h-4" />
                 Check Another Refund
@@ -361,7 +361,7 @@ export default function RefundTrackerPage() {
         )}
 
         {/* FAQ */}
-        <div className="mt-12 bg-gray-50 rounded-2xl p-8">
+        <div className="mt-12 bg-white rounded-2xl p-8">
           <h3 className="text-xl font-bold mb-6">Frequently Asked Questions</h3>
 
           <div className="space-y-4">

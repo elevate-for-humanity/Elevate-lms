@@ -536,7 +536,7 @@ export default function ProviderApplicationForm() {
 function ReviewSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="border border-slate-200 rounded-lg overflow-hidden">
-      <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
+      <div className="bg-white px-4 py-2 border-b border-slate-200">
         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</span>
       </div>
       <div className="px-4 py-3 space-y-1.5">{children}</div>

@@ -134,7 +134,7 @@ export default function CheckEligibilityPage() {
           </div>
 
           {/* CTA */}
-          <div className="bg-gray-50 rounded-xl p-8 text-center border">
+          <div className="bg-white rounded-xl p-8 text-center border">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready to get started?</h2>
             <p className="text-gray-600 mb-6">
               If the criteria above describe your situation, you may be a good candidate for our programs.
@@ -151,7 +151,7 @@ export default function CheckEligibilityPage() {
                 href="https://www.in.gov/dwd/career-connect/find-a-workone-office/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition"
+                className="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-white transition"
               >
                 <MapPin className="w-5 h-5" />
                 Find a WorkOne Location

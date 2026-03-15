@@ -72,9 +72,9 @@ export default async function ShopDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Shop', href: '/shop' }, { label: 'Dashboard' }]} />
         </div>
@@ -129,7 +129,7 @@ export default async function ShopDashboardPage() {
                 </thead>
                 <tbody className="divide-y">
                   {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
+                    <tr key={order.id} className="hover:bg-white">
                       <td className="py-4 font-medium text-gray-900">{order.id}</td>
                       <td className="py-4 text-gray-600">{order.customer}</td>
                       <td className="py-4 text-gray-900">${order.total}</td>
@@ -138,7 +138,7 @@ export default async function ShopDashboardPage() {
                           order.status === 'delivered' ? 'bg-brand-green-100 text-brand-green-700' :
                           order.status === 'shipped' ? 'bg-brand-blue-100 text-brand-blue-700' :
                           order.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-gray-100 text-gray-700'
+                          'bg-white text-gray-700'
                         }`}>
                           {order.status}
                         </span>
@@ -159,15 +159,15 @@ export default async function ShopDashboardPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
             <div className="space-y-3">
-              <Link href="/shop/products" className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-blue-50">
+              <Link href="/shop/products" className="flex items-center gap-3 p-4 bg-white rounded-lg hover:bg-brand-blue-50">
                 <Package className="w-5 h-5 text-gray-600" />
                 <span className="font-medium">Manage Products</span>
               </Link>
-              <Link href="/shop/orders" className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-blue-50">
+              <Link href="/shop/orders" className="flex items-center gap-3 p-4 bg-white rounded-lg hover:bg-brand-blue-50">
                 <ShoppingBag className="w-5 h-5 text-gray-600" />
                 <span className="font-medium">View Orders</span>
               </Link>
-              <Link href="/shop/reports" className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-brand-blue-50">
+              <Link href="/shop/reports" className="flex items-center gap-3 p-4 bg-white rounded-lg hover:bg-brand-blue-50">
                 <BarChart3 className="w-5 h-5 text-gray-600" />
                 <span className="font-medium">Sales Reports</span>
               </Link>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function LMSPortalPublicPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Learning Portal' }]} />
         </div>
@@ -51,27 +51,27 @@ export default function LMSPortalPublicPage() {
             Everything you need to succeed in your career training program.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Play className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Video Courses</h3>
               <p className="text-slate-600">Professional video lessons and interactive content with instructor oversight and progress checkpoints.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <BarChart3 className="w-10 h-10 text-brand-green-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Progress Tracking</h3>
               <p className="text-slate-600">Monitor your progress, see completion rates, and stay on track with your goals.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Award className="w-10 h-10 text-amber-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Certificates</h3>
               <p className="text-slate-600">Earn industry-recognized certificates upon completing your training programs.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-slate-600">Connect with fellow students, join study groups, and participate in forums.</p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="text-xl font-bold mb-2">Assessments</h3>
               <p className="text-slate-600">Test your knowledge with quizzes and practical assessments.</p>
@@ -88,7 +88,7 @@ export default function LMSPortalPublicPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-white transition-colors"
             >
               Apply Now
             </Link>

@@ -78,7 +78,7 @@ export default async function ProgramCatalogPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
           { label: 'Programs', href: '/programs' },
@@ -86,7 +86,7 @@ export default async function ProgramCatalogPage({
         ]} />
       </div>
 
-      <div className="bg-slate-900 py-10">
+      <div className="bg-white py-10 border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Program Catalog</h1>
           <p className="text-slate-300 text-sm">
@@ -202,7 +202,7 @@ function ProgramCard({ prog }: { prog: ProgramRow }) {
             <span key={tag} className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded-full">{tag}</span>
           ))}
           {prog.category && (
-            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{prog.category}</span>
+            <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded-full">{prog.category}</span>
           )}
         </div>
 

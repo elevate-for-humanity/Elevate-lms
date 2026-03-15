@@ -3,7 +3,7 @@ import { Home, Search } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center px-4 max-w-2xl">
         <div className="mb-8">
           <div className="text-8xl font-black text-gray-200 mb-4">404</div>
@@ -25,7 +25,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/programs"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-white transition font-semibold"
           >
             <Search className="h-5 w-5" />
             Browse Programs

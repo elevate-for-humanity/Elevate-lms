@@ -18,7 +18,7 @@ export default async function InstructorAddStudentPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -75,7 +75,7 @@ export default async function InstructorAddStudentPage() {
             </button>
             <button
               type="button"
-              className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-slate-50"
+              className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-white"
             >
               Cancel
             </button>
@@ -91,7 +91,7 @@ export default async function InstructorAddStudentPage() {
           </button>
         </div>
         
-        <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+        <div className="mt-4 p-4 bg-white border border-slate-200 rounded-lg">
           <h3 className="font-semibold text-black mb-2">Need Help?</h3>
           <p className="text-sm text-black">
             Contact support at <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a> for assistance with student enrollment.

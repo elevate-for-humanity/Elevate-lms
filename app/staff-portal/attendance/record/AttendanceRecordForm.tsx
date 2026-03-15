@@ -150,7 +150,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
               <option value="marked">Marked</option>
               <option value="unmarked">Unmarked</option>
             </select>
-            <button onClick={markAllPresent} className="px-4 py-2 border rounded-lg hover:bg-gray-50">
+            <button onClick={markAllPresent} className="px-4 py-2 border rounded-lg hover:bg-white">
               Mark All Present
             </button>
             <button onClick={handleSave} disabled={isSaving}
@@ -165,7 +165,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
       {/* Student List */}
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-white">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Student</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Program</th>
@@ -175,7 +175,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
           <tbody className="divide-y">
             {filteredStudents.length > 0 ? (
               filteredStudents.map(student => (
-                <tr key={student.id} className="hover:bg-gray-50">
+                <tr key={student.id} className="hover:bg-white">
                   <td className="px-4 py-3">
                     <p className="font-medium">{student.name}</p>
                     <p className="text-sm text-gray-500">{student.email}</p>
@@ -187,7 +187,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'present' 
                             ? 'bg-brand-green-500 text-white' 
-                            : 'bg-gray-100 hover:bg-brand-green-100'
+                            : 'bg-white hover:bg-brand-green-100'
                         }`}>
                         Present
                       </button>
@@ -195,7 +195,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'late' 
                             ? 'bg-yellow-500 text-white' 
-                            : 'bg-gray-100 hover:bg-yellow-100'
+                            : 'bg-white hover:bg-yellow-100'
                         }`}>
                         Late
                       </button>
@@ -203,7 +203,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'absent' 
                             ? 'bg-brand-red-500 text-white' 
-                            : 'bg-gray-100 hover:bg-brand-red-100'
+                            : 'bg-white hover:bg-brand-red-100'
                         }`}>
                         Absent
                       </button>
@@ -211,7 +211,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'excused' 
                             ? 'bg-brand-blue-500 text-white' 
-                            : 'bg-gray-100 hover:bg-brand-blue-100'
+                            : 'bg-white hover:bg-brand-blue-100'
                         }`}>
                         Excused
                       </button>

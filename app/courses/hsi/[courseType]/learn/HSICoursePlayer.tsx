@@ -46,7 +46,7 @@ export function HSICoursePlayer({
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
@@ -72,7 +72,7 @@ export function HSICoursePlayer({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setUseIframe(!useIframe)}
-              className="px-4 py-2 text-sm font-medium text-black bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-200 transition-colors"
             >
               {useIframe ? 'Open in New Tab' : 'Embed Course'}
             </button>

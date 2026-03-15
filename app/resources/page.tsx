@@ -69,7 +69,7 @@ const sections = [
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Resources' }]} />
         </div>
@@ -118,7 +118,7 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <FileText className="w-8 h-8 text-slate-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Need Help?</h2>

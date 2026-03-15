@@ -42,7 +42,7 @@ export default function SNAPETPartnerPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'SNAP E&T Partner' }]} />
         </div>
@@ -82,7 +82,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* Why EFH is Positioned */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
@@ -221,7 +221,7 @@ export default function SNAPETPartnerPage() {
                     <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
-                <tr className="bg-gray-50">
+                <tr className="bg-white">
                   <td className="px-6 py-4 font-semibold">Work Experience</td>
                   <td className="px-6 py-4">
                     DOL Registered Apprenticeships (Barber, HVAC, Building
@@ -241,7 +241,7 @@ export default function SNAPETPartnerPage() {
                     <CheckCircle className="w-5 h-5 inline-block text-brand-green-600" />
                   </td>
                 </tr>
-                <tr className="bg-gray-50">
+                <tr className="bg-white">
                   <td className="px-6 py-4 font-semibold">
                     Supervised Job Search
                   </td>
@@ -348,7 +348,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* Our Infrastructure */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Infrastructure</h2>
@@ -454,7 +454,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* FSSA / TANF / Third Party Partnership */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">FSSA Partnership & Third Party Reimbursement</h2>
@@ -469,14 +469,14 @@ export default function SNAPETPartnerPage() {
             <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
               <h3 className="text-2xl font-bold mb-6">Who We Serve</h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                   <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">SNAP</div>
                   <div>
                     <p className="font-semibold text-slate-900">SNAP Participants</p>
                     <p className="text-sm text-slate-600">Voluntary enrollment. USDA FNS funded. We accept referrals directly and can refer eligible students back for additional support services.</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                   <div className="w-10 h-10 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">TANF</div>
                   <div>
                     <p className="font-semibold text-slate-900">TANF Participants</p>
@@ -566,7 +566,7 @@ export default function SNAPETPartnerPage() {
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition text-lg"
             >
               <Phone className="w-5 h-5" /> Contact Us
             </Link>

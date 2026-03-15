@@ -223,7 +223,7 @@ export default function InstructorNav() {
       {/* Help/Support */}
       <div className="mt-8 pt-8 border-t border-gray-800">
         <Link
-          href="/help"
+          href="/support"
           className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white transition"
         >
           <HelpCircle className="w-4 h-4" />

@@ -106,7 +106,7 @@ export default function LiveChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Chat" }]} />
       </div>
@@ -198,7 +198,7 @@ export default function LiveChatPage() {
                 <button
                   key={reply}
                   onClick={() => handleSend(reply)}
-                  className="text-sm bg-white border border-gray-200 rounded-full px-3 py-1.5 hover:bg-gray-50 transition"
+                  className="text-sm bg-white border border-gray-200 rounded-full px-3 py-1.5 hover:bg-white transition"
                 >
                   {reply}
                 </button>

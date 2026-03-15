@@ -20,7 +20,7 @@ export default async function QuizzesPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Quizzes" }]} />
         </div>
@@ -92,7 +92,7 @@ export default async function QuizzesPage() {
     const bestAttempt = quizAttempts.reduce((best, a) => (!best || a.score > best.score) ? a : best, null);
     
     if (!bestAttempt) {
-      return { status: 'not_started', label: 'Not Started', color: 'bg-slate-100 text-slate-700' };
+      return { status: 'not_started', label: 'Not Started', color: 'bg-white text-slate-700' };
     }
     
     if (bestAttempt.score >= (quiz.passing_score || 70)) {
@@ -109,7 +109,7 @@ export default async function QuizzesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Quizzes" }]} />
         </div>
@@ -182,7 +182,7 @@ export default async function QuizzesPage() {
                 const attemptCount = attempts.filter(a => a.quiz_id === quiz.id).length;
 
                 return (
-                  <Link key={quiz.id} href={`/lms/quizzes/${quiz.id}`} className="block p-6 hover:bg-slate-50 transition">
+                  <Link key={quiz.id} href={`/lms/quizzes/${quiz.id}`} className="block p-6 hover:bg-white transition">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1 min-w-0">
                         <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -233,7 +233,7 @@ export default async function QuizzesPage() {
               <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Quizzes Available</h3>
               <p className="text-slate-600 mb-6">Quizzes from your enrolled courses will appear here.</p>
-              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
+              <Link href="/learner/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 Browse Courses
               </Link>
             </div>

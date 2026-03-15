@@ -15,7 +15,7 @@ export default function SupervisorVerificationPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -188,15 +188,15 @@ export default function SupervisorVerificationPage() {
       </div>
 
       {/* Screen nav */}
-      <div className="py-8 bg-slate-50 print:hidden">
+      <div className="py-8 bg-white print:hidden">
         <div className="max-w-3xl mx-auto px-4 flex flex-wrap gap-3">
           <Link href="/compliance/competency-verification/barber" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
             Barber Rubric Overview
           </Link>
-          <Link href="/compliance/competency-verification/barber/apprenticeship-agreement" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/apprenticeship-agreement" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Apprenticeship Agreement
           </Link>
-          <Link href="/compliance/competency-verification/barber/ojt-hours-log" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/ojt-hours-log" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             OJT Hours Log
           </Link>
         </div>

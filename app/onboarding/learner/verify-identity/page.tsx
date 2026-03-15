@@ -37,8 +37,8 @@ export default async function VerifyIdentityPage() {
   const isPending = !!idDoc && !isVerified;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Onboarding', href: '/onboarding/learner' },

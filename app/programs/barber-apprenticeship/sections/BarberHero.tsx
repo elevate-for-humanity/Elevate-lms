@@ -53,7 +53,7 @@ export function BarberHero() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-6 bg-slate-900">
+      <section className="py-6 bg-white border-t">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {QUICK_STATS.map((s) => (
@@ -75,7 +75,7 @@ export function BarberHero() {
               <p className="text-slate-700 leading-relaxed text-lg mb-6">
                 The Barber Apprenticeship Program is a competency-based workforce training program designed to prepare participants for employment in the barbering industry through structured Related Technical Instruction (RTI) and supervised On-the-Job Training (OJT) in licensed barbershop environments. This program follows an apprenticeship-style training model combining classroom instruction, LMS-based modules, and real-world client service under licensed supervision.
               </p>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+              <div className="bg-white border border-slate-200 rounded-xl p-6">
                 <p className="text-sm text-slate-600 leading-relaxed italic">
                   INTraining Program ID: #10004637 &middot; Provider: 2Exclusive LLC-S &middot; Location: Elevate for Humanity Training Center, Indianapolis, Indiana (Marion County)
                 </p>

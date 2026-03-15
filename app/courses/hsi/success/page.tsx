@@ -41,7 +41,7 @@ export default async function HSISuccessPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
           { label: 'Courses', href: '/courses' },
@@ -175,7 +175,7 @@ export default async function HSISuccessPage({
       </section>
 
       {/* Need Help */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Need Help?</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -230,7 +230,7 @@ export default async function HSISuccessPage({
             </Link>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-white hover:bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors"
             >
               Go to Dashboard
             </Link>

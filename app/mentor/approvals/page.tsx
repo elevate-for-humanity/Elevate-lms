@@ -147,7 +147,7 @@ export default async function MentorApprovalsPage({
       </div>
 
       <form
-        className="flex flex-wrap gap-3 items-end bg-slate-50 p-4 rounded-lg"
+        className="flex flex-wrap gap-3 items-end bg-white p-4 rounded-lg"
         action="/mentor/approvals"
         method="get"
       >
@@ -223,7 +223,7 @@ export default async function MentorApprovalsPage({
         </div>
 
         <button
-          className="border border-slate-300 rounded px-4 py-2 text-sm font-semibold bg-white hover:bg-slate-50 transition"
+          className="border border-slate-300 rounded px-4 py-2 text-sm font-semibold bg-white hover:bg-white transition"
           type="submit"
         >
           Filter
@@ -239,7 +239,7 @@ export default async function MentorApprovalsPage({
       </form>
 
       <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-        <div className="grid grid-cols-14 gap-2 px-4 py-3 text-xs font-bold bg-slate-100 text-black border-b border-slate-200">
+        <div className="grid grid-cols-14 gap-2 px-4 py-3 text-xs font-bold bg-white text-black border-b border-slate-200">
           <div className="col-span-3">Apprentice</div>
           <div className="col-span-2">Date</div>
           <div className="col-span-2">Type</div>
@@ -263,7 +263,7 @@ export default async function MentorApprovalsPage({
               return (
                 <div
                   key={e.id}
-                  className="grid grid-cols-14 gap-2 px-4 py-3 text-sm items-start hover:bg-slate-50 transition"
+                  className="grid grid-cols-14 gap-2 px-4 py-3 text-sm items-start hover:bg-white transition"
                 >
                   <div className="col-span-3">
                     <div className="font-semibold text-black">
@@ -303,7 +303,7 @@ export default async function MentorApprovalsPage({
                             ? 'bg-brand-green-100 text-brand-green-800'
                             : e.status === 'REJECTED'
                               ? 'bg-brand-red-100 text-brand-red-800'
-                              : 'bg-slate-100 text-black'
+                              : 'bg-white text-black'
                       }`}
                     >
                       {e.status}
@@ -316,7 +316,7 @@ export default async function MentorApprovalsPage({
                         e.funding_phase === 'WIOA'
                           ? 'bg-brand-blue-100 text-brand-blue-800'
                           : e.funding_phase === 'PRE_WIOA'
-                            ? 'bg-slate-100 text-black'
+                            ? 'bg-white text-black'
                             : 'bg-brand-blue-100 text-brand-blue-800'
                       }`}
                     >
@@ -385,7 +385,7 @@ export default async function MentorApprovalsPage({
                       }}
                     >
                       <button
-                        className="px-3 py-2 border border-slate-600 text-black rounded text-xs font-semibold hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-2 border border-slate-600 text-black rounded text-xs font-semibold hover:bg-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={e.status !== 'APPROVED'}
                         title="Lock after approval so it can't be changed"
                       >
@@ -400,7 +400,7 @@ export default async function MentorApprovalsPage({
         )}
       </div>
 
-      <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded border border-slate-200">
+      <div className="text-xs text-slate-500 bg-white p-3 rounded border border-slate-200">
         <strong>Policy reminders:</strong> No backdated WIOA hours, weekly caps
         enforced by API, lock entries after approval for audit safety.
       </div>

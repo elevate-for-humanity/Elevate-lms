@@ -53,7 +53,7 @@ export default function WebsiteBuilderAppPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Website Builder" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-100 text-slate-900 py-16 px-4">
+      <section className="bg-white text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -78,7 +78,7 @@ export default function WebsiteBuilderAppPage() {
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart - $79/mo
                 </Link>
-                <button className="inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
+                <button className="inline-flex items-center gap-2 border border-slate-300 hover:bg-white text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
                   <Play className="w-5 h-5" />
                   Watch Demo
                 </button>
@@ -86,7 +86,7 @@ export default function WebsiteBuilderAppPage() {
             </div>
             <div className="relative">
               <div className="bg-white rounded-2xl shadow-2xl p-4">
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <div className="aspect-video bg-white rounded-lg overflow-hidden">
                   <video
                     autoPlay
                     muted
@@ -104,7 +104,7 @@ export default function WebsiteBuilderAppPage() {
       </section>
 
       {/* Templates */}
-      <section className="py-12 px-4 bg-gray-50">
+      <section className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-gray-600 mb-6">Industry-specific templates included</p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -180,7 +180,7 @@ export default function WebsiteBuilderAppPage() {
                   href={`/store/cart?add=website-${plan.name.toLowerCase()}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors ${
                     plan.popular 
-                      ? 'bg-white text-brand-blue-600 hover:bg-gray-100' 
+                      ? 'bg-white text-brand-blue-600 hover:bg-white' 
                       : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                   }`}
                 >
@@ -202,7 +202,7 @@ export default function WebsiteBuilderAppPage() {
             <Link href="/store/cart?add=website-pro" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial
             </Link>
-            <Link href="/contact" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">
+            <Link href="/contact" className="border border-slate-300 hover:bg-white text-slate-900 px-8 py-4 rounded-lg font-bold">
               Request Demo
             </Link>
           </div>

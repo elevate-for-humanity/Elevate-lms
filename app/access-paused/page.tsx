@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function AccessPausedPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           {/* Icon */}
@@ -41,7 +41,7 @@ export default function AccessPausedPage() {
           </p>
 
           {/* Reassurance */}
-          <div className="bg-slate-50 rounded-lg p-4 mb-6">
+          <div className="bg-white rounded-lg p-4 mb-6">
             <p className="text-sm text-slate-500">
               Your progress and data are safe.
               Once your administrator resolves the billing, you&apos;ll have full access again.
@@ -60,7 +60,7 @@ export default function AccessPausedPage() {
             
             <Link
               href="/"
-              className="w-full inline-flex items-center justify-center gap-2 text-slate-600 px-6 py-3 rounded-lg font-medium hover:bg-slate-100 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 text-slate-600 px-6 py-3 rounded-lg font-medium hover:bg-white transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Home

@@ -108,7 +108,7 @@ export default function SignDocumentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading document...</p>
@@ -119,7 +119,7 @@ export default function SignDocumentPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-md p-8">
           <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-brand-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@ export default function SignDocumentPage() {
 
   if (signed) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-md mx-auto text-center bg-white rounded-lg shadow-md p-8">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
@@ -162,7 +162,7 @@ export default function SignDocumentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Sign", href: "/sign" }, { label: "[Documentid]" }]} />
       </div>
@@ -237,7 +237,7 @@ export default function SignDocumentPage() {
             </button>
             <Link
               href="/dashboard"
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-white transition-colors"
             >
               Cancel
             </Link>

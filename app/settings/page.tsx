@@ -37,7 +37,7 @@ export default async function SettingsPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-6xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
           <Link href="/" className="hover:text-brand-orange-600">Home</Link>
@@ -53,7 +53,7 @@ export default async function SettingsPage() {
               {settingsSections.map(section => (
                 <button key={section.id} onClick={() => setActiveSection(section.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
-                    activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
+                    activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-white'
                   }`}>
                   <section.icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{section.name}</span>
@@ -76,7 +76,7 @@ export default async function SettingsPage() {
                     <div className="w-20 h-20 bg-brand-orange-100 rounded-full flex items-center justify-center">
                       <User className="w-10 h-10 text-brand-orange-600" />
                     </div>
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Change Photo</button>
+                    <button className="px-4 py-2 border rounded-lg hover:bg-white">Change Photo</button>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -126,7 +126,7 @@ export default async function SettingsPage() {
                   <div className="pt-4 border-t">
                     <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
                     <p className="text-sm text-gray-600 mb-3">Add an extra layer of security to your account</p>
-                    <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Enable 2FA</button>
+                    <button className="px-4 py-2 border rounded-lg hover:bg-white">Enable 2FA</button>
                   </div>
                 </div>
               )}
@@ -134,7 +134,7 @@ export default async function SettingsPage() {
               {activeSection === 'billing' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold">Billing & Payments</h2>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-white rounded-lg p-4">
                     <p className="font-medium">Current Plan: <span className="text-brand-orange-600">Pro</span></p>
                     <p className="text-sm text-gray-600">$29/month, renews on Feb 15, 2024</p>
                   </div>
@@ -183,15 +183,15 @@ export default async function SettingsPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
                       <div className="flex gap-4">
-                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                           <input type="radio" name="theme" value="light" defaultChecked />
                           <span>Light</span>
                         </label>
-                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                           <input type="radio" name="theme" value="dark" />
                           <span>Dark</span>
                         </label>
-                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-white">
                           <input type="radio" name="theme" value="system" />
                           <span>System</span>
                         </label>

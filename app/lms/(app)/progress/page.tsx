@@ -37,7 +37,7 @@ export default async function ProgressPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Progress" }]} />
         </div>
@@ -171,7 +171,7 @@ export default async function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Progress" }]} />
         </div>
@@ -278,10 +278,10 @@ export default async function ProgressPage() {
                       <Link
                         key={enrollment.id}
                         href={`/lms/courses/${enrollment.course_id}`}
-                        className="block p-6 hover:bg-slate-50 transition"
+                        className="block p-6 hover:bg-white transition"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                             {enrollment.courses?.thumbnail_url ? (
                               <Image alt="Progress indicator" 
                                 src={enrollment.courses.thumbnail_url} 
@@ -312,7 +312,7 @@ export default async function ProgressPage() {
                             </p>
                             <div className="flex items-center gap-4">
                               <div className="flex-1">
-                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-2 bg-white rounded-full overflow-hidden">
                                   <div 
                                     className={`h-full rounded-full ${
                                       progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
@@ -340,7 +340,7 @@ export default async function ProgressPage() {
                     Enroll in courses to start tracking your progress.
                   </p>
                   <Link
-                    href="/lms/courses"
+                    href="/learner/courses"
                     className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
                   >
                     Browse Courses
@@ -404,14 +404,14 @@ export default async function ProgressPage() {
               <h3 className="font-bold text-slate-900 mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 <Link 
-                  href="/lms/courses"
+                  href="/learner/courses"
                   className="block w-full text-center bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
                 >
                   Continue Learning
                 </Link>
                 <Link 
-                  href="/lms/certificates"
-                  className="block w-full text-center border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition"
+                  href="/learner/certificates"
+                  className="block w-full text-center border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-white transition"
                 >
                   View Certificates
                 </Link>

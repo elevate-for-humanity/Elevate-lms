@@ -40,7 +40,7 @@ export default function SpeedGraderWrapper({ courseId, assignment, submissions }
 
   if (submissions.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
         <p className="text-slate-600 text-lg">No submissions to grade yet.</p>
         <Link
           href={`/instructor/courses/${courseId}/gradebook`}
@@ -70,7 +70,7 @@ export default function SpeedGraderWrapper({ courseId, assignment, submissions }
       <div className="absolute top-4 left-4 z-50">
         <Link
           href={`/instructor/courses/${courseId}/gradebook`}
-          className="inline-flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow text-sm text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow text-sm text-slate-700 hover:bg-white"
         >
           <ArrowLeft className="w-4 h-4" />
           Gradebook

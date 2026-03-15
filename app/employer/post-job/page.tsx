@@ -12,12 +12,12 @@ export const metadata: Metadata = {
 
 export default async function PostJobPage() {
   const supabase = await createClient();
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/employer" className="hover:text-primary">Employer</Link></li><li>/</li><li className="text-gray-900 font-medium">Post Job</li></ol></nav>
@@ -39,7 +39,7 @@ export default async function PostJobPage() {
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Required skills and qualifications" /></div>
             <div className="flex gap-4 pt-4 border-t">
               <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Post Job</button>
-              <Link href="/employer/opportunities" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
+              <Link href="/employer/opportunities" className="px-4 py-2 border rounded-lg hover:bg-white">Cancel</Link>
             </div>
           </form>
         </div>

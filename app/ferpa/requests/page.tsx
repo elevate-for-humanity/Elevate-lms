@@ -60,8 +60,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   approved: { label: 'Approved', color: 'bg-brand-green-100 text-brand-green-800', icon: CheckCircle },
   partially_approved: { label: 'Partially Approved', color: 'bg-brand-orange-100 text-brand-orange-800', icon: AlertCircle },
   denied: { label: 'Denied', color: 'bg-brand-red-100 text-brand-red-800', icon: XCircle },
-  completed: { label: 'Completed', color: 'bg-gray-100 text-gray-800', icon: CheckCircle },
-  cancelled: { label: 'Cancelled', color: 'bg-gray-100 text-gray-500', icon: XCircle },
+  completed: { label: 'Completed', color: 'bg-white text-gray-800', icon: CheckCircle },
+  cancelled: { label: 'Cancelled', color: 'bg-white text-gray-500', icon: XCircle },
 };
 
 export default async function FerpaRequestsPage() {
@@ -70,7 +70,7 @@ export default async function FerpaRequestsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -131,7 +131,7 @@ export default async function FerpaRequestsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -217,7 +217,7 @@ export default async function FerpaRequestsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">All Requests</h2>
-            <button className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-white">
               <Filter className="w-4 h-4" />
               Filter
             </button>
@@ -231,11 +231,11 @@ export default async function FerpaRequestsPage() {
                 const overdue = isOverdue(request);
 
                 return (
-                  <div key={request.id} className="px-6 py-4 hover:bg-gray-50">
+                  <div key={request.id} className="px-6 py-4 hover:bg-white">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          overdue ? 'bg-brand-red-100' : 'bg-gray-100'
+                          overdue ? 'bg-brand-red-100' : 'bg-white'
                         }`}>
                           <FileText className={`w-5 h-5 ${overdue ? 'text-brand-red-600' : 'text-gray-500'}`} />
                         </div>

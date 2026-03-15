@@ -124,7 +124,7 @@ export default function ProgramHolderSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Onboarding" }]} />
       </div>
@@ -558,7 +558,7 @@ export default function ProgramHolderSetup() {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h2 className="text-3xl font-bold mb-6">Review Your Program</h2>
             <div className="space-y-6">
-              <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+              <div className="bg-white rounded-lg p-6 space-y-4">
                 <div>
                   <p className="text-sm text-black">Organization</p>
                   <p className="font-semibold">{formData.organizationName}</p>

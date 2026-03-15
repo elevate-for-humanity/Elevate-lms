@@ -52,8 +52,8 @@ export default async function CreatorDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Creator', href: '/creator' }, { label: 'Dashboard' }]} />
         </div>
@@ -108,11 +108,11 @@ export default async function CreatorDashboardPage() {
               </thead>
               <tbody className="divide-y">
                 {courses.slice(0, 10).map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50">
+                  <tr key={course.id} className="hover:bg-white">
                     <td className="py-4 font-medium text-gray-900">{course.title}</td>
                     <td className="py-4 text-center text-gray-600">{course.students}</td>
                     <td className="py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-700'}`}>
                         {course.status}
                       </span>
                     </td>

@@ -19,7 +19,7 @@ export default function PartnerOnboardingSuccessPage() {
         <Image src="/images/pages/partner-page-10.jpg" alt="Onboarding complete" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Onboarding', href: '/partner/onboarding' }, { label: 'Success' }]} />
         </div>
@@ -39,7 +39,7 @@ export default function PartnerOnboardingSuccessPage() {
             Thank you for applying to become a Partner Shop with Elevate for Humanity.
           </p>
 
-          <div className="bg-slate-50 rounded-lg p-6 text-left space-y-4 mb-8">
+          <div className="bg-white rounded-lg p-6 text-left space-y-4 mb-8">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-brand-blue-600" />

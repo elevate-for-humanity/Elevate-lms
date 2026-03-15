@@ -39,7 +39,7 @@ export default async function StaffTrainingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -79,9 +79,9 @@ export default async function StaffTrainingPage() {
     totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Training' }]} />
         </div>
@@ -232,7 +232,7 @@ export default async function StaffTrainingPage() {
                   </div>
 
                   {module.progress && (
-                    <div className="mb-4 p-3 bg-slate-50 rounded-lg">
+                    <div className="mb-4 p-3 bg-white rounded-lg">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-black">
                           Completed:{' '}
@@ -269,7 +269,7 @@ export default async function StaffTrainingPage() {
                     )}
                     {!module.isCompleted && (
                       <button
-                        className="flex-1 px-4 py-2 bg-slate-100 text-black rounded-lg hover:bg-slate-200 transition-colors"
+                        className="flex-1 px-4 py-2 bg-white text-black rounded-lg hover:bg-slate-200 transition-colors"
                         onClick={() => {
                           alert(
                             'Quiz functionality will be implemented with interactive modal'

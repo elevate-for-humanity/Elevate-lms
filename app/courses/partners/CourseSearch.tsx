@@ -179,7 +179,7 @@ export default function CourseSearch({ courses }: CourseSearchProps) {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   priceRange === option.value
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    : 'bg-white text-black hover:bg-gray-200'
                 }`}
               >
                 {option.label}

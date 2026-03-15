@@ -122,7 +122,7 @@ export default function InstructionalFrameworkPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Instructional Framework' }]} />
         </div>
@@ -169,7 +169,7 @@ export default function InstructionalFrameworkPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6 mb-8">
-            <div className="bg-slate-50 rounded-lg p-5">
+            <div className="bg-white rounded-lg p-5">
               <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-brand-blue-600" />
                 Institutional Classification
@@ -180,7 +180,7 @@ export default function InstructionalFrameworkPage() {
                 curriculum oversight.
               </p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-5">
+            <div className="bg-white rounded-lg p-5">
               <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-brand-blue-600" />
                 Curriculum Ownership
@@ -207,7 +207,7 @@ export default function InstructionalFrameworkPage() {
               { role: 'Employer Partners', entity: 'OJT Providers (Hands-On Apprenticeship Training)', detail: 'Structured workplace training under documented work process schedules, supervisor verification, wage progression, periodic evaluations.' },
               { role: 'Central Compliance System', entity: 'Institutional LMS', detail: 'Single system of record for RTI attendance, module completion, assessments, instructor verification, OJT hour logging, and cohort progress reporting.' },
             ].map((item, i) => (
-              <div key={i} className="flex gap-4 items-start bg-gray-50 rounded-lg p-4">
+              <div key={i} className="flex gap-4 items-start bg-white rounded-lg p-4">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   {i + 1}
                 </div>
@@ -249,7 +249,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Provider Tier System */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Provider Tier System</h2>
           <p className="text-gray-600 mb-8">
@@ -312,7 +312,7 @@ export default function InstructionalFrameworkPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-slate-50">
+                <tr className="bg-white">
                   <th className="text-left p-3 font-semibold text-gray-900 border-b">Program</th>
                   <th className="text-center p-3 font-semibold text-gray-900 border-b">Total Hours</th>
                   <th className="text-center p-3 font-semibold text-gray-900 border-b">RTI Hours</th>
@@ -324,7 +324,7 @@ export default function InstructionalFrameworkPage() {
               </thead>
               <tbody>
                 {RTI_PROGRAMS.map((p, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-white/50'}>
                     <td className="p-3 font-medium text-gray-900 border-b">{p.program}</td>
                     <td className="p-3 text-center text-gray-700 border-b">{p.totalHours.toLocaleString()}</td>
                     <td className="p-3 text-center text-brand-blue-700 font-medium border-b">{p.rtiHours}</td>
@@ -341,7 +341,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Authorized RTI Provider Registry */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Authorized RTI Provider Registry</h2>
           <p className="text-gray-600 mb-6">
@@ -364,7 +364,7 @@ export default function InstructionalFrameworkPage() {
               </thead>
               <tbody>
                 {RTI_REGISTRY.map((r, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white/50' : 'bg-white'}>
                     <td className="p-3 font-medium text-gray-900 border-b">{r.program}</td>
                     <td className="p-3 text-gray-700 border-b">{r.credentialPartner}</td>
                     <td className="p-3 text-gray-700 border-b text-xs">{r.partnerType}</td>
@@ -389,7 +389,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Competency & Assessment */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Competency Tracking & Assessment</h2>
           <p className="text-gray-600 mb-8">
@@ -483,7 +483,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Credential Issuance */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Credential Issuance (Dual-Issuer Model)</h2>
           <p className="text-gray-600 mb-6">
@@ -534,12 +534,12 @@ export default function InstructionalFrameworkPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Registration & Compliance References</h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="bg-slate-50 rounded-lg p-5">
+            <div className="bg-white rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
               <p className="font-semibold text-gray-900">RAPIDS ID: 2025-IN-132301</p>
               <p className="text-sm text-gray-600 mt-1">Sponsor of Record: 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-5">
+            <div className="bg-white rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">ETPL / INTraining</p>
               <p className="font-semibold text-gray-900">Location ID: 10004621</p>
               <p className="text-sm text-gray-600 mt-1">Indiana Department of Workforce Development</p>
@@ -555,19 +555,19 @@ export default function InstructionalFrameworkPage() {
             </Link>
             <Link
               href="/workone-partner-packet"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               WorkOne Partner Packet
             </Link>
             <Link
               href="/pathways/training-model"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               How Training Works
             </Link>
             <Link
               href="/instructor-credentials"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               Instructor Credentials
             </Link>

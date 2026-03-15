@@ -76,9 +76,9 @@ export default function StudentProgressWidget() {
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 rounded w-1/3"></div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="h-20 bg-gray-100 rounded"></div>
-            <div className="h-20 bg-gray-100 rounded"></div>
-            <div className="h-20 bg-gray-100 rounded"></div>
+            <div className="h-20 bg-white rounded"></div>
+            <div className="h-20 bg-white rounded"></div>
+            <div className="h-20 bg-white rounded"></div>
           </div>
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function StudentProgressWidget() {
             </div>
             
             {program.required_hours && (
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+              <div className="h-2 bg-white rounded-full overflow-hidden mb-2">
                 <div
                   className="h-full bg-brand-green-500 rounded-full transition-all"
                   style={{ width: `${progress}%` }}

@@ -72,7 +72,7 @@ export default function AttendancePolicyPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Attendance Requirements</h2>
           
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <div className="bg-white rounded-lg p-6 mb-6">
             <h3 className="font-bold text-gray-900 mb-3">Minimum Attendance Standard</h3>
             <p className="text-gray-700 mb-4">
               Students must maintain a minimum of <strong>80% attendance</strong> in both online 
@@ -87,7 +87,7 @@ export default function AttendancePolicyPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-white rounded-lg p-6">
             <h3 className="font-bold text-gray-900 mb-3">Clock Hour Programs</h3>
             <p className="text-gray-700">
               Programs that require specific clock hours for certification or licensing 
@@ -103,7 +103,7 @@ export default function AttendancePolicyPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Attendance Tracking</h2>
           
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Online Tracking</h3>
               <p className="text-gray-700">
                 The Learning Management System (LMS) automatically tracks:
@@ -117,7 +117,7 @@ export default function AttendancePolicyPage() {
               </ul>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">In-Person Tracking</h3>
               <p className="text-gray-700">
                 In-person attendance is documented through:
@@ -137,7 +137,7 @@ export default function AttendancePolicyPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Absences and Tardiness</h2>
           
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Excused Absences</h3>
               <p className="text-gray-700 mb-3">
                 The following may be considered excused absences with proper documentation:
@@ -155,7 +155,7 @@ export default function AttendancePolicyPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Unexcused Absences</h3>
               <p className="text-gray-700">
                 Absences without prior approval or documentation are considered unexcused. 
@@ -164,7 +164,7 @@ export default function AttendancePolicyPage() {
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Tardiness</h3>
               <p className="text-gray-700">
                 Arriving more than 15 minutes late to an in-person session is considered tardy. 
@@ -285,7 +285,7 @@ export default function AttendancePolicyPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

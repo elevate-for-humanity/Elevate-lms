@@ -29,7 +29,7 @@ export default async function MembersPage() {
     .limit(50);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -46,7 +46,7 @@ export default async function MembersPage() {
                 className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green-500"
               />
             </div>
-            <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50">
+            <button className="p-2 border border-slate-200 rounded-lg hover:bg-white">
               <Filter className="w-5 h-5 text-slate-600" />
             </button>
           </div>
@@ -89,7 +89,7 @@ export default async function MembersPage() {
         {/* Load More */}
         {members && members.length >= 50 && (
           <div className="text-center mt-8">
-            <button className="px-6 py-3 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-slate-50">
+            <button className="px-6 py-3 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-white">
               Load More Members
             </button>
           </div>

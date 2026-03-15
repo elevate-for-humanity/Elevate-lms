@@ -146,7 +146,7 @@ export default async function ApprenticeCourseDetailPage({
   const progressPercent = moduleData.length > 0 ? Math.round((completedCount / moduleData.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-900 text-white">
         <div className="max-w-5xl mx-auto px-6 py-8">

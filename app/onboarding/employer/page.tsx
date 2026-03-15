@@ -173,7 +173,7 @@ export default async function EmployerOnboardingPage() {
   const progressPercent = Math.round((requiredComplete / totalRequired) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Onboarding' }, { label: 'Employer' }]} />
@@ -244,7 +244,7 @@ export default async function EmployerOnboardingPage() {
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                   step.status === 'complete' ? 'bg-green-100' :
                   step.status === 'current' ? 'bg-brand-blue-100' :
-                  'bg-gray-100'
+                  'bg-white'
                 }`}>
                   {step.status === 'complete' ? (
                     <CheckCircle className="w-5 h-5 text-green-600" />

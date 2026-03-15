@@ -51,7 +51,7 @@ export default function ProgramHolderLanding() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Program Holder' }]} />
         </div>
@@ -71,7 +71,7 @@ export default function ProgramHolderLanding() {
       {/* Avatar Guide */}
 
       {/* Features */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Portal Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -141,7 +141,7 @@ export default function ProgramHolderLanding() {
             </div>
           </div>
 
-          <div className="mt-8 bg-slate-50 border border-slate-200 rounded-lg p-5">
+          <div className="mt-8 bg-white border border-slate-200 rounded-lg p-5">
             <p className="text-sm text-slate-700">
               <strong>In short:</strong> The barber on file is responsible for supervising the apprenticeship training and verifying that apprentices are learning the trade correctly while working in the shop.
             </p>
@@ -150,7 +150,7 @@ export default function ProgramHolderLanding() {
       </section>
 
       {/* Shop Owner — Responsibilities */}
-      <section className="py-16 bg-slate-50 border-t border-slate-200">
+      <section className="py-16 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <Store className="w-7 h-7 text-teal-700 flex-shrink-0" />
@@ -282,15 +282,15 @@ export default function ProgramHolderLanding() {
           {/* Required pay structure */}
           <h3 className="text-lg font-bold text-slate-900 mb-4">Required Pay Structure</h3>
           <div className="space-y-4 mb-8">
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h4 className="font-bold text-slate-900 mb-1">Base Hourly Wage (Required)</h4>
               <p className="text-sm text-slate-600">Apprentices must receive an hourly wage at or above the applicable minimum wage for all hours worked, including OJT hours. This is the base compensation and is non-negotiable.</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h4 className="font-bold text-slate-900 mb-1">Optional Commission on Services</h4>
               <p className="text-sm text-slate-600">Commission or tips <strong>may supplement</strong> the base hourly wage but <strong>cannot replace it</strong>. The apprentice must receive at least minimum wage before any commission or tip income is considered.</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <div className="bg-white border border-slate-200 rounded-lg p-4">
               <h4 className="font-bold text-slate-900 mb-1">Progressive Wage Increases</h4>
               <p className="text-sm text-slate-600">Wages increase as the apprentice advances through the program, gains skills, and completes training milestones. The wage schedule is defined in the apprenticeship agreement.</p>
             </div>
@@ -301,7 +301,7 @@ export default function ProgramHolderLanding() {
           <p className="text-sm text-slate-600 mb-4">This is a common structure used by barber shops hosting apprentices. It protects the shop legally and protects the apprentice from being unpaid when business is slow.</p>
           <div className="overflow-hidden rounded-lg border border-slate-200">
             <table className="w-full text-sm">
-              <thead className="bg-slate-100">
+              <thead className="bg-white">
                 <tr>
                   <th className="text-left px-4 py-3 font-bold text-slate-900">Stage</th>
                   <th className="text-left px-4 py-3 font-bold text-slate-900">Compensation</th>
@@ -312,7 +312,7 @@ export default function ProgramHolderLanding() {
                   <td className="px-4 py-3 text-slate-700 font-medium">Starting</td>
                   <td className="px-4 py-3 text-slate-600">Hourly base (e.g., $12–$15/hr depending on state)</td>
                 </tr>
-                <tr className="bg-slate-50">
+                <tr className="bg-white">
                   <td className="px-4 py-3 text-slate-700 font-medium">After competency milestones</td>
                   <td className="px-4 py-3 text-slate-600">Hourly base + commission on services</td>
                 </tr>

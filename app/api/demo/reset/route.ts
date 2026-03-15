@@ -17,6 +17,9 @@ export const dynamic = 'force-dynamic';
 const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001';
 
 async function _POST(request: Request) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

@@ -334,7 +334,7 @@ export default function TimeclockPage() {
   // Loading state
   if (contextLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading timeclock...</p>
@@ -346,7 +346,7 @@ export default function TimeclockPage() {
   // Error state
   if (contextError || !context) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-md mx-auto px-4">
           <Link 
             href="/apprentice" 
@@ -375,7 +375,7 @@ export default function TimeclockPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-md mx-auto px-4">
         <Link 
           href="/apprentice" 
@@ -413,7 +413,7 @@ export default function TimeclockPage() {
                 Work Site
               </label>
               {context.allowedSites.length === 1 ? (
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-700">
+                <div className="p-3 bg-white rounded-lg text-sm text-gray-700">
                   {context.allowedSites[0].name}
                 </div>
               ) : (
@@ -444,7 +444,7 @@ export default function TimeclockPage() {
           )}
 
           {/* Location Status */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-white rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <MapPin className={`w-5 h-5 mr-2 ${location.error ? 'text-brand-red-500' : 'text-brand-green-500'}`} />

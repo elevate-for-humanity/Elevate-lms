@@ -36,7 +36,7 @@ export default async function MarketplaceProductsPage() {
   const categories = Array.from(new Set(items.map(p => p.category).filter(Boolean)));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[
         { label: 'Community', href: '/community' },
         { label: 'Marketplace', href: '/community/marketplace' },
@@ -57,7 +57,7 @@ export default async function MarketplaceProductsPage() {
           <div className="flex flex-wrap gap-2 mb-8 justify-center">
             <span className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-medium">All</span>
             {categories.map(cat => (
-              <span key={cat} className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+              <span key={cat} className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-gray-700 hover:bg-white cursor-pointer">
                 {cat}
               </span>
             ))}
@@ -77,7 +77,7 @@ export default async function MarketplaceProductsPage() {
               return (
                 <div key={product.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition group">
                   {images[0] && (
-                    <div className="relative h-48 bg-gray-100 overflow-hidden">
+                    <div className="relative h-48 bg-white overflow-hidden">
                       <Image
                         src={images[0]}
                         alt={product.title}
@@ -106,7 +106,7 @@ export default async function MarketplaceProductsPage() {
                         {product.price === 0 ? 'Free' : `$${product.price}`}
                       </span>
                       {product.condition && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
                           {product.condition}
                         </span>
                       )}

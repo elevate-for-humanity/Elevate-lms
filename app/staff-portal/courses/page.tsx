@@ -48,7 +48,7 @@ export default async function StaffCoursesPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Courses' }]} />
@@ -72,7 +72,7 @@ export default async function StaffCoursesPage() {
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-white border-b">
                 <tr>
                   <th className="text-left p-4 font-semibold text-gray-900">Course</th>
                   <th className="text-left p-4 font-semibold text-gray-900">Category</th>
@@ -91,7 +91,7 @@ export default async function StaffCoursesPage() {
                   </tr>
                 ) : (
                   courseList.map((course: any) => (
-                    <tr key={course.id} className="hover:bg-gray-50">
+                    <tr key={course.id} className="hover:bg-white">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <BookOpen className="w-5 h-5 text-brand-blue-600" />
@@ -103,7 +103,7 @@ export default async function StaffCoursesPage() {
                       <td className="p-4 text-gray-600">{course.duration ? `${course.duration} weeks` : '-'}</td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          course.status === 'Active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'
+                          course.status === 'Active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-700'
                         }`}>{course.status}</span>
                       </td>
                       <td className="p-4">

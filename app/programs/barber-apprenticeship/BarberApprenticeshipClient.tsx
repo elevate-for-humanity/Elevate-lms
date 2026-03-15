@@ -38,7 +38,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <span className="flex-shrink-0 text-xs font-bold text-white px-3 py-1 rounded-full bg-brand-blue-600">DOL Registered</span>
             </div>
             <p className="text-slate-600 text-lg mb-6">{p.subtitle}</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 rounded-lg p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white rounded-lg p-4">
               <SpecItem icon={Clock} label="Duration" value="52 weeks" />
               <SpecItem icon={BookOpen} label="Hours/Week" value="15–20 hrs" />
               <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
@@ -75,7 +75,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-slate-700" />
               </div>
               <h2 className="text-xl font-bold text-slate-900">Career Pathway</h2>
@@ -94,7 +94,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ MEASURABLE OUTCOMES (condensed paragraph) ═══ */}
-      <section className="bg-slate-50 py-10">
+      <section className="bg-white py-10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-72 rounded-xl overflow-hidden shadow-lg order-2 md:order-1">
@@ -102,7 +102,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
             </div>
             <div className="order-1 md:order-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                   <ClipboardList className="w-5 h-5 text-slate-700" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">Measurable Outcomes</h2>
@@ -122,7 +122,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ CREDENTIALS EARNED (image blocks, no OSHA 10) ═══ */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
             <Award className="w-5 h-5 text-slate-700" />
           </div>
           <h2 className="text-xl font-bold text-slate-900">Credentials Earned</h2>
@@ -150,7 +150,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ CTA: INQUIRY & ENROLLMENT ═══ */}
-      <section className="bg-slate-900 py-12">
+      <section className="bg-white py-12 border-t">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-white text-center mb-3">Ready to Start?</h2>
           <p className="text-slate-400 text-center max-w-2xl mx-auto mb-8">
@@ -255,10 +255,10 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ CAREER OUTCOMES / LABOR MARKET ═══ */}
-      <section className="bg-slate-50 py-10">
+      <section className="bg-white py-10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
               <Briefcase className="w-5 h-5 text-slate-700" />
             </div>
             <h2 className="text-xl font-bold text-slate-900">Career Outcomes</h2>
@@ -274,7 +274,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
               <div className="text-3xl font-bold text-slate-900 mt-2">{p.laborMarket.growthRate}</div>
               <div className="text-sm text-slate-600">Job Growth (10-year)</div>
             </div>
-            <div className="bg-slate-50 rounded-lg p-6 text-center border border-slate-200">
+            <div className="bg-white rounded-lg p-6 text-center border border-slate-200">
               <Building2 className="w-8 h-8 text-slate-600 mx-auto" />
               <div className="text-lg font-bold text-slate-900 mt-2">{p.laborMarket.salaryRange}</div>
               <div className="text-sm text-slate-600">Salary Range ({p.laborMarket.region})</div>
@@ -295,7 +295,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       {/* ═══ FAQ ═══ */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
             <FileText className="w-5 h-5 text-slate-700" />
           </div>
           <h2 className="text-xl font-bold text-slate-900">Frequently Asked Questions</h2>
@@ -303,7 +303,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
         <div className="space-y-3">
           {p.faqs.map((faq, i) => (
             <details key={i} className="group bg-white border border-slate-200 rounded-lg overflow-hidden">
-              <summary className="px-5 py-4 cursor-pointer font-medium text-slate-900 hover:bg-slate-50 transition-colors flex items-center justify-between">
+              <summary className="px-5 py-4 cursor-pointer font-medium text-slate-900 hover:bg-white transition-colors flex items-center justify-between">
                 {faq.question}
                 <ChevronRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform flex-shrink-0" />
               </summary>
@@ -381,7 +381,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ INSTITUTIONAL FOOTER ═══ */}
-      <section className="bg-slate-50 border-t py-8">
+      <section className="bg-white border-t py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-slate-600">
             <div>

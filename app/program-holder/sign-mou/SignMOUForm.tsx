@@ -119,7 +119,7 @@ export function SignMOUForm() {
       </div>
 
       {/* Agreement Checkbox */}
-      <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+      <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-slate-200">
         <input
           type="checkbox"
           id="agreed"
@@ -150,7 +150,7 @@ export function SignMOUForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-3 border border-slate-300 text-black rounded-lg font-semibold hover:bg-slate-50 transition"
+          className="px-6 py-3 border border-slate-300 text-black rounded-lg font-semibold hover:bg-white transition"
         >
           Cancel
         </button>

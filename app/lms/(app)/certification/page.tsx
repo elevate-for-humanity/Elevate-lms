@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const STATE_STYLES: Record<CredentialLifecycleState, { label: string; color: string }> = {
-  not_eligible:                    { label: 'Not Eligible',     color: 'bg-gray-100 text-gray-600' },
+  not_eligible:                    { label: 'Not Eligible',     color: 'bg-white text-gray-600' },
   eligible:                        { label: 'Eligible',         color: 'bg-brand-blue-100 text-brand-blue-700' },
   payment_required:                { label: 'Payment Required', color: 'bg-yellow-100 text-yellow-700' },
   payment_pending:                 { label: 'Funding Pending',  color: 'bg-orange-100 text-orange-700' },
@@ -228,7 +228,7 @@ export default async function CertificationPage() {
               <div className="text-center py-8">
                 <Award className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p className="text-gray-500 mb-3">No certificates earned yet</p>
-                <Link href="/lms/courses" className="text-brand-blue-600 font-medium hover:underline">
+                <Link href="/learner/courses" className="text-brand-blue-600 font-medium hover:underline">
                   Browse courses to earn certificates
                 </Link>
               </div>

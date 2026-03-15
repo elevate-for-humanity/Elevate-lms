@@ -71,7 +71,7 @@ function SubmitTicketContent() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="min-h-screen bg-white py-16">
         <div className="max-w-2xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
             <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -93,7 +93,7 @@ function SubmitTicketContent() {
               </Link>
               <Link
                 href="/"
-                className="px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition"
+                className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition"
               >
                 Go to Homepage
               </Link>
@@ -105,7 +105,7 @@ function SubmitTicketContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-3xl mx-auto px-6">
         <Link
           href="/support"
@@ -276,7 +276,7 @@ function SubmitTicketContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Ticket" }]} />
       </div>

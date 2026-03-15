@@ -107,16 +107,16 @@ export default async function DrugTestingLandingPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/drug-testing-page-3.jpg" alt="Professional Drug Testing Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Professional Drug Testing Services</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Fast, accurate, and affordable drug testing for employers and individuals. DOT and non-DOT options with nationwide collection sites.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Professional Drug Testing Services</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Fast, accurate, and affordable drug testing for employers and individuals. DOT and non-DOT options with nationwide collection sites.</p>
           </div>
         </div>
       </section>
 
       {/* Features Bar */}
-      <section className="py-8 bg-brand-blue-900 text-white">
+      <section className="py-8 bg-brand-blue-900 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-6">
             {features.map((feature) => (
@@ -144,7 +144,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* Testing Categories */}
-      <section id="services" className="py-20 bg-gray-50">
+      <section id="services" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -183,7 +183,7 @@ export default async function DrugTestingLandingPage() {
                   <p className="text-gray-600 mb-4">{category.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {category.tests.map((test) => (
-                      <span key={test} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                      <span key={test} className="bg-white text-gray-700 px-3 py-1 rounded-full text-sm">
                         {test}
                       </span>
                     ))}
@@ -232,14 +232,14 @@ export default async function DrugTestingLandingPage() {
                   'Dedicated account manager',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/drug-testing/employer-programs"
-                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
               >
                 <Users className="w-5 h-5" />
                 Set Up Employer Account
@@ -250,7 +250,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* DOT Section */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-20 bg-gray-900 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -261,7 +261,7 @@ export default async function DrugTestingLandingPage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 DOT Drug & Alcohol Testing
               </h2>
-              <p className="text-xl text-gray-300 mb-6">
+              <p className="text-xl text-slate-600 mb-6">
                 FMCSA-compliant testing for CDL drivers and DOT-regulated employees. 
                 Full compliance with 49 CFR Part 40.
               </p>
@@ -274,15 +274,15 @@ export default async function DrugTestingLandingPage() {
                   'Clearinghouse reporting',
                   'SAP referrals available',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-300">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                  <li key={item} className="flex items-center gap-3 text-slate-600">
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/drug-testing/dot-testing"
-                className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+                className="inline-flex items-center gap-2 bg-brand-orange-500 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
               >
                 DOT Testing Details
                 <ArrowRight className="w-5 h-5" />
@@ -316,7 +316,7 @@ export default async function DrugTestingLandingPage() {
               { step: 6, title: 'Results Delivered', desc: 'Receive results via secure portal and email. Most results in 24-48 hours.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6">
-                <div className="w-14 h-14 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-14 h-14 bg-brand-blue-600 text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -331,7 +331,7 @@ export default async function DrugTestingLandingPage() {
 
       {/* Certification Program from DB */}
       {program && (
-        <section className="py-16 bg-slate-50">
+        <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 rounded-full text-brand-green-700 text-sm font-medium mb-4">
@@ -385,7 +385,7 @@ export default async function DrugTestingLandingPage() {
               </div>
             )}
             <div className="text-center mt-8">
-              <Link href="/start" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
+              <Link href="/start" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-slate-900 font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
                 Apply for This Program <ArrowRight className="w-5 h-5" />
               </Link>
               {program.tuition && (
@@ -397,7 +397,7 @@ export default async function DrugTestingLandingPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Schedule a Drug Test?
@@ -408,14 +408,14 @@ export default async function DrugTestingLandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-lg"
             >
               <Phone className="w-5 h-5" />
               (317) 314-3757
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
             >
               Request Quote
             </Link>

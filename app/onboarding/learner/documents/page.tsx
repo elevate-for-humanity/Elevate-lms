@@ -135,19 +135,19 @@ export default function DocumentsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* VIDEO HERO — full bleed, no text on top */}
       <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
         <video src="/videos/elevate-overview-with-narration.mp4" autoPlay loop playsInline className="w-full h-full object-cover" />
       </div>
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Onboarding', href: '/onboarding/learner' },
@@ -223,7 +223,7 @@ export default function DocumentsPage() {
                   setSsnDisplay(formatSsn(digits));
                 }}
                 disabled={ssnSaved}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 font-mono tracking-wider disabled:bg-gray-100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 font-mono tracking-wider disabled:bg-white"
               />
             </div>
             <button
@@ -257,7 +257,7 @@ export default function DocumentsPage() {
 
         {requiredComplete && (
           <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center gap-5">
-            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center flex-shrink-0">
               <FileText className="w-7 h-7 text-slate-500" />
             </div>
             <div className="flex-1 text-center sm:text-left">
@@ -286,15 +286,15 @@ export default function DocumentsPage() {
             return (
               <div key={doc.type} className={`bg-white border rounded-xl p-5 ${isUploaded ? 'border-brand-blue-200' : 'border-gray-200'}`}>
                 <div className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isUploaded ? 'bg-brand-blue-100' : 'bg-gray-100'}`}>
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isUploaded ? 'bg-brand-blue-100' : 'bg-white'}`}>
                     {isUploaded ? <CheckCircle2 className="w-5 h-5 text-brand-blue-600" /> : <FileText className="w-5 h-5 text-gray-400" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className={`font-semibold ${isUploaded ? 'text-brand-blue-900' : 'text-gray-900'}`}>{doc.title}</h3>
                       {doc.required && !isUploaded && <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded">Required</span>}
-                      {!doc.required && !isUploaded && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Optional</span>}
-                      {isUploaded && <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">Uploaded</span>}
+                      {!doc.required && !isUploaded && <span className="text-xs bg-white text-gray-500 px-2 py-0.5 rounded">Optional</span>}
+                      {isUploaded && <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded font-medium">Uploaded</span>}
                     </div>
                     <p className="text-gray-600 text-sm mb-2">{doc.description}</p>
                     <p className="text-xs text-gray-400 mb-3">Accepted: {doc.acceptedFormats}</p>
@@ -332,7 +332,7 @@ export default function DocumentsPage() {
           })}
         </div>
 
-        <div className="mt-8 bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+        <div className="mt-8 bg-white rounded-lg p-4 text-sm text-gray-600">
           <p className="font-medium text-gray-700 mb-1">Document Security</p>
           <p>All uploaded documents are encrypted and stored securely. Only authorized admissions staff can access your documents for verification purposes. Documents are retained per federal record-keeping requirements.</p>
         </div>

@@ -42,7 +42,7 @@ function MarketplaceThankYouContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4" />
           <p className="text-black">Processing your purchase...</p>
@@ -53,7 +53,7 @@ function MarketplaceThankYouContent() {
 
   if (error || !purchaseData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
           <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
@@ -86,7 +86,7 @@ function MarketplaceThankYouContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace", href: "/marketplace" }, { label: "Thank You" }]} />
       </div>
@@ -157,13 +157,13 @@ function MarketplaceThankYouContent() {
         <div className="text-center space-y-3">
           <Link
             href="/marketplace"
-            className="block w-full bg-gray-100 text-black py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
+            className="block w-full bg-white text-black py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
           >
             Browse More Products
           </Link>
           <Link
             href="/"
-            className="block w-full border border-gray-300 text-black py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
+            className="block w-full border border-gray-300 text-black py-3 rounded-lg font-semibold hover:bg-white transition"
           >
             Return Home
           </Link>
@@ -177,7 +177,7 @@ export default function MarketplaceThankYouPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-white flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto" />
             <p className="mt-4 text-black">Loading...</p>

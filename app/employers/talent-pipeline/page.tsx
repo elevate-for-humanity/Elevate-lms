@@ -101,7 +101,7 @@ export default async function TalentPipelinePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -193,7 +193,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -228,7 +228,7 @@ export default async function TalentPipelinePage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {industries.map((industry) => (
-              <div key={industry.name} className="bg-gray-50 p-6 rounded-xl">
+              <div key={industry.name} className="bg-white p-6 rounded-xl">
                 <div className="text-4xl mb-4">{industry.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{industry.name}</h3>
                 <ul className="space-y-2">

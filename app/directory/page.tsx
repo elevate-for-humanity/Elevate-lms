@@ -29,7 +29,7 @@ export default async function DirectoryPage() {
 const partners = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner Directory' }]} />
         </div>
@@ -51,7 +51,7 @@ const partners = (dbRows as any[]) || [];
             {partners.map((p) => (
               <div key={p.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
                 <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-14 h-14 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
                     {p.logo ? (
                       <Image src={p.logo} alt={p.name} width={40} height={40} className="w-10 h-10 object-contain" />
                     ) : (
@@ -81,7 +81,7 @@ const partners = (dbRows as any[]) || [];
       </section>
 
       {/* External Resources */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">External Resources</h2>
           <div className="grid sm:grid-cols-2 gap-4">

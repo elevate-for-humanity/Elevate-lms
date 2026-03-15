@@ -46,7 +46,7 @@ export default function ProgramCoursesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
           <p className="text-black">Loading courses...</p>
@@ -62,7 +62,7 @@ export default function ProgramCoursesPage() {
     .join(' ');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Programs', href: '/programs' },
@@ -75,7 +75,7 @@ export default function ProgramCoursesPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/pages/programs-slug-courses-hero.jpg" alt="Professional training courses and certification programs" fill sizes="100vw" className="object-cover" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-2 bg-slate-700 px-4 py-2 rounded-full mb-4">
               <BookOpen className="w-5 h-5 text-slate-300" />
@@ -181,7 +181,7 @@ export default function ProgramCoursesPage() {
               
               return (
                 <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
-                  <div className="relative aspect-video overflow-hidden bg-gray-100">
+                  <div className="relative aspect-video overflow-hidden bg-white">
                     <Image alt="Course lesson" 
                       src={courseImage} 
                       alt={course.title}

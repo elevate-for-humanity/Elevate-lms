@@ -30,7 +30,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
           posterAlt={`Career Training in ${state.name}`}
           size="marketing"
         />
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <div className="flex items-center gap-2 text-brand-green-300 mb-4 justify-center">
               <MapPin className="w-5 h-5" />
@@ -119,7 +119,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
             Many programs are free for qualifying {state.demonym}. Check your eligibility today.
           </p>
           <Link
-            href="/eligibility"
+            href="/wioa-eligibility"
             className="inline-flex items-center px-8 py-4 bg-white text-brand-green-600 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors"
           >
             Check Eligibility <ArrowRight className="ml-2 w-5 h-5" />

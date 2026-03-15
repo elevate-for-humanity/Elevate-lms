@@ -167,7 +167,7 @@ function AssessmentContent() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-10 text-center">
           {passed ? (
             <>
@@ -208,7 +208,7 @@ function AssessmentContent() {
 
   if (!started) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-lg w-full bg-white rounded-2xl shadow-lg p-10">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -230,7 +230,7 @@ function AssessmentContent() {
               </div>
             ))}
           </div>
-          <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600 mb-6">
+          <div className="bg-white rounded-xl p-4 text-sm text-slate-600 mb-6">
             Answer honestly — there are no trick questions. The assessment tests knowledge of student support, FERPA, WIOA, and Elevate's mission.
           </div>
           <button onClick={() => setStarted(true)}
@@ -246,7 +246,7 @@ function AssessmentContent() {
   const progress = Math.round(((current + 1) / QUESTIONS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Progress bar */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3">
@@ -271,7 +271,7 @@ function AssessmentContent() {
                 className={`w-full text-left flex items-start gap-4 p-4 rounded-xl border-2 transition-all ${
                   answers[q.id] === opt.id
                     ? 'border-brand-blue-600 bg-brand-blue-50'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    : 'border-slate-200 hover:border-slate-300 hover:bg-white'
                 }`}>
                 <span className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 ${
                   answers[q.id] === opt.id
@@ -295,7 +295,7 @@ function AssessmentContent() {
         <div className="flex gap-3">
           {current > 0 && (
             <button onClick={() => setCurrent(c => c - 1)}
-              className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-slate-50">
+              className="flex-1 py-3 border rounded-xl text-slate-700 font-medium hover:bg-white">
               Back
             </button>
           )}
@@ -318,7 +318,7 @@ function AssessmentContent() {
 
 export default function AssessmentPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" /></div>}>
       <AssessmentContent />
     </Suspense>
   );

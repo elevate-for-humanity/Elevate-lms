@@ -49,7 +49,7 @@ export default function HVACCurriculumPage() {
         <p className="text-slate-600 mt-2">{course.subtitle}</p>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 bg-slate-50 rounded-lg p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 bg-white rounded-lg p-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-slate-900">{course.modules.length}</div>
             <div className="text-xs text-slate-500 uppercase">Modules</div>
@@ -69,7 +69,7 @@ export default function HVACCurriculumPage() {
         </div>
 
         {/* Credentials */}
-        <div className="mt-6 bg-slate-50 rounded-lg p-4">
+        <div className="mt-6 bg-white rounded-lg p-4">
           <h2 className="text-sm font-bold text-slate-500 uppercase mb-2">Credentials Earned Upon Completion</h2>
           <div className="flex flex-wrap gap-2">
             {['EPA 608 Universal', 'Residential HVAC Cert 1', 'Residential HVAC Cert 2', 'OSHA 30', 'CPR', 'Rise Up'].map((c) => (
@@ -99,7 +99,7 @@ export default function HVACCurriculumPage() {
             return (
               <div key={mod.id} className="border border-slate-200 rounded-lg overflow-hidden">
                 {/* Module header */}
-                <div className="bg-slate-50 px-5 py-4 border-b border-slate-200">
+                <div className="bg-white px-5 py-4 border-b border-slate-200">
                   <div className="flex items-baseline gap-3">
                     <span className="text-xs font-bold text-slate-400">Module {i + 1}</span>
                     <h3 className="text-lg font-bold text-slate-900">{mod.title}</h3>
@@ -140,14 +140,14 @@ export default function HVACCurriculumPage() {
       </div>
 
       {/* CTA */}
-      <section className="bg-slate-900 py-10">
+      <section className="bg-white py-10 border-t">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white">HVAC Technician Training</h2>
+            <h2 className="text-xl font-bold text-slate-900">HVAC Technician Training</h2>
             <p className="text-slate-400 text-sm">{course.modules.length} modules · {totalLessons} lessons · {course.estimatedDurationWeeks} weeks</p>
           </div>
           <div className="flex gap-3">
-            <Link href="/apply/student?program=hvac-technician" className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-slate-100 transition-colors">Apply Now</Link>
+            <Link href="/apply/student?program=hvac-technician" className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-white transition-colors">Apply Now</Link>
             <Link href="/programs/hvac-technician" className="border border-slate-500 text-white px-6 py-3 rounded font-semibold text-sm hover:border-white transition-colors">Program Details</Link>
           </div>
         </div>
@@ -165,7 +165,7 @@ function LessonTypeBadge({ type }: { type: string }) {
     assignment: 'bg-purple-100 text-purple-700',
   };
   return (
-    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${styles[type] || 'bg-slate-100 text-slate-600'}`}>
+    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${styles[type] || 'bg-white text-slate-600'}`}>
       {type}
     </span>
   );

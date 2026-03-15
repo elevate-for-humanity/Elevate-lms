@@ -94,7 +94,7 @@ export default function StaffCampaignsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-black">
@@ -159,7 +159,7 @@ export default function StaffCampaignsPage() {
                 {myStudents.map((student: any) => (
                   <label
                     key={student.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-white cursor-pointer"
                   >
                     <input
                       type="checkbox"

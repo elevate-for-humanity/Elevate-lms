@@ -107,16 +107,16 @@ export default function EmployerProgramsPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/images/pages/drug-testing-employer.jpg" alt="Employer Drug Testing Programs" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Employer Drug Testing Programs</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Comprehensive drug testing solutions for businesses of all sizes. From startups to enterprises, we have a program that fits your needs.</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Employer Drug Testing Programs</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Comprehensive drug testing solutions for businesses of all sizes. From startups to enterprises, we have a program that fits your needs.</p>
           </div>
         </div>
       </section>
 
       {/* Program Types */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Testing Programs We Offer</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -127,7 +127,7 @@ export default function EmployerProgramsPage() {
                 <ul className="space-y-2">
                   {program.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-gray-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                      <span className="text-slate-500 flex-shrink-0">•</span>
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -157,7 +157,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Volume Pricing */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-slate-900">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">Volume Discounts</h2>
           <p className="text-brand-blue-200 text-center mb-8">
@@ -188,7 +188,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* How to Get Started */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How to Get Started</h2>
           <div className="space-y-6">
@@ -199,7 +199,7 @@ export default function EmployerProgramsPage() {
               { step: 4, title: 'Start Testing', desc: 'Send employees to any of our 20,000+ locations nationwide.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-slate-900 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -231,7 +231,7 @@ export default function EmployerProgramsPage() {
               'Warehousing',
               'And More...',
             ].map((industry) => (
-              <div key={industry} className="bg-gray-50 p-4 rounded-lg text-center">
+              <div key={industry} className="bg-white p-4 rounded-lg text-center">
                 <span className="text-gray-700 font-medium">{industry}</span>
               </div>
             ))}
@@ -259,14 +259,14 @@ export default function EmployerProgramsPage() {
                   'Audit support',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span className="text-slate-500 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/drug-testing/dot-testing"
-                className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+                className="inline-flex items-center gap-2 bg-brand-orange-500 text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
               >
                 Learn About DOT Testing
               </Link>
@@ -284,7 +284,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up Your Program?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">
@@ -293,14 +293,14 @@ export default function EmployerProgramsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition text-lg"
             >
               <Phone className="w-5 h-5" />
               (317) 314-3757
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
             >
               Request Quote
             </Link>

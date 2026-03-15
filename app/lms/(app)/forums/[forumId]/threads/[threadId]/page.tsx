@@ -55,7 +55,7 @@ export default async function ThreadPage({ params }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -101,11 +101,11 @@ export default async function ThreadPage({ params }: Props) {
   const author = thread.profiles as { full_name: string | null; avatar_url: string | null } | null;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-          <Link href="/lms/forums" className="hover:text-slate-900">Forums</Link>
+          <Link href="/learner/forums" className="hover:text-slate-900">Forums</Link>
           <span>/</span>
           <Link href={`/lms/forums/${forumId}`} className="hover:text-slate-900">
             {forum?.name || 'Forum'}
@@ -159,7 +159,7 @@ export default async function ThreadPage({ params }: Props) {
           </div>
 
           {/* Thread Actions */}
-          <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center gap-4">
+          <div className="px-6 py-3 bg-white border-t border-slate-100 flex items-center gap-4">
             <button className="flex items-center gap-2 text-slate-600 hover:text-brand-blue-600 transition">
               <ThumbsUp className="w-4 h-4" />
               <span className="text-sm">Like</span>
@@ -187,7 +187,7 @@ export default async function ThreadPage({ params }: Props) {
                     className="bg-white rounded-xl border border-slate-200 p-4"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                         {replyAuthor?.avatar_url ? (
                           <img
                             src={replyAuthor.avatar_url}

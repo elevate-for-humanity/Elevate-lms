@@ -18,7 +18,7 @@ export default async function LmsPublicPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -54,7 +54,7 @@ export default async function LmsPublicPage() {
             </Link>
             <Link
               href="/start"
-              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-zinc-50 text-center"
+              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-white text-center"
             >
               Apply Now
             </Link>
@@ -117,7 +117,7 @@ export default async function LmsPublicPage() {
             </Link>
             <Link
               href="/login?next=/lms/dashboard"
-              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-zinc-50 text-center"
+              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-white text-center"
             >
               Already Enrolled? Login
             </Link>

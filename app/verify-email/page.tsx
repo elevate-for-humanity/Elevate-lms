@@ -54,7 +54,7 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-orange-100 rounded-full mb-4">
@@ -112,7 +112,7 @@ export default function VerifyEmailPage() {
 
           <button
             onClick={() => window.location.reload()}
-            className="w-full px-6 py-3 border-2 border-gray-300 text-black font-semibold rounded-lg hover:bg-gray-50 transition"
+            className="w-full px-6 py-3 border-2 border-gray-300 text-black font-semibold rounded-lg hover:bg-white transition"
           >
             I've Verified - Refresh Page
           </button>

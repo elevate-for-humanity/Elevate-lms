@@ -27,7 +27,7 @@ export default async function FerpaHelpPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -90,7 +90,7 @@ export default async function FerpaHelpPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -138,7 +138,7 @@ export default async function FerpaHelpPage() {
               <div className="divide-y divide-gray-200">
                 {faqs.map((faq, index) => (
                   <details key={index} className="group">
-                    <summary className="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-gray-50">
+                    <summary className="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-white">
                       <span className="font-medium text-gray-900">{faq.question}</span>
                       <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
                     </summary>

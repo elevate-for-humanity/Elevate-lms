@@ -30,7 +30,7 @@ export default function OJTTrainingPlanPage() {
         </div>
 
         <div className="prose prose-slate max-w-none">
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mb-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Training Plan Summary</h2>
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
               <div>
@@ -138,7 +138,7 @@ export default function OJTTrainingPlanPage() {
             <li>Employment outcomes (hire date, wage, retention) are tracked for WIOA performance measures</li>
           </ul>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mt-8">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mt-8">
             <h2 className="text-lg font-bold text-slate-900 mt-0">Approvals</h2>
             <div className="grid sm:grid-cols-2 gap-6 text-sm text-slate-600">
               <div>

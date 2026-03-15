@@ -16,7 +16,7 @@ export default function FinalSignoffPage() {
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -84,7 +84,7 @@ export default function FinalSignoffPage() {
           <h2 className="font-bold text-sm mb-3 print:text-[11px] print:mb-2">Hour Completion Verification</h2>
           <table className="w-full border-collapse text-sm print:text-[10px]">
             <thead>
-              <tr className="bg-gray-100 print:bg-gray-50">
+              <tr className="bg-white print:bg-white">
                 <th className="text-left p-2 border font-semibold print:p-1">Category</th>
                 <th className="text-center p-2 border font-semibold w-24 print:p-1">Required</th>
                 <th className="text-center p-2 border font-semibold w-24 print:p-1">Completed</th>
@@ -110,7 +110,7 @@ export default function FinalSignoffPage() {
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">☐</td>
               </tr>
-              <tr className="font-semibold bg-gray-50">
+              <tr className="font-semibold bg-white">
                 <td className="p-2 border print:p-1">Total Program Hours</td>
                 <td className="p-2 border text-center print:p-1">2,000 hours</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
@@ -125,7 +125,7 @@ export default function FinalSignoffPage() {
           <h2 className="font-bold text-sm mb-3 print:text-[11px] print:mb-2">Competency Section Verification</h2>
           <table className="w-full border-collapse text-sm print:text-[10px]">
             <thead>
-              <tr className="bg-gray-100 print:bg-gray-50">
+              <tr className="bg-white print:bg-white">
                 <th className="text-left p-2 border font-semibold print:p-1">Section</th>
                 <th className="text-center p-2 border font-semibold w-20 print:p-1">Items</th>
                 <th className="text-center p-2 border font-semibold w-20 print:p-1">All ≥ 3?</th>
@@ -143,7 +143,7 @@ export default function FinalSignoffPage() {
                   <td className="p-2 border print:p-1">&nbsp;</td>
                 </tr>
               ))}
-              <tr className="font-semibold bg-gray-50">
+              <tr className="font-semibold bg-white">
                 <td className="p-2 border print:p-1">Total Competencies</td>
                 <td className="p-2 border text-center print:p-1">{BARBER_STATS.totalCompetencies}</td>
                 <td className="p-2 border text-center print:p-1">☐ Yes &nbsp; ☐ No</td>
@@ -312,15 +312,15 @@ export default function FinalSignoffPage() {
       </div>
 
       {/* Screen nav */}
-      <div className="py-8 bg-slate-50 print:hidden">
+      <div className="py-8 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4 flex flex-wrap gap-3">
           <Link href="/compliance/competency-verification/barber" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
             Barber Rubric Overview
           </Link>
-          <Link href="/compliance/competency-verification/barber/scoring-sheet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/scoring-sheet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Scoring Sheet
           </Link>
-          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <Link href="/compliance/competency-verification/barber/monthly-ojt-evaluation" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
             Monthly OJT Evaluation
           </Link>
         </div>

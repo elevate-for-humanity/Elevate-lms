@@ -85,7 +85,7 @@ export default function DemoLearnerPage() {
           </div>
           <div className="divide-y">
             {COURSES.map(c => (
-              <div key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50">
+              <div key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-white">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 text-sm">{c.name}</span>
@@ -108,7 +108,7 @@ export default function DemoLearnerPage() {
                     </button>
                   )}
                   {c.status === 'Not Started' && (
-                    <button onClick={() => showToast(`Starting ${c.name}...`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+                    <button onClick={() => showToast(`Starting ${c.name}...`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white transition">
                       Start
                     </button>
                   )}
@@ -132,7 +132,7 @@ export default function DemoLearnerPage() {
             </button>
           </div>
           {showLogForm && (
-            <div className="px-5 py-4 bg-gray-50 border-b flex flex-col sm:flex-row gap-3 animate-fade-in-up">
+            <div className="px-5 py-4 bg-white border-b flex flex-col sm:flex-row gap-3 animate-fade-in-up">
               <input type="number" placeholder="Hours" value={logHours} onChange={e => setLogHours(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-24 outline-none focus:ring-2 focus:ring-brand-red-500" />
               <input type="text" placeholder="Activity description" value={logActivity} onChange={e => setLogActivity(e.target.value)} className="border rounded-lg px-3 py-2 text-sm flex-1 outline-none focus:ring-2 focus:ring-brand-red-500" />
               <button onClick={submitHours} className="bg-brand-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-green-700 transition">Submit</button>
@@ -152,7 +152,7 @@ export default function DemoLearnerPage() {
               </div>
             ))}
             {HOURS_LOG.map((h, i) => (
-              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50">
+              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-white">
                 <div>
                   <div className="font-medium text-gray-900 text-sm">{h.activity}</div>
                   <div className="text-xs text-gray-500">{h.date} · {h.supervisor}</div>
@@ -177,14 +177,14 @@ export default function DemoLearnerPage() {
           </div>
           <div className="divide-y">
             {CERTS.map((c, i) => (
-              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50">
+              <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-white">
                 <div>
                   <div className="font-medium text-gray-900 text-sm">{c.name}</div>
                   <div className="text-xs text-gray-500">Issued {c.issued}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded font-medium">{c.status}</span>
-                  <button onClick={() => showToast(`${c.name} downloaded`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
+                  <button onClick={() => showToast(`${c.name} downloaded`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white transition flex items-center gap-1">
                     <Download className="w-3 h-3" /> Download
                   </button>
                 </div>

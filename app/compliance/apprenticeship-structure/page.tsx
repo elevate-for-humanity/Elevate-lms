@@ -42,7 +42,7 @@ export default function ApprenticeshipStructurePage() {
   return (
     <div className="bg-white min-h-screen print:bg-white">
       {/* Breadcrumbs — hidden on print */}
-      <div className="bg-slate-50 border-b print:hidden">
+      <div className="bg-white border-b print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Compliance', href: '/compliance' },
@@ -96,12 +96,12 @@ export default function ApprenticeshipStructurePage() {
 
           {/* Registration */}
           <div className="grid sm:grid-cols-2 gap-4 mb-10">
-            <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
+            <div className="bg-white rounded-lg p-5 print:border print:bg-white">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
               <p className="font-bold text-gray-900">2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
               <p className="text-sm text-gray-600 mt-1">RAPIDS ID: 2025-IN-132301</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
+            <div className="bg-white rounded-lg p-5 print:border print:bg-white">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">ETPL / INTraining</p>
               <p className="font-bold text-gray-900">Location ID: 10004621</p>
               <p className="text-sm text-gray-600 mt-1">Indiana Department of Workforce Development (DWD)</p>
@@ -111,7 +111,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Institutional Hierarchy */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Institutional Hierarchy</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -160,7 +160,7 @@ export default function ApprenticeshipStructurePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse print:text-[10px]">
               <thead>
-                <tr className="bg-slate-50 print:bg-gray-100">
+                <tr className="bg-white print:bg-white">
                   <th className="text-left p-2.5 font-semibold text-gray-900 border-b">Program</th>
                   <th className="text-left p-2.5 font-semibold text-gray-900 border-b">Occupation</th>
                   <th className="text-center p-2.5 font-semibold text-gray-900 border-b">RTI Hrs</th>
@@ -174,7 +174,7 @@ export default function ApprenticeshipStructurePage() {
               </thead>
               <tbody>
                 {PROGRAM_HOURS.map((p, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-white/50'}>
                     <td className="p-2.5 font-medium text-gray-900 border-b">{p.program}</td>
                     <td className="p-2.5 text-gray-600 border-b">{p.occupation}</td>
                     <td className="p-2.5 text-center text-brand-blue-700 font-semibold border-b print:text-gray-900">{p.rtiHours}</td>
@@ -204,7 +204,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Credential Issuance Chain */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Credential Issuance Chain</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -271,7 +271,7 @@ export default function ApprenticeshipStructurePage() {
             How Related Technical Instruction is delivered, tracked, and validated.
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-6 border print:bg-white">
+          <div className="bg-white rounded-lg p-6 border print:bg-white">
             <p className="text-sm text-gray-700 leading-relaxed mb-4">
               Related Technical Instruction (RTI) is delivered through state-approved training
               providers and licensed credential partners aligned to occupation-specific curriculum.
@@ -306,7 +306,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* OJT Structure */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">OJT Structure</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -341,7 +341,7 @@ export default function ApprenticeshipStructurePage() {
           </p>
 
           <div className="grid sm:grid-cols-2 gap-4 mb-6">
-            <div className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
+            <div className="bg-white rounded-lg p-4 print:border print:bg-white">
               <p className="font-semibold text-gray-900 text-sm mb-2">Assessment Authority</p>
               <ul className="space-y-1 text-xs text-gray-700">
                 <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />RTI competencies → Credential Partner / Instructor</li>
@@ -349,7 +349,7 @@ export default function ApprenticeshipStructurePage() {
                 <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Final completion → Program Holder + Sponsor</li>
               </ul>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
+            <div className="bg-white rounded-lg p-4 print:border print:bg-white">
               <p className="font-semibold text-gray-900 text-sm mb-2">Evaluation Checkpoints</p>
               <ul className="space-y-1 text-xs text-gray-700">
                 <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />30-day evaluation (initial progress)</li>
@@ -362,7 +362,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* LMS as Compliance System */}
-      <section className="py-10 bg-slate-50 print:bg-white print:border-t">
+      <section className="py-10 bg-white print:bg-white print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">LMS as Compliance Record System</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -378,7 +378,7 @@ export default function ApprenticeshipStructurePage() {
               { label: 'OJT Hour Logging', desc: 'Employer-submitted OJT hours with supervisor verification' },
               { label: 'Cohort Progress Reports', desc: 'Structured reports for workforce partners (WorkOne, community organizations, etc.)' },
             ].map((item, i) => (
-              <div key={i} className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
+              <div key={i} className="bg-white rounded-lg p-4 print:border print:bg-white">
                 <p className="font-semibold text-gray-900 text-sm mb-1">{item.label}</p>
                 <p className="text-gray-600 text-xs">{item.desc}</p>
               </div>
@@ -388,19 +388,19 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Navigation — hidden on print */}
-      <section className="py-10 bg-slate-50 print:hidden">
+      <section className="py-10 bg-white print:hidden">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
               Credential Partner Registry
             </Link>
-            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructional Framework
             </Link>
-            <Link href="/instructor-credentials" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/instructor-credentials" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Instructor Credentials
             </Link>
-            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-white transition">
               Workforce Partnership Packet
             </Link>
             <PrintButton />

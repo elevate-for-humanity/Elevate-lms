@@ -21,7 +21,7 @@ const resources = [
 
 export default function EducatorHubPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Educator Hub' }]} />
@@ -33,10 +33,10 @@ export default function EducatorHubPage() {
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src="/hero-images/how-it-works-hero.jpg" alt="Educator Hub" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Educator Hub</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Everything you need to create impactful learning experiences</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Educator Hub</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Everything you need to create impactful learning experiences</p>
           </div>
         </div>
       </section>
@@ -62,7 +62,7 @@ export default function EducatorHubPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Become an Instructor</h2>
           <p className="text-gray-600 mb-8">Share your expertise and help others achieve their career goals.</p>
-          <Link href="/start" className="inline-flex items-center gap-2 bg-teal-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-teal-700">
+          <Link href="/start" className="inline-flex items-center gap-2 bg-teal-600 text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-teal-700">
             Apply to Teach
           </Link>
         </div>

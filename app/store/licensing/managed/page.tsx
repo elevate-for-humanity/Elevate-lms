@@ -118,7 +118,7 @@ export default function ManagedPlatformPage() {
               </Link>
               <Link
                 href="/store/demos"
-                className="border border-slate-300 hover:bg-slate-50 text-slate-900 font-bold px-8 py-4 rounded-lg transition border border-white/20"
+                className="border border-slate-300 hover:bg-white text-slate-900 font-bold px-8 py-4 rounded-lg transition border border-white/20"
               >
                 See Platform Demo
               </Link>
@@ -141,7 +141,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">What You Get</h2>
           
@@ -187,7 +187,7 @@ export default function ManagedPlatformPage() {
       {/* License Terms - Clear */}
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-8">
+          <div className="bg-white border border-slate-200 rounded-xl p-8">
             <h3 className="text-xl font-bold text-slate-900 mb-6">This is a Managed Platform License</h3>
             
             <div className="grid md:grid-cols-2 gap-8 mb-6">
@@ -283,7 +283,7 @@ export default function ManagedPlatformPage() {
                   className={`block text-center py-3 px-6 rounded-lg font-bold transition ${
                     plan.popular
                       ? 'bg-brand-red-600 hover:bg-brand-red-700 text-white'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                      : 'bg-white hover:bg-slate-200 text-slate-900'
                   }`}
                 >
                   Start 14-Day Free Trial
@@ -319,7 +319,7 @@ export default function ManagedPlatformPage() {
               { day: 'Day 14', title: 'Go live', desc: 'Choose a plan at checkout. Your trial data carries over. Launch to your organization.' },
             ].map((step, i) => (
               <div key={step.day} className="relative">
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 h-full">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 h-full">
                   <span className="text-brand-red-600 text-xs font-bold uppercase">{step.day}</span>
                   <h3 className="font-bold text-slate-900 mt-1 mb-1">{step.title}</h3>
                   <p className="text-slate-600 text-sm">{step.desc}</p>
@@ -332,7 +332,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* Credential Add-ons */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">Credential Add-ons</h2>
           <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
@@ -370,7 +370,7 @@ export default function ManagedPlatformPage() {
           </p>
           <Link
             href="/store/trial"
-            className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-4 rounded-lg hover:bg-slate-50 transition"
+            className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-4 rounded-lg hover:bg-white transition"
           >
             Start Free Trial
             <ArrowRight className="w-5 h-5" />
@@ -397,7 +397,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* Legal */}
-      <section className="py-8 border-t border-slate-200 bg-slate-50">
+      <section className="py-8 border-t border-slate-200 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-600 text-xs">
             All products are licensed access to platforms operated by Elevate for Humanity. 

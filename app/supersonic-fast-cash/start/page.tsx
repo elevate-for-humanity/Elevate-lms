@@ -107,7 +107,7 @@ export default function StartPage() {
       </section>
 
       {/* Call Option */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
             <Phone className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
@@ -136,7 +136,7 @@ export default function StartPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-3">Before You Start</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Gather your W-2s and 1099s</li>
@@ -145,7 +145,7 @@ export default function StartPage() {
               </ul>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-3">After Filing</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Receive confirmation within 24-48 hours</li>
@@ -168,7 +168,7 @@ export default function StartPage() {
           </p>
           <Link
             href="/supersonic-fast-cash/pricing"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-white transition-colors"
           >
             View Pricing
             <ArrowRight className="ml-2 w-5 h-5" />

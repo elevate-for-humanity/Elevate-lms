@@ -30,7 +30,7 @@ export default async function BankingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
         </div>
@@ -64,7 +64,7 @@ export default async function BankingPage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-8 bg-gray-50 border-b">
+      <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-8">
             <div className="flex items-center">
@@ -208,7 +208,7 @@ export default async function BankingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-12 text-center">
             How It Works
@@ -313,7 +313,7 @@ export default async function BankingPage() {
       </section>
 
       {/* Fees & Disclosures */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-8 text-center">
             Fees & Disclosures
@@ -379,7 +379,7 @@ export default async function BankingPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-white hover:bg-white text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               Contact Us
             </Link>

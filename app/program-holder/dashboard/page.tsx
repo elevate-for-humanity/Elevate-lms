@@ -47,7 +47,7 @@ export default async function ProgramHolderDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Program Holder Dashboard' }]} />
 
       {/* Hero banner */}
@@ -104,7 +104,7 @@ export default async function ProgramHolderDashboardPage() {
                   </thead>
                   <tbody className="divide-y">
                     {programs.slice(0, 6).map((program) => (
-                      <tr key={program.id} className="hover:bg-gray-50">
+                      <tr key={program.id} className="hover:bg-white">
                         <td className="py-4">
                           <Link href={`/program-holder/programs/${program.id}`} className="font-medium text-brand-blue-600 hover:underline">
                             {program.name}
@@ -134,10 +134,10 @@ export default async function ProgramHolderDashboardPage() {
                 <Link href="/program-holder/programs" className="flex items-center gap-3 p-3 bg-brand-blue-50 rounded-lg text-brand-blue-700 hover:bg-brand-blue-100">
                   <BookOpen className="w-5 h-5" /> Add New Program
                 </Link>
-                <Link href="/program-holder/students" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-gray-700 hover:bg-gray-100">
+                <Link href="/program-holder/students" className="flex items-center gap-3 p-3 bg-white rounded-lg text-gray-700 hover:bg-white">
                   <Users className="w-5 h-5" /> Manage Students
                 </Link>
-                <Link href="/program-holder/reports" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-gray-700 hover:bg-gray-100">
+                <Link href="/program-holder/reports" className="flex items-center gap-3 p-3 bg-white rounded-lg text-gray-700 hover:bg-white">
                   <BarChart3 className="w-5 h-5" /> View Reports
                 </Link>
                 <Link href="/program-holder/payroll" className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg text-brand-green-700 hover:bg-brand-green-100">

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function JRIFundingPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'JRI' }]} />
         </div>
@@ -55,7 +55,7 @@ export default function JRIFundingPage() {
       </section>
 
       {/* What's Covered + Eligibility */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10">
             <div>
@@ -107,7 +107,7 @@ export default function JRIFundingPage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Your Past Doesn&apos;t Define Your Future</h2>
           <p className="text-xl text-white/90 mb-10">JRI funding may give you a fresh start with funded career training. Check your eligibility today.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/start" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/start" className="bg-white text-brand-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-white transition hover:scale-105 shadow-lg">Apply Now</Link>
             <Link href="/partners/jri" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">JRI Partner Courses</Link>
             <Link href="/contact" className="border-2 border-white/60 text-white/90 px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
           </div>

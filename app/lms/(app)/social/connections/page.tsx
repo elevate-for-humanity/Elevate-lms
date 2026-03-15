@@ -24,7 +24,7 @@ export default async function ConnectionsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -67,7 +67,7 @@ export default async function ConnectionsPage() {
   const pending = pendingRequests || [];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -138,7 +138,7 @@ export default async function ConnectionsPage() {
                     <button className="p-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                       <CheckCircle className="w-5 h-5" />
                     </button>
-                    <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">
+                    <button className="p-2 bg-white text-gray-600 rounded-lg hover:bg-gray-200">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
@@ -175,7 +175,7 @@ export default async function ConnectionsPage() {
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                    <button className="flex-1 px-3 py-2 text-sm bg-white text-gray-700 rounded-lg hover:bg-gray-200">
                       <MessageSquare className="w-4 h-4 inline mr-1" />
                       Message
                     </button>

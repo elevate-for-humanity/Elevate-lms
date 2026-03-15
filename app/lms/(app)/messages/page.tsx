@@ -91,7 +91,7 @@ export default async function MessagesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Messages" }]} />
       </div>
@@ -124,10 +124,10 @@ export default async function MessagesPage() {
                 />
               </div>
               <div className="flex gap-2">
-                <button className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" title="Starred">
+                <button className="p-2 text-slate-600 hover:bg-white rounded-lg" title="Starred">
                   <Star className="w-5 h-5" />
                 </button>
-                <button className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" title="Archive">
+                <button className="p-2 text-slate-600 hover:bg-white rounded-lg" title="Archive">
                   <Archive className="w-5 h-5" />
                 </button>
               </div>
@@ -141,7 +141,7 @@ export default async function MessagesPage() {
                 <Link
                   key={conv.id}
                   href={`/lms/messages/${conv.id}`}
-                  className={`block p-4 hover:bg-slate-50 transition ${conv.unread > 0 ? 'bg-brand-blue-50' : ''}`}
+                  className={`block p-4 hover:bg-white transition ${conv.unread > 0 ? 'bg-brand-blue-50' : ''}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-brand-blue-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
@@ -196,7 +196,7 @@ export default async function MessagesPage() {
         <div className="mt-8">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Contacts</h2>
           <div className="grid md:grid-cols-3 gap-4">
-            <Link href="/lms/messages" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition">
+            <Link href="/learner/messages" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-brand-green-600" />

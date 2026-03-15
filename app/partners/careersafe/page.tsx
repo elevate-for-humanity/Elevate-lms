@@ -30,7 +30,7 @@ export default async function CAREERSAFEPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -55,7 +55,7 @@ export default async function CAREERSAFEPage() {
       </section>
 
       {/* Features */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             What You Get
@@ -176,7 +176,7 @@ export default async function CAREERSAFEPage() {
       </section>
 
       {/* Contact Information */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             Need Help?
@@ -245,7 +245,7 @@ export default async function CAREERSAFEPage() {
               href="https://www.careersafeonline.com/campus/signin"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-10 py-5 bg-white text-brand-blue-600 text-xl font-bold rounded-full hover:bg-slate-100 transition-all hover:scale-105 shadow-2xl gap-2"
+              className="inline-flex items-center justify-center px-10 py-5 bg-white text-brand-blue-600 text-xl font-bold rounded-full hover:bg-white transition-all hover:scale-105 shadow-2xl gap-2"
             >
               Get Started
               <ExternalLink className="w-6 h-6" />

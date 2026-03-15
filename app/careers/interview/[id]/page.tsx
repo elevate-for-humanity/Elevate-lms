@@ -80,7 +80,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
 
   if (!app) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
           <h1 className="text-xl font-bold text-slate-900 mb-2">Interview Not Found</h1>
@@ -144,7 +144,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
     : null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Careers', href: '/careers' }, { label: 'Interview' }]} />
@@ -241,7 +241,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
               Our HR team is reviewing your assessment results and will send you a Zoom link within 2 business days.
               Watch your email at <strong>{user.email}</strong>.
             </p>
-            <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600 mb-6">
+            <div className="bg-white rounded-xl p-4 text-sm text-slate-600 mb-6">
               <p className="font-semibold mb-1">What to expect:</p>
               <p>A 45-minute video interview covering your experience, situational judgment, and alignment with our mission. The interview is conversational — not a test.</p>
             </div>

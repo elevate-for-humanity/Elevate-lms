@@ -117,7 +117,7 @@ export default function JRIPage() {
 
   return (
     <div className="bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Job Ready Indy' }]} />
         </div>
@@ -171,7 +171,7 @@ export default function JRIPage() {
             {programBenefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                <div key={index} className="bg-white rounded-xl p-6 border border-gray-100">
                   <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
                     <IconComponent className="w-6 h-6 text-brand-green-600" />
                   </div>
@@ -185,7 +185,7 @@ export default function JRIPage() {
       </section>
 
       {/* Eligibility */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -227,7 +227,7 @@ export default function JRIPage() {
                 </Link>
                 <a
                   href="/support"
-                  className="block w-full border-2 border-gray-300 text-gray-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-gray-50 transition"
+                  className="block w-full border-2 border-gray-300 text-gray-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-white transition"
                 >
                   Contact Us: (317) 314-3757
                 </a>
@@ -259,7 +259,7 @@ export default function JRIPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{program.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{program.description}</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                  <span className="inline-flex items-center gap-1 text-xs bg-white text-gray-700 px-2 py-1 rounded">
                     <Clock className="w-3 h-3" />
                     {program.duration}
                   </span>
@@ -284,7 +284,7 @@ export default function JRIPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">JRI Program FAQ</h2>
           <div className="space-y-4">
@@ -324,7 +324,7 @@ export default function JRIPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?funding=jri"
-              className="inline-flex items-center justify-center bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
             >
               Apply Now
             </Link>

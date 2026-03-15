@@ -24,7 +24,7 @@ export default async function WorkforceBoardPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -113,7 +113,7 @@ export default async function WorkforceBoardPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Workforce Board' }]} />
         </div>
@@ -135,7 +135,7 @@ export default async function WorkforceBoardPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 px-6 bg-gray-50">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">
             Portal Features

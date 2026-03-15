@@ -49,7 +49,7 @@ const sampleQuestions = [
 
 export default function AIChatPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -97,7 +97,7 @@ export default function AIChatPage() {
             </div>
 
             {/* Chat Messages */}
-            <div className="p-6 space-y-4 bg-gray-50">
+            <div className="p-6 space-y-4 bg-white">
               {/* AI Message */}
               <div className="flex gap-3">
                 <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -194,7 +194,7 @@ export default function AIChatPage() {
       </section>
 
       {/* Sample Questions */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Try Asking</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -240,7 +240,7 @@ export default function AIChatPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

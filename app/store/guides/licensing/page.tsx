@@ -57,7 +57,7 @@ export default function LicensingGuidePage() {
                   View Managed License →
                 </Link>
               </div>
-              <div className="bg-slate-100 border border-slate-200 rounded-xl p-6">
+              <div className="bg-white border border-slate-200 rounded-xl p-6">
                 <h3 className="font-bold text-slate-900 mb-2">Source-Use (Enterprise)</h3>
                 <ul className="text-sm text-slate-600 space-y-1">
                   <li>• Starting at $75,000</li>
@@ -173,11 +173,11 @@ export default function LicensingGuidePage() {
               Choose how users access your platform:
             </p>
             <div className="mt-4 space-y-4">
-              <div className="bg-slate-50 p-4 rounded-lg">
+              <div className="bg-white p-4 rounded-lg">
                 <h4 className="font-bold text-slate-900">Default: Subdomain</h4>
                 <p className="text-sm text-slate-600">yourorg.elevateforhumanity.org — No setup required, works immediately.</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-lg">
+              <div className="bg-white p-4 rounded-lg">
                 <h4 className="font-bold text-slate-900">Optional: Custom Domain</h4>
                 <p className="text-sm text-slate-600">lms.yourcompany.com — Requires DNS configuration. We provide instructions.</p>
               </div>
@@ -244,7 +244,7 @@ export default function LicensingGuidePage() {
       </section>
 
       {/* Master Statement */}
-      <section className="py-8 px-4 bg-slate-100">
+      <section className="py-8 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-slate-600 italic">{MASTER_STATEMENT}</p>
         </div>

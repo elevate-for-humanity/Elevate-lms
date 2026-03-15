@@ -102,7 +102,7 @@ export default function AccreditationPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Accreditation & Compliance' }]} />
         </div>
@@ -120,7 +120,7 @@ export default function AccreditationPage() {
       </div>
 
       {/* Credentials Grid */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">
             Our Credentials
@@ -216,7 +216,7 @@ export default function AccreditationPage() {
                 verifyLabel: 'OSHA Outreach Training',
               },
             ].map((p) => (
-              <div key={p.org} className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+              <div key={p.org} className="bg-white border border-slate-200 rounded-xl p-5">
                 <p className="text-xs font-bold text-brand-blue-600 uppercase tracking-wider mb-1">{p.org}</p>
                 <p className="font-bold text-slate-900 text-sm mb-2">{p.cert}</p>
                 <p className="text-xs text-slate-500 leading-relaxed mb-3">{p.detail}</p>
@@ -289,7 +289,7 @@ export default function AccreditationPage() {
             Legal Entity Attribution
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-50 rounded-xl p-6 border">
+            <div className="bg-white rounded-xl p-6 border">
               <h3 className="font-bold text-lg mb-3">2Exclusive LLC-S</h3>
               <p className="text-xs text-brand-blue-600 font-medium mb-3">Legal Entity — DBA Elevate for Humanity Career &amp; Technical Institute</p>
               <p className="text-gray-600 text-sm mb-3">
@@ -307,7 +307,7 @@ export default function AccreditationPage() {
                 Programs: HVAC, CDL, CNA, Electrical, Welding, IT Support, Barber, Business
               </p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border">
+            <div className="bg-white rounded-xl p-6 border">
               <h3 className="font-bold text-lg mb-3">Selfish Inc</h3>
               <p className="text-xs text-brand-blue-600 font-medium mb-3">501(c)(3) Nonprofit Organization</p>
               <p className="text-gray-600 text-sm mb-3">
@@ -329,7 +329,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Compliance & Data Handling */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">
             Compliance &amp; Data Handling
@@ -368,7 +368,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Important Disclosure */}
-      <section className="py-12 bg-slate-50 border-y">
+      <section className="py-12 bg-white border-y">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold mb-4">Important Information</h2>
           <div className="space-y-3 text-gray-600 text-sm">
@@ -412,7 +412,7 @@ export default function AccreditationPage() {
               href="https://intraining.dwd.in.gov/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">Indiana INTraining — ETPL Provider Search</span>
@@ -424,7 +424,7 @@ export default function AccreditationPage() {
               href="https://www.apprenticeship.gov/partner-finder"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">DOL RAPIDS Apprenticeship Lookup</span>
@@ -436,7 +436,7 @@ export default function AccreditationPage() {
               href="https://sam.gov/search/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">SAM.gov Entity Search</span>
@@ -448,7 +448,7 @@ export default function AccreditationPage() {
               href="https://www.epa.gov/section608"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">EPA Section 608 Certification Program</span>
@@ -460,7 +460,7 @@ export default function AccreditationPage() {
               href="https://www.in.gov/dwd/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">Indiana Department of Workforce Development</span>
@@ -472,7 +472,7 @@ export default function AccreditationPage() {
               href="https://www.guidestar.org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+              className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition border"
             >
               <div>
                 <span className="font-medium block">Candid / GuideStar Nonprofit Profile</span>
@@ -485,7 +485,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Compliance Documentation */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-4">
             Compliance Documentation
@@ -616,7 +616,7 @@ export default function AccreditationPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

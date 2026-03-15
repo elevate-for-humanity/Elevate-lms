@@ -20,7 +20,7 @@ function SuccessContent({
   const sessionId = searchParams.session_id;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="max-w-2xl w-full bg-white shadow-lg rounded-lg p-8 md:p-12">
         <div className="text-center">
           <span className="text-slate-400 flex-shrink-0">•</span>
@@ -63,7 +63,7 @@ function SuccessContent({
           </div>
 
           {sessionId && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-8">
+            <div className="bg-white rounded-lg p-4 mb-8">
               <p className="text-sm text-black">
                 <span className="font-semibold">Session ID:</span>{' '}
                 <code className="bg-gray-200 px-2 py-2 rounded text-xs">
@@ -127,7 +127,7 @@ export default async function CheckoutSuccessPage({
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>

@@ -20,7 +20,7 @@ export default function IndustryInsightsPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Mentorship", href: "/mentorship" }, { label: "Industry Insights" }]} />
       </div>
-<div className="bg-gray-50 border-b">
+<div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -60,7 +60,7 @@ export default function IndustryInsightsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Industries We Cover</h2>
           <div className="flex flex-wrap justify-center gap-4">
@@ -80,7 +80,7 @@ export default function IndustryInsightsPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Industry Knowledge</h2>
           <p className="text-xl text-indigo-100 mb-8">Connect with mentors who have been where you want to go.</p>
-          <Link href="/start" className="bg-white hover:bg-gray-100 text-indigo-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/start" className="bg-white hover:bg-white text-indigo-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

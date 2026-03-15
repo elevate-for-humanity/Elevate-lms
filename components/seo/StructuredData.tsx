@@ -126,7 +126,7 @@ export function ProgramStructuredData({
       sameAs: SITE_URL,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '8888 Keystone Crossing Suite 1300',
+        streetAddress: '8888 Keystone Crossing, Suite 1300',
         addressLocality: 'Indianapolis',
         addressRegion: 'IN',
         postalCode: '46240',

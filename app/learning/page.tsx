@@ -22,7 +22,7 @@ export default async function LearningHubPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -38,7 +38,7 @@ export default async function LearningHubPage() {
     .eq('published', true)
     .order('category');
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Learning Hub' },
@@ -53,8 +53,8 @@ export default async function LearningHubPage() {
             Everything you need to succeed in your learning journey. Access lessons, resources, and tools.
           </p>
           <Link
-            href="/lms/dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-gray-100"
+            href="/learner/dashboard"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-white"
           >
             Go to Dashboard
             <ArrowRight className="w-5 h-5" />
@@ -71,7 +71,7 @@ export default async function LearningHubPage() {
               icon={<BookOpen className="w-12 h-12 text-brand-green-600" />}
               title="Lessons"
               description="Browse and access all course lessons"
-              href="/lms/courses"
+              href="/learner/courses"
               count="500+ lessons"
             />
             <ResourceCard
@@ -118,12 +118,12 @@ export default async function LearningHubPage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Quick Access</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <QuickLink title="My Courses" href="/lms/courses" />
-            <QuickLink title="Assignments" href="/lms/assignments" />
-            <QuickLink title="Grades" href="/lms/grades" />
-            <QuickLink title="Calendar" href="/lms/calendar" />
-            <QuickLink title="Messages" href="/lms/messages" />
-            <QuickLink title="Resources" href="/lms/resources" />
+            <QuickLink title="My Courses" href="/learner/courses" />
+            <QuickLink title="Assignments" href="/learner/assignments" />
+            <QuickLink title="Grades" href="/learner/grades" />
+            <QuickLink title="Calendar" href="/learner/calendar" />
+            <QuickLink title="Messages" href="/learner/messages" />
+            <QuickLink title="Resources" href="/learner/resources" />
             <QuickLink title="Support" href="/support" />
             <QuickLink title="Help Center" href="/support/help" />
           </div>
@@ -136,8 +136,8 @@ export default async function LearningHubPage() {
           <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
           <p className="text-xl mb-8">Access all your courses and resources in one place</p>
           <Link
-            href="/lms/dashboard"
-            className="inline-block px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-gray-100"
+            href="/learner/dashboard"
+            className="inline-block px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-white"
           >
             Go to My Dashboard
           </Link>
@@ -151,7 +151,7 @@ export default async function LearningHubPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>
@@ -183,7 +183,7 @@ function QuickLink({ title, href }: any) {
   return (
     <Link
       href={href}
-      className="p-4 border rounded-lg hover:shadow-lg transition-shadow bg-white text-center font-semibold hover:bg-gray-50"
+      className="p-4 border rounded-lg hover:shadow-lg transition-shadow bg-white text-center font-semibold hover:bg-white"
     >
       {title}
     </Link>

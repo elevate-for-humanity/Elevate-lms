@@ -426,7 +426,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {config.additionalSections}
 
       {/* FINAL CTA */}
-      <section className="bg-slate-900 text-white py-20">
+      <section className="bg-white py-20 border-t">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold">Ready to Get Started?</h2>
           <p className="mt-4 text-lg text-white/90">

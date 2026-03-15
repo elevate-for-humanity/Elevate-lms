@@ -68,7 +68,7 @@ export default async function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace" }]} />
       </div>
@@ -90,7 +90,7 @@ export default async function MarketplacePage() {
               <Link 
                 key={cat}
                 href={cat === 'All' ? '/marketplace' : `/marketplace?category=${cat.toLowerCase()}`}
-                className={`px-4 py-2 rounded-lg text-sm ${cat === 'All' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                className={`px-4 py-2 rounded-lg text-sm ${cat === 'All' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-white'}`}
               >
                 {cat}
               </Link>
@@ -141,7 +141,7 @@ export default async function MarketplacePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

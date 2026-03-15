@@ -35,7 +35,7 @@ export default async function LibraryPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Library" }]} />
         </div>
@@ -120,7 +120,7 @@ export default async function LibraryPage() {
       case 'link':
         return 'bg-brand-green-100 text-brand-green-600';
       default:
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-white text-slate-600';
     }
   };
 
@@ -135,7 +135,7 @@ export default async function LibraryPage() {
   const hasContent = (courseMaterials && courseMaterials.length > 0) || (resources && resources.length > 0);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Library" }]} />
         </div>
@@ -196,7 +196,7 @@ export default async function LibraryPage() {
                         key={enrollment.course_id}
                         className="bg-white rounded-xl border border-slate-200 overflow-hidden"
                       >
-                        <div className="p-4 border-b border-slate-200 bg-slate-50">
+                        <div className="p-4 border-b border-slate-200 bg-white">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                               <Folder className="w-5 h-5 text-brand-blue-600" />
@@ -215,7 +215,7 @@ export default async function LibraryPage() {
                             return (
                               <div
                                 key={material.id}
-                                className="flex items-center justify-between p-4 hover:bg-slate-50 transition"
+                                className="flex items-center justify-between p-4 hover:bg-white transition"
                               >
                                 <div className="flex items-center gap-4">
                                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}`}>
@@ -327,7 +327,7 @@ export default async function LibraryPage() {
               Course materials and resources will appear here once you enroll in courses.
             </p>
             <Link
-              href="/lms/courses"
+              href="/learner/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
@@ -341,28 +341,28 @@ export default async function LibraryPage() {
           <h2 className="text-xl font-bold mb-4">Quick Access</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Link
-              href="/lms/courses"
+              href="/learner/courses"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <BookOpen className="w-5 h-5" />
               <span>My Courses</span>
             </Link>
             <Link
-              href="/lms/assignments"
+              href="/learner/assignments"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <FileText className="w-5 h-5" />
               <span>Assignments</span>
             </Link>
             <Link
-              href="/lms/resources"
+              href="/learner/resources"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <Folder className="w-5 h-5" />
               <span>Resources</span>
             </Link>
             <Link
-              href="/lms/help"
+              href="/support"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <Star className="w-5 h-5" />

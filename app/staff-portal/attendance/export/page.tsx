@@ -45,7 +45,7 @@ export default async function ExportAttendancePage() {
     .select('*', { count: 'exact', head: true });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -217,7 +217,7 @@ export default async function ExportAttendancePage() {
                   </button>
                   <button
                     type="button"
-                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white text-gray-700"
                   >
                     Preview
                   </button>
@@ -251,7 +251,7 @@ export default async function ExportAttendancePage() {
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Recent Exports</h3>
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
                   <FileSpreadsheet className="w-8 h-8 text-emerald-600" />
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 text-sm truncate">
@@ -263,7 +263,7 @@ export default async function ExportAttendancePage() {
                     <Download className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
                   <FileSpreadsheet className="w-8 h-8 text-emerald-600" />
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 text-sm truncate">

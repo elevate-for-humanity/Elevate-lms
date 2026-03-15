@@ -148,7 +148,7 @@ export default function IdentityVerificationFlow({
   // If verification is pending
   if (verification?.status === 'pending' || hasIdDoc || hasSsnDoc) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <Clock className="w-16 h-16 mx-auto mb-4 text-brand-orange-600" />
           <h1 className="text-2xl font-bold text-black mb-4">
@@ -178,7 +178,7 @@ export default function IdentityVerificationFlow({
   // If verification failed
   if (verification?.status === 'failed') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-brand-red-600" />
           <h1 className="text-2xl font-bold text-black mb-4">
@@ -209,7 +209,7 @@ export default function IdentityVerificationFlow({
   // Choose verification method
   if (!verificationMethod) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-2xl w-full">
           <div className="text-center mb-8">
             <Shield className="w-16 h-16 mx-auto mb-4 text-brand-blue-600" />
@@ -316,7 +316,7 @@ export default function IdentityVerificationFlow({
   // Stripe Identity Flow
   if (verificationMethod === 'stripe') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <Camera className="w-16 h-16 mx-auto mb-4 text-brand-blue-600" />
           <h1 className="text-2xl font-bold text-black mb-4 text-center">
@@ -366,7 +366,7 @@ export default function IdentityVerificationFlow({
   // Manual Upload Flow
   if (verificationMethod === 'manual') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
         <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8">
           <Upload className="w-16 h-16 mx-auto mb-4 text-black" />
           <h1 className="text-2xl font-bold text-black mb-4 text-center">

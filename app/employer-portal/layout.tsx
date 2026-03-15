@@ -31,7 +31,7 @@ export default async function EmployerPortalLayout({
   if (!user) redirect('/login?redirect=/employer-portal');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <Link href="/employer-portal" className="font-semibold text-gray-900">Employer Portal</Link>

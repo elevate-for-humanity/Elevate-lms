@@ -29,7 +29,7 @@ export default async function OnboardingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">        <div className="text-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">        <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
         </div>
@@ -79,7 +79,7 @@ export default async function OnboardingPage() {
           </p>
         </div>
       </section>
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             Choose Your Path
@@ -205,7 +205,7 @@ export default async function OnboardingPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/signup"
-              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
             >
               Sign Up Now
             </Link>

@@ -255,9 +255,9 @@ export default function HvacApplyPage() {
             priority
           />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply Now</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Apply Now</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Building Technician with HVAC Fundamentals — 12 Weeks, 6 Credentials</p>
           </div>
         </div>
@@ -317,7 +317,7 @@ export default function HvacApplyPage() {
                   <div className="bg-brand-green-500/20 rounded-xl p-4">
                     <div className="text-center">
                       <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
-                      <div className="text-sm text-white mt-2 space-y-1 text-left">
+                      <div className="text-sm text-slate-600 mt-2 space-y-1 text-left">
                         <p><strong>20% down:</strong> ${PRICING.depositAmount.toLocaleString()} today</p>
                         <p><strong>Structured weekly:</strong> ${structuredWeekly}/wk × {weeksNeeded} wks</p>
                         <p><strong>Custom weekly:</strong> any amount ≥ ${MIN_WEEKLY}/wk</p>
@@ -546,7 +546,7 @@ export default function HvacApplyPage() {
                       </button>
 
                       {paymentOption === 'custom' && (
-                        <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200 space-y-3">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Weekly payment amount (min ${structuredWeekly.toFixed(2)})
@@ -592,7 +592,7 @@ export default function HvacApplyPage() {
                       </button>
 
                       {paymentOption === 'affirm' && (
-                        <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Amount to finance with Affirm (min ${PRICING.depositAmount.toLocaleString()})
                           </label>
@@ -620,7 +620,7 @@ export default function HvacApplyPage() {
                       </button>
 
                       {paymentOption === 'sezzle' && (
-                        <div className="ml-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Amount to pay with Sezzle (${PRICING.depositAmount.toLocaleString()} – $2,500)
                           </label>
@@ -666,7 +666,7 @@ export default function HvacApplyPage() {
                     </div>
 
                     {/* Payment methods accepted */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
                       <p className="text-sm text-black font-medium mb-3">Payment methods accepted at checkout:</p>
                       <div className="flex flex-wrap gap-2">
                         {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay', 'Afterpay', 'Klarna', 'Affirm', 'Sezzle'].map(m => (
@@ -729,7 +729,7 @@ export default function HvacApplyPage() {
             </div>
 
             {/* Help */}
-            <div className="mt-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
               <p className="text-sm text-gray-600 mb-3">
                 Our enrollment team can help you find funding, answer questions, or walk you through the application.

@@ -96,7 +96,7 @@ function BookingForm() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
             <ChevronRight className="w-8 h-8 text-slate-500" />
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 mb-3">Request Received</h1>
@@ -114,7 +114,7 @@ function BookingForm() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-900 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
@@ -291,7 +291,7 @@ function BookingForm() {
 
 export default function BookTestingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><p className="text-slate-400 text-sm">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><p className="text-slate-400 text-sm">Loading...</p></div>}>
       <BookingForm />
     </Suspense>
   );

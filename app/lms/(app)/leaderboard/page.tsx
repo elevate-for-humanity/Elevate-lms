@@ -43,7 +43,7 @@ export default async function LeaderboardPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Leaderboard" }]} />
         </div>
@@ -157,13 +157,13 @@ export default async function LeaderboardPage() {
 
   const getRankBg = (rank: number) => {
     if (rank === 1) return 'bg-yellow-50 border-yellow-200';
-    if (rank === 2) return 'bg-slate-50 border-gray-200';
+    if (rank === 2) return 'bg-white border-gray-200';
     if (rank === 3) return 'bg-brand-orange-50 border-amber-200';
     return 'bg-white border-slate-200';
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Leaderboard" }]} />
         </div>
@@ -251,7 +251,7 @@ export default async function LeaderboardPage() {
                       {getRankIcon(rank)}
                     </div>
 
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
                       {entry.avatarUrl ? (
                         <img
                           src={entry.avatarUrl}
@@ -305,7 +305,7 @@ export default async function LeaderboardPage() {
                 Be the first to earn points by completing courses and quizzes!
               </p>
               <Link
-                href="/lms/courses"
+                href="/learner/courses"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 <BookOpen className="w-5 h-5" />
@@ -319,7 +319,7 @@ export default async function LeaderboardPage() {
         <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
           <h3 className="font-bold text-slate-900 mb-4">How to Earn Points</h3>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
               <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-brand-green-600" />
               </div>
@@ -328,7 +328,7 @@ export default async function LeaderboardPage() {
                 <div className="text-xs text-slate-500">Complete a course</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
               <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                 <Target className="w-5 h-5 text-brand-blue-600" />
               </div>
@@ -337,7 +337,7 @@ export default async function LeaderboardPage() {
                 <div className="text-xs text-slate-500">Complete a lesson</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
               <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-brand-blue-600" />
               </div>
@@ -346,7 +346,7 @@ export default async function LeaderboardPage() {
                 <div className="text-xs text-slate-500">Quiz score bonus</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <Award className="w-5 h-5 text-yellow-600" />
               </div>
@@ -360,7 +360,7 @@ export default async function LeaderboardPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/learner/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

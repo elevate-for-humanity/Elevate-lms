@@ -30,7 +30,7 @@ async function getCategoryPosts(category: string) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -169,7 +169,7 @@ export default async function CategoryPage({
 
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-slate-50 rounded-lg p-6 sticky top-4">
+            <div className="bg-white rounded-lg p-6 sticky top-4">
               <h3 className="font-bold text-black mb-4">Categories</h3>
               <ul className="space-y-2">
                 {allCategories.map((cat) => (

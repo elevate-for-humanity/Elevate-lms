@@ -26,7 +26,7 @@ export default async function SecuritySettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <Breadcrumbs items={[
@@ -52,7 +52,7 @@ export default async function SecuritySettingsPage() {
                 <p className="text-gray-600 text-sm mt-1">
                   Change your password to keep your account secure.
                 </p>
-                <button className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                <button className="mt-4 px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-200 transition">
                   Change Password
                 </button>
               </div>
@@ -93,7 +93,7 @@ export default async function SecuritySettingsPage() {
                 <p className="text-gray-600 text-sm mt-1">
                   Manage devices where you're currently logged in.
                 </p>
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-white rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-gray-900">Current Session</p>

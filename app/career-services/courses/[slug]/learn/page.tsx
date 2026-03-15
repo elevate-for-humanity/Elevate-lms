@@ -103,7 +103,7 @@ export default async function CourseLearnPage({
             </Link>
             <Link
               href="/career-services/courses"
-              className="block w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50"
+              className="block w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-white"
             >
               Browse All Courses
             </Link>

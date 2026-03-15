@@ -62,7 +62,7 @@ const taxPrepPlans = [
 export default function PricingPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Pricing" }]} />
       </div>
@@ -128,7 +128,7 @@ export default function PricingPage() {
                   className={`block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
                     plan.popular
                       ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      : 'bg-white text-gray-900 hover:bg-gray-200'
                   }`}
                 >
                   Get Started
@@ -154,7 +154,7 @@ export default function PricingPage() {
               'Encrypted data protection',
               'Email support',
             ].map((item, idx) => (
-              <div key={idx} className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div key={idx} className="flex items-center gap-3 bg-white p-4 rounded-lg border border-gray-200">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
@@ -164,7 +164,7 @@ export default function PricingPage() {
       </section>
 
       {/* Optional Refund Advance */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -249,7 +249,7 @@ export default function PricingPage() {
           </h2>
 
           <div className="space-y-6">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
@@ -263,7 +263,7 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
@@ -276,7 +276,7 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
                 <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
@@ -294,7 +294,7 @@ export default function PricingPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             Questions About Pricing?

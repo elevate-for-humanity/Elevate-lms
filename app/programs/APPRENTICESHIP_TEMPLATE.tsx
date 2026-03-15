@@ -39,7 +39,7 @@ export default function ApprenticeshipPage() {
             preload="none"
             className="absolute inset-0 h-full w-full object-cover"
           >
-            <source src="/videos/barber-hero-final.mp4" type="video/mp4" />
+            <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__3/video-7b329d1f-3f92-4ec5-acdf-9d2d7ff6de5f.mp4?Expires=2083752835<source src="/videos/barber-hero-final.mp4" type="video/mp4" />Key-Pair-Id=K2ZDLYDZI2R1DF<source src="/videos/barber-hero-final.mp4" type="video/mp4" />Signature=PwinNDJ~aDGbHoMI8-Hfr28QIj7s~0mwzn92P-muIHO0bW86~4gW6MzRyslLtk~TOzdfX8aTYA9OeGF-sbBPwCBUw8gTpXO6QvhwpJsFW5DiLHnEP6q6vCTvQ-jEpwV20izIuWVSpY-txGY7bDGHhkSq6-wP26b0J-lstFIMwxRHQjJ9rKmX9i4pzNruZJEQ2ILvO-LdWivm98j5TMLm09HgYzesifHFPPzUzNH7NlYwwvIO2-NtXWEuixrQFdJ2Zt4ocgdmqP9auvaeYr9hbS~F6k6CBybWLlnGoLggGkluqp1vFzt-eIslYgFKl8m4Du4UFJawNl3KmcyA9uTWtA__" type="video/mp4" />
           </video>
 
           {/* Overlay Content */}
@@ -88,23 +88,23 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Value Props Strip */}
-      <section className="bg-slate-900 text-white py-8">
+      <section className="bg-white py-8 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
               <DollarSign className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">$12-15/Hour</div>
-              <div className="text-slate-300">Paid Training</div>
+              <div className="text-slate-600">Paid Training</div>
             </div>
             <div className="flex flex-col items-center">
               <Clock className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">2,000 Hours</div>
-              <div className="text-slate-300">Hands-On Experience</div>
+              <div className="text-slate-600">Hands-On Experience</div>
             </div>
             <div className="flex flex-col items-center">
               <Award className="w-12 h-12 text-brand-orange-500 mb-3" />
               <div className="text-2xl font-bold mb-1">State Licensed</div>
-              <div className="text-slate-300">Indiana Barber License</div>
+              <div className="text-slate-600">Indiana Barber License</div>
             </div>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Why Apprenticeship */}
-      <section className="py-24 bg-slate-50">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -198,7 +198,7 @@ export default function ApprenticeshipPage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-brand-green-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-6 h-6 text-white" />
+                    <DollarSign className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-black mb-2">
@@ -214,7 +214,7 @@ export default function ApprenticeshipPage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-brand-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <Users className="w-6 h-6 text-white" />
+                    <Users className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-black mb-2">
@@ -229,7 +229,7 @@ export default function ApprenticeshipPage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-brand-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-white" />
+                    <Shield className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-black mb-2">
@@ -244,7 +244,7 @@ export default function ApprenticeshipPage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-brand-orange-500 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <Briefcase className="w-6 h-6 text-white" />
+                    <Briefcase className="w-6 h-6 text-slate-900" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-black mb-2">
@@ -260,7 +260,7 @@ export default function ApprenticeshipPage() {
             </div>
 
             <div className="relative">
-              <div className="bg-slate-900 rounded-3xl p-12 text-white">
+              <div className="bg-slate-900 rounded-3xl p-12 text-slate-900">
                 <h3 className="text-3xl font-bold mb-8">Program Details</h3>
 
                 <div className="space-y-6">
@@ -323,9 +323,9 @@ export default function ApprenticeshipPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-slate-50 rounded-3xl p-8 hover:shadow-xl transition">
+            <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-brand-blue-500 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-white" />
+                <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Classic Cuts
@@ -350,9 +350,9 @@ export default function ApprenticeshipPage() {
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-3xl p-8 hover:shadow-xl transition">
+            <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-brand-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-white" />
+                <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Grooming Services
@@ -377,9 +377,9 @@ export default function ApprenticeshipPage() {
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-3xl p-8 hover:shadow-xl transition">
+            <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-brand-orange-500 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-white" />
+                <CheckCircle className="w-8 h-8 text-slate-900" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Business Skills
@@ -408,7 +408,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-24 bg-slate-900 text-white">
+      <section className="py-24 bg-white border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black mb-6">
@@ -438,7 +438,7 @@ export default function ApprenticeshipPage() {
                 <div className="w-16 h-16 bg-slate-700 rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">James W.</div>
-                  <div className="text-slate-400">Apprentice, 6 months</div>
+                  <div className="text-slate-500">Apprentice, 6 months</div>
                 </div>
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function ApprenticeshipPage() {
                 <div className="w-16 h-16 bg-slate-700 rounded-full"></div>
                 <div>
                   <div className="font-bold text-lg">DeAndre Williams</div>
-                  <div className="text-slate-400">
+                  <div className="text-slate-500">
                     Licensed Barber, Graduate 2024
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-br from-brand-orange-600 to-brand-orange-700 text-white">
+      <section className="py-24 bg-gradient-to-br from-brand-orange-600 to-brand-orange-700 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-5xl md:text-6xl font-black mb-6">
             Start Earning While You Learn
@@ -484,7 +484,7 @@ export default function ApprenticeshipPage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center gap-3 bg-white text-brand-orange-600 px-12 py-6 rounded-xl text-xl font-bold hover:bg-slate-100 transition shadow-2xl"
+              className="inline-flex items-center justify-center gap-3 bg-white text-brand-orange-600 px-12 py-6 rounded-xl text-xl font-bold hover:bg-white transition shadow-2xl"
             >
               Apply Now
               <ArrowRight className="w-6 h-6" />

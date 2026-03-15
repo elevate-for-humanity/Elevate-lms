@@ -151,7 +151,7 @@ export default function SupersonicGovernanceContactPage() {
         </section>
 
         {/* For Tax Filers */}
-        <section className="mb-12 bg-slate-50 rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">For Tax Filers</h2>
           <p className="text-slate-700 mb-4">
             If you have questions about your tax preparation or refund advance:
@@ -194,25 +194,25 @@ export default function SupersonicGovernanceContactPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/admin/governance"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Governance Hub
             </Link>
             <Link
               href="/admin/governance/security"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Security Statement
             </Link>
             <Link
               href="/admin/governance/compliance"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Compliance Framework
             </Link>
             <Link
               href="/supersonic-fast-cash/services/tax-preparation"
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="px-4 py-2 bg-white text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Tax Preparation
             </Link>

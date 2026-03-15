@@ -165,7 +165,7 @@ export default function BookAppointmentPage() {
             We've received your appointment request. You'll receive a confirmation email at{' '}
             <strong>{formData.email}</strong> within 24 hours.
           </p>
-          <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+          <div className="bg-white rounded-lg p-4 mb-6 text-left">
             <p className="text-sm text-gray-600">
               <strong>Service:</strong> {services.find(s => s.id === selectedService)?.name}
             </p>
@@ -320,7 +320,7 @@ export default function BookAppointmentPage() {
                         disabled={isBooked}
                         className={`p-3 rounded-lg border text-center transition ${
                           isBooked
-                            ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                            ? 'border-gray-200 bg-white text-gray-400 cursor-not-allowed line-through'
                             : selectedTime === time
                             ? 'border-purple-600 bg-purple-50 text-purple-700'
                             : 'border-gray-200 hover:border-purple-300'
@@ -336,7 +336,7 @@ export default function BookAppointmentPage() {
               <div className="flex justify-between">
                 <button
                   onClick={() => setStep(1)}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
@@ -426,7 +426,7 @@ export default function BookAppointmentPage() {
                   type="button"
                   onClick={() => setStep(2)}
                   disabled={submitting}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition flex items-center gap-2 disabled:opacity-50"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>

@@ -65,21 +65,21 @@ export default function CashAdvancePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <DollarSign className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Advance Amounts</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">$250 – $7,500</p>
               <p className="text-sm text-gray-500">Based on expected refund</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Timing</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">Same Day</p>
               <p className="text-sm text-gray-500">If approved</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-semibold text-gray-900 mb-2">Repayment</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">Automatic</p>
@@ -90,7 +90,7 @@ export default function CashAdvancePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
             How It Works
@@ -185,7 +185,7 @@ export default function CashAdvancePage() {
             </ul>
           </div>
 
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h3 className="font-semibold text-gray-900 mb-4">Eligibility Factors</h3>
             <p className="text-gray-600 mb-4">
               The bank considers several factors when reviewing advance applications:
@@ -213,7 +213,7 @@ export default function CashAdvancePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
             Frequently Asked Questions

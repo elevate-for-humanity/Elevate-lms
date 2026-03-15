@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function TrainingPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -23,7 +23,7 @@ export default async function TrainingPage() {
   const { count: activeCount } = await db.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
@@ -47,9 +47,9 @@ export default async function TrainingPage() {
           <div className="p-4 border-b"><h2 className="font-semibold">Training Programs</h2></div>
           <div className="divide-y">
             {programs && programs.length > 0 ? programs.map((prog: any) => (
-              <div key={prog.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+              <div key={prog.id} className="p-4 flex items-center justify-between hover:bg-white">
                 <div><p className="font-medium">{prog.title}</p><p className="text-sm text-gray-500">{prog.provider || 'Provider'} • {prog.duration || 'Duration N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>{prog.status || 'draft'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-white text-gray-600'}`}>{prog.status || 'draft'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No programs found</div>}
           </div>

@@ -91,7 +91,7 @@ export default function GradebookClient({ initialData }: Props) {
   const { students } = initialData;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-white">
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="flex items-center justify-between">
           <div>
@@ -113,8 +113,8 @@ export default function GradebookClient({ initialData }: Props) {
         <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-100 bg-white shadow-sm">
           <table className="min-w-full text-xs">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky left-0 z-10 bg-slate-50 px-3 py-2 text-left text-[11px] font-medium text-slate-500">
+              <tr className="bg-white">
+                <th className="sticky left-0 z-10 bg-white px-3 py-2 text-left text-[11px] font-medium text-slate-500">
                   Student
                 </th>
                 {gradeItems.map((gi) => (

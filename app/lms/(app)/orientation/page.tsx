@@ -27,7 +27,7 @@ export default async function OrientationPage() {
   const isCompleted = profile.orientation_completed;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Orientation" }]} />
       </div>
@@ -78,7 +78,7 @@ export default async function OrientationPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Orientation" }]} />
       </div>
@@ -165,7 +165,7 @@ export default async function OrientationPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-sm font-bold text-black">2</span>
                   </div>
                   <div>
@@ -178,7 +178,7 @@ export default async function OrientationPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-sm font-bold text-black">3</span>
                   </div>
                   <div>
@@ -189,7 +189,7 @@ export default async function OrientationPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-sm font-bold text-black">4</span>
                   </div>
                   <div>
@@ -210,7 +210,7 @@ export default async function OrientationPage() {
               <div className="space-y-2">
                 <Link
                   href="/programs"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white transition"
                 >
                   <Book className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
@@ -219,7 +219,7 @@ export default async function OrientationPage() {
                 </Link>
                 <Link
                   href="/how-it-works"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white transition"
                 >
                   <Users className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
@@ -228,7 +228,7 @@ export default async function OrientationPage() {
                 </Link>
                 <Link
                   href="/financial-aid"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white transition"
                 >
                   <Award className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
@@ -237,7 +237,7 @@ export default async function OrientationPage() {
                 </Link>
                 <Link
                   href="/career-services"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-white transition"
                 >
                   <Briefcase className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">

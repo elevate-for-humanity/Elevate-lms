@@ -132,7 +132,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
   const unansweredCount = shuffledQuestions.length - answeredCount;
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-white">
       {/* Exam monitoring — only active when examSessionId is provided */}
       {examSessionId && (
         <>
@@ -157,7 +157,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-lg ${
                   timeRemaining < 60 ? 'bg-brand-red-100 text-brand-red-700' : 
                   timeRemaining < 300 ? 'bg-yellow-100 text-yellow-700' : 
-                  'bg-slate-100 text-slate-700'
+                  'bg-white text-slate-700'
                 }`}>
                   <Clock className="w-5 h-5" />
                   {formatTime(timeRemaining)}
@@ -207,7 +207,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                   className={`p-2 rounded-lg transition ${
                     flagged.has(currentQuestion.id)
                       ? 'bg-yellow-100 text-yellow-600'
-                      : 'bg-slate-100 text-slate-400 hover:text-slate-600'
+                      : 'bg-white text-slate-400 hover:text-slate-600'
                   }`}
                   title={flagged.has(currentQuestion.id) ? 'Unflag question' : 'Flag for review'}
                 >
@@ -235,13 +235,13 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                         className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition ${
                           isSelected
                             ? 'border-brand-blue-600 bg-brand-blue-50'
-                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                            : 'border-slate-200 hover:border-slate-300 hover:bg-white'
                         }`}
                       >
                         <span className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                           isSelected
                             ? 'bg-brand-blue-600 text-white'
-                            : 'bg-slate-100 text-slate-600'
+                            : 'bg-white text-slate-600'
                         }`}>
                           {letter}
                         </span>
@@ -294,7 +294,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                           ? 'bg-brand-blue-600 text-white'
                           : isAnswered
                           ? 'bg-brand-green-100 text-brand-green-700'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          : 'bg-white text-slate-600 hover:bg-slate-200'
                       }`}
                     >
                       {idx + 1}
@@ -312,7 +312,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                   <span className="text-slate-600">Answered</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-4 h-4 bg-slate-100 rounded" />
+                  <span className="w-4 h-4 bg-white rounded" />
                   <span className="text-slate-600">Unanswered</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -351,7 +351,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
             <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirmSubmit(false)}
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-white transition"
               >
                 Review Answers
               </button>

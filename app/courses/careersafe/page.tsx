@@ -23,7 +23,7 @@ export default async function CareerSafePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -127,7 +127,7 @@ export default async function CareerSafePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Courses', href: '/courses' },
@@ -188,7 +188,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* Courses Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Available Courses
@@ -251,7 +251,7 @@ export default async function CareerSafePage() {
           <div className="grid md:grid-cols-3 gap-6">
             <Link
               href="/programs/electrical"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">HVAC Technician</h3>
               <p className="text-black mb-4">
@@ -264,7 +264,7 @@ export default async function CareerSafePage() {
 
             <Link
               href="/programs/electrical"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">
                 Building Maintenance
@@ -279,7 +279,7 @@ export default async function CareerSafePage() {
 
             <Link
               href="/programs/cna"
-              className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">Home Health Aide</h3>
               <p className="text-black mb-4">
@@ -312,7 +312,7 @@ export default async function CareerSafePage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-white text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

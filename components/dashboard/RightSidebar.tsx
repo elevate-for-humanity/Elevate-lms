@@ -205,25 +205,25 @@ export function RightSidebar() {
         </h3>
         <div className="space-y-2">
           <Link
-            href="/lms/courses"
+            href="/learner/courses"
             className="block px-3 py-2 text-sm text-black hover:bg-white hover:text-brand-red-700 rounded-lg transition"
           >
             Browse Courses
           </Link>
           <Link
-            href="/lms/assignments"
+            href="/learner/assignments"
             className="block px-3 py-2 text-sm text-black hover:bg-white hover:text-brand-red-700 rounded-lg transition"
           >
             View Assignments
           </Link>
           <Link
-            href="/lms/grades"
+            href="/learner/grades"
             className="block px-3 py-2 text-sm text-black hover:bg-white hover:text-brand-red-700 rounded-lg transition"
           >
             Check Grades
           </Link>
           <Link
-            href="/lms/certificates"
+            href="/learner/certificates"
             className="block px-3 py-2 text-sm text-black hover:bg-white hover:text-brand-red-700 rounded-lg transition"
           >
             My Certificates
@@ -278,7 +278,7 @@ export function RightSidebar() {
           </div>
         </div>
         <Link
-          href="/lms/calendar"
+          href="/learner/calendar"
           className="block mt-3 text-center text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View Full Calendar →
@@ -332,7 +332,7 @@ export function RightSidebar() {
           )}
         </h3>
         <Link
-          href="/lms/notifications"
+          href="/learner/notifications"
           className="block text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View All Notifications →

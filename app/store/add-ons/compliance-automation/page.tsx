@@ -85,7 +85,7 @@ export default function ComplianceAutomationPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Store', href: '/store' }, 
@@ -132,7 +132,7 @@ export default function ComplianceAutomationPage() {
       </section>
 
       {/* Compliance Areas */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Comprehensive Coverage</h2>
@@ -198,7 +198,7 @@ export default function ComplianceAutomationPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Pricing</h2>
@@ -241,7 +241,7 @@ export default function ComplianceAutomationPage() {
               </ul>
               <Link
                 href="/store/add-ons/compliance-automation/checkout?plan=monthly"
-                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition"
+                className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
               >
                 Start Monthly Plan — $374/mo
               </Link>
@@ -260,7 +260,7 @@ export default function ComplianceAutomationPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/store/add-ons/compliance-automation/checkout"
-              className="inline-flex items-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               Purchase Now — $1,297
               <ArrowRight className="w-5 h-5" />

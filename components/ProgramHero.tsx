@@ -29,7 +29,7 @@ export default function ProgramHero({
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image src={imageSrc} alt={imageAlt} fill className="object-cover" priority quality={100} sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">{title}</h1>
             <p className="text-lg md:text-xl text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>

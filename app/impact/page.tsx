@@ -24,7 +24,7 @@ export default async function ImpactPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -41,7 +41,7 @@ export default async function ImpactPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Impact' }]} />
         </div>
@@ -64,7 +64,7 @@ export default async function ImpactPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 rounded-2xl p-8">
+            <div className="bg-white rounded-2xl p-8">
               <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <Target className="w-8 h-8 text-white" />
               </div>
@@ -77,7 +77,7 @@ export default async function ImpactPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-8">
+            <div className="bg-white rounded-2xl p-8">
               <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
@@ -90,7 +90,7 @@ export default async function ImpactPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-8">
+            <div className="bg-white rounded-2xl p-8">
               <div className="w-16 h-16 bg-brand-orange-600 rounded-xl flex items-center justify-center mb-6">
                 <Users className="w-8 h-8 text-white" />
               </div>
@@ -103,7 +103,7 @@ export default async function ImpactPage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-8">
+            <div className="bg-white rounded-2xl p-8">
               <div className="w-16 h-16 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6">
                 <Award className="w-8 h-8 text-white" />
               </div>
@@ -120,7 +120,7 @@ export default async function ImpactPage() {
       </section>
 
       {/* Funding Opportunities */}
-      <section className="w-full py-20 bg-gray-50">
+      <section className="w-full py-20 bg-white">
         <div className="mx-auto w-full max-w-6xl px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Partnership Opportunities

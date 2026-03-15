@@ -153,7 +153,7 @@ export default function SupersonicGovernancePage() {
                 className="group p-5 bg-white border border-slate-200 rounded-xl hover:border-emerald-300 hover:shadow-md transition-all"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
                     <link.icon className="w-5 h-5 text-slate-600 group-hover:text-emerald-600" />
                   </div>
                   <div className="flex-1">
@@ -191,7 +191,7 @@ export default function SupersonicGovernancePage() {
         </section>
 
         {/* Related Resources */}
-        <section className="mb-12 bg-slate-50 rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link

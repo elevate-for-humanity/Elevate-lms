@@ -27,7 +27,7 @@ const benefits = [
 export default function MentorshipPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">      <div className="bg-white border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Mentorship Program' }]} />
         </div>
@@ -58,7 +58,7 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-10 bg-slate-50 border-t border-slate-100">
+      <section className="py-10 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-lg font-bold text-slate-900 mb-5">Mentorship Focus Areas</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -118,7 +118,7 @@ export default function MentorshipPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

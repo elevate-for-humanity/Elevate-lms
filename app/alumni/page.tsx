@@ -48,7 +48,7 @@ const featuredAlumni: { name: string; program: string; company: string; image: s
 export default function AlumniPage() {
   return (
     <div className="min-h-screen bg-white">      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Alumni' }]} />
         </div>
@@ -84,7 +84,7 @@ export default function AlumniPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-gray-50 border-b">
+      <section className="py-12 bg-white border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -114,7 +114,7 @@ export default function AlumniPage() {
       </section>
 
       {/* Featured Alumni */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Alumni Network</h2>
           {featuredAlumni.length > 0 ? (

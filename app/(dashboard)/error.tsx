@@ -15,7 +15,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         <AlertCircle className="h-16 w-16 text-brand-red-600 mx-auto mb-6" />
 
@@ -46,7 +46,7 @@ export default function DashboardError({
 
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold"
           >
             <Home className="h-5 w-5" />
             Go Home
@@ -54,7 +54,7 @@ export default function DashboardError({
 
           <Link
             href="/api/auth/signout"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-black rounded-lg hover:bg-gray-50 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-black rounded-lg hover:bg-white transition font-semibold"
           >
             <LogOut className="h-5 w-5" />
             Sign Out & Try Again

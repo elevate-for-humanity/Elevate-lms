@@ -11,7 +11,7 @@ type CourseStatus = 'complete' | 'incomplete' | 'loading';
 
 export default function CertiportExamPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><p className="text-slate-500">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><p className="text-slate-500">Loading...</p></div>}>
       <CertiportExamContent />
     </Suspense>
   );
@@ -124,7 +124,7 @@ function CertiportExamContent() {
   // If voucher already assigned, show it
   if (existingRequest?.status === 'voucher_assigned' && existingRequest.voucherCode) {
     return (
-      <div className="min-h-screen bg-slate-50 py-12 px-4">        <div className="max-w-2xl mx-auto">
+      <div className="min-h-screen bg-white py-12 px-4">        <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
@@ -167,7 +167,7 @@ function CertiportExamContent() {
   // If request is pending
   if (existingRequest?.status === 'pending' || existingRequest?.status === 'paid') {
     return (
-      <div className="min-h-screen bg-slate-50 py-12 px-4">
+      <div className="min-h-screen bg-white py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -189,7 +189,7 @@ function CertiportExamContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -244,7 +244,7 @@ function CertiportExamContent() {
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
                       selectedExam === exam.code
                         ? 'bg-brand-blue-50 border-2 border-brand-blue-500'
-                        : 'hover:bg-slate-50 border-2 border-transparent'
+                        : 'hover:bg-white border-2 border-transparent'
                     }`}
                   >
                     <input

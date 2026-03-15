@@ -60,7 +60,7 @@ export default function SupersonicFastCashPage() {
 
 
       {/* How It Works */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
@@ -259,7 +259,7 @@ export default function SupersonicFastCashPage() {
               <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 <Link
                   href="/supersonic-fast-cash/locations"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-white transition-colors"
                 >
                   <MapPin className="w-5 h-5" />
                   All Locations
@@ -290,7 +290,7 @@ export default function SupersonicFastCashPage() {
       <TestimonialsSection 
         serviceType="tax"
         title="What Our Customers Say"
-        bgColor="bg-gray-50"
+        bgColor="bg-white"
         limit={3}
       />
 
@@ -300,63 +300,63 @@ export default function SupersonicFastCashPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Link
               href="/supersonic-fast-cash/calculator"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <Calculator className="w-8 h-8 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Refund Calculator</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/tax-tools"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <FileText className="w-8 h-8 text-brand-green-600" />
               <span className="font-semibold text-gray-900">Tax Tools</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/upload-documents"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <Upload className="w-8 h-8 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Upload Documents</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/training"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">Tax Training</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/careers"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <Users className="w-8 h-8 text-brand-red-600" />
               <span className="font-semibold text-gray-900">Join Our Team</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/careers/training"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">Tax Training Program</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/services/payroll"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">Payroll Services</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/tools/software-download"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">Software Download</span>
             </Link>
             <Link
               href="/supersonic-fast-cash/transparency"
-              className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 bg-white p-4 rounded-xl hover:bg-white transition-colors"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">How We Operate</span>
@@ -373,7 +373,7 @@ export default function SupersonicFastCashPage() {
                 { label: 'Texas', href: '/supersonic-fast-cash/tax-preparation-texas' },
               ].map((s) => (
                 <Link key={s.href} href={s.href}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-brand-red-50 hover:text-brand-red-700 transition-colors">
+                  className="px-3 py-1.5 bg-white text-slate-700 rounded-full text-sm font-medium hover:bg-brand-red-50 hover:text-brand-red-700 transition-colors">
                   {s.label}
                 </Link>
               ))}
@@ -394,7 +394,7 @@ export default function SupersonicFastCashPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-600 px-10 py-5 rounded-xl font-black text-xl hover:bg-gray-100 transition-colors shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-600 px-10 py-5 rounded-xl font-black text-xl hover:bg-white transition-colors shadow-lg"
             >
               💵 Apply Now - Get Cash Today
               <ArrowRight className="w-6 h-6" />
@@ -407,7 +407,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* E-File Disclosure */}
-      <section className="py-6 bg-gray-100 border-t">
+      <section className="py-6 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-500">
             Electronic filing is subject to IRS validation. Acceptance is not guaranteed. 

@@ -50,7 +50,7 @@ export default async function TransferRequestPage() {
     ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <a

@@ -52,7 +52,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
           <Image src={config.hero.image} alt={config.hero.title} fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="bg-slate-900 py-10">
+        <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             {config.hero.tag && (
               <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-brand-blue-300'}`}>

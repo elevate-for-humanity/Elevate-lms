@@ -101,7 +101,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
                 <span className={`px-2 py-1 rounded text-xs ${
                   apt.status === 'scheduled' ? 'bg-brand-green-100 text-brand-green-700' :
                   apt.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                  'bg-gray-100 text-gray-700'
+                  'bg-white text-gray-700'
                 }`}>
                   {apt.status}
                 </span>
@@ -203,7 +203,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
       {/* Summary & Confirm */}
       <div className="bg-white rounded-xl border p-6">
         <h2 className="text-lg font-semibold mb-4">Appointment Summary</h2>
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <div className="bg-white rounded-lg p-4 mb-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500">Advisor</p>

@@ -18,7 +18,7 @@ export default async function EmployerSettingsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -42,7 +42,7 @@ export default async function EmployerSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-6">
@@ -266,7 +266,7 @@ export default async function EmployerSettingsPage() {
           </div>
           
           <div className="space-y-4">
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">New Applications</div>
                 <div className="text-sm text-gray-600">Get notified when candidates apply to your jobs</div>
@@ -274,7 +274,7 @@ export default async function EmployerSettingsPage() {
               <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">New Candidates</div>
                 <div className="text-sm text-gray-600">Get notified when new candidates match your criteria</div>
@@ -282,7 +282,7 @@ export default async function EmployerSettingsPage() {
               <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer">
               <div>
                 <div className="font-medium">Weekly Digest</div>
                 <div className="text-sm text-gray-600">Receive a weekly summary of activity</div>

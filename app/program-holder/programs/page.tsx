@@ -32,7 +32,7 @@ export default async function ProgramHolderProgramsPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[
         { label: 'Program Holder', href: '/program-holder/dashboard' },
         { label: 'Programs' },
@@ -49,7 +49,7 @@ export default async function ProgramHolderProgramsPage() {
         {programs.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Program</th>
                   <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
@@ -61,7 +61,7 @@ export default async function ProgramHolderProgramsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {programs.map((program) => (
-                  <tr key={program.id} className="hover:bg-gray-50">
+                  <tr key={program.id} className="hover:bg-white">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
@@ -71,7 +71,7 @@ export default async function ProgramHolderProgramsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${program.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${program.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-700'}`}>
                         {program.status}
                       </span>
                     </td>

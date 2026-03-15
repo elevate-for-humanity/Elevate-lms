@@ -37,7 +37,7 @@ export default async function NetworkingEventsPage() {
           alt="Networking events and career fairs"
           fill className="object-cover" priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
+        
         <div className="absolute inset-x-0 bottom-0 max-w-6xl mx-auto px-4 pb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-300 mb-1">Career Services</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Networking Events</h1>
@@ -94,7 +94,7 @@ export default async function NetworkingEventsPage() {
       )}
 
       {/* Employer CTA */}
-      <section className="bg-slate-50 border-t py-12">
+      <section className="bg-white border-t py-12">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center gap-6">
           <div className="flex-shrink-0 w-14 h-14 bg-brand-blue-100 rounded-2xl flex items-center justify-center">
             <Building2 className="w-7 h-7 text-brand-blue-600" />
@@ -105,7 +105,7 @@ export default async function NetworkingEventsPage() {
               Participate in our career fairs and meet pre-screened, credential-ready candidates from Elevate programs.
             </p>
           </div>
-          <Link href="/for/employers" className="flex-shrink-0 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors">
+          <Link href="/employer" className="flex-shrink-0 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors">
             Partner with us
           </Link>
         </div>

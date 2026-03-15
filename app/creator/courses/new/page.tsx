@@ -167,7 +167,7 @@ export default function CreatorNewCoursePage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="border border-slate-300 px-6 py-3 rounded-lg hover:bg-slate-50 font-semibold transition"
+              className="border border-slate-300 px-6 py-3 rounded-lg hover:bg-white font-semibold transition"
             >
               Cancel
             </button>

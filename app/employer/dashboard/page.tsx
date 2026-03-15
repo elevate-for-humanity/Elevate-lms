@@ -44,7 +44,7 @@ export default async function EmployerDashboardOrchestrated() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -275,7 +275,7 @@ export default async function EmployerDashboardOrchestrated() {
                 {postings?.slice(0, 5).map((posting) => (
                   <div
                     key={posting.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-white rounded-lg"
                   >
                     <div>
                       <div className="font-semibold text-black">
@@ -445,11 +445,11 @@ export default async function EmployerDashboardOrchestrated() {
               <h3 className="text-lg font-bold text-black">Hiring Summary</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-lg">
+              <div className="p-4 bg-white rounded-lg">
                 <p className="text-2xl font-bold text-black">{postings?.length || 0}</p>
                 <p className="text-sm text-black">Active Postings</p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-lg">
+              <div className="p-4 bg-white rounded-lg">
                 <p className="text-2xl font-bold text-black">{applications?.length || 0}</p>
                 <p className="text-sm text-black">Pending Applications</p>
               </div>

@@ -80,18 +80,18 @@ export default function NailTechDocumentsPage() {
   const canSubmit = governmentId?.status === 'complete';
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="bg-slate-900 text-white py-8">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white py-8 border-t">
         <div className="max-w-2xl mx-auto px-6">
           <h1 className="text-3xl font-black mb-2">Required Documents</h1>
-          <p className="text-slate-300">Upload your documents to complete enrollment and access your program.</p>
+          <p className="text-slate-600">Upload your documents to complete enrollment and access your program.</p>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
           <div className="bg-brand-red-600 px-6 py-3">
-            <h2 className="text-lg font-bold text-white">Required</h2>
+            <h2 className="text-lg font-bold text-slate-900">Required</h2>
           </div>
           <div className="p-6">
             <div className="mb-4">
@@ -104,7 +104,7 @@ export default function NailTechDocumentsPage() {
               </div>
 
               {governmentId ? (
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
                   <FileText className="w-5 h-5 text-slate-400" />
                   <span className="flex-1 text-sm text-slate-700 truncate">{governmentId.name}</span>
                   {governmentId.status === 'uploading' && <span className="text-sm text-pink-600">Uploading...</span>}

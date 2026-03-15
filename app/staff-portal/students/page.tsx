@@ -14,14 +14,14 @@ export const metadata: Metadata = {
 export default async function StudentsPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
+  if (!supabase) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   const { data: students, count } = await db.from('profiles').select('*', { count: 'exact' }).eq('role', 'student').order('created_at', { ascending: false }).limit(20);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/staff-portal" className="hover:text-primary">Staff Portal</Link></li><li>/</li><li className="text-gray-900 font-medium">Students</li></ol></nav>
@@ -34,7 +34,7 @@ export default async function StudentsPage() {
           <div className="p-4 border-b"><input type="text" placeholder="Search students..." className="w-full border rounded-lg px-3 py-2" /></div>
           <div className="divide-y">
             {students && students.length > 0 ? students.map((student: any) => (
-              <div key={student.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+              <div key={student.id} className="p-4 flex items-center justify-between hover:bg-white">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center"><span className="text-brand-blue-600 font-medium">{(student.full_name || 'S')[0]}</span></div>
                   <div><p className="font-medium">{student.full_name || 'Student'}</p><p className="text-sm text-gray-500">{student.email}</p></div>

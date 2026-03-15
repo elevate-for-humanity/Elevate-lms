@@ -62,7 +62,7 @@ export default async function ForumsPage() {
   const totalReplies = (recentTopics ?? []).reduce((s, t) => s + (t.reply_count ?? 0), 0);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -145,7 +145,7 @@ export default async function ForumsPage() {
                     <Link
                       key={topic.id}
                       href={`/lms/forums/topics/${topic.id}`}
-                      className="block p-4 hover:bg-slate-50 transition-colors"
+                      className="block p-4 hover:bg-white transition-colors"
                     >
                       <div className="flex items-start gap-2">
                         {topic.is_pinned && <Pin className="w-3.5 h-3.5 text-brand-blue-500 flex-shrink-0 mt-0.5" />}

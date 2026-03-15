@@ -233,7 +233,7 @@ export function DashboardDropdown({ className }: Props) {
 
             <div className="border-t border-slate-200 p-2 bg-slate-50">
               <Link
-                href="/dashboards"
+                href="/admin/dashboard"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-brand-blue-600 hover:bg-white rounded-lg transition"
               >

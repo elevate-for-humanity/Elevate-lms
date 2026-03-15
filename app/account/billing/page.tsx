@@ -154,7 +154,7 @@ export default function BillingPage() {
 
   if (isPageLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
+      <div className="min-h-screen bg-white py-12 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
@@ -162,7 +162,7 @@ export default function BillingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-3xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
@@ -178,7 +178,7 @@ export default function BillingPage() {
 
   if (!license) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="max-w-3xl mx-auto px-4">
           <div className="mb-8">
             <h1 className="text-3xl font-black text-gray-900">Billing</h1>
@@ -214,9 +214,9 @@ export default function BillingPage() {
   const StatusIcon = status.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Account', href: '/account' }, { label: 'Billing' }]} />
         </div>
@@ -277,7 +277,7 @@ export default function BillingPage() {
         {/* Plan Card */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Current Plan</h2>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white rounded-lg">
             <div>
               <p className="font-bold text-gray-900">{plan.name} Plan</p>
               <p className="text-gray-600">
@@ -312,7 +312,7 @@ export default function BillingPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                   <CreditCard className="w-5 h-5 text-gray-600" />
                 </div>
                 <div>

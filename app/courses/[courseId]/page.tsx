@@ -165,7 +165,7 @@ export default async function CourseDetailPage({
   const heroImage = '/images/pages/hvac-technician.jpg';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs
         items={[
           { label: 'Programs', href: '/programs' },
@@ -342,13 +342,13 @@ export default async function CourseDetailPage({
                             className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                               isCompleted
                                 ? 'bg-brand-green-50 hover:bg-brand-green-100'
-                                : 'hover:bg-slate-50'
+                                : 'hover:bg-white'
                             }`}
                           >
                             <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                               isCompleted
                                 ? 'bg-brand-green-200 text-brand-green-700'
-                                : 'bg-slate-100 text-slate-500'
+                                : 'bg-white text-slate-500'
                             }`}>
                               {isCompleted ? '✓' : idx + 1}
                             </div>
@@ -460,7 +460,7 @@ export default async function CourseDetailPage({
                 )}
                 {isEnrolled && (
                   <Link
-                    href="/lms/dashboard"
+                    href="/learner/dashboard"
                     className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-semibold hover:border-slate-400 transition-colors"
                   >
                     Back to Dashboard

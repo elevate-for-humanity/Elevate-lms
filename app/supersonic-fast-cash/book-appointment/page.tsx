@@ -200,7 +200,7 @@ export default function BookAppointment() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Book Appointment" }]} />
       </div>
@@ -680,7 +680,7 @@ export default function BookAppointment() {
             </div>
 
             {/* Summary */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <div className="bg-white rounded-lg p-6 mb-8">
               <h3 className="font-bold text-lg mb-4">Appointment Summary</h3>
               <div className="space-y-2 text-sm">
                 <p>

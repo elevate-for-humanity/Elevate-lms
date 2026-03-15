@@ -55,25 +55,25 @@ export function DashboardSidebar({
         </h3>
         <div className="space-y-2">
           <Link
-            href="/lms/courses"
+            href="/learner/courses"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             Browse Courses
           </Link>
           <Link
-            href="/lms/assignments"
+            href="/learner/assignments"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             View Assignments
           </Link>
           <Link
-            href="/lms/grades"
+            href="/learner/grades"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             Check Grades
           </Link>
           <Link
-            href="/lms/certificates"
+            href="/learner/certificates"
             className="block px-3 py-2 text-sm text-black hover:bg-brand-red-50 hover:text-brand-red-700 rounded-lg transition"
           >
             My Certificates
@@ -119,7 +119,7 @@ export function DashboardSidebar({
           </div>
         </div>
         <Link
-          href="/lms/calendar"
+          href="/learner/calendar"
           className="block mt-3 text-center text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View Full Calendar →
@@ -167,7 +167,7 @@ export function DashboardSidebar({
           )}
         </h3>
         <Link
-          href="/lms/notifications"
+          href="/learner/notifications"
           className="block text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
         >
           View All Notifications →
@@ -204,35 +204,35 @@ export function LeftSidebar() {
     <div className="w-64 bg-slate-50 border-r border-slate-200 p-4 space-y-4">
       <nav role="navigation" aria-label="Main navigation" className="space-y-1">
         <Link
-          href="/lms/dashboard"
+          href="/learner/dashboard"
           className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-black bg-white rounded-lg"
         >
           <BookOpen className="w-4 h-4" />
           Dashboard
         </Link>
         <Link
-          href="/lms/courses"
+          href="/learner/courses"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <BookOpen className="w-4 h-4" />
           My Courses
         </Link>
         <Link
-          href="/lms/calendar"
+          href="/learner/calendar"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Calendar className="w-4 h-4" />
           Calendar
         </Link>
         <Link
-          href="/lms/grades"
+          href="/learner/grades"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Award className="w-4 h-4" />
           Grades
         </Link>
         <Link
-          href="/lms/notifications"
+          href="/learner/notifications"
           className="flex items-center gap-3 px-3 py-2 text-sm text-black hover:bg-white rounded-lg transition"
         >
           <Bell className="w-4 h-4" />

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function ThankYouPage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Thank You" }]} />
       </div>
@@ -106,7 +106,7 @@ export default function ThankYouPage() {
             </p>
           </div>
 
-          <div className="bg-gray-100 p-6 rounded-xl mb-8">
+          <div className="bg-white p-6 rounded-xl mb-8">
             <h3 className="font-semibold text-gray-900 mb-3">Questions?</h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="tel:+13173143757" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
@@ -121,7 +121,7 @@ export default function ThankYouPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
-              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50"
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-white"
             >
               <Download className="w-5 h-5 mr-2" /> View MOU Template
             </Link>

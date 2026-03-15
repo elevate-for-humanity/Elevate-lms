@@ -358,7 +358,7 @@ export default function LessonPage() {
   if (!lesson) {
     if (loadTimeout) {
       return (
-        <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
+        <div className="flex items-center justify-center h-[100dvh] bg-white">
           <div className="text-center max-w-md px-4">
             <div className="w-14 h-14 bg-brand-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-7 h-7 text-brand-red-600" />
@@ -379,16 +379,16 @@ export default function LessonPage() {
     }
 
     return (
-      <div className="flex h-[100dvh] bg-slate-50">
+      <div className="flex h-[100dvh] bg-white">
         <aside className="hidden lg:block w-80 bg-white border-r p-4">
           <div className="h-5 bg-slate-200 rounded w-3/4 mb-4 animate-pulse" />
-          <div className="h-2 bg-slate-100 rounded-full mb-6 animate-pulse" />
+          <div className="h-2 bg-white rounded-full mb-6 animate-pulse" />
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center gap-3 p-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
               <div className="flex-1">
                 <div className="h-4 bg-slate-200 rounded w-3/4 mb-1 animate-pulse" />
-                <div className="h-3 bg-slate-100 rounded w-1/2 animate-pulse" />
+                <div className="h-3 bg-white rounded w-1/2 animate-pulse" />
               </div>
             </div>
           ))}
@@ -406,7 +406,7 @@ export default function LessonPage() {
   const progressPercent = lessons.length > 0 ? Math.round((completedLessonIds.size / lessons.length) * 100) : 0;
 
   return (
-    <div className="flex h-[100dvh] bg-slate-50">
+    <div className="flex h-[100dvh] bg-white">
       {/* Mobile sidebar toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -429,7 +429,7 @@ export default function LessonPage() {
         className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 w-80 max-w-[85vw] lg:max-w-none bg-white border-r overflow-y-auto transition-transform duration-300 fixed lg:relative h-full z-40 flex flex-col`}
       >
         {/* Sidebar header */}
-        <div className="p-4 sm:p-5 border-b bg-slate-50 flex-shrink-0">
+        <div className="p-4 sm:p-5 border-b bg-white flex-shrink-0">
           <Link
             href={`/courses/${courseId}`}
             className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mb-3 inline-flex items-center gap-1"
@@ -467,14 +467,14 @@ export default function LessonPage() {
                 className="mb-1"
               >
                 <summary className={`flex items-center gap-2.5 p-2.5 rounded-lg cursor-pointer list-none [&::-webkit-details-marker]:hidden text-sm transition-colors ${
-                  isCurrentModule ? 'bg-brand-blue-50' : 'hover:bg-slate-50'
+                  isCurrentModule ? 'bg-brand-blue-50' : 'hover:bg-white'
                 }`}>
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                     modCompleted
                       ? 'bg-brand-green-100 text-brand-green-700'
                       : isCurrentModule
                         ? 'bg-brand-blue-100 text-brand-blue-700'
-                        : 'bg-slate-100 text-slate-500'
+                        : 'bg-white text-slate-500'
                   }`}>
                     {modCompleted ? '✓' : mod.order_index}
                   </div>
@@ -499,7 +499,7 @@ export default function LessonPage() {
                           key={l.id}
                           className="flex items-center gap-2.5 p-2 rounded-lg text-sm text-slate-400 cursor-not-allowed opacity-60"
                         >
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-slate-100">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-white">
                             <Lock className="w-2.5 h-2.5 text-slate-400" />
                           </div>
                           <span className="flex-1 truncate">{l.title}</span>
@@ -517,7 +517,7 @@ export default function LessonPage() {
                             ? 'bg-brand-blue-100 border-l-3 border-brand-blue-600'
                             : lessonDone
                               ? 'text-brand-green-700 hover:bg-brand-green-50'
-                              : 'text-slate-600 hover:bg-slate-50'
+                              : 'text-slate-600 hover:bg-white'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -525,7 +525,7 @@ export default function LessonPage() {
                             ? 'bg-brand-green-200'
                             : isCurrent
                               ? 'bg-brand-blue-200'
-                              : 'bg-slate-100'
+                              : 'bg-white'
                         }`}>
                           {lessonDone ? (
                             <CheckCircle className="w-3 h-3 text-brand-green-600" />
@@ -786,7 +786,7 @@ export default function LessonPage() {
               <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm ${
                 isCompleted
                   ? 'bg-brand-green-50 text-brand-green-700 border-2 border-brand-green-300'
-                  : 'bg-slate-100 text-slate-500'
+                  : 'bg-white text-slate-500'
               }`}>
                 <CheckCircle className="w-4 h-4" />
                 {isCompleted ? 'Completed' : 'Watch 90% of the video to complete'}
@@ -806,8 +806,8 @@ export default function LessonPage() {
                 aria-label="Previous Lesson"
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition ${
                   hasPrevious
-                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                    : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+                    ? 'bg-white hover:bg-slate-200 text-slate-700'
+                    : 'bg-white text-slate-300 cursor-not-allowed'
                 }`}
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -821,7 +821,7 @@ export default function LessonPage() {
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition ${
                   hasNext && isCompleted
                     ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
-                    : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-white text-slate-400 cursor-not-allowed'
                 }`}
               >
                 {!isCompleted && hasNext && <Lock className="w-3.5 h-3.5" />}
@@ -944,7 +944,7 @@ export default function LessonPage() {
 
               {/* Competency Alignment */}
               {competencyTags.length > 0 && (
-                <div className="bg-slate-50 rounded-xl p-5 sm:p-6 border border-slate-200">
+                <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200">
                   <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 mb-3">
                     <Target className="w-4 h-4 text-brand-blue-600" />
                     Competency Alignment

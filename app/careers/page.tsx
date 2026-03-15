@@ -41,7 +41,7 @@ export default async function CareersPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -86,9 +86,9 @@ export default async function CareersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Careers' }]} />
         </div>
@@ -218,7 +218,7 @@ export default async function CareersPage() {
                           </span>
                         )}
                         {position.location && (
-                          <span className="bg-slate-100 text-slate-700 px-3 py-2 rounded-full">{position.location}</span>
+                          <span className="bg-white text-slate-700 px-3 py-2 rounded-full">{position.location}</span>
                         )}
                       </div>
                     </div>
@@ -304,7 +304,7 @@ export default async function CareersPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Careers FAQ</h2>
           <div className="space-y-4">
@@ -344,7 +344,7 @@ export default async function CareersPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-white text-brand-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
+              className="inline-block bg-white text-brand-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
             >
               Contact Us
             </Link>

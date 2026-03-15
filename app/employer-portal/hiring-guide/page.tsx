@@ -66,7 +66,7 @@ const resources = [
 export default function HiringGuidePage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
 <div className="relative h-80 bg-brand-blue-800 overflow-hidden">
         <Image
@@ -145,7 +145,7 @@ export default function HiringGuidePage() {
                     <p className="text-sm text-gray-500">{resource.type} - {resource.size}</p>
                   </div>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition">
+                <button className="p-2 hover:bg-white rounded-lg transition">
                   <Download className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
@@ -161,7 +161,7 @@ export default function HiringGuidePage() {
           <div className="flex justify-center gap-4">
             <Link
               href="/employer-portal/jobs/new"
-              className="px-6 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold flex items-center gap-2"
+              className="px-6 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-white transition font-semibold flex items-center gap-2"
             >
               Post a Job <ArrowRight className="w-4 h-4" />
             </Link>

@@ -124,7 +124,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               type="email"
               value={user.email || ''}
               disabled
-              className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500"
+              className="w-full px-4 py-2 border rounded-lg bg-white text-gray-500"
             />
             <p className="text-xs text-gray-400 mt-1">Email cannot be changed</p>
           </div>

@@ -123,16 +123,16 @@ export default function BillingSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'LMS', href: '/lms' }, { label: 'Settings', href: '/lms/settings' }, { label: 'Billing' }]} />
         </div>
@@ -176,7 +176,7 @@ export default function BillingSettingsPage() {
           {paymentMethods.length > 0 ? (
             <div className="space-y-3">
               {paymentMethods.map((method) => (
-                <div key={method.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={method.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white rounded-lg border flex items-center justify-center">
                       <CreditCard className="w-5 h-5 text-gray-600" />

@@ -23,7 +23,7 @@ export default async function ErrorPage({
   const displayMessage = ERROR_MESSAGES[messageKey] || 'An unexpected error occurred. Please try again.';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="bg-white rounded-2xl shadow-sm border p-8">
           <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -40,7 +40,7 @@ export default async function ErrorPage({
             </Link>
             <Link
               href="/support"
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-white font-medium"
             >
               Contact Support
             </Link>

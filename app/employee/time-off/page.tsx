@@ -55,12 +55,12 @@ export default async function TimeOffPage() {
       case 'denied':
         return <span className="bg-brand-red-100 text-brand-red-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><XCircle className="w-3 h-3" />Denied</span>;
       default:
-        return <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded">{status}</span>;
+        return <span className="bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded">{status}</span>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Employee', href: '/employee' }, { label: 'Time Off' }]} />
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">

@@ -27,7 +27,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'About Us' }]} />
         </div>
@@ -72,7 +72,7 @@ export default function AboutPage() {
             <Link href="/pathways" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               See Our Career Pathways <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link href="/start" className="bg-white hover:bg-gray-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
+            <Link href="/start" className="bg-white hover:bg-white text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
           </div>
@@ -180,7 +180,7 @@ export default function AboutPage() {
       </section>
 
       {/* Training Delivery Model */}
-      <section className="py-10 bg-slate-50 border-t border-gray-200">
+      <section className="py-10 bg-white border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
           <p className="text-sm text-gray-600 mb-4">
@@ -244,15 +244,15 @@ export default function AboutPage() {
             Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
-            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Related Technical Instruction</h3>
               <p className="text-xs text-gray-600">Delivered by the institute through structured curriculum and learning systems.</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">On-the-Job Training</h3>
               <p className="text-xs text-gray-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Oversight &amp; Compliance</h3>
               <p className="text-xs text-gray-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
             </div>
@@ -266,7 +266,7 @@ export default function AboutPage() {
       </section>
 
       {/* Who We Serve — with images */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Who We Serve</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -337,7 +337,7 @@ export default function AboutPage() {
               { logo: '/images/partners/workone.webp', name: 'WorkOne', role: 'Workforce Partner', desc: 'We work with WorkOne career centers across Central Indiana for participant referrals and eligibility screening.' },
               { logo: '/images/partners/nextleveljobs.webp', name: 'Next Level Jobs', role: 'Workforce Ready Grant Provider', desc: 'Our high-demand certification programs qualify for the Workforce Ready Grant through Next Level Jobs.' },
             ].map((cred) => (
-              <div key={cred.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5 text-center">
+              <div key={cred.name} className="bg-white rounded-lg border border-gray-200 p-5 text-center">
                 <div className="relative w-16 h-16 mx-auto mb-3 overflow-hidden">
                   <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" />
                 </div>
@@ -355,7 +355,7 @@ export default function AboutPage() {
               { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
               { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
             ].map((cred) => (
-              <div key={cred.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5 text-center">
+              <div key={cred.name} className="bg-white rounded-lg border border-gray-200 p-5 text-center">
                 <div className="w-16 h-16 mx-auto mb-3 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
                   <span className="text-slate-700 font-bold text-xs">{cred.name}</span>
                 </div>
@@ -392,7 +392,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -472,7 +472,7 @@ export default function AboutPage() {
       </section>
 
       {/* Programs at a glance */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -508,7 +508,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
           <div className="grid sm:grid-cols-3 gap-6">
-            <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/pathways/partners" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
@@ -520,7 +520,7 @@ export default function AboutPage() {
                 </span>
               </div>
             </Link>
-            <Link href="/about/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-employer-partners.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
@@ -532,7 +532,7 @@ export default function AboutPage() {
                 </span>
               </div>
             </Link>
-            <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/pathways" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/job-placement.jpg" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>

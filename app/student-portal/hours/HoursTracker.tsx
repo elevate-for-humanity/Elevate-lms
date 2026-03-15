@@ -68,8 +68,8 @@ export default function HoursTracker() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-32 bg-gray-100 rounded"></div>
-          <div className="h-32 bg-gray-100 rounded"></div>
+          <div className="h-32 bg-white rounded"></div>
+          <div className="h-32 bg-white rounded"></div>
         </div>
       </div>
     );
@@ -109,7 +109,7 @@ export default function HoursTracker() {
         return (
           <div key={enrollment.enrollment_id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             {/* Header */}
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <div className="bg-white px-6 py-4 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900">{enrollment.program_name}</h2>
               {enrollment.required_hours && (
                 <p className="text-sm text-gray-600 mt-1">
@@ -160,7 +160,7 @@ export default function HoursTracker() {
                   <span>Progress toward {enrollment.required_hours} hours</span>
                   <span>{enrollment.verified_total.toFixed(1)} / {enrollment.required_hours}</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-white rounded-full overflow-hidden">
                   <div
                     className="h-full bg-brand-green-500 rounded-full transition-all"
                     style={{ width: `${progress}%` }}

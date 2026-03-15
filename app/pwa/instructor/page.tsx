@@ -23,7 +23,7 @@ export default async function InstructorPWAPage() {
   const { courses, totalEnrollments, activeEnrollments } = await getInstructorData();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
         <Image src="/images/pages/demo-page-4.jpg" alt="Instructor in classroom" fill className="object-cover" priority />
@@ -60,10 +60,10 @@ export default async function InstructorPWAPage() {
           <Link href="/instructor/courses" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
             My Courses →
           </Link>
-          <Link href="/instructor/students" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/instructor/students" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             Student Roster
           </Link>
-          <Link href="/pwa/instructor" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/pwa/instructor" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-white">
             Grading
           </Link>
         </div>

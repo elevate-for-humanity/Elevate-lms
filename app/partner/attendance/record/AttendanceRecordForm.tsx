@@ -105,7 +105,7 @@ export default function AttendanceRecordForm({
         <h3 className="font-semibold text-gray-900 mb-4">Students ({attendance.length})</h3>
         <div className="space-y-2">
           {attendance.map((student, i) => (
-            <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={student.id} className="flex items-center justify-between p-3 bg-white rounded-lg">
               <span className="font-medium text-gray-900">{student.name}</span>
               <div className="flex gap-4">
                 <label className="flex items-center cursor-pointer">

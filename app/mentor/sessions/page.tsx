@@ -84,7 +84,7 @@ export default async function MentorSessionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
@@ -120,7 +120,7 @@ export default async function MentorSessionsPage() {
                   </div>
                   <div className="mt-4 flex gap-2">
                     <button className="flex-1 bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700">Join</button>
-                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Reschedule</button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white">Reschedule</button>
                   </div>
                 </div>
               ))}
@@ -137,7 +137,7 @@ export default async function MentorSessionsPage() {
           {pastSessions.length > 0 ? (
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Mentee</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
@@ -147,7 +147,7 @@ export default async function MentorSessionsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {pastSessions.map((session) => (
-                    <tr key={session.id} className="hover:bg-gray-50">
+                    <tr key={session.id} className="hover:bg-white">
                       <td className="px-6 py-4 font-medium text-gray-900">{session.mentee}</td>
                       <td className="px-6 py-4 text-gray-600">{session.date}</td>
                       <td className="px-6 py-4 text-gray-600">{session.topic}</td>

@@ -24,48 +24,57 @@ export function useHeroVideo({
     const el = videoRef.current;
     if (!el) return;
 
-    // Always start muted — browsers allow muted autoplay universally.
+    // Must start muted — required for autoplay across all browsers
     el.muted = true;
-    el.volume = 1; // pre-set so unmute is instant
+    el.volume = 1;
 
     async function startPlay() {
       if (!el) return;
-      try {
-        await el.play();
-      } catch {
-        // Autoplay blocked entirely — poster stays visible
-      }
+      try { await el.play(); } catch {}
     }
 
-    // Play immediately on page load, muted (browsers allow muted autoplay universally).
     startPlay();
 
-    if (!pauseOffScreen) {
-      return;
-    }
+    if (!pauseOffScreen) return;
 
-    // Pause when scrolled off screen to save resources.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          startPlay();
-        } else {
-          el.pause();
-        }
+        if (entry.isIntersecting) startPlay();
+        else el.pause();
       },
       { threshold }
     );
 
     observer.observe(el);
-
     return () => observer.disconnect();
   }, [pauseOffScreen, threshold]);
 
   function unmute() {
     const el = videoRef.current;
     if (!el) return;
+
+    if (!muted) {
+      // Toggle back to muted
+      el.muted = true;
+      setMuted(true);
+      // Also mute any audio track on the page
+      const audio = document.getElementById('hero-audio') as HTMLAudioElement | null;
+      if (audio) { audio.pause(); audio.currentTime = 0; }
+      return;
+    }
+
+    // Unmute video
     el.muted = false;
     setMuted(false);
+
+    // If there's a separate audio track, play it in sync
+    const audio = document.getElementById('hero-audio') as HTMLAudioElement | null;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+
+    // Fallback: if browser blocks unmuted video, stay muted silently
     el.play().catch(() => {
       el.muted = true;
       setMuted(true);

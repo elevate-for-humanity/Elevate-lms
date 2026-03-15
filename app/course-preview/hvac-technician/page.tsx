@@ -81,7 +81,7 @@ function ServiceCallCard({ scenario }: { scenario: ReturnType<typeof getModuleSc
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left px-5 py-4 hover:bg-slate-50 transition"
+        className="w-full text-left px-5 py-4 hover:bg-white transition"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -101,7 +101,7 @@ function ServiceCallCard({ scenario }: { scenario: ReturnType<typeof getModuleSc
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
-          <div className="bg-slate-50 rounded-lg p-4">
+          <div className="bg-white rounded-lg p-4">
             <p className="text-xs font-bold text-slate-500 uppercase mb-1">System Info</p>
             <p className="text-sm text-slate-700">{scenario.systemInfo}</p>
           </div>
@@ -231,7 +231,7 @@ export default function HVACClassroomPreview() {
         header, footer, nav, .site-header, .site-footer { display: none !important; }
         #main-content { padding-top: 0 !important; }
       `}</style>
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-white">
       {/* Banner */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white text-center py-3 text-sm font-medium shadow-lg">
         <GraduationCap className="w-4 h-4 inline mr-2" />
@@ -263,7 +263,7 @@ export default function HVACClassroomPreview() {
               <span>{completedModuleCount}/{course.modules.length} modules</span>
               <span>{overallProgress}%</span>
             </div>
-            <div className="bg-slate-100 rounded-full h-2">
+            <div className="bg-white rounded-full h-2">
               <div className="bg-brand-green-600 h-2 rounded-full transition-all duration-500" style={{ width: `${overallProgress}%` }} />
             </div>
           </div>
@@ -285,7 +285,7 @@ export default function HVACClassroomPreview() {
                 className={`w-full text-left p-3 rounded-lg mb-1 transition ${
                   locked ? 'opacity-40 cursor-not-allowed'
                     : isActive ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
-                    : 'hover:bg-slate-50 border-l-4 border-transparent'
+                    : 'hover:bg-white border-l-4 border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -293,7 +293,7 @@ export default function HVACClassroomPreview() {
                     locked ? 'bg-slate-200 text-slate-400'
                       : mAllDone ? 'bg-brand-green-100 text-brand-green-600'
                       : isActive ? 'bg-brand-blue-100 text-brand-blue-600'
-                      : 'bg-slate-100 text-slate-600'
+                      : 'bg-white text-slate-600'
                   }`}>
                     {locked ? <Lock className="w-3.5 h-3.5" />
                       : mAllDone ? <CheckCircle className="w-4 h-4" />
@@ -318,14 +318,14 @@ export default function HVACClassroomPreview() {
               className={`w-full text-left p-3 rounded-lg mb-1 transition ${
                 currentModuleIndex === course.modules.length
                   ? 'bg-amber-50 border-l-4 border-amber-500'
-                  : 'hover:bg-slate-50 border-l-4 border-transparent'
+                  : 'hover:bg-white border-l-4 border-transparent'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
                   currentModuleIndex === course.modules.length
                     ? 'bg-amber-100 text-amber-600'
-                    : 'bg-slate-100 text-slate-600'
+                    : 'bg-white text-slate-600'
                 }`}>
                   <GraduationCap className="w-4 h-4" />
                 </div>
@@ -579,7 +579,7 @@ export default function HVACClassroomPreview() {
                   {mod.lessons.filter((l) => l.type === 'lab').length === 0 &&
                    getModuleDiagrams(modId).filter((d) => d.hasInteractive).length === 0 &&
                    getModuleScenarios(modId).length === 0 && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+                    <div className="bg-white border border-slate-200 rounded-lg p-6 text-center">
                       <FlaskConical className="w-10 h-10 text-slate-300 mx-auto mb-2" />
                       <p className="text-slate-500">This module&apos;s lab is completed during OJT (on-the-job training).</p>
                     </div>
@@ -618,7 +618,7 @@ export default function HVACClassroomPreview() {
               onClick={() => currentModuleIndex > 0 && goToModule(currentModuleIndex - 1)}
               disabled={currentModuleIndex === 0}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition ${
-                currentModuleIndex === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100'
+                currentModuleIndex === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-white'
               }`}
             >
               <ChevronLeft className="w-5 h-5" /> Previous Module

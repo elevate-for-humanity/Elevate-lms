@@ -96,14 +96,14 @@ export default async function PartnerReportsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/partner-page-12.jpg" alt="Partner reports" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner' }, { label: 'Reports' }]} />
         </div>
@@ -115,7 +115,7 @@ export default async function PartnerReportsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Partnership Reports</h1>
             <p className="text-gray-600">Performance metrics and analytics</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+          <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-white">
             <Download className="w-4 h-4" /> Export Report
           </button>
         </div>
@@ -152,7 +152,7 @@ export default async function PartnerReportsPage() {
               {quarters.map((q, idx) => (
                 <div key={q.name} className="flex items-center gap-4">
                   <span className="w-8 text-sm font-medium text-gray-500">{q.name}</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                  <div className="flex-1 bg-white rounded-full h-4 overflow-hidden">
                     <div className="bg-brand-orange-500 h-full rounded-full" 
                       style={{ width: `${Math.min(100, (idx + 1) * 20)}%` }} />
                   </div>
@@ -196,7 +196,7 @@ export default async function PartnerReportsPage() {
               { name: 'Completion Report', desc: 'Completed programs', period: 'Last 12 Months' },
               { name: 'Financial Summary', desc: 'Payout calculations', period: 'Current Quarter' },
             ].map(report => (
-              <div key={report.name} className="border rounded-lg p-4 hover:bg-gray-50">
+              <div key={report.name} className="border rounded-lg p-4 hover:bg-white">
                 <div className="flex items-start justify-between">
                   <div>
                     <FileText className="w-8 h-8 text-gray-400 mb-2" />
@@ -204,7 +204,7 @@ export default async function PartnerReportsPage() {
                     <p className="text-sm text-gray-500">{report.desc}</p>
                     <p className="text-xs text-gray-400 mt-1">{report.period}</p>
                   </div>
-                  <button className="p-2 hover:bg-gray-100 rounded">
+                  <button className="p-2 hover:bg-white rounded">
                     <Download className="w-4 h-4 text-gray-500" />
                   </button>
                 </div>

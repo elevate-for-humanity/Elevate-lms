@@ -28,7 +28,7 @@ export default function DirectDepositPage() {
         <Breadcrumbs items={[{ label: "Banking", href: "/banking" }, { label: "Direct Deposit" }]} />
       </div>
 {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -133,7 +133,7 @@ export default function DirectDepositPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-8">
+            <div className="bg-white rounded-xl p-8">
               <h3 className="text-xl font-bold text-gray-900 mb-6">What You Need</h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -173,7 +173,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* Timeline */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Expected Timeline
@@ -249,7 +249,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions
@@ -305,7 +305,7 @@ export default function DirectDepositPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />
             </Link>

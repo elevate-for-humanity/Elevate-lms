@@ -51,7 +51,7 @@ export default function KingdomKonnectPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Partner With Us</h2>
           <p className="text-xl text-brand-blue-100 mb-8">Join our network of faith-based organizations making a difference.</p>
-          <Link href="/partners" className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/partners" className="bg-white hover:bg-white text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Learn More <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
@@ -64,7 +64,7 @@ export default function KingdomKonnectPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
             >
               Apply Now
             </Link>

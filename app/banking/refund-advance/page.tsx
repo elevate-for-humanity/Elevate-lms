@@ -28,7 +28,7 @@ export default function RefundAdvancePage() {
         <Breadcrumbs items={[{ label: "Banking", href: "/banking" }, { label: "Refund Advance" }]} />
       </div>
 {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
             <Link href="/" className="hover:text-brand-blue-600">Home</Link>
@@ -90,13 +90,13 @@ export default function RefundAdvancePage() {
           </h2>
 
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+            <div className="bg-white rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
               <p className="text-4xl font-bold text-brand-blue-600 mb-2">$500</p>
               <p className="text-gray-600 mb-4">Minimum refund: $1,000</p>
               <p className="text-sm text-gray-500">Quick cash for immediate needs</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+            <div className="bg-white rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
               <p className="text-4xl font-bold text-brand-blue-600 mb-2">$1,500</p>
               <p className="text-gray-600 mb-4">Minimum refund: $3,000</p>
               <p className="text-sm text-gray-500">Cover bills and expenses</p>
@@ -111,7 +111,7 @@ export default function RefundAdvancePage() {
               <p className="text-sm text-brand-blue-100">Best value for most filers</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+            <div className="bg-white rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
               <p className="text-4xl font-bold text-brand-blue-600 mb-2">$6,000</p>
               <p className="text-gray-600 mb-4">Minimum refund: $10,000</p>
               <p className="text-sm text-gray-500">Maximum advance available</p>
@@ -125,7 +125,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             How Refund Advance Works
@@ -279,7 +279,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Important Disclosures */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Important Information
@@ -340,7 +340,7 @@ export default function RefundAdvancePage() {
           </h2>
 
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Will this affect my credit score?</h3>
               <p className="text-gray-600">
                 No. Refund advances do not require a credit check and are not reported to credit bureaus. 
@@ -348,7 +348,7 @@ export default function RefundAdvancePage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What if my refund is less than expected?</h3>
               <p className="text-gray-600">
                 If your actual refund is less than the advance amount, you may be responsible for 
@@ -356,7 +356,7 @@ export default function RefundAdvancePage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">How fast can I get my money?</h3>
               <p className="text-gray-600">
                 Most approved advances are funded the same day. Funds can be deposited to your bank 
@@ -364,7 +364,7 @@ export default function RefundAdvancePage() {
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Can I get an advance if I owe back taxes?</h3>
               <p className="text-gray-600">
                 If you owe back taxes, the IRS may offset your refund to pay the debt. This could 
@@ -387,7 +387,7 @@ export default function RefundAdvancePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="bg-white hover:bg-gray-100 text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-white text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Apply Now <ArrowRight className="ml-2 w-5 h-5" />
             </Link>

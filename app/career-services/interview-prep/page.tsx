@@ -63,7 +63,7 @@ export default function InterviewPrepPage() {
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Interview Prep' }]} />
         </div>
@@ -95,7 +95,7 @@ export default function InterviewPrepPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {interviewTypes.map((type, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition">
+              <div key={index} className="bg-white rounded-xl p-6 hover:shadow-lg transition">
                 <type.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{type.title}</h3>
                 <p className="text-gray-600 text-sm">{type.description}</p>
@@ -106,7 +106,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Mock Interview Process */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Mock Interview Process
@@ -198,7 +198,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Tips */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Top Interview Tips
@@ -224,28 +224,28 @@ export default function InterviewPrepPage() {
           </h2>
 
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Tell me about yourself.</h3>
               <p className="text-gray-600 text-sm">
                 Focus on your professional background, key achievements, and why you are interested in this role. Keep it to 2-3 minutes.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Why do you want to work here?</h3>
               <p className="text-gray-600 text-sm">
                 Show you have researched the company. Connect your skills and goals to their mission and the specific role.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">What is your greatest weakness?</h3>
               <p className="text-gray-600 text-sm">
                 Be honest but strategic. Choose a real weakness and explain what you are doing to improve it.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-2">Where do you see yourself in 5 years?</h3>
               <p className="text-gray-600 text-sm">
                 Show ambition while being realistic. Align your goals with potential growth at the company.
@@ -297,7 +297,7 @@ export default function InterviewPrepPage() {
             </Link>
             <Link
               href="/career-services"
-              className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-white hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               View All Career Services
             </Link>

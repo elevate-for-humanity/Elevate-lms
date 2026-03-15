@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr';
 function Button({ children, variant, onClick, type, className }: { children: React.ReactNode; variant?: string; onClick?: () => void; type?: 'button' | 'submit'; className?: string }) {
   const baseClass = 'px-4 py-2 rounded-lg font-medium transition-colors';
-  const variantClass = variant === 'outline' ? 'border border-gray-300 hover:bg-gray-50' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700';
+  const variantClass = variant === 'outline' ? 'border border-gray-300 hover:bg-white' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700';
   return (
     <button type={type || 'button'} onClick={onClick} className={`${baseClass} ${variantClass} ${className || ''}`}>
       {children}
@@ -50,7 +50,7 @@ export default function PostJobPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-white py-12">
         <div className="container mx-auto px-4 max-w-2xl text-center">
           <div className="bg-white rounded-lg shadow-sm p-8">
             <div className="relative w-32 h-32 mx-auto mb-6 overflow-hidden">
@@ -81,7 +81,7 @@ export default function PostJobPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Post Job" }]} />
       </div>

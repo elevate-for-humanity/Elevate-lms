@@ -61,7 +61,7 @@ export default async function ProgramScopedLayout({
               {program.is_active ? (
                 <span className="text-xs bg-brand-green-100 text-brand-green-800 px-2 py-0.5 rounded">Active</span>
               ) : (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Inactive</span>
+                <span className="text-xs bg-white text-gray-600 px-2 py-0.5 rounded">Inactive</span>
               )}
             </div>
           </div>
@@ -69,7 +69,7 @@ export default async function ProgramScopedLayout({
       </div>
 
       {/* Program-scoped nav */}
-      <div className="bg-gray-50 border-b overflow-x-auto">
+      <div className="bg-white border-b overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4">
           <nav className="flex gap-1 py-1" aria-label="Program navigation">
             {navItems.map((item) => (

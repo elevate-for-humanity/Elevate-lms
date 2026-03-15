@@ -57,7 +57,7 @@ export default async function MenteesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
@@ -79,7 +79,7 @@ export default async function MenteesPage() {
         {mentees.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Program</th>
@@ -91,13 +91,13 @@ export default async function MenteesPage() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {mentees.map((mentee) => (
-                  <tr key={mentee.id} className="hover:bg-gray-50">
+                  <tr key={mentee.id} className="hover:bg-white">
                     <td className="px-6 py-4 font-medium text-gray-900">{mentee.name}</td>
                     <td className="px-6 py-4 text-gray-600">{mentee.program}</td>
                     <td className="px-6 py-4 text-gray-600">{mentee.startDate}</td>
                     <td className="px-6 py-4 text-center text-gray-600">{mentee.sessions}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${mentee.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${mentee.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-white text-gray-700'}`}>
                         {mentee.status}
                       </span>
                     </td>

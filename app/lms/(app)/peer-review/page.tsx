@@ -22,7 +22,7 @@ export default async function PeerReviewPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -38,7 +38,7 @@ export default async function PeerReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -145,7 +145,7 @@ export default async function PeerReviewPage() {
                   Submit assignments in your courses to receive peer feedback
                 </p>
                 <Link
-                  href="/lms/courses"
+                  href="/learner/courses"
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                 >
                   Go to My Courses →

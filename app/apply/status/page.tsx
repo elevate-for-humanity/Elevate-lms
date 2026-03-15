@@ -88,7 +88,7 @@ export default function ApplicationStatusPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <Breadcrumbs
         items={[
           { label: 'Apply', href: '/apply' },
@@ -166,7 +166,7 @@ export default function ApplicationStatusPage() {
 
               {application.status === 'approved' && (
                 <Link
-                  href="/lms/dashboard"
+                  href="/learner/dashboard"
                   className="mt-6 inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700"
                 >
                   Go to Student Dashboard
@@ -177,7 +177,7 @@ export default function ApplicationStatusPage() {
         )}
 
         {searched && !application && !error && (
-          <div className="bg-gray-100 rounded-lg p-6 text-center">
+          <div className="bg-white rounded-lg p-6 text-center">
             <p className="text-gray-600">No application found. Did you use a different email?</p>
           </div>
         )}

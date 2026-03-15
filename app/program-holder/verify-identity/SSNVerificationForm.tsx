@@ -239,7 +239,7 @@ export default function SSNVerificationForm({
         </div>
       </form>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-6 p-4 bg-white rounded-lg">
         <p className="text-sm text-black">
           <strong>About SSN Verification:</strong>
           <br />

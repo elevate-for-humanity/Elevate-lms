@@ -59,7 +59,7 @@ export default function CDLWaitlistPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'CDL Training', href: '/programs/cdl' }, { label: 'Waitlist' }]} />
         </div>
@@ -90,13 +90,13 @@ export default function CDLWaitlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'CDL Training', href: '/programs/cdl' }, { label: 'Waitlist' }]} />
       </div>
 
       {/* Hero */}
-      <section className="relative bg-slate-900 text-white py-16 overflow-hidden">
+      <section className="relative bg-white py-16 overflow-hidden border-t">
         <div className="absolute inset-0">
           <Image src="/images/pages/programs-cdl-waitlist-hero.jpg" alt="CDL truck training" fill className="object-cover" priority />
         </div>

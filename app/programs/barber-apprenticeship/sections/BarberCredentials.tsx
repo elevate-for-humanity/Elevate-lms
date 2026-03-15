@@ -24,7 +24,7 @@ export function BarberCredentials() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {CREDENTIALS.map((cred, i) => (
-              <div key={i} className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <div key={i} className="bg-white rounded-xl p-5 border border-slate-200">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold">{i + 1}</span>
                   <span className="text-xs font-bold uppercase tracking-wider text-brand-red-600">{cred.type}</span>
@@ -38,7 +38,7 @@ export function BarberCredentials() {
       </section>
 
       {/* Section 6 — What You'll Learn (Curriculum) */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">What You&apos;ll Learn</h2>
           <p className="text-slate-600 mb-10 max-w-3xl">
@@ -68,7 +68,7 @@ export function BarberCredentials() {
             Participants receive hands-on training in licensed barbershops under the supervision of licensed barbers. Workplace training includes real client services, shop operations, sanitation practices, and professional skill development.
           </p>
           <div className="grid sm:grid-cols-2 gap-6">
-            <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
                 <Image src="/images/pages/barber-gallery-1.jpg" alt="Supervised barber training" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
@@ -77,7 +77,7 @@ export function BarberCredentials() {
                 <p className="text-slate-600 text-sm">Training in approved employer environments under licensed barber supervisors with at least 2 years of experience. All training sites maintain active shop licensing.</p>
               </div>
             </div>
-            <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
                 <Image src="/images/pages/barber-gallery-2.jpg" alt="Barber performance evaluation" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
@@ -86,7 +86,7 @@ export function BarberCredentials() {
                 <p className="text-slate-600 text-sm">Monthly competency evaluations by supervising barbers, with tri-party verification (RTI instructor + Employer + Program Oversight) at key milestones.</p>
               </div>
             </div>
-            <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
                 <Image src="/images/pages/barber-gallery-3.jpg" alt="Barbershop employment" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
@@ -95,7 +95,7 @@ export function BarberCredentials() {
                 <p className="text-slate-600 text-sm">Apprentices may train under hourly paid, booth-based, or hybrid arrangements depending on the partner shop&apos;s operational policies. All models require licensed supervision and documented OJT hours.</p>
               </div>
             </div>
-            <div className="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
                 <Image src="/images/pages/barber-training.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>

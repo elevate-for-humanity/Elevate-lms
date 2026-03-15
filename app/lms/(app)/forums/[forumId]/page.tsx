@@ -59,7 +59,7 @@ export default async function ForumPage({ params }: Props) {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -105,11 +105,11 @@ export default async function ForumPage({ params }: Props) {
     .eq('forum_id', forumId);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
         <Link
-          href="/lms/forums"
+          href="/learner/forums"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -154,7 +154,7 @@ export default async function ForumPage({ params }: Props) {
                 <Link
                   key={thread.id}
                   href={`/lms/forums/${forumId}/threads/${thread.id}`}
-                  className="flex items-center gap-4 p-4 hover:bg-slate-50 transition"
+                  className="flex items-center gap-4 p-4 hover:bg-white transition"
                 >
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <MessageSquare className="w-5 h-5 text-brand-blue-600" />

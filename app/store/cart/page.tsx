@@ -29,7 +29,7 @@ export default async function CartPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -44,7 +44,7 @@ export default async function CartPage() {
   // Show empty cart for guests instead of redirecting
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4 mb-8">
             <Link href="/store" className="text-gray-500 hover:text-gray-700">
@@ -65,7 +65,7 @@ export default async function CartPage() {
               </Link>
               <Link
                 href="/store"
-                className="inline-flex items-center gap-2 border border-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-gray-50"
+                className="inline-flex items-center gap-2 border border-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-white"
               >
                 Continue Shopping
               </Link>
@@ -100,7 +100,7 @@ export default async function CartPage() {
   const total = subtotal + tax;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -124,7 +124,7 @@ export default async function CartPage() {
               {cartItems.map((item: any) => (
                 <div key={item.id} className="bg-white rounded-xl shadow-sm border p-4">
                   <div className="flex gap-4">
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
+                    <div className="w-20 h-20 bg-white rounded-lg overflow-hidden flex-shrink-0 relative">
                       {item.product?.image_url ? (
                         <Image alt="Product image" 
                           src={item.product.image_url} 
@@ -149,7 +149,7 @@ export default async function CartPage() {
                             <input type="hidden" name="quantity" value={item.quantity - 1} />
                             <button 
                               type="submit"
-                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-50"
+                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-white"
                               disabled={item.quantity <= 1}
                             >
                               <Minus className="w-4 h-4" />
@@ -161,7 +161,7 @@ export default async function CartPage() {
                             <input type="hidden" name="quantity" value={item.quantity + 1} />
                             <button 
                               type="submit"
-                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-50"
+                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-white"
                             >
                               <Plus className="w-4 h-4" />
                             </button>

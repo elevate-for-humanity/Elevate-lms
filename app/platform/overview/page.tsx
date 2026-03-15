@@ -35,7 +35,7 @@ export default async function PlatformLicensingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -93,7 +93,7 @@ export default async function PlatformLicensingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="#license-types"
-                className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+                className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
               >
                 Compare License Types
               </Link>
@@ -109,7 +109,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* Government Credentials Included */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
@@ -335,7 +335,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/license/pricing"
-                className="block w-full bg-white text-brand-blue-600 hover:bg-slate-100 text-center px-6 py-4 rounded-lg font-bold transition text-lg"
+                className="block w-full bg-white text-brand-blue-600 hover:bg-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Learn More & Apply →
               </Link>
@@ -344,7 +344,7 @@ export default async function PlatformLicensingPage() {
             {/* License Type 2: Independent Platform */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center">
+                <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
                   <Building2 className="w-8 h-8 text-black" />
                 </div>
                 <div>
@@ -366,7 +366,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-4 mb-6">
+              <div className="bg-white rounded-xl p-4 mb-6">
                 <div className="font-bold text-black mb-2">You Handle:</div>
                 <div className="space-y-1 text-sm text-black">
                   <div>• Get your own ETPL/WIOA approvals</div>
@@ -534,7 +534,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-lg p-4 mb-6 text-sm">
+              <div className="bg-white rounded-lg p-4 mb-6 text-sm">
                 <div className="font-bold text-black mb-1">
                   <span className="text-slate-400 flex-shrink-0">•</span> Best For:
                 </div>
@@ -555,7 +555,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* Original Pricing Tiers Section (Keep for reference) */}
-      <section id="tiers" className="py-20 bg-slate-50">
+      <section id="tiers" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -570,7 +570,7 @@ export default async function PlatformLicensingPage() {
             {/* Tier 1: Basic */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-6 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
                   <Building2 className="w-6 h-6 text-black" />
                 </div>
                 <div>
@@ -607,7 +607,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-lg p-3 mb-4 text-xs">
+              <div className="bg-white rounded-lg p-3 mb-4 text-xs">
                 <div className="font-semibold mb-1">No Credentials</div>
                 <div className="text-black">
                   For private training providers
@@ -680,7 +680,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/contact?tier=government"
-                className="block w-full bg-white text-brand-blue-600 hover:bg-slate-100 text-center px-4 py-3 rounded-lg font-bold transition"
+                className="block w-full bg-white text-brand-blue-600 hover:bg-white text-center px-4 py-3 rounded-lg font-bold transition"
               >
                 Get Started
               </Link>
@@ -802,7 +802,7 @@ export default async function PlatformLicensingPage() {
           </div>
 
           {/* Size Pricing Table */}
-          <div className="mt-12 bg-slate-50 rounded-2xl p-8">
+          <div className="mt-12 bg-white rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-center mb-8">
               Pricing by Size
             </h3>
@@ -919,7 +919,7 @@ export default async function PlatformLicensingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/demos"
-              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition"
             >
               View Live Demos
             </Link>

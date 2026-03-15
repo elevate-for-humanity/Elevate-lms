@@ -101,7 +101,7 @@ export default async function StudentPortalGradesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
@@ -144,7 +144,7 @@ export default async function StudentPortalGradesPage() {
             <h2 className="text-xl font-semibold mb-4">Course Progress</h2>
             <div className="space-y-4">
               {enrollmentsList.map((enrollment: any) => (
-                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                   <div>
                     <h3 className="font-medium text-gray-900">
                       {enrollment.programs?.name || enrollment.programs?.title || 'Program'}
@@ -174,7 +174,7 @@ export default async function StudentPortalGradesPage() {
                 </div>
               ))}
               {courseEnrollmentsList.map((enrollment: any) => (
-                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={enrollment.id} className="flex items-center justify-between p-4 bg-white rounded-lg">
                   <div>
                     <h3 className="font-medium text-gray-900">
                       {enrollment.courses?.name || enrollment.courses?.title || 'Course'}

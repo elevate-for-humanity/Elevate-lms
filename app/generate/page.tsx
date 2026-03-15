@@ -313,7 +313,7 @@ export default function GenerateSitePage() {
               </div>
 
               {/* Mini Preview Hero */}
-              <div className="p-8 bg-slate-50">
+              <div className="p-8 bg-white">
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">
                   {siteConfig.homepage.heroTitle}
                 </h2>
@@ -333,7 +333,7 @@ export default function GenerateSitePage() {
                 <h3 className="font-bold text-slate-900 mb-4">Featured Programs</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {siteConfig.programs.map((program) => (
-                    <div key={program.name} className="p-4 bg-slate-50 rounded-lg">
+                    <div key={program.name} className="p-4 bg-white rounded-lg">
                       <p className="font-medium text-slate-900 text-sm">{program.name}</p>
                       <p className="text-xs text-slate-500">{program.duration}</p>
                     </div>

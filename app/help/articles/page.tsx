@@ -61,9 +61,9 @@ export default async function HelpArticlesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Articles' }]} />
         </div>
@@ -113,7 +113,7 @@ export default async function HelpArticlesPage() {
                 <Link 
                   key={article.id} 
                   href={`/help/articles/article/${article.slug || article.id}`} 
-                  className="block p-4 hover:bg-gray-50"
+                  className="block p-4 hover:bg-white"
                 >
                   <h3 className="font-medium text-gray-900 mb-1">{article.title}</h3>
                   <div className="flex items-center gap-4 text-sm text-gray-500">

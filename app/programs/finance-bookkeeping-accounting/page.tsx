@@ -75,7 +75,7 @@ export default function FinancePathwayPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-slate-900">
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
         <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
           <source src="/videos/business-finance.mp4" type="video/mp4" />
         </video>
@@ -126,7 +126,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== PATHWAY MODEL ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Pathway Structure</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Training → Credential → Internship → Employment</h2>
@@ -154,7 +154,7 @@ export default function FinancePathwayPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Three Tiers. One Pathway.</h2>
             <div className="space-y-6">
               {tiers.map((tier) => (
-                <div key={tier.level} className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                <div key={tier.level} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                   <div className="p-6 sm:p-8">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <span className="text-xs font-bold text-white px-3 py-1 rounded-full bg-slate-800">{tier.level}</span>
@@ -212,7 +212,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== CREDENTIAL STACK ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">National Credentials</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Credential &amp; Validation Stack</h2>
@@ -244,15 +244,15 @@ export default function FinancePathwayPage() {
               <p>Work-based learning placements for WIOA-funded participants are coordinated through WorkOne Indianapolis (Region 5). The assigned career advisor or case manager approves the placement, sets the reimbursement rate per local board policy, and receives weekly progress reports. Credential attainment and employment outcomes are reported to the local workforce development board for WIOA performance measures.</p>
             </div>
             <div className="grid sm:grid-cols-3 gap-6 mb-8">
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
+              <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">Workforce-Funded Work Experience</h3>
                 <p className="text-xs text-slate-600">WorkOne authorizes paid work experience. Workforce board pays stipend or wage per local policy. Elevate supervises. Hours and learning objectives documented per WIOA guidelines.</p>
               </div>
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
+              <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">OJT Reimbursement Model</h3>
                 <p className="text-xs text-slate-600">Participant hired as W-2 employee. WorkOne reimburses employer 50–75% of wages during defined training period per local board policy. Formal OJT contract and training plan required.</p>
               </div>
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
+              <div className="bg-white rounded-lg p-5 border border-slate-200">
                 <h3 className="font-bold text-slate-900 text-sm mb-2">Employer-Funded Placement</h3>
                 <p className="text-xs text-slate-600">Partner employer pays wages directly. Training plan and evaluation documented. No workforce reimbursement. Still reported to WorkOne for outcome tracking if participant is WIOA-enrolled.</p>
               </div>
@@ -278,7 +278,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== OUTCOME LADDER ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Outcome Metrics</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Defined Outcome Ladder</h2>
@@ -335,7 +335,7 @@ export default function FinancePathwayPage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Start This Credential Pathway</h2>
             <p className="text-xl text-white/90 mb-8">Apply in minutes. Training may be fully funded for eligible participants.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/apply?program=finance-bookkeeping-accounting" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+              <Link href="/apply?program=finance-bookkeeping-accounting" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors">
                 Apply Now
               </Link>
               <Link href="/programs" className="bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-800 transition-colors">
@@ -347,7 +347,7 @@ export default function FinancePathwayPage() {
       </InView>
 
       {/* ===== TRUST BAR ===== */}
-      <section className="py-8 bg-slate-50 border-t border-slate-100">
+      <section className="py-8 bg-white border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-4">

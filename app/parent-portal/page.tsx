@@ -33,7 +33,7 @@ export default async function ParentPortalPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -88,7 +88,7 @@ export default async function ParentPortalPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center gap-2 bg-white text-pink-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-2xl"
+                className="inline-flex items-center justify-center gap-2 bg-white text-pink-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition shadow-2xl"
               >
                 Access Portal
                 <ArrowRight className="w-5 h-5" />
@@ -167,7 +167,7 @@ export default async function ParentPortalPage() {
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-white text-pink-600 px-10 py-5 rounded-xl text-lg font-black hover:bg-gray-100 transition"
+            className="inline-flex items-center gap-2 bg-white text-pink-600 px-10 py-5 rounded-xl text-lg font-black hover:bg-white transition"
           >
             Access Parent Portal
             <ArrowRight className="w-6 h-6" />

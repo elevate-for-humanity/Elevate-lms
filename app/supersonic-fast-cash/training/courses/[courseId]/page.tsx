@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -88,7 +88,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
   const totalHours = Math.round(totalMinutes / 60);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "[Courseid]" }]} />
       </div>
@@ -175,7 +175,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                 {lessons.map((lesson) => (
                   <div
                     key={lesson.id}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 hover:bg-white transition-colors"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
@@ -199,7 +199,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                             {lesson.topics.slice(0, 3).map((topic, i) => (
                               <span
                                 key={i}
-                                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                                className="text-xs bg-white text-gray-600 px-2 py-1 rounded"
                               >
                                 {topic}
                               </span>

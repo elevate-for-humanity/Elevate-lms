@@ -161,7 +161,7 @@ export default function StudentApplicationPage() {
           {existingApplication.status === 'approved' && (
             <div className="mt-6">
               <a
-                href="/lms/enroll"
+                href="/learner/enroll"
                 className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700"
               >
                 Proceed to Enrollment
@@ -200,7 +200,7 @@ export default function StudentApplicationPage() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
         {/* Personal Info (pre-filled) */}
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <h2 className="font-semibold text-gray-900 mb-3">Personal Information</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>

@@ -49,7 +49,7 @@ const populations = [
 
 export default function MissionPage() {
   return (
-    <div className="min-h-screen bg-white">      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'About', href: '/about' },
@@ -166,7 +166,7 @@ export default function MissionPage() {
             </Link>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-white transition-colors"
             >
               About Elevate
               <ArrowRight className="w-4 h-4" />

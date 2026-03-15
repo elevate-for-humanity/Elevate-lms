@@ -27,7 +27,7 @@ export default async function QAChecklistPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -57,9 +57,9 @@ export default async function QAChecklistPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'QA Checklist' }]} />
         </div>
@@ -150,7 +150,7 @@ export default async function QAChecklistPage() {
                             Completed
                           </span>
                         ) : (
-                          <span className="px-3 py-2 bg-slate-100 text-black text-sm font-medium rounded-full flex items-center gap-1">
+                          <span className="px-3 py-2 bg-white text-black text-sm font-medium rounded-full flex items-center gap-1">
                             <Square className="h-4 w-4" />
                             Pending
                           </span>

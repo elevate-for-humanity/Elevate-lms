@@ -45,7 +45,7 @@ const sections = [
 export default function StudentHandbookPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Student', href: '/lms/dashboard' }, { label: 'Handbook' }]} />
         </div>
@@ -57,7 +57,7 @@ export default function StudentHandbookPage() {
 
         <div className="space-y-8">
           {sections.map((section) => (
-            <div key={section.title} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <div key={section.title} className="bg-white rounded-xl p-6 border border-slate-200">
               <div className="flex items-start gap-4">
                 <section.icon className="w-6 h-6 text-brand-red-600 flex-shrink-0 mt-1" />
                 <div>

@@ -119,7 +119,7 @@ export default function NewJobPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs", href: "/employer-portal/jobs" }, { label: "New Job" }]} />
 
       <div className="bg-white border-b">
@@ -349,7 +349,7 @@ export default function NewJobPage() {
           {/* Actions */}
           <div className="flex items-center justify-between">
             <button type="button" onClick={(e) => handleSubmit(e, true)} disabled={isSubmitting}
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50">
+              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white transition flex items-center gap-2 disabled:opacity-50">
               <Save className="w-4 h-4" />
               Save as Draft
             </button>

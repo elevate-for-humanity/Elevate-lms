@@ -17,7 +17,7 @@ export default function WorkforcePartnersPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Workforce Partners' }]} />
         </div>
@@ -50,7 +50,7 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* How We Work Together */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-black text-center mb-4">How We Work Together</h2>
           <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
@@ -131,7 +131,7 @@ export default function WorkforcePartnersPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition-all">
+              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-full font-bold hover:bg-white transition-all">
                 Access Partner Packet <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -145,7 +145,7 @@ export default function WorkforcePartnersPage() {
       {/* ETPL Information */}
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-slate-50 rounded-2xl p-8 md:p-12">
+          <div className="bg-white rounded-2xl p-8 md:p-12">
             <div className="grid lg:grid-cols-2 gap-8 items-center">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 mb-4">ETPL Approved Provider</h2>
@@ -159,7 +159,7 @@ export default function WorkforcePartnersPage() {
                   <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors">
                     View Approved Programs
                   </Link>
-                  <a href="https://www.in.gov/dwd/career-training-adult-ed/intraining/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                  <a href="https://www.in.gov/dwd/career-training-adult-ed/intraining/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-white transition-colors">
                     View ETPL List
                   </a>
                 </div>

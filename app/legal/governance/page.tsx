@@ -20,7 +20,7 @@ export default async function GovernanceIndexPage() {
 const documents = (dbRows as any[]) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Governance" }]} />
       </div>

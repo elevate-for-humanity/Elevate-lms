@@ -18,7 +18,7 @@ export default async function FundingSuccessPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -29,7 +29,7 @@ export default async function FundingSuccessPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Success' }]} />
         </div>
@@ -107,7 +107,7 @@ export default async function FundingSuccessPage() {
           </Link>
           <Link
             href="/admin/dashboard"
-            className="px-6 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 rounded-lg hover:bg-gray-50 font-bold transition-all"
+            className="px-6 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 rounded-lg hover:bg-white font-bold transition-all"
           >
             Back to Dashboard
           </Link>

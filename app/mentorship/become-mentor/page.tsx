@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function BecomeMentorPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Mentorship', href: '/mentorship' }, { label: 'Become a Mentor' }]} />
         </div>
@@ -38,7 +38,7 @@ export default function BecomeMentorPage() {
               { icon: Clock, title: 'Flexible Commitment', desc: '2-4 hours per month. Meet in person, by phone, or video. Work around your schedule.' },
               { icon: Heart, title: 'Community Impact', desc: 'Many of our students are first-generation professionals. Your guidance has outsized impact.' },
             ].map((item) => (
-              <div key={item.title} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200">
                 <item.icon className="w-8 h-8 text-brand-red-600 mb-3" />
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -49,7 +49,7 @@ export default function BecomeMentorPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-12 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Mentor Requirements</h2>
           <div className="bg-white rounded-xl p-6 border border-slate-200">

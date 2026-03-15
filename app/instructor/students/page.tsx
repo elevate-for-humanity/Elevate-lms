@@ -21,7 +21,7 @@ export default async function InstructorStudentsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -70,14 +70,14 @@ export default async function InstructorStudentsPage() {
   const completedStudents = enrollments?.filter(e => e.status === 'completed') || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/instructor-page-14.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Students' }]} />
         </div>
@@ -144,7 +144,7 @@ export default async function InstructorStudentsPage() {
         {/* Students List */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-white border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
@@ -157,7 +157,7 @@ export default async function InstructorStudentsPage() {
             <tbody className="divide-y">
               {enrollments && enrollments.length > 0 ? (
                 enrollments.map((enrollment: any) => (
-                  <tr key={enrollment.id} className="hover:bg-gray-50">
+                  <tr key={enrollment.id} className="hover:bg-white">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center">
@@ -193,7 +193,7 @@ export default async function InstructorStudentsPage() {
                           ? 'bg-brand-green-100 text-brand-green-800'
                           : enrollment.status === 'active'
                           ? 'bg-brand-blue-100 text-brand-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                          : 'bg-white text-gray-800'
                       }`}>
                         {enrollment.status}
                       </span>

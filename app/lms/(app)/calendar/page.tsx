@@ -132,7 +132,7 @@ export default async function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Calendar" }]} />
       </div>
@@ -143,7 +143,7 @@ export default async function CalendarPage() {
             <p className="text-slate-600 mt-1">Track your classes, assignments, and important dates</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition">
               <Bell className="w-4 h-4" />
               Reminders
             </button>
@@ -158,20 +158,20 @@ export default async function CalendarPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
               <div className="flex items-center justify-between p-6 border-b border-slate-200">
-                <button className="p-2 hover:bg-slate-100 rounded-lg transition">
+                <button className="p-2 hover:bg-white rounded-lg transition">
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <h2 className="text-xl font-bold text-slate-900">
                   {monthNames[currentMonth]} {currentYear}
                 </h2>
-                <button className="p-2 hover:bg-slate-100 rounded-lg transition">
+                <button className="p-2 hover:bg-white rounded-lg transition">
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="grid grid-cols-7 border-b border-slate-200">
                 {dayNames.map(day => (
-                  <div key={day} className="p-3 text-center text-sm font-semibold text-slate-600 bg-slate-50">
+                  <div key={day} className="p-3 text-center text-sm font-semibold text-slate-600 bg-white">
                     {day}
                   </div>
                 ))}
@@ -186,7 +186,7 @@ export default async function CalendarPage() {
                     <div 
                       key={index} 
                       className={`min-h-[100px] p-2 border-b border-r border-slate-100 ${
-                        day ? 'hover:bg-slate-50 cursor-pointer' : 'bg-slate-50'
+                        day ? 'hover:bg-white cursor-pointer' : 'bg-white'
                       }`}
                     >
                       {day && (
@@ -252,7 +252,7 @@ export default async function CalendarPage() {
               {events.filter(e => new Date(e.start_time).toDateString() === now.toDateString()).length > 0 ? (
                 <div className="space-y-3">
                   {events.filter(e => new Date(e.start_time).toDateString() === now.toDateString()).map((event, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div key={i} className="flex items-start gap-3 p-3 bg-white rounded-lg">
                       <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         {event.event_type === 'class' ? <BookOpen className="w-5 h-5 text-brand-blue-600" /> :
                          event.is_virtual ? <Video className="w-5 h-5 text-brand-blue-600" /> :
@@ -285,7 +285,7 @@ export default async function CalendarPage() {
               {upcomingAssignments.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingAssignments.map((assignment, i) => (
-                    <Link key={i} href={`/lms/assignments/${assignment.id}`} className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+                    <Link key={i} href={`/lms/assignments/${assignment.id}`} className="block p-3 bg-white rounded-lg hover:bg-white transition">
                       <div className="font-medium text-slate-900 truncate">{assignment.title}</div>
                       <div className="text-sm text-slate-600">{assignment.courses?.title}</div>
                       <div className="text-sm text-brand-orange-600 font-medium mt-1">Due: {formatDate(assignment.due_date)}</div>
@@ -303,10 +303,10 @@ export default async function CalendarPage() {
             <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
               <h3 className="font-bold mb-4">Quick Actions</h3>
               <div className="space-y-2">
-                <Link href="/lms/assignments" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                <Link href="/learner/assignments" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
                   View All Assignments
                 </Link>
-                <Link href="/lms/grades" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                <Link href="/learner/grades" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
                   Check Grades
                 </Link>
                 <Link href="/lms/support" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">

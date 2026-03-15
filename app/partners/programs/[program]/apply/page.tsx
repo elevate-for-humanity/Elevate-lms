@@ -165,7 +165,7 @@ export default function UniversalPartnerApplyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
           { label: 'Partners', href: '/partners' },
@@ -291,7 +291,7 @@ export default function UniversalPartnerApplyPage() {
               <div className="space-y-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Review &amp; Submit</h2>
 
-                <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 space-y-2">
+                <div className="bg-white rounded-lg p-4 text-sm text-gray-600 space-y-2">
                   <p><strong>Business:</strong> {formData.businessLegalName} {formData.dba ? `(DBA: ${formData.dba})` : ''}</p>
                   <p><strong>Contact:</strong> {formData.contactName} — {formData.contactEmail} — {formData.contactPhone}</p>
                   <p><strong>Location:</strong> {formData.addressLine1}, {formData.city}, {formData.state} {formData.zip}</p>
@@ -326,11 +326,11 @@ export default function UniversalPartnerApplyPage() {
             {/* Navigation */}
             <div className="flex justify-between mt-8">
               {step > 1 ? (
-                <button type="button" onClick={() => setStep(s => s - 1)} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium">
+                <button type="button" onClick={() => setStep(s => s - 1)} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium">
                   Back
                 </button>
               ) : (
-                <Link href={`/partners/programs/${slug}`} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium inline-flex items-center">
+                <Link href={`/partners/programs/${slug}`} className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-white transition font-medium inline-flex items-center">
                   Cancel
                 </Link>
               )}

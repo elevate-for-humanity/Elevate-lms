@@ -77,7 +77,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
       </section>
 
       {/* Program title + quick facts */}
-      <section className="bg-slate-900 text-white">
+      <section className="bg-white">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
@@ -87,10 +87,10 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           </div>
           <p className="text-slate-300 text-sm mb-4 max-w-2xl">{data.tagline}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm border-t border-slate-700 pt-4">
-            <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-400">Duration</div></div>
-            <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-400">Total Hours</div></div>
-            <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString()}</div><div className="text-slate-400">Per Participant</div></div>
-            <div><div className="font-bold text-lg">{data.cohortMin}–{data.cohortMax}</div><div className="text-slate-400">Cohort Size</div></div>
+            <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-500">Duration</div></div>
+            <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-500">Total Hours</div></div>
+            <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString()}</div><div className="text-slate-500">Per Participant</div></div>
+            <div><div className="font-bold text-lg">{data.cohortMin}–{data.cohortMax}</div><div className="text-slate-500">Cohort Size</div></div>
           </div>
         </div>
       </section>
@@ -265,10 +265,10 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
       </section>
 
       {/* CTA */}
-      <section className="bg-slate-900 py-10">
+      <section className="bg-white py-10 border-t">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white">{data.name}</h2>
+            <h2 className="text-xl font-bold text-slate-900">{data.name}</h2>
             <p className="text-slate-400 text-sm">{data.duration} · ${data.costPerParticipant.toLocaleString()}/participant</p>
           </div>
           <div className="flex gap-3">

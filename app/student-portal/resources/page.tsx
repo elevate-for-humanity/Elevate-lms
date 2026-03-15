@@ -33,7 +33,7 @@ export default function StudentPortalResourcesPage() {
           </div>
           <h2 className="text-xl font-semibold mb-2">Digital Library</h2>
           <p className="text-gray-600 mb-4">Access e-books, journals, and research databases.</p>
-          <a href="/lms/library" className="text-brand-blue-600 hover:underline">Browse Library →</a>
+          <a href="/learner/library" className="text-brand-blue-600 hover:underline">Browse Library →</a>
         </div>
 
         {/* Tutoring */}
@@ -93,7 +93,7 @@ export default function StudentPortalResourcesPage() {
           </div>
           <h2 className="text-xl font-semibold mb-2">Study Materials</h2>
           <p className="text-gray-600 mb-4">Course materials, past exams, and study guides.</p>
-          <a href="/lms/resources" className="text-brand-blue-600 hover:underline">View Materials →</a>
+          <a href="/learner/resources" className="text-brand-blue-600 hover:underline">View Materials →</a>
         </div>
       </div>
 
@@ -101,16 +101,16 @@ export default function StudentPortalResourcesPage() {
       <section className="mt-8 bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
         <div className="grid md:grid-cols-4 gap-4">
-          <a href="/lms/calendar" className="p-3 border rounded-lg hover:bg-gray-50 text-center">
+          <a href="/learner/calendar" className="p-3 border rounded-lg hover:bg-white text-center">
             Academic Calendar
           </a>
-          <a href="/student-handbook" className="p-3 border rounded-lg hover:bg-gray-50 text-center">
+          <a href="/student-handbook" className="p-3 border rounded-lg hover:bg-white text-center">
             Student Handbook
           </a>
-          <a href="/financial-aid" className="p-3 border rounded-lg hover:bg-gray-50 text-center">
+          <a href="/financial-aid" className="p-3 border rounded-lg hover:bg-white text-center">
             Financial Aid
           </a>
-          <a href="/support" className="p-3 border rounded-lg hover:bg-gray-50 text-center">
+          <a href="/support" className="p-3 border rounded-lg hover:bg-white text-center">
             Health Services
           </a>
         </div>

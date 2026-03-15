@@ -14,7 +14,7 @@ export default function GrantsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Grants & Scholarships' }]} />
         </div>
@@ -32,7 +32,7 @@ export default function GrantsPage() {
       </section>
 
       {/* What This Means For You */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
             What This Means For You
@@ -76,7 +76,7 @@ export default function GrantsPage() {
                   <p className="text-slate-600 mb-4">
                     WIOA is the main federal workforce funding program. It is designed for adults who need new skills to get a good job. If you qualify, WIOA can cover tuition, books, supplies, certification exams, and may help with transportation and childcare. Indiana residents only — eligibility is determined through WorkOne.
                   </p>
-                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">You likely qualify if you:</h4>
                     <ul className="grid md:grid-cols-2 gap-2">
                       {[
@@ -111,7 +111,7 @@ export default function GrantsPage() {
                   <p className="text-slate-600 mb-4">
                     This is Indiana&apos;s state grant for high-demand careers. It&apos;s specifically for programs that lead to jobs employers are hiring for right now — like healthcare, IT, and skilled trades.
                   </p>
-                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">Requirements:</h4>
                     <ul className="space-y-2">
                       {[
@@ -140,7 +140,7 @@ export default function GrantsPage() {
                   <p className="text-slate-600 mb-4">
                     If you receive SNAP benefits, you may qualify for funded job training plus support services like transportation assistance and childcare referrals. Indiana residents only — eligibility is determined through your local SNAP E&T provider.
                   </p>
-                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">You qualify if you:</h4>
                     <ul className="space-y-2">
                       {[
@@ -172,7 +172,7 @@ export default function GrantsPage() {
                   <p className="text-slate-600 mb-4">
                     Everyone deserves a second chance. JRI funding helps justice-involved individuals get career training and support services to build a stable future. We believe in your potential.
                   </p>
-                  <div className="bg-slate-50 rounded-lg p-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">This program is for you if:</h4>
                     <ul className="space-y-2">
                       {[
@@ -224,7 +224,7 @@ export default function GrantsPage() {
           <div className="text-center mt-12">
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white transition-colors"
             >
               Check Your Eligibility Now <ArrowRight className="w-5 h-5" />
             </Link>

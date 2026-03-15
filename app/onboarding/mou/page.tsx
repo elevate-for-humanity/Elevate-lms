@@ -240,13 +240,13 @@ export default function MOUOnboardingPage() {
   });
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding' }, { label: 'Training Network Partner Agreement' }]} />
@@ -406,7 +406,7 @@ export default function MOUOnboardingPage() {
                 )}
 
                 {/* Acknowledgment */}
-                <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                <label className="flex items-start gap-3 cursor-pointer p-4 bg-white rounded-xl border border-slate-200 hover:bg-white transition-colors">
                   <input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)}
                     className="mt-0.5 w-5 h-5 rounded border-slate-300 text-brand-blue-600 focus:ring-brand-blue-500" />
                   <span className="text-sm text-slate-700 leading-relaxed">

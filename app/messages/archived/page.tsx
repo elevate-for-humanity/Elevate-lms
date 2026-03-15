@@ -12,9 +12,9 @@ export default function ArchivedMessagesPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Messages', href: '/messages' }, { label: 'Archived' }]} />
         </div>
@@ -38,8 +38,8 @@ export default function ArchivedMessagesPage() {
           {archivedMessages.length > 0 ? (
             <div className="divide-y divide-gray-200">
               {archivedMessages.map((message) => (
-                <div key={message.id} className="p-4 hover:bg-gray-50 flex items-center">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                <div key={message.id} className="p-4 hover:bg-white flex items-center">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-4">
                     <Mail className="w-5 h-5 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">

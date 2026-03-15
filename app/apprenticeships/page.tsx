@@ -42,7 +42,7 @@ const apprenticeships = (dbRows as any[]) || [];
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships' }]} />
         </div>
@@ -174,7 +174,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">How It Works</h2>
           <p className="text-center text-slate-600 mb-12">4 steps to your new career</p>
@@ -230,7 +230,7 @@ const apprenticeships = (dbRows as any[]) || [];
       <section className="py-20 bg-slate-900">
         {/* Registered Apprenticeship Authority */}
         <div className="max-w-5xl mx-auto px-4 mb-16">
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 sm:p-8">
+          <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Registered Apprenticeship Authority</h2>
             <p className="text-sm text-slate-700 leading-relaxed mb-4">
               Elevate for Humanity Career &amp; Training Institute administers apprenticeship programs under a sponsor-led model. As the sponsor of record, 2Exclusive LLC-S oversees standards, curriculum alignment, apprentice registration, hour tracking, and compliance reporting. Apprentices complete supervised on-the-job training at approved licensed partner sites while receiving structured related technical instruction through the institute.

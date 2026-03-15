@@ -22,9 +22,9 @@ export default async function CourseSuccessPage({
   // For now, show success message
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Courses', href: '/career-services/courses' }, { label: 'Success' }]} />
         </div>
@@ -66,7 +66,7 @@ export default async function CourseSuccessPage({
             
             <Link
               href="/career-services/courses"
-              className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2"
+              className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-white transition flex items-center justify-center gap-2"
             >
               Browse More Courses
               <ArrowRight className="w-4 h-4" />

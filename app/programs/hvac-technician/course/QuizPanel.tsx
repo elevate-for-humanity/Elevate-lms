@@ -127,7 +127,7 @@ export function QuizPanel({
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
       {/* Progress bar */}
-      <div className="h-1.5 bg-slate-100">
+      <div className="h-1.5 bg-white">
         <div
           className="h-full bg-brand-blue-500 transition-all duration-300"
           style={{ width: `${((current + 1) / questions.length) * 100}%` }}
@@ -143,7 +143,7 @@ export function QuizPanel({
           <div className="flex items-center gap-3">
             {secondsLeft !== null && (
               <span className={`flex items-center gap-1 text-xs font-mono font-bold px-2 py-1 rounded-lg ${
-                timerWarning ? 'bg-brand-red-50 text-brand-red-600' : 'bg-slate-100 text-slate-600'
+                timerWarning ? 'bg-brand-red-50 text-brand-red-600' : 'bg-white text-slate-600'
               }`}>
                 <Clock className="w-3 h-3" />
                 {formatTime(secondsLeft)}
@@ -163,7 +163,7 @@ export function QuizPanel({
         {/* Options */}
         <div className="space-y-3 mb-6">
           {q.options.map((opt, idx) => {
-            let style = 'border-slate-200 hover:border-slate-300 hover:bg-slate-50';
+            let style = 'border-slate-200 hover:border-slate-300 hover:bg-white';
             if (selected === idx && !showResult) style = 'border-brand-blue-400 bg-brand-blue-50 ring-2 ring-brand-blue-200';
             if (showResult && idx === q.correctAnswer) style = 'border-brand-green-400 bg-brand-green-50';
             if (showResult && selected === idx && idx !== q.correctAnswer) style = 'border-brand-red-400 bg-brand-red-50';
@@ -179,7 +179,7 @@ export function QuizPanel({
                   selected === idx && !showResult ? 'bg-brand-blue-600 text-white' :
                   showResult && idx === q.correctAnswer ? 'bg-brand-green-500 text-white' :
                   showResult && selected === idx ? 'bg-brand-red-500 text-white' :
-                  'bg-slate-100 text-slate-600'
+                  'bg-white text-slate-600'
                 }`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
@@ -214,7 +214,7 @@ export function QuizPanel({
               className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-colors cursor-pointer ${
                 selected !== null
                   ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-white text-slate-400 cursor-not-allowed'
               }`}
             >
               Submit Answer

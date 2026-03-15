@@ -132,23 +132,23 @@ export default function AlumniProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Lms", href: "/lms" }, { label: "Profile" }]} />
       </div>
 <div className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/lms/dashboard" className="hover:text-gray-700">LMS</Link>
+            <Link href="/learner/dashboard" className="hover:text-gray-700">LMS</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/lms/alumni" className="hover:text-gray-700">Alumni</Link>
+            <Link href="/learner/alumni" className="hover:text-gray-700">Alumni</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900 font-medium">My Profile</span>
           </nav>
@@ -219,7 +219,7 @@ export default function AlumniProfilePage() {
                       id="email"
                       value={profile.email}
                       disabled
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-500"
                     />
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export default function AlumniProfilePage() {
 
           {/* Submit */}
           <div className="flex items-center justify-end gap-4">
-            <Link href="/lms/alumni" className="px-4 py-2 text-gray-700 hover:text-gray-900">
+            <Link href="/learner/alumni" className="px-4 py-2 text-gray-700 hover:text-gray-900">
               Cancel
             </Link>
             <button

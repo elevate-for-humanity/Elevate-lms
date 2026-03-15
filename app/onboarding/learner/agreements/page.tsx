@@ -69,7 +69,7 @@ export default function AgreementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
 
       {/* VIDEO HERO — Elevate overview, full bleed, no overlay text */}
       <div className="relative w-full" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>

@@ -73,7 +73,7 @@ export default function TrialPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image src="/images/pages/store-trial-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
-        <div className="bg-slate-50 border-b">
+        <div className="bg-white border-b">
           <div className="max-w-6xl mx-auto px-4 py-3">
             <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Trial Started' }]} />
           </div>
@@ -92,7 +92,7 @@ export default function TrialPage() {
               You&apos;re now in your live workspace (14-day trial). Nothing here is public until you launch.
             </p>
 
-            <div className="bg-slate-50 rounded-xl p-6 mb-6 text-left space-y-3">
+            <div className="bg-white rounded-xl p-6 mb-6 text-left space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">Organization</span>
                 <span className="font-semibold text-slate-900">{orgName}</span>
@@ -149,7 +149,7 @@ export default function TrialPage() {
   // Form state
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Start Trial' }]} />
         </div>
@@ -164,7 +164,7 @@ export default function TrialPage() {
                 <Image src="/images/pages/store-trial-detail.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover" />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your admin dashboard — ready in under 60 seconds</p>
-              <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <div className="bg-white rounded-xl p-5 border border-slate-200">
                 <h3 className="text-sm font-bold text-slate-900 mb-3">What happens next</h3>
                 <ol className="space-y-2 text-sm text-slate-600">
                   <li className="flex gap-2"><span className="text-brand-red-600 font-bold">1.</span> Fill out the form — 3 fields, 30 seconds</li>
@@ -183,7 +183,7 @@ export default function TrialPage() {
             </p>
           </div>
 
-          <div className="bg-slate-50 rounded-xl p-6 mb-8">
+          <div className="bg-white rounded-xl p-6 mb-8">
             <h2 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wide">What you get</h2>
             <ul className="space-y-2 text-sm text-slate-800">
               <li className="flex items-start gap-2"><Clock className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" /> 14-day full platform access</li>

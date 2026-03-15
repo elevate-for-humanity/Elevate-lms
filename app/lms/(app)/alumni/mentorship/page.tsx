@@ -41,7 +41,7 @@ export default async function MentorshipPage() {
   const mentorList = mentors || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
@@ -133,7 +133,7 @@ export default async function MentorshipPage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Mentors Available</h2>
               <p className="text-gray-600 mb-6">No mentors are available yet. Contact career services to be matched with a mentor.</p>
               <Link 
-                href="/lms/alumni"
+                href="/learner/alumni"
                 className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 Return to Alumni Portal

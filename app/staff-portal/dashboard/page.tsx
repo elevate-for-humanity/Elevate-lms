@@ -40,7 +40,7 @@ export default async function StaffDashboard() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -94,9 +94,9 @@ export default async function StaffDashboard() {
     .limit(10);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Dashboard' }]} />
         </div>
@@ -184,7 +184,7 @@ export default async function StaffDashboard() {
             <div className="space-y-2">
               <Link
                 href="/admin/students"
-                className="block p-3 border rounded-lg hover:bg-slate-50 transition"
+                className="block p-3 border rounded-lg hover:bg-white transition"
               >
                 <div className="font-semibold">View All Students</div>
                 <div className="text-sm text-black">
@@ -193,7 +193,7 @@ export default async function StaffDashboard() {
               </Link>
               <Link
                 href="/admin/programs"
-                className="block p-3 border rounded-lg hover:bg-slate-50 transition"
+                className="block p-3 border rounded-lg hover:bg-white transition"
               >
                 <div className="font-semibold">View Programs</div>
                 <div className="text-sm text-black">
@@ -202,7 +202,7 @@ export default async function StaffDashboard() {
               </Link>
               <Link
                 href="/admin/reports"
-                className="block p-3 border rounded-lg hover:bg-slate-50 transition"
+                className="block p-3 border rounded-lg hover:bg-white transition"
               >
                 <div className="font-semibold">Generate Reports</div>
                 <div className="text-sm text-black">
@@ -260,7 +260,7 @@ export default async function StaffDashboard() {
           <div className="overflow-x-auto">
             {recentEnrollments && recentEnrollments.length > 0 ? (
               <table className="w-full">
-                <thead className="bg-slate-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
                       Student
@@ -278,7 +278,7 @@ export default async function StaffDashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {recentEnrollments.map((enrollment) => (
-                    <tr key={enrollment.id} className="hover:bg-slate-50">
+                    <tr key={enrollment.id} className="hover:bg-white">
                       <td className="px-6 py-4 text-sm text-black">
                         {enrollment.profiles?.full_name ||
                           enrollment.profiles?.email ||
@@ -296,7 +296,7 @@ export default async function StaffDashboard() {
                                 ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : enrollment.status === 'pending'
                                   ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-slate-100 text-black'
+                                  : 'bg-white text-black'
                           }`}
                         >
                           {enrollment.status}

@@ -83,7 +83,7 @@ export default function ProgramTemplate() {
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white hover:bg-slate-50 text-black font-bold rounded-lg border-2 border-slate-300 transition text-center"
+              className="px-8 py-4 bg-white hover:bg-white text-black font-bold rounded-lg border-2 border-slate-300 transition text-center"
             >
               Talk to an Advisor
             </Link>
@@ -92,7 +92,7 @@ export default function ProgramTemplate() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-black mb-8">
             What You'll Learn
@@ -214,7 +214,7 @@ export default function ProgramTemplate() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-slate-50 transition text-center"
+              className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-white transition text-center"
             >
               Apply Now
             </Link>

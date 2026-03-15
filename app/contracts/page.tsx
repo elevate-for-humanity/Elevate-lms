@@ -44,7 +44,7 @@ export default function ContractsPage() {
       </section>
 
       {/* Contract Templates */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Master Platform License Agreement */}
@@ -325,7 +325,7 @@ export default function ContractsPage() {
       </section>
 
       {/* How to Use */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-black mb-4">
@@ -392,7 +392,7 @@ export default function ContractsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?topic=contracts"
-              className="inline-flex items-center justify-center gap-2 bg-white text-black hover:bg-slate-100 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
+              className="inline-flex items-center justify-center gap-2 bg-white text-black hover:bg-white px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
             >
               Contact Us
             </Link>

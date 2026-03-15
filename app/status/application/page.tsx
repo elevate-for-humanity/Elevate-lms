@@ -116,7 +116,7 @@ function StatusContent() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="mt-6 h-64 animate-pulse rounded-3xl bg-gray-100" />
+        <div className="mt-6 h-64 animate-pulse rounded-3xl bg-white" />
       </div>
     );
   }
@@ -161,7 +161,7 @@ function StatusContent() {
         </div>
 
         {/* Current stage */}
-        <div className="mt-6 rounded-2xl bg-gray-50 p-5">
+        <div className="mt-6 rounded-2xl bg-white p-5">
           <div className="text-sm font-medium text-gray-500">Current stage</div>
           <div className="mt-1 text-xl font-bold text-gray-900">{app.stageLabel}</div>
           <p className="mt-2 text-gray-700">{stageInfo.message}</p>
@@ -226,7 +226,7 @@ export default function ApplicationStatusPage() {
     <Suspense fallback={
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-        <div className="mt-6 h-64 animate-pulse rounded-3xl bg-gray-100" />
+        <div className="mt-6 h-64 animate-pulse rounded-3xl bg-white" />
       </div>
     }>
       <StatusContent />

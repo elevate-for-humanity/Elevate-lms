@@ -22,7 +22,7 @@ export default async function PricingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -59,14 +59,14 @@ export default async function PricingPage() {
   return (
     <div>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'License', href: '/license' }, { label: 'Pricing' }]} />
         </div>
       </div>
 
       {/* Header */}
-      <section className="bg-slate-50 py-16">
+      <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Platform Licensing</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -141,7 +141,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Features Comparison */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Plans Include</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -204,7 +204,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-gray-100">
+      <section className="py-8 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-gray-500">
           <p>{DISCLAIMERS.pricing}</p>
         </div>

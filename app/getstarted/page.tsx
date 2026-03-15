@@ -54,7 +54,7 @@ export default function Page() {
               </Link>
               <Link
                 href="/programs"
-                className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-slate-100 text-lg shadow-2xl transition-all border-2 border-white"
+                className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-white text-lg shadow-2xl transition-all border-2 border-white"
               >
                 View Programs
               </Link>
@@ -64,7 +64,7 @@ export default function Page() {
       </section>
 
       {/* Your Journey - 3 Simple Steps */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto text-center mb-16">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-4 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
@@ -227,7 +227,7 @@ export default function Page() {
       </section>
 
       {/* Feature Cards */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">

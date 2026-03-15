@@ -47,9 +47,9 @@ export default function TimeOffRequestPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Employee', href: '/employee' }, { label: 'Time Off', href: '/employee/time-off' }, { label: 'Request' }]} />
         </div>

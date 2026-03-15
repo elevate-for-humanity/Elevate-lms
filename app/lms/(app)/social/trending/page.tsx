@@ -24,7 +24,7 @@ export default async function TrendingPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -68,7 +68,7 @@ export default async function TrendingPage() {
   const hasContent = trendingPosts.length > 0 || trendingThreads.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -110,7 +110,7 @@ export default async function TrendingPage() {
                   </div>
                   <div className="divide-y">
                     {trendingPosts.map((post: any) => (
-                      <div key={post.id} className="p-6 hover:bg-gray-50">
+                      <div key={post.id} className="p-6 hover:bg-white">
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                           <span>{post.profiles?.full_name || 'Anonymous'}</span>
                           <span>•</span>
@@ -152,7 +152,7 @@ export default async function TrendingPage() {
                   <div className="divide-y">
                     {trendingThreads.map((thread: any) => (
                       <Link key={thread.id} href={`/lms/forums/${thread.forum_id}/threads/${thread.id}`}
-                        className="block p-4 hover:bg-gray-50">
+                        className="block p-4 hover:bg-white">
                         <h4 className="font-medium text-gray-900">{thread.title}</h4>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                           <span>by {thread.profiles?.full_name || 'Anonymous'}</span>
@@ -174,7 +174,7 @@ export default async function TrendingPage() {
                   Active Groups
                 </h3>
                 <div className="space-y-3">
-                  <Link href="/lms/social/groups/healthcare" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
+                  <Link href="/lms/social/groups/healthcare" className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">
                     <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
                       <Heart className="w-5 h-5 text-brand-red-600" />
                     </div>
@@ -182,7 +182,7 @@ export default async function TrendingPage() {
                       <div className="font-medium text-gray-900 text-sm">Healthcare Professionals</div>
                     </div>
                   </Link>
-                  <Link href="/lms/social/groups/trades" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
+                  <Link href="/lms/social/groups/trades" className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">
                     <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
                       <TrendingUp className="w-5 h-5 text-brand-orange-600" />
                     </div>
@@ -190,7 +190,7 @@ export default async function TrendingPage() {
                       <div className="font-medium text-gray-900 text-sm">Skilled Trades Network</div>
                     </div>
                   </Link>
-                  <Link href="/lms/social/groups/career" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
+                  <Link href="/lms/social/groups/career" className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <TrendingUp className="w-5 h-5 text-brand-blue-600" />
                     </div>

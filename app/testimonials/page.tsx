@@ -57,18 +57,18 @@ export default function TestimonialsPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Testimonials' }]} />
         </div>
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-slate-700">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-white">
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 text-center px-4">
             Success Stories
           </h1>
         </div>
@@ -108,7 +108,7 @@ export default function TestimonialsPage() {
                 <div className="p-6 space-y-3">
                   <div className="h-6 bg-gray-200 rounded w-2/3" />
                   <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-20 bg-gray-100 rounded" />
+                  <div className="h-20 bg-white rounded" />
                 </div>
               </div>
             ))}
@@ -126,14 +126,14 @@ export default function TestimonialsPage() {
         {/* No Testimonials State */}
         {!loading && !error && testimonials.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-            <Quote className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Quote className="w-16 h-16 text-slate-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Share Your Story</h2>
             <p className="text-gray-600 mb-6">
               Are you a graduate? We&apos;d love to hear about your journey. Contact us to share your success story.
             </p>
             <Link
               href="/start"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-slate-900 font-semibold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Start Your Journey
               <ArrowRight className="w-5 h-5" />
@@ -158,7 +158,7 @@ export default function TestimonialsPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-slate-700">
-                        <span className="text-4xl font-bold text-white">
+                        <span className="text-4xl font-bold text-slate-900">
                           {story.name.charAt(0)}
                         </span>
                       </div>
@@ -175,7 +175,7 @@ export default function TestimonialsPage() {
                     )}
 
                     {story.quote && (
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <div className="bg-white rounded-lg p-4 mb-4">
                         <Quote className="w-5 h-5 text-brand-blue-500 mb-2" />
                         <p className="text-gray-700 text-sm italic line-clamp-3">
                           &ldquo;{story.quote}&rdquo;
@@ -208,14 +208,14 @@ export default function TestimonialsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-orange-600 font-semibold rounded-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-orange-600 font-semibold rounded-lg hover:bg-white transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/programs"
-              className="px-6 py-3 bg-brand-orange-400 text-white font-semibold rounded-lg hover:bg-brand-orange-300 transition"
+              className="px-6 py-3 bg-brand-orange-400 text-slate-900 font-semibold rounded-lg hover:bg-brand-orange-300 transition"
             >
               View Programs
             </Link>

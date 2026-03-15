@@ -5,7 +5,7 @@ export function BarberDeliveryModel() {
   return (
     <>
       {/* Section 2 — Training Delivery Model */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Training Delivery Model</h2>
           <p className="text-slate-600 mb-10 max-w-3xl">
@@ -60,22 +60,22 @@ export function BarberDeliveryModel() {
             Training hours are documented through OJT logs, LMS tracking, and supervisor evaluations to ensure consistent skill development and compliance with workforce training standards.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">15</div>
               <div className="text-sm font-bold text-slate-900">Months</div>
               <div className="text-slate-500 text-xs mt-1">Total Duration</div>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">2,000</div>
               <div className="text-sm font-bold text-slate-900">OJT Hours</div>
               <div className="text-slate-500 text-xs mt-1">Licensed Shops</div>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">RTI</div>
               <div className="text-sm font-bold text-slate-900">Structured</div>
               <div className="text-slate-500 text-xs mt-1">Competency-Aligned</div>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
               <div className="text-3xl font-black text-brand-red-600 mb-1">$4,890</div>
               <div className="text-sm font-bold text-slate-900">Total Cost</div>
               <div className="text-slate-500 text-xs mt-1">BNPL Available</div>
@@ -97,7 +97,7 @@ export function BarberDeliveryModel() {
       </section>
 
       {/* Section 4 — Core Competencies */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Core Competencies</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">

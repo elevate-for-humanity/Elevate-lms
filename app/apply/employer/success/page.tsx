@@ -18,7 +18,7 @@ export default async function EmployerApplicationSuccess() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -30,7 +30,7 @@ export default async function EmployerApplicationSuccess() {
   // Log page visit
   await db.from('page_views').insert({ page: 'employer_application_success' }).select();
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green-100 text-brand-green-700 mb-4">
           <span className="text-slate-400 flex-shrink-0">•</span>

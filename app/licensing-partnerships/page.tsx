@@ -152,7 +152,7 @@ export default function LicensingPartnershipsPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-black mb-6">
@@ -268,13 +268,13 @@ export default function LicensingPartnershipsPage() {
             </a>
             <Link
               href="/apply/program-holder"
-              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-slate-50 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-white transition"
             >
               Apply to Partner
             </Link>
             <a
               href="tel:317-314-3757"
-              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-slate-50 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold text-base hover:bg-white transition"
             >
               Call (317) 314-3757
             </a>

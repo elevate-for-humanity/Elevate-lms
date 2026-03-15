@@ -22,7 +22,7 @@ export default async function EmployerBenefitsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -108,7 +108,7 @@ export default async function EmployerBenefitsPage() {
             </div>
           </section>
 
-          <section className="bg-gray-50 rounded-lg p-8">
+          <section className="bg-white rounded-lg p-8">
             <h2 className="text-2xl font-bold mb-4">Success Metrics</h2>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>

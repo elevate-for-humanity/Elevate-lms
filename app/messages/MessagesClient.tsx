@@ -119,7 +119,7 @@ export default function MessagesClient({ userId, initialConversations, participa
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white shadow-sm border-b">
           <div className="px-4 py-4">
@@ -154,7 +154,7 @@ export default function MessagesClient({ userId, initialConversations, participa
                     <button
                       key={conv.id}
                       onClick={() => setSelectedConversation(conv.id)}
-                      className={`w-full p-4 flex items-center gap-3 hover:bg-gray-50 border-b transition ${
+                      className={`w-full p-4 flex items-center gap-3 hover:bg-white border-b transition ${
                         selectedConversation === conv.id ? 'bg-brand-blue-50' : ''
                       }`}
                     >
@@ -180,7 +180,7 @@ export default function MessagesClient({ userId, initialConversations, participa
           </div>
 
           {/* Messages Area */}
-          <div className={`flex-1 flex flex-col bg-gray-50 ${!selectedConversation ? 'hidden md:flex' : ''}`}>
+          <div className={`flex-1 flex flex-col bg-white ${!selectedConversation ? 'hidden md:flex' : ''}`}>
             {selectedConversation ? (
               <>
                 {/* Header */}

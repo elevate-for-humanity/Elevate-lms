@@ -63,7 +63,7 @@ export default async function StudentPortalSchedulePage() {
   const upcomingAppointments = appointments || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
 
       {/* Hero */}
       <section className="relative h-[260px] sm:h-[340px] overflow-hidden bg-slate-900">
@@ -231,7 +231,7 @@ export default async function StudentPortalSchedulePage() {
           ) : (
             <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
               {upcomingAppointments.map((apt: any) => (
-                <div key={apt.id} className="flex items-center gap-4 p-5 hover:bg-gray-50 transition-colors">
+                <div key={apt.id} className="flex items-center gap-4 p-5 hover:bg-white transition-colors">
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                     <Image
                       src="/images/pages/calendar-page-1.jpg"

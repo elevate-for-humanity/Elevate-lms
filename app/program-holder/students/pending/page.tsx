@@ -22,7 +22,7 @@ export default async function PendingStudentsPage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Students" }]} />
         </div>
@@ -85,7 +85,7 @@ export default async function PendingStudentsPage() {
     .order('enrolled_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Students" }]} />
         </div>
@@ -188,7 +188,7 @@ export default async function PendingStudentsPage() {
                       {pendingApplications.map((application) => (
                         <tr
                           key={application.id}
-                          className="border-b hover:bg-slate-50 transition-colors"
+                          className="border-b hover:bg-white transition-colors"
                         >
                           <td className="py-3 px-4">
                             <div className="font-medium text-black">

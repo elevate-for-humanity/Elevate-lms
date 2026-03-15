@@ -252,7 +252,7 @@ export default function DIYTaxesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Diy Taxes" }]} />
       </div>
@@ -756,7 +756,7 @@ export default function DIYTaxesPage() {
                 </div>
 
                 {taxReturn.w2Income.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg text-black">
+                  <div className="text-center py-8 bg-white rounded-lg text-black">
                     No W-2s added yet. Click "Add W-2" or upload your W-2 to
                     auto-fill.
                   </div>
@@ -1214,7 +1214,7 @@ export default function DIYTaxesPage() {
               {/* Summary */}
               <div className="space-y-6">
                 {/* Personal Info Summary */}
-                <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="p-6 bg-white rounded-lg">
                   <h3 className="font-bold text-lg mb-3">
                     Personal Information
                   </h3>
@@ -1237,7 +1237,7 @@ export default function DIYTaxesPage() {
                 </div>
 
                 {/* Income Summary */}
-                <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="p-6 bg-white rounded-lg">
                   <h3 className="font-bold text-lg mb-3">Income</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
@@ -1262,7 +1262,7 @@ export default function DIYTaxesPage() {
                 </div>
 
                 {/* Deductions Summary */}
-                <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="p-6 bg-white rounded-lg">
                   <h3 className="font-bold text-lg mb-3">Deductions</h3>
                   <div className="text-sm">
                     <div className="flex justify-between">

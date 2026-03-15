@@ -47,7 +47,7 @@ export default function LMSStandardsPage() {
           </a>
         </div>
 
-        <nav className="bg-gray-50 rounded-lg p-6 mb-10">
+        <nav className="bg-white rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
             <li><a href="#purpose" className="text-brand-green-600 hover:underline">1. Purpose & Scope</a></li>
@@ -89,7 +89,7 @@ export default function LMSStandardsPage() {
           <h3 className="text-lg font-semibold mt-6 mb-3">2.1 Course Categories</h3>
           <table className="w-full border-collapse border mb-4">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-white">
                 <th className="border p-3 text-left">Category</th>
                 <th className="border p-3 text-left">Description</th>
                 <th className="border p-3 text-left">Typical Duration</th>
@@ -97,9 +97,9 @@ export default function LMSStandardsPage() {
             </thead>
             <tbody>
               <tr><td className="border p-3">Tax Preparation</td><td className="border p-3">IRS-compliant tax preparer training</td><td className="border p-3">40-80 hours</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Financial Literacy</td><td className="border p-3">Personal finance, budgeting, credit</td><td className="border p-3">10-20 hours</td></tr>
+              <tr className="bg-white"><td className="border p-3">Financial Literacy</td><td className="border p-3">Personal finance, budgeting, credit</td><td className="border p-3">10-20 hours</td></tr>
               <tr><td className="border p-3">Professional Development</td><td className="border p-3">Career skills, entrepreneurship</td><td className="border p-3">5-40 hours</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Technology</td><td className="border p-3">Digital skills, software training</td><td className="border p-3">10-60 hours</td></tr>
+              <tr className="bg-white"><td className="border p-3">Technology</td><td className="border p-3">Digital skills, software training</td><td className="border p-3">10-60 hours</td></tr>
               <tr><td className="border p-3">Continuing Education</td><td className="border p-3">CE credits for licensed professionals</td><td className="border p-3">2-16 hours</td></tr>
             </tbody>
           </table>
@@ -130,12 +130,12 @@ export default function LMSStandardsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">3.2 Media Standards</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Media Type</th><th className="border p-3 text-left">Requirements</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Media Type</th><th className="border p-3 text-left">Requirements</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Video</td><td className="border p-3">1080p minimum, clear audio, closed captions required</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Audio</td><td className="border p-3">Clear quality, transcript provided</td></tr>
+              <tr className="bg-white"><td className="border p-3">Audio</td><td className="border p-3">Clear quality, transcript provided</td></tr>
               <tr><td className="border p-3">Images</td><td className="border p-3">High resolution, alt text required, proper licensing</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Documents</td><td className="border p-3">PDF format, accessible (tagged), printable</td></tr>
+              <tr className="bg-white"><td className="border p-3">Documents</td><td className="border p-3">PDF format, accessible (tagged), printable</td></tr>
             </tbody>
           </table>
           
@@ -157,12 +157,12 @@ export default function LMSStandardsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">4.1 Qualification Requirements</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Course Category</th><th className="border p-3 text-left">Minimum Qualifications</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Course Category</th><th className="border p-3 text-left">Minimum Qualifications</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Tax Preparation</td><td className="border p-3">Active PTIN, 3+ years experience, IRS Annual Filing Season Program or EA/CPA</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Financial Literacy</td><td className="border p-3">Relevant certification (CFP, AFC) or 5+ years industry experience</td></tr>
+              <tr className="bg-white"><td className="border p-3">Financial Literacy</td><td className="border p-3">Relevant certification (CFP, AFC) or 5+ years industry experience</td></tr>
               <tr><td className="border p-3">Professional Development</td><td className="border p-3">Demonstrated expertise, professional credentials in subject area</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Technology</td><td className="border p-3">Industry certifications or 3+ years professional experience</td></tr>
+              <tr className="bg-white"><td className="border p-3">Technology</td><td className="border p-3">Industry certifications or 3+ years professional experience</td></tr>
             </tbody>
           </table>
           
@@ -193,12 +193,12 @@ export default function LMSStandardsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">5.1 Certificate Types</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Type</th><th className="border p-3 text-left">Requirements</th><th className="border p-3 text-left">Validity</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Type</th><th className="border p-3 text-left">Requirements</th><th className="border p-3 text-left">Validity</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Completion Certificate</td><td className="border p-3">100% course completion</td><td className="border p-3">Permanent</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Achievement Certificate</td><td className="border p-3">Completion + 70% assessment score</td><td className="border p-3">Permanent</td></tr>
+              <tr className="bg-white"><td className="border p-3">Achievement Certificate</td><td className="border p-3">Completion + 70% assessment score</td><td className="border p-3">Permanent</td></tr>
               <tr><td className="border p-3">Professional Certification</td><td className="border p-3">Completion + 80% assessment + practical component</td><td className="border p-3">1-3 years (renewal required)</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">CE Credits</td><td className="border p-3">Per accrediting body requirements</td><td className="border p-3">Per accrediting body</td></tr>
+              <tr className="bg-white"><td className="border p-3">CE Credits</td><td className="border p-3">Per accrediting body requirements</td><td className="border p-3">Per accrediting body</td></tr>
             </tbody>
           </table>
           
@@ -233,12 +233,12 @@ export default function LMSStandardsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">6.2 Ongoing Quality Metrics</h3>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Metric</th><th className="border p-3 text-left">Target</th><th className="border p-3 text-left">Action if Below</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Metric</th><th className="border p-3 text-left">Target</th><th className="border p-3 text-left">Action if Below</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Completion Rate</td><td className="border p-3">&gt;60%</td><td className="border p-3">Content review, engagement analysis</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Student Rating</td><td className="border p-3">&gt;4.0/5.0</td><td className="border p-3">Instructor coaching, content revision</td></tr>
+              <tr className="bg-white"><td className="border p-3">Student Rating</td><td className="border p-3">&gt;4.0/5.0</td><td className="border p-3">Instructor coaching, content revision</td></tr>
               <tr><td className="border p-3">Assessment Pass Rate</td><td className="border p-3">70-90%</td><td className="border p-3">Question review (too easy/hard)</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Support Tickets</td><td className="border p-3">&lt;5% of enrollments</td><td className="border p-3">UX review, content clarification</td></tr>
+              <tr className="bg-white"><td className="border p-3">Support Tickets</td><td className="border p-3">&lt;5% of enrollments</td><td className="border p-3">UX review, content clarification</td></tr>
             </tbody>
           </table>
           
@@ -285,12 +285,12 @@ export default function LMSStandardsPage() {
         <section id="responsibilities" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Roles & Responsibilities</h2>
           <table className="w-full border-collapse border">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Role</th><th className="border p-3 text-left">Responsibilities</th></tr></thead>
             <tbody>
               <tr><td className="border p-3">Director of Education</td><td className="border p-3">Overall LMS governance, course approval, quality standards</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Content Manager</td><td className="border p-3">Course review, accessibility compliance, content updates</td></tr>
+              <tr className="bg-white"><td className="border p-3">Content Manager</td><td className="border p-3">Course review, accessibility compliance, content updates</td></tr>
               <tr><td className="border p-3">Instructors</td><td className="border p-3">Course creation, student support, content maintenance</td></tr>
-              <tr className="bg-gray-50"><td className="border p-3">Student Support</td><td className="border p-3">Enrollment issues, technical support, refund processing</td></tr>
+              <tr className="bg-white"><td className="border p-3">Student Support</td><td className="border p-3">Enrollment issues, technical support, refund processing</td></tr>
               <tr><td className="border p-3">Technical Team</td><td className="border p-3">Platform maintenance, feature development, integrations</td></tr>
             </tbody>
           </table>
@@ -299,7 +299,7 @@ export default function LMSStandardsPage() {
         <section id="versioning" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Versioning & Review</h2>
           <table className="w-full border-collapse border mb-4">
-            <thead><tr className="bg-gray-100"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
+            <thead><tr className="bg-white"><th className="border p-3 text-left">Version</th><th className="border p-3 text-left">Date</th><th className="border p-3 text-left">Changes</th></tr></thead>
             <tbody><tr><td className="border p-3">1.0</td><td className="border p-3">January 2025</td><td className="border p-3">Initial authoritative version</td></tr></tbody>
           </table>
           <p className="text-gray-700"><strong>Review Schedule:</strong> Annually, or upon significant changes to educational offerings or accreditation requirements.</p>

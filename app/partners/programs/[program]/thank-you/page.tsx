@@ -28,7 +28,7 @@ export default async function ThankYouPage({ params }: { params: Promise<{ progr
   if (!config) notFound();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
           { label: 'Partners', href: '/partners' },
@@ -88,7 +88,7 @@ export default async function ThankYouPage({ params }: { params: Promise<{ progr
           </ol>
         </div>
 
-        <div className="bg-gray-100 p-6 rounded-xl mb-8">
+        <div className="bg-white p-6 rounded-xl mb-8">
           <h3 className="font-semibold text-gray-900 mb-3">Questions?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="tel:+13173143757" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">

@@ -100,7 +100,7 @@ function CollapsibleQA() {
         <div key={i} className="border border-slate-200 rounded-lg overflow-hidden print:border-slate-300">
           <button
             onClick={() => setOpen(open === i ? null : i)}
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 transition print:hidden"
+            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white transition print:hidden"
           >
             <span className="font-semibold text-slate-900 text-sm">{i + 1}. {item.q}</span>
             {open === i ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />}
@@ -173,7 +173,7 @@ export default function StudyGuideClient() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 print:bg-white">
+    <div className="min-h-screen bg-white print:bg-white">
       {/* Print/Download toolbar — hidden when printing */}
       <div className="print:hidden sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -184,7 +184,7 @@ export default function StudyGuideClient() {
           <div className="flex gap-2">
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-semibold transition"
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-white text-sm font-semibold transition"
             >
               <Download className="w-4 h-4" />
               {sg('download')}
@@ -224,7 +224,7 @@ export default function StudyGuideClient() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-left">
+                <tr className="bg-white text-left">
                   <th className="px-3 py-2 font-bold text-slate-700 rounded-l-lg">Type</th>
                   <th className="px-3 py-2 font-bold text-slate-700 rounded-r-lg">What It Covers</th>
                 </tr>
@@ -247,7 +247,7 @@ export default function StudyGuideClient() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-slate-50 text-left">
+                <tr className="bg-white text-left">
                   {['Refrigerant', 'Type', 'ODP', 'GWP', 'Cylinder Color', 'Status', 'Safety Group'].map(h => (
                     <th key={h} className="px-2 py-2 font-bold text-slate-700">{h}</th>
                   ))}
@@ -277,7 +277,7 @@ export default function StudyGuideClient() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-left">
+                <tr className="bg-white text-left">
                   <th className="px-3 py-2 font-bold text-slate-700">System Type</th>
                   <th className="px-3 py-2 font-bold text-slate-700">Required Level</th>
                   <th className="px-3 py-2 font-bold text-slate-700">Notes</th>
@@ -296,7 +296,7 @@ export default function StudyGuideClient() {
           </div>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
             {LEAK_RATES.map((r) => (
-              <div key={r.type} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <div key={r.type} className="bg-white rounded-xl p-3 border border-slate-200">
                 <p className="text-xs font-bold text-slate-500 uppercase mb-1">Leak Trigger Rate</p>
                 <p className="text-sm font-semibold text-slate-900">{r.type}</p>
                 <p className="text-2xl font-black text-brand-red-600 mt-1">{r.rate}</p>
@@ -336,7 +336,7 @@ export default function StudyGuideClient() {
               ['Refrigerant purchases', 'EPA 608 cert required since 2018'],
               ['De minimis release', 'Hose connect/disconnect only — all others illegal'],
             ].map(([rule, value]) => (
-              <div key={rule} className="flex gap-3 bg-slate-50 rounded-xl p-3 border border-slate-100">
+              <div key={rule} className="flex gap-3 bg-white rounded-xl p-3 border border-slate-100">
                 <CheckCircle className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-slate-900 text-xs uppercase tracking-wide">{rule}</p>

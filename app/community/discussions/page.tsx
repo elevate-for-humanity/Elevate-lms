@@ -62,9 +62,9 @@ export default async function DiscussionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Community', href: '/community' }, { label: 'Discussions' }]} />
         </div>
@@ -101,7 +101,7 @@ export default async function DiscussionsPage() {
                   <Link
                     key={cat.id}
                     href={`/community/discussions?category=${cat.id}`}
-                    className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-white"
                   >
                     {cat.name}
                   </Link>
@@ -118,7 +118,7 @@ export default async function DiscussionsPage() {
                   <Link
                     key={discussion.id}
                     href={`/community/discussions/${discussion.id}`}
-                    className="block p-4 hover:bg-gray-50"
+                    className="block p-4 hover:bg-white"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -128,7 +128,7 @@ export default async function DiscussionsPage() {
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                           <span>{discussion.author?.full_name || 'Anonymous'}</span>
                           {discussion.category && (
-                            <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">
+                            <span className="px-2 py-0.5 bg-white rounded-full text-xs">
                               {discussion.category}
                             </span>
                           )}

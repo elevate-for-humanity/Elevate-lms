@@ -336,7 +336,7 @@ export default function TrainingPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Training" }]} />
       </div>
@@ -383,7 +383,7 @@ export default function TrainingPage() {
                     (window.location.href =
                       '/supersonic-fast-cash/careers/apply')
                   }
-                  className="w-full mt-4 bg-white text-brand-green-600 py-3 px-6 rounded-lg font-bold hover:bg-gray-100"
+                  className="w-full mt-4 bg-white text-brand-green-600 py-3 px-6 rounded-lg font-bold hover:bg-white"
                 >
                   Apply Now (Get FREE Training)
                 </button>
@@ -436,7 +436,7 @@ export default function TrainingPage() {
                   <p className="mb-3">Have an employee access key?</p>
                   <button
                     onClick={() => setShowAccessKeyModal(true)}
-                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-white"
                   >
                     Enter Access Key
                   </button>
@@ -447,7 +447,7 @@ export default function TrainingPage() {
                     onClick={() =>
                       (window.location.href = '/supersonic-fast-cash/tools')
                     }
-                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-white"
                   >
                     View Software Options
                   </button>
@@ -459,7 +459,7 @@ export default function TrainingPage() {
                       (window.location.href =
                         '/supersonic-fast-cash/careers/competency-test')
                     }
-                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-white"
                   >
                     Take Competency Test →
                   </button>
@@ -764,21 +764,21 @@ export default function TrainingPage() {
 
               <div className="p-8">
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center p-4 bg-white rounded-lg">
                     <Clock className="w-8 h-8 mx-auto mb-2 text-brand-green-600" />
                     <div className="font-bold">
                       {selectedModuleData.duration}
                     </div>
                     <div className="text-sm text-black">Duration</div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center p-4 bg-white rounded-lg">
                     <BookOpen className="w-8 h-8 mx-auto mb-2 text-brand-blue-600" />
                     <div className="font-bold">
                       {selectedModuleData.lessons} Lessons
                     </div>
                     <div className="text-sm text-black">Content</div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center p-4 bg-white rounded-lg">
                     <Award className="w-8 h-8 mx-auto mb-2 text-brand-blue-600" />
                     <div className="font-bold">Certificate</div>
                     <div className="text-sm text-black">Upon Completion</div>

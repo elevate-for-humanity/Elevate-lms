@@ -39,7 +39,7 @@ export default async function ProgramHolderDashboard() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
 
       
         <div className="text-center">
@@ -82,7 +82,7 @@ export default async function ProgramHolderDashboard() {
         <Image src="/images/pages/instructor-page-8.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Dashboard' }]} />
         </div>
@@ -212,7 +212,7 @@ export default async function ProgramHolderDashboard() {
                                 ? 'bg-brand-green-100 text-brand-green-700'
                                 : student.status === 'completed'
                                   ? 'bg-brand-blue-100 text-brand-blue-700'
-                                  : 'bg-gray-100 text-black'
+                                  : 'bg-white text-black'
                             }`}
                           >
                             {student.status}
@@ -249,7 +249,7 @@ export default async function ProgramHolderDashboard() {
               <div className="space-y-3">
                 <Link
                   href="/instructor/students"
-                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
                 >
                   <p className="font-medium text-black">Manage Students</p>
                   <p className="text-xs text-black">
@@ -258,7 +258,7 @@ export default async function ProgramHolderDashboard() {
                 </Link>
                 <Link
                   href="/instructor/programs"
-                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
                 >
                   <p className="font-medium text-black">View Programs</p>
                   <p className="text-xs text-black">
@@ -267,7 +267,7 @@ export default async function ProgramHolderDashboard() {
                 </Link>
                 <Link
                   href="/instructor/settings"
-                  className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition"
+                  className="block w-full text-left px-4 py-3 bg-white hover:bg-white rounded-lg transition"
                 >
                   <p className="font-medium text-black">Settings</p>
                   <p className="text-xs text-black">Update your profile</p>
@@ -299,7 +299,7 @@ export default async function ProgramHolderDashboard() {
                     <p className="text-xs text-brand-blue-700">Connect with students and instructors</p>
                   </Link>
                   <Link 
-                    href="/lms/forums" 
+                    href="/learner/forums" 
                     className="block w-full text-left px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg transition border border-brand-blue-200"
                   >
                     <p className="font-medium text-brand-blue-900">Discussion Forums</p>

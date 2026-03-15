@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function IncidentResponsePage() {
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Incident Response" }]} />
       </div>
@@ -70,7 +70,7 @@ export default function IncidentResponsePage() {
             
             <div className="overflow-x-auto mb-8">
               <table className="min-w-full border border-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-4 py-3 text-left font-bold text-black border-b">Severity</th>
                     <th className="px-4 py-3 text-left font-bold text-black border-b">Acknowledgment</th>
@@ -100,7 +100,7 @@ export default function IncidentResponsePage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Response Process</h2>
             
             <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   1
                 </div>
@@ -112,7 +112,7 @@ export default function IncidentResponsePage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   2
                 </div>
@@ -124,7 +124,7 @@ export default function IncidentResponsePage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   3
                 </div>
@@ -136,7 +136,7 @@ export default function IncidentResponsePage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   4
                 </div>
@@ -148,7 +148,7 @@ export default function IncidentResponsePage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
                 <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   5
                 </div>

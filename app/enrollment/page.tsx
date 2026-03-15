@@ -67,7 +67,7 @@ export default async function EnrollmentPage() {
       </section>
 
       {/* Featured Programs */}
-      <section className="bg-gray-50 py-12 border-t border-gray-100">
+      <section className="bg-white py-12 border-t border-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Available Programs</h2>
           <p className="text-sm text-gray-500 text-center mb-8">Select a program to begin your application</p>
@@ -103,14 +103,14 @@ export default async function EnrollmentPage() {
       {/* Funding */}
       <section className="max-w-5xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Funding Options</h2>
-        <p className="text-sm text-gray-500 text-center mb-8">Most students pay $0 out of pocket through workforce funding</p>
+        <p className="text-sm text-gray-500 text-center mb-8">Funding available through WIOA and state programs for eligible participants</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { title: 'WIOA Funding', desc: 'Workforce Innovation and Opportunity Act covers tuition, materials, and exam fees for eligible participants.', icon: DollarSign },
             { title: 'Next Level Jobs', desc: 'Indiana\'s Workforce Ready Grant covers training costs for high-demand certifications.', icon: FileText },
             { title: 'Employer Sponsorship', desc: 'Partner employers may sponsor training costs with OJT wage reimbursement.', icon: Users },
           ].map((f) => (
-            <div key={f.title} className="bg-gray-50 rounded-xl border border-gray-200 p-5">
+            <div key={f.title} className="bg-white rounded-xl border border-gray-200 p-5">
               <f.icon className="w-6 h-6 text-brand-blue-600 mb-3" />
               <h3 className="font-semibold text-gray-900 mb-1">{f.title}</h3>
               <p className="text-xs text-gray-500">{f.desc}</p>

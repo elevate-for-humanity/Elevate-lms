@@ -125,8 +125,8 @@ We do not sell, rent, or trade personal data to any third party for marketing or
 
 export default function SecurityAndDataProtectionPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-slate-50 border-b">
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Security & Data Protection' }]} />
         </div>

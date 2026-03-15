@@ -27,7 +27,7 @@ export default async function CompliancePage() {
 
   if (!supabase) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Compliance" }]} />
         </div>
@@ -129,7 +129,7 @@ export default async function CompliancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Compliance" }]} />
         </div>
@@ -324,7 +324,7 @@ export default async function CompliancePage() {
               </Link>
               <Link
                 href="/program-holder/dashboard"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-slate-50 text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-white text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
               >
                 Back to Dashboard
               </Link>

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { BookOpen, Download, ChevronRight, FileText, Shield, Users, Clock, Award } from 'lucide-react';
+import { BookOpen, Download, ChevronRight, FileText, Shield, Users, Clock, Award, ShieldAlert } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -41,12 +41,16 @@ export default async function StudentHandbookPage() {
     .single() : { data: null };
 
   const sections = [
-    { title: 'Welcome & Mission', description: 'Our commitment to your success', icon: BookOpen },
-    { title: 'Program Expectations', description: 'Attendance, participation, and conduct', icon: Users },
-    { title: 'Academic Policies', description: 'Grading, assessments, and certifications', icon: Award },
-    { title: 'Code of Conduct', description: 'Professional behavior standards', icon: Shield },
-    { title: 'Attendance Policy', description: 'Requirements and procedures', icon: Clock },
-    { title: 'Support Services', description: 'Resources available to you', icon: FileText },
+    { title: '1. Welcome & Mission', description: 'Who we are and what we expect', icon: BookOpen },
+    { title: '2. Program Expectations', description: 'Attendance, participation, and conduct', icon: Users },
+    { title: '3. Attendance Policy', description: 'Minimum 80% required — federal requirement for funded students', icon: Clock },
+    { title: '4. Code of Conduct', description: 'Professional behavior standards — non-negotiable', icon: Shield },
+    { title: '5. Academic Integrity', description: 'Your credentials must be earned', icon: Award },
+    { title: '6. Your Rights', description: 'FERPA, ADA, nondiscrimination, grievance', icon: Shield },
+    { title: '7. Support Services', description: 'Career, academic, barrier removal, technology', icon: FileText },
+    { title: '8. Grievance Procedure', description: 'How to file a complaint without retaliation', icon: FileText },
+    { title: '9. Disciplinary Process', description: 'Warning → probation → dismissal', icon: Shield },
+    { title: '10. Contact', description: 'How to reach us', icon: FileText },
   ];
 
   return (
@@ -125,115 +129,195 @@ export default async function StudentHandbookPage() {
           </div>
         </div>
 
+        {/* Non-negotiable banner */}
+        <div className="bg-red-50 border-l-4 border-red-600 p-5 rounded-r-xl mb-8 flex gap-3">
+          <ShieldAlert className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-red-900 mb-1">These policies are not up for negotiation.</p>
+            <p className="text-red-800 text-sm">
+              Every policy in this handbook applies to every student in every program. None of it is
+              optional. If something is unclear, ask your program coordinator before your first session —
+              not after an incident occurs.
+            </p>
+          </div>
+        </div>
+
         {/* Content Sections */}
         <div className="space-y-8">
+
           <section id="section-1" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Welcome & Mission</h2>
-            <p className="text-gray-600 mb-4">
-              Welcome to Elevate For Humanity! We are committed to providing you with the skills, 
-              knowledge, and support you need to launch a successful career. Our mission is to 
-              break the cycle of poverty through workforce development.
+            <h2 className="text-xl font-bold mb-4">1. Welcome & Mission</h2>
+            <p className="text-gray-700 mb-4">
+              Elevate for Humanity provides career training, credentialing, and job placement support
+              to job seekers, returning citizens, veterans, and underserved communities across Indiana.
+              Our programs are designed to get you employed in a skilled trade or career field with
+              industry-recognized credentials.
             </p>
-            <p className="text-gray-600">
-              As a student, you are joining a community of learners dedicated to personal and 
-              professional growth. We believe in your potential and are here to support you 
-              every step of the way.
+            <p className="text-gray-700">
+              You are here because you chose to invest in yourself. We take that seriously. In return,
+              we expect you to show up, do the work, and conduct yourself as the professional you are
+              training to become.
             </p>
           </section>
 
           <section id="section-2" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Program Expectations</h2>
-            <ul className="space-y-3 text-gray-600">
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
-                Attend all scheduled classes and training sessions
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
-                Participate actively in discussions and activities
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
-                Complete all assignments and assessments on time
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
-                Maintain professional conduct at all times
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
-                Communicate proactively with instructors and staff
-              </li>
+            <h2 className="text-xl font-bold mb-4">2. Program Expectations</h2>
+            <p className="text-gray-700 mb-4">
+              These are not suggestions. They are the minimum standards required to remain enrolled.
+            </p>
+            <ul className="space-y-3 text-gray-700">
+              {[
+                'Attend every scheduled session. Attendance is tracked and reported to funding agencies.',
+                'Arrive on time. Arriving more than 15 minutes late counts as a half-absence.',
+                'Complete all assignments, assessments, and hands-on competency demonstrations.',
+                'Maintain professional conduct at all times — in class, at employer sites, and online.',
+                'Communicate proactively. If something comes up, contact your coordinator before missing a session, not after.',
+                'Register with WorkOne if you are receiving WIOA funding. This is a federal requirement, not optional.',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </section>
 
           <section id="section-3" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Academic Policies</h2>
-            <div className="space-y-4 text-gray-600">
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Grading</h3>
-                <p>Programs use a competency-based assessment model. You must demonstrate proficiency in all required skills to earn your certification.</p>
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-900 mb-2">Certifications</h3>
-                <p>Upon successful completion, you will receive industry-recognized certifications that qualify you for employment in your field.</p>
-              </div>
+            <h2 className="text-xl font-bold mb-4">3. Attendance Policy</h2>
+            <p className="text-gray-700 mb-4">
+              <strong>Minimum 80% attendance is required to remain in good standing.</strong> This is
+              not a guideline — it is a condition of your enrollment and, for funded students, a
+              condition of your funding.
+            </p>
+            <div className="space-y-3 text-gray-700">
+              <p><strong>Excused absences:</strong> Notify your program coordinator within 24 hours of any absence. Documentation may be required (medical, court, emergency). Excused absences still count toward your attendance percentage.</p>
+              <p><strong>Unexcused absences:</strong> Three consecutive unexcused absences will result in a probation notice. A fourth may result in dismissal from the program.</p>
+              <p><strong>Tardiness:</strong> Arriving more than 15 minutes late counts as a half-absence. Leaving more than 15 minutes early counts as a half-absence.</p>
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+              <p className="text-sm text-yellow-800">
+                <strong>For WIOA-funded students:</strong> Attendance records are submitted to Indiana DWD.
+                Falling below 80% attendance may result in suspension of your funding. This is federal
+                policy — Elevate cannot override it.
+              </p>
             </div>
           </section>
 
           <section id="section-4" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Code of Conduct</h2>
-            <p className="text-gray-600 mb-4">
-              All students are expected to conduct themselves professionally and respectfully. 
-              This includes treating fellow students, instructors, and staff with dignity and respect.
+            <h2 className="text-xl font-bold mb-4">4. Code of Conduct</h2>
+            <p className="text-gray-700 mb-4">
+              You are training to enter a professional field. The conduct standards here mirror what
+              employers expect. Violating them is not just a handbook issue — it reflects on your
+              readiness for employment.
             </p>
+            <div className="space-y-3 text-gray-700 mb-4">
+              <p><strong>Treat everyone with respect.</strong> This includes fellow students, instructors, staff, and anyone you encounter at employer sites. Harassment, bullying, or discrimination of any kind will result in immediate dismissal.</p>
+              <p><strong>No weapons, alcohol, or illegal substances</strong> on any training site or employer site, at any time. Violation results in immediate dismissal with no appeal.</p>
+              <p><strong>No recording</strong> of instructors, staff, or fellow students without explicit consent.</p>
+              <p><strong>Dress appropriately</strong> per your program&apos;s dress code. Your coordinator will provide specifics at orientation.</p>
+              <p><strong>No sharing of LMS login credentials.</strong> Your account is yours. Sharing it is academic dishonesty.</p>
+            </div>
             <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
-              <h3 className="font-medium text-brand-red-800 mb-2">Prohibited Conduct</h3>
+              <h3 className="font-semibold text-brand-red-800 mb-2">Immediate Dismissal — No Warning</h3>
               <ul className="text-sm text-brand-red-700 space-y-1">
-                <li>• Harassment or discrimination of any kind</li>
-                <li>• Academic dishonesty or cheating</li>
-                <li>• Possession of weapons or illegal substances</li>
-                <li>• Disruptive behavior in class</li>
+                <li>• Violence or threats of violence toward any person</li>
+                <li>• Possession of weapons or illegal substances on site</li>
+                <li>• Sexual harassment or assault</li>
+                <li>• Falsifying attendance or program records</li>
               </ul>
             </div>
           </section>
 
           <section id="section-5" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Attendance Policy</h2>
-            <p className="text-gray-600 mb-4">
-              Regular attendance is essential for your success. Students must maintain at least 
-              80% attendance to remain in good standing.
+            <h2 className="text-xl font-bold mb-4">5. Academic Integrity</h2>
+            <p className="text-gray-700 mb-3">
+              Your credentials mean something because they are earned. Cheating undermines that — for
+              you and for every other student in the program.
             </p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="font-medium text-yellow-800 mb-2">Absence Procedures</h3>
-              <p className="text-sm text-yellow-700">
-                If you must miss class, notify your instructor as soon as possible. 
-                Excessive absences may result in dismissal from the program.
-              </p>
-            </div>
+            <ul className="space-y-2 text-gray-700">
+              <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">—</span> All submitted work must be your own.</li>
+              <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">—</span> Plagiarism or cheating on any exam or assessment results in immediate dismissal from the program.</li>
+              <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">—</span> AI-generated content submitted as your own original work is prohibited.</li>
+              <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">—</span> Do not share exam questions, answers, or assessment materials with other students.</li>
+            </ul>
           </section>
 
           <section id="section-6" className="bg-white rounded-xl shadow-sm border p-6">
-            <h2 className="text-xl font-bold mb-4">Support Services</h2>
+            <h2 className="text-xl font-bold mb-4">6. Your Rights as a Student</h2>
+            <p className="text-gray-700 mb-4">
+              These rights are guaranteed. Elevate is obligated to honor them. If you believe any
+              have been violated, you have the right to file a grievance without retaliation.
+            </p>
+            <ul className="space-y-3 text-gray-700">
+              <li><strong>Right to a safe, respectful learning environment.</strong> No student should feel unsafe or disrespected at any Elevate training site.</li>
+              <li><strong>Right to inspect your educational records under FERPA.</strong> You may request to view your records at any time. Contact your program coordinator.</li>
+              <li><strong>Right to reasonable accommodations</strong> for documented disabilities under the ADA and Section 504. Request accommodations at enrollment — do not wait until you are struggling.</li>
+              <li><strong>Right to file a grievance without retaliation.</strong> See Section 8 for the process.</li>
+              <li><strong>Right to withdraw from the program at any time.</strong> See your enrollment agreement for the refund policy.</li>
+              <li><strong>Right to nondiscrimination.</strong> Elevate does not discriminate on the basis of race, color, religion, sex, national origin, age, disability, or any other protected characteristic. This is federal law under WIOA Section 188.</li>
+            </ul>
+          </section>
+
+          <section id="section-7" className="bg-white rounded-xl shadow-sm border p-6">
+            <h2 className="text-xl font-bold mb-4">7. Support Services</h2>
+            <p className="text-gray-700 mb-4">
+              These services exist to help you succeed. Use them. Asking for help is not a sign of
+              weakness — it is what professionals do.
+            </p>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium mb-2">Career Services</h3>
-                <p className="text-sm text-gray-600">Resume help, interview prep, and job placement assistance</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium mb-2">Academic Support</h3>
-                <p className="text-sm text-gray-600">Tutoring, study groups, and additional instruction</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium mb-2">Personal Support</h3>
-                <p className="text-sm text-gray-600">Counseling referrals and emergency assistance</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium mb-2">Technology Support</h3>
-                <p className="text-sm text-gray-600">Help with LMS, equipment, and software</p>
-              </div>
+              {[
+                { title: 'Career Services', desc: 'Resume writing, interview preparation, and job placement assistance. Available to all students during and after program completion.' },
+                { title: 'Academic Support', desc: 'Additional instruction, tutoring coordination, and study resources. Contact your coordinator if you are falling behind — do not wait.' },
+                { title: 'Barrier Removal', desc: 'Case management support for transportation, childcare, housing, and other barriers. WIOA-funded students may be eligible for supportive services.' },
+                { title: 'Technology Support', desc: 'Help with LMS access, device issues, and software. Contact your coordinator or use the platform help desk.' },
+              ].map((s) => (
+                <div key={s.title} className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-semibold mb-1">{s.title}</h3>
+                  <p className="text-sm text-gray-600">{s.desc}</p>
+                </div>
+              ))}
             </div>
           </section>
+
+          <section id="section-8" className="bg-white rounded-xl shadow-sm border p-6">
+            <h2 className="text-xl font-bold mb-4">8. Grievance Procedure</h2>
+            <p className="text-gray-700 mb-3">
+              If you have a complaint about a student, instructor, staff member, or program condition:
+            </p>
+            <ol className="space-y-3 text-gray-700 list-decimal list-inside">
+              <li><strong>Step 1:</strong> Speak with your program coordinator. Most issues are resolved here within 2 business days.</li>
+              <li><strong>Step 2:</strong> If unresolved within 5 business days, submit a written grievance to <strong>elevate4humanityedu@gmail.com</strong> with subject line &quot;Student Grievance.&quot;</li>
+              <li><strong>Step 3:</strong> Elevate will respond in writing within 10 business days.</li>
+              <li><strong>Step 4:</strong> If still unresolved, you may contact the Indiana Commission for Higher Education or the U.S. Department of Education.</li>
+            </ol>
+            <p className="text-sm text-gray-500 mt-3">
+              Filing a grievance will not affect your enrollment status or result in retaliation of any kind.
+            </p>
+          </section>
+
+          <section id="section-9" className="bg-white rounded-xl shadow-sm border p-6">
+            <h2 className="text-xl font-bold mb-4">9. Disciplinary Process</h2>
+            <p className="text-gray-700 mb-3">
+              For most violations, the process is: verbal warning → written warning → probation → dismissal.
+              Serious violations skip directly to dismissal (see Section 4).
+            </p>
+            <p className="text-gray-700">
+              You have the right to respond in writing to any written warning or probation notice within
+              5 business days. Your response will be placed in your file and considered before any
+              further action is taken.
+            </p>
+          </section>
+
+          <section id="section-10" className="bg-white rounded-xl shadow-sm border p-6">
+            <h2 className="text-xl font-bold mb-4">10. Contact</h2>
+            <div className="space-y-1 text-gray-700">
+              <p><strong>Program Coordinator:</strong> Assigned at enrollment</p>
+              <p><strong>Phone:</strong> (317) 314-3757</p>
+              <p><strong>Email:</strong> elevate4humanityedu@gmail.com</p>
+              <p><strong>Address:</strong> 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</p>
+            </div>
+          </section>
+
         </div>
 
         {/* Acknowledgment */}

@@ -56,7 +56,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage 
           poster={posterImage}
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           onError={() => setVideoFailed(true)}
         />
       ) : posterImage ? (

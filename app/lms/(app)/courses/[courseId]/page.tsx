@@ -116,7 +116,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   // Fetch lessons
   const { data: lessons } = await db
-    .from('training_lessons')
+    .from('lms_lessons')
     .select('*')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });

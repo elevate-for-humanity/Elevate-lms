@@ -82,7 +82,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
 
   const { data: allLessons } = courseIds.length > 0
     ? await db
-        .from('training_lessons')
+        .from('lms_lessons')
         .select('id, course_id')
         .in('course_id', courseIds)
     : { data: [] };

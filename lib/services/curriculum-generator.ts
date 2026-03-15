@@ -110,6 +110,8 @@ export interface LessonDef {
    * Required for coverage reporting. Omit only for non-exam programs.
    */
   credentialDomainKey?: string;
+  /** training_courses.id — links this lesson to the LMS course page */
+  courseId?: string;
   quizzes?: QuizDef[];
   recaps?: RecapDef[];
 }
@@ -334,6 +336,7 @@ export class CurriculumGenerator {
       .upsert(
         {
           program_id:           this.programId,
+          course_id:            def.courseId ?? null,
           module_id:            moduleId,
           lesson_slug:          def.lessonSlug,
           lesson_title:         def.lessonTitle,

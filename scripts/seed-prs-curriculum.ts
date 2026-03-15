@@ -74,6 +74,7 @@ async function main() {
         lessonTitle:         lesson.title,
         moduleSlug:          mod.id,
         moduleTitle:         mod.title,
+        courseId:            PRS_COURSE_ID,
         durationMinutes:     lesson.durationMinutes ?? 30,
         lessonOrder:         lessonIndex + 1,
         moduleOrder:         modIndex + 1,

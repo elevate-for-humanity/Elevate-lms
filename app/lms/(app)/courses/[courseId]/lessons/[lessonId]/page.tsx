@@ -82,13 +82,13 @@ export default function LessonPage() {
 
     // 1. Fetch lesson data
     const { data: lessonData } = await supabase
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('*')
       .eq('id', lessonId)
       .single();
 
     const { data: lessonsData } = await supabase
-      .from('training_lessons')
+      .from('lms_lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_index');

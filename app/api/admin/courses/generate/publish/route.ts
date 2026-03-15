@@ -23,6 +23,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { runAlignmentAudit } from '@/lib/services/credential-alignment-audit';
 import type { GeneratedCourse } from '../route';
 
 // ── Compiled draft schema (v2 course compiler) ────────────────────────────────
@@ -97,6 +98,58 @@ const PublishDraftSchema = z.object({
 type PublishDraft = z.infer<typeof PublishDraftSchema>;
 type CompiledLesson = z.infer<typeof CompiledLessonSchema>;
 type CompiledModule = z.infer<typeof CompiledModuleSchema>;
+
+// ── Coverage gate ─────────────────────────────────────────────────────────────
+
+/**
+ * Blocks publication when the program's credential coverage audit fails.
+ *
+ * Only runs when:
+ *   - a program_id is present (course is being attached to a program)
+ *   - the caller is requesting live publication (not saving as draft)
+ *
+ * Returns an error message string if blocked, null if clear to publish.
+ *
+ * The audit checks: credential mapped, exam domains seeded, every domain
+ * has at least one lesson with a quiz, completion rules exist.
+ * Saving as draft (auto_publish=false / is_published=false) is always allowed
+ * so admins can stage content before it is complete.
+ */
+async function checkCoverageGate(
+  programId: string,
+  isLivePublish: boolean
+): Promise<string | null> {
+  if (!isLivePublish) return null; // drafts bypass the gate
+
+  // runAlignmentAudit takes slugs; resolve the program slug from the DB
+  const db = createAdminClient();
+  if (!db) return null; // DB unavailable — fail open, log below
+
+  const { data: prog } = await db
+    .from('programs')
+    .select('slug')
+    .eq('id', programId)
+    .single();
+
+  if (!prog) {
+    logger.warn('coverage-gate: program not found', { programId });
+    return null; // unknown program — don't block, let FK constraint catch it
+  }
+
+  const result = await runAlignmentAudit([prog.slug]);
+  const programAudit = result.programs.find(p => p.programSlug === prog.slug);
+
+  if (!programAudit) return null; // program not active — skip gate
+
+  if (programAudit.isAligned) return null; // all clear
+
+  const gapSummary = programAudit.gaps.slice(0, 3).join('; ');
+  return (
+    `Publication blocked: credential coverage incomplete for program "${prog.slug}". ` +
+    `Gaps: ${gapSummary}. ` +
+    `Save as draft (auto_publish: false) to stage content without publishing.`
+  );
+}
 
 // ── Pre-publish validators ────────────────────────────────────────────────────
 
@@ -203,6 +256,13 @@ async function publishCompiledDraft(
   ensureUniqueLessonTitles(draft);
   validateQuizAnswers(draft);
   validateDurations(draft);
+
+  // Coverage gate: block live publication if credential alignment is incomplete.
+  // Drafts (auto_publish: false) are always allowed through.
+  if (draft.program_id) {
+    const coverageError = await checkCoverageGate(draft.program_id, draft.auto_publish);
+    if (coverageError) throw new Error(coverageError);
+  }
 
   const slugBase = draft.course_name
     .toLowerCase().trim()
@@ -407,6 +467,14 @@ async function _POST(req: NextRequest) {
 
     if (!course?.title || !course.modules?.length) {
       return NextResponse.json({ error: 'Invalid course data' }, { status: 400 });
+    }
+
+    // Coverage gate for legacy path
+    if (program_id) {
+      const coverageError = await checkCoverageGate(program_id, is_published);
+      if (coverageError) {
+        return NextResponse.json({ error: coverageError }, { status: 422 });
+      }
     }
 
     // ── 1. Course record ────────────────────────────────────────────────────

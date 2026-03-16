@@ -114,7 +114,7 @@ WITH prog AS (
   )
 )
 INSERT INTO public.program_credentials (
-  program_id, credential_id, is_primary, display_order,
+  program_id, credential_id, is_primary, sort_order,
   exam_fee_payer, exam_fee_cents, notes
 )
 SELECT

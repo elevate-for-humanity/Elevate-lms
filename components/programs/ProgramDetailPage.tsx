@@ -174,7 +174,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             {/* Wage range */}
             <div>
               <DollarSign className="w-5 h-5 text-brand-green-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{p.laborMarket.salaryRange}</div>
+              <div className="text-lg font-extrabold text-white">{p.laborMarket?.salaryRange ?? '—'}</div>
               <div className="text-xs text-slate-400">Typical wage range</div>
             </div>
             {/* Training hours */}
@@ -192,8 +192,8 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             {/* Job growth */}
             <div>
               <TrendingUp className="w-5 h-5 text-brand-red-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{p.laborMarket.growthRate}</div>
-              <div className="text-xs text-slate-400">Job growth ({p.laborMarket.sourceYear})</div>
+              <div className="text-lg font-extrabold text-white">{p.laborMarket?.growthRate ?? '—'}</div>
+              <div className="text-xs text-slate-400">Job growth ({p.laborMarket?.sourceYear ?? ''})</div>
             </div>
           </div>
 

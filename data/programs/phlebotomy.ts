@@ -103,6 +103,15 @@ export const PHLEBOTOMY: ProgramSchema = {
     source: 'Bureau of Labor Statistics, 2024',
   },
 
+  laborMarket: {
+    medianSalary: 37380,
+    salaryRange: '$30,000–$45,000',
+    growthRate: '10% (faster than average)',
+    source: 'U.S. Bureau of Labor Statistics',
+    sourceYear: 2024,
+    region: 'Indianapolis-Carmel-Anderson MSA',
+  },
+
   complianceAlignment: [
     { framework: 'OSHA Bloodborne Pathogens Standard (29 CFR 1910.1030)', description: 'Full compliance training included' },
     { framework: 'HIPAA Patient Privacy', description: 'Patient data handling and confidentiality' },

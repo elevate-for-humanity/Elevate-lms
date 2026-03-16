@@ -55,8 +55,6 @@ import * as Sentry from '@sentry/nextjs';
 
 
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
-
 // Supabase admin client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -173,6 +171,9 @@ async function flagCertRows(
 }
 
 async function _POST(request: NextRequest) {
+  // Read secret at request time — module-level init would freeze a missing value permanently.
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
   // Stage 0: Log env var presence for debugging
   logger.info('[webhook] Env check:', {
     hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
@@ -182,6 +183,14 @@ async function _POST(request: NextRequest) {
     stripeInitialized: !!stripe,
     supabaseInitialized: !!supabase,
   });
+
+  if (!webhookSecret) {
+    logger.error('[webhook] STRIPE_WEBHOOK_SECRET is not set');
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 500 }
+    );
+  }
 
   if (!stripe || !supabase) {
     logger.error('[webhook] Missing config:', { stripe: !!stripe, supabase: !!supabase });
@@ -2308,4 +2317,7 @@ async function _POST(request: NextRequest) {
   logger.info('[webhook] Returning 200 for event:', event.id);
   return NextResponse.json({ received: true });
 }
-export const POST = withApiAudit('/api/webhooks/stripe', _POST, { actor_type: 'webhook' , critical: true });
+// skip_body: Stripe body is already consumed by request.text() inside the handler.
+// critical omitted: audit failure must not override the 200 returned to Stripe —
+// the handler writes its own idempotency records to stripe_webhook_events.
+export const POST = withApiAudit('/api/webhooks/stripe', _POST, { actor_type: 'webhook', skip_body: true });

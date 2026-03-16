@@ -7,7 +7,7 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
 import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 import { FadeInUp, StaggerChildren, StaggerItem, BlurIn } from '@/components/animations/PremiumAnimations';
-import { ArrowRight, GraduationCap, Building2, BarChart3 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -70,65 +70,6 @@ export default function HomePage() {
               </Link>
             </div>
           </BlurIn>
-        </div>
-      </section>
-
-      {/* ── AUDIENCE ROUTING ── */}
-      <section className="bg-slate-50 border-b border-slate-200 py-8 sm:py-10">
-        <div className="max-w-5xl mx-auto px-6">
-          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Who are you here for?</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Student / Job Seeker */}
-            <Link
-              href="/start"
-              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-brand-red-500 rounded-xl p-6 transition-all hover:shadow-md"
-            >
-              <div className="w-10 h-10 rounded-lg bg-brand-red-50 flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-5 h-5 text-brand-red-600" />
-              </div>
-              <div>
-                <p className="font-bold text-slate-900 text-base mb-1">Student / Job Seeker</p>
-                <p className="text-slate-500 text-sm leading-snug">See programs, start dates, and how to get funded training at no cost.</p>
-              </div>
-              <span className="text-brand-red-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
-                Start here <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            {/* Employer / Hiring Partner */}
-            <Link
-              href="/employer"
-              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-brand-blue-500 rounded-xl p-6 transition-all hover:shadow-md"
-            >
-              <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
-                <Building2 className="w-5 h-5 text-brand-blue-600" />
-              </div>
-              <div>
-                <p className="font-bold text-slate-900 text-base mb-1">Employer / Hiring Partner</p>
-                <p className="text-slate-500 text-sm leading-snug">Access pre-screened graduates, WOTC credits, and OJT reimbursement.</p>
-              </div>
-              <span className="text-brand-blue-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
-                Hire graduates <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            {/* Agency / Workforce Board */}
-            <Link
-              href="/workforce-board"
-              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-slate-700 rounded-xl p-6 transition-all hover:shadow-md"
-            >
-              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                <BarChart3 className="w-5 h-5 text-slate-700" />
-              </div>
-              <div>
-                <p className="font-bold text-slate-900 text-base mb-1">Agency / Workforce Board</p>
-                <p className="text-slate-500 text-sm leading-snug">Review compliance, outcomes reporting, and WIOA alignment documentation.</p>
-              </div>
-              <span className="text-slate-700 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
-                View outcomes <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -242,39 +183,48 @@ export default function HomePage() {
       </section>
 
       {/* ── PROGRAMS ── */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
+      <section className="py-14 sm:py-20 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <FadeInUp>
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Programs</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10">Career pathways we offer</h2>
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Programs</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Career pathways we offer</h2>
+            <p className="text-slate-500 text-sm sm:text-base mb-8">High-demand fields. Short timelines. Most fully funded.</p>
           </FadeInUp>
-          <StaggerChildren staggerDelay={0.06}>
-            {PROGRAMS.map((p) => (
-              <StaggerItem key={p.name}>
-                <Link href={p.href} className="group flex items-center gap-5 py-4 border-b border-slate-100 hover:border-slate-300 transition-colors">
-                  <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="56px" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 text-sm">{p.name}</p>
-                    <p className="text-xs text-slate-500">{p.sector} · {p.duration}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xs font-bold text-brand-green-700">{p.salary}</p>
-                    <p className="text-[10px] text-slate-500">starting</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors flex-shrink-0" />
-                </Link>
-              </StaggerItem>
-            ))}
+          <StaggerChildren staggerDelay={0.05}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              {PROGRAMS.map((p) => (
+                <StaggerItem key={p.name}>
+                  <Link
+                    href={p.href}
+                    className="group block bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-brand-red-300 hover:shadow-md transition-all"
+                  >
+                    <div className="relative w-full" style={{ aspectRatio: '4/3' }}>
+                      <Image
+                        src={p.image}
+                        alt={p.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-3 sm:p-4">
+                      <p className="font-bold text-slate-900 text-xs sm:text-sm leading-tight mb-1 line-clamp-2">{p.name}</p>
+                      <p className="text-brand-green-700 text-xs font-semibold">{p.salary}</p>
+                      <p className="text-slate-400 text-xs">{p.duration}</p>
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </div>
           </StaggerChildren>
           <FadeInUp delay={0.3}>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
-                View Full Program Details
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm">
+                View All Programs
               </Link>
-              <Link href="/credentials" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-white transition-colors">
-                View All Credentials
+              <Link href="/credentials" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-white transition-colors text-sm">
+                View Credentials
               </Link>
             </div>
           </FadeInUp>

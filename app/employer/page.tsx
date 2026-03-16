@@ -42,6 +42,7 @@ export default function EmployerPage() {
       <PageVideoHero
         videoSrc="/videos/employer-hero.mp4"
         posterSrc="/images/pages/employer-hero.jpg"
+        audioSrc="/audio/heroes/career-services.mp3"
         posterAlt="Employer partnerships — hire trained graduates"
         size="marketing"
       />

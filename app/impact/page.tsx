@@ -72,6 +72,7 @@ export default async function ImpactPage() {
       <PageVideoHero
         videoSrc="/videos/graduation-success.mp4"
         posterSrc="/images/pages/impact-video-poster.jpg"
+        audioSrc="/audio/welcome-voiceover.mp3"
         posterAlt="Elevate graduate outcomes and community impact"
         size="marketing"
       />

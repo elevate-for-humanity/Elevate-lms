@@ -42,6 +42,7 @@ export default function EmployersPage() {
       <PageVideoHero
         videoSrc="/videos/employer-hero.mp4"
         posterSrc="/images/pages/employers-page-1.jpg"
+        audioSrc="/audio/heroes/career-services.mp3"
         posterAlt="Employers — Elevate for Humanity"
         size="marketing"
       />

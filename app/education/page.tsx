@@ -115,6 +115,7 @@ export default function EducationLandingPage() {
         <PageVideoHero
           videoSrc="/videos/lms-learning.mp4"
           posterSrc="/images/pages/training-cohort.jpg"
+          audioSrc="/audio/heroes/programs.mp3"
           posterAlt="Career training programs at Elevate for Humanity"
           size="marketing"
         />

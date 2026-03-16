@@ -8,6 +8,10 @@
       "onAutoForward": "notify"
     }
   },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "corepack enable && corepack prepare pnpm@10.28.2 --activate && pnpm install && (cp -n .env.example .env.local || true)",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -16,8 +20,25 @@
         "bradlc.vscode-tailwindcss",
         "ms-vscode.vscode-typescript-next",
         "eamodio.gitlens",
-        "christian-kohler.path-intellisense"
-      ]
+        "christian-kohler.path-intellisense",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-pull-request-github",
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true
+      }
+    },
+    "codespaces": {
+      "openFiles": ["README.md"]
     }
   }
 }

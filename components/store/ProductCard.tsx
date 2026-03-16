@@ -41,6 +41,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading="lazy"
           />
           {product.badge && (
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
@@ -82,6 +84,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="192px"
+            loading="lazy"
           />
           {product.badge && (
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
@@ -155,6 +159,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          loading="lazy"
         />
         
         {/* Badge */}

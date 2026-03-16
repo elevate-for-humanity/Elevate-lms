@@ -104,7 +104,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
                 </h1>
-                <p className="text-white/75 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+                <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
                   {p.subtitle}
                 </p>
 
@@ -116,7 +116,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                     { icon: <Award className="w-3.5 h-3.5" />, val: `${p.credentials.length} credential${p.credentials.length !== 1 ? 's' : ''}` },
                     { icon: <MapPin className="w-3.5 h-3.5" />, val: p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person' },
                   ].map(({ icon, val }) => (
-                    <span key={val} className="inline-flex items-center gap-1.5 bg-white/10 text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
+                    <span key={val} className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
                       {icon}{val}
                     </span>
                   ))}
@@ -164,6 +164,51 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══ CREDIBILITY STRIP ══════════════════════════════════════ */}
+      <section className="bg-slate-900 py-8 border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {/* Wage range */}
+            <div>
+              <DollarSign className="w-5 h-5 text-brand-green-400 mx-auto mb-1.5" />
+              <div className="text-lg font-extrabold text-white">{p.laborMarket.salaryRange}</div>
+              <div className="text-xs text-slate-400">Typical wage range</div>
+            </div>
+            {/* Training hours */}
+            <div>
+              <Clock className="w-5 h-5 text-brand-blue-400 mx-auto mb-1.5" />
+              <div className="text-lg font-extrabold text-white">{totalHours > 0 ? `${totalHours} hrs` : hoursRange}</div>
+              <div className="text-xs text-slate-400">Total training hours</div>
+            </div>
+            {/* Credentials */}
+            <div>
+              <Award className="w-5 h-5 text-brand-orange-400 mx-auto mb-1.5" />
+              <div className="text-lg font-extrabold text-white">{p.credentials.length} credential{p.credentials.length !== 1 ? 's' : ''}</div>
+              <div className="text-xs text-slate-400">{p.credentials[0]?.issuingBody ?? 'Industry recognized'}</div>
+            </div>
+            {/* Job growth */}
+            <div>
+              <TrendingUp className="w-5 h-5 text-brand-red-400 mx-auto mb-1.5" />
+              <div className="text-lg font-extrabold text-white">{p.laborMarket.growthRate}</div>
+              <div className="text-xs text-slate-400">Job growth ({p.laborMarket.sourceYear})</div>
+            </div>
+          </div>
+
+          {/* Regulatory / compliance alignment */}
+          {p.complianceAlignment.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-slate-800 flex flex-wrap items-center gap-3 justify-center">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Aligned with:</span>
+              {p.complianceAlignment.map((a) => (
+                <span key={a.standard} className="inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-700">
+                  <Shield className="w-3 h-3 text-brand-green-400" />
+                  {a.standard}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -30,7 +30,9 @@ export function ProgramCard({
           alt={title}
           fill
           className="object-cover"
-          quality={100}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          loading="lazy"
+          quality={85}
         />
         {badge && (
           <div className="absolute top-4 right-4 bg-white text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">

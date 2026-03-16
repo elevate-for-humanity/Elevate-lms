@@ -6,7 +6,7 @@ import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
 import { FadeInUp, StaggerChildren, StaggerItem, BlurIn } from '@/components/animations/PremiumAnimations';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, GraduationCap, Building2, BarChart3 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -69,6 +69,65 @@ export default function HomePage() {
               </Link>
             </div>
           </BlurIn>
+        </div>
+      </section>
+
+      {/* ── AUDIENCE ROUTING ── */}
+      <section className="bg-slate-50 border-b border-slate-200 py-8 sm:py-10">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Who are you here for?</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Student / Job Seeker */}
+            <Link
+              href="/start"
+              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-brand-red-500 rounded-xl p-6 transition-all hover:shadow-md"
+            >
+              <div className="w-10 h-10 rounded-lg bg-brand-red-50 flex items-center justify-center flex-shrink-0">
+                <GraduationCap className="w-5 h-5 text-brand-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 text-base mb-1">Student / Job Seeker</p>
+                <p className="text-slate-500 text-sm leading-snug">See programs, start dates, and how to get funded training at no cost.</p>
+              </div>
+              <span className="text-brand-red-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                Start here <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+
+            {/* Employer / Hiring Partner */}
+            <Link
+              href="/employer"
+              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-brand-blue-500 rounded-xl p-6 transition-all hover:shadow-md"
+            >
+              <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
+                <Building2 className="w-5 h-5 text-brand-blue-600" />
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 text-base mb-1">Employer / Hiring Partner</p>
+                <p className="text-slate-500 text-sm leading-snug">Access pre-screened graduates, WOTC credits, and OJT reimbursement.</p>
+              </div>
+              <span className="text-brand-blue-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                Hire graduates <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+
+            {/* Agency / Workforce Board */}
+            <Link
+              href="/workforce-board"
+              className="group flex flex-col items-start gap-3 bg-white border-2 border-slate-200 hover:border-slate-700 rounded-xl p-6 transition-all hover:shadow-md"
+            >
+              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <BarChart3 className="w-5 h-5 text-slate-700" />
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 text-base mb-1">Agency / Workforce Board</p>
+                <p className="text-slate-500 text-sm leading-snug">Review compliance, outcomes reporting, and WIOA alignment documentation.</p>
+              </div>
+              <span className="text-slate-700 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                View outcomes <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -215,12 +274,12 @@ export default function HomePage() {
       </section>
 
       {/* ── FUNDING ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
-            <p className="text-brand-red-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Most participants pay $0 for training</h2>
-            <p className="text-brand-red-100 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-brand-blue-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Most participants pay $0 for training</h2>
+            <p className="text-brand-blue-100 leading-relaxed mb-10 max-w-2xl">
               Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants.
             </p>
           </FadeInUp>
@@ -232,16 +291,16 @@ export default function HomePage() {
             ].map((f) => (
               <StaggerItem key={f.label}>
                 <div className="bg-white/10 rounded-xl p-6 mb-4 last:mb-0">
-                  <p className="text-brand-red-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
-                  <h3 className="text-slate-900 font-bold text-base mb-2">{f.label}</h3>
-                  <p className="text-brand-red-100 text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-brand-blue-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                  <h3 className="text-white font-bold text-base mb-2">{f.label}</h3>
+                  <p className="text-brand-blue-100 text-sm leading-relaxed">{f.desc}</p>
                 </div>
               </StaggerItem>
             ))}
           </StaggerChildren>
           <FadeInUp delay={0.3}>
             <div className="flex flex-wrap gap-4 mt-8">
-              <Link href="/wioa-eligibility" className="bg-white text-brand-red-600 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors">
+              <Link href="/wioa-eligibility" className="bg-white text-brand-blue-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-blue-50 transition-colors">
                 Check My Eligibility
               </Link>
               <Link href="/funding" className="border border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">
@@ -326,6 +385,27 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </StaggerChildren>
+        </div>
+      </section>
+
+      {/* ── OUTCOMES ── */}
+      <section className="py-12 sm:py-14 bg-slate-900 border-t border-slate-800">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">Workforce Outcomes</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: '500+', label: 'Graduates Trained', sub: 'and counting' },
+              { value: '30+', label: 'Employer Partners', sub: 'active hiring' },
+              { value: '15+', label: 'Credentials Offered', sub: 'nationally recognized' },
+              { value: '$0', label: 'Cost to Eligible Participants', sub: 'WIOA & state funded' },
+            ].map((m) => (
+              <div key={m.label}>
+                <div className="text-3xl sm:text-4xl font-black text-brand-red-500 mb-1">{m.value}</div>
+                <div className="text-sm font-semibold text-white mb-0.5">{m.label}</div>
+                <div className="text-xs text-slate-400">{m.sub}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

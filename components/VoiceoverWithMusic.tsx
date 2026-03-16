@@ -24,6 +24,7 @@ export default function VoiceoverWithMusic({
   const playAudio = useCallback(() => {
     if (!audioRef.current || hasPlayed) return;
     
+    audioRef.current.muted = false;
     audioRef.current.volume = volume;
     audioRef.current.play()
       .then(() => {
@@ -86,77 +87,63 @@ export default function VoiceoverWithMusic({
 
   if (!isVisible && !showPlayButton) return null;
 
-  // Playing state - sleek player bar
+  // Playing state — branded bottom bar
   if (isPlaying) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom duration-300">
+      <div className="fixed bottom-0 left-0 right-0 z-50">
         {/* Progress bar */}
-        <div className="h-1 bg-gray-200">
-          <div 
-            className="h-full bg-gradient-to-r from-brand-blue-500 to-brand-blue-600 transition-all duration-100"
+        <div className="h-1 bg-slate-200">
+          <div
+            className="h-full bg-brand-red-600 transition-all duration-100"
             style={{ width: `${progress}%` }}
           />
         </div>
-        
-        {/* Player bar */}
-        <div className="bg-white/95 backdrop-blur-lg border-t border-gray-100 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            {/* Left - Now playing */}
+        <div className="bg-slate-900 border-t border-slate-700">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue-500 to-brand-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-blue-500/30">
-                <div className="flex items-end gap-0.5 h-4">
-                  <span className="w-1 bg-white rounded-full animate-soundbar1" />
-                  <span className="w-1 bg-white rounded-full animate-soundbar2" />
-                  <span className="w-1 bg-white rounded-full animate-soundbar3" />
-                </div>
+              {/* Soundbars */}
+              <div className="flex items-end gap-0.5 h-5 flex-shrink-0">
+                <span className="w-1 bg-brand-red-500 rounded-full animate-soundbar1" style={{ height: '60%' }} />
+                <span className="w-1 bg-brand-red-500 rounded-full animate-soundbar2" style={{ height: '100%' }} />
+                <span className="w-1 bg-brand-red-500 rounded-full animate-soundbar3" style={{ height: '40%' }} />
+                <span className="w-1 bg-brand-red-500 rounded-full animate-soundbar1" style={{ height: '80%' }} />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">Welcome to Elevate</p>
-                <p className="text-xs text-gray-500 truncate">Free career training programs</p>
+                <p className="text-sm font-bold text-white truncate">Elevate for Humanity</p>
+                <p className="text-xs text-slate-400 truncate">Indianapolis workforce training</p>
               </div>
             </div>
-
-            {/* Right - Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={stopAudio}
-                className="p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all"
-                aria-label="Stop"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <rect x="6" y="6" width="12" height="12" rx="1" />
-                </svg>
-              </button>
-            </div>
+            <button
+              onClick={stopAudio}
+              className="flex-shrink-0 px-4 py-1.5 rounded-full border border-slate-600 text-slate-300 hover:border-slate-400 hover:text-white text-xs font-semibold transition-colors"
+              aria-label="Stop"
+            >
+              Stop
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  // Play button - prominent floating button
+  // Play button — brand red, bottom right
   if (showPlayButton && !hasPlayed) {
     return (
       <button
         onClick={playAudio}
         className="fixed bottom-6 right-6 z-50 group"
-        aria-label="Play welcome message"
+        aria-label="Hear our welcome message"
       >
         <div className="relative">
-          {/* Pulse ring - more visible */}
-          <div className="absolute -inset-2 rounded-full bg-white animate-ping opacity-30" />
-          <div className="absolute -inset-1 rounded-full bg-brand-orange-400 animate-pulse opacity-40" />
-          
-          {/* Button - orange for visibility */}
-          <div className="relative flex items-center gap-3 bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 text-white pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-brand-orange-500/40 hover:shadow-brand-orange-500/50 hover:scale-105 transition-all duration-200 border-2 border-white/20">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
+          <div className="absolute -inset-1 rounded-full bg-brand-red-600 animate-pulse opacity-30" />
+          <div className="relative flex items-center gap-2.5 bg-brand-red-600 hover:bg-brand-red-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl hover:scale-105 transition-all duration-200">
+            {/* Speaker icon */}
+            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            </svg>
             <div className="text-left">
-              <span className="text-base font-bold block">🔊 Listen</span>
-              <span className="text-xs opacity-90">Welcome message</span>
+              <span className="text-sm font-bold block leading-tight">Hear Our Story</span>
+              <span className="text-xs opacity-80 leading-tight">Elevate for Humanity</span>
             </div>
           </div>
         </div>

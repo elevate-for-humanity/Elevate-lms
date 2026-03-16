@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://elevateforhumanity.institute';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',

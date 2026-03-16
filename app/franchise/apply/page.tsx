@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -13,7 +14,7 @@ const PACKAGES = [
   { value: 'unsure', label: 'Not sure yet — help me decide' },
 ];
 
-export default function FranchiseApplyPage() {
+function FranchiseApplyPageInner() {
   const searchParams = useSearchParams();
   const preselected = searchParams.get('package') || '';
 
@@ -313,5 +314,13 @@ export default function FranchiseApplyPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function FranchiseApplyPage() {
+  return (
+    <Suspense>
+      <FranchiseApplyPageInner />
+    </Suspense>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -54,7 +55,7 @@ const organizationTypes = [
   { value: 'other', label: 'Other' },
 ];
 
-export default function LicenseCheckoutPage() {
+function LicenseCheckoutPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const planId = searchParams.get('plan') || 'institutional';
@@ -369,5 +370,13 @@ export default function LicenseCheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LicenseCheckoutPage() {
+  return (
+    <Suspense>
+      <LicenseCheckoutPageInner />
+    </Suspense>
   );
 }

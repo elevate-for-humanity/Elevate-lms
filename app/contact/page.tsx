@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -17,7 +18,7 @@ const contactInfo = [
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
 ];
 
-export default function ContactPage() {
+function ContactPageInner() {
   const searchParams = useSearchParams();
   const prefillProgram = searchParams.get('program') || '';
   const prefillSubject = searchParams.get('subject') || '';
@@ -436,5 +437,13 @@ export default function ContactPage() {
         <FeedbackWidget userId="" />
       </div>
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense>
+      <ContactPageInner />
+    </Suspense>
   );
 }

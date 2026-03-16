@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -31,7 +32,7 @@ const TYPE_OPTIONS: { value: ApplicantType; label: string; desc: string }[] = [
   },
 ];
 
-export default function BarberApplyPage() {
+function BarberApplyPageInner() {
   const searchParams = useSearchParams();
   const [applicantType, setApplicantType] = useState<ApplicantType>('');
 
@@ -119,5 +120,13 @@ export default function BarberApplyPage() {
         {applicantType === 'program_holder' && <ProgramHolderForm />}
       </div>
     </div>
+  );
+}
+
+export default function BarberApplyPage() {
+  return (
+    <Suspense>
+      <BarberApplyPageInner />
+    </Suspense>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -21,7 +22,7 @@ const positions = [
   { id: 'apprentice', name: 'Esthetician Apprentice' },
 ];
 
-export default function ApplyPage() {
+function ApplyPageInner() {
   const searchParams = useSearchParams();
   const positionParam = searchParams.get('position') || '';
   
@@ -292,5 +293,13 @@ export default function ApplyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense>
+      <ApplyPageInner />
+    </Suspense>
   );
 }

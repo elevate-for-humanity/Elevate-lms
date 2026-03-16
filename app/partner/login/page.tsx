@@ -1,5 +1,6 @@
 
 'use client';
+import { Suspense } from 'react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -12,7 +13,7 @@ const IDENTITY_ERRORS: Record<string, string> = {
   no_partner: 'Your account is not linked to a partner organization. Please contact support at info@elevateforhumanity.org.',
 };
 
-export default function PartnerLoginPage() {
+function PartnerLoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -241,5 +242,13 @@ export default function PartnerLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PartnerLoginPage() {
+  return (
+    <Suspense>
+      <PartnerLoginPageInner />
+    </Suspense>
   );
 }

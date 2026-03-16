@@ -38,8 +38,6 @@ export default function AboutPage() {
         posterSrc="/images/pages/about-hero.jpg"
         posterAlt="About Elevate for Humanity"
         size="marketing"
-        title="About Elevate for Humanity"
-        subtitle="Founded by an IRS Enrolled Agent and military veteran. Built to close the workforce gap in Indianapolis."
       />
 
       {/* Who We Are */}

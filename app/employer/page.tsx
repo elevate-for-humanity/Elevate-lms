@@ -44,8 +44,6 @@ export default function EmployerPage() {
         posterSrc="/images/pages/employer-hero.jpg"
         posterAlt="Employer partnerships — hire trained graduates"
         size="marketing"
-        title="Employer Partnerships"
-        subtitle="Partner with Elevate to build your workforce pipeline. Access WOTC tax credits and pre-screened candidates."
       />
 
       {/* Header */}

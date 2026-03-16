@@ -53,8 +53,6 @@ export default async function ImpactPage() {
         posterSrc="/images/pages/impact-video-poster.jpg"
         posterAlt="Elevate graduate outcomes and community impact"
         size="marketing"
-        title="Our Impact"
-        subtitle="Real outcomes for real people. Graduates earning living wages, building careers, and changing their families' futures."
       />
 
 

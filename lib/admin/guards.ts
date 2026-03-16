@@ -136,3 +136,6 @@ export const SENSITIVE_ROUTES = [
   '/admin/program-generator',
   '/admin/syllabus-generator',
 ] as const;
+
+// Re-export API guards — routes import from this path
+export { apiAuthGuard, apiRequireAdmin } from '@/lib/authGuards';

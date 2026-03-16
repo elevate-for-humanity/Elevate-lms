@@ -21,7 +21,7 @@ export default function VoiceoverWithMusic({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Create audio object once on mount — never recreated
+  // Create audio object once on mount, auto-play on first scroll
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const audio = new Audio(audioSrc);
@@ -36,10 +36,38 @@ export default function VoiceoverWithMusic({
       setTimeout(() => setIsVisible(false), 300);
     };
 
+    // Show button immediately as fallback
     setShowPlayButton(true);
     setIsVisible(true);
 
+    // Auto-trigger on first scroll
+    const onScroll = () => {
+      window.removeEventListener('scroll', onScroll, true);
+      const a = audioRef.current;
+      if (!a) return;
+      a.muted = false;
+      a.volume = volume;
+      a.play()
+        .then(() => {
+          setHasPlayed(true);
+          setIsPlaying(true);
+          setShowPlayButton(false);
+          progressInterval.current = setInterval(() => {
+            if (audioRef.current) {
+              const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+              setProgress(pct);
+            }
+          }, 100);
+        })
+        .catch(() => {
+          // Browser still blocked — button stays visible for manual play
+        });
+    };
+
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true, once: true } as any);
+
     return () => {
+      window.removeEventListener('scroll', onScroll, true);
       if (progressInterval.current) clearInterval(progressInterval.current);
       audio.pause();
     };

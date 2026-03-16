@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useHeroVideo } from '@/hooks/useHeroVideo';
+import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 
 export type HeroSize = 'primary' | 'program' | 'marketing' | 'support';
 
@@ -25,32 +26,6 @@ interface PageVideoHeroProps {
 
 export default function PageVideoHero({ videoSrc, posterSrc, posterAlt, audioSrc, size = 'marketing', title, subtitle, badge }: PageVideoHeroProps) {
   const { videoRef } = useHeroVideo();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const playedRef = useRef(false);
-
-  useEffect(() => {
-    if (!audioSrc || !audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio.muted = false;
-    audio.play().catch(() => {
-      audio.muted = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio.muted = false;
-        audio.play().catch(() => {});
-        window.removeEventListener('click', unmute);
-        window.removeEventListener('touchstart', unmute);
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('keydown', unmute);
-      };
-      window.addEventListener('click', unmute, { once: true });
-      window.addEventListener('touchstart', unmute, { once: true, passive: true });
-      window.addEventListener('scroll', unmute, { capture: true, passive: true, once: true } as any);
-      window.addEventListener('keydown', unmute, { once: true });
-    });
-  }, [audioSrc]);
 
   return (
     <section className={`relative w-full ${SIZE[size]} overflow-hidden`}>
@@ -70,9 +45,7 @@ export default function PageVideoHero({ videoSrc, posterSrc, posterAlt, audioSrc
         </div>
       )}
 
-      {audioSrc && (
-        <audio ref={audioRef} src={audioSrc} preload="auto" aria-hidden="true" />
-      )}
+      {audioSrc && <VoiceoverWithMusic audioSrc={audioSrc} />}
     </section>
   );
 }

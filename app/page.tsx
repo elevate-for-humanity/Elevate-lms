@@ -5,7 +5,7 @@ import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
-import PageAudio from '@/components/PageAudio';
+import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 import { FadeInUp, StaggerChildren, StaggerItem, BlurIn } from '@/components/animations/PremiumAnimations';
 import { ArrowRight, GraduationCap, Building2, BarChart3 } from 'lucide-react';
 
@@ -476,7 +476,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <PageAudio voiceoverSrc="/videos/homepage-hero-new.mp3" />
+      <VoiceoverWithMusic audioSrc="/videos/homepage-hero-new.mp3" />
     </main>
   );
 }

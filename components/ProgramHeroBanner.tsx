@@ -1,7 +1,9 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useState } from 'react';
+
 import { useHeroVideo } from '@/hooks/useHeroVideo';
+import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -14,33 +16,7 @@ interface ProgramHeroBannerProps {
 
 export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage, title, subtitle, badge }: ProgramHeroBannerProps) {
   const { videoRef } = useHeroVideo();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const playedRef = useRef(false);
   const [videoFailed, setVideoFailed] = useState(false);
-
-  useEffect(() => {
-    if (!voiceoverSrc || !audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio.muted = false;
-    audio.play().catch(() => {
-      audio.muted = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio.muted = false;
-        audio.play().catch(() => {});
-        window.removeEventListener('click', unmute);
-        window.removeEventListener('touchstart', unmute);
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('keydown', unmute);
-      };
-      window.addEventListener('click', unmute, { once: true });
-      window.addEventListener('touchstart', unmute, { once: true, passive: true });
-      window.addEventListener('scroll', unmute, { capture: true, passive: true, once: true } as any);
-      window.addEventListener('keydown', unmute, { once: true });
-    });
-  }, [voiceoverSrc]);
 
   return (
     <div className="relative w-full h-full">
@@ -82,9 +58,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage,
         </div>
       )}
 
-      {voiceoverSrc && (
-        <audio ref={audioRef} src={voiceoverSrc} preload="auto" aria-hidden="true" />
-      )}
+      {voiceoverSrc && <VoiceoverWithMusic audioSrc={voiceoverSrc} />}
     </div>
   );
 }

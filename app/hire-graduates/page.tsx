@@ -26,13 +26,6 @@ export default async function HireGraduatesPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-
-      <PageVideoHero
-        videoSrc="/videos/employer-hero.mp4"
-        posterSrc="/images/pages/hire-graduates-page-1.jpg"
-        posterAlt="Hire Graduates — Elevate for Humanity"
-        size="marketing"
-      />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -123,7 +116,6 @@ export default async function HireGraduatesPage() {
                 </div>
               ))}
             </div>
-          </div>
         </div>
       </section>
 

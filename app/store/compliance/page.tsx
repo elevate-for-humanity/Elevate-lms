@@ -208,7 +208,6 @@ export default async function CompliancePage() {
                 View Grant Documentation
                 <ExternalLink className="w-4 h-4" />
               </Link>
-              </div>
             </div>
           </div>
         </div>

@@ -59,8 +59,7 @@ export default function PhilanthropyPage() {
                   <p className="text-slate-600 text-sm leading-relaxed">{area.desc}</p>
                 </div>
               </div>
-            ));
-            })}
+            ))}
           </div>
         </div>
       </section>

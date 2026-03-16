@@ -24,8 +24,9 @@ FILES_WITH_SEARCH_PARAMS=$(grep -rl "useSearchParams" --include="page.tsx" app/ 
 
 for file in $FILES_WITH_SEARCH_PARAMS; do
   # Check if file has Suspense import AND wraps the component
-  HAS_SUSPENSE_IMPORT=$(grep -c "Suspense" "$file" 2>/dev/null || echo "0")
-  
+  HAS_SUSPENSE_IMPORT=$(grep -c "Suspense" "$file" 2>/dev/null || true)
+  HAS_SUSPENSE_IMPORT=$(( ${HAS_SUSPENSE_IMPORT:-0} + 0 ))
+
   if [ "$HAS_SUSPENSE_IMPORT" -lt 2 ]; then
     echo -e "${RED}❌ FAIL:${NC} $file"
     echo "   Uses useSearchParams() but missing Suspense boundary"

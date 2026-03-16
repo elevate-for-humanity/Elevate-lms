@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const PROJECT_MANAGEMENT: ProgramSchema = {
   slug: 'project-management', title: 'Project Management',
-  subtitle: 'Earn Certiport Project Management certification. Agile, Scrum, and traditional PM methodologies in 6 weeks.',
+  subtitle: 'Prepare for Certiport Project Management certification. Agile, Scrum, and traditional PM methodologies in 6 weeks.',
   sector: 'business', category: 'Project Management',
   heroImage: '/images/pages/project-management.jpg', heroImageAlt: 'Project manager leading a team meeting',
   deliveryMode: 'hybrid', durationWeeks: 6, hoursPerWeekMin: 15, hoursPerWeekMax: 20,
@@ -67,5 +67,5 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Project Management' }],
   metaTitle: 'Project Management | Certiport Certified | Indianapolis',
-  metaDescription: 'Earn project management certification in 6 weeks. Agile, Scrum, and traditional PM. Project managers earn $95,370/year. WIOA funding available.',
+  metaDescription: 'Prepare for project management certification in 6 weeks. Agile, Scrum, and traditional PM. Project managers earn $95,370/year. WIOA funding available.',
 };

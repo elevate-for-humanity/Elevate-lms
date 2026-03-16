@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const PEER_RECOVERY: ProgramSchema = {
   slug: 'peer-recovery-specialist',
   title: 'Peer Recovery Specialist',
-  subtitle: 'Earn Indiana Certified Peer Recovery Specialist (CPRS) credentials. 46-hour training for individuals with lived recovery experience.',
+  subtitle: 'Prepare for the Indiana Certified Peer Recovery Specialist (CPRS) exam. 46-hour training for individuals with lived recovery experience.',
   sector: 'healthcare',
   category: 'Behavioral Health',
   heroImage: '/images/pages/peer-recovery.jpg',
@@ -20,8 +20,8 @@ export const PEER_RECOVERY: ProgramSchema = {
   badge: 'Funding Available',
   badgeColor: 'green',
   credentials: [
-    { name: 'Indiana Certified Peer Recovery Specialist (CPRS)', issuer: 'Indiana Counselors Association on Alcohol and Drug Abuse (ICAADA)', description: 'State-recognized credential for peer recovery support services.', validity: '2 years (renewable with CE)' },
-    { name: 'CPR/AED/First Aid', issuer: 'American Heart Association', description: 'Emergency response certification.', validity: '2 years' },
+    { name: 'Indiana Certified Peer Recovery Specialist (CPRS)', issuer: 'Indiana Counselors Association on Alcohol and Drug Abuse (ICAADA)', description: 'State-recognized credential issued by ICAADA after passing the CPRS exam. Elevate training prepares you to apply and sit for this exam.', validity: '2 years (renewable with CE)' },
+    { name: 'CPR/AED/First Aid', issuer: 'CareerSafe / American Heart Association', description: 'Emergency response certification completed during training. Issued by the certifying provider upon passing.', validity: '2 years' },
     { name: 'Naloxone Administration', issuer: 'Indiana State Department of Health', description: 'Training to administer naloxone for opioid overdose reversal.', validity: 'No expiration' },
   ],
   outcomes: [
@@ -66,18 +66,18 @@ export const PEER_RECOVERY: ProgramSchema = {
   ],
   cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/peer-recovery-specialist' },
   admissionRequirements: ['18 years or older', 'Lived experience with recovery (self or family)', 'High school diploma or GED', 'Background check required'],
-  equipmentIncluded: 'All training materials, naloxone kit, and CPRS application fee included',
+  equipmentIncluded: 'All training materials, naloxone kit, and CPRS exam fee included upon successful program completion',
   modality: 'Hybrid — In-person group sessions, LMS-supported coursework',
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['Community mental health centers', 'Recovery housing organizations', 'Hospital behavioral health departments'],
-  pricingIncludes: ['46 instructional hours', 'CPRS application fee', 'Naloxone training and kit', 'CPR/First Aid certification', 'Career placement support'],
+  pricingIncludes: ['46 instructional hours', 'CPRS exam fee (paid by Elevate upon completion)', 'Naloxone training and kit', 'CPR/First Aid certification', 'Career placement support'],
   paymentTerms: 'WIOA and grant funding accepted. Self-pay: $1,200.',
   faqs: [
     { question: 'Do I need to be in recovery?', answer: 'Yes. Indiana CPRS requires lived experience with recovery — either personal or as a family member of someone in recovery.' },
-    { question: 'How long does certification take?', answer: 'The 46-hour training takes 4 weeks. After completing training, you apply to ICAADA for the CPRS credential.' },
+    { question: 'How does certification work?', answer: 'The 46-hour training takes 4 weeks. After completing training, Elevate provides your completion documentation. You then apply to ICAADA for exam eligibility. Once approved, you sit for the CPRS exam — Elevate covers the exam fee. ICAADA issues the credential after you pass.' },
     { question: 'Where do peer recovery specialists work?', answer: 'Community mental health centers, hospitals, recovery housing, courts, and community organizations.' },
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Peer Recovery Specialist' }],
-  metaTitle: 'Peer Recovery Specialist | Indiana CPRS Certified | Indianapolis',
-  metaDescription: 'Earn Indiana Certified Peer Recovery Specialist (CPRS) credentials in 4 weeks. 18% job growth. WIOA funding available. Indianapolis.',
+  metaTitle: 'Peer Recovery Specialist Training | CPRS Exam Prep | Indianapolis',
+  metaDescription: 'Prepare for the Indiana CPRS exam in 4 weeks. Exam fee covered upon completion. 18% job growth. WIOA funding available. Indianapolis.',
 };

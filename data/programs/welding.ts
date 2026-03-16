@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const WELDING: ProgramSchema = {
   slug: 'welding',
   title: 'Welding Technology',
-  subtitle: 'Learn MIG, TIG, and stick welding. Earn AWS certifications and enter the skilled trades workforce in 10 weeks.',
+  subtitle: 'Learn MIG, TIG, and stick welding. Prepare for AWS certifications and enter the skilled trades workforce in 10 weeks.',
   sector: 'skilled-trades',
   category: 'Welding & Fabrication',
 
@@ -111,5 +111,5 @@ export const WELDING: ProgramSchema = {
 
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Welding Technology' }],
   metaTitle: 'Welding Technology | AWS Certified | Indianapolis',
-  metaDescription: 'Learn MIG, TIG, and stick welding. Earn AWS D1.1 certification in 10 weeks. Welders earn $47,540/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Learn MIG, TIG, and stick welding. Prepare for AWS D1.1 certification in 10 weeks. Welders earn $47,540/year. WIOA funding available. Indianapolis.',
 };

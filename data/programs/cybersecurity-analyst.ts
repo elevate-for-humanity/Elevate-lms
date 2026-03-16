@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const CYBERSECURITY_ANALYST: ProgramSchema = {
   slug: 'cybersecurity-analyst',
   title: 'Cybersecurity Analyst',
-  subtitle: 'Protect networks and data from cyber threats. Earn CompTIA Security+ in 12 weeks.',
+  subtitle: 'Protect networks and data from cyber threats. Prepare for CompTIA Security+ in 12 weeks.',
   sector: 'technology',
   category: 'Cybersecurity',
 
@@ -216,5 +216,5 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   ],
 
   metaTitle: 'Cybersecurity Analyst | CompTIA Security+ | Indianapolis',
-  metaDescription: 'Earn CompTIA Security+ and Network+ certifications. 12-week program. Cybersecurity analysts earn $112,000/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
+  metaDescription: 'Prepare for CompTIA Security+ and Network+ certifications. 12-week program. Cybersecurity analysts earn $112,000/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

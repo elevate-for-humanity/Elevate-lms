@@ -8,7 +8,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const PHLEBOTOMY: ProgramSchema = {
   slug: 'phlebotomy',
   title: 'Phlebotomy Technician',
-  subtitle: 'Complete 120 hours of classroom and clinical training in 4 weeks. Earn the NHA Certified Phlebotomy Technician (CPT) credential and enter healthcare within a month.',
+  subtitle: 'Complete 120 hours of classroom and clinical training in 4 weeks. Prepare for the NHA Certified Phlebotomy Technician (CPT) exam and enter healthcare within a month.',
   sector: 'healthcare',
   category: 'Healthcare',
 
@@ -172,7 +172,7 @@ export const PHLEBOTOMY: ProgramSchema = {
   },
 
   metaTitle: 'Phlebotomy Training | NHA CPT Certification | Indianapolis Indiana',
-  metaDescription: '4-week phlebotomy program in Indianapolis. Earn the NHA Certified Phlebotomy Technician (CPT) credential. 120 hours, self-pay $1,500 with flexible payment plans.',
+  metaDescription: '4-week phlebotomy program in Indianapolis. Prepare for the NHA Certified Phlebotomy Technician (CPT) exam. 120 hours, self-pay $1,500 with flexible payment plans.',
 
   enrollmentTracks: {
     funded: {

@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const BOOKKEEPING: ProgramSchema = {
   slug: 'bookkeeping',
   title: 'Bookkeeping & QuickBooks',
-  subtitle: 'Master small business accounting and earn the QuickBooks Certified User credential in 5 weeks.',
+  subtitle: 'Master small business accounting and prepare for the QuickBooks Certified User exam in 5 weeks.',
   sector: 'business',
   category: 'Accounting & Finance',
 
@@ -189,5 +189,5 @@ export const BOOKKEEPING: ProgramSchema = {
   ],
 
   metaTitle: 'Bookkeeping & QuickBooks | Certified User | Indianapolis',
-  metaDescription: 'Earn QuickBooks Certified User credential. 5-week program. Bookkeepers earn $45,860/year in Indiana. Payment plans available.',
+  metaDescription: 'Prepare for the QuickBooks Certified User exam. 5-week program. Bookkeepers earn $45,860/year in Indiana. Payment plans available.',
 };

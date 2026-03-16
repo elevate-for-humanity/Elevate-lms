@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const BUSINESS_ADMIN: ProgramSchema = {
   slug: 'business', title: 'Business Administration',
-  subtitle: 'Earn Certiport business certifications. Microsoft Office, QuickBooks, and business fundamentals in 8 weeks.',
+  subtitle: 'Prepare for Certiport business certifications. Microsoft Office, QuickBooks, and business fundamentals in 8 weeks.',
   sector: 'business', category: 'Business Administration',
   heroImage: '/images/pages/admin-business-hero.jpg', heroImageAlt: 'Business administration student working on a computer',
   deliveryMode: 'hybrid', durationWeeks: 8, hoursPerWeekMin: 15, hoursPerWeekMax: 20,
@@ -73,5 +73,5 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Business Administration' }],
   metaTitle: 'Business Administration | Certiport Certified | Indianapolis',
-  metaDescription: 'Earn Microsoft Office, QuickBooks, and ESB certifications in 8 weeks. Indianapolis. WIOA funding available for eligible Indiana residents.',
+  metaDescription: 'Prepare for Microsoft Office, QuickBooks, and ESB certifications in 8 weeks. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

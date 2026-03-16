@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const CAD_DRAFTING: ProgramSchema = {
   slug: 'cad-drafting', title: 'CAD/Drafting Technician',
-  subtitle: 'Learn AutoCAD and Revit for architectural and mechanical drafting. Earn Autodesk Certified User credentials in 10 weeks.',
+  subtitle: 'Learn AutoCAD and Revit for architectural and mechanical drafting. Prepare for Autodesk Certified User credentials in 10 weeks.',
   sector: 'technology', category: 'Design & Drafting',
   heroImage: '/images/pages/cad-drafting.jpg', heroImageAlt: 'CAD drafting student working on technical drawings',
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
@@ -70,5 +70,5 @@ export const CAD_DRAFTING: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'CAD/Drafting Technician' }],
   metaTitle: 'CAD/Drafting Technician | Autodesk Certified | Indianapolis',
-  metaDescription: 'Learn AutoCAD and Revit in 10 weeks. Earn Autodesk certifications. CAD drafters earn $60,290/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
+  metaDescription: 'Learn AutoCAD and Revit in 10 weeks. Prepare for Autodesk certifications. CAD drafters earn $60,290/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

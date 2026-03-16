@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const SANITATION: ProgramSchema = {
   slug: 'sanitation-infection-control',
   title: 'Sanitation & Infection Control',
-  subtitle: 'Earn infection control and sanitation certifications for healthcare, food service, and personal services industries in 2 weeks.',
+  subtitle: 'Prepare for infection control and ServSafe certifications for healthcare, food service, and personal services industries in 2 weeks.',
   sector: 'healthcare',
   category: 'Infection Control',
   heroImage: '/images/pages/sanitation.jpg',
@@ -73,5 +73,5 @@ export const SANITATION: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Sanitation & Infection Control' }],
   metaTitle: 'Sanitation & Infection Control Certification | Indianapolis',
-  metaDescription: 'Earn infection control and ServSafe certifications in 2 weeks. Required for healthcare, food service, and personal services. Indianapolis.',
+  metaDescription: 'Prepare for infection control and ServSafe certifications in 2 weeks. Required for healthcare, food service, and personal services. Indianapolis.',
 };

@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const GRAPHIC_DESIGN: ProgramSchema = {
   slug: 'graphic-design', title: 'Graphic Design',
-  subtitle: 'Learn Adobe Photoshop, Illustrator, and InDesign. Earn Adobe Certified Professional credentials in 10 weeks.',
+  subtitle: 'Learn Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional credentials in 10 weeks.',
   sector: 'technology', category: 'Graphic Design',
   heroImage: '/images/pages/graphic-design.jpg', heroImageAlt: 'Graphic design student working in Adobe Creative Suite',
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
@@ -68,5 +68,5 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Graphic Design' }],
   metaTitle: 'Graphic Design | Adobe Certified Professional | Indianapolis',
-  metaDescription: 'Learn Photoshop, Illustrator, and InDesign in 10 weeks. Earn 3 Adobe certifications. Designers earn $57,990/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
+  metaDescription: 'Learn Photoshop, Illustrator, and InDesign in 10 weeks. Prepare for 3 Adobe certifications. Designers earn $57,990/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
 };

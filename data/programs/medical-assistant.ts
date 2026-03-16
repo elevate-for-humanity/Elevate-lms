@@ -107,5 +107,5 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Medical Assistant' }],
   metaTitle: 'Medical Assistant Program | CCMA Certified | Indianapolis',
-  metaDescription: 'Earn CCMA, phlebotomy, and EKG certifications in 12 weeks. Medical assistants earn $38,270/year. 14% job growth. WIOA funding available. Indianapolis.',
+  metaDescription: 'Prepare for CCMA, phlebotomy, and EKG certifications in 12 weeks. Medical assistants earn $38,270/year. 14% job growth. WIOA funding available. Indianapolis.',
 };

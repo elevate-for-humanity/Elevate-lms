@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const OFFICE_ADMINISTRATION: ProgramSchema = {
   slug: 'office-administration',
   title: 'Office Administration',
-  subtitle: 'Master Microsoft Office and business communication. Earn Microsoft Office Specialist certifications in 6 weeks.',
+  subtitle: 'Master Microsoft Office and business communication. Prepare for Microsoft Office Specialist certifications in 6 weeks.',
   sector: 'business',
   category: 'Business Administration',
 
@@ -202,5 +202,5 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
   ],
 
   metaTitle: 'Office Administration | Microsoft Office Specialist | Indianapolis',
-  metaDescription: 'Earn Microsoft Office Specialist certifications in Word, Excel, and Outlook. 6-week program. WIOA funding available. Indianapolis.',
+  metaDescription: 'Prepare for Microsoft Office Specialist certifications in Word, Excel, and Outlook. 6-week program. WIOA funding available. Indianapolis.',
 };

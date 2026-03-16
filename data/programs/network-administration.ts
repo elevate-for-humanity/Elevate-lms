@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const NETWORK_ADMIN: ProgramSchema = {
   slug: 'network-administration', title: 'Network Administration',
-  subtitle: 'Earn CompTIA Network+ certification. Network design, configuration, and troubleshooting in 10 weeks.',
+  subtitle: 'Prepare for CompTIA Network+ certification. Network design, configuration, and troubleshooting in 10 weeks.',
   sector: 'technology', category: 'Networking',
   heroImage: '/images/pages/network-administration.jpg', heroImageAlt: 'Network administration student configuring network equipment',
   videoSrc: '/videos/it-technology.mp4',
@@ -73,5 +73,5 @@ export const NETWORK_ADMIN: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Network Administration' }],
   metaTitle: 'Network Administration | CompTIA Network+ | Indianapolis',
-  metaDescription: 'Earn CompTIA Network+ certification in 10 weeks. Network admins earn $90,520/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Prepare for CompTIA Network+ certification in 10 weeks. Network admins earn $90,520/year. WIOA funding available. Indianapolis.',
 };

@@ -3,7 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const IT_HELP_DESK: ProgramSchema = {
   slug: 'it-help-desk',
   title: 'IT Help Desk Technician',
-  subtitle: 'Troubleshoot hardware, software, and networks. Earn CompTIA A+ in 8 weeks and launch your IT career.',
+  subtitle: 'Troubleshoot hardware, software, and networks. Prepare for CompTIA A+ in 8 weeks and launch your IT career.',
   sector: 'technology',
   category: 'Information Technology',
 
@@ -206,5 +206,5 @@ export const IT_HELP_DESK: ProgramSchema = {
   ],
 
   metaTitle: 'IT Help Desk Technician | CompTIA A+ | Indianapolis',
-  metaDescription: 'Earn CompTIA A+ and IT Specialist certifications. 8-week program. Help desk technicians earn $55,510/year in Indiana. WIOA funding available.',
+  metaDescription: 'Prepare for CompTIA A+ and IT Specialist certifications. 8-week program. Help desk technicians earn $55,510/year in Indiana. WIOA funding available.',
 };

@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const NETWORK_SUPPORT: ProgramSchema = {
   slug: 'network-support-technician', title: 'Network Support Technician',
-  subtitle: 'Earn IT Specialist certification in networking. Entry-level network support and help desk skills in 6 weeks.',
+  subtitle: 'Prepare for IT Specialist certification in networking. Entry-level network support and help desk skills in 6 weeks.',
   sector: 'technology', category: 'IT Support',
   heroImage: '/images/pages/networking-hero.jpg', heroImageAlt: 'Network support technician troubleshooting a connection',
   deliveryMode: 'hybrid', durationWeeks: 6, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
@@ -66,5 +66,5 @@ export const NETWORK_SUPPORT: ProgramSchema = {
   ],
   breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Programs', href: '/programs' }, { label: 'Network Support Technician' }],
   metaTitle: 'Network Support Technician | IT Specialist Certified | Indianapolis',
-  metaDescription: 'Earn IT Specialist networking certification in 6 weeks. Network support techs earn $57,910/year. WIOA funding available. Indianapolis.',
+  metaDescription: 'Prepare for IT Specialist networking certification in 6 weeks. Network support techs earn $57,910/year. WIOA funding available. Indianapolis.',
 };

@@ -179,7 +179,7 @@ export default function EmployersPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                image: '/images/pages/employers-page-1.jpg',
+                image: '/images/pages/training-cohort.jpg',
                 alt: 'Pre-trained and pre-screened workforce candidates',
                 title: 'Pre-Trained, Pre-Screened Candidates',
                 desc: 'Every candidate we refer has completed a training program, earned at least one industry credential, and been assessed for job readiness. You are not getting random resumes — you are getting people who have already invested in their career.',

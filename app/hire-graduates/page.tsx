@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Award, Briefcase } from 'lucide-react';
+
 import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const dynamic = 'force-dynamic';
@@ -97,11 +97,10 @@ export default async function HireGraduatesPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/hire-graduates-page-1.jpg"
-                  alt="Hire Graduates"
+                  src="/images/pages/employers-page-1.jpg"
+                  alt="Certified graduates ready for employment"
                   fill
                   className="object-cover"
-                  quality={100}
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
@@ -109,21 +108,21 @@ export default async function HireGraduatesPage() {
 
             {/* Feature Cards */}
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <BookOpen className="w-8 h-8 text-brand-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-3">Learn</h3>
-                <p className="text-black">Access quality training programs</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <Award className="w-8 h-8 text-brand-green-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-3">Certify</h3>
-                <p className="text-black">Earn industry certifications</p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <Briefcase className="w-8 h-8 text-brand-blue-600 mb-4" />
-                <h3 className="text-lg font-semibold mb-3">Work</h3>
-                <p className="text-black">Get hired in your field</p>
-              </div>
+              {[
+                { image: '/images/pages/training-classroom.jpg', alt: 'Students in workforce training programs', title: 'Learn', desc: 'Short-term, industry-aligned training programs with hands-on instruction.' },
+                { image: '/images/pages/credentials-page-1.jpg', alt: 'Industry certifications earned by graduates', title: 'Certify', desc: 'Graduates earn nationally recognized credentials before day one on the job.' },
+                { image: '/images/pages/about-employer-partners.jpg', alt: 'Graduates placed with employer partners', title: 'Work', desc: 'We connect certified graduates directly with employers hiring in their field.' },
+              ].map((card) => (
+                <div key={card.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                    <Image src={card.image} alt={card.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">{card.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{card.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

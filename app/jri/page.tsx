@@ -40,7 +40,7 @@ export default function JRIPage() {
     { 
       title: 'Fully Funded Training', 
       description: 'Tuition, books, supplies, uniforms, and certification exams covered for eligible participants.',
-      image: '/images/pages/jri-page-1.jpg',
+      image: '/images/pages/funding-page-1.jpg',
       alt: 'Funded workforce training program',
     },
     { 

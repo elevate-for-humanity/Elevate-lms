@@ -20,8 +20,7 @@ const PROGRAMS = [
   {
     title: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/pages/workforce-training.jpg',
-    icon: '/images/pages/workforce-training.jpg',
+    image: '/images/pages/cna-patient-care.jpg',
     desc: 'CNA, Medical Assistant, Phlebotomy, and more. Hands-on clinical training for in-demand healthcare careers.',
     tags: ['CNA', 'Medical Assistant', 'Phlebotomy', 'CPR & First Aid'],
   },
@@ -29,50 +28,45 @@ const PROGRAMS = [
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
     image: '/images/pages/hvac-technician.jpg',
-    icon: '/images/pages/hvac-technician.jpg',
     desc: 'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
     tags: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
   },
   {
     title: 'Technology',
     href: '/programs/technology',
-    image: '/images/pages/workforce-training.jpg',
-    icon: '/images/pages/workforce-training.jpg',
+    image: '/images/pages/cybersecurity.jpg',
     desc: 'Cybersecurity, IT Support, Software Development, and Networking. Launch a career in tech.',
     tags: ['Cybersecurity', 'IT Help Desk', 'Software Dev'],
   },
   {
     title: 'CDL & Transportation',
     href: '/programs/cdl-training',
-    image: '/images/pages/hvac-technician.jpg',
-    icon: '/images/pages/hvac-technician.jpg',
+    image: '/images/pages/cdl-truck-highway.jpg',
     desc: 'Commercial Driving License training with job placement. Class A and Class B CDL programs.',
     tags: ['CDL Class A', 'CDL Class B', 'Diesel Mechanic'],
   },
   {
     title: 'Beauty & Barbering',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/workforce-training.jpg',
-    icon: '/images/pages/workforce-training.jpg',
+    image: '/images/pages/barber-apprenticeship.jpg',
     desc: 'Barber apprenticeships and cosmetology training. Learn from licensed professionals in real shop settings.',
     tags: ['Barber Apprenticeship', 'Cosmetology', 'Nail Tech'],
   },
   {
     title: 'Business & Finance',
     href: '/programs/business',
-    image: '/images/pages/workforce-training.jpg',
-    icon: '/images/pages/workforce-training.jpg',
+    image: '/images/pages/tax-preparation.jpg',
     desc: 'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship programs.',
     tags: ['Bookkeeping', 'Tax Prep', 'Entrepreneurship'],
   },
 ];
 
 const LOCATIONS = [
-  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/workforce-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
-  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/workforce-training.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
-  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/hvac-technician.jpg', desc: 'Career training aligned with Ohio industry demand.' },
-  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/hvac-technician.jpg', desc: 'Expanding workforce development across Tennessee.' },
-  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/workforce-training.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
+  { state: 'Indiana', href: '/career-training-indiana', cities: ['Indianapolis', 'Fort Wayne', 'Evansville'], image: '/images/pages/about-career-training.jpg', desc: 'Main campus. WIOA-eligible programs, apprenticeships, and job placement.' },
+  { state: 'Illinois', href: '/career-training-illinois', cities: ['Chicago', 'Aurora', 'Naperville'], image: '/images/pages/training-classroom.jpg', desc: 'Workforce programs across the Chicago metro and statewide.' },
+  { state: 'Ohio', href: '/career-training-ohio', cities: ['Columbus', 'Cleveland', 'Cincinnati'], image: '/images/pages/welding-sparks.jpg', desc: 'Career training aligned with Ohio industry demand.' },
+  { state: 'Tennessee', href: '/career-training-tennessee', cities: ['Nashville', 'Memphis', 'Knoxville'], image: '/images/pages/electrical.jpg', desc: 'Expanding workforce development across Tennessee.' },
+  { state: 'Texas', href: '/career-training-texas', cities: ['Houston', 'Dallas', 'San Antonio'], image: '/images/pages/business-sector.jpg', desc: 'Trade, healthcare, and technology programs for Texas.' },
 ];
 
 const STATS = [
@@ -120,7 +114,7 @@ export default function EducationLandingPage() {
       <section className="pt-16">
         <PageVideoHero
           videoSrc="/videos/lms-learning.mp4"
-          posterSrc="/images/pages/education-hero.jpg"
+          posterSrc="/images/pages/training-cohort.jpg"
           posterAlt="Career training programs at Elevate for Humanity"
           size="marketing"
         />
@@ -170,7 +164,7 @@ export default function EducationLandingPage() {
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2.5 mb-3">
-                    <Image src={p.icon} alt={p.title} width={40} height={40} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+                    <Image src={p.image} alt={p.title} width={40} height={40} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
                     <h3 className="text-lg font-bold text-gray-900">{p.title}</h3>
                   </div>
                   <p className="text-gray-600 text-sm mb-3">{p.desc}</p>

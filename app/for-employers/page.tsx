@@ -146,7 +146,7 @@ export default async function ForEmployersPage() {
                 description: 'Most programs are 2-16 weeks. We match candidates to your openings as they complete training.',
               },
               {
-                image: '/images/pages/for-employers-page-1.jpg',
+                image: '/images/pages/admin-apprenticeships-hero.jpg',
                 alt: 'No-cost employer recruitment through workforce funding',
                 title: 'No Cost to You',
                 description: 'Training is funded through WIOA, DOL grants, and institutional funding. You pay nothing for recruitment or training.',

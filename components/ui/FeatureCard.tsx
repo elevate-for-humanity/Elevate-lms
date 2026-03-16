@@ -1,21 +1,53 @@
-import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 interface FeatureCardProps {
-  icon: React.ReactNode;
+  image: string;
+  alt: string;
   title: string;
   description: string;
+  href?: string;
+  /** 'feature' = 16:10 (platform screenshots), 'program' = 4:3 (training photos) */
+  ratio?: 'feature' | 'program';
 }
 
-export function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className="text-center p-6">
-      <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <div className="text-brand-orange-600">
-          {icon}
-        </div>
+/**
+ * Standard marketing card with a required image as the primary visual.
+ * Icons are not used as primary visuals — use small utility icons in description text only.
+ */
+export function FeatureCard({ image, alt, title, description, href, ratio = 'feature' }: FeatureCardProps) {
+  const aspectStyle = ratio === 'program'
+    ? { aspectRatio: '4/3' }
+    : { aspectRatio: '16/10' };
+
+  const inner = (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition h-full flex flex-col">
+      <div className="relative w-full overflow-hidden" style={aspectStyle}>
+        <Image
+          src={image}
+          alt={alt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        />
       </div>
-      <h3 className="text-xl font-bold text-black mb-2">{title}</h3>
-      <p className="text-black">{description}</p>
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-bold text-slate-900 text-lg mb-2">{title}</h3>
+        <p className="text-slate-600 text-sm leading-relaxed flex-1">{description}</p>
+        {href && (
+          <div className="mt-4">
+            <span className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold">
+              Learn more <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
+
+  if (href) {
+    return <Link href={href} className="block h-full">{inner}</Link>;
+  }
+  return inner;
 }

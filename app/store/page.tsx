@@ -102,10 +102,10 @@ export default function StorePage() {
           <p className="text-slate-600 text-center mb-10">Real screenshots from the platform. This is what your staff and students will use every day.</p>
           <div className="grid sm:grid-cols-2 gap-6">
             {[
-              { img: '/images/pages/demos-hero.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
-              { img: '/images/pages/demos-hero.jpg', label: 'Student View — courses, certificates, career services' },
+              { img: '/images/pages/admin-compliance-hero.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
+              { img: '/images/pages/admin-employers-hero.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
+              { img: '/images/pages/admin-funding-hero.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
+              { img: '/images/pages/admin-grants-hero.jpg', label: 'Student View — courses, certificates, career services' },
             ].map(s => (
               <div key={s.img} className="group">
                 <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-slate-200">
@@ -129,9 +129,9 @@ export default function StorePage() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5 mb-8">
             {[
-              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/pages/demos-hero.jpg' },
-              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/pages/demos-hero.jpg' },
-              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/pages/demos-hero.jpg' },
+              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/pages/admin-compliance-detail.jpg' },
+              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/pages/admin-employers-playbook-detail.jpg' },
+              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/pages/admin-partners-lms-detail.jpg' },
             ].map(d => (
               <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition">
                 <div className="relative aspect-video">

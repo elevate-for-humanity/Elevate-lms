@@ -1,72 +1,74 @@
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  BookOpen, 
-  FileText, 
-  Award, 
-  ArrowRight, 
-  Download,
-  Users,
-  TrendingUp,
-  Shield,
-  Building2,
-CheckCircle, } from 'lucide-react';
+import { ArrowRight, TrendingUp, Shield, Building2, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Guides & Resources | Elevate Store',
-  description: 'Professional guides and resources for workforce development, capital readiness, and licensing compliance. Build institutional trust and scale responsibly.',
+  description:
+    'Practical guides for workforce development organizations — capital readiness, compliance, licensing, and funding navigation.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/guides',
   },
 };
 
-const guides = [
+const GUIDES = [
   {
     id: 'capital-readiness',
     title: 'Capital Readiness Guide',
     subtitle: 'For Licensed & Workforce Organizations',
-    description: 'Build institutional trust, pass audits, and scale responsibly. A practical guide for licensed and workforce-aligned organizations seeking funding.',
+    description:
+      'Most workforce organizations lose funding opportunities not because they lack programs, but because their documentation, governance, and audit trail are not ready when a funder asks. This guide walks through exactly what auditors and grant reviewers look for — and how to have it ready before they ask.',
     href: '/store/guides/capital-readiness',
-    icon: Award,
     price: '$297',
     originalPrice: '$497',
-    image: '/images/pages/training-page-1.jpg',
     badge: 'Best Seller',
+    badgeColor: 'bg-brand-blue-600',
+    image: '/images/pages/admin-compliance-hero.jpg',
+    imageAlt: 'Compliance audit dashboard showing documentation readiness',
     features: [
-      '150+ page comprehensive guide',
+      '150+ page practical guide',
       'Audit preparation checklists',
       'Compliance documentation templates',
       'Funding source directory',
       'Case studies from funded organizations',
       'Lifetime updates included',
     ],
+    cta: 'View Details',
+    ctaHref: '/store/guides/capital-readiness',
+    secondaryCta: 'Purchase Now',
+    secondaryHref: '/store/guides/capital-readiness?buy=true',
   },
   {
     id: 'licensing',
     title: 'Platform Licensing Guide',
     subtitle: 'Understanding Your License',
-    description: 'Complete guide to understanding and managing your workforce operating system license. Covers all tiers, features, and compliance requirements.',
+    description:
+      'A clear walkthrough of how the Elevate platform license works — what each tier includes, how provisioning works, what you own versus what you access, and how billing and enforcement operate. Included with every managed license at no extra cost.',
     href: '/store/guides/licensing',
-    icon: FileText,
     price: 'Included',
     originalPrice: null,
-    image: '/images/pages/training-page-1.jpg',
     badge: 'Included with License',
+    badgeColor: 'bg-brand-green-600',
+    image: '/images/pages/admin-analytics-hero.jpg',
+    imageAlt: 'Platform analytics dashboard showing license usage and feature access',
     features: [
       'License tier comparison',
       'Feature availability matrix',
-      'Compliance requirements',
-      'Upgrade pathways',
-      'Support options',
-      'FAQ and troubleshooting',
+      'Compliance requirements by tier',
+      'Upgrade and downgrade pathways',
+      'Support options and SLA details',
+      'Billing, enforcement, and data retention policy',
     ],
+    cta: 'Download Guide',
+    ctaHref: '/store/guides/licensing',
+    secondaryCta: null,
+    secondaryHref: null,
   },
 ];
 
-const categories = [
+const CATEGORIES = [
   { name: 'Funding & Grants', count: 3, icon: TrendingUp },
   { name: 'Compliance', count: 5, icon: Shield },
   { name: 'Operations', count: 4, icon: Building2 },
@@ -74,130 +76,124 @@ const categories = [
 ];
 
 export default function GuidesPage() {
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Guides' }]} />
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
+      {/* Hero */}
+      <section className="relative h-56 md:h-72 overflow-hidden">
         <Image
           src="/images/pages/store-guides-hero.jpg"
-          alt="Guides & Resources"
+          alt="Workforce development guides and resources"
           fill
           className="object-cover"
           priority
+          sizes="100vw"
         />
-        
+        <div className="absolute inset-0 bg-slate-900/55" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-6xl mx-auto px-6 pb-8 w-full">
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Guides &amp; Resources</h1>
+            <p className="text-slate-200 text-base max-w-xl">
+              Practical documentation for workforce organizations — written from the inside, not from a consulting firm.
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* Category Pills */}
-      <section className="py-8 border-b">
+      {/* Category filter */}
+      <section className="py-6 border-b bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-medium">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-semibold">
               All Guides
             </button>
-            {categories.map((cat) => (
-              <button 
+            {CATEGORIES.map((cat) => (
+              <button
                 key={cat.name}
-                className="px-4 py-2 bg-white text-slate-700 rounded-full text-sm font-medium hover:bg-slate-200 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-full text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <cat.icon className="w-4 h-4" />
                 {cat.name}
-                <span className="text-slate-600">({cat.count})</span>
+                <span className="text-slate-400">({cat.count})</span>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Guides Grid */}
-      <section id="guides" className="py-16 lg:py-24">
+      {/* Guides */}
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Featured Guides</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Each guide is written by workforce development experts and updated regularly.
-            </p>
-          </div>
-
           <div className="space-y-12">
-            {guides.map((guide, index) => (
-              <div 
-                key={guide.id} 
-                className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+            {GUIDES.map((guide, index) => (
+              <div
+                key={guide.id}
+                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className={`grid lg:grid-cols-2 ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
-                  {/* Image Side */}
-                  <div className={`relative h-64 lg:h-auto min-h-[350px] ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
+                  {/* Image */}
+                  <div className={`relative min-h-[280px] lg:min-h-[380px] ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
                     <Image
                       src={guide.image}
-                      alt={guide.title}
+                      alt={guide.imageAlt}
                       fill
                       className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                     <div className="absolute top-4 left-4">
-                      <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${
-                        guide.price === 'Included' 
-                          ? 'bg-brand-green-500 text-white' 
-                          : 'bg-brand-blue-600 text-white'
-                      }`}>
+                      <span className={`inline-block px-3 py-1.5 rounded-full text-xs font-bold text-white ${guide.badgeColor}`}>
                         {guide.badge}
                       </span>
                     </div>
-
                   </div>
 
-                  {/* Content Side */}
-                  <div className="p-8 lg:p-10">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                        <guide.icon className="w-7 h-7 text-brand-blue-600" />
+                  {/* Content */}
+                  <div className="p-8 lg:p-10 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between mb-4">
+                        <p className="text-sm font-semibold text-brand-blue-600">{guide.subtitle}</p>
+                        <div className="text-right">
+                          <div className="text-2xl font-black text-brand-blue-600">{guide.price}</div>
+                          {guide.originalPrice && (
+                            <div className="text-sm text-slate-400 line-through">{guide.originalPrice}</div>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-brand-blue-600">{guide.price}</div>
-                        {guide.originalPrice && (
-                          <div className="text-sm text-slate-600 line-through">{guide.originalPrice}</div>
-                        )}
+
+                      <h2 className="text-2xl font-bold text-slate-900 mb-3">{guide.title}</h2>
+                      <p className="text-slate-600 leading-relaxed mb-6">{guide.description}</p>
+
+                      <div className="mb-8">
+                        <h3 className="font-semibold text-slate-900 text-sm mb-3">What&apos;s included:</h3>
+                        <ul className="grid sm:grid-cols-2 gap-2">
+                          {guide.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
+                              <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
 
-                    <p className="text-sm text-brand-blue-600 font-medium mb-1">{guide.subtitle}</p>
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">{guide.title}</h3>
-                    <p className="text-slate-600 mb-6">{guide.description}</p>
-
-                    <div className="mb-8">
-                      <h4 className="font-semibold text-slate-900 mb-3">What&apos;s Included:</h4>
-                      <ul className="grid sm:grid-cols-2 gap-2">
-                        {guide.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-2 text-sm text-slate-600">
-                            <span className="text-slate-400 flex-shrink-0">•</span>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-3">
                       <Link
-                        href={guide.href}
-                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
+                        href={guide.ctaHref}
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors text-sm"
                       >
-                        {guide.price === 'Included' ? 'Download Guide' : 'View Details'}
-                        <ArrowRight className="w-5 h-5" />
+                        {guide.cta} <ArrowRight className="w-4 h-4" />
                       </Link>
-                      {guide.price !== 'Included' && (
+                      {guide.secondaryCta && guide.secondaryHref && (
                         <Link
-                          href={`${guide.href}?buy=true`}
-                          className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+                          href={guide.secondaryHref}
+                          className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors text-sm"
                         >
-                          Purchase Now
+                          {guide.secondaryCta}
                         </Link>
                       )}
                     </div>
@@ -209,47 +205,23 @@ export default function GuidesPage() {
         </div>
       </section>
 
-      {/* Testimonial */}
-      <section className="py-16 bg-white">
+      {/* CTA */}
+      <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="mb-6">
-            <div className="flex justify-center gap-1 text-yellow-400 text-2xl mb-4">
-              ⭐⭐⭐⭐⭐
-            </div>
-            <blockquote className="text-2xl font-medium text-slate-900 mb-6">
-              &ldquo;The Capital Readiness Guide helped us secure $2.3M in workforce funding. 
-              The audit checklists alone saved us months of preparation.&rdquo;
-            </blockquote>
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                JM
-              </div>
-              <div className="text-left">
-                <div className="font-semibold text-slate-900">Jennifer Martinez</div>
-                <div className="text-sm text-slate-600">Executive Director, Workforce Solutions Inc.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Need Custom Training Materials?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
-            We develop custom guides and training materials for enterprise clients.
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Need Custom Training Materials?</h2>
+          <p className="text-brand-blue-100 mb-8">
+            We develop custom guides and compliance documentation for enterprise clients and licensing partners.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition-colors"
             >
               Contact Us
             </Link>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition-colors"
             >
               Back to Store
             </Link>

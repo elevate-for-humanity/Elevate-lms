@@ -11,8 +11,8 @@ export default function StructuredData() {
     logo: {
       '@type': 'ImageObject',
       url: 'https://www.elevateforhumanity.org/logo.png',
-      width: 250,
-      height: 250,
+      width: 341,
+      height: 512,
     },
     image: 'https://www.elevateforhumanity.org/images/pages/workforce-training.jpg',
     foundingDate: '2019',

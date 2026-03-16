@@ -67,9 +67,8 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
+      <section className="py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6">
             {/* Feature Grid */}
             <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
               <div>
@@ -129,7 +128,7 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* FAQ for Employers */}
-      <section className="py-16 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Employer FAQ</h2>
           <div className="space-y-4">
@@ -156,29 +155,27 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Hire Trained Talent?
-            </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Connect with job-ready graduates at no cost to your organization.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/contact?type=employer"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
-              >
-                Request Candidates
-              </Link>
-              <Link
-                href="/employer"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
-              >
-                Learn More
-              </Link>
-            </div>
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+            Ready to Hire Trained Talent?
+          </h2>
+          <p className="text-base md:text-lg text-slate-600 mb-8">
+            Connect with job-ready graduates at no cost to your organization.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link
+              href="/contact?type=employer"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition-colors"
+            >
+              Request Candidates
+            </Link>
+            <Link
+              href="/employer"
+              className="border border-slate-300 text-slate-700 px-8 py-4 rounded-lg font-bold hover:bg-white transition-colors"
+            >
+              Employer Portal
+            </Link>
           </div>
         </div>
       </section>

@@ -64,11 +64,12 @@ export default async function CompliancePage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Compliance Standards</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
-                <Circle className="w-8 h-8 text-brand-green-600" />
+            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
+              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <Image src="/images/pages/admin-wioa-hero.jpg" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
               <p className="text-gray-700 mb-4">
                 Workforce Innovation and Opportunity Act (WIOA) compliant data collection, reporting, and performance tracking.
               </p>
@@ -97,13 +98,15 @@ export default async function CompliancePage() {
                 View WIOA Documentation
                 <ExternalLink className="w-4 h-4" />
               </Link>
+              </div>
             </div>
 
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Lock className="w-8 h-8 text-brand-blue-600" />
+            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
+              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <Image src="/images/pages/admin-compliance-hero.jpg" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">FERPA Protection</h3>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-4">FERPA Protection</h3>
               <p className="text-gray-700 mb-4">
                 Family Educational Rights and Privacy Act (FERPA) compliant student data protection and access controls.
               </p>
@@ -132,6 +135,7 @@ export default async function CompliancePage() {
                 View FERPA Documentation
                 <ExternalLink className="w-4 h-4" />
               </Link>
+              </div>
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
@@ -167,13 +171,15 @@ export default async function CompliancePage() {
                 View WCAG Documentation
                 <ExternalLink className="w-4 h-4" />
               </Link>
+              </div>
             </div>
 
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-brand-orange-600" />
+            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
+              <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                <Image src="/images/pages/admin-grants-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>
               <p className="text-gray-700 mb-4">
                 Automated reporting for federal and state workforce grants with customizable templates.
               </p>
@@ -202,6 +208,7 @@ export default async function CompliancePage() {
                 View Grant Documentation
                 <ExternalLink className="w-4 h-4" />
               </Link>
+              </div>
             </div>
           </div>
         </div>

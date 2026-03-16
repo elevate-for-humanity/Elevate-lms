@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -33,19 +32,38 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <PageVideoHero
-        videoSrc="/videos/about-mission.mp4"
-        posterSrc="/images/pages/about-hero.jpg"
-        posterAlt="About Elevate for Humanity"
-        size="marketing"
-      />
+      {/* Hero — image with overlay text so the page has immediate context */}
+      <section className="relative h-64 md:h-96 overflow-hidden">
+        <Image
+          src="/images/pages/about-hero.jpg"
+          alt="Elevate for Humanity — workforce development in Indianapolis"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-slate-900/55" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-4xl mx-auto px-6 pb-10 w-full">
+            <p className="text-brand-red-300 font-bold text-xs uppercase tracking-widest mb-2">
+              Indianapolis, Indiana
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
+              Elevate for Humanity
+            </h1>
+            <p className="text-slate-200 text-base max-w-xl">
+              Workforce development institute providing funded career training to people facing barriers to employment.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Who We Are */}
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-6">
-            <Image src="/logo.png" alt="Elevate for Humanity" width={64} height={64} />
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Elevate for Humanity</h1>
+            <Image src="/logo.png" alt="Elevate for Humanity logo" width={64} height={64} />
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Who We Are</h2>
           </div>
           <div className="text-gray-700 space-y-4">
             <p>
@@ -72,7 +90,7 @@ export default function AboutPage() {
             <Link href="/pathways" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               See Our Career Pathways <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link href="/start" className="bg-white hover:bg-white text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
+            <Link href="/start" className="bg-white hover:bg-brand-red-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
           </div>
@@ -83,14 +101,14 @@ export default function AboutPage() {
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Our Mission</h2>
-          <p className="text-lg text-brand-red-100 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-lg text-slate-700 leading-relaxed max-w-3xl mx-auto">
             To create pathways out of poverty and into prosperity by connecting justice-involved
             individuals, low-income families, veterans, individuals with disabilities, and anyone
             facing barriers to employment with high-quality, funded career training, individualized
             employment support, and direct employer placement.
           </p>
           <div className="mt-6">
-            <Link href="/about/mission" className="inline-flex items-center text-slate-600 hover:text-white text-sm font-semibold underline underline-offset-4">
+            <Link href="/about/mission" className="inline-flex items-center text-slate-600 hover:text-brand-red-600 text-sm font-semibold underline underline-offset-4">
               Full mission statement &amp; values <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </div>
@@ -549,15 +567,15 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-12 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-brand-red-100 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+          <p className="text-lg text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Check your eligibility in about 5 minutes. If you qualify for funding,
             your entire training can be free — tuition, materials, certifications, and career services.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/start" className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition inline-flex items-center">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition inline-flex items-center">
               Check Eligibility &amp; Apply <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-bold text-lg transition border-2 border-white/30">

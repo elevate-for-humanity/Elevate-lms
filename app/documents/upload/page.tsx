@@ -127,9 +127,17 @@ export default function DocumentUploadPage() {
 
       <div className="py-8">
         <div className="max-w-3xl mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">Upload Required Documents</h1>
+          {/* Branding context */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-10 bg-brand-red-600 rounded-full flex-shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-brand-red-600 uppercase tracking-widest">Enrollment Step</p>
+              <h1 className="text-2xl font-bold text-slate-900">Upload Required Documents</h1>
+            </div>
+          </div>
           <p className="text-gray-600 mb-8">
             Upload each document below. Required items must be submitted before your enrollment can be finalized.
+            Documents are stored securely and only accessible to authorized Elevate staff.
           </p>
 
           {/* Checklist */}
@@ -210,13 +218,13 @@ export default function DocumentUploadPage() {
                   const { data: { user } } = await supabase.auth.getUser();
                   if (!user) { setError('Please log in.'); return; }
                   const { error: err } = await supabase.from('secure_identity').upsert({ user_id: user.id, ssn_last4: ssnDigits.slice(-4), updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-                  if (err) { setError('Failed to save: ' + err.message); return; }
+                  if (err) { setError('Failed to save SSN. Please try again or contact support.'); return; }
                   setSuccess('SSN saved securely.');
                   setError(null);
                   setSsnDisplay('***-**-' + ssnDigits.slice(-4));
                   setSsnSaved(true);
-                } catch (e: any) {
-                  setError('Failed to save: ' + (e?.message || 'unknown error'));
+                } catch {
+                  setError('Failed to save SSN. Please try again or contact support.');
                 }
               }}>Save</Button>
             </div>

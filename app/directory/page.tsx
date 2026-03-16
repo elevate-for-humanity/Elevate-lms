@@ -36,7 +36,7 @@ const partners = (dbRows as any[]) || [];
       </div>
 
       {/* Hero */}
-      <section className="bg-white py-14 sm:py-20">
+      <section className="bg-white py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">Partner Directory</h1>
           <p className="text-lg text-slate-600 max-w-2xl">Workforce development partners, government agencies, and community resources.</p>
@@ -44,7 +44,7 @@ const partners = (dbRows as any[]) || [];
       </section>
 
       {/* Partners */}
-      <section className="py-14 sm:py-20">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Workforce Partners</h2>
           <div className="space-y-4">
@@ -81,7 +81,7 @@ const partners = (dbRows as any[]) || [];
       </section>
 
       {/* External Resources */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">External Resources</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -96,7 +96,7 @@ const partners = (dbRows as any[]) || [];
       </section>
 
       {/* CTA */}
-      <section className="py-14 sm:py-20">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Want to Partner With Us?</h2>
           <p className="text-slate-600 mb-8">Employers, workforce agencies, and community organizations — let&apos;s connect.</p>

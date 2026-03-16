@@ -32,8 +32,13 @@ const getOfficialDomains = () => {
     .split('/')[0];
   return [
     domain,
+    // Primary domain
     'www.elevateforhumanity.org',
     'elevateforhumanity.org',
+    // Second owned domain
+    'www.elevateforhumanityeducation.com',
+    'elevateforhumanityeducation.com',
+    // Hosting / dev
     'elevate317.netlify.app',
     '.netlify.app',          // Netlify deploy previews
     '.gitpod.dev',           // Gitpod dev environments

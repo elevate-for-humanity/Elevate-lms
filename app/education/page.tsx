@@ -163,10 +163,7 @@ export default function EducationLandingPage() {
                   <Image src={p.image} alt={`${p.title} training`} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-5">
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <Image src={p.image} alt={p.title} width={40} height={40} className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
-                    <h3 className="text-lg font-bold text-gray-900">{p.title}</h3>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">{p.title}</h3>
                   <p className="text-gray-600 text-sm mb-3">{p.desc}</p>
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {p.tags.map((t) => <span key={t} className="text-xs bg-white text-slate-700 px-2 py-1 rounded-full">{t}</span>)}

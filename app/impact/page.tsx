@@ -2,12 +2,12 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { TrendingUp, Users, Award, Target, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const dynamic = 'force-dynamic';
-
-import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Impact & Outcomes | Elevate for Humanity',
@@ -18,9 +18,37 @@ export const metadata: Metadata = {
   },
 };
 
+const FUNDER_REASONS = [
+  {
+    image: '/images/pages/admin-compliance-hero.jpg',
+    alt: 'WIOA compliance dashboard showing participant tracking and reporting',
+    title: 'Aligned with Funding Requirements',
+    desc: 'Programs designed to meet WIOA, WRG, DOL, and state workforce board requirements. Built-in compliance and reporting.',
+  },
+  {
+    image: '/images/pages/healthcare-grad.jpg',
+    alt: 'Graduate receiving credential after completing workforce training',
+    title: 'Proven Outcomes',
+    desc: 'High completion rates, strong job placement, and wage gains. Real-time tracking and transparent reporting.',
+  },
+  {
+    image: '/images/pages/admin-analytics-hero.jpg',
+    alt: 'Platform analytics showing enrollment and outcome metrics',
+    title: 'Scalable Infrastructure',
+    desc: 'Technology platform that can be licensed and deployed across multiple sites, maximizing your investment.',
+  },
+  {
+    image: '/images/pages/employer-handshake.jpg',
+    alt: 'Employer and graduate meeting — sustainable workforce placement',
+    title: 'Sustainable Model',
+    desc: 'Designed for long-term sustainability through employer partnerships, licensing, and diversified funding.',
+  },
+];
+
 export default async function ImpactPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,21 +60,14 @@ export default async function ImpactPage() {
       </div>
     );
   }
-  
-  // Fetch impact metrics
-  const { data: metrics } = await db
-    .from('impact_metrics')
-    .select('*')
-    .order('category');
+
   return (
     <div className="bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Impact' }]} />
         </div>
       </div>
-
 
       <PageVideoHero
         videoSrc="/videos/graduation-success.mp4"
@@ -55,142 +76,117 @@ export default async function ImpactPage() {
         size="marketing"
       />
 
-
       {/* Why Funders Choose Elevate */}
-      <section className="w-full py-20 bg-white">
-        <div className="mx-auto w-full max-w-6xl px-6">
-          <h2 className="text-4xl font-black text-black mb-12 text-center">
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             Why Funders Choose Elevate
           </h2>
+          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+            Workforce boards, foundations, and government agencies fund Elevate because outcomes are measurable and compliance is built in.
+          </p>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
-                <Target className="w-8 h-8 text-white" />
+          <div className="grid sm:grid-cols-2 gap-8">
+            {FUNDER_REASONS.map((item) => (
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image
+                    src={item.image}
+                    alt={item.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-black mb-4">
-                Aligned with Funding Requirements
-              </h3>
-              <p className="text-black">
-                Programs designed to meet WIOA, WRG, DOL, and state workforce
-                board requirements. Built-in compliance and reporting.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
-                <TrendingUp className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-4">
-                Proven Outcomes
-              </h3>
-              <p className="text-black">
-                High completion rates, strong job placement, and wage gains.
-                Real-time tracking and transparent reporting.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-4">
-                Scalable Infrastructure
-              </h3>
-              <p className="text-black">
-                Technology platform that can be licensed and deployed across
-                multiple sites, maximizing your investment.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8">
-              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-6">
-                <Award className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-black mb-4">
-                Sustainable Model
-              </h3>
-              <p className="text-black">
-                Designed for long-term sustainability through employer
-                partnerships, licensing, and diversified funding.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Funding Opportunities */}
-      <section className="w-full py-20 bg-white">
-        <div className="mx-auto w-full max-w-6xl px-6">
-          <h2 className="text-4xl font-black text-black mb-12 text-center">
+      {/* Outcome metrics strip */}
+      <section className="py-12 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: '14+', label: 'Program Types' },
+              { value: '$0', label: 'Cost with WIOA Funding' },
+              { value: '15+', label: 'Industry Credentials' },
+              { value: '100%', label: 'Job Placement Support' },
+            ].map((m) => (
+              <div key={m.label}>
+                <div className="text-3xl font-black text-brand-red-600 mb-1">{m.value}</div>
+                <div className="text-sm text-slate-600">{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Partnership Opportunities */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             Partnership Opportunities
           </h2>
+          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+            Multiple ways to invest in workforce development with clear, measurable outcomes.
+          </p>
 
-          <div className="space-y-6 max-w-3xl mx-auto">
-            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
-              <h3 className="text-xl font-bold text-black mb-2">
-                Program Sponsorship
-              </h3>
-              <p className="text-black">
-                Fund specific training programs or cohorts. Direct impact with
-                clear outcomes.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
-              <h3 className="text-xl font-bold text-black mb-2">
-                Platform Licensing
-              </h3>
-              <p className="text-black">
-                Support deployment of the platform to additional organizations
-                and regions.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
-              <h3 className="text-xl font-bold text-black mb-2">
-                Barrier Removal Fund
-              </h3>
-              <p className="text-black">
-                Support wraparound services: transportation, childcare,
-                emergency assistance.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border-2 border-gray-200">
-              <h3 className="text-xl font-bold text-black mb-2">
-                Innovation & Expansion
-              </h3>
-              <p className="text-black">
-                Fund new program development, technology enhancements, or
-                geographic expansion.
-              </p>
-            </div>
+          <div className="space-y-4">
+            {[
+              {
+                title: 'Program Sponsorship',
+                desc: 'Fund specific training programs or cohorts. Direct impact with clear outcomes — you know exactly how many people trained and placed.',
+              },
+              {
+                title: 'Platform Licensing',
+                desc: 'Support deployment of the Elevate platform to additional workforce organizations and regions. Multiplies your investment across multiple providers.',
+              },
+              {
+                title: 'Barrier Removal Fund',
+                desc: 'Support wraparound services: transportation, childcare, emergency assistance. Keeps participants in training who would otherwise drop out.',
+              },
+              {
+                title: 'Innovation & Expansion',
+                desc: 'Fund new program development, technology enhancements, or geographic expansion into underserved communities.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="flex items-start gap-5 p-6 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                <div className="w-2 h-2 rounded-full bg-brand-red-600 mt-2 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="w-full py-20 bg-white">
-        <div className="mx-auto w-full max-w-4xl text-center px-6">
-          <h2 className="text-4xl font-black text-black mb-6">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
             Ready to Make an Impact?
           </h2>
-          <p className="text-xl text-black mb-10">
-            Let's discuss how your support can create lasting change in
-            workforce development.
+          <p className="text-slate-600 mb-8 max-w-xl mx-auto">
+            Let&apos;s discuss how your support can create lasting change in workforce development.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-5 rounded-xl font-bold text-lg transition shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-lg font-bold transition-colors"
             >
-              Contact Us
-              <ArrowRight className="w-5 h-5" />
+              Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/about"
-              className="inline-flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-black px-10 py-5 rounded-xl font-bold text-lg transition"
+              className="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-10 py-4 rounded-lg font-bold hover:bg-white transition-colors"
             >
               Learn More About Us
             </Link>

@@ -1,8 +1,9 @@
 /**
  * scripts/hydrate-prs-lessons.ts
  *
- * Seeds PRS lesson rows in curriculum_lessons using prs-indiana blueprint.
- * Slugs are the identity. Title matching is not used.
+ * Hydrates PRS curriculum_lessons rows with full instructional content.
+ * Identity: lesson_slug (never title matching).
+ * Fails loudly on any unmatched lesson.
  *
  * Usage:
  *   npx tsx scripts/hydrate-prs-lessons.ts          # dry run
@@ -11,10 +12,9 @@
 
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
-import { prsIndianaBlueprint } from '../lib/curriculum/blueprints/prs-indiana';
 
 const APPLY = process.argv.includes('--apply');
-const PROGRAM_ID = 'a7b8c9d0-e1f2-4a5b-4c5d-6e7f8a9b0c1d'; // peer-recovery-specialist-jri
+const PROGRAM_SLUG = 'peer-recovery-specialist-jri';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,134 +22,95 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-// Flatten blueprint into ordered rows
-const blueprintLessons = prsIndianaBlueprint.modules.flatMap(mod =>
-  mod.lessons.map(lesson => ({
-    moduleKey:   mod.key,
-    moduleTitle: mod.title,
-    moduleOrder: mod.order,
-    domainKey:   lesson.domainKey,
-    slug:        lesson.slug,
-    title:       lesson.title,
-    lessonOrder: lesson.order,
-  }))
-);
+type LessonPayload = {
+  lesson_slug: string;
+  script_text: string;
+  summary_text: string;
+  reflection_prompt: string;
+  key_terms: string[];
+  competency_keys: string[];
+  job_application: string;
+  watch_for: string[];
+};
 
-// Guard: fail at script load if blueprint count is wrong
-if (blueprintLessons.length !== prsIndianaBlueprint.expectedLessonCount) {
-  throw new Error(
-    `Blueprint flattened to ${blueprintLessons.length} lessons, expected ${prsIndianaBlueprint.expectedLessonCount}`
-  );
-}
+// Content imported from separate file to keep this script manageable
+import { PRS_LESSONS } from './prs-lesson-payloads';
 
 async function main() {
   console.log(`\nPRS Lesson Hydration — mode: ${APPLY ? 'APPLY' : 'DRY RUN'}`);
-  console.log(`Blueprint: ${prsIndianaBlueprint.id} v${prsIndianaBlueprint.version}`);
-  console.log(`Modules: ${prsIndianaBlueprint.expectedModuleCount}  Lessons: ${blueprintLessons.length}\n`);
+  console.log(`Lessons in seed: ${PRS_LESSONS.length}\n`);
 
-  // Load existing DB rows for this program
-  const { data: existing, error: fetchErr } = await supabase
+  if (PRS_LESSONS.length !== 39) {
+    throw new Error(`Expected 39 lessons, got ${PRS_LESSONS.length}. Complete all lessons before running.`);
+  }
+
+  const { data: prog, error: progErr } = await supabase
+    .from('programs')
+    .select('id, slug, title')
+    .eq('slug', PROGRAM_SLUG)
+    .single();
+
+  if (progErr || !prog) {
+    throw new Error(`Program "${PROGRAM_SLUG}" not found: ${progErr?.message}`);
+  }
+  console.log(`Program: ${prog.title} (${prog.id})\n`);
+
+  const { data: dbRows, error: fetchErr } = await supabase
     .from('curriculum_lessons')
-    .select('id, slug, title, module_title, competency_keys')
-    .eq('program_id', PROGRAM_ID);
+    .select('id, lesson_slug, lesson_title, competency_keys')
+    .eq('program_id', prog.id);
 
   if (fetchErr) throw new Error(`DB fetch failed: ${fetchErr.message}`);
 
-  const dbBySlug = new Map((existing ?? []).map(r => [r.slug, r]));
-  const dbByTitle = new Map((existing ?? []).map(r => [r.title?.trim().toLowerCase(), r]));
+  const dbBySlug = new Map((dbRows ?? []).map(r => [r.lesson_slug, r]));
+  console.log(`DB rows: ${dbRows?.length ?? 0}`);
 
-  console.log(`DB rows found: ${existing?.length ?? 0}`);
-  console.log(`Blueprint lessons: ${blueprintLessons.length}\n`);
-
-  const toUpdate: Array<{ id: string; slug: string; title: string; payload: object }> = [];
-  const toInsert: Array<object> = [];
+  const matched: Array<{ id: string; lesson_slug: string; payload: object }> = [];
   const unresolved: string[] = [];
 
-  for (const bp of blueprintLessons) {
-    // Match by slug first (durable identity), fall back to title for migration
-    const bySlug  = dbBySlug.get(bp.slug);
-    const byTitle = dbByTitle.get(bp.title.trim().toLowerCase());
-    const row     = bySlug ?? byTitle;
-
-    const payload = {
-      slug:         bp.slug,
-      module_title: bp.moduleTitle,
-      module_order: bp.moduleOrder,
-      lesson_order: bp.lessonOrder,
-      domain_key:   bp.domainKey,
-      program_id:   PROGRAM_ID,
-      status:       'published',
-      updated_at:   new Date().toISOString(),
-    };
-
-    if (row) {
-      toUpdate.push({ id: row.id, slug: bp.slug, title: bp.title, payload });
-    } else {
-      toInsert.push({ ...payload, title: bp.title });
+  for (const seed of PRS_LESSONS) {
+    const row = dbBySlug.get(seed.lesson_slug);
+    if (!row) {
+      unresolved.push(seed.lesson_slug);
+      continue;
     }
-  }
-
-  // Print plan
-  console.log('── UPDATE (existing rows) ──────────────────────────');
-  for (const u of toUpdate) {
-    console.log(`  ✓ [${u.slug}] ${u.title}`);
-  }
-
-  if (toInsert.length > 0) {
-    console.log('\n── INSERT (new rows) ───────────────────────────────');
-    for (const ins of toInsert as any[]) {
-      console.log(`  + [${ins.slug}] ${ins.title}`);
-    }
+    const { lesson_slug, ...rest } = seed;
+    matched.push({ id: row.id, lesson_slug, payload: { ...rest, updated_at: new Date().toISOString() } });
   }
 
   if (unresolved.length > 0) {
-    console.error('\n── UNRESOLVED (blueprint lessons with no DB match) ──');
-    for (const u of unresolved) console.error(`  ✗ ${u}`);
-    throw new Error(`${unresolved.length} blueprint lesson(s) could not be resolved. Fix before applying.`);
+    console.error('\nUNRESOLVED lesson slugs (no DB match):');
+    unresolved.forEach(s => console.error(`  ✗ ${s}`));
+    throw new Error(`${unresolved.length} lesson(s) unresolved. Fix slugs before applying.`);
   }
 
-  console.log(`\nSummary: ${toUpdate.length} update(s), ${toInsert.length} insert(s)`);
+  console.log(`\nMatched: ${matched.length} / ${PRS_LESSONS.length}`);
+  matched.forEach(m => console.log(`  ✓ ${m.lesson_slug}`));
 
   if (!APPLY) {
     console.log('\nDry run complete. Re-run with --apply to write changes.');
     return;
   }
 
-  // Apply updates
   let updated = 0;
-  let inserted = 0;
-
-  for (const u of toUpdate) {
+  for (const m of matched) {
     const { error } = await supabase
       .from('curriculum_lessons')
-      .update(u.payload)
-      .eq('id', u.id);
-    if (error) throw new Error(`Update failed for "${u.slug}": ${error.message}`);
+      .update(m.payload)
+      .eq('id', m.id);
+    if (error) throw new Error(`Update failed for "${m.lesson_slug}": ${error.message}`);
     updated++;
+    console.log(`  ✅ ${m.lesson_slug}`);
   }
 
-  if (toInsert.length > 0) {
-    const { error } = await supabase
-      .from('curriculum_lessons')
-      .insert(toInsert);
-    if (error) throw new Error(`Insert failed: ${error.message}`);
-    inserted = toInsert.length;
-  }
-
-  // Verify final count
-  const { count, error: countErr } = await supabase
+  const { count } = await supabase
     .from('curriculum_lessons')
     .select('id', { count: 'exact', head: true })
-    .eq('program_id', PROGRAM_ID);
+    .eq('program_id', prog.id)
+    .not('competency_keys', 'eq', '{}');
 
-  if (countErr) throw new Error(`Verification query failed: ${countErr.message}`);
-
-  console.log(`\n✅ Applied: ${updated} updated, ${inserted} inserted`);
-  console.log(`✅ DB now has ${count} PRS lessons`);
-
-  if (count !== prsIndianaBlueprint.expectedLessonCount) {
-    console.warn(`⚠️  Expected ${prsIndianaBlueprint.expectedLessonCount}, got ${count} — investigate duplicates`);
-  }
+  console.log(`\n✅ Updated: ${updated}`);
+  console.log(`✅ Lessons with competency_keys populated: ${count} / ${dbRows?.length ?? 0}`);
 }
 
 main().catch(err => {

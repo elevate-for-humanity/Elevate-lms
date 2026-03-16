@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, GraduationCap, Briefcase, DollarSign, Users, Monitor, Shield } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Platform Features | Elevate for Humanity',
@@ -12,40 +12,40 @@ export const metadata: Metadata = {
 
 const features = [
   {
-    icon: GraduationCap,
+    image: '/images/pages/comp-pathway-classroom.jpg',
+    alt: 'Students completing online enrollment on laptops',
     title: 'Online Enrollment',
     desc: 'Apply for programs, upload documents, and track your application status — all from your phone or computer. No office visit required.',
-    color: 'bg-brand-blue-50 text-brand-blue-600',
   },
   {
-    icon: DollarSign,
+    image: '/images/pages/admin-funding-hero.jpg',
+    alt: 'Funding verification and eligibility dashboard',
     title: 'Funding Verification',
     desc: 'Check your eligibility for WIOA, WRG, and JRI funding online. See which programs are covered before you apply.',
-    color: 'bg-brand-green-50 text-brand-green-600',
   },
   {
-    icon: Monitor,
+    image: '/images/pages/comp-pathway-healthcare.jpg',
+    alt: 'Student accessing course materials on the LMS',
     title: 'Learning Management System',
     desc: 'Access course materials, complete assignments, track progress, and earn certifications through our online LMS.',
-    color: 'bg-purple-50 text-purple-600',
   },
   {
-    icon: Briefcase,
+    image: '/images/pages/about-career-training.jpg',
+    alt: 'Career services resume and interview preparation',
     title: 'Career Services Portal',
     desc: 'Build your resume, practice interviews, search job listings, and connect with employer partners — all self-service.',
-    color: 'bg-brand-orange-50 text-brand-orange-600',
   },
   {
-    icon: Users,
+    image: '/images/pages/about-employer-partners.jpg',
+    alt: 'Employer connections and graduate hiring pipeline',
     title: 'Employer Connections',
     desc: 'Employers post jobs and browse certified graduates. Students get matched with employers hiring in their field.',
-    color: 'bg-brand-red-50 text-brand-red-600',
   },
   {
-    icon: Shield,
+    image: '/images/pages/admin-compliance-hero.jpg',
+    alt: 'Secure document portal and credential management',
     title: 'Secure Document Portal',
     desc: 'Upload IDs, transcripts, and certifications securely. Download completion certificates and credential verification letters.',
-    color: 'bg-white text-slate-600',
   },
 ];
 
@@ -67,18 +67,17 @@ export default function FeaturesPage() {
       <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => {
-              const Icon = f.icon;
-              return (
-                <div key={f.title} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${f.color}`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
+            {features.map((f) => (
+              <div key={f.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image src={f.image} alt={f.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                </div>
+                <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-2">{f.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </section>

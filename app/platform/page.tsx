@@ -1,84 +1,110 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Shield, Building2, Award, CheckCircle, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 export const metadata: Metadata = {
-  title: 'Workforce Development Hub | Elevate for Humanity',
+  title: 'Workforce Infrastructure Platform | Elevate for Humanity',
   description:
-    'Elevate operates a Workforce Development Hub that hosts training programs delivered by Elevate and approved partner institutions, connects learners to credential authorities, and provides employers and workforce agencies with a verified pipeline of credentialed talent.',
+    'Multi-tenant workforce infrastructure for training providers, workforce boards, employers, and government agencies. WIOA-aligned, DOL-compliant, audit-ready.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/platform',
   },
 };
 
-const pipelineSteps = [
-  { step: '1', label: 'Intake & Eligibility', desc: 'WIOA screening, enrollment, funding verification' },
-  { step: '2', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid programs' },
-  { step: '3', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready reports' },
-  { step: '4', label: 'Employer Placement', desc: 'Pipeline matching, partner hiring, career services' },
-  { step: '5', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention' },
-];
-
-const providerControls = [
+const capabilities = [
   {
-    icon: Building2,
-    title: 'Provider Verification',
-    desc: 'Organizations applying to deliver programs inside the hub must demonstrate legal standing, relevant experience, and capacity to serve the target population. Verification is completed before any program is listed or any learner is enrolled.',
+    image: '/images/pages/platform-page-2.jpg',
+    alt: 'Multi-tenant provider management dashboard',
+    label: 'Multi-Tenant Architecture',
+    desc: 'Each provider, employer, and agency operates in an isolated data environment. Role-based access enforced at the row level — no cross-tenant data exposure.',
   },
   {
-    icon: Award,
-    title: 'Program Approval',
-    desc: 'Each program must identify the credential authority, define the learning pathway, and meet minimum standards for curriculum, instruction, and assessment. Programs are reviewed before activation and subject to ongoing performance review.',
+    image: '/images/pages/platform-page-3.jpg',
+    alt: 'WIOA and workforce funding compliance tools',
+    label: 'Funding Compliance',
+    desc: 'WIOA Title I, Workforce Ready Grant, JRI, and DOL Registered Apprenticeship standards built into the data model. Compliance documentation maintained per program.',
   },
   {
-    icon: CheckCircle,
-    title: 'Credential Authority Validation',
-    desc: 'The platform stores credential records and verification links. Certifications are issued exclusively by their respective national or state authorities — EPA, PTCB, CompTIA, NCCER, Indiana SDOH, and others. Elevate does not issue credentials it does not legally control.',
+    image: '/images/pages/platform-page-4.jpg',
+    alt: 'Credential pathway and verification management',
+    label: 'Credential Authority Separation',
+    desc: 'Platform stores credential records and verification links. Certifications issued exclusively by their respective national or state authorities — EPA, PTCB, CompTIA, NCCER, Indiana SDOH.',
   },
   {
-    icon: Shield,
-    title: 'Workforce Funding Compliance',
-    desc: 'Programs operating on the hub must comply with applicable workforce funding requirements including WIOA Title I, Workforce Ready Grant, JRI, and DOL Registered Apprenticeship standards. Compliance documentation is maintained per program.',
+    image: '/images/pages/platform-page-5.jpg',
+    alt: 'Audit-ready reporting and analytics dashboard',
+    label: 'Audit-Ready Reporting',
+    desc: 'Attendance, FERPA, DOL/DWD, and PIRL-aligned reports. Every admin action logged. Immutable audit trail on all operations involving learner data or funding records.',
+  },
+  {
+    image: '/images/pages/platform-page-6.jpg',
+    alt: 'Employer pipeline and graduate placement tracking',
+    label: 'Employer Pipeline',
+    desc: 'Verified graduate pipeline with credential records, placement tracking, and WOTC documentation. Employers post hiring needs and access pre-screened candidates directly.',
+  },
+  {
+    image: '/images/pages/platform-page-7.jpg',
+    alt: 'Apprenticeship hours and OJT management',
+    label: 'Apprenticeship & OJT',
+    desc: 'DOL Registered Apprenticeship sponsor infrastructure. Hours logging, RTI tracking, wage progression, and employer agreement management in one system.',
   },
 ];
 
 const audiences = [
   {
+    image: '/images/pages/platform-page-8.jpg',
+    alt: 'Training provider onboarding and program management',
     title: 'Training Providers',
-    desc: 'Deliver workforce programs under the Elevate hub with built-in compliance infrastructure, credential pathway management, and employer connections.',
+    desc: 'Deliver workforce programs under the Elevate hub with built-in compliance infrastructure, credential pathway management, and employer connections. MOU-based onboarding.',
     href: '/platform/providers',
-    cta: 'Provider requirements →',
+    cta: 'Provider requirements',
   },
   {
-    title: 'Employers',
-    desc: 'Access a verified pipeline of credentialed graduates. Post hiring needs, manage apprenticeship agreements, and track workforce outcomes.',
-    href: '/employer',
-    cta: 'Employer portal →',
-  },
-  {
-    title: 'Workforce Agencies',
+    image: '/images/pages/platform-page-9.jpg',
+    alt: 'Workforce board and agency reporting tools',
+    title: 'Workforce Boards & Agencies',
     desc: 'WIOA-aligned dashboards, multi-provider outcome reporting, and state agency integration. Built for organizations that answer to funders and auditors.',
     href: '/platform/workforce-boards',
-    cta: 'Agency overview →',
+    cta: 'Agency overview',
   },
   {
-    title: 'Program Holders',
-    desc: 'MOU-based network for training providers operating under the Elevate umbrella. Shared infrastructure, separate program identity.',
-    href: '/program-holder',
-    cta: 'Program holder info →',
+    image: '/images/pages/platform-page-10.jpg',
+    alt: 'Employer hiring portal and apprenticeship management',
+    title: 'Employers',
+    desc: 'Access a verified pipeline of credentialed graduates. Manage apprenticeship agreements, track OJT hours, and document WOTC eligibility — all in one place.',
+    href: '/employer',
+    cta: 'Employer portal',
+  },
+  {
+    image: '/images/pages/platform-page-11.jpg',
+    alt: 'Platform licensing for workforce organizations',
+    title: 'License the Platform',
+    desc: 'Organizations running their own workforce programs can license the full infrastructure stack — enrollment, compliance, credentialing, reporting, and employer pipeline.',
+    href: '/store/licensing',
+    cta: 'Licensing options',
   },
 ];
 
-const governancePrinciples = [
+const complianceItems = [
   'FERPA-aware student data handling with row-level security',
-  'Role-based access: admin, staff, instructor, partner, learner',
+  'Role-based access: admin, staff, instructor, partner, learner, case manager',
   'WIOA / WRG / JRI compliance-ready reporting',
-  'Audit logs and activity tracking on all operations',
+  'Immutable audit logs on all operations',
   'Credential authority separation — platform stores records, authorities issue credentials',
   'Secure provider onboarding and MOU management',
-  'Multi-tenant architecture — provider data is isolated by default',
+  'Multi-tenant architecture — provider data isolated by default',
+  'PIRL-aligned participant records for DOL reporting',
+];
+
+const pipeline = [
+  { n: '01', label: 'Intake & Eligibility', desc: 'WIOA screening, enrollment, funding verification' },
+  { n: '02', label: 'Training Delivery', desc: 'LMS, apprenticeships, in-person, hybrid' },
+  { n: '03', label: 'Compliance & Reporting', desc: 'Attendance, FERPA, DOL/DWD audit-ready' },
+  { n: '04', label: 'Employer Placement', desc: 'Pipeline matching, partner hiring, career services' },
+  { n: '05', label: 'Outcome Tracking', desc: 'Credentials, employment, wage gains, retention' },
 ];
 
 export default function PlatformPage() {
@@ -90,160 +116,89 @@ export default function PlatformPage() {
         </div>
       </div>
 
-      {/* ─── HERO ─── */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] min-h-[320px] overflow-hidden">
-        <ProgramHeroBanner videoSrc="/videos/lms-learning.mp4" />
-        <div className="absolute inset-0 z-10 flex items-center">
-          <div className="max-w-6xl mx-auto px-6 w-full">
-            <p className="text-xs uppercase tracking-widest text-brand-red-400 font-bold mb-3">Workforce Infrastructure</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 max-w-3xl leading-tight">
-              Workforce Development Hub
-            </h1>
-            <p className="text-lg text-slate-200 max-w-2xl mb-8 leading-relaxed">
-              Elevate operates a Workforce Development Hub that hosts training programs delivered by Elevate and approved partner institutions, connects learners to credential authorities, and provides employers and workforce agencies with a verified pipeline of credentialed talent.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/platform/providers" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
-                Provider Requirements <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href="/store/licensing" className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition">
-                License the Platform
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* HERO */}
+      <section className="relative h-[55vh] sm:h-[60vh] md:h-[65vh] min-h-[360px] overflow-hidden">
+        <ProgramHeroBanner
+          videoSrc="/videos/elevate-overview-with-narration.mp4"
+          posterImage="/images/pages/platform-page-1.jpg"
+          voiceoverSrc="/audio/heroes/programs.mp3"
+        />
       </section>
 
-      {/* ─── OPERATIONAL STATEMENT ─── */}
-      <section className="py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-4">What This Platform Is</p>
-          <blockquote className="text-xl sm:text-2xl text-white font-medium leading-relaxed mb-6">
-            &ldquo;Elevate operates a Workforce Development Hub that hosts training programs delivered by Elevate and approved partner institutions, connects learners to credential authorities, and provides employers and workforce agencies with a verified pipeline of credentialed talent.&rdquo;
-          </blockquote>
-          <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
-            This is not a training website with a portal bolted on. It is shared infrastructure for multiple providers, credential authorities, employers, and workforce agencies — operating from a single coordinated system.
+      {/* POSITIONING STATEMENT */}
+      <section className="py-16 bg-white border-b">
+        <div className="max-w-4xl mx-auto px-6">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-4">What This Is</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
+            Workforce infrastructure for providers, agencies, and employers — not a course platform.
+          </h1>
+          <p className="text-slate-600 text-lg leading-relaxed mb-4 max-w-3xl">
+            Elevate operates a multi-tenant Workforce Development Hub. Training providers deliver programs under the hub. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.
           </p>
-        </div>
-      </section>
-
-      {/* ─── THREE LAYERS ─── */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">System Architecture</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Three integrated layers</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-sm leading-relaxed">
-              Each layer has a distinct function. Together they form a complete workforce pipeline from first contact to verified employment outcome.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                number: '01',
-                label: 'Training Institute',
-                color: 'red',
-                heading: 'Programs delivered by Elevate and approved partners',
-                body: 'Short-term career training in healthcare, skilled trades, CDL, barbering, and technology. Programs run 4–16 weeks. Partner providers operate under approved program agreements with defined curriculum, credential pathways, and compliance requirements.',
-                link: '/programs',
-                linkText: 'See programs →',
-              },
-              {
-                number: '02',
-                label: 'Credential Infrastructure',
-                color: 'blue',
-                heading: 'Pathway management and verification records',
-                body: 'The platform manages exam preparation, progress tracking, and credential verification records. Certifications are issued by their respective national authorities. Elevate coordinates the learning pipeline and testing logistics — it does not issue credentials it does not legally control.',
-                link: '/credentials',
-                linkText: 'View credentials →',
-              },
-              {
-                number: '03',
-                label: 'Workforce Network',
-                color: 'green',
-                heading: 'Employers, agencies, and partners connected',
-                body: 'Employers post hiring needs and access verified graduates. Workforce agencies track outcomes and run compliance reports. Partner providers manage cohorts. All roles operate from the same platform with isolated data and role-based access.',
-                link: '/partners',
-                linkText: 'Network overview →',
-              },
-            ].map((layer) => (
-              <div
-                key={layer.number}
-                className={`rounded-2xl border-2 p-6 flex flex-col ${
-                  layer.color === 'red'
-                    ? 'border-brand-red-200 bg-brand-red-50'
-                    : layer.color === 'blue'
-                    ? 'border-brand-blue-200 bg-brand-blue-50'
-                    : 'border-brand-green-200 bg-brand-green-50'
-                }`}
-              >
-                <div className={`text-4xl font-black mb-3 ${layer.color === 'red' ? 'text-brand-red-200' : layer.color === 'blue' ? 'text-brand-blue-200' : 'text-brand-green-200'}`}>{layer.number}</div>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${layer.color === 'red' ? 'text-brand-red-600' : layer.color === 'blue' ? 'text-brand-blue-600' : 'text-brand-green-600'}`}>{layer.label}</p>
-                <h3 className="text-base font-bold text-slate-900 mb-3">{layer.heading}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed flex-1">{layer.body}</p>
-                <Link href={layer.link} className={`mt-4 text-sm font-semibold ${layer.color === 'red' ? 'text-brand-red-600 hover:text-brand-red-700' : layer.color === 'blue' ? 'text-brand-blue-600 hover:text-brand-blue-700' : 'text-brand-green-600 hover:text-brand-green-700'}`}>{layer.linkText}</Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── PROVIDER GOVERNANCE ─── */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Provider Governance</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Four operational controls for every provider</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-sm leading-relaxed">
-              Any organization delivering programs inside the hub must meet these requirements before activation. These controls protect learners, credential authorities, and workforce funders.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {providerControls.map((control) => (
-              <div key={control.title} className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <control.icon className="w-5 h-5 text-brand-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 mb-2">{control.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{control.desc}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/platform/providers" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
-              Full provider requirements and application <ArrowRight className="w-4 h-4" />
+          <p className="text-slate-500 text-base leading-relaxed max-w-3xl">
+            If you are a workforce board, training provider, government agency, or employer looking for infrastructure built for WIOA, DOL, and state funding compliance — this is what you are looking at.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
+              Schedule a Demo <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/store/licensing" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition text-sm">
+              Licensing Options
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─── PIPELINE ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      {/* CAPABILITIES */}
+      <section className="py-16 sm:py-20 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="mb-12">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Platform Capabilities</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Built for funders, auditors, and regulators</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {capabilities.map((cap) => (
+              <div key={cap.label} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image
+                    src={cap.image}
+                    alt={cap.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 mb-2">{cap.label}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{cap.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PIPELINE */}
+      <section className="py-16 sm:py-20 bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">End-to-End Pipeline</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Every stage in one system</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-sm leading-relaxed">
+            <p className="text-slate-600 text-sm max-w-2xl leading-relaxed">
               From first contact to verified employment outcome — no handoffs to disconnected tools.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-            {pipelineSteps.map((s, i) => (
-              <div key={s.step} className="relative">
+            {pipeline.map((s, i) => (
+              <div key={s.n} className="relative">
                 <div className="bg-white rounded-xl border border-slate-200 p-5 h-full">
-                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-white font-bold text-sm mb-3">
-                    {s.step}
-                  </div>
+                  <div className="text-3xl font-black text-slate-100 mb-3 leading-none">{s.n}</div>
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{s.label}</h3>
-                  <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{s.desc}</p>
                 </div>
-                {i < pipelineSteps.length - 1 && (
-                  <div className="hidden sm:flex absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
-                    <ArrowRight className="w-5 h-5 text-brand-red-400" />
+                {i < pipeline.length - 1 && (
+                  <div className="hidden sm:flex absolute top-1/2 -right-3 -translate-y-1/2 z-10">
+                    <ArrowRight className="w-5 h-5 text-slate-300" />
                   </div>
                 )}
               </div>
@@ -252,73 +207,96 @@ export default function PlatformPage() {
         </div>
       </section>
 
-      {/* ─── WHO IT SERVES ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      {/* WHO IT SERVES */}
+      <section className="py-16 sm:py-20 bg-white border-b">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Who It Serves</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Different roles, one connected system</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Find your path into the platform</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {audiences.map((a) => (
-              <div key={a.title} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col">
-                <h3 className="font-bold text-slate-900 mb-2">{a.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">{a.desc}</p>
-                <Link href={a.href} className="text-brand-red-600 hover:text-brand-red-700 text-sm font-semibold">
-                  {a.cta}
-                </Link>
+              <div key={a.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
+                <div className="relative w-full" style={{ aspectRatio: '4/3' }}>
+                  <Image
+                    src={a.image}
+                    alt={a.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-slate-900 mb-2">{a.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed flex-1 mb-4">{a.desc}</p>
+                  <Link href={a.href} className="inline-flex items-center gap-1 text-brand-red-600 hover:text-brand-red-700 text-sm font-semibold">
+                    {a.cta} <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── GOVERNANCE & SECURITY ─── */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Governance & Security</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Built for funders, auditors, and regulators</h2>
-            <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">
-              The platform is designed for organizations that operate under workforce funding agreements and must demonstrate compliance to state and federal agencies.
-            </p>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-700 p-8">
-            <ul className="space-y-4">
-              {governancePrinciples.map((g) => (
-                <li key={g} className="flex items-start gap-3">
-                  <Lock className="w-4 h-4 text-brand-red-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-600 text-sm">{g}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="mt-6 text-center">
-            <Link href="/compliance" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">
-              Full compliance and security documentation →
-            </Link>
+      {/* COMPLIANCE & SECURITY */}
+      <section className="py-16 sm:py-20 bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Compliance & Security</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
+                Designed for organizations that answer to funders and auditors
+              </h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                Every design decision in this platform was made with workforce funding compliance in mind. WIOA, WRG, JRI, and DOL Registered Apprenticeship requirements are not bolted on — they are in the data model.
+              </p>
+              <ul className="space-y-3">
+                {complianceItems.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2" />
+                    <span className="text-slate-600 text-sm leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6">
+                <Link href="/compliance" className="text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                  Full compliance documentation →
+                </Link>
+              </div>
+            </div>
+            <div className="relative min-h-[320px] rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+              <Image
+                src="/images/pages/platform-page-12.jpg"
+                alt="Compliance and audit infrastructure"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
+      {/* PRIMARY CTA */}
       <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-4">Get Started</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
             Ready to operate on the platform?
           </h2>
-          <p className="text-red-100 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
-            Whether you are a training provider, employer, workforce agency, or organization looking to license the system — start here.
+          <p className="text-slate-600 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+            Whether you are a training provider, workforce board, employer, or organization looking to license the infrastructure — the next step is a conversation.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/platform/providers" className="inline-flex items-center gap-2 bg-white text-brand-red-600 px-6 py-3 rounded-lg font-bold hover:bg-red-50 transition text-sm">
-              Provider Requirements <ArrowRight className="w-4 h-4" />
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-red-700 transition">
+              Schedule a Demo <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/store/licensing" className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition text-sm">
-              License the Platform
+            <Link href="/platform/providers" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition">
+              Provider Requirements
             </Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-6 py-3 rounded-lg font-bold hover:bg-white/10 transition text-sm">
-              Contact Us
+            <Link href="/store/licensing" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition">
+              Licensing Options
             </Link>
           </div>
         </div>

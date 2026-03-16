@@ -116,48 +116,50 @@ export default async function ForEmployersPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: Users,
+                image: '/images/pages/employers-page-1.jpg',
+                alt: 'Pre-screened talent pipeline of certified graduates',
                 title: 'Pre-Screened Talent Pipeline',
                 description: 'Candidates complete background checks, drug testing, and skills assessments before referral. You interview only qualified applicants.',
-                color: 'bg-brand-blue-50 text-brand-blue-600',
               },
               {
-                icon: DollarSign,
+                image: '/images/pages/admin-funding-hero.jpg',
+                alt: 'WOTC tax credit documentation and processing',
                 title: 'WOTC Tax Credits',
                 description: 'Claim up to $9,600 per eligible hire through the Work Opportunity Tax Credit. We handle the paperwork.',
-                color: 'bg-brand-green-50 text-brand-green-600',
               },
               {
-                icon: Award,
+                image: '/images/pages/employers-page-2.jpg',
+                alt: 'Industry certification exams and credentialing',
                 title: 'Industry Certifications',
                 description: 'Candidates complete training and sit for recognized credential exams — EPA 608, CDL, CNA, Certiport IT Specialist, barber license, and more — before day one.',
-                color: 'bg-amber-50 text-amber-600',
               },
               {
-                icon: Shield,
+                image: '/images/pages/admin-apprenticeships-hero.jpg',
+                alt: 'DOL registered apprenticeship program management',
                 title: 'DOL Registered Apprenticeships',
                 description: 'Structured earn-and-learn programs with mentorship. We manage compliance, you develop loyal employees.',
-                color: 'bg-indigo-50 text-indigo-600',
               },
               {
-                icon: Clock,
+                image: '/images/pages/employers-page-3.jpg',
+                alt: 'Rapid candidate placement within weeks of training',
                 title: 'Rapid Placement',
                 description: 'Most programs are 2-16 weeks. We match candidates to your openings as they complete training.',
-                color: 'bg-pink-50 text-pink-600',
               },
               {
-                icon: FileText,
+                image: '/images/pages/for-employers-page-1.jpg',
+                alt: 'No-cost employer recruitment through workforce funding',
                 title: 'No Cost to You',
                 description: 'Training is funded through WIOA, DOL grants, and institutional funding. You pay nothing for recruitment or training.',
-                color: 'bg-teal-50 text-teal-600',
               },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border p-6">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.color} mb-4`}>
-                  <item.icon className="w-6 h-6" />
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
-                <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.description}</p>
+                </div>
               </div>
             ))}
           </div>

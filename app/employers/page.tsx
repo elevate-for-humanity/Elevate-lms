@@ -179,45 +179,52 @@ export default function EmployersPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: Users,
+                image: '/images/pages/employers-page-1.jpg',
+                alt: 'Pre-trained and pre-screened workforce candidates',
                 title: 'Pre-Trained, Pre-Screened Candidates',
                 desc: 'Every candidate we refer has completed a training program, earned at least one industry credential, and been assessed for job readiness. You are not getting random resumes — you are getting people who have already invested in their career.',
               },
               {
-                icon: Award,
+                image: '/images/pages/credentials-page-1.jpg',
+                alt: 'Industry certifications earned before day one',
                 title: 'Industry Certifications Already Earned',
                 desc: 'Our graduates hold credentials recognized by employers and regulators: EPA 608, OSHA 10/30, CNA, CDL Class A/B, Indiana Barber License, CompTIA A+, QuickBooks, and more. They show up with proof of competency.',
               },
               {
-                icon: DollarSign,
+                image: '/images/pages/admin-funding-hero.jpg',
+                alt: 'Zero cost employer recruitment through workforce grants',
                 title: 'Zero Recruiting Cost',
                 desc: 'We do not charge employers for candidate referrals, job postings, or placement. Our funding comes from workforce grants, not employer fees. You pay nothing to access our talent pipeline.',
               },
               {
-                icon: Clock,
+                image: '/images/pages/employers-page-2.jpg',
+                alt: 'Faster ramp-up and lower turnover with trained graduates',
                 title: 'Faster Ramp-Up, Lower Turnover',
                 desc: 'Candidates who complete structured training programs are more likely to stay. They chose this career path deliberately, invested time in preparation, and have support services (career coaching, case management) that continue after placement.',
               },
               {
-                icon: MessageSquare,
+                image: '/images/pages/about-career-training.jpg',
+                alt: 'Ongoing post-placement support for employers and employees',
                 title: 'Ongoing Support After Placement',
                 desc: 'We do not disappear after the hire. Elevate provides post-placement follow-up for both the employer and the employee. If issues arise during the OJT period, we help resolve them before they become terminations.',
               },
               {
-                icon: Building2,
+                image: '/images/pages/employers-page-3.jpg',
+                alt: 'Workforce funding coordination including OJT and WOTC',
                 title: 'Workforce Funding Coordination',
                 desc: 'OJT contracts, WOTC pre-screening, Federal Bonding applications, apprenticeship registration — we handle the administrative burden so you can focus on running your business.',
               },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200">
-                  <Icon className="w-8 h-8 text-brand-orange-500 mb-3" />
-                  <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-slate-600">{item.desc}</p>
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
-              );
-            })}
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

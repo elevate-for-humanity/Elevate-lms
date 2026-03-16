@@ -66,10 +66,10 @@ export default async function AgenciesPage() {
     .limit(3);
 
   const complianceFeatures = [
-    { icon: Shield, title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor' },
-    { icon: FileCheck, title: 'ETPL Approved', description: 'Listed on Indiana\'s Eligible Training Provider List' },
-    { icon: Award, title: 'WIOA Compliant', description: 'Full compliance with Workforce Innovation and Opportunity Act' },
-    { icon: TrendingUp, title: 'Outcome Tracking', description: 'Real-time reporting on placement, retention, and wages' },
+    { image: '/images/pages/admin-compliance-hero.jpg', alt: 'DOL Registered apprenticeship compliance', title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor' },
+    { image: '/images/pages/admin-wioa-hero.jpg', alt: 'ETPL approved training provider listing', title: 'ETPL Approved', description: 'Listed on Indiana\'s Eligible Training Provider List' },
+    { image: '/images/pages/admin-compliance-audit-hero.jpg', alt: 'WIOA compliance documentation and reporting', title: 'WIOA Compliant', description: 'Full compliance with Workforce Innovation and Opportunity Act' },
+    { image: '/images/pages/admin-wioa-reports-hero.jpg', alt: 'Real-time outcome tracking and placement reporting', title: 'Outcome Tracking', description: 'Real-time reporting on placement, retention, and wages' },
   ];
 
   const platformFeatures = [
@@ -117,12 +117,15 @@ export default async function AgenciesPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Built for Government Compliance</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {complianceFeatures.map((feature, index) => {
-              const Icon = feature.icon;
               return (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-sm border text-center">
-                  <Icon className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm">{feature.description}</p>
+                <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                    <Image src={feature.image} alt={feature.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-slate-900 text-lg mb-2">{feature.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
               );
             })}

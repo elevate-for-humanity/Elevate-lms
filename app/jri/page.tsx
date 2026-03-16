@@ -40,32 +40,38 @@ export default function JRIPage() {
     { 
       title: 'Fully Funded Training', 
       description: 'Tuition, books, supplies, uniforms, and certification exams covered for eligible participants.',
-      icon: DollarSign 
+      image: '/images/pages/jri-page-1.jpg',
+      alt: 'Funded workforce training program',
     },
     { 
       title: 'Career Counseling', 
       description: 'Work one-on-one with a dedicated career coach who understands your situation.',
-      icon: Heart 
+      image: '/images/pages/comp-pathway-classroom.jpg',
+      alt: 'One-on-one career counseling session',
     },
     { 
       title: 'Job Placement', 
       description: 'We connect you with employers committed to second-chance hiring.',
-      icon: Briefcase 
+      image: '/images/pages/about-employer-partners.jpg',
+      alt: 'Job placement and employer connections',
     },
     { 
       title: 'Support Services', 
       description: 'Transportation, childcare support, work clothing, and more.',
-      icon: Shield 
+      image: '/images/pages/comp-home-pathways-support.jpg',
+      alt: 'Supportive services for workforce participants',
     },
     { 
       title: 'Flexible Scheduling', 
       description: 'Day and evening classes to work around your commitments.',
-      icon: Clock 
+      image: '/images/pages/comp-pathway-healthcare.jpg',
+      alt: 'Flexible day and evening class scheduling',
     },
     { 
       title: 'Ongoing Mentorship', 
       description: 'Stay connected with mentors even after graduation.',
-      icon: Users 
+      image: '/images/pages/mentorship-page-1.jpg',
+      alt: 'Ongoing mentorship after graduation',
     },
   ];
 
@@ -168,18 +174,17 @@ export default function JRIPage() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programBenefits.map((benefit, index) => {
-              const IconComponent = benefit.icon;
-              return (
-                <div key={index} className="bg-white rounded-xl p-6 border border-gray-100">
-                  <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                    <IconComponent className="w-6 h-6 text-brand-green-600" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                  <p className="text-gray-600">{benefit.description}</p>
+            {programBenefits.map((benefit, index) => (
+              <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
+                  <Image src={benefit.image} alt={benefit.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
-              );
-            })}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{benefit.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

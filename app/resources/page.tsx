@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FileText, ExternalLink, GraduationCap, DollarSign, Briefcase, Shield } from 'lucide-react';
+import { ArrowRight, ExternalLink, GraduationCap, DollarSign, Briefcase, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Resources | Elevate for Humanity',
@@ -118,12 +118,13 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20 bg-white border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <FileText className="w-8 h-8 text-slate-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Need Help?</h2>
           <p className="text-slate-600 mb-6">Can&apos;t find what you&apos;re looking for? Contact our team.</p>
-          <Link href="/contact" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition">Contact Us</Link>
+          <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition">
+            Contact Us <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
     </div>

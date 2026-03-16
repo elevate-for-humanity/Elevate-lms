@@ -1,11 +1,9 @@
 
-import PageVideoHero from '@/components/ui/PageVideoHero';
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
 import Link from 'next/link';
-import { Users, MessageSquare, Calendar, Star, ArrowRight,
-  Phone
-} from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Mentorship Program | Elevate For Humanity',
@@ -33,13 +31,16 @@ export default function MentorshipPage() {
         </div>
       </div>
 
-      <section className="bg-white text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Users className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Mentorship Program</h1>
-          <p className="text-xl text-indigo-100 mb-8">Get personalized guidance from experienced professionals in your field</p>
-          <Link href="/mentorship" className="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-full font-bold hover:bg-indigo-50">
-            Find a Mentor <ArrowRight className="w-5 h-5" />
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] min-h-[320px] overflow-hidden">
+        <Image src="/images/pages/mentorship-page-1.jpg" alt="Mentorship program — career guidance from experienced professionals" fill className="object-cover" priority sizes="100vw" />
+      </section>
+
+      <section className="py-12 bg-white border-b">
+        <div className="max-w-4xl mx-auto px-6">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Mentorship Program</h1>
+          <p className="text-lg text-slate-600 mb-6 max-w-2xl">Get personalized guidance from experienced professionals in your field.</p>
+          <Link href="/mentorship" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
+            Find a Mentor <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>
@@ -101,20 +102,27 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-4">Become a Mentor</h2>
-          <p className="text-indigo-100 mb-8">Share your experience and help others succeed in their careers.</p>
-          <Link href="/mentorship/become-mentor" className="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-50">
-            Apply to Mentor
-          </Link>
+      <section className="py-16 bg-white border-t">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+              <Image src="/images/pages/mentorship-page-2.jpg" alt="Experienced mentor sharing career guidance" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Become a Mentor</h2>
+              <p className="text-slate-600 mb-6">Share your experience and help others succeed in their careers.</p>
+              <Link href="/mentorship/become-mentor" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
+                Apply to Mentor <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-white border-t py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Ready to Start Your Career?</h2>
+          <p className="text-slate-600 mb-6">Check your eligibility for funded career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"

@@ -118,7 +118,7 @@ const PROGRAMS = [
     whatItMeans: 'AWS certifications are the industry standard recognized by employers worldwide. They prove you can produce welds that meet structural and safety specifications. Combined with OSHA 10, you are qualified to work in manufacturing, construction, fabrication, aerospace, and energy.',
     training: 'You master four welding processes: Stick (SMAW), MIG (GMAW), TIG (GTAW), and Flux-Core (FCAW) — these cover 95% of welding jobs. You also learn oxy-fuel cutting, plasma cutting, blueprint reading, welding symbols, and metallurgy. 400+ hours of hands-on training. All safety equipment is provided (helmets, gloves, jackets, respirators). Day and evening classes available.',
     duration: '12–16 weeks (400+ hours hands-on)',
-    examDay: 'You complete AWS certification testing in multiple processes and positions during the program. OSHA 10 is completed in the first weeks.',
+    examDay: 'AWS certification testing is administered by an AWS Authorized Test Facility (ATF) with a Certified Welding Inspector (CWI). Elevate coordinates scheduling. OSHA 10 is completed in the first weeks.',
     whoHires: [
       { employer: 'Manufacturing plants', pay: '$40K–$55K starting' },
       { employer: 'Fabrication shops', pay: '$42K–$58K starting' },

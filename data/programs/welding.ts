@@ -24,7 +24,7 @@ export const WELDING: ProgramSchema = {
   badgeColor: 'green',
 
   credentials: [
-    { name: 'AWS D1.1 Structural Welding Certification', issuer: 'American Welding Society', description: 'Industry-standard certification for structural steel welding.', validity: '6 months (retest required)' },
+    { name: 'AWS D1.1 Structural Welding Certification', issuer: 'American Welding Society', description: 'Industry-standard certification for structural steel welding. Testing administered by an AWS Authorized Test Facility (ATF) with a Certified Welding Inspector (CWI). Elevate coordinates scheduling.', validity: '6 months (retest required)' },
     { name: 'OSHA 10 Construction', issuer: 'OSHA', description: 'Construction safety certification covering hazard recognition.', validity: 'Recommended renewal every 5 years' },
     { name: 'CPR/AED/First Aid', issuer: 'American Heart Association', description: 'Emergency response certification.', validity: '2 years' },
   ],

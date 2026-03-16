@@ -5,6 +5,7 @@ import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
+import PageAudio from '@/components/PageAudio';
 import { FadeInUp, StaggerChildren, StaggerItem, BlurIn } from '@/components/animations/PremiumAnimations';
 import { ArrowRight, GraduationCap, Building2, BarChart3 } from 'lucide-react';
 
@@ -134,7 +135,53 @@ export default function HomePage() {
       {/* ── TRUST STRIP ── */}
       <TrustStrip variant="compact" showAnimation />
 
-
+      {/* ── AUDIENCE ROUTING ── */}
+      <section className="bg-slate-50 border-b border-slate-200 py-8 sm:py-10">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Who are you here for?</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Student */}
+            <Link href="/start" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-brand-red-500 rounded-xl overflow-hidden transition-all hover:shadow-md">
+              <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <Image src="/images/pages/adult-learner.jpg" alt="Student in workforce training" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+              </div>
+              <div className="p-5 flex flex-col flex-1">
+                <p className="font-bold text-slate-900 text-base mb-1">Student / Job Seeker</p>
+                <p className="text-slate-500 text-sm leading-snug mb-4">See programs, start dates, and how to get funded training at no cost.</p>
+                <span className="text-brand-red-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                  Start here <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </Link>
+            {/* Employer */}
+            <Link href="/employer" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-brand-blue-500 rounded-xl overflow-hidden transition-all hover:shadow-md">
+              <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer hiring Elevate graduates" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+              </div>
+              <div className="p-5 flex flex-col flex-1">
+                <p className="font-bold text-slate-900 text-base mb-1">Employer / Hiring Partner</p>
+                <p className="text-slate-500 text-sm leading-snug mb-4">Access pre-screened graduates, WOTC credits, and OJT reimbursement.</p>
+                <span className="text-brand-blue-600 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                  Hire graduates <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </Link>
+            {/* Agency */}
+            <Link href="/workforce-board" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-slate-700 rounded-xl overflow-hidden transition-all hover:shadow-md">
+              <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <Image src="/images/pages/career-services-page-3.jpg" alt="Workforce agency and compliance reporting" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+              </div>
+              <div className="p-5 flex flex-col flex-1">
+                <p className="font-bold text-slate-900 text-base mb-1">Agency / Workforce Board</p>
+                <p className="text-slate-500 text-sm leading-snug mb-4">Review compliance, outcomes reporting, and WIOA alignment documentation.</p>
+                <span className="text-slate-700 text-sm font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 mt-auto">
+                  View outcomes <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── WHAT WE DO ── */}
       <section className="py-16 sm:py-20 bg-white">
@@ -429,6 +476,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PageAudio voiceoverSrc="/videos/homepage-hero-new.mp3" />
     </main>
   );
 }

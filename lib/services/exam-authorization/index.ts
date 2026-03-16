@@ -14,6 +14,7 @@
 
 import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 import { getStripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { checkCertificationReadiness } from './readiness';
@@ -67,6 +68,7 @@ export async function initiateCertification(
 ): Promise<{ ok: boolean; error?: string; result?: InitiateResult }> {
   const db = createAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
+  await setAuditContext(db, { systemActor: 'exam-authorization' });
 
   // Readiness check
   const readiness = await checkCertificationReadiness(userId, programId);
@@ -229,6 +231,7 @@ export async function confirmPaymentAndAuthorize(
 ): Promise<{ ok: boolean; error?: string }> {
   const db = createAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
+  await setAuditContext(db, { systemActor: 'exam-authorization' });
 
   // Resolve payment record
   const { data: payment } = await db
@@ -337,6 +340,7 @@ export async function markForwarded(
 ): Promise<{ ok: boolean; error?: string }> {
   const db = createAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
+  await setAuditContext(db, { systemActor: 'exam-authorization' });
 
   const { data: req } = await db
     .from('certification_requests')
@@ -394,6 +398,7 @@ export async function recordUpload(
 ): Promise<{ ok: boolean; error?: string; uploadId?: string }> {
   const db = createAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
+  await setAuditContext(db, { systemActor: 'exam-authorization' });
 
   const { data: req } = await db
     .from('certification_requests')
@@ -458,6 +463,7 @@ export async function verifyUploadAndIssueCertificate(
 ): Promise<{ ok: boolean; error?: string; certificateId?: string }> {
   const db = createAdminClient();
   if (!db) return { ok: false, error: 'Database unavailable' };
+  await setAuditContext(db, { systemActor: 'exam-authorization' });
 
   const { data: req } = await db
     .from('certification_requests')

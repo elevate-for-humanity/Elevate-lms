@@ -21,18 +21,45 @@ export default function VoiceoverWithMusic({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
+  // Create audio object once on mount — never recreated
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const audio = new Audio(audioSrc);
+    audio.preload = 'auto';
+    audio.muted = false;
+    audio.volume = volume;
+    audioRef.current = audio;
+
+    audio.onended = () => {
+      if (progressInterval.current) clearInterval(progressInterval.current);
+      setIsPlaying(false);
+      setTimeout(() => setIsVisible(false), 300);
+    };
+
+    setShowPlayButton(true);
+    setIsVisible(true);
+
+    return () => {
+      if (progressInterval.current) clearInterval(progressInterval.current);
+      audio.pause();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioSrc]);
+
   const playAudio = useCallback(() => {
-    if (!audioRef.current || hasPlayed) return;
-    
-    audioRef.current.muted = false;
-    audioRef.current.volume = volume;
-    audioRef.current.play()
+    const audio = audioRef.current;
+    if (!audio || hasPlayed) return;
+
+    audio.muted = false;
+    audio.volume = volume;
+
+    audio.play()
       .then(() => {
         setHasPlayed(true);
         setIsPlaying(true);
         setShowPlayButton(false);
         setIsVisible(true);
-        
+
         progressInterval.current = setInterval(() => {
           if (audioRef.current) {
             const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
@@ -41,6 +68,7 @@ export default function VoiceoverWithMusic({
         }, 100);
       })
       .catch(() => {
+        // Should not happen — this is triggered by user gesture
         setShowPlayButton(true);
         setIsVisible(true);
       });
@@ -51,39 +79,11 @@ export default function VoiceoverWithMusic({
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    if (progressInterval.current) {
-      clearInterval(progressInterval.current);
-    }
+    if (progressInterval.current) clearInterval(progressInterval.current);
     setIsPlaying(false);
     setIsVisible(false);
     setProgress(0);
   }, []);
-
-  useEffect(() => {
-    if (hasPlayed || typeof window === 'undefined') return undefined;
-
-    const audio = new Audio(audioSrc);
-    audio.preload = 'auto';
-    audioRef.current = audio;
-
-    audio.onended = () => {
-      if (progressInterval.current) clearInterval(progressInterval.current);
-      setIsPlaying(false);
-      setTimeout(() => setIsVisible(false), 300);
-    };
-
-    // Show play button immediately - don't try autoplay (browsers block it)
-    setShowPlayButton(true);
-    setIsVisible(true);
-
-    return () => {
-      if (progressInterval.current) clearInterval(progressInterval.current);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, [audioSrc, hasPlayed]);
 
   if (!isVisible && !showPlayButton) return null;
 

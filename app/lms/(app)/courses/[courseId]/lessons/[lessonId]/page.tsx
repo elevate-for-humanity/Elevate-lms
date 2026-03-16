@@ -200,12 +200,21 @@ export default function LessonPage() {
         // Update sidebar completion state
         setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
 
-        // Handle course completion + certificate
+        // Handle course completion — auto-advance to certification page
         if (result.courseProgress?.courseCompleted) {
           setCourseCompleted(true);
           if (result.certificate) {
             setCertificate(result.certificate);
           }
+          // Auto-advance: redirect to certification outcome page instead of
+          // leaving learner on the lesson player with a manual complete button
+          router.push(`/lms/courses/${courseId}/certification`);
+          return;
+        }
+
+        // Auto-advance to next lesson after marking complete
+        if (hasNext) {
+          router.push(`/lms/courses/${courseId}/lessons/${lessons[currentIndex + 1].id}`);
         }
       } else {
         const response = await fetch(`/api/lessons/${lessonId}/complete`, {
@@ -397,76 +406,158 @@ export default function LessonPage() {
         </div>
 
         <nav role="navigation" aria-label="Main navigation" className="p-4">
-          {lessons.map((l, idx) => {
-            const lessonDone = completedLessonIds.has(l.id) || (l.id === lessonId && isCompleted);
-            // Sequential lock: lesson is accessible only if it's the first, or the previous lesson is done
-            const previousDone = idx === 0 || completedLessonIds.has(lessons[idx - 1]?.id);
-            const isLocked = !lessonDone && !previousDone && l.id !== lessonId;
-            const isCurrent = l.id === lessonId;
-
-            if (isLocked) {
-              return (
-                <div
-                  key={l.id}
-                  className="flex items-center gap-3 p-3 rounded-lg mb-2 opacity-40 cursor-not-allowed"
-                  title="Complete the previous lesson first"
-                >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white text-slate-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm truncate text-slate-400">{l.title}</div>
-                    <div className="text-xs text-slate-400">{l.duration}</div>
-                  </div>
-                </div>
-              );
+          {/* Group lessons by module_title when available, otherwise flat list */}
+          {(() => {
+            // Build module groups
+            const groups: { title: string | null; lessons: typeof lessons }[] = [];
+            for (const l of lessons) {
+              const title = l.module_title ?? null;
+              const last = groups[groups.length - 1];
+              if (last && last.title === title) { last.lessons.push(l); }
+              else { groups.push({ title, lessons: [l] }); }
             }
+            const multiGroup = groups.length > 1 && groups.some(g => g.title);
+            return groups.map((group, gi) => (
+              <div key={gi} className="mb-2">
+                {multiGroup && group.title && (
+                  <div className="px-2 py-1.5 mb-1 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                    {group.title}
+                  </div>
+                )}
+                {group.lessons.map((l) => {
+                  const idx = lessons.findIndex(x => x.id === l.id);
+                  const lessonDone = completedLessonIds.has(l.id) || (l.id === lessonId && isCompleted);
+                  const previousDone = idx === 0 || completedLessonIds.has(lessons[idx - 1]?.id);
+                  const isLocked = !lessonDone && !previousDone && l.id !== lessonId;
+                  const isCurrent = l.id === lessonId;
+                  // Step type badge
+                  const stepBadge = l.step_type === 'checkpoint' ? '⬡' : l.step_type === 'quiz' ? '?' : l.step_type === 'lab' ? '⚙' : null;
 
-            return (
-              <Link
-                key={l.id}
-                href={`/lms/courses/${courseId}/lessons/${l.id}`}
-                className={`flex items-center gap-3 p-3 rounded-lg mb-2 transition ${
-                  isCurrent
-                    ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
-                    : 'hover:bg-white'
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    lessonDone
-                      ? 'bg-brand-green-100 text-brand-green-600'
-                      : isCurrent
-                        ? 'bg-brand-blue-100 text-brand-blue-600'
-                        : 'bg-white text-black'
-                  }`}
-                >
-                  {lessonDone ? (
-                    <span className="w-3 h-3 rounded-full bg-brand-green-500 inline-block" />
-                  ) : (
-                    <span className="text-sm font-bold">{idx + 1}</span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div
-                    className={`font-semibold text-sm truncate ${isCurrent ? 'text-brand-blue-900' : lessonDone ? 'text-brand-green-800' : 'text-black'}`}
-                  >
-                    {l.title}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {lessonDone ? 'Completed' : l.duration}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+                  if (isLocked) {
+                    return (
+                      <div
+                        key={l.id}
+                        className="flex items-center gap-3 p-3 rounded-lg mb-1 opacity-40 cursor-not-allowed"
+                        title="Complete the previous lesson first"
+                      >
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white text-slate-400">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-sm truncate text-slate-400">{l.title}</div>
+                          <div className="text-xs text-slate-400">{l.duration}</div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={l.id}
+                      href={`/lms/courses/${courseId}/lessons/${l.id}`}
+                      className={`flex items-center gap-3 p-3 rounded-lg mb-1 transition ${
+                        isCurrent
+                          ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
+                          : 'hover:bg-white'
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold ${
+                          lessonDone
+                            ? 'bg-brand-green-100 text-brand-green-600'
+                            : isCurrent
+                              ? 'bg-brand-blue-100 text-brand-blue-600'
+                              : 'bg-white text-black'
+                        }`}
+                      >
+                        {lessonDone ? (
+                          <span className="w-3 h-3 rounded-full bg-brand-green-500 inline-block" />
+                        ) : stepBadge ? (
+                          <span>{stepBadge}</span>
+                        ) : (
+                          <span>{idx + 1}</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-semibold text-sm truncate ${isCurrent ? 'text-brand-blue-900' : lessonDone ? 'text-brand-green-800' : 'text-black'}`}>
+                          {l.title}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {lessonDone ? 'Completed' : l.step_type === 'checkpoint' ? 'Checkpoint' : l.step_type === 'lab' ? 'Lab' : l.step_type === 'assignment' ? 'Assignment' : l.duration}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ));
+          })()}
         </nav>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Content area — switches on lesson.content_type */}
-        {lesson.content_type === 'scorm' && lesson.scorm_package_id ? (
+        {/* Content area — routes by step_type first, then content_type for legacy */}
+        {/* Checkpoint: module-boundary gate with reflection prompt */}
+        {(lesson.step_type === 'checkpoint') && !lesson.quiz_questions?.length ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <ClipboardList className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-amber-600">Module Checkpoint</div>
+                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                </div>
+              </div>
+              {lesson.content && (
+                <div className="prose max-w-none mb-6"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+              )}
+              <div className="bg-white rounded-lg p-6 border border-amber-100">
+                <p className="text-sm font-semibold text-slate-700 mb-2">Reflection</p>
+                <p className="text-slate-600 text-sm">{lesson.description || 'Review the key concepts from this module before continuing.'}</p>
+              </div>
+            </div>
+          </div>
+        ) : lesson.step_type === 'lab' ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-brand-blue-600" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-brand-blue-600">Hands-On Lab</div>
+                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                </div>
+              </div>
+              {lesson.content && (
+                <div className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+              )}
+            </div>
+          </div>
+        ) : lesson.step_type === 'assignment' ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-purple-600">Assignment</div>
+                  <h2 className="text-xl font-bold text-slate-900">{lesson.title}</h2>
+                </div>
+              </div>
+              {lesson.content && (
+                <div className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
+              )}
+            </div>
+          </div>
+        ) : lesson.content_type === 'scorm' && lesson.scorm_package_id ? (
           <div className="h-[70vh]">
             <iframe
               src={`/api/scorm/content/${lesson.scorm_package_id}/${lesson.scorm_launch_path || 'index.html'}`}

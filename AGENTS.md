@@ -103,6 +103,74 @@ Last verified: 882/882 pages, zero errors
 
 ---
 
+# CONTAINMENT — Known Issues and Safe Next Changes
+
+Evidence-based audit run 2026-03-16. Re-run scripts at any time to get current counts.
+
+## Audit Scripts
+
+Three scripts in `scripts/` produce repeatable, evidence-based reports. Run before any data-dependent feature work.
+
+```bash
+bash scripts/audit-schema-refs.sh   # DB table gaps: code refs with no CREATE TABLE in migrations
+bash scripts/audit-auth-gaps.sh     # Auth gaps: no-auth routes, role-blind admin routes, error leaks
+bash scripts/audit-env-vars.sh      # Env var gaps: referenced in code but absent from .env.example
+```
+
+Current counts (as of last audit):
+- Schema gaps (≥5 refs, no migration): **126 tables**
+- Routes with no auth check: **62**
+- Admin routes with identity-only auth (no role check): **16**
+- Routes leaking `error.message`: **33**
+- Undocumented env vars: **171**
+
+## Known Bug: `apiRequireAdmin` excludes `super_admin` and `staff`
+
+`lib/authGuards.ts` line 466 — `allowedRoles: ['admin']` only. `super_admin` and `staff` are silently blocked from any route using this helper.
+
+**Do not use `apiRequireAdmin()` until this is fixed.** Use an inline role check instead:
+
+```ts
+const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
+```
+
+The fix itself is one line in `lib/authGuards.ts`:
+```ts
+// Change this:
+allowedRoles: ['admin'],
+// To this:
+allowedRoles: ['admin', 'super_admin', 'staff'],
+```
+
+## Database Truth Requirement
+
+**Before writing any new data-dependent route or migration**, run this query in the Supabase Dashboard SQL editor and confirm the table exists in the live DB:
+
+```sql
+SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;
+```
+
+The migration files define 368 tables. The live DB may differ. `profiles`, `programs`, `training_courses`, and `program_enrollments` are referenced heavily but have no `CREATE TABLE` in migrations — they are assumed to exist but unconfirmed from code alone.
+
+## Five Safest Next Changes (priority order)
+
+These are the highest-value, lowest-blast-radius fixes. Each touches 1–3 files.
+
+1. **Fix `apiRequireAdmin` role list** — `lib/authGuards.ts` line 466. One-line change. Unblocks `super_admin` and `staff` from 16 routes.
+
+2. **Add role check to course-generation routes** — `app/api/admin/courses/generate/route.ts`, `/parse/route.ts`, `/regenerate/route.ts`. Replace `getCurrentUser()` with a role check for `admin`/`super_admin`. Any logged-in user can currently call these and consume OpenAI quota.
+
+3. **Fix error leak in `/api/ai/generate-course`** — Remove `message:` and `details:` fields from the 500 response body (`app/api/ai/generate-course/route.ts` lines 107–108). Replace with a static string.
+
+4. **Run live DB schema diff** — Query `pg_tables` in Supabase Dashboard, diff against migration-defined tables. Converts 126 "unknown" tables into confirmed present/absent. Required before any new data-dependent feature.
+
+5. **Document undocumented env vars** — Add 171 missing vars to `.env.example` with placeholder values. Missing `SSN_ENCRYPTION_KEY`, `REDIS_URL`, `IRS_CERT_PATH`, etc. fail silently at runtime, not at build time.
+
+---
+
 # Key Components Created
 
 - **`components/marketing/PublicLandingPage.tsx`** — Reusable config-driven landing page (hero, intro, features, steps, CTA). Used by 7 partner pages.
@@ -172,6 +240,15 @@ if (auth.error) return auth.error;
 import { apiRequireAdmin } from '@/lib/admin/guards';
 const auth = await apiRequireAdmin(request);
 if (auth.error) return auth.error;
+```
+
+⚠️ **`apiRequireAdmin` is bugged** — it only allows `'admin'`, not `'super_admin'` or `'staff'` (`lib/authGuards.ts` line 466). Until fixed, use an inline role check for admin routes:
+
+```ts
+const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
 ```
 
 There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.

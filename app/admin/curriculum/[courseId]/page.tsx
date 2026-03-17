@@ -59,6 +59,19 @@ export default async function CurriculumCourseEditorPage({
     notFound();
   }
 
+  // HVAC remains legacy-driven pending content migration.
+  // training_lessons (95 rows, course f0593164) is the live learner path.
+  // curriculum_lessons (47 rows, program 4226f7f6) is an unpopulated skeleton
+  // and must NOT be published or marketed as the live course until a full
+  // content parity migration is completed and verified.
+  const LEGACY_DRIVEN_COURSES: Record<string, string> = {
+    'f0593164-55be-5867-98e7-8a86770a8dd0':
+      'HVAC Technician — live learner path is training_lessons (95 lessons). ' +
+      'These curriculum_lessons rows are an unpopulated migration skeleton. ' +
+      'Do not publish or route learners here until content parity is verified.',
+  };
+  const legacyWarning = LEGACY_DRIVEN_COURSES[courseId] ?? null;
+
   // Module summary for the sidebar
   const { data: moduleSummary } = await db
     .from('curriculum_lessons')
@@ -97,6 +110,14 @@ export default async function CurriculumCourseEditorPage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Legacy path warning — shown when curriculum_lessons is not the live path */}
+        {legacyWarning && (
+          <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 flex gap-3">
+            <span className="text-amber-600 font-bold text-sm shrink-0">⚠️ LEGACY PATH ACTIVE</span>
+            <p className="text-sm text-amber-800">{legacyWarning}</p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>

@@ -8,6 +8,13 @@
  *
  * Insert order: training_courses → training_lessons → curriculum_lessons (parallel, if program_id) → completion_rules → program_courses
  *
+ * NOTE: HVAC (program 4226f7f6 / course f0593164) remains legacy-driven.
+ * The live learner path is training_lessons (95 rows). The curriculum_lessons
+ * skeleton (47 rows) is unpopulated and must NOT be published as the live
+ * course until a full content parity migration is completed and verified.
+ * Pass threshold: legacy quizzes use 70% (matching real EPA 608 exam).
+ * curriculum_lessons checkpoints are set to 80% — resolve before activating.
+ *
  * Schema verified against live DB (cuxzzpsyufcewtmicszk):
  *   completion_rules  — entity_type/entity_id (no direct course_id column)
  *   program_courses   — order_index (not sort_order)

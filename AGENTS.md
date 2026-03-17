@@ -135,6 +135,30 @@ HVAC was built before the DB-driven engine. These files must not be copied for n
 
 The lesson page runs both paths in parallel for backward compatibility. New programs use only the DB-driven path.
 
+### HVAC Source of Truth (critical — do not delete legacy content)
+
+**Live learner path:** `training_courses.id = f0593164-55be-5867-98e7-8a86770a8dd0`
+**Live program:** `programs.id = 4226f7f6-fbc1-44b5-83e8-b12ea149e4c7` (slug: `hvac-technician`)
+**Live content:** `training_lessons` — 95 rows with full EPA 608 content including:
+- Core: ozone/Clean Air Act, refrigerant types, recovery/recycling/reclamation, safety, PT relationships
+- Type I (lessons 35–39), Type II (lessons 40–46), Type III (lessons 47–52)
+- 5 full-length practice exams (lessons 55–59), Universal exam (lesson 59)
+- OSHA 30-Hour (lessons 77–84), CPR/First Aid (lessons 85–87), NRF Rise Up (lessons 88–95)
+- Pass threshold: **70%** (matches real EPA 608 exam)
+
+**Do not delete `training_lessons` for HVAC.** It is the only complete, content-populated course path.
+
+**curriculum_lessons skeleton (NOT live):** 47 rows under program `4226f7f6`, all with empty `script_text`. This is an unpopulated migration artifact. It is not served to learners. Do not publish, route, or market it until a full content parity migration is completed.
+
+**Pass threshold mismatch:** legacy quizzes = 70%, curriculum_lessons checkpoints = 80%. Resolve intentionally before activating the new path — do not silently change the standard.
+
+**Parity migration prerequisites before activating curriculum_lessons path:**
+1. Migrate all 95 lesson scripts into `curriculum_lessons.script_text`
+2. Migrate all 5 practice exams as `step_type='exam'` with `passing_score=70`
+3. Migrate OSHA 30, CPR, NRF Rise Up as separate credential blocks
+4. Align pass threshold to one standard (70% recommended — matches EPA 608)
+5. Run full learner simulation end-to-end on new path before switching
+
 ---
 
 ## In Progress / Incomplete Work

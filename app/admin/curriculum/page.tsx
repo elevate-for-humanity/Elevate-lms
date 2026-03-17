@@ -29,7 +29,7 @@ export default async function CurriculumPage() {
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
     redirect('/unauthorized');
   }
 

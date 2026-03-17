@@ -14,9 +14,11 @@
  *   - Generator may expand lessons inside bounds; may not invent modules.
  */
 
-import type { CredentialBlueprint } from './types';
-
-export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
+// HVAC_EPA608_BLUEPRINT is a generation-rules blueprint, not a CredentialBlueprint.
+// It has a different schema (generationRules, trackVariants, competencies, assessments)
+// and is consumed by the AI course generator, not CurriculumGenerator.
+// Access via getHvacBlueprint() from lib/curriculum/blueprints/index.ts.
+export const HVAC_EPA608_BLUEPRINT = {
   slug: 'epa-608-core-v1',
   title: 'HVAC Technician / EPA Section 608 Certification',
   version: '1.0.0',

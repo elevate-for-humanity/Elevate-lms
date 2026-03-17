@@ -12,7 +12,7 @@ interface SubItem {
 
 interface NavItem {
   name: string;
-  href: string;
+  href?: string;
   subItems?: SubItem[];
 }
 
@@ -25,13 +25,24 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
     <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
       {items.map((item) => (
         <div key={item.name} className="relative group">
-          <Link
-            href={item.href}
-            className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2"
-            aria-haspopup={item.subItems && item.subItems.length > 0 ? 'true' : undefined}
-          >
-            {item.name}
-          </Link>
+          {item.subItems && item.subItems.length > 0 ? (
+            <button
+              type="button"
+              className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2 cursor-default"
+              aria-haspopup="true"
+            >
+              {item.name}
+            </button>
+          ) : item.href ? (
+            <Link
+              href={item.href}
+              className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2"
+            >
+              {item.name}
+            </Link>
+          ) : (
+            <span className="text-slate-700 font-medium text-sm py-2">{item.name}</span>
+          )}
           
           {/* Dropdown - visible on hover or keyboard focus-within */}
           {item.subItems && item.subItems.length > 0 && (

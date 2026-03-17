@@ -178,8 +178,8 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         const body = await res.text();
         results.push({ email, status: 'failed', error: `${res.status}: ${body}` });
       }
-    } catch (err: any) {
-      results.push({ email, status: 'failed', error: err.message });
+    } catch (err: unknown) {
+      results.push({ email, status: 'failed', error: 'Send failed' });
     }
 
     // Small delay between sends to avoid rate limits

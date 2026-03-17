@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { CheckCircle, Award, ArrowRight, BookOpen, ExternalLink } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import ExamReadinessWidget from '@/components/lms/ExamReadinessWidget';
 
 export const metadata: Metadata = {
   title: 'Certification | Elevate LMS',
@@ -113,6 +114,11 @@ export default async function CertificationPage({ params }: Props) {
           </div>
           <p className="text-sm text-slate-500 mt-2">{pct}% complete</p>
         </div>
+
+        {/* Exam readiness — live domain-level status from DB */}
+        {course.program_id && (
+          <ExamReadinessWidget courseId={courseId} programTitle={course.title} />
+        )}
 
         {/* Certificate issued */}
         {certificate && (

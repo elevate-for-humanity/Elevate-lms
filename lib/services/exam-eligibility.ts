@@ -1,6 +1,24 @@
 /**
  * Exam eligibility service.
  *
+ * AUTHORIZATION AUTHORITY MODEL
+ * ─────────────────────────────
+ * Path A — DB trigger (authoritative):
+ *   trg_auto_exam_authorization fires on checkpoint_scores INSERT.
+ *   When evaluate_exam_readiness() returns is_ready=true, it writes a row to
+ *   exam_authorizations. This is the source of truth for whether a learner
+ *   may sit an exam. It is deterministic, independent of app-layer bugs, and
+ *   idempotent (unique index on user_id + program_id where status != expired/revoked).
+ *
+ * Path B — service layer (funding/auxiliary):
+ *   checkEligibilityAndAuthorize() is called from the lesson completion route.
+ *   It writes to exam_funding_authorizations — a separate table used for
+ *   funding coordination and DOL reporting. It is NOT the gate for exam access.
+ *   If Path B fails silently, Path A still governs.
+ *
+ * The exam-readiness API (/api/lms/courses/[courseId]/exam-readiness) reads
+ * exam_authorizations (Path A) to surface authorization status to the learner.
+ *
  * Wraps evaluate_exam_eligibility_v2() (credential_exam_domains aware) and
  * evaluate_exam_eligibility() (EPA simulation pipeline, preserved as-is).
  *
@@ -73,8 +91,10 @@ export async function checkExamEligibility(
       .eq('id', credentialId)
       .maybeSingle();
 
-    // EPA 608: delegate to existing simulation-based function
-    if (cr?.abbreviation === 'EPA-608' || cr?.verification_source === 'epa_direct') {
+    // EPA 608 simulation pipeline: only active when verification_source = 'epa_direct'.
+    // Credentials with abbreviation 'EPA-608' but verification_source = 'external_link'
+    // use the standard v2 domain-coverage path — the simulation pipeline is not wired.
+    if (cr?.verification_source === 'epa_direct') {
       return await checkEpaEligibility(db, learnerId, credentialId, programId, evaluatedAt);
     }
 

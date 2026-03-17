@@ -342,7 +342,7 @@ export default function LessonPage() {
     const ln = lesson.lesson_number;
     if (ln >= 1 && ln <= 4) {
       const num = String(ln).padStart(3, '0');
-      return `https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/captions/hvac-lesson-${num}.vtt`;
+      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/captions/hvac-lesson-${num}.vtt`;
     }
     return null;
   }, [lesson?.lesson_number]);

@@ -1,4 +1,19 @@
 'use client';
+/**
+ * INTENTIONALLY PUBLIC — sales/demo preview shell.
+ *
+ * Data source: localStorage only. No DB reads. No Supabase queries.
+ * Links to /store?preview=<id> for conversion.
+ *
+ * HARD RULE: Do NOT import createClient, createAdminClient, or any
+ * Supabase helper here. Do NOT add fetch() calls to internal APIs.
+ * If this page needs protected data, add an auth gate first and
+ * remove this comment block.
+ *
+ * Violation check (dev only): if supabase client is ever imported
+ * into this file, the build will fail on the import itself because
+ * this is a client component with no server context.
+ */
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useEffect, useState } from 'react';

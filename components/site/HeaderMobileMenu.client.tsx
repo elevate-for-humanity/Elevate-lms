@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 interface NavItem {
   name: string;
-  href: string;
+  href?: string;
   subItems?: { name: string; href: string; isHeader?: boolean; nested?: boolean }[];
 }
 
@@ -128,7 +128,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                     </div>
                   )}
                 </>
-              ) : (
+              ) : item.href ? (
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
@@ -136,6 +136,8 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                 >
                   {item.name}
                 </Link>
+              ) : (
+                <span className="block py-3 text-slate-900 font-medium">{item.name}</span>
               )}
             </div>
           ))}

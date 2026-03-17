@@ -12,7 +12,6 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 export const NAV_ITEMS = [
   {
     name: 'Get Trained',
-    href: '/programs',
     subItems: [
       { name: '— Programs —', href: '/programs', isHeader: true },
       { name: 'All Programs', href: '/programs' },
@@ -44,7 +43,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Partners & Employers',
-    href: '/partners',
     subItems: [
       { name: '— Employers —', href: '/partnerships', isHeader: true },
       { name: 'Hire Our Graduates', href: '/employer' },
@@ -67,7 +65,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Workforce & Gov',
-    href: '/about',
     subItems: [
       { name: '— About Elevate —', href: '/about', isHeader: true },
       { name: 'About Us', href: '/about' },
@@ -96,7 +93,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Platform',
-    href: '/platform',
     subItems: [
       { name: 'Platform Overview', href: '/platform' },
       { name: 'License the Platform', href: '/store/licensing' },
@@ -107,7 +103,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Rise Foundation',
-    href: '/rise-foundation',
     subItems: [
       { name: 'Mental Wellness', href: '/rise-foundation/trauma-recovery' },
       { name: 'Young Adult Wellness', href: '/rise-foundation/young-adult-wellness' },
@@ -121,7 +116,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'My Account',
-    href: '/login',
     subItems: [
       { name: '— Students —', href: '/login', isHeader: true },
       { name: 'Sign In', href: '/login' },
@@ -136,7 +130,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Support',
-    href: '/support',
     subItems: [
       { name: 'Employment Support', href: '/employment-support' },
       { name: 'Career Services', href: '/career-services' },

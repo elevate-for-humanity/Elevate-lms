@@ -33,8 +33,8 @@ export const brandConfigs: Record<Brand, BrandConfig> = {
 export const SUPERSONIC_GOVERNANCE_DOMAIN = 'supersonicfastermoney.com';
 
 export function getCanonicalUrl(path: string): string {
-  // All governance pages canonical to Elevate
-  return `https://www.elevateforhumanity.org${path}`;
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  return `${base}${path}`;
 }
 
 export function getBrandFromHost(host: string): Brand {

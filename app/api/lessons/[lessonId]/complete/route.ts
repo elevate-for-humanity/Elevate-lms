@@ -56,13 +56,50 @@ async function _POST(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
     }
 
-    // Check if user is enrolled and approved
-    const { data: enrollment } = await db
+    // Check enrollment — try training_enrollments first (legacy), then
+    // program_enrollments (canonical). Both tables are valid sources.
+    // Normalise to { id, status, approved_at, program_id } so downstream
+    // code is table-agnostic.
+    let enrollment: { id: string; status: string; approved_at: string | null; program_id: string | null } | null = null;
+
+    const { data: trainingEnrollment } = await db
       .from('training_enrollments')
       .select('id, status, approved_at, program_id')
       .eq('user_id', user.id)
       .eq('course_id', lesson.course_id)
-      .single();
+      .maybeSingle();
+
+    if (trainingEnrollment) {
+      enrollment = trainingEnrollment;
+    } else {
+      // Resolve program_id from the lesson's course_id via curriculum_lessons,
+      // then look up program_enrollments.
+      const { data: lessonProgram } = await db
+        .from('curriculum_lessons')
+        .select('program_id')
+        .eq('course_id', lesson.course_id)
+        .limit(1)
+        .maybeSingle();
+
+      if (lessonProgram?.program_id) {
+        const { data: programEnrollment } = await db
+          .from('program_enrollments')
+          .select('id, status, confirmed_at, program_id')
+          .eq('user_id', user.id)
+          .eq('program_id', lessonProgram.program_id)
+          .in('status', ['active', 'enrolled', 'in_progress', 'completed'])
+          .maybeSingle();
+
+        if (programEnrollment) {
+          enrollment = {
+            id:          programEnrollment.id,
+            status:      programEnrollment.status,
+            approved_at: programEnrollment.confirmed_at,
+            program_id:  programEnrollment.program_id,
+          };
+        }
+      }
+    }
 
     if (!enrollment) {
       return NextResponse.json(

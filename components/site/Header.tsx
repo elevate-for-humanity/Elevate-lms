@@ -6,27 +6,26 @@ import Image from 'next/image';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 
-// Navigation structure — three audience paths + secondary items
-// Primary doors: Get Trained (learners), Partners & Employers, Workforce & Government
-// Secondary: Platform, Rise Foundation, My Account
+// Navigation structure
+// Programs and student-specific items link to the LMS (/lms) not /programs
 export const NAV_ITEMS = [
   {
     name: 'Get Trained',
-    href: '/programs',
+    href: '/lms',
     subItems: [
-      { name: '— Programs —', href: '/programs', isHeader: true },
-      { name: 'All Programs', href: '/programs' },
-      { name: 'Healthcare', href: '/programs/cna' },
-      { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-      { name: 'CDL Driving', href: '/programs/cdl-training' },
-      { name: 'Technology', href: '/programs/technology' },
-      { name: 'Barbering & Beauty', href: '/programs/barber-apprenticeship' },
-      { name: 'Business & Finance', href: '/programs/business' },
-      { name: 'Social Services', href: '/programs/peer-recovery-specialist' },
+      { name: '— Courses —', href: '/lms', isHeader: true },
+      { name: 'All Courses', href: '/lms' },
+      { name: 'Healthcare', href: '/lms?category=healthcare' },
+      { name: 'Skilled Trades', href: '/lms?category=skilled-trades' },
+      { name: 'CDL Driving', href: '/lms?category=cdl' },
+      { name: 'Technology', href: '/lms?category=technology' },
+      { name: 'Barbering & Beauty', href: '/lms?category=barbering' },
+      { name: 'Business & Finance', href: '/lms?category=business' },
+      { name: 'Social Services', href: '/lms?category=social-services' },
       { name: '— Credentials —', href: '/credentials', isHeader: true },
       { name: 'All Credentials', href: '/credentials' },
       { name: 'Certifications', href: '/training/certifications' },
-      { name: 'Apprenticeships', href: '/programs/apprenticeships' },
+      { name: 'Apprenticeships', href: '/lms?category=apprenticeships' },
       { name: '— Funding —', href: '/funding', isHeader: true },
       { name: 'How Funding Works', href: '/funding/how-it-works' },
       { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
@@ -34,11 +33,6 @@ export const NAV_ITEMS = [
       { name: 'JRI Funding', href: '/funding/jri' },
       { name: 'Job Ready Indy', href: '/funding/job-ready-indy' },
       { name: 'All Funding Options →', href: '/funding' },
-      { name: '— Student Support —', href: '/support', isHeader: true },
-      { name: 'How It Works', href: '/how-it-works' },
-      { name: 'Career Services', href: '/career-services' },
-      { name: 'Orientation', href: '/orientation' },
-      { name: 'Student Handbook', href: '/student-handbook' },
       { name: 'Apply Now →', href: '/apply' },
     ],
   },
@@ -123,10 +117,10 @@ export const NAV_ITEMS = [
     name: 'My Account',
     href: '/login',
     subItems: [
-      { name: '— Students —', href: '/login', isHeader: true },
+      { name: '— Learners —', href: '/login', isHeader: true },
       { name: 'Sign In', href: '/login' },
       { name: 'My Dashboard', href: '/learner/dashboard' },
-      { name: 'My Courses', href: '/learner/dashboard' },
+      { name: 'My Courses', href: '/lms' },
       { name: '— Partners & Employers —', href: '/login', isHeader: true },
       { name: 'Partner Login', href: '/partner/login' },
       { name: 'Employer Portal', href: '/apply/employer' },
@@ -141,7 +135,7 @@ export const NAV_ITEMS = [
       { name: 'Employment Support', href: '/employment-support' },
       { name: 'Career Services', href: '/career-services' },
       { name: 'Student Handbook', href: '/student-handbook' },
-      { name: '— Student Resources —', href: '/support', isHeader: true },
+      { name: '— Learner Resources —', href: '/support', isHeader: true },
       { name: 'Orientation', href: '/orientation' },
       { name: 'Resources', href: '/resources' },
       { name: 'Academic Calendar', href: '/academic-calendar' },

@@ -1,8 +1,8 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 
@@ -21,6 +21,13 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const supabase = createClient();
+  const pathname = usePathname();
+
+  // Close menu on any route change
+  useEffect(() => {
+    setIsOpen(false);
+    setExpandedItem(null);
+  }, [pathname]);
 
   // Lock body scroll when menu is open and close on Escape
   useEffect(() => {

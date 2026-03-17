@@ -1,67 +1,74 @@
+/**
+ * POST /api/org/invite  — create an org invitation
+ * GET  /api/org/invite  — list pending invitations for the actor's org
+ *
+ * Auth: org_admin or org_owner (via requireOrgAccess).
+ * Invite table: org_invites (canonical — do not use org_invitations).
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getOrgContext } from '@/lib/org/getOrgContext';
+import { requireOrgAccess } from '@/lib/auth/org-guard';
+import { sendOrgInviteEmail } from '@/lib/email/sendOrgInviteEmail';
+import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as crypto from 'node:crypto';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { getOrgContext } from '@/lib/org/getOrgContext';
-import { sendOrgInviteEmail } from '@/lib/email/sendOrgInviteEmail';
-import * as crypto from 'node:crypto';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'contact');
+  if (rateLimited) return rateLimited;
+
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return safeError('Unauthorized', 401);
+
+  let ctx;
   try {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+    ctx = await getOrgContext(supabase, user.id);
+  } catch {
+    return safeError('No organization found for this user', 403);
+  }
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  // Require org_admin or higher
+  try {
+    await requireOrgAccess(req, ctx.organization_id, 'org_admin');
+  } catch (res) {
+    return res as NextResponse;
+  }
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return safeError('Invalid JSON', 400);
+  }
 
-    const ctx = await getOrgContext(supabase, user.id);
+  const { email, role, organization_id, cohort_id } = body;
 
-    // Only org_admin and super_admin can invite
-    if (!['org_admin', 'super_admin'].includes(ctx.role)) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions' },
-        { status: 403 }
-      );
-    }
+  if (!email || !role) {
+    return safeError('Missing required fields: email, role', 400);
+  }
 
-    const body = await req.json();
-    const { email, role, organization_id } = body;
+  const normalizedEmail = email.toLowerCase().trim();
+  const targetOrgId = organization_id || ctx.organization_id;
 
-    if (!email || !role) {
-      return NextResponse.json(
-        { error: 'Missing required fields: email, role' },
-        { status: 400 }
-      );
-    }
+  // org_admin can only invite to their own org
+  if (targetOrgId !== ctx.organization_id) {
+    return safeError('Cannot invite to a different organization', 403);
+  }
 
-    // Normalize email
-    const normalizedEmail = email.toLowerCase().trim();
+  const db = createAdminClient();
+  if (!db) return safeError('Service unavailable', 503);
 
-    // Use current org if not specified
-    const targetOrgId = organization_id || ctx.organization_id;
-
-    // Verify user has permission for target org
-    if (targetOrgId !== ctx.organization_id && ctx.role !== 'super_admin') {
-      return NextResponse.json(
-        { error: 'Cannot invite to different organization' },
-        { status: 403 }
-      );
-    }
-
-    // Check if there's already a pending invite for this email
+  try {
+    // Duplicate pending invite check
     const { data: pendingInvite } = await db
       .from('org_invites')
       .select('id')
@@ -71,141 +78,113 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (pendingInvite) {
-      return NextResponse.json(
-        { error: 'Invite already pending for this email' },
-        { status: 409 }
-      );
+      return safeError('A pending invitation already exists for this email', 409);
     }
 
-    // Check if invited email already has an account and is a member
-    const { data: invitedProfile } = await db
+    // Existing member check
+    const { data: existingProfile } = await db
       .from('profiles')
       .select('id')
       .eq('email', normalizedEmail)
-      .single();
+      .maybeSingle();
 
-    if (invitedProfile) {
-      // User exists - check if already a member
+    if (existingProfile) {
       const { data: existingMembership } = await db
         .from('organization_users')
         .select('id')
         .eq('organization_id', targetOrgId)
-        .eq('user_id', invitedProfile.id)
-        .single();
+        .eq('user_id', existingProfile.id)
+        .maybeSingle();
 
       if (existingMembership) {
-        return NextResponse.json(
-          { error: 'User already member of organization' },
-          { status: 409 }
-        );
+        return safeError('User is already a member of this organization', 409);
       }
     }
 
-    // Generate secure token
     const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Create invite
     const { data: invite, error: inviteError } = await db
       .from('org_invites')
       .insert({
-        email: normalizedEmail,
+        email:           normalizedEmail,
         role,
         token,
         organization_id: targetOrgId,
-        created_by: user.id,
-        expires_at: new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000
-        ).toISOString(),
+        created_by:      user.id,
+        expires_at:      expiresAt,
+        cohort_id:       cohort_id ?? null,
       })
-      .select()
+      .select('id, email, role, expires_at')
       .single();
 
-    if (inviteError) {
-      throw inviteError;
-    }
+    if (inviteError) return safeInternalError(inviteError, 'POST /api/org/invite insert');
 
     const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/accept-invite?token=${token}`;
 
-    // Send email if SENDGRID_API_KEY is configured
     if (process.env.SENDGRID_API_KEY) {
       const { data: inviterProfile } = await db
         .from('profiles')
         .select('full_name')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       await sendOrgInviteEmail({
-        to: normalizedEmail,
+        to:               normalizedEmail,
         inviteUrl,
         organizationName: ctx.organization.name,
-        inviterName: inviterProfile?.full_name || undefined,
+        inviterName:      inviterProfile?.full_name ?? undefined,
       });
     }
 
     return NextResponse.json({
       invite,
-      message: 'Invite created successfully',
-      invite_url: inviteUrl,
-      email_sent: !!process.env.SENDGRID_API_KEY,
+      invite_url:  inviteUrl,
+      email_sent:  !!process.env.SENDGRID_API_KEY,
     });
-  } catch (err: any) {
-    return NextResponse.json(
-      {
-        err:
-          'Internal server error',
-      },
-      { status: 500 }
-    );
+  } catch (err) {
+    return safeInternalError(err, 'POST /api/org/invite');
   }
 }
 
 async function _GET(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return safeError('Unauthorized', 401);
+
+  let ctx;
   try {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+    ctx = await getOrgContext(supabase, user.id);
+  } catch {
+    return safeError('No organization found for this user', 403);
+  }
 
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  try {
+    await requireOrgAccess(req, ctx.organization_id, 'org_admin');
+  } catch (res) {
+    return res as NextResponse;
+  }
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const db = createAdminClient();
+  if (!db) return safeError('Service unavailable', 503);
 
-    const ctx = await getOrgContext(supabase, user.id);
-
-    // Only org_admin and super_admin can view invites
-    if (!['org_admin', 'super_admin'].includes(ctx.role)) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions' },
-        { status: 403 }
-      );
-    }
-
+  try {
     const { data: invites, error } = await db
       .from('org_invites')
-      .select('*')
+      .select('id, email, role, cohort_id, expires_at, created_at, accepted_at')
       .eq('organization_id', ctx.organization_id)
-      .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
 
-    if (error) {
-      throw error;
-    }
+    if (error) return safeInternalError(error, 'GET /api/org/invite select');
 
     return NextResponse.json({ invites });
-  } catch (err: any) {
-    return NextResponse.json(
-      {
-        err:
-          'Internal server error',
-      },
-      { status: 500 }
-    );
+  } catch (err) {
+    return safeInternalError(err, 'GET /api/org/invite');
   }
 }
-export const GET = withApiAudit('/api/org/invite', _GET);
+
+export const GET  = withApiAudit('/api/org/invite', _GET);
 export const POST = withApiAudit('/api/org/invite', _POST);

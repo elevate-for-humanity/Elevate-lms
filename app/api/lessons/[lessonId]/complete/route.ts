@@ -13,7 +13,9 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import {
   recordStepCompletion,
   recordStepUncompletion,
+  enforceCheckpointGate,
 } from '@/lib/lms/engine';
+import type { CheckpointGateError } from '@/lib/lms/engine';
 
 async function _POST(
   request: NextRequest,
@@ -74,6 +76,27 @@ async function _POST(
         { error: 'Enrollment pending approval' },
         { status: 403 }
       );
+    }
+
+    // Checkpoint gate: block completion if the prior module's checkpoint
+    // has not been passed. Enforced server-side — client gating alone is
+    // insufficient because it can be bypassed via direct API calls.
+    try {
+      await enforceCheckpointGate(user.id, lessonId, lesson.course_id);
+    } catch (gateErr) {
+      const e = gateErr as CheckpointGateError;
+      if (e.code === 'CHECKPOINT_NOT_PASSED') {
+        return NextResponse.json(
+          {
+            error: e.message,
+            code: 'CHECKPOINT_NOT_PASSED',
+            checkpointLessonId: e.checkpointLessonId,
+            requiredScore: e.requiredScore,
+          },
+          { status: 403 }
+        );
+      }
+      throw gateErr; // unexpected — re-throw to 500 handler
     }
 
     // Fetch lesson details for type-specific enforcement

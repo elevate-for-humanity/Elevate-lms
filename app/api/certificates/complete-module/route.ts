@@ -5,6 +5,7 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { isCheckpointGateError, checkpointGateResponse } from '@/lib/lms/engine/gate';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -46,6 +47,7 @@ async function _POST(request: NextRequest) {
       }, { onConflict: 'user_id,lesson_id' });
 
     if (progressError) {
+      if (isCheckpointGateError(progressError)) return checkpointGateResponse();
       logger.error('Module completion recording failed', progressError);
       return NextResponse.json({ error: 'Failed to record completion' }, { status: 500 });
     }

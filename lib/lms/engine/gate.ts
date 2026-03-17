@@ -14,6 +14,7 @@
  * Throws { code: 'CHECKPOINT_NOT_PASSED', message, checkpointId } if blocked.
  */
 
+import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface CheckpointGateError {
@@ -23,6 +24,42 @@ export interface CheckpointGateError {
   checkpointTitle: string;
   requiredScore: number;
   bestScore: number | null;
+}
+
+/**
+ * isCheckpointGateError
+ *
+ * Returns true if the thrown value is either:
+ *   - A CheckpointGateError from the application-layer gate, or
+ *   - A raw PostgreSQL 23514 error from the DB-layer trigger.
+ *
+ * Use this in catch blocks on lesson_progress write paths that use
+ * createAdminClient() and do not call enforceCheckpointGate() first.
+ */
+export function isCheckpointGateError(err: unknown): boolean {
+  if (!err) return false;
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    (err as CheckpointGateError).code === 'CHECKPOINT_NOT_PASSED' ||
+    msg.includes('Checkpoint gate blocked') ||
+    msg.includes('23514')
+  );
+}
+
+/**
+ * checkpointGateResponse
+ *
+ * Returns a normalized NextResponse for checkpoint gate violations.
+ * Use in API route catch blocks after isCheckpointGateError().
+ */
+export function checkpointGateResponse(): NextResponse {
+  return NextResponse.json(
+    {
+      error: 'You must pass the required checkpoint before continuing.',
+      code:  'CHECKPOINT_NOT_PASSED',
+    },
+    { status: 403 }
+  );
 }
 
 export async function enforceCheckpointGate(

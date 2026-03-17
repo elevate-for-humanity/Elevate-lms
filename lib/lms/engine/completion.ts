@@ -14,6 +14,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { StepCompletionResult, CheckpointAttemptResult } from './types';
 import { issueCertificateIfEligible } from './certificate';
+import { isCheckpointGateError, CheckpointGateError } from './gate';
 
 // ─── recordStepCompletion ─────────────────────────────────────────────────────
 
@@ -26,7 +27,10 @@ export async function recordStepCompletion(
 ): Promise<StepCompletionResult> {
   const db = createAdminClient();
 
-  // Upsert lesson_progress
+  // Upsert lesson_progress.
+  // The DB trigger trg_enforce_lesson_progress_checkpoint_gate fires here.
+  // If the gate blocks, Postgres raises ERRCODE 23514 — normalize it to a
+  // structured CheckpointGateError so callers get a consistent domain error.
   const { error: progressError } = await db
     .from('lesson_progress')
     .upsert(
@@ -44,6 +48,17 @@ export async function recordStepCompletion(
     );
 
   if (progressError) {
+    if (isCheckpointGateError(progressError)) {
+      const gateErr: CheckpointGateError = {
+        code:               'CHECKPOINT_NOT_PASSED',
+        message:            'You must pass the required checkpoint before continuing.',
+        checkpointLessonId: '',
+        checkpointTitle:    '',
+        requiredScore:      80,
+        bestScore:          null,
+      };
+      throw gateErr;
+    }
     throw new Error(`recordStepCompletion: ${progressError.message}`);
   }
 

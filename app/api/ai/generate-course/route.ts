@@ -102,11 +102,7 @@ async function _POST(req: NextRequest) {
     );
 
     return NextResponse.json(
-      {
-        error: 'Failed to generate content',
-        message: toErrorMessage(error),
-        details: error.response?.data || error.toString(),
-      },
+      { error: 'Failed to generate content' },
       { status: 500 }
     );
   }

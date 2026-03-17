@@ -129,7 +129,8 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
             controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             controller.close();
           } catch (error) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: String(error) })}\n\n`));
+            logger.error('studio/chat stream error', error instanceof Error ? error : undefined);
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`));
             controller.close();
           }
         },

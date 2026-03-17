@@ -60,8 +60,9 @@ async function _POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      return NextResponse.json({ error: 'OCR extraction failed', details: error }, { status: 500 });
+      const detail = await response.text();
+      logger.error('OCR Netlify function error', { status: response.status, detail });
+      return NextResponse.json({ error: 'OCR extraction failed' }, { status: 500 });
     }
 
     const result = await response.json();

@@ -152,8 +152,9 @@ export async function GET(request: NextRequest) {
       });
 
       if (!pdfResponse.ok) {
-        const error = await pdfResponse.text();
-        return NextResponse.json({ error: 'PDF generation failed', details: error }, { status: 500 });
+        const detail = await pdfResponse.text();
+        logger.error('export PDF Netlify function error', { type, status: pdfResponse.status, detail });
+        return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
       }
 
       const pdfBuffer = await pdfResponse.arrayBuffer();

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Award, FileCheck, Briefcase, ChevronRight, BadgeCheck, DollarSign, MapPin } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -12,9 +13,9 @@ export const metadata: Metadata = {
 
 const completionCerts = [
   { name: 'Entrepreneurship', desc: 'Business plan development, entity formation, marketing, and financial management.', img: '/images/pages/business-sector.jpg' },
-  { name: 'Bookkeeping & QuickBooks', desc: 'Double-entry bookkeeping, financial statements, and QuickBooks Online proficiency.', img: '/images/pages/certifications-page-1.jpg' },
-  { name: 'Business Administration', desc: 'Microsoft Office, business communication, project management, and professional development.', img: '/images/pages/career-services-page-1.jpg' },
-  { name: 'Tax Preparation', desc: 'Individual tax return preparation, IRS compliance, and tax software proficiency.', img: '/images/pages/courses-page-1.jpg' },
+  { name: 'Bookkeeping & QuickBooks', desc: 'Double-entry bookkeeping, financial statements, and QuickBooks Online proficiency.', img: '/images/pages/bookkeeping-ledger.jpg' },
+  { name: 'Business Administration', desc: 'Microsoft Office, business communication, project management, and professional development.', img: '/images/pages/office-admin-desk.jpg' },
+  { name: 'Tax Preparation', desc: 'Individual tax return preparation, IRS compliance, and tax software proficiency.', img: '/images/pages/tax-preparation.jpg' },
   { name: 'Sanitation & Infection Control', desc: 'Disinfection procedures, bloodborne pathogen safety, and regulatory compliance.', img: '/images/pages/sanitation.jpg' },
   { name: 'Micro Programs', desc: 'Short-term stackable credentials in safety, digital literacy, and professional development.', img: '/images/pages/certifications.jpg' },
 ];
@@ -23,7 +24,7 @@ const industryCerts = [
   { name: 'OSHA 10 / OSHA 30', issuer: 'U.S. Department of Labor', field: 'Construction & Trades', desc: 'Workplace safety certification. DOL-issued card upon completion.', img: '/images/pages/electrical.jpg' },
   { name: 'CPR / AED / First Aid', issuer: 'AHA / Health & Safety Institute', field: 'Healthcare & General', desc: 'Same-day certification. Valid 2 years. Required for healthcare, childcare, and many trades.', img: '/images/pages/cna-nursing.jpg' },
   { name: 'CNA (Certified Nursing Assistant)', issuer: 'Indiana State Dept. of Health', field: 'Healthcare', desc: 'State-certified credential for patient care. Requires state competency exam.', img: '/images/pages/healthcare-sector.jpg' },
-  { name: 'CDL Class A License', issuer: 'Indiana BMV', field: 'Transportation', desc: 'Commercial driver license. Requires pre-trip, skills, and road test administered by the state.', img: '/images/pages/cdl-training.jpg' },
+  { name: 'CDL Class A License', issuer: 'Indiana BMV', field: 'Transportation', desc: 'Commercial driver license. Requires pre-trip, skills, and road test administered by the state.', img: '/images/pages/cdl-loading-dock.jpg' },
   { name: 'EPA Section 608', issuer: 'ESCO Institute / Mainstream Engineering', field: 'HVAC', desc: 'Required by federal law to handle refrigerants. Proctored on-site at our authorized testing center. Does not expire.', img: '/images/pages/hvac-technician.jpg' },
   { name: 'QuickBooks Certified User', issuer: 'Certiport / Intuit', field: 'Business', desc: 'Vendor certification exam administered through Certiport testing centers.', img: '/images/pages/bookkeeping.jpg' },
   { name: 'IT Specialist', issuer: 'Certiport', field: 'Technology', desc: 'Vendor certification in business applications, administered through Certiport.', img: '/images/pages/it-help-desk.jpg' },
@@ -34,7 +35,7 @@ const industryCerts = [
   { name: 'Phlebotomy Technician (CPT)', issuer: 'NHA', field: 'Healthcare', desc: 'National certification for blood draw and specimen collection. NHA-proctored exam.', img: '/images/pages/phlebotomy.jpg' },
   { name: 'Medical Assistant (CCMA)', issuer: 'NHA', field: 'Healthcare', desc: 'Clinical and administrative medical assisting. NHA-proctored exam.', img: '/images/pages/medical-assistant.jpg' },
   { name: 'Indiana CPRS', issuer: 'Indiana DMHA', field: 'Behavioral Health', desc: 'State credential for peer recovery specialists. Requires supervised practicum hours and state application.', img: '/images/pages/peer-recovery.jpg' },
-  { name: 'IRS PTIN', issuer: 'IRS', field: 'Tax Preparation', desc: 'Preparer Tax Identification Number. Required to prepare federal returns for compensation.', img: '/images/pages/tax-preparation.jpg' },
+  { name: 'IRS PTIN', issuer: 'IRS', field: 'Tax Preparation', desc: 'Preparer Tax Identification Number. Required to prepare federal returns for compensation.', img: '/images/pages/finance-accounting.jpg' },
 ];
 
 const apprenticeshipCreds = [
@@ -51,42 +52,18 @@ export default function CredentialsPage() {
       </div>
 
       {/* Hero banner */}
-      <section className="relative h-[340px] sm:h-[460px] overflow-hidden bg-white">
-        <Image
-          src="/images/pages/credentials-page-1.jpg"
-          alt="Credential pathways at Elevate for Humanity"
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-50"
-          priority
-        />
-        
-        <div className="relative h-full flex items-center">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-            <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">Credential Pathways</p>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight max-w-2xl">
-              Credentials at Elevate
-            </h1>
-            <p className="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
-              Three layers of credentials — completion certificates we issue, industry certifications from external testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <a href="#layer-1" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                <FileCheck className="w-4 h-4" /> Completion Certificates
-              </a>
-              <a href="#layer-2" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                <Award className="w-4 h-4" /> Industry Certifications
-              </a>
-              <a href="#layer-3" className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                <Briefcase className="w-4 h-4" /> Apprenticeship
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageVideoHero
+        videoSrc="/videos/welding-trades.mp4"
+        posterSrc="/images/pages/credentials-page-1.jpg"
+        posterAlt="Credential pathways at Elevate for Humanity"
+        size="program"
+        badge="Credential Pathways"
+        title="Credentials at Elevate"
+        subtitle="Three layers of credentials — completion certificates, industry certifications from national testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours."
+      />
 
       {/* Stats bar */}
-      <div className="bg-white border-t border-slate-700">
+      <div className="bg-white border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6">
           <div className="flex items-center gap-3">
             <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
@@ -148,13 +125,11 @@ export default function CredentialsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {completionCerts.map((cred) => (
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
-                <div className="relative h-36 overflow-hidden">
-                  <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
-                  </div>
+                <div className="relative h-40 overflow-hidden flex-shrink-0">
+                  <Image src={cred.img} alt={cred.name} fill sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" className="object-cover" />
                 </div>
                 <div className="p-4 flex flex-col flex-1">
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-2">{cred.name}</h3>
                   <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
                   <span className="inline-block mt-3 text-[10px] font-bold text-brand-blue-700 bg-brand-blue-50 border border-brand-blue-100 px-2.5 py-1 rounded-full self-start">Elevate-issued</span>
                 </div>
@@ -178,15 +153,13 @@ export default function CredentialsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {industryCerts.map((cred) => (
               <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
-                <div className="relative h-36 overflow-hidden">
-                  <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
-                    <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
-                  </div>
+                <div className="relative h-40 overflow-hidden flex-shrink-0">
+                  <Image src={cred.img} alt={cred.name} fill sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" className="object-cover" />
+                  <span className="absolute top-3 left-3 bg-white/90 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full">{cred.field}</span>
                 </div>
                 <div className="p-4 flex flex-col flex-1">
-                  <p className="text-emerald-700 text-xs font-semibold mb-1">Issued by {cred.issuer}</p>
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{cred.name}</h3>
+                  <p className="text-emerald-700 text-xs font-semibold mb-2">Issued by {cred.issuer}</p>
                   <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
                   <span className="inline-block mt-3 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full self-start">External credential</span>
                 </div>
@@ -197,35 +170,33 @@ export default function CredentialsPage() {
       </section>
 
       {/* Layer 3 — Registered Apprenticeship */}
-      <section id="layer-3" className="py-14 bg-white border-b border-slate-800">
+      <section id="layer-3" className="py-14 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
-            <Briefcase className="w-5 h-5 text-amber-400" />
-            <p className="text-amber-400 font-bold text-xs uppercase tracking-widest">Layer 3</p>
+            <Briefcase className="w-5 h-5 text-amber-600" />
+            <p className="text-amber-600 font-bold text-xs uppercase tracking-widest">Layer 3</p>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Registered Apprenticeship Credentials</h2>
-          <p className="text-slate-400 text-sm mb-8 max-w-2xl">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Registered Apprenticeship Credentials</h2>
+          <p className="text-slate-500 text-sm mb-8 max-w-2xl">
             The highest-authority credentials. Require documented OJT hours with employer training sites, competency verification by supervising employers, and DOL sponsor oversight. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301).
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {apprenticeshipCreds.map((cred) => (
-              <div key={cred.name} className="bg-white rounded-2xl border border-slate-700 overflow-hidden flex flex-col">
-                <div className="relative h-44 overflow-hidden">
-                  <Image src={cred.img} alt={cred.name} fill sizes="400px" className="object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/55 px-4 py-2">
-                    <p className="text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">{cred.field}</p>
-                    <h3 className="font-bold text-white text-sm leading-tight">{cred.name}</h3>
-                  </div>
+              <div key={cred.name} className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
+                <div className="relative h-40 overflow-hidden flex-shrink-0">
+                  <Image src={cred.img} alt={cred.name} fill sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" className="object-cover" />
+                  <span className="absolute top-3 left-3 bg-white/90 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-full">{cred.field}</span>
                 </div>
                 <div className="p-4 flex flex-col flex-1">
-                  <p className="text-amber-400 text-xs font-semibold mb-1">Issued by {cred.issuer}</p>
-                  <p className="text-slate-300 text-xs leading-relaxed flex-1">{cred.desc}</p>
-                  <span className="inline-block mt-3 text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-full self-start">DOL Registered</span>
+                  <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{cred.name}</h3>
+                  <p className="text-amber-600 text-xs font-semibold mb-2">Issued by {cred.issuer}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed flex-1">{cred.desc}</p>
+                  <span className="inline-block mt-3 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full self-start">DOL Registered</span>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-slate-500 text-xs mt-6">Additional apprenticeship programs (culinary, diesel) are in development pending employer partner agreements.</p>
+          <p className="text-slate-400 text-xs mt-6">Additional apprenticeship programs (culinary, diesel) are in development pending employer partner agreements.</p>
         </div>
       </section>
 

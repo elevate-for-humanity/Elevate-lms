@@ -143,6 +143,9 @@ certs/
 *.key
 *.pem
 
+# IRS XSD Schemas (copyrighted by IRS, download from e-Services)
+lib/tax-software/schemas/*/
+
 # ATS Evidence (large files)
 reports/ats-evidence/
 # Trigger rebuild

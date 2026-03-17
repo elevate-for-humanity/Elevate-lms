@@ -227,11 +227,16 @@ export default function LessonPage() {
           setIsCompleted(false);
           try {
             const err = await response.json();
-            if (err.required && err.actual != null) {
+            if (err.code === 'CHECKPOINT_NOT_PASSED') {
+              // Server-side gate fired — surface the exact message from the API
+              // which includes checkpoint title and required score.
+              setCompletionError(err.error ?? 'You must pass the previous module checkpoint before continuing.');
+              setCheckpointBlocked(true);
+            } else if (err.required && err.actual != null) {
               const remaining = Math.ceil((err.required - err.actual) / 60);
               setCompletionError(`Please spend at least ${remaining} more minute${remaining !== 1 ? 's' : ''} on this lesson before marking it complete.`);
             } else {
-              setCompletionError('Unable to mark complete. Please try again.');
+              setCompletionError(err.error ?? 'Unable to mark complete. Please try again.');
             }
           } catch {
             setCompletionError('Unable to mark complete. Please try again.');
@@ -767,8 +772,9 @@ export default function LessonPage() {
               <div>
                 <p className="font-semibold text-amber-800 text-sm">Module checkpoint required</p>
                 <p className="text-amber-700 text-sm mt-1">
-                  You must pass the checkpoint for the previous module before continuing.
-                  Return to that checkpoint and achieve a passing score to unlock this lesson.
+                  {completionError && completionError.includes('≥')
+                    ? completionError
+                    : 'You must pass the checkpoint for the previous module before continuing. Return to that checkpoint and achieve a passing score to unlock this lesson.'}
                 </p>
               </div>
             </div>

@@ -310,31 +310,50 @@
 
 # ============================================
 # SUPERSONIC DOMAIN (supersonicfastermoney.com)
-# 301 to canonical domain to prevent duplicate content indexing.
+# Serves Supersonic Fast Cash + VITA tax content from this domain.
+# /tax/* and /supersonic-fast-cash/* both map through.
+# HTTP naked → HTTPS www first, then path rules apply.
 # ============================================
 
-[[redirects]]
-  from = "https://supersonicfastermoney.com/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://www.supersonicfastermoney.com/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
-  status = 301
-  force = true
-
+# HTTP → HTTPS canonicalization (must come first)
 [[redirects]]
   from = "http://supersonicfastermoney.com/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  to = "https://www.supersonicfastermoney.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://www.supersonicfastermoney.com/*"
-  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  to = "https://www.supersonicfastermoney.com/:splat"
   status = 301
+  force = true
+
+# Naked → www
+[[redirects]]
+  from = "https://supersonicfastermoney.com/*"
+  to = "https://www.supersonicfastermoney.com/:splat"
+  status = 301
+  force = true
+
+# VITA / tax pages — live at /tax/* on the main site
+[[redirects]]
+  from = "https://www.supersonicfastermoney.com/tax/*"
+  to = "https://www.elevateforhumanity.org/tax/:splat"
+  status = 200
+  force = true
+
+# Supersonic Fast Cash pages — live at /supersonic-fast-cash/* on the main site
+[[redirects]]
+  from = "https://www.supersonicfastermoney.com/supersonic-fast-cash/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 200
+  force = true
+
+# Root and all other paths → Supersonic homepage
+[[redirects]]
+  from = "https://www.supersonicfastermoney.com/*"
+  to = "https://www.elevateforhumanity.org/supersonic-fast-cash/:splat"
+  status = 200
   force = true
 
 # ============================================

@@ -1,0 +1,67 @@
+SUPERSONIC FAST CASH — LEARN TO FILE VIDEO SCRIPT
+"How to File Your Own Taxes — Step by Step"
+Duration: 90–120 seconds
+Tone: Educational, encouraging, practical
+
+---
+
+SCENE 1 — OPEN (0:00–0:08)
+Visual: Person sitting at a laptop at home. Tax documents next to them.
+Relaxed home setting. Morning light.
+Voiceover (calm, encouraging):
+"Filing your own taxes doesn't have to be complicated.
+Here's exactly what you need to know to get it done right."
+
+SCENE 2 — WHAT YOU NEED (0:08–0:28)
+Visual: Documents laid out on a table — W-2, 1099, Social Security card,
+bank statement.
+Voiceover:
+"Before you start, gather your W-2 from every employer, any 1099 forms
+for other income, Social Security numbers for everyone on your return,
+and your bank account information for direct deposit.
+That's it. You're ready to begin."
+
+SCENE 3 — FILING STATUS (0:28–0:45)
+Visual: Screen recording of the DIY filing software — filing status selection.
+Voiceover:
+"The first thing you'll choose is your filing status — single, married
+filing jointly, head of household. This affects your standard deduction
+and your tax rate. If you're not sure, our software walks you through it."
+
+SCENE 4 — INCOME (0:45–1:00)
+Visual: Entering W-2 information into the software. Import feature shown.
+Voiceover:
+"Next, enter your income. If your employer is in our system, you can
+import your W-2 directly — no typing required. For 1099 income, enter
+each form separately."
+
+SCENE 5 — CREDITS (1:00–1:18)
+Visual: Software showing Earned Income Tax Credit and Child Tax Credit screens.
+Voiceover:
+"This is where most people leave money on the table. Our software
+automatically checks whether you qualify for the Earned Income Tax Credit,
+the Child Tax Credit, and other credits. These can add thousands of dollars
+to your refund — and you don't have to know to ask for them."
+
+SCENE 6 — REVIEW AND FILE (1:18–1:35)
+Visual: Review screen. Person reading through their return. Clicking submit.
+E-file confirmation screen.
+Voiceover:
+"Before you file, review your complete return. When you're ready, e-file
+directly to the IRS. You'll receive a confirmation within 24 hours.
+Your refund arrives in 10 to 21 days with direct deposit."
+
+SCENE 7 — CTA (1:35–1:50)
+Visual: Website on screen. DIY filing start page.
+Voiceover:
+"Ready to file? Start your return at supersonicfastermoney.com.
+Or if you'd rather have a professional handle it, book an appointment
+at any of our Indianapolis locations."
+
+---
+
+PRODUCTION NOTES:
+- Mix of screen recordings and real footage
+- Keep screen recordings clean — no test data, use realistic sample numbers
+- Voiceover should feel like a knowledgeable friend, not a corporate narrator
+- End card: website URL only

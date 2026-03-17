@@ -1,335 +1,113 @@
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Clock, Car, Video } from 'lucide-react';
+import SupersonicPageHero from '@/components/supersonic/SupersonicPageHero';
 
-export const dynamic = 'force-dynamic';
-
-export const metadata = {
-  title: 'Locations & Hours | Supersonic Fast Cash',
-  description:
-    'Visit our Indianapolis office or schedule a virtual appointment. Serving all 50 states.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/locations',
-  },
+export const metadata: Metadata = {
+  title: 'Locations | Supersonic Fast Cash',
+  description: 'Find a Supersonic Fast Cash tax preparation office near you. Indianapolis and surrounding areas. Walk-ins welcome.',
+  alternates: { canonical: 'https://www.supersonicfastermoney.com/supersonic-fast-cash/locations' },
 };
 
-export default async function LocationsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+const LOCATIONS = [
+  { name: 'Keystone Crossing — Main Office', address: '8888 Keystone Crossing, Suite 1300', city: 'Indianapolis, IN 46240', phone: '(317) 314-3757', hours: 'Mon–Fri 9am–8pm · Sat 9am–5pm · Sun 12pm–5pm', image: '/images/pages/supersonic-page-1.jpg' },
+  { name: 'Eastside Indianapolis', address: '2524 N Arlington Ave', city: 'Indianapolis, IN 46218', phone: '(317) 314-3757', hours: 'Mon–Fri 10am–7pm · Sat 9am–4pm', image: '/images/pages/supersonic-page-10.jpg' },
+  { name: 'Southside Indianapolis', address: '1802 Madison Ave', city: 'Indianapolis, IN 46225', phone: '(317) 314-3757', hours: 'Mon–Fri 10am–7pm · Sat 9am–3pm', image: '/images/pages/supersonic-page-11.jpg' },
+  { name: 'Northwest Indianapolis', address: '3901 Lafayette Rd', city: 'Indianapolis, IN 46254', phone: '(317) 314-3757', hours: 'Tue–Fri 11am–7pm · Sat 9am–4pm', image: '/images/pages/supersonic-page-12.jpg' },
+];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch locations
-  const { data: locations } = await db
-    .from('locations')
-    .select('*')
-    .eq('brand', 'supersonic');
+const STATES = [
+  { label: 'Indiana', href: '/supersonic-fast-cash/tax-preparation-indiana', image: '/images/pages/supersonic-page-10.jpg' },
+  { label: 'Illinois', href: '/supersonic-fast-cash/tax-preparation-illinois', image: '/images/pages/supersonic-page-11.jpg' },
+  { label: 'Ohio', href: '/supersonic-fast-cash/tax-preparation-ohio', image: '/images/pages/supersonic-page-12.jpg' },
+  { label: 'Tennessee', href: '/supersonic-fast-cash/tax-preparation-tennessee', image: '/images/pages/supersonic-fast-cash-page-1.jpg' },
+  { label: 'Texas', href: '/supersonic-fast-cash/tax-preparation-texas', image: '/images/pages/supersonic-tax.jpg' },
+];
+
+export default function LocationsPage() {
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Locations" }]} />
-      </div>
-{/* Hero */}
-      <section className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">Visit Us or Meet Online</h1>
-          <p className="text-xl text-black">
-            In-person service in Indianapolis or virtual appointments nationwide
-          </p>
-        </div>
-      </section>
+      <SupersonicPageHero
+        image="/images/pages/supersonic-page-4.jpg"
+        alt="Supersonic Fast Cash office locations"
+        title="Our Locations"
+        subtitle="Walk-ins welcome. Appointments recommended during peak tax season (January–April)."
+      />
 
-      {/* Main Office */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Office Info */}
-            <div>
-              <h2 className="text-3xl font-bold text-black mb-8">
-                Indianapolis Office
-              </h2>
-
-              <div className="space-y-6 mb-8">
-                <div className="flex items-start gap-4">
-                  <MapPin className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-black mb-1">
-                      Address
-                    </div>
-                    <div className="text-black">
-                      8888 Keystone Crossing, Suite 1300
-                      <br />
-                      Indianapolis, IN 46240
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Phone className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-black mb-1">
-                      Phone
-                    </div>
-                    <a
-                      href="/support"
-                      className="text-brand-blue-600 hover:text-brand-blue-700"
-                    >
-                      (317) 314-3757
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Mail className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-black mb-1">
-                      Email
-                    </div>
-                    <a
-                      href="mailto:supersonicfastcashllc@gmail.com"
-                      className="text-brand-blue-600 hover:text-brand-blue-700"
-                    >
-                      supersonicfastcashllc@gmail.com
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Clock className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-black mb-2">
-                      Hours
-                    </div>
-                    <div className="space-y-1 text-black">
-                      <div className="flex justify-between gap-8">
-                        <span>Monday - Friday:</span>
-                        <span className="font-medium">9:00 AM - 7:00 PM</span>
-                      </div>
-                      <div className="flex justify-between gap-8">
-                        <span>Saturday:</span>
-                        <span className="font-medium">10:00 AM - 4:00 PM</span>
-                      </div>
-                      <div className="flex justify-between gap-8">
-                        <span>Sunday:</span>
-                        <span className="font-medium">Closed</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Car className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-black mb-1">
-                      Parking
-                    </div>
-                    <div className="text-black">
-                      Free parking available on-site
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/supersonic-fast-cash/book-appointment"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-                >
-                  Book In-Person Visit
-                </Link>
-                <a
-                  href="https://www.google.com/maps/place/8888+Keystone+Crossing,+Indianapolis,+IN+46240"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Get Directions
-                </a>
-              </div>
-            </div>
-
-            {/* Map */}
-            <div className="bg-white rounded-xl overflow-hidden h-[500px]">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3063.8!2d-86.0!3d39.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMznCsDU0JzAwLjAiTiA4NsKwMDAnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Virtual Services */}
+      {/* LOCATIONS */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <Video className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-black mb-4">
-              Virtual Appointments Available
-            </h2>
-            <p className="text-xl text-black">
-              Can't make it to our office? We offer secure video consultations
-              for clients anywhere in the United States.
-            </p>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">Indianapolis Offices</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">Four locations across Indianapolis. All offices offer full tax preparation, refund advances, and document upload services.</p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Video className="w-6 h-6 text-brand-blue-600" />
-              </div>
-              <h3 className="font-bold text-black mb-2">
-                Video Consultation
-              </h3>
-              <p className="text-sm text-black">
-                Face-to-face meeting via secure video call
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-6 h-6 text-brand-green-600" />
-              </div>
-              <h3 className="font-bold text-black mb-2">
-                Phone Consultation
-              </h3>
-              <p className="text-sm text-black">
-                Discuss your tax situation over the phone
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-brand-blue-600" />
-              </div>
-              <h3 className="font-bold text-black mb-2">Document Upload</h3>
-              <p className="text-sm text-black">
-                Securely upload documents online
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <Link
-              href="/supersonic-fast-cash/book-appointment"
-              className="inline-block px-8 py-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-            >
-              Schedule Virtual Appointment
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Service Area */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-black mb-4">
-              Serving All 50 States
-            </h2>
-            <p className="text-xl text-black">
-              While our office is in Indianapolis, we prepare returns for
-              clients nationwide
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {[
-              'Alabama',
-              'Alaska',
-              'Arizona',
-              'Arkansas',
-              'California',
-              'Colorado',
-              'Connecticut',
-              'Delaware',
-              'Florida',
-              'Georgia',
-              'Hawaii',
-              'Idaho',
-              'Illinois',
-              'Indiana',
-              'Iowa',
-              'Kansas',
-              'Kentucky',
-              'Louisiana',
-              'Maine',
-              'Maryland',
-              'Massachusetts',
-              'Michigan',
-              'Minnesota',
-              'Mississippi',
-              'Missouri',
-              'Montana',
-              'Nebraska',
-              'Nevada',
-              'New Hampshire',
-              'New Jersey',
-              'New Mexico',
-              'New York',
-              'North Carolina',
-              'North Dakota',
-              'Ohio',
-              'Oklahoma',
-              'Oregon',
-              'Pennsylvania',
-              'Rhode Island',
-              'South Carolina',
-              'South Dakota',
-              'Tennessee',
-              'Texas',
-              'Utah',
-              'Vermont',
-              'Virginia',
-              'Washington',
-              'West Virginia',
-              'Wisconsin',
-              'Wyoming',
-            ].map((state) => (
-              <div key={state} className="text-center py-2 text-black">
-                {state}
+          <div className="grid md:grid-cols-2 gap-8">
+            {LOCATIONS.map((loc) => (
+              <div key={loc.name} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
+                <div className="relative h-52 flex-shrink-0">
+                  <Image src={loc.image} alt={loc.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                </div>
+                <div className="p-6 flex-1 bg-white">
+                  <h3 className="font-bold text-slate-900 text-lg mb-4">{loc.name}</h3>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Address', value: `${loc.address}, ${loc.city}`, image: '/images/pages/locations-page-1.jpg' },
+                      { label: 'Phone', value: loc.phone, image: '/images/pages/contact-page-1.jpg' },
+                      { label: 'Hours', value: loc.hours, image: '/images/pages/calendar-page-1.jpg' },
+                    ].map((item) => (
+                      <div key={item.label} className="flex gap-3 items-start">
+                        <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                          <Image src={item.image} alt={item.label} fill className="object-cover" sizes="40px" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{item.label}</p>
+                          <p className="text-slate-900 text-sm font-medium">{item.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Link href="/supersonic-fast-cash/book-appointment" className="mt-5 block w-full text-center py-3 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition-colors">
+                    Book at This Location
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* STATE AREAS */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">Service Areas by State</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">We serve clients in five states. Select your state for local VITA sites and tax preparation locations.</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+            {STATES.map((state) => (
+              <Link key={state.label} href={state.href} className="group rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300">
+                <div className="relative h-32">
+                  <Image src={state.image} alt={state.label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 20vw" />
+                </div>
+                <div className="p-3 bg-white">
+                  <p className="font-bold text-slate-900 group-hover:text-brand-red-600 transition-colors text-sm">{state.label} →</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-900 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
-            Visit us in Indianapolis or schedule a virtual appointment today
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/supersonic-fast-cash/book-appointment"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-white transition-colors"
-            >
-              Book Appointment
-            </Link>
-            <Link
-              href="/support"
-              className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors border-2 border-white"
-            >
-              Call (317) 314-3757
-            </Link>
+      <section className="relative h-[45vh] min-h-[320px]">
+        <Image src="/images/pages/supersonic-page-5.jpg" alt="Book your tax appointment" fill className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Book Your Appointment</h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/supersonic-fast-cash/book-appointment" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">Book Now</Link>
+              <a href="tel:+13173143757" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">(317) 314-3757</a>
+            </div>
           </div>
         </div>
       </section>

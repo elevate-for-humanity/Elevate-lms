@@ -1,174 +1,104 @@
-
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Phone, 
-  Mail, 
-  Clock, 
-  HelpCircle,
-  FileText,
-  DollarSign,
-  Shield,
-  ArrowRight
-} from 'lucide-react';
+import SupersonicPageHero from '@/components/supersonic/SupersonicPageHero';
 
 export const metadata: Metadata = {
   title: 'Support | Supersonic Fast Cash',
   description: 'Get help with tax preparation, filing questions, and refund status. Contact our support team.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/support',
-  },
+  alternates: { canonical: 'https://www.supersonicfastermoney.com/supersonic-fast-cash/support' },
 };
 
-const faqs = [
+const FAQS = [
   {
     category: 'Tax Preparation',
-    icon: FileText,
+    image: '/images/pages/supersonic-tax-prep.jpg',
     questions: [
-      {
-        q: 'What documents do I need to file?',
-        a: 'You\'ll need W-2s from employers, 1099 forms for other income, Social Security numbers for yourself and dependents, and bank account information for direct deposit.',
-      },
-      {
-        q: 'How long does filing take?',
-        a: 'Most returns take 15-45 minutes depending on complexity. Simple W-2 returns are faster. Self-employment or investment income takes longer.',
-      },
-      {
-        q: 'When will I get my refund?',
-        a: 'The IRS typically processes e-filed returns in 10-21 days. Direct deposit is faster than paper checks. You can track your refund status after filing.',
-      },
+      { q: 'What documents do I need to file?', a: "You'll need W-2s from all employers, 1099 forms for other income, Social Security numbers for yourself and all dependents, last year's return if available, and bank account information for direct deposit. If you're self-employed, bring your income and expense records." },
+      { q: 'How long does filing take?', a: 'Most returns take 15–45 minutes depending on complexity. Simple W-2 returns are faster. Self-employment, rental income, or investment income takes longer. Our preparers work efficiently and will let you know upfront if your return is more complex.' },
+      { q: 'When will I get my refund?', a: 'The IRS typically processes e-filed returns in 10–21 days. Direct deposit is faster than a paper check. You can track your refund status at IRS.gov after filing. If you qualify for a refund advance, you can receive funds the same day your return is accepted.' },
     ],
   },
   {
     category: 'Refund Advance',
-    icon: DollarSign,
+    image: '/images/pages/supersonic-page-2.jpg',
     questions: [
-      {
-        q: 'Is the refund advance required?',
-        a: 'No. The advance is completely optional. You can file your taxes and wait for your refund from the IRS without taking an advance.',
-      },
-      {
-        q: 'Is this a loan?',
-        a: 'No. The advance is based on your expected tax refund and is repaid automatically from that refund. You do not make separate payments.',
-      },
-      {
-        q: 'How much can I get?',
-        a: 'Advance amounts range from $250 to $7,500 depending on your expected refund and eligibility. The bank determines the final amount.',
-      },
-      {
-        q: 'What if my refund is less than expected?',
-        a: 'If the IRS adjusts your refund, you may owe the difference. Advance amounts are typically less than your full expected refund for this reason.',
-      },
+      { q: 'Is the refund advance required?', a: 'No. The advance is completely optional. You can file your taxes and wait for your standard IRS refund without taking an advance. There is no pressure to use this product.' },
+      { q: 'Is this a loan?', a: 'The advance is a financial product offered by a lending partner. It is based on your expected tax refund and is repaid automatically when your IRS refund arrives. You do not make separate monthly payments.' },
+      { q: 'How much can I get?', a: 'Advance amounts range from $500 to $7,500 depending on your expected refund and eligibility. The lending partner determines the final amount. Approval is not guaranteed and is subject to eligibility requirements.' },
+      { q: 'What if my refund is less than expected?', a: 'If the IRS adjusts your refund downward, you may owe the difference between the advance amount and the actual refund. Advance amounts are typically set below your full expected refund to account for this possibility.' },
     ],
   },
   {
     category: 'Account & Security',
-    icon: Shield,
+    image: '/images/pages/supersonic-page-4.jpg',
     questions: [
-      {
-        q: 'Is my information secure?',
-        a: 'Yes. We use encryption to protect your personal and financial information. Your data is never sold to third parties.',
-      },
-      {
-        q: 'Can I access my return after filing?',
-        a: 'Yes. You can download a copy of your filed return from your account at any time.',
-      },
+      { q: 'Is my information secure?', a: 'Yes. We use encryption to protect your personal and financial information during transmission and storage. Your data is never sold to third parties. We comply with IRS data security requirements for authorized e-file providers.' },
+      { q: 'Can I access my return after filing?', a: 'Yes. You can download a copy of your filed return from your account at any time. We recommend saving a copy for your records. Returns are available for at least three years after filing.' },
     ],
   },
 ];
 
-export default function SupportPage() {
+const QUICK_LINKS = [
+  { label: 'How Tax Filing Works', href: '/supersonic-fast-cash/how-it-works', image: '/images/pages/supersonic-page-6.jpg' },
+  { label: 'Pricing', href: '/supersonic-fast-cash/pricing', image: '/images/pages/finance-accounting.jpg' },
+  { label: 'About Refund Advances', href: '/supersonic-fast-cash/services/refund-advance', image: '/images/pages/supersonic-page-3.jpg' },
+  { label: 'Book Appointment', href: '/supersonic-fast-cash/book-appointment', image: '/images/pages/supersonic-page-7.jpg' },
+];
 
+export default function SupportPage() {
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Support" }]} />
-      </div>
-{/* Hero */}
-      <section className="bg-brand-blue-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-semibold text-gray-900 mb-4">
-            Support Center
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Find answers to common questions or contact our team for help.
-          </p>
-        </div>
-      </section>
+      <SupersonicPageHero
+        image="/images/pages/supersonic-page-8.jpg"
+        alt="Supersonic Fast Cash support center"
+        title="Support Center"
+        subtitle="Find answers to common questions or contact our team directly."
+      />
 
-      {/* Contact Options */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
-            Contact Us
-          </h2>
-
+      {/* CONTACT OPTIONS — image cards, no icons */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-10 text-center">Contact Us</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
-              <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
-              <a 
-                href="/support" 
-                className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
-              >
-                (317) 314-3757
+            {[
+              { label: 'Phone', value: '(317) 314-3757', href: 'tel:+13173143757', image: '/images/pages/contact-page-1.jpg', desc: 'Mon–Fri 9am–8pm, Sat 9am–5pm, Sun 12pm–5pm' },
+              { label: 'Email', value: 'support@supersonicfastcash.com', href: 'mailto:support@supersonicfastcash.com', image: '/images/pages/admin-email-hero.jpg', desc: 'Response within 1 business day' },
+              { label: 'In Person', value: '8888 Keystone Crossing, Suite 1300', href: '/supersonic-fast-cash/locations', image: '/images/pages/locations-page-1.jpg', desc: 'Indianapolis, IN 46240' },
+            ].map((item) => (
+              <a key={item.label} href={item.href} className="group rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300 flex flex-col">
+                <div className="relative h-44 w-full">
+                  <Image src={item.image} alt={item.label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
+                <div className="p-5 flex-1 bg-white">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{item.label}</p>
+                  <p className="font-bold text-slate-900 group-hover:text-brand-red-600 transition-colors mb-1">{item.value}</p>
+                  <p className="text-sm text-slate-500">{item.desc}</p>
+                </div>
               </a>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
-              <Mail className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-              <a 
-                href="mailto:support@supersonicfastcash.com" 
-                className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
-              >
-                support@supersonicfastcash.com
-              </a>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200 text-center">
-              <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Hours</h3>
-              <p className="text-gray-600 text-sm">
-                Mon-Fri: 9am-6pm EST<br />
-                Sat: 10am-4pm EST
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FAQs */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
-            Frequently Asked Questions
-          </h2>
-
-          <div className="space-y-12">
-            {faqs.map((category) => (
-              <div key={category.category}>
-                <div className="flex items-center gap-3 mb-6">
-                  <category.icon className="w-6 h-6 text-brand-blue-600" />
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {category.category}
-                  </h3>
+      {/* FAQs — image per category, no icons */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-12 text-center">Frequently Asked Questions</h2>
+          <div className="space-y-16">
+            {FAQS.map((cat) => (
+              <div key={cat.category}>
+                <div className="flex items-center gap-5 mb-8">
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                    <Image src={cat.image} alt={cat.category} fill className="object-cover" sizes="64px" />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900">{cat.category}</h3>
                 </div>
-
                 <div className="space-y-4">
-                  {category.questions.map((faq, idx) => (
-                    <div 
-                      key={idx} 
-                      className="bg-white border border-gray-200 rounded-xl p-6"
-                    >
-                      <div className="flex items-start gap-3">
-                        <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-2">{faq.q}</h4>
-                          <p className="text-gray-600 text-sm">{faq.a}</p>
-                        </div>
-                      </div>
+                  {cat.questions.map((faq) => (
+                    <div key={faq.q} className="bg-white rounded-xl p-6 border border-slate-200">
+                      <p className="font-bold text-slate-900 mb-2">{faq.q}</p>
+                      <p className="text-slate-600 text-sm leading-relaxed">{faq.a}</p>
                     </div>
                   ))}
                 </div>
@@ -178,65 +108,35 @@ export default function SupportPage() {
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
-            Quick Links
-          </h2>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Link 
-              href="/supersonic-fast-cash/how-it-works"
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
-            >
-              <span className="font-medium text-gray-900">How Tax Filing Works</span>
-              <ArrowRight className="w-5 h-5 text-gray-400" />
-            </Link>
-
-            <Link 
-              href="/supersonic-fast-cash/pricing"
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
-            >
-              <span className="font-medium text-gray-900">Pricing</span>
-              <ArrowRight className="w-5 h-5 text-gray-400" />
-            </Link>
-
-            <Link 
-              href="/supersonic-fast-cash/cash-advance"
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
-            >
-              <span className="font-medium text-gray-900">About Refund Advances</span>
-              <ArrowRight className="w-5 h-5 text-gray-400" />
-            </Link>
-
-            <Link 
-              href="/supersonic-fast-cash/book-appointment"
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 hover:bg-white transition-colors"
-            >
-              <span className="font-medium text-gray-900">Schedule Appointment</span>
-              <ArrowRight className="w-5 h-5 text-gray-400" />
-            </Link>
+      {/* QUICK LINKS — image cards */}
+      <section className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-10 text-center">Quick Links</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {QUICK_LINKS.map((link) => (
+              <Link key={link.label} href={link.href} className="group rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300">
+                <div className="relative h-32">
+                  <Image src={link.image} alt={link.label} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
+                </div>
+                <div className="p-3 bg-white">
+                  <p className="font-semibold text-slate-900 text-sm group-hover:text-brand-red-600 transition-colors">{link.label} →</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-semibold text-white mb-4">
-            Ready to file?
-          </h2>
-          <p className="text-brand-blue-200 mb-8">
-            Start your tax return today.
-          </p>
-          <Link
-            href="/supersonic-fast-cash/start"
-            className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
-          >
-            Start Tax Preparation
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+      <section className="relative h-[45vh] min-h-[320px]">
+        <Image src="/images/pages/supersonic-page-9.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File?</h2>
+            <Link href="/supersonic-fast-cash/start" className="px-10 py-4 bg-brand-red-600 text-white font-black text-xl rounded-xl hover:bg-brand-red-700 transition-colors">
+              Start Tax Preparation
+            </Link>
+          </div>
         </div>
       </section>
     </div>

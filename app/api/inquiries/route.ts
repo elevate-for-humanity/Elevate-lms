@@ -85,15 +85,9 @@ async function _POST(req: Request) {
       .single();
 
     if (error) {
-      logger.error('Supabase insert error:', JSON.stringify(error, null, 2));
+      logger.error('Supabase insert error', { code: error.code, details: error.details, hint: error.hint });
       return NextResponse.json(
-        {
-          error: 'Failed to save inquiry',
-          debug: 'Internal server error',
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
-        },
+        { error: 'Failed to save inquiry' },
         { status: 500 }
       );
     }

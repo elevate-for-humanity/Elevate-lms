@@ -4,8 +4,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
-import { logAuditEvent } from '@/lib/audit';
-import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
@@ -20,6 +18,18 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
+  const identifier = getClientIdentifier(req.headers);
+  const rateLimitResult = rateLimit(identifier, {
+    limit: 10,
+    window: 60 * 60 * 1000,
+  });
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many reports. Please try again later.' },
+      { status: 429 }
+    );
+  }
 
   try {
     const { product_id, reporter_email, reason, details } = await req.json();

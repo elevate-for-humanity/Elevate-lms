@@ -405,11 +405,10 @@ async function publishCompiledDraft(
     // Upsert modules rows so curriculum_lessons.module_id can be populated.
     // Identity key: program_id + slug. Safe to run on every publish.
     const moduleUpsertRows = draft.modules.map((mod) => ({
-      program_id:   draft.program_id,
-      title:        mod.module_title,
-      slug:         slugify(mod.module_title).slice(0, 80),
-      module_order: mod.module_order - 1,
-      status:       'published',
+      program_id:  draft.program_id,
+      title:       mod.module_title,
+      slug:        slugify(mod.module_title).slice(0, 80),
+      order_index: mod.module_order - 1,
     }));
     const { data: upsertedModules, error: modErr } = await db
       .from('modules')
@@ -481,6 +480,7 @@ async function publishCompiledDraft(
           module_order:      mod.module_order - 1,
           module_title:      mod.module_title,
           step_type,
+          passing_score:     isCheckpoint ? 80 : 0,
           script_text:       lesson.narration_script,
           summary_text:      lesson.summary_text || '',
           reflection_prompt: lesson.reflection_prompt || '',
@@ -655,9 +655,27 @@ async function _POST(req: NextRequest) {
     // ── 2b. curriculum_lessons parallel write ───────────────────────────────
     // Only when program_id is present (NOT NULL constraint on curriculum_lessons).
     if (program_id) {
+      // Upsert modules first so module_id FK can be satisfied on curriculum_lessons.
+      const moduleUpsertRows2 = course.modules.map((mod, modIdx) => ({
+        program_id,
+        title:       mod.title,
+        slug:        mod.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80),
+        order_index: modIdx,
+      }));
+      const { data: upsertedModules2, error: modErr2 } = await db
+        .from('modules')
+        .upsert(moduleUpsertRows2, { onConflict: 'program_id,slug', ignoreDuplicates: false })
+        .select('id, slug');
+      if (modErr2) logger.warn('modules upsert failed (non-fatal)', { error: modErr2.message });
+      const moduleIdBySlug2 = new Map<string, string>(
+        (upsertedModules2 ?? []).map((m: { id: string; slug: string }) => [m.slug, m.id])
+      );
+
       const curriculumRows = course.modules.flatMap((mod, modIdx) => {
         const totalInModule = mod.lessons.length;
         const isFinalModule = modIdx === course.modules.length - 1;
+        const modSlug2 = mod.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+        const resolvedModuleId2 = moduleIdBySlug2.get(modSlug2) ?? null;
 
         return mod.lessons.map((lesson, lessonIdx) => {
           const slugBase = lesson.title
@@ -688,12 +706,14 @@ async function _POST(req: NextRequest) {
           return {
             program_id,
             course_id:         courseId,
+            module_id:         resolvedModuleId2,
             lesson_slug:       `${slugBase}-${lesson.lesson_number}`,
             lesson_title:      lesson.title,
             lesson_order:      lesson.lesson_number - 1,
             module_order:      modIdx,
             module_title:      mod.title,
             step_type,
+            passing_score:     isCheckpoint ? 80 : 0,
             script_text:       lesson.content,
             summary_text:      lesson.summary_text || lesson.description || '',
             reflection_prompt: lesson.reflection_prompt || '',

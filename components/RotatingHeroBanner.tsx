@@ -5,9 +5,12 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-  { image: "/images/pages/comp-home-hero.jpg" },
-  { image: "/images/pages/comp-home-hero-programs.jpg" },
   { image: "/images/pages/training-classroom.jpg" },
+  { image: "/images/pages/cna-nursing-real.jpg" },
+  { image: "/images/pages/cdl-truck-highway.jpg" },
+  { image: "/images/pages/welding-sparks.jpg" },
+  { image: "/images/pages/hvac-technician.jpg" },
+  { image: "/images/pages/electrical-wiring.jpg" },
 ];
 
 export default function RotatingHeroBanner() {

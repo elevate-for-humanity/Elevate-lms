@@ -3,7 +3,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   slug: 'business', title: 'Business Administration',
   subtitle: 'Prepare for Certiport business certifications. Microsoft Office, QuickBooks, and business fundamentals in 8 weeks.',
   sector: 'business', category: 'Business Administration',
-  heroImage: '/images/pages/admin-business-hero.jpg', heroImageAlt: 'Business administration student working on a computer',
+  heroImage: '/images/pages/business-sector.jpg', heroImageAlt: 'Business administration student working on a computer',
   deliveryMode: 'hybrid', durationWeeks: 8, hoursPerWeekMin: 15, hoursPerWeekMax: 20,
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 60, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–12:00 PM (15–20 hrs/week)',

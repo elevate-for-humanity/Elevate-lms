@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
@@ -83,7 +84,7 @@ export default function HomePage() {
             {/* Employer */}
             <Link href="/employer" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-brand-blue-500 rounded-xl overflow-hidden transition-all hover:shadow-md">
               <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                <Image src="/images/pages/hire-graduates-page-1.jpg" alt="Employer hiring Elevate graduates" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer hiring Elevate graduates" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <p className="font-bold text-slate-900 text-base mb-1">Employer / Hiring Partner</p>
@@ -96,7 +97,7 @@ export default function HomePage() {
             {/* Agency */}
             <Link href="/workforce-board" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-slate-700 rounded-xl overflow-hidden transition-all hover:shadow-md">
               <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                <Image src="/images/pages/workforce-board-page-1.jpg" alt="Workforce agency and compliance reporting" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+                <Image src="/images/pages/career-services-page-3.jpg" alt="Workforce agency and compliance reporting" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <p className="font-bold text-slate-900 text-base mb-1">Agency / Workforce Board</p>
@@ -110,180 +111,135 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TRAINING PROGRAMS ── */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* ── WHAT WE DO ── */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Training Programs</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Career pathways we offer</h2>
-            <p className="text-slate-500 mb-10">Short-term. Credential-bearing. Most fully funded through WIOA and Indiana state grants.</p>
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">What We Do</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-12">Training. Credentials. Network.</h2>
           </FadeInUp>
-          <StaggerChildren staggerDelay={0.07}>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  sector: 'Healthcare',
-                  title: 'CNA Certification',
-                  desc: 'Become a Certified Nursing Assistant in 4–6 weeks. Clinical training included. Indiana ISDH credential. WIOA eligible.',
-                  image: '/images/pages/cna-patient-care.jpg',
-                  alt: 'CNA student practicing patient care',
-                  salary: '$30K–$42K',
-                  duration: '4–6 weeks',
-                  href: '/programs/cna',
-                },
-                {
-                  sector: 'Skilled Trades',
-                  title: 'HVAC Technician',
-                  desc: 'EPA Section 608 certification. Hands-on lab training in heating, cooling, and refrigeration systems. High demand statewide.',
-                  image: '/images/pages/hvac-unit.jpg',
-                  alt: 'HVAC technician working on equipment',
-                  salary: '$48K–$80K',
-                  duration: '12 weeks',
-                  href: '/programs/hvac-technician',
-                },
-                {
-                  sector: 'Transportation',
-                  title: 'CDL Commercial Driving',
-                  desc: 'Class A CDL training with pre-trip inspection, backing, and road test prep. DOT physical included. Job placement assistance.',
-                  image: '/images/pages/cdl-training.jpg',
-                  alt: 'CDL commercial driving training',
-                  salary: '$50K–$75K+',
-                  duration: '4–6 weeks',
-                  href: '/programs/cdl-training',
-                },
-                {
-                  sector: 'Skilled Trades',
-                  title: 'Welding',
-                  desc: 'AWS-aligned welding training covering MIG, TIG, and stick. Hands-on shop time from day one. NCCER credential pathway.',
-                  image: '/images/pages/welding-torch.jpg',
-                  alt: 'Welding student using a torch in the shop',
-                  salary: '$54K–$150K+',
-                  duration: '12–16 weeks',
-                  href: '/programs/welding',
-                },
-                {
-                  sector: 'Technology',
-                  title: 'IT Support / Help Desk',
-                  desc: 'CompTIA A+ and IT Fundamentals prep. Troubleshooting, networking basics, and help desk operations. Remote and on-site roles.',
-                  image: '/images/pages/it-helpdesk-desk.jpg',
-                  alt: 'IT support student at a help desk',
-                  salary: '$35K–$60K',
-                  duration: '8–12 weeks',
-                  href: '/programs/it-help-desk',
-                },
-                {
-                  sector: 'Personal Services',
-                  title: 'Barber Apprenticeship',
-                  desc: 'DOL Registered Apprenticeship. 2,000 hours of OJT at a licensed barbershop. Earn while you learn. Indiana Barber License pathway.',
-                  image: '/images/pages/barber-client-chair.jpg',
-                  alt: 'Barber apprentice working with a client',
-                  salary: '$30K–$60K+',
-                  duration: '12–18 months',
-                  href: '/programs/barber-apprenticeship',
-                },
-              ].map((p) => (
-                <StaggerItem key={p.title}>
-                  <Link
-                    href={p.href}
-                    className="group flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-red-300 hover:shadow-lg transition-all h-full"
-                  >
-                    {/* Picture */}
-                    <div className="relative w-full flex-shrink-0" style={{ aspectRatio: '16/9' }}>
-                      <Image
-                        src={p.image}
-                        alt={p.alt}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        loading="lazy"
-                      />
-                      <span className="absolute top-3 left-3 bg-white/90 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                        {p.sector}
-                      </span>
-                    </div>
-                    {/* Card body */}
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-extrabold text-slate-900 text-base mb-2">{p.title}</h3>
-                      <p className="text-slate-500 text-sm leading-relaxed mb-4 flex-1">{p.desc}</p>
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <div>
-                          <p className="text-brand-green-700 font-bold text-sm">{p.salary}</p>
-                          <p className="text-slate-400 text-xs">{p.duration}</p>
-                        </div>
-                        <span className="inline-flex items-center gap-1 text-brand-red-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
-                          Learn more <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </StaggerItem>
-              ))}
-            </div>
+          <StaggerChildren staggerDelay={0.15}>
+            {[
+              {
+                label: 'Training',
+                heading: 'Short-term programs, real credentials',
+                body: 'Healthcare, skilled trades, CDL, barbering, and technology — 4 to 16 weeks, most fully funded. Every program ends with a proctored certification exam on-site at Elevate.',
+                image: '/images/pages/training-classroom.jpg',
+                alt: 'Students in workforce training classroom',
+                link: '/programs',
+                linkText: 'See all programs',
+              },
+              {
+                label: 'Credentials',
+                heading: 'Exam prep to verified certification',
+                body: 'Credentials are issued by the national certifying body — EPA, PTCB, CompTIA, NCCER, Indiana ISDH. Portable and verifiable nationwide. Elevate tracks eligibility and coordinates testing.',
+                image: '/images/pages/career-services-hero.jpg',
+                alt: 'Credential pathway and certification tracking',
+                link: '/credentials',
+                linkText: 'View credentials',
+                reverse: true,
+              },
+              {
+                label: 'Network',
+                heading: 'Employers, agencies, and partners',
+                body: 'One platform connects training providers, workforce agencies, and hiring employers for outcome tracking and placement. Many students have job offers before their last day of class.',
+                image: '/images/pages/employer-hero.jpg',
+                alt: 'Employers and workforce agencies collaborating',
+                link: '/platform',
+                linkText: 'Explore the network',
+              },
+            ].map((item) => (
+              <StaggerItem key={item.label}>
+                <div className={`flex flex-col sm:flex-row gap-8 items-center mb-16 last:mb-0 ${item.reverse ? 'sm:flex-row-reverse' : ''}`}>
+                  <div className="relative w-full sm:w-1/2 rounded-xl overflow-hidden flex-shrink-0" style={{ aspectRatio: '4/3' }}>
+                    <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                  </div>
+                  <div className="sm:w-1/2">
+                    <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">{item.label}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">{item.heading}</h3>
+                    <p className="text-slate-600 leading-relaxed mb-4">{item.body}</p>
+                    <Link href={item.link} className="inline-flex items-center text-brand-red-600 font-semibold hover:text-brand-red-700">
+                      {item.linkText} <ArrowRight className="ml-1 w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerChildren>
+        </div>
+      </section>
+
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <FadeInUp>
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">The Process</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">From your first call to your first paycheck</h2>
+            <p className="text-slate-600 max-w-2xl leading-relaxed mb-12">
+              We handle the complexity — funding paperwork, scheduling, credential testing, and employer introductions. You focus on training.
+            </p>
+          </FadeInUp>
+          <StaggerChildren staggerDelay={0.12}>
+            {[
+              { num: '01', title: 'Check your eligibility', desc: 'Register at Indiana Career Connect and meet with a WorkOne case manager. They determine which funding you qualify for — WIOA, Workforce Ready Grant, or JRI. Free, takes about a week.', image: '/images/pages/wioa-meeting.jpg', alt: 'WorkOne career counseling session' },
+              { num: '02', title: 'Enroll in a cohort', desc: 'Once funding is confirmed, you join a scheduled cohort. Training combines classroom instruction, hands-on lab work, and online coursework. All tools, materials, and safety gear are provided.', image: '/images/pages/training-cohort.jpg', alt: 'Students enrolled in a training cohort' },
+              { num: '03', title: 'Earn your credential', desc: 'You sit for a proctored certification exam on-site at Elevate. Your credential is issued by the national certifying body — EPA, OSHA, Indiana ISDH, Certiport, or AWS. Portable and verifiable nationwide.', image: '/images/pages/healthcare-grad.jpg', alt: 'Graduate earning a nationally recognized credential' },
+              { num: '04', title: 'Get placed with an employer', desc: 'Our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many students have job offers before their last day of class.', image: '/images/pages/employer-handshake.jpg', alt: 'Graduate meeting with employer' },
+            ].map((step, i) => (
+              <StaggerItem key={step.num}>
+                <div className={`flex flex-col sm:flex-row gap-8 items-start mb-14 last:mb-0 ${i % 2 !== 0 ? 'sm:flex-row-reverse' : ''}`}>
+                  <div className="relative w-full sm:w-2/5 rounded-xl overflow-hidden flex-shrink-0" style={{ aspectRatio: '4/3' }}>
+                    <Image src={step.image} alt={step.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, 40vw" />
+                  </div>
+                  <div className="sm:w-3/5 pt-2">
+                    <p className="text-brand-red-600 font-extrabold text-xs uppercase tracking-widest mb-2">{step.num}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
+                    <p className="text-slate-600 leading-relaxed">{step.desc}</p>
+                  </div>
+                </div>
+              </StaggerItem>
+            ))}
           </StaggerChildren>
           <FadeInUp delay={0.2}>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm">
-                View All Programs
-              </Link>
-              <Link href="/credentials" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-                View Credentials
-              </Link>
-            </div>
+            <Link href="/how-it-works" className="inline-flex items-center border border-slate-900 text-slate-900 font-bold px-8 py-3 rounded-lg hover:bg-slate-900 hover:text-white transition-colors text-sm mt-4">
+              Full Process Details <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
           </FadeInUp>
         </div>
       </section>
 
       {/* ── FUNDING ── */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="py-16 sm:py-20 bg-brand-blue-700">
+        <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Funding</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Most participants pay $0 for training</h2>
-            <p className="text-slate-500 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-brand-blue-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Most participants pay $0 for training</h2>
+            <p className="text-brand-blue-100 leading-relaxed mb-10 max-w-2xl">
               Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants.
             </p>
           </FadeInUp>
           <StaggerChildren staggerDelay={0.1}>
-            <div className="grid sm:grid-cols-3 gap-5">
-              {[
-                {
-                  label: 'WIOA Title I',
-                  tag: 'Federal',
-                  desc: 'Primary federal workforce funding. Covers tuition, books, tools, and exam fees for eligible adults, dislocated workers, and youth 16–24.',
-                  color: 'border-brand-blue-200 bg-brand-blue-50',
-                  tagColor: 'bg-brand-blue-100 text-brand-blue-700',
-                },
-                {
-                  label: 'Workforce Ready Grant',
-                  tag: 'Indiana State',
-                  desc: 'Indiana state grant for high-demand certifications in healthcare, IT, and skilled trades. No repayment required for eligible participants.',
-                  color: 'border-brand-green-200 bg-brand-green-50',
-                  tagColor: 'bg-brand-green-100 text-brand-green-700',
-                },
-                {
-                  label: 'Justice Reinvestment Initiative',
-                  tag: 'Indiana DWD',
-                  desc: 'State-funded training for justice-involved individuals. Covers tuition and supportive services. Many Elevate employer partners hire regardless of background.',
-                  color: 'border-brand-orange-200 bg-brand-orange-50',
-                  tagColor: 'bg-brand-orange-100 text-brand-orange-700',
-                },
-              ].map((f) => (
-                <StaggerItem key={f.label}>
-                  <div className={`rounded-2xl border p-6 h-full ${f.color}`}>
-                    <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full mb-3 ${f.tagColor}`}>{f.tag}</span>
-                    <h3 className="text-slate-900 font-bold text-base mb-2">{f.label}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </div>
+            {[
+              { label: 'WIOA', tag: 'Federal', desc: 'Primary federal workforce funding. Covers tuition, books, tools, and exam fees for eligible adults, dislocated workers, and youth 16–24.' },
+              { label: 'Workforce Ready Grant', tag: 'Indiana State', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants in healthcare, IT, and skilled trades.' },
+              { label: 'JRI — Job Ready Indy', tag: 'Indiana State', desc: 'Funded career training for eligible justice-involved individuals through Indiana DWD. Many Elevate employer partners hire regardless of background.' },
+            ].map((f) => (
+              <StaggerItem key={f.label}>
+                <div className="bg-white/10 rounded-xl p-6 mb-4 last:mb-0">
+                  <p className="text-brand-blue-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                  <h3 className="text-white font-bold text-base mb-2">{f.label}</h3>
+                  <p className="text-brand-blue-100 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              </StaggerItem>
+            ))}
           </StaggerChildren>
           <FadeInUp delay={0.3}>
             <div className="flex flex-wrap gap-4 mt-8">
-              <Link href="/wioa-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors">
+              <Link href="/wioa-eligibility" className="bg-white text-brand-blue-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-blue-50 transition-colors">
                 Check My Eligibility
               </Link>
-              <Link href="/funding" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-colors">
+              <Link href="/funding" className="border border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">
                 All Funding Options
               </Link>
             </div>
@@ -295,11 +251,11 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex flex-col sm:flex-row gap-10 items-center">
-            <div className="w-full sm:w-1/2 flex-shrink-0">
-              <div className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                <Image src="/images/pages/for-employers-page-1.jpg" alt="Elevate graduates meeting with hiring employers" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+            <FadeInUp className="w-full sm:w-1/2">
+              <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                <Image src="/images/pages/graduation-ceremony.jpg" alt="Credentialed Elevate graduates" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
-            </div>
+            </FadeInUp>
             <FadeInUp delay={0.15} className="w-full sm:w-1/2">
               <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Employers</p>
               <h2 className="text-2xl font-bold text-slate-900 mb-4">We build your next workforce pipeline</h2>

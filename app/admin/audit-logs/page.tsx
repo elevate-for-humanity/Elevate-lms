@@ -44,7 +44,7 @@ export default function AuditLogsPage() {
         setLogs(data.logs || []);
       }
     } catch (err) {
-      // Error: $1
+      // silent
     } finally {
       setLoading(false);
     }
@@ -63,14 +63,7 @@ export default function AuditLogsPage() {
 
   const exportLogs = () => {
     const csv = [
-      [
-        'Timestamp',
-        'User',
-        'Email',
-        'Action',
-        'Resource Type',
-        'Resource ID',
-      ].join(','),
+      ['Timestamp', 'User', 'Email', 'Action', 'Resource Type', 'Resource ID'].join(','),
       ...filteredLogs.map((log) =>
         [
           new Date(log.created_at).toISOString(),
@@ -98,115 +91,79 @@ export default function AuditLogsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      {/* Hero Image */}
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Audit Logs" }]} />
-        </div>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-300" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Audit Logs" }]} />
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div className="mb-4">
+          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Audit Logs' }]} />
         </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Link
-            href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
-          >
-            ← Back to Dashboard
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Shield className="w-8 h-8 text-brand-blue-600" />
-                <h1 className="text-3xl font-bold text-black">Audit Logs</h1>
-              </div>
-              <p className="text-black">
-                Track all system activities and user actions
-              </p>
+
+        {/* Page header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <Link href="/admin/dashboard" className="text-sm text-gray-400 hover:text-gray-600 mb-3 inline-block">
+              ← Back to Dashboard
+            </Link>
+            <div className="flex items-center gap-3">
+              <Shield className="w-5 h-5 text-gray-400" />
+              <h1 className="text-2xl font-semibold text-gray-900">Audit Logs</h1>
             </div>
-            <button
-              onClick={exportLogs}
-              className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
-            >
-              <Download className="w-4 h-4" />
-              Export CSV
-            </button>
+            <p className="text-sm text-gray-500 mt-1">Track all system activities and user actions</p>
           </div>
+          <button
+            onClick={exportLogs}
+            className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-black mb-2">
-              Total Events
-            </h3>
-            <p className="text-3xl font-bold text-brand-blue-600">
-              {logs.length}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-black mb-2">Today</h3>
-            <p className="text-3xl font-bold text-brand-green-600">
-              {
-                logs.filter(
-                  (l) =>
-                    new Date(l.created_at).toDateString() ===
-                    new Date().toDateString()
-                ).length
-              }
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-black mb-2">
-              Unique Users
-            </h3>
-            <p className="text-3xl font-bold text-brand-blue-600">
-              {new Set(logs.map((l) => l.user_id)).size}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-black mb-2">
-              Resource Types
-            </h3>
-            <p className="text-3xl font-bold text-brand-orange-600">
-              {new Set(logs.map((l) => l.resource_type)).size}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Total Events', value: logs.length },
+            { label: 'Today', value: logs.filter((l) => new Date(l.created_at).toDateString() === new Date().toDateString()).length },
+            { label: 'Unique Users', value: new Set(logs.map((l) => l.user_id)).size },
+            { label: 'Resource Types', value: new Set(logs.map((l) => l.resource_type)).size },
+          ].map(({ label, value }) => (
+            <div key={label} className="border border-gray-200 rounded-lg p-5">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</p>
+              <p className="text-2xl font-semibold text-gray-900">{value}</p>
+            </div>
+          ))}
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="border border-gray-200 rounded-lg p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-black mb-1">
-                <Search className="w-4 h-4 inline mr-1" />
-                Search
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                <Search className="w-3.5 h-3.5 inline mr-1" />Search
               </label>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by user, action, or resource"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-black mb-1">
-                <Filter className="w-4 h-4 inline mr-1" />
-                Action
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                <Filter className="w-3.5 h-3.5 inline mr-1" />Action
               </label>
               <select
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md"
+                className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 <option value="">All Actions</option>
                 <option value="user_created">User Created</option>
@@ -218,13 +175,11 @@ export default function AuditLogsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-black mb-1">
-                Resource Type
-              </label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Resource Type</label>
               <select
                 value={resourceFilter}
                 onChange={(e) => setResourceFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md"
+                className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 <option value="">All Types</option>
                 <option value="user">User</option>
@@ -238,75 +193,54 @@ export default function AuditLogsPage() {
         </div>
 
         {/* Logs Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
           {filteredLogs.length === 0 ? (
-            <div className="text-center py-12">
-              <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-black text-lg">No audit logs found</p>
+            <div className="text-center py-16">
+              <Shield className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+              <p className="text-sm text-gray-400">No audit logs found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-100">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                      Timestamp
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                      Action
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                      Resource
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                      Details
-                    </th>
+                    {['Timestamp', 'User', 'Action', 'Resource', 'Details'].map((h) => (
+                      <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100 bg-white">
                   {filteredLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                    <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(log.created_at).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-black">
-                          {log.user?.full_name || 'Unknown'}
-                        </div>
-                        <div className="text-sm text-black">
-                          {log.user?.email || ''}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{log.user?.full_name || 'Unknown'}</div>
+                        <div className="text-xs text-gray-400">{log.user?.email || ''}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-2 text-xs rounded bg-brand-blue-100 text-brand-blue-800">
+                        <span className="px-2 py-1 text-xs font-medium rounded border border-gray-200 text-gray-600">
                           {log.action}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-black">
-                          {log.resource_type}
-                        </div>
+                        <div className="text-sm text-gray-700">{log.resource_type}</div>
                         {log.resource_id && (
-                          <div className="text-xs text-black">
-                            ID: {log.resource_id.substring(0, 8)}...
-                          </div>
+                          <div className="text-xs text-gray-400">ID: {log.resource_id.substring(0, 8)}...</div>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-black">
-                        {log.metadata &&
-                          Object.keys(log.metadata).length > 0 && (
-                            <details className="cursor-pointer">
-                              <summary className="text-brand-blue-600 hover:text-brand-blue-800">
-                                View metadata
-                              </summary>
-                              <pre className="mt-2 text-xs bg-gray-50 p-2 rounded overflow-auto max-w-xs">
-                                {JSON.stringify(log.metadata, null, 2)}
-                              </pre>
-                            </details>
-                          )}
+                      <td className="px-6 py-4 text-sm">
+                        {log.metadata && Object.keys(log.metadata).length > 0 && (
+                          <details className="cursor-pointer">
+                            <summary className="text-xs text-gray-400 hover:text-gray-600">View metadata</summary>
+                            <pre className="mt-2 text-xs bg-gray-50 border border-gray-100 p-2 rounded overflow-auto max-w-xs">
+                              {JSON.stringify(log.metadata, null, 2)}
+                            </pre>
+                          </details>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -315,6 +249,7 @@ export default function AuditLogsPage() {
             </div>
           )}
         </div>
+
       </div>
     </div>
   );

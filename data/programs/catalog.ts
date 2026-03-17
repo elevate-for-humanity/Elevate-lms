@@ -10,23 +10,73 @@ import { OFFICE_ADMINISTRATION } from './office-administration';
 import { CONSTRUCTION_TRADES } from './construction-trades-certification';
 import { NETWORK_SUPPORT } from './network-support-technician';
 import { WEB_DEVELOPMENT } from './web-development';
+import { PEER_RECOVERY } from './peer-recovery-specialist';
+import { CDL_TRAINING } from './cdl-training';
+import { WELDING } from './welding';
+import { ELECTRICAL } from './electrical';
+import { MEDICAL_ASSISTANT } from './medical-assistant';
+import { PHLEBOTOMY } from './phlebotomy';
+import { PLUMBING } from './plumbing';
+import { DIESEL_MECHANIC } from './diesel-mechanic';
+import { FORKLIFT } from './forklift';
+import { COSMETOLOGY } from './cosmetology-apprenticeship';
+import { NAIL_TECH } from './nail-technician-apprenticeship';
+import { CULINARY } from './culinary-apprenticeship';
+import { CPR_FIRST_AID } from './cpr-first-aid';
+import { SANITATION } from './sanitation-infection-control';
+import { TAX_PREPARATION } from './tax-preparation';
+import { BUSINESS_ADMIN } from './business-administration';
+import { ENTREPRENEURSHIP } from './entrepreneurship';
+import { PROJECT_MANAGEMENT } from './project-management';
+import { GRAPHIC_DESIGN } from './graphic-design';
+import { SOFTWARE_DEV } from './software-development';
+import { CAD_DRAFTING } from './cad-drafting';
+import { NETWORK_ADMIN } from './network-administration';
 
 /**
  * Program Catalog — All programs grouped by sector.
  * Add new programs here. The catalog page renders from this array.
  */
 export const ALL_PROGRAMS: ProgramSchema[] = [
-  HVAC_TECHNICIAN,
-  PHARMACY_TECHNICIAN,
-  BARBER_APPRENTICESHIP,
+  // Healthcare
   CNA,
+  MEDICAL_ASSISTANT,
+  PHLEBOTOMY,
+  PHARMACY_TECHNICIAN,
+  PEER_RECOVERY,
+  CPR_FIRST_AID,
+  SANITATION,
+  // Skilled Trades
+  HVAC_TECHNICIAN,
+  ELECTRICAL,
+  WELDING,
+  PLUMBING,
+  CONSTRUCTION_TRADES,
+  DIESEL_MECHANIC,
+  FORKLIFT,
+  // Transportation
+  CDL_TRAINING,
+  // Personal Services
+  BARBER_APPRENTICESHIP,
+  COSMETOLOGY,
+  NAIL_TECH,
+  CULINARY,
+  // Technology
   IT_HELP_DESK,
   CYBERSECURITY_ANALYST,
+  NETWORK_SUPPORT,
+  NETWORK_ADMIN,
+  WEB_DEVELOPMENT,
+  SOFTWARE_DEV,
+  GRAPHIC_DESIGN,
+  CAD_DRAFTING,
+  // Business
   BOOKKEEPING,
   OFFICE_ADMINISTRATION,
-  CONSTRUCTION_TRADES,
-  NETWORK_SUPPORT,
-  WEB_DEVELOPMENT,
+  TAX_PREPARATION,
+  BUSINESS_ADMIN,
+  ENTREPRENEURSHIP,
+  PROJECT_MANAGEMENT,
 ];
 
 export const SECTORS = [

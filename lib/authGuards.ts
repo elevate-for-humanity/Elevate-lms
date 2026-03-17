@@ -116,7 +116,7 @@ export async function requireAuth() {
 export async function requireAdmin() {
   const { user, role } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'super_admin', 'staff'],
   });
 
   return user;
@@ -463,7 +463,7 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
 export async function apiRequireAdmin() {
   const result = await apiAuthGuard({
     requireAuth: true,
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'super_admin', 'staff'],
   });
 
   if (!result.authorized) {

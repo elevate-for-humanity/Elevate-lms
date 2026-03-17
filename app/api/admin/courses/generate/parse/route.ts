@@ -12,7 +12,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+
+const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,6 +37,12 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const db = createAdminClient();
+    const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+    if (!profile || !ADMIN_ROLES.has(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const contentType = req.headers.get('content-type') ?? '';
 

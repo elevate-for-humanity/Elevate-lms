@@ -208,7 +208,38 @@ const auth = await apiRequireAdmin(request);
 if (auth.error) return auth.error;
 ```
 
+⚠️ **`apiRequireAdmin` previously only allowed `'admin'`** — this was fixed in PR #50. It now allows `['admin', 'super_admin', 'staff']`. If you see identity-only checks on admin routes, add an explicit role check:
+
+```ts
+const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+}
+```
+
 There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.
+
+### Audit Scripts
+
+Three scripts in `scripts/` produce repeatable, evidence-based reports. Run before any data-dependent feature work.
+
+```bash
+bash scripts/audit-schema-refs.sh   # DB table gaps: code refs with no CREATE TABLE in migrations
+bash scripts/audit-auth-gaps.sh     # Auth gaps: no-auth routes, role-blind admin routes, error leaks
+bash scripts/audit-env-vars.sh      # Env var gaps: referenced in code but absent from .env.example
+```
+
+Current counts (as of 2026-03-16 audit):
+- Schema gaps (≥5 refs, no migration): **126 tables** — requires live DB diff to resolve
+- Routes with no auth check: **62**
+- Admin routes with identity-only auth (no role check): **13** (3 generate routes fixed in PR #50)
+- Routes leaking `error.message`: **33**
+
+**Before writing any new data-dependent route**, run this in Supabase Dashboard SQL editor to confirm the table exists live:
+
+```sql
+SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;
+```
 
 ### API Error Response Shape
 

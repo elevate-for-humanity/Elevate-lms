@@ -28,6 +28,9 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
+      {/* Audio mounts immediately so scroll listener registers before user scrolls */}
+      <VoiceoverWithMusic audioSrc="/videos/homepage-hero-new.mp3" />
+
       {/* ── VIDEO HERO ── */}
       <section className="relative h-[56vw] min-h-[320px] max-h-[700px] overflow-hidden">
         <HomeHeroVideo />
@@ -365,7 +368,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <VoiceoverWithMusic audioSrc="/videos/homepage-hero-new.mp3" />
     </main>
   );
 }

@@ -21,6 +21,8 @@ import {
   Settings,
   TrendingUp,
   ClipboardCheck,
+  BookMarked,
+  ChevronDown,
 } from 'lucide-react';
 
 interface LMSNavigationProps {
@@ -78,6 +80,18 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
     { href: '/lms/schedule', label: 'Schedule', desc: 'Dates & deadlines', icon: Calendar },
     { href: '/lms/messages', label: 'Messages', desc: 'Inbox & chat', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
     { href: '/lms/certificates', label: 'Certificates', desc: 'Your credentials', icon: Award },
+  ];
+
+  // Resources available to learners inside the LMS — not surfaced on the marketing site.
+  const resourceItems = [
+    { href: '/orientation', label: 'Orientation' },
+    { href: '/student-handbook', label: 'Student Handbook' },
+    { href: '/academic-calendar', label: 'Academic Calendar' },
+    { href: '/resources', label: 'Learning Resources' },
+    { href: '/career-services', label: 'Career Services' },
+    { href: '/employment-support', label: 'Employment Support' },
+    { href: '/grievance', label: 'Grievance' },
+    { href: '/support/help', label: 'Help Center' },
   ];
 
   const isActive = (href: string) =>
@@ -143,6 +157,31 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 </Link>
               );
             })}
+
+            {/* Resources dropdown — student-facing links that don't belong on the marketing site */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white/90 hover:bg-white/10 transition-all"
+                aria-haspopup="true"
+              >
+                <BookMarked className="w-4 h-4" />
+                <span className="hidden xl:inline">Resources</span>
+                <ChevronDown className="w-3 h-3 opacity-60" />
+              </button>
+              <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-50">
+                <div className="bg-white rounded-lg shadow-lg border border-slate-200 py-2 min-w-[200px]">
+                  {resourceItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-blue-600"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Side */}
@@ -255,6 +294,21 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
               })}
             </div>
             
+            {/* Resources section */}
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="px-4 py-2 text-xs font-bold text-white/40 uppercase tracking-wide">Resources</div>
+              {resourceItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg text-sm"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
             {/* Mobile User Section */}
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="flex items-center gap-3 px-4 py-2">

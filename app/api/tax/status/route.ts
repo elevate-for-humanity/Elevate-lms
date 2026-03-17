@@ -36,7 +36,9 @@ const searchParams = request.nextUrl.searchParams;
       submit: '/api/tax/submit',
       status: '/api/tax/status'
     },
-    certificationStatus: 'READY_FOR_SUBMISSION',
+    certificationStatus: process.env.IRS_SOFTWARE_ID
+      ? 'SOFTWARE_ID_CONFIGURED'
+      : 'PENDING_IRS_SOFTWARE_DEVELOPER_APPLICATION',
     testResults: runTests ? runCertificationTests() : undefined
   };
   

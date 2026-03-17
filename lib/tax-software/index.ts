@@ -1,7 +1,8 @@
 /**
- * Supersonic Tax Software
- * Direct IRS MeF Integration
- * EFIN: 358459
+ * Supersonic Fast Cash E-File System
+ * IRS MeF integration for Form 1040 (individual returns)
+ * EFIN: set via IRS_EFIN env var
+ * Software ID: set via IRS_SOFTWARE_ID env var (assigned after ATS certification)
  */
 
 // Core types

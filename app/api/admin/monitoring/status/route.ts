@@ -11,23 +11,27 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 async function _GET(request: Request) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-// Require admin auth — this endpoint exposes infrastructure details
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  // Auth — admin/super_admin only (endpoint exposes infrastructure details)
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  if (supabase) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  const db = createAdminClient() ?? supabase;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const startTime = Date.now();
-  
+
   try {
     const checks = {
       database: await checkDatabase(),
@@ -37,8 +41,7 @@ async function _GET(request: Request) {
     };
 
     const overall = determineOverallStatus(checks);
-    
-    const metrics = await getMetrics();
+    const metrics = getMetrics();
 
     return NextResponse.json({
       overall,
@@ -74,79 +77,34 @@ async function _GET(request: Request) {
 
 async function checkDatabase() {
   const startTime = Date.now();
-  
   try {
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-    
-    // Simple query to check connection
-    const { error } = await db
-      .from('profiles')
-      .select('count')
-      .limit(1)
-      .single();
-
+    const db = createAdminClient() ?? supabase;
+    const { error } = await db.from('profiles').select('count').limit(1).single();
     const latency = Date.now() - startTime;
-
+    // "multiple rows" error means the query ran — DB is connected
     if (error && !error.message.includes('multiple')) {
-      return {
-        status: 'fail',
-        connected: false,
-        error: 'Internal server error',
-        latency,
-      };
+      return { status: 'fail', connected: false, latency };
     }
-
-    return {
-      status: 'pass',
-      connected: true,
-      latency,
-    };
-  } catch (error) {
-    return {
-      status: 'fail',
-      connected: false,
-      error: 'Internal server error',
-      latency: Date.now() - startTime,
-    };
+    return { status: 'pass', connected: true, latency };
+  } catch {
+    return { status: 'fail', connected: false, latency: Date.now() - startTime };
   }
 }
 
 async function checkRedis() {
   const startTime = Date.now();
-  
   try {
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      return {
-        status: 'warn',
-        connected: false,
-        message: 'Redis not configured',
-        latency: 0,
-      };
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) {
+      return { status: 'warn', connected: false, message: 'Redis not configured', latency: 0 };
     }
-
-    const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
-
-    // Test connection with ping
+    const redis = new Redis({ url, token });
     await redis.ping();
-    
-    const latency = Date.now() - startTime;
-
-    return {
-      status: 'pass',
-      connected: true,
-      latency,
-    };
-  } catch (error) {
-    return {
-      status: 'fail',
-      connected: false,
-      error: 'Internal server error',
-      latency: Date.now() - startTime,
-    };
+    return { status: 'pass', connected: true, latency: Date.now() - startTime };
+  } catch {
+    return { status: 'fail', connected: false, latency: Date.now() - startTime };
   }
 }
 
@@ -156,62 +114,36 @@ function checkStripe() {
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY &&
     process.env.STRIPE_WEBHOOK_SECRET
   );
-
-  return {
-    status: configured ? 'pass' : 'warn',
-    configured,
-    message: configured ? 'Stripe configured' : 'Stripe not configured',
-  };
+  return { status: configured ? 'pass' : 'warn', configured };
 }
 
 function checkEmail() {
-  const configured = !!(
-    process.env.SENDGRID_API_KEY &&
-    process.env.EMAIL_FROM
-  );
-
-  return {
-    status: configured ? 'pass' : 'warn',
-    configured,
-    message: configured ? 'Email configured' : 'Email not configured',
-  };
+  const configured = !!(process.env.SENDGRID_API_KEY && process.env.EMAIL_FROM);
+  return { status: configured ? 'pass' : 'warn', configured };
 }
 
 function determineOverallStatus(checks: any): 'healthy' | 'degraded' | 'down' {
-  const statuses = Object.values(checks).map((check: any) => check.status);
-  
+  const statuses = Object.values(checks).map((c: any) => c.status);
   if (statuses.includes('fail')) {
-    // If database is down, system is down
-    if (checks.database.status === 'fail') {
-      return 'down';
-    }
-    return 'degraded';
+    return checks.database?.status === 'fail' ? 'down' : 'degraded';
   }
-  
-  if (statuses.includes('warn')) {
-    return 'degraded';
-  }
-  
+  if (statuses.includes('warn')) return 'degraded';
   return 'healthy';
 }
 
-async function getMetrics() {
-  const memoryUsage = process.memoryUsage();
-  const uptime = process.uptime();
-
+function getMetrics() {
+  const mem = process.memoryUsage();
   return {
-    uptime,
+    uptime: process.uptime(),
     memory: {
-      used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
-      total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
-      rss: Math.round(memoryUsage.rss / 1024 / 1024),
-      unit: 'MB',
+      used: Math.round(mem.heapUsed / 1024 / 1024),
+      total: Math.round(mem.heapTotal / 1024 / 1024),
     },
-    node: {
-      version: process.version,
-      platform: process.platform,
-      arch: process.arch,
-    },
+    // Request and rate-limit counters are not tracked in-process.
+    // Wire up to Redis or an APM tool for real values.
+    requests: { total: 0, errors: 0, rate: 0 },
+    rateLimits: { blocked: 0, allowed: 0 },
   };
 }
+
 export const GET = withApiAudit('/api/admin/monitoring/status', _GET);

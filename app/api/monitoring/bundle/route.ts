@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getRuntimeReadiness } from '@/lib/tax-software/config/runtime-readiness';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -124,6 +125,14 @@ async function _GET(req: Request) {
       Object.entries(queryErrors).filter(([, v]) => v !== null)
     );
 
+    // MeF readiness — non-blocking, errors surfaced in bundle
+    let mefReadiness: ReturnType<typeof getRuntimeReadiness> | null = null;
+    try {
+      mefReadiness = getRuntimeReadiness();
+    } catch {
+      // getRuntimeReadiness is synchronous and should never throw, but guard anyway
+    }
+
     const bundle = {
       generated_at: new Date().toISOString(),
       summary: {
@@ -152,6 +161,7 @@ async function _GET(req: Request) {
       credentials: credentials.data,
       partner_providers: partnerProviders.data,
       recent_enrollments: enrollments.data.slice(0, 20),
+      mef_readiness: mefReadiness ?? { ok: false, issues: [{ code: 'UNAVAILABLE', message: 'Could not check MeF readiness' }] },
       ...(Object.keys(activeErrors).length > 0 && { errors: activeErrors }),
     };
 

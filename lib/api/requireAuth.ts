@@ -37,8 +37,8 @@ export async function requireAuth(request: Request): Promise<{
     return {
       userId: null,
       error: NextResponse.json(
-        { error: 'Service unavailable' },
-        { status: 503 }
+        { error: 'Authentication required' },
+        { status: 401 }
       ),
     };
   }

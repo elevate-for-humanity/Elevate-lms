@@ -264,6 +264,13 @@ export interface TaxReturn {
   // Direct Deposit
   directDeposit?: BankAccount;
   
+  // Identity verification (required for self-select PIN)
+  // priorYearAGI: use 0 for first-time filers or if prior return was not filed
+  priorYearAGI?: number;
+  // ipPin: IRS-issued 6-digit Identity Protection PIN (if taxpayer has one)
+  ipPin?: string;
+  spouseIpPin?: string;
+
   // Signatures
   taxpayerSignature?: {
     pin: string;
@@ -279,7 +286,15 @@ export interface TaxReturn {
     ptin: string;
     firmEIN?: string;
     firmName?: string;
+    firmAddress?: {
+      street: string;
+      city: string;
+      state: string;
+      zip: string;
+    };
+    phone?: string;
     signedDate: string;
+    selfPrepared?: boolean;
   };
 }
 

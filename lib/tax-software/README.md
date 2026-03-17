@@ -1,8 +1,13 @@
-# Elevate Tax Software - IRS Direct E-File System
+# Supersonic Fast Cash E-File System
 
 ## Overview
 
-This module implements direct IRS e-file capabilities for Form 1040 individual tax returns. The system is designed to meet IRS Modernized e-File (MeF) specifications and supports the IRS Software Developer program requirements.
+Web-based tax preparation and electronic filing system for individual income tax returns. The system generates IRS Modernized e-File (MeF) compliant XML for Form 1040, performs validation and business rule checks, transmits submissions via secure SOAP-based integration with IRS MeF services, and processes acknowledgments with status tracking and audit logging.
+
+**IRS Application Status:** Software Developer application pending (e-file Application → Add Provider Option → Software Developer)
+**Scope:** Form 1040 only (initial certification)
+**EFIN:** Set via `IRS_EFIN` env var
+**Software ID:** Assigned by IRS after ATS certification — set via `IRS_SOFTWARE_ID`
 
 ## Architecture
 
@@ -48,11 +53,29 @@ lib/tax-software/
 ## Environment Variables
 
 ```env
-IRS_EFIN=000000                    # 6-digit EFIN
-IRS_SOFTWARE_ID=PENDING            # IRS-assigned software ID
-IRS_ENVIRONMENT=test               # test | assurance | production
-SSN_ENCRYPTION_KEY=<32-byte-hex>   # Encryption key for SSN storage
+IRS_EFIN=358459                    # 6-digit EFIN (Supersonic Fast Cash)
+IRS_SOFTWARE_ID=PENDING            # IRS-assigned after ATS certification
+IRS_ENVIRONMENT=test               # test | production
+IRS_TEST_CERT_PATH=certs/test/client.crt
+IRS_TEST_KEY_PATH=certs/test/client.key
+IRS_PROD_CERT_PATH=certs/prod/client.crt
+IRS_PROD_KEY_PATH=certs/prod/client.key
+SSN_ENCRYPTION_KEY=<32-byte-hex>   # AES-256 key for xml_content encryption (TODO)
 ```
+
+## IRS Certification Checklist
+
+- [ ] Add Software Developer provider option in IRS e-Services e-file Application
+- [ ] Receive ATS questionnaire from IRS
+- [ ] Download IRS XSD schemas → `lib/tax-software/schemas/2024/` (add to .gitignore)
+- [ ] Obtain IRS test certificates → `certs/test/` (never commit)
+- [ ] Run ATS: `npx tsx lib/tax-software/testing/ats-runner.ts --real`
+- [ ] Pass all IRS ATS scenarios for Form 1040
+- [ ] Receive IRS-assigned Software ID → set `IRS_SOFTWARE_ID`
+- [ ] Obtain production certificates from IdenTrust → `certs/prod/`
+- [ ] Encrypt `xml_content` / `return_data` at rest (AES-256) before production go-live
+
+**Do not set `IRS_ENVIRONMENT=production` until all checklist items are complete.**
 
 ## Usage
 

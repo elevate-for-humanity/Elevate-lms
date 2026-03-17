@@ -3,13 +3,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
 import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
+import { validateAgainstXsd } from '@/lib/tax-software/schemas/schema-validator';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { assertRuntimeReadyForSubmission } from '@/lib/tax-software/config/runtime-readiness';
 
 async function _POST(request: NextRequest) {
   try {
+    // Hard-block if runtime is not ready (missing EFIN, schemas, xmllint)
+    try {
+      assertRuntimeReadyForSubmission();
+    } catch (error) {
+      const issues =
+        error && typeof error === "object" && "issues" in error
+          ? (error as { issues: unknown }).issues
+          : [];
+      return NextResponse.json(
+        {
+          ok: false,
+          code: "MEF_RUNTIME_NOT_READY",
+          message: "Submission blocked because the MeF runtime is not fully configured.",
+          issues,
+        },
+        { status: 503 }
+      );
+    }
+
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
@@ -55,8 +76,12 @@ async function _POST(request: NextRequest) {
       refundAmount: body.refundAmount,
       amountOwed: body.amountOwed,
       directDeposit: body.directDeposit,
+      priorYearAGI: body.priorYearAGI,
+      ipPin: body.ipPin,
+      spouseIpPin: body.spouseIpPin,
       taxpayerSignature: body.taxpayerSignature,
-      spouseSignature: body.spouseSignature
+      spouseSignature: body.spouseSignature,
+      preparerSignature: body.preparerSignature
     };
     
     // Validate the return
@@ -69,9 +94,35 @@ async function _POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    // Create MeF submission
+    // IRS_SOFTWARE_ID is assigned after ATS certification.
+    // Falls back to 'PENDING' until IRS issues the identifier.
     const softwareId = process.env.IRS_SOFTWARE_ID || 'PENDING';
+
+    // Create MeF submission
     const submission = createMeFSubmission(taxReturn, softwareId);
+
+    // XSD validation via xmllint — assertRuntimeReadyForSubmission above guarantees
+    // schemas and xmllint are present before we reach this point.
+    const tmpXml = `/tmp/mef-${submission.submissionId}.xml`;
+    const fs = await import('node:fs/promises');
+    await fs.writeFile(tmpXml, submission.xmlContent, 'utf-8');
+    let xsdResult;
+    try {
+      xsdResult = validateAgainstXsd(tmpXml);
+    } finally {
+      await fs.unlink(tmpXml).catch(() => {});
+    }
+    if (!xsdResult.valid) {
+      logger.error('MeF XML schema validation failed:', xsdResult.errors);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'XML schema validation failed. Return cannot be transmitted.',
+          schemaErrors: xsdResult.errors,
+        },
+        { status: 422 }
+      );
+    }
     
     // Transmit to IRS (test mode by default)
     const transmitter = createTransmitter({

@@ -88,16 +88,15 @@ export class IRSTransmitter {
       // Build SOAP envelope for IRS transmission
       const soapEnvelope = this.buildSOAPEnvelope(submission);
       
-      // In test mode, simulate the transmission
-      if (this.config.environment === 'test') {
-        return this.simulateTransmission(submission);
-      }
+      // In test mode, transmit to IRS ATS endpoints (not simulated).
+      // Real ATS responses are required to validate the transmission pipeline.
+      // Set IRS_ENVIRONMENT=test and provide IRS test certificates to use ATS.
       
       // Transmit to IRS
       const response = await fetch(`${endpoint}/transmitter`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/soap+xml; charset=utf-8',
+          'Content-Type': 'text/xml; charset=utf-8',
           'SOAPAction': 'TransmitReturn'
         },
         body: soapEnvelope
@@ -185,59 +184,36 @@ export class IRSTransmitter {
   }
   
   /**
-   * Simulate transmission for test environment
-   */
-  private simulateTransmission(submission: MeFSubmission): TransmissionResult {
-    const dcn = `${Date.now()}`.slice(-14);
-    const acknowledgment: MeFAcknowledgment = {
-      submissionId: submission.submissionId,
-      status: 'accepted',
-      dcn,
-      acceptedAt: new Date().toISOString()
-    };
-    
-    return {
-      success: true,
-      submissionId: submission.submissionId,
-      transmittedAt: new Date().toISOString(),
-      acknowledgment
-    };
-  }
-  
-  /**
    * Check status of a previously submitted return
    */
   async checkStatus(submissionId: string): Promise<MeFAcknowledgment | null> {
     const endpoint = IRS_MEF_ENDPOINTS[this.config.environment];
     
-    // In test mode, return simulated status
-    if (this.config.environment === 'test') {
-      return {
-        submissionId,
-        status: 'accepted',
-        dcn: `${Date.now()}`.slice(-14),
-        acceptedAt: new Date().toISOString()
-      };
-    }
-    
     try {
+      // IRS MeF requires SOAP 1.1
       const soapEnvelope = `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:mef="http://www.irs.gov/a2a/mef/MeFAcknowledgementService.xsd">
   <soap:Header>
-    <EFIN>${EFIN}</EFIN>
-    <SoftwareId>${this.config.softwareId}</SoftwareId>
+    <mef:MeFHeader>
+      <mef:EFIN>${EFIN}</mef:EFIN>
+      <mef:SoftwareId>${this.config.softwareId}</mef:SoftwareId>
+      <mef:SessionIndicator>Y</mef:SessionIndicator>
+      <mef:TestIndicator>${this.config.environment === 'test' ? 'T' : 'P'}</mef:TestIndicator>
+      <mef:Timestamp>${new Date().toISOString()}</mef:Timestamp>
+    </mef:MeFHeader>
   </soap:Header>
   <soap:Body>
-    <GetAcknowledgement>
-      <SubmissionId>${submissionId}</SubmissionId>
-    </GetAcknowledgement>
+    <mef:GetAcknowledgementRequest>
+      <mef:SubmissionId>${submissionId}</mef:SubmissionId>
+    </mef:GetAcknowledgementRequest>
   </soap:Body>
 </soap:Envelope>`;
       
       const response = await fetch(`${endpoint}/acknowledgement`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/soap+xml; charset=utf-8',
+          'Content-Type': 'text/xml; charset=utf-8',
           'SOAPAction': 'GetAcknowledgement'
         },
         body: soapEnvelope
@@ -328,18 +304,42 @@ export class IRSTransmitter {
   }
   
   private buildSOAPEnvelope(submission: MeFSubmission): string {
+    // IRS MeF requires SOAP 1.1 (schemas.xmlsoap.org), not SOAP 1.2 (w3.org/2003/05)
     return `<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:mef="http://www.irs.gov/a2a/mef/MeFTransmitterService.xsd">
   <soap:Header>
-    <EFIN>${EFIN}</EFIN>
-    <SoftwareId>${this.config.softwareId}</SoftwareId>
-    <SubmissionId>${submission.submissionId}</SubmissionId>
-    <TaxYear>${submission.taxYear}</TaxYear>
+    <mef:MeFHeader>
+      <mef:EFIN>${EFIN}</mef:EFIN>
+      <mef:SoftwareId>${this.config.softwareId}</mef:SoftwareId>
+      <mef:SessionIndicator>Y</mef:SessionIndicator>
+      <mef:TestIndicator>${this.config.environment === 'test' ? 'T' : 'P'}</mef:TestIndicator>
+      <mef:Timestamp>${new Date().toISOString()}</mef:Timestamp>
+    </mef:MeFHeader>
   </soap:Header>
   <soap:Body>
-    <TransmitReturn>
-      <ReturnData>${Buffer.from(submission.xmlContent).toString('base64')}</ReturnData>
-    </TransmitReturn>
+    <mef:TransmitRequest>
+      <mef:TransmissionHeader>
+        <mef:TransmissionId>${submission.submissionId}</mef:TransmissionId>
+        <mef:Timestamp>${new Date().toISOString()}</mef:Timestamp>
+        <mef:TransmissionCount>1</mef:TransmissionCount>
+      </mef:TransmissionHeader>
+      <mef:ReturnDataList>
+        <mef:ReturnData>
+          <mef:SubmissionId>${submission.submissionId}</mef:SubmissionId>
+          <mef:TaxYear>${submission.taxYear}</mef:TaxYear>
+          <mef:ReturnType>1040</mef:ReturnType>
+          <mef:ContentLocation>attachment</mef:ContentLocation>
+        </mef:ReturnData>
+      </mef:ReturnDataList>
+      <mef:BinaryAttachmentList>
+        <mef:BinaryAttachment>
+          <mef:ContentId>attachment</mef:ContentId>
+          <mef:ContentType>application/xml</mef:ContentType>
+          <mef:BinaryContent>${Buffer.from(submission.xmlContent).toString('base64')}</mef:BinaryContent>
+        </mef:BinaryAttachment>
+      </mef:BinaryAttachmentList>
+    </mef:TransmitRequest>
   </soap:Body>
 </soap:Envelope>`;
   }

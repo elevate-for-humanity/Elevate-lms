@@ -6,7 +6,8 @@
 import { TaxReturn, MeFSubmission } from '../types';
 
 const IRS_NAMESPACE = 'http://www.irs.gov/efile';
-const EFIN = '358459';
+// EFIN must be set via IRS_EFIN env var. Fallback is for local dev only.
+const EFIN = process.env.IRS_EFIN || '358459';
 
 export function generateSubmissionId(): string {
   const timestamp = Date.now().toString(36);
@@ -62,7 +63,37 @@ export function generateReturnHeader(taxReturn: TaxReturn, softwareId: string): 
       <SpouseSignaturePIN>${taxReturn.spouseSignature.pin}</SpouseSignaturePIN>
       <SpouseSignatureDt>${taxReturn.spouseSignature.signedDate}</SpouseSignatureDt>
       ` : ''}
+      ${taxReturn.priorYearAGI !== undefined ? `
+      <PrimaryPriorYearAGIAmt>${formatCurrency(taxReturn.priorYearAGI)}</PrimaryPriorYearAGIAmt>
+      ` : ''}
+      ${taxReturn.ipPin ? `
+      <IPPINGrp>
+        <PrimaryIPPIN>${taxReturn.ipPin}</PrimaryIPPIN>
+        ${taxReturn.spouseIpPin ? `<SpouseIPPIN>${taxReturn.spouseIpPin}</SpouseIPPIN>` : ''}
+      </IPPINGrp>
+      ` : ''}
       <ReturnTypeCd>1040</ReturnTypeCd>
+      ${taxReturn.preparerSignature && !taxReturn.preparerSignature.selfPrepared ? `
+      <PreparerFirmGrp>
+        <PreparerFirmEIN>${taxReturn.preparerSignature.firmEIN ? formatEIN(taxReturn.preparerSignature.firmEIN) : ''}</PreparerFirmEIN>
+        <PreparerFirmName>
+          <BusinessNameLine1Txt>${escapeXml(taxReturn.preparerSignature.firmName || '')}</BusinessNameLine1Txt>
+        </PreparerFirmName>
+        ${taxReturn.preparerSignature.firmAddress ? `
+        <PreparerUSAddress>
+          <AddressLine1Txt>${escapeXml(taxReturn.preparerSignature.firmAddress.street)}</AddressLine1Txt>
+          <CityNm>${escapeXml(taxReturn.preparerSignature.firmAddress.city)}</CityNm>
+          <StateAbbreviationCd>${taxReturn.preparerSignature.firmAddress.state}</StateAbbreviationCd>
+          <ZIPCd>${taxReturn.preparerSignature.firmAddress.zip}</ZIPCd>
+        </PreparerUSAddress>
+        ` : ''}
+      </PreparerFirmGrp>
+      <PreparerPersonGrp>
+        <PTIN>${escapeXml(taxReturn.preparerSignature.ptin)}</PTIN>
+        <PreparerSignatureDt>${taxReturn.preparerSignature.signedDate}</PreparerSignatureDt>
+        ${taxReturn.preparerSignature.phone ? `<PhoneNum>${taxReturn.preparerSignature.phone.replace(/\D/g, '')}</PhoneNum>` : ''}
+      </PreparerPersonGrp>
+      ` : '<SelfPreparedInd>X</SelfPreparedInd>'}
       <Filer>
         <PrimarySSN>${formatSSN(taxReturn.taxpayer.ssn)}</PrimarySSN>
         ${taxReturn.spouse ? `<SpouseSSN>${formatSSN(taxReturn.spouse.ssn)}</SpouseSSN>` : ''}

@@ -3,7 +3,9 @@
 # Admin domain: elevateconnectsdirectory.org (separate admin panel)
 
 [build]
-  command = "corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run build"
+  # libxml2-utils provides xmllint, required for IRS MeF XSD validation.
+  # Without it, schema-validator.ts returns XMLLINT_NOT_AVAILABLE and blocks all submissions.
+  command = "apt-get update && apt-get install -y libxml2-utils && corepack enable && pnpm install --no-frozen-lockfile && npx tsx scripts/ci-token-gate.ts && pnpm run build"
   publish = ".next"
   functions = "netlify/functions"
 
@@ -245,6 +247,13 @@
 # Requires CRON_SECRET env var in Netlify site settings.
 [functions."cron-onboarding-reminder"]
   schedule = "0 14 * * 1"
+
+# IRS MeF ACK polling — every 5 minutes during filing season.
+# Polls mef_submissions with status in (transmitting, pending_ack, transmitted).
+# Requires CRON_SECRET and IRS_SOFTWARE_ID env vars.
+# IRS does not push ACKs — transmitter must poll.
+[functions."cron-poll-mef-acks"]
+  schedule = "*/5 * * * *"
 
 # ============================================
 # ADMIN DOMAIN (www.elevateconnectsdirectory.org)

@@ -6,33 +6,37 @@ import Image from 'next/image';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 
-// Navigation structure
-// Programs and student-specific items link to the LMS (/lms) not /programs
+// Marketing site navigation.
+//
+// Rule: this header is for first-time visitors — brand, mission, trust, outcomes,
+// partners, and a single clear entry point into the LMS.
+//
+// Anything tied to studying, enrolling, accessing courses, or navigating programs
+// belongs in the LMS navigation (components/lms/LMSNavigation.tsx), not here.
 export const NAV_ITEMS = [
   {
     name: 'Get Trained',
-    href: '/lms',
+    href: '/programs',
     subItems: [
-      { name: '— Courses —', href: '/lms', isHeader: true },
-      { name: 'All Courses', href: '/lms' },
-      { name: 'Healthcare', href: '/lms?category=healthcare' },
-      { name: 'Skilled Trades', href: '/lms?category=skilled-trades' },
-      { name: 'CDL Driving', href: '/lms?category=cdl' },
-      { name: 'Technology', href: '/lms?category=technology' },
-      { name: 'Barbering & Beauty', href: '/lms?category=barbering' },
-      { name: 'Business & Finance', href: '/lms?category=business' },
-      { name: 'Social Services', href: '/lms?category=social-services' },
+      { name: '— Training Areas —', href: '/programs', isHeader: true },
+      { name: 'Healthcare', href: '/programs/healthcare' },
+      { name: 'Skilled Trades', href: '/programs/skilled-trades' },
+      { name: 'CDL Driving', href: '/programs/cdl-training' },
+      { name: 'Technology', href: '/programs/technology' },
+      { name: 'Barbering & Beauty', href: '/programs/barber-apprenticeship' },
+      { name: 'Business & Finance', href: '/programs/finance-bookkeeping-accounting' },
+      { name: 'Peer Recovery', href: '/programs/peer-recovery-specialist' },
+      { name: 'All Programs →', href: '/programs' },
       { name: '— Credentials —', href: '/credentials', isHeader: true },
-      { name: 'All Credentials', href: '/credentials' },
       { name: 'Certifications', href: '/training/certifications' },
-      { name: 'Apprenticeships', href: '/lms?category=apprenticeships' },
+      { name: 'Apprenticeships', href: '/programs/apprenticeships' },
+      { name: 'Credential Verification', href: '/verify-credentials' },
       { name: '— Funding —', href: '/funding', isHeader: true },
       { name: 'How Funding Works', href: '/funding/how-it-works' },
       { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
       { name: 'Workforce Ready Grant', href: '/funding/wrg' },
       { name: 'JRI Funding', href: '/funding/jri' },
       { name: 'Job Ready Indy', href: '/funding/job-ready-indy' },
-      { name: 'All Funding Options →', href: '/funding' },
       { name: 'Apply Now →', href: '/apply' },
     ],
   },
@@ -60,22 +64,21 @@ export const NAV_ITEMS = [
     ],
   },
   {
-    name: 'Workforce & Gov',
+    name: 'About',
     href: '/about',
     subItems: [
-      { name: '— About Elevate —', href: '/about', isHeader: true },
+      { name: '— Organization —', href: '/about', isHeader: true },
       { name: 'About Us', href: '/about' },
       { name: 'Our Mission', href: '/mission' },
       { name: 'Founder', href: '/founder' },
       { name: 'Our Team', href: '/about/team' },
       { name: 'Governance', href: '/governance' },
       { name: 'Accreditation', href: '/accreditation' },
-      { name: '— Outcomes & Compliance —', href: '/outcomes/indiana', isHeader: true },
+      { name: '— Outcomes —', href: '/outcomes/indiana', isHeader: true },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'Success Stories', href: '/testimonials' },
       { name: 'Impact', href: '/impact' },
       { name: 'Compliance & Security', href: '/compliance' },
-      { name: 'Credential Verification', href: '/verify-credentials' },
       { name: '— Funding Programs —', href: '/funding', isHeader: true },
       { name: 'Federal Programs (WIOA)', href: '/funding/federal-programs' },
       { name: 'State Programs', href: '/funding/state-programs' },
@@ -114,36 +117,12 @@ export const NAV_ITEMS = [
     ],
   },
   {
-    name: 'My Account',
-    href: '/login',
+    name: 'Contact',
+    href: '/contact',
     subItems: [
-      { name: '— Learners —', href: '/login', isHeader: true },
-      { name: 'Sign In', href: '/login' },
-      { name: 'My Dashboard', href: '/learner/dashboard' },
-      { name: 'My Courses', href: '/lms' },
-      { name: '— Partners & Employers —', href: '/login', isHeader: true },
-      { name: 'Partner Login', href: '/partner/login' },
-      { name: 'Employer Portal', href: '/apply/employer' },
-      { name: '— New Here? —', href: '/apply', isHeader: true },
-      { name: 'Apply Now →', href: '/apply' },
-    ],
-  },
-  {
-    name: 'Support',
-    href: '/support',
-    subItems: [
-      { name: 'Employment Support', href: '/employment-support' },
-      { name: 'Career Services', href: '/career-services' },
-      { name: 'Student Handbook', href: '/student-handbook' },
-      { name: '— Learner Resources —', href: '/support', isHeader: true },
-      { name: 'Orientation', href: '/orientation' },
-      { name: 'Resources', href: '/resources' },
-      { name: 'Academic Calendar', href: '/academic-calendar' },
-      { name: 'Grievance', href: '/grievance' },
-      { name: '— Help —', href: '/support', isHeader: true },
-      { name: 'Help Center', href: '/support/help' },
       { name: 'Contact Us', href: '/contact' },
       { name: 'FAQ', href: '/faq' },
+      { name: 'Help Center', href: '/support/help' },
     ],
   },
 ];

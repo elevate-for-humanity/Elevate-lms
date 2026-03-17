@@ -32,16 +32,31 @@ export async function issueCertificateIfEligible(
 
   if (existing) return existing.certificate_number;
 
-  // Any failed (non-passing) checkpoint scores?
-  const { data: failedCheckpoints } = await db
-    .from('checkpoint_scores')
+  // Every checkpoint/exam lesson for this course must have at least one passing score.
+  // A learner with zero checkpoint attempts is not eligible.
+  const { data: requiredCheckpoints } = await db
+    .from('curriculum_lessons')
     .select('id')
-    .eq('user_id', userId)
     .eq('course_id', courseId)
-    .eq('passed', false);
+    .in('step_type', ['checkpoint', 'exam']);
 
-  if (failedCheckpoints && failedCheckpoints.length > 0) {
-    return null; // Gated steps not all passed
+  const totalCheckpoints = requiredCheckpoints?.length ?? 0;
+
+  if (totalCheckpoints > 0) {
+    // For each required checkpoint, confirm at least one passing score exists.
+    const { data: passingScores } = await db
+      .from('checkpoint_scores')
+      .select('lesson_id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .eq('passed', true);
+
+    const passedLessonIds = new Set((passingScores ?? []).map((r: any) => r.lesson_id));
+    const allPassed = (requiredCheckpoints ?? []).every((cl: any) => passedLessonIds.has(cl.id));
+
+    if (!allPassed) {
+      return null;
+    }
   }
 
   // Resolve program_id from enrollment
@@ -53,12 +68,7 @@ export async function issueCertificateIfEligible(
 
   const programId = enrollment?.program_id ?? null;
 
-  // Count total checkpoint_scores for metadata
-  const { data: allCheckpoints } = await db
-    .from('checkpoint_scores')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('course_id', courseId);
+  const checkpointsPassed = totalCheckpoints; // all required checkpoints passed (verified above)
 
   const certNumber = `EFH-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
   const verificationUrl = `/verify/${certNumber}`;
@@ -71,8 +81,8 @@ export async function issueCertificateIfEligible(
     certificate_number:  certNumber,
     completion_date:     new Date().toISOString().split('T')[0],
     verification_url:    verificationUrl,
-    checkpoints_passed:  allCheckpoints?.length ?? 0,
-    total_checkpoints:   allCheckpoints?.length ?? 0,
+    checkpoints_passed:  checkpointsPassed,
+    total_checkpoints:   totalCheckpoints,
   });
 
   if (error) {

@@ -756,18 +756,8 @@ const nextConfig = {
       { source: '/pwa/barber/dashboard',        destination: '/pwa/barber',          permanent: false },
       { source: '/pwa/shop-owner/dashboard',    destination: '/pwa/shop-owner',      permanent: false },
 
-      // ============================================
-      // EMPLOYER-PORTAL → EMPLOYER CONSOLIDATION
-      // /employer is canonical. These four features have matching pages there.
-      // Unique employer-portal pages (applications, company, hiring-guide,
-      // interviews, messages, wotc, programs) are preserved as-is.
-      // ============================================
+      // /employer-portal root → canonical employer dashboard
       { source: '/employer-portal',           destination: '/employer/dashboard',  permanent: true },
-      { source: '/employer-portal/analytics', destination: '/employer/analytics',  permanent: true },
-      { source: '/employer-portal/candidates',destination: '/employer/candidates', permanent: true },
-      { source: '/employer-portal/jobs',      destination: '/employer/jobs',       permanent: true },
-      { source: '/employer-portal/jobs/new',  destination: '/employer/post-job',   permanent: true },
-      { source: '/employer-portal/settings',  destination: '/employer/settings',   permanent: true },
 
       // ============================================
       // DEAD LINK FIXES — public-facing

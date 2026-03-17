@@ -425,31 +425,61 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
 - ✅ Auto-certificate issuance wired in lesson completion route
 - ✅ `CurriculumLessonManager` component built
 
+## Governance Status
+
+Remaining governance items have been resolved to decision state.
+
+### 1. Admin curriculum builder
+**Status: DONE**
+Staff guard aligned with `[courseId]` page. Missing `curriculum_lessons_admin_write` RLS policy added (browser client saves were silently rejected). Page is operational.
+
+### 2. HVAC blueprint registration
+**Status: DONE**
+Registry was already correct — `HVAC_EPA608_BLUEPRINT` exported via `getHvacBlueprint()` in `index.ts`. Incorrect `CredentialBlueprint` type annotation removed from `hvac-epa-608.ts`.
+
+### 3. FORCE ROW SECURITY on `checkpoint_scores` and `program_completion_certificates`
+**Status: DEFERRED BY DESIGN**
+Inventory (`scripts/inventory-privileged-write-paths.cjs`) confirmed live service-role write paths:
+- `checkpoint_scores` — written by `recordCheckpointAttempt` via `createAdminClient()`
+- `program_completion_certificates` — written by `issueCertificateIfEligible` via `createAdminClient()`
+
+Applying `FORCE ROW SECURITY` now would break checkpoint recording and certificate issuance.
+
+**Prerequisite to reopen:** migrate these writes to learner-scoped access or `SECURITY DEFINER` RPCs, then add explicit authenticated policies. Do not put this on a near-term checklist without also committing to that refactor.
+
+### 4. `lesson_progress` super_admin RLS tightening
+**Status: PRODUCT DECISION REQUIRED — current model is intentional**
+`lesson_progress_insert` / `lesson_progress_update` policies allow super_admin JWT to write for any `user_id`. This is actively used: `app/admin/enrollments/EnrollmentManagementClient.tsx` deletes another user's progress rows when an admin removes an enrollment.
+
+Do not tighten without replacing admin remediation and enrollment-management behavior with a formal override workflow.
+
+### Approved current governance posture
+- DB triggers enforce progression integrity on all write paths including service_role
+- Audit triggers capture checkpoint passes, certificate issuance, and admin completion overrides
+- Privileged override capability is intentional, documented, and monitored via `audit_logs`
+
+---
+
 ## Remaining Technical Debt
 
 - ~1,521 `console.log` calls — use `import { logger } from '@/lib/logger'`
 - 78 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
 - `lib/rateLimit.ts` still exists (`@deprecated`, 0 active importers) — delete when confirmed
-- `lib/curriculum/blueprints/hvac-epa-608.ts` not registered in `index.ts`
 - `lib/curriculum/blueprints/prs.ts` may be superseded by `prs-indiana.ts` — verify
 - `app/api/auth/login/route.ts` — deprecated duplicate of `/api/auth/signin`
 - 8 certificate-related tables have no migration source — verify in Supabase Dashboard
 - `lib/mou-storage.ts` uses `createBrowserClient` in server context
 - `lib/storage/complianceEvidence.ts` uses deprecated `lib/supabase-api` shim
-- Admin curriculum builder page not yet created (`app/admin/curriculum/[courseId]/page.tsx`)
 
 ---
 
 ## FUTURE TASKS
 
-1. **Apply migration** — run `20260327000003_checkpoint_gating.sql` in Supabase Dashboard
-2. **Admin curriculum builder page** — wire `CurriculumLessonManager` into `app/admin/curriculum/[courseId]/page.tsx`
-3. **Lab/assignment instructor sign-off UI** — `step_submissions` table is ready, UI not built
-4. **Register HVAC blueprint** — add `hvac-epa-608.ts` to `lib/curriculum/blueprints/index.ts`
-5. **Delete `lib/rateLimit.ts`** — confirm 0 importers, then delete
-6. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
-7. **JotForm webhook security** — add IP allowlist or HMAC check
-8. **Commit and push** all accumulated changes
+1. **Lab/assignment instructor sign-off UI** — `step_submissions` table is ready, UI not built
+2. **Delete `lib/rateLimit.ts`** — confirm 0 importers, then delete
+3. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
+4. **JotForm webhook security** — add IP allowlist or HMAC check
+5. **RLS hardening (when ready)** — migrate `recordCheckpointAttempt` and `issueCertificateIfEligible` to learner-scoped access or `SECURITY DEFINER` RPCs, then apply `FORCE ROW SECURITY` on `checkpoint_scores` and `program_completion_certificates`
 
 ---
 

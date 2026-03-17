@@ -4,6 +4,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
+import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -94,15 +95,14 @@ async function _POST(req: NextRequest) {
       raw: output,
       success: true,
     });
-  } catch (error) {
-    const errorId = crypto.randomUUID();
+  } catch (error) { 
     logger.error(
-      `AI generation error [${errorId}]:`,
+      'AI generation error:',
       error instanceof Error ? error : new Error(String(error))
     );
 
     return NextResponse.json(
-      { error: 'Course generation failed. Please try again later.', errorId },
+      { error: 'Failed to generate content' },
       { status: 500 }
     );
   }

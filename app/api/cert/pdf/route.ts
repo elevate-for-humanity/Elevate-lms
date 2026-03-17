@@ -62,8 +62,9 @@ const supabase = await createRouteHandlerClient({ cookies });
   });
 
   if (!pdfResponse.ok) {
-    const error = await pdfResponse.text();
-    return NextResponse.json({ error: 'PDF generation failed', details: error }, { status: 500 });
+    const detail = await pdfResponse.text();
+    logger.error('cert-pdf Netlify function error', { serial, status: pdfResponse.status, detail });
+    return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 
   const pdfBuffer = await pdfResponse.arrayBuffer();

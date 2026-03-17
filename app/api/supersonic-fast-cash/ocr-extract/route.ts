@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -43,8 +44,9 @@ async function _POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      return NextResponse.json({ error: 'OCR extraction failed', details: error }, { status: 500 });
+      const detail = await response.text();
+      logger.error('SupersonicFastCash OCR Netlify function error', { status: response.status, detail });
+      return NextResponse.json({ error: 'OCR extraction failed' }, { status: 500 });
     }
 
     const result = await response.json();

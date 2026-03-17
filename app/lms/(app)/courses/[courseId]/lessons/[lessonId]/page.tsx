@@ -108,7 +108,10 @@ export default function LessonPage() {
 
     // 2. Set state
     if (lessonData) {
-      // If quiz lesson has no quiz_questions, fall back to local quiz bank
+      // Fall back to local HVAC quiz bank when quiz_questions is absent.
+      // Applies to legacy training_lessons rows (content_type='quiz') only.
+      // After migration 20260401000005, curriculum_lessons rows carry quiz_questions
+      // directly, so this fallback is only needed for the training_lessons path.
       let quizQuestions = lessonData.quiz_questions;
       let quizPassingScore = lessonData.passing_score;
       if (lessonData.content_type === 'quiz' && (!quizQuestions || quizQuestions.length === 0)) {
@@ -630,7 +633,7 @@ export default function LessonPage() {
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
             />
           </div>
-        ) : lesson.content_type === 'quiz' && (lesson.quiz_questions?.length > 0 || lesson.quiz_id) ? (
+        ) : (lesson.step_type === 'checkpoint' || lesson.content_type === 'quiz') && (lesson.quiz_questions?.length > 0 || lesson.quiz_id) ? (
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             <QuizPlayer
               questions={lesson.quiz_questions || []}

@@ -135,52 +135,52 @@ HVAC was built before the DB-driven engine. These files must not be copied for n
 
 The lesson page runs both paths in parallel for backward compatibility. New programs use only the DB-driven path.
 
-### HVAC Source of Truth (critical — do not delete legacy content)
+### HVAC Source of Truth — MIGRATED (2025-Q2)
 
-**Live learner path:** `training_courses.id = f0593164-55be-5867-98e7-8a86770a8dd0`
-**Live program:** `programs.id = 4226f7f6-fbc1-44b5-83e8-b12ea149e4c7` (slug: `hvac-technician`)
-**Live content:** `training_lessons` — 95 rows with full EPA 608 content including:
-- Core: ozone/Clean Air Act, refrigerant types, recovery/recycling/reclamation, safety, PT relationships
-- Type I (lessons 35–39), Type II (lessons 40–46), Type III (lessons 47–52)
-- 5 full-length practice exams (lessons 55–59), Universal exam (lesson 59)
-- OSHA 30-Hour (lessons 77–84), CPR/First Aid (lessons 85–87), NRF Rise Up (lessons 88–95)
-- Pass threshold: **70%** (matches real EPA 608 exam)
+**Course ID:** `f0593164-55be-5867-98e7-8a86770a8dd0`
+**Program ID:** `4226f7f6-fbc1-44b5-83e8-b12ea149e4c7` (slug: `hvac-technician`)
+**Content source:** `curriculum_lessons` — migration complete as of 2025-Q2
 
-**Do not delete `training_lessons` for HVAC.** It is the only complete, content-populated course path.
+**curriculum_lessons state (live):**
+- 95 rows, all `status='published'`
+- 85 `lesson` type + 10 `checkpoint` type (one quiz per module) — 21 total lessons with `quiz_questions` populated
+- Pass threshold: **70%** on all checkpoint/quiz lessons (EPA 608 standard)
+- Lesson slugs: `hvac-lesson-1` through `hvac-lesson-95`
+- `quiz_questions` backfilled from `training_lessons` via migration `20260401000005`
 
-**curriculum_lessons skeleton (NOT live):** 47 rows under program `4226f7f6`, all with empty `script_text`. This is an unpopulated migration artifact. It is not served to learners. Do not publish, route, or market it until a full content parity migration is completed.
+**training_lessons:** 95 rows retained as **read-only archive**. Do not write to or delete from this table.
 
-**Pass threshold mismatch:** legacy quizzes = 70%, curriculum_lessons checkpoints = 80%. Resolve intentionally before activating the new path — do not silently change the standard.
+**lms_lessons view:** `curriculum_lessons` rows take priority (UNION ALL with NOT EXISTS guard). HVAC learners are served from `curriculum_lessons`. The view now exposes `cl.quiz_questions` and `cl.passing_score` directly (fixed in migration `20260401000005`).
 
-**Parity migration prerequisites before activating curriculum_lessons path:**
-1. Migrate all 95 lesson scripts into `curriculum_lessons.script_text`
-2. Migrate all 5 practice exams as `step_type='exam'` with `passing_score=70`
-3. Migrate OSHA 30, CPR, NRF Rise Up as separate credential blocks
-4. Align pass threshold to one standard (70% recommended — matches EPA 608)
-5. Run full learner simulation end-to-end on new path before switching
+**Pending migration (apply in Supabase Dashboard):**
+- `20260401000005_curriculum_lessons_quiz_questions.sql` — adds `quiz_questions` column, backfills HVAC data, updates `lms_lessons` view
+
+**Do not delete `training_lessons` for HVAC** — it is the archive source for `quiz_questions` backfill and a rollback reference.
 
 ---
 
 ## In Progress / Incomplete Work
 
-### Migration Must Be Applied
+### Migrations Pending (apply in Supabase Dashboard)
 
-`supabase/migrations/20260327000003_checkpoint_gating.sql` has been created but not yet applied. Until applied:
-- `checkpoint_scores` and `step_submissions` tables do not exist
-- `passing_score` column does not exist on `curriculum_lessons`
-- The lesson page fails open (checkpoints render but scores are not recorded)
+These files exist in `supabase/migrations/` but have **not** been applied to the live DB:
+
+| File | Effect |
+|------|--------|
+| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
+
+Until `20260401000005` is applied:
+- `curriculum_lessons.quiz_questions` column does not exist
+- `lms_lessons` view returns `NULL` for `quiz_questions` on curriculum rows
+- HVAC checkpoint quiz player falls back to `HVAC_QUIZ_MAP` (still functional, but not DB-driven)
 
 ### Lab / Assignment Instructor Sign-Off UI
 
-`step_submissions` table is defined in the migration above. The lesson page renders lab/assignment UI shells but submission storage requires the migration to be applied. Instructor sign-off UI is not yet built.
+`step_submissions` table exists (applied via earlier migration). The lesson page renders lab/assignment UI shells but instructor sign-off UI is not yet built.
 
 ### Admin Curriculum Builder Page
 
-`components/admin/CurriculumLessonManager.tsx` is built. It needs to be wired into a new page at `app/admin/curriculum/[courseId]/page.tsx` (does not exist yet).
-
-### HVAC Blueprint Not Registered
-
-`lib/curriculum/blueprints/hvac-epa-608.ts` exists but is not registered in `lib/curriculum/blueprints/index.ts`. Register it before running the HVAC curriculum generator.
+`components/admin/CurriculumLessonManager.tsx` is built and wired into `app/admin/curriculum/[courseId]/page.tsx`.
 
 ---
 

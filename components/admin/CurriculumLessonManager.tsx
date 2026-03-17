@@ -35,6 +35,7 @@ interface CurriculumLesson {
   script_text: string | null;
   video_file: string | null;
   module_id: string | null;
+  quiz_questions: any[] | null;
 }
 
 interface Props {
@@ -75,7 +76,7 @@ export default function CurriculumLessonManager({ courseId, moduleOrder }: Props
       const supabase = createClient();
       let query = supabase
         .from('curriculum_lessons')
-        .select('id, lesson_slug, lesson_title, step_type, passing_score, module_order, lesson_order, duration_minutes, status, script_text, video_file, module_id')
+        .select('id, lesson_slug, lesson_title, step_type, passing_score, module_order, lesson_order, duration_minutes, status, script_text, video_file, module_id, quiz_questions')
         .eq('course_id', courseId)
         .order('module_order')
         .order('lesson_order');
@@ -347,6 +348,32 @@ export default function CurriculumLessonManager({ courseId, moduleOrder }: Props
                                 placeholder="Lesson script or rich HTML content…"
                               />
                             </div>
+
+                            {/* Quiz questions — only for quiz/checkpoint/exam */}
+                            {showScore && (
+                              <div className="md:col-span-2">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                                  Quiz Questions (JSON)
+                                </label>
+                                <textarea
+                                  rows={8}
+                                  value={m.quiz_questions ? JSON.stringify(m.quiz_questions, null, 2) : ''}
+                                  onChange={e => {
+                                    try {
+                                      const parsed = e.target.value ? JSON.parse(e.target.value) : null;
+                                      setField(lesson.id, 'quiz_questions', parsed);
+                                    } catch {
+                                      // Don't update on invalid JSON — let user finish typing
+                                    }
+                                  }}
+                                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-y"
+                                  placeholder={'[\n  {\n    "id": "q1",\n    "question": "...",\n    "options": ["A", "B", "C", "D"],\n    "correctAnswer": 0,\n    "explanation": "..."\n  }\n]'}
+                                />
+                                <p className="text-xs text-slate-400 mt-1">
+                                  Array of question objects. Each needs: id, question, options[], correctAnswer (0-based index), explanation.
+                                </p>
+                              </div>
+                            )}
                           </div>
 
                           {/* Slug (read-only) */}

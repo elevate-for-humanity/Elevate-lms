@@ -20,6 +20,7 @@ CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import QuizPlayer from '@/components/lms/QuizPlayer';
 import LessonPlayer from '@/components/lms/LessonPlayer';
+import StepSubmissionForm from '@/components/lms/StepSubmissionForm';
 import InteractiveVideoPlayer from '@/components/lms/InteractiveVideoPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
@@ -586,6 +587,12 @@ export default function LessonPage() {
                 <div className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
               )}
+              <StepSubmissionForm
+                lessonId={lessonId}
+                courseId={courseId}
+                stepType="lab"
+                lessonTitle={lesson.title}
+              />
             </div>
           </div>
         ) : lesson.step_type === 'assignment' ? (
@@ -604,6 +611,12 @@ export default function LessonPage() {
                 <div className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }} />
               )}
+              <StepSubmissionForm
+                lessonId={lessonId}
+                courseId={courseId}
+                stepType="assignment"
+                lessonTitle={lesson.title}
+              />
             </div>
           </div>
         ) : lesson.content_type === 'scorm' && lesson.scorm_package_id ? (

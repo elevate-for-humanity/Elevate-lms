@@ -29,7 +29,7 @@ const MODULES = [
   { num: 16, title: 'Capstone & Certification Prep', lessons: 7, topics: 'EPA 608 Universal exam prep, OSHA 10, CPR/AED, final assessment' },
 ];
 
-const VIDEO_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4';
+const VIDEO_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`;
 
 export default function HvacCourseLicensePage() {
   return (

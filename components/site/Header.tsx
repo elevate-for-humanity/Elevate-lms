@@ -16,7 +16,6 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 export const NAV_ITEMS = [
   {
     name: 'Get Trained',
-    href: '/programs',
     subItems: [
       { name: '— Training Areas —', href: '/programs', isHeader: true },
       { name: 'Healthcare', href: '/programs/healthcare' },
@@ -42,7 +41,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Partners & Employers',
-    href: '/partners',
     subItems: [
       { name: '— Employers —', href: '/partnerships', isHeader: true },
       { name: 'Hire Our Graduates', href: '/employer' },
@@ -93,7 +91,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Platform',
-    href: '/platform',
     subItems: [
       { name: 'Platform Overview', href: '/platform' },
       { name: 'License the Platform', href: '/store/licensing' },
@@ -104,7 +101,6 @@ export const NAV_ITEMS = [
   },
   {
     name: 'Rise Foundation',
-    href: '/rise-foundation',
     subItems: [
       { name: 'Mental Wellness', href: '/rise-foundation/trauma-recovery' },
       { name: 'Young Adult Wellness', href: '/rise-foundation/young-adult-wellness' },

@@ -246,9 +246,11 @@ async function main() {
     });
 
     for (const [lessonIndex, lesson] of mod.lessons.entries()) {
-      const lessonSlug = `${mod.id}-${lesson.id}`;
-      const rawQuizzes = QUIZ_QUESTIONS[lesson.id];
-      const quizzes    = rawQuizzes?.map((q, i) => ({ ...q, quizOrder: i }));
+      const lessonSlug   = `${mod.id}-${lesson.id}`;
+      const rawQuizzes   = QUIZ_QUESTIONS[lesson.id];
+      const quizzes      = rawQuizzes?.map((q, i) => ({ ...q, quizOrder: i }));
+      // Module-boundary quiz lessons gate the next module
+      const isCheckpoint = lesson.type === 'quiz';
 
       await gen.upsertLesson({
         lessonSlug,
@@ -260,6 +262,8 @@ async function main() {
         lessonOrder:         lessonIndex + 1,
         moduleOrder:         modIndex + 1,
         credentialDomainKey: domainKey,
+        stepType:            isCheckpoint ? 'checkpoint' : 'lesson',
+        passingScore:        isCheckpoint ? 80 : 0,
         quizzes,
       });
     }

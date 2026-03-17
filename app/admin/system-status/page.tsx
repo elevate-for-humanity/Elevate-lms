@@ -62,7 +62,7 @@ interface CreatorCapability {
 }
 
 async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorCapability[]> {
-  const baseUrl = 'https://www.elevateforhumanity.org';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const capabilities: CreatorCapability[] = [];
   
   // Helper to check if table exists and is accessible

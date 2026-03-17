@@ -20,7 +20,7 @@ const HVACLab = dynamic(() => import('@/components/HVACLab'), {
 })
 
 const VIDEO_URL =
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4'
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`
 
 function SectionHeader({ number, title }: { number: number; title: string }) {
   return (

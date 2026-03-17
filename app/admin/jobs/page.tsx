@@ -4,6 +4,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Building2, MapPin, Clock, Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -40,6 +42,12 @@ async function getJobsData() {
 }
 
 export default async function JobsPage() {
+  const auth = await createClient();
+  const { data: { user } } = await auth.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/jobs');
+  const { data: profile } = await auth.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+
   const { jobs: dbJobs, stats: dbStats } = await getJobsData();
 
   const stats = [

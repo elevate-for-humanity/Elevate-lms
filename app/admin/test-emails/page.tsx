@@ -3,11 +3,26 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Send, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function TestEmailsPage() {
+  const router = useRouter();
+
+  // Admin-only tool — redirect non-admins on mount
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.replace('/login?redirect=/admin/test-emails'); return; }
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+      if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+        router.replace('/unauthorized');
+      }
+    });
+  }, [router]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     success: boolean;

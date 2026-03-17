@@ -51,19 +51,21 @@ export async function checkCertificationReadiness(
   }
 
   // ── 2. Lesson completion ────────────────────────────────────────────────────
-  // Get all lessons for this program via training_course → curriculum_lessons
+  // curriculum_lessons uses status='published', not is_published
   const { data: lessons } = await db
     .from('curriculum_lessons')
     .select('id, content_type, title')
     .eq('program_id', programId)
-    .eq('is_published', true);
+    .eq('status', 'published');
 
   const totalLessons = lessons?.length ?? 0;
 
+  // lesson_progress is the canonical completion table (written by recordStepCompletion)
   const { data: completions } = await db
-    .from('lesson_completions')
+    .from('lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId)
+    .eq('completed', true)
     .in('lesson_id', (lessons ?? []).map((l) => l.id));
 
   const completedIds = new Set((completions ?? []).map((c) => c.lesson_id));
@@ -74,17 +76,18 @@ export async function checkCertificationReadiness(
   }
 
   // ── 3. Quiz passage ─────────────────────────────────────────────────────────
+  // quiz_attempts.quiz_id stores the lesson UUID (used as quiz identity)
   const quizLessons = (lessons ?? []).filter((l) => l.content_type === 'quiz');
   const totalQuizzes = quizLessons.length;
 
   const { data: quizResults } = await db
-    .from('curriculum_quiz_attempts')
-    .select('lesson_id, passed')
+    .from('quiz_attempts')
+    .select('quiz_id, passed')
     .eq('user_id', userId)
-    .in('lesson_id', quizLessons.map((l) => l.id))
+    .in('quiz_id', quizLessons.map((l) => l.id))
     .eq('passed', true);
 
-  const passedQuizIds = new Set((quizResults ?? []).map((r) => r.lesson_id));
+  const passedQuizIds = new Set((quizResults ?? []).map((r) => r.quiz_id));
   const quizzesPassed = passedQuizIds.size;
 
   if (quizzesPassed < totalQuizzes) {

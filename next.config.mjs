@@ -719,6 +719,47 @@ const nextConfig = {
       { source: '/metrics', destination: '/programs', permanent: false },
 
       // ============================================
+      // STUB PAGE REPLACEMENTS
+      // These were redirect-only page.tsx files (<12 lines).
+      // Moved here so they don't occupy a page slot in the build.
+      // ============================================
+      { source: '/admin',                                  destination: '/admin/dashboard',                    permanent: true  },
+      { source: '/admin/staff',                            destination: '/admin/users?role=staff',             permanent: true  },
+      { source: '/selfish-inc',                            destination: '/rise-foundation',                    permanent: true  },
+      { source: '/team',                                   destination: '/about/team',                         permanent: true  },
+      { source: '/partner/apply',                          destination: '/partner/onboarding',                 permanent: true  },
+      { source: '/partner/programs',                       destination: '/partner/dashboard',                  permanent: true  },
+      { source: '/partners/barber-shop',                   destination: '/partners/barbershop-apprenticeship', permanent: true  },
+      { source: '/partners/portal',                        destination: '/partner-portal',                     permanent: true  },
+      { source: '/onboarding/handbook',                    destination: '/onboarding/learner/handbook',        permanent: true  },
+      { source: '/onboarding/partner',                     destination: '/partner/onboarding',                 permanent: true  },
+      { source: '/onboarding/employer/agreement',          destination: '/onboarding/mou',                    permanent: true  },
+      { source: '/student-portal/onboarding',              destination: '/onboarding/learner',                 permanent: true  },
+      { source: '/student-portal/onboarding/approved',     destination: '/onboarding/learner',                 permanent: true  },
+      { source: '/student-portal/onboarding/documents',    destination: '/onboarding/learner/documents',       permanent: true  },
+      { source: '/student-portal/onboarding/agreements',   destination: '/onboarding/learner/agreements',      permanent: true  },
+
+      // ============================================
+      // PHASE 1 STUB REPLACEMENTS
+      // Redirect-only page.tsx files moved here to free build slots.
+      // ============================================
+      // Handbook canonicalization — /student-handbook is the single source
+      { source: '/student/handbook',          destination: '/student-handbook', permanent: true },
+      { source: '/student-portal/handbook',   destination: '/student-handbook', permanent: true },
+
+      // /cert/verify kept as page.tsx — passes query params to /verify
+      { source: '/partner/dashboard',           destination: '/partner-portal',      permanent: true  },
+      { source: '/partner',                     destination: '/partner-portal',      permanent: true  },
+      { source: '/programs/admin/dashboard',    destination: '/programs/admin',      permanent: true  },
+      // /store/licenses/managed passes query params — handled by next.config rewrite
+      // pwa auth-redirect stubs: redirect to canonical pwa pages
+      { source: '/pwa/barber/dashboard',        destination: '/pwa/barber',          permanent: false },
+      { source: '/pwa/shop-owner/dashboard',    destination: '/pwa/shop-owner',      permanent: false },
+
+      // /employer-portal root → canonical employer dashboard
+      { source: '/employer-portal',           destination: '/employer/dashboard',  permanent: true },
+
+      // ============================================
       // DEAD LINK FIXES — public-facing
     ];
   },

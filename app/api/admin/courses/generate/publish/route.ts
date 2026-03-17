@@ -24,6 +24,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { runAlignmentAudit } from '@/lib/services/credential-alignment-audit';
+import { slugify } from '@/lib/course-utils';
 import type { GeneratedCourse } from '../route';
 
 // ── Compiled draft schema (v2 course compiler) ────────────────────────────────
@@ -401,40 +402,92 @@ async function publishCompiledDraft(
   // Only written when program_id is present (NOT NULL constraint on curriculum_lessons).
   // The lms_lessons view returns curriculum_lessons rows first; training_lessons are the fallback.
   if (draft.program_id) {
+    // Upsert modules rows so curriculum_lessons.module_id can be populated.
+    // Identity key: program_id + slug. Safe to run on every publish.
+    const moduleUpsertRows = draft.modules.map((mod) => ({
+      program_id:  draft.program_id,
+      title:       mod.module_title,
+      slug:        slugify(mod.module_title).slice(0, 80),
+      order_index: mod.module_order - 1,
+    }));
+    const { data: upsertedModules, error: modErr } = await db
+      .from('modules')
+      .upsert(moduleUpsertRows, { onConflict: 'program_id,slug', ignoreDuplicates: false })
+      .select('id, slug');
+    if (modErr) logger.warn('modules upsert failed (non-fatal)', { error: modErr.message });
+
+    // Build slug → id map for module_id resolution below
+    const moduleIdBySlug = new Map<string, string>(
+      (upsertedModules ?? []).map((m: { id: string; slug: string }) => [m.slug, m.id])
+    );
+
     let clLessonNumber = 1;
     const curriculumRows: Record<string, unknown>[] = [];
 
+    // Track lesson count per module to auto-assign the last lesson as checkpoint.
+    const moduleLessonCounts = new Map<number, number>();
     for (const mod of draft.modules) {
-      for (const lesson of mod.lessons) {
-        const slugBase = lesson.lesson_title
-          .toLowerCase().trim()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '')
-          .slice(0, 80);
-        const lessonSlug = `${slugBase}-${clLessonNumber}`;
+      moduleLessonCounts.set(mod.module_order, mod.lessons.length);
+    }
 
-        // key_terms: extract from narration_script if not explicitly provided.
-        // Stored as [{ term, definition }] jsonb.
+    const moduleLessonIndexes = new Map<number, number>(); // module_order → current index (1-based)
+
+    for (const mod of draft.modules) {
+      const totalInModule = moduleLessonCounts.get(mod.module_order) ?? 0;
+      moduleLessonIndexes.set(mod.module_order, 0);
+
+      for (const lesson of mod.lessons) {
+        const currentIndex = (moduleLessonIndexes.get(mod.module_order) ?? 0) + 1;
+        moduleLessonIndexes.set(mod.module_order, currentIndex);
+
+        const lessonSlug = `${slugify(lesson.lesson_title).slice(0, 80)}-${clLessonNumber}`;
+
         const keyTerms: Array<{ term: string; definition: string }> = [];
 
+        // Derive step_type from content signals.
+        // The last lesson of each module (except the final module) becomes a
+        // checkpoint — it gates entry to the next module once the migration
+        // 20260327000001_step_type.sql is applied.
+        const titleLower = lesson.lesson_title.toLowerCase();
+        const isLastInModule = currentIndex === totalInModule;
+        const isFinalModule  = mod.module_order === draft.modules.length;
+        const isCheckpoint   =
+          titleLower.includes('checkpoint') ||
+          titleLower.includes('module assessment') ||
+          (isLastInModule && !isFinalModule);
+
+        const step_type: string =
+          isCheckpoint                                    ? 'checkpoint' :
+          titleLower.includes('exam') ||
+          titleLower.includes('final assessment')         ? 'exam' :
+          titleLower.includes('lab') ||
+          titleLower.includes('hands-on')                 ? 'lab' :
+          titleLower.includes('assignment') ||
+          titleLower.includes('reflection')               ? 'assignment' :
+          lesson.knowledge_check?.length > 0              ? 'quiz' :
+                                                            'lesson';
+
+        const modSlug = slugify(mod.module_title).slice(0, 80);
+        const resolvedModuleId = moduleIdBySlug.get(modSlug) ?? null;
+
         curriculumRows.push({
-          program_id:       draft.program_id,
-          course_id:        courseId,
-          lesson_slug:      lessonSlug,
-          lesson_title:     lesson.lesson_title,
-          lesson_order:     clLessonNumber - 1,
-          module_order:     mod.module_order - 1,
-          module_title:     mod.module_title,
-          // script_text is the canonical content field for curriculum_lessons
-          script_text:      lesson.narration_script,
-          // summary_text and reflection_prompt are used by the audit and learner UI
-          summary_text:     lesson.summary_text || '',
+          program_id:        draft.program_id,
+          course_id:         courseId,
+          module_id:         resolvedModuleId,
+          lesson_slug:       lessonSlug,
+          lesson_title:      lesson.lesson_title,
+          lesson_order:      clLessonNumber - 1,
+          module_order:      mod.module_order - 1,
+          module_title:      mod.module_title,
+          step_type,
+          passing_score:     isCheckpoint ? 80 : 0,
+          script_text:       lesson.narration_script,
+          summary_text:      lesson.summary_text || '',
           reflection_prompt: lesson.reflection_prompt || '',
-          // competency_keys drives per-competency fidelity gating in audit-alignment.ts
-          competency_keys:  lesson.competency_keys ?? [],
-          key_terms:        keyTerms,
-          duration_minutes: lesson.estimated_minutes,
-          status:           resolvePublishStatus(draft.auto_publish, callerRole),
+          competency_keys:   lesson.competency_keys ?? [],
+          key_terms:         keyTerms,
+          duration_minutes:  lesson.estimated_minutes,
+          status:            resolvePublishStatus(draft.auto_publish, callerRole),
         });
         clLessonNumber++;
       }
@@ -488,6 +541,7 @@ async function publishCompiledDraft(
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 120;
 
 async function _POST(req: NextRequest) {
   try {
@@ -601,31 +655,75 @@ async function _POST(req: NextRequest) {
     // ── 2b. curriculum_lessons parallel write ───────────────────────────────
     // Only when program_id is present (NOT NULL constraint on curriculum_lessons).
     if (program_id) {
-      const curriculumRows = course.modules.flatMap((mod, modIdx) =>
-        mod.lessons.map((lesson) => {
+      // Upsert modules first so module_id FK can be satisfied on curriculum_lessons.
+      const moduleUpsertRows2 = course.modules.map((mod, modIdx) => ({
+        program_id,
+        title:       mod.title,
+        slug:        mod.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80),
+        order_index: modIdx,
+      }));
+      const { data: upsertedModules2, error: modErr2 } = await db
+        .from('modules')
+        .upsert(moduleUpsertRows2, { onConflict: 'program_id,slug', ignoreDuplicates: false })
+        .select('id, slug');
+      if (modErr2) logger.warn('modules upsert failed (non-fatal)', { error: modErr2.message });
+      const moduleIdBySlug2 = new Map<string, string>(
+        (upsertedModules2 ?? []).map((m: { id: string; slug: string }) => [m.slug, m.id])
+      );
+
+      const curriculumRows = course.modules.flatMap((mod, modIdx) => {
+        const totalInModule = mod.lessons.length;
+        const isFinalModule = modIdx === course.modules.length - 1;
+        const modSlug2 = mod.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+        const resolvedModuleId2 = moduleIdBySlug2.get(modSlug2) ?? null;
+
+        return mod.lessons.map((lesson, lessonIdx) => {
           const slugBase = lesson.title
             .toLowerCase().trim()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '')
             .slice(0, 80);
+
+          const titleLower = lesson.title.toLowerCase();
+          const isLastInModule = lessonIdx === totalInModule - 1;
+          const isCheckpoint =
+            titleLower.includes('checkpoint') ||
+            titleLower.includes('module assessment') ||
+            (isLastInModule && !isFinalModule);
+
+          const step_type: string =
+            isCheckpoint                                    ? 'checkpoint' :
+            titleLower.includes('exam') ||
+            titleLower.includes('final assessment')         ? 'exam' :
+            titleLower.includes('lab') ||
+            titleLower.includes('hands-on')                 ? 'lab' :
+            titleLower.includes('assignment') ||
+            titleLower.includes('reflection')               ? 'assignment' :
+            lesson.content_type === 'quiz' ||
+            (lesson.quiz_questions?.length ?? 0) > 0        ? 'quiz' :
+                                                              'lesson';
+
           return {
             program_id,
-            course_id:        courseId,
-            lesson_slug:      `${slugBase}-${lesson.lesson_number}`,
-            lesson_title:     lesson.title,
-            lesson_order:     lesson.lesson_number - 1,
-            module_order:     modIdx,
-            module_title:     mod.title,
-            script_text:      lesson.content,
-            summary_text:     lesson.summary_text || lesson.description || '',
+            course_id:         courseId,
+            module_id:         resolvedModuleId2,
+            lesson_slug:       `${slugBase}-${lesson.lesson_number}`,
+            lesson_title:      lesson.title,
+            lesson_order:      lesson.lesson_number - 1,
+            module_order:      modIdx,
+            module_title:      mod.title,
+            step_type,
+            passing_score:     isCheckpoint ? 80 : 0,
+            script_text:       lesson.content,
+            summary_text:      lesson.summary_text || lesson.description || '',
             reflection_prompt: lesson.reflection_prompt || '',
-            competency_keys:  lesson.competency_keys ?? [],
-            key_terms:        [] as Array<{ term: string; definition: string }>,
-            duration_minutes: lesson.duration_minutes,
-            status:           resolvePublishStatus(is_published, callerRole),
+            competency_keys:   lesson.competency_keys ?? [],
+            key_terms:         [] as Array<{ term: string; definition: string }>,
+            duration_minutes:  lesson.duration_minutes,
+            status:            resolvePublishStatus(is_published, callerRole),
           };
-        })
-      );
+        });
+      });
 
       const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
       if (clErr) {

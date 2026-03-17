@@ -5,6 +5,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { FileText, Users, Clock, AlertTriangle, Download, Search, Circle, } from 'lucide-react';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'WIOA Compliance | Admin | Elevate for Humanity',
@@ -45,6 +47,12 @@ async function getWIOAData() {
 }
 
 export default async function WIOAPage() {
+  const auth = await createClient();
+  const { data: { user } } = await auth.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/wioa');
+  const { data: profile } = await auth.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+
   const { participants: dbParticipants, stats: dbStats } = await getWIOAData();
 
   const stats = [

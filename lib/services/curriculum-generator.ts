@@ -112,6 +112,19 @@ export interface LessonDef {
   credentialDomainKey?: string;
   /** training_courses.id — links this lesson to the LMS course page */
   courseId?: string;
+  /**
+   * Lesson type. Controls rendering and completion rules.
+   * Defaults to 'lesson' if omitted.
+   * Set to 'checkpoint' on module-boundary lessons that gate the next module.
+   */
+  stepType?: 'lesson' | 'quiz' | 'checkpoint' | 'lab' | 'assignment' | 'exam' | 'certification';
+  /**
+   * Minimum score (0–100) required to pass.
+   * Required for checkpoint/quiz/exam step types.
+   * Defaults to 0 for plain lessons (no pass threshold).
+   * curriculum_lessons.passing_score is NOT NULL — always written explicitly.
+   */
+  passingScore?: number;
   quizzes?: QuizDef[];
   recaps?: RecapDef[];
 }
@@ -354,6 +367,9 @@ export class CurriculumGenerator {
           diagram_file:         def.diagramFile ?? null,
           duration_minutes:     def.durationMinutes ?? null,
           credential_domain_id: credentialDomainId,
+          step_type:            def.stepType ?? 'lesson',
+          // NOT NULL column — 0 for plain lessons, explicit threshold for checkpoints/quizzes/exams
+          passing_score:        def.passingScore ?? (def.stepType && def.stepType !== 'lesson' ? 80 : 0),
           status:               'published',
           updated_at:           new Date().toISOString(),
         },

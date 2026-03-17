@@ -396,7 +396,7 @@ export default function HVACClassroomPreview() {
             <div>
               {currentModuleIndex === 0 ? (
                 <InteractiveVideoPlayer
-                  videoUrl="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4"
+                  videoUrl={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`}
                   title={mod.title}
                   onProgress={handleProgress}
                   onComplete={() => completeTab('video')}

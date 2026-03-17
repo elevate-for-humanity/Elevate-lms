@@ -1,3 +1,9 @@
+/**
+ * @legacy Static healthcare course landing page.
+ * This page is NOT DB-driven. It predates the DB-driven course engine.
+ * Do not add new static course pages inside app/lms/. All new courses must
+ * be DB-driven and accessible via /lms/courses/[courseId].
+ */
 
 import { Metadata } from 'next';
 import Link from 'next/link';

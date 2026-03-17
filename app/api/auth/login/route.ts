@@ -1,7 +1,12 @@
+/**
+ * @deprecated Use /api/auth/signin instead.
+ * This route duplicates /api/auth/signin and uses the deprecated in-memory
+ * rate limiter (lib/rateLimit). It is kept only for backward compatibility
+ * with any existing callers. Do not add new callers — use /api/auth/signin.
+ */
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -10,17 +15,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-    // Rate limit: 5 login attempts per minute per IP
-    const identifier = getClientIdentifier(request.headers);
-    const rateLimitResult = rateLimit(identifier, RATE_LIMITS.AUTH);
     
-    if (!rateLimitResult.ok) {
-      return NextResponse.json(
-        { error: 'Too many login attempts. Please try again later.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
-      );
-    }
-
     const { email, password } = await request.json();
 
     if (!email || !password) {

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { BookOpen, Users, BarChart, Settings, Home, MessageSquare } from 'lucide-react';
+import { BookOpen, Users, BarChart, Settings, Home, MessageSquare, ClipboardList } from 'lucide-react';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/instructor', icon: Home, label: 'Dashboard' },
   { href: '/instructor/courses', icon: BookOpen, label: 'Courses' },
   { href: '/instructor/students', icon: Users, label: 'Students' },
+  { href: '/instructor/submissions', icon: ClipboardList, label: 'Submissions' },
   { href: '/instructor/analytics', icon: BarChart, label: 'Analytics' },
   { href: '/instructor/campaigns', icon: MessageSquare, label: 'Campaigns' },
   { href: '/instructor/settings', icon: Settings, label: 'Settings' },

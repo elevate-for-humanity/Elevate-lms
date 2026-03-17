@@ -1,3 +1,8 @@
+/**
+ * @legacy Pre-certification completion page.
+ * Redirects to the canonical certification end-state page.
+ * Kept for backward compatibility with any existing links.
+ */
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';

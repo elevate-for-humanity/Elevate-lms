@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { rateLimitNew as rateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -11,15 +10,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     // Rate limit: 60 requests per minute
-    const identifier = getClientIdentifier(request.headers);
-    const rateLimitResult = await rateLimit(identifier, { limit: 60, windowMs: 60000 });
     
-    if (!rateLimitResult.ok) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded' },
-        { status: 429 }
-      );
-    }
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');

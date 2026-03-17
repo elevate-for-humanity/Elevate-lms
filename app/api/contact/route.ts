@@ -5,7 +5,6 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -36,25 +35,6 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Rate limiting: 5 requests per minute per IP
-    const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = await rateLimit(identifier, RATE_LIMITS.CONTACT_FORM);
-
-    if (!rateLimitResult.ok) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Too many requests. Please try again in a minute.'
-        },
-        {
-          status: 429,
-          headers: {
-            'Retry-After': '60',
-            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
-          }
-        }
-      );
-    }
 
     // Parse and validate request body
     const body = await req.json().catch(() => null);

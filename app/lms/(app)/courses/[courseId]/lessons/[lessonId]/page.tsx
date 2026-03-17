@@ -53,6 +53,10 @@ export default function LessonPage() {
   const [certificate, setCertificate] = useState<any>(null);
   const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  // checkpointBlocked: true when the previous module's checkpoint has not been passed.
+  // Prevents advancing past a failed checkpoint into the next module.
+  const [checkpointBlocked, setCheckpointBlocked] = useState(false);
+  const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
   const lessonStartTime = React.useRef(Date.now());
 
   useEffect(() => {
@@ -163,6 +167,46 @@ export default function LessonPage() {
     } catch {
       // Auth/progress fetch failed — lesson still renders fine
     }
+
+    // 4. Fetch learner progress via engine API (covers checkpoint_scores +
+    //    step_submissions in one call). Replaces direct Supabase checkpoint query.
+    try {
+      if (user) {
+        const res = await fetch(`/api/lms/progress?courseId=${courseId}`);
+        if (res.ok) {
+          const data = await res.json();
+          // completedLessonIds already set above from lesson_progress; merge with engine result
+          if (Array.isArray(data.completedLessonIds)) {
+            setCompletedLessonIds(new Set<string>(data.completedLessonIds));
+            setIsCompleted(data.completedLessonIds.includes(lessonId));
+          }
+          // Passed checkpoint IDs from engine checkpoint_scores
+          if (data.checkpointScores) {
+            const passedIds = new Set<string>(
+              Object.entries(data.checkpointScores as Record<string, { passed: boolean }>)
+                .filter(([, v]) => v.passed)
+                .map(([k]) => k)
+            );
+            setPassedCheckpointIds(passedIds);
+          }
+        }
+      }
+    } catch {
+      // Fail open — lesson still renders without gating data
+    }
+
+    // 5. Determine if the current lesson is blocked by an unpassed checkpoint.
+    // A lesson is blocked when it is in module N and the checkpoint for module N-1
+    // has not been passed. Only applies to curriculum_lessons (lesson_source = 'curriculum').
+    if (lessonData && lessonsData && lessonData.lesson_source === 'curriculum' && lessonData.module_order > 1) {
+      const prevModuleOrder = lessonData.module_order - 1;
+      const prevCheckpoint = lessonsData.find(
+        (l: any) => l.module_order === prevModuleOrder && l.step_type === 'checkpoint'
+      );
+      if (prevCheckpoint && !passedCheckpointIds.has(prevCheckpoint.id)) {
+        setCheckpointBlocked(true);
+      }
+    }
   };
 
   const markComplete = async () => {
@@ -198,7 +242,7 @@ export default function LessonPage() {
         const result = await response.json();
 
         // Update sidebar completion state
-        setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
+        setCompletedLessonIds((prev) => new Set<string>([...Array.from(prev), lessonId]));
 
         // Handle course completion — auto-advance to certification page
         if (result.courseProgress?.courseCompleted) {
@@ -571,8 +615,36 @@ export default function LessonPage() {
             <QuizPlayer
               questions={lesson.quiz_questions || []}
               title={lesson.title}
-              onComplete={async (score) => {
-                if (score >= (lesson.passing_score || 70)) {
+              onComplete={async (score, answers) => {
+                const passingScore = lesson.passing_score || 70;
+                const passed = score >= passingScore;
+
+                // For checkpoint and exam steps, record the score via the engine API.
+                // This is what the module gate reads — must be written before markComplete.
+                if (lesson.step_type === 'checkpoint' || lesson.step_type === 'exam') {
+                  try {
+                    await fetch(`/api/lessons/${lessonId}/checkpoint`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        courseId,
+                        moduleOrder: lesson.module_order ?? 0,
+                        score,
+                        passingScore,
+                        answers: answers ?? {},
+                      }),
+                    });
+
+                    if (passed) {
+                      setPassedCheckpointIds(prev => new Set<string>([...Array.from(prev), lessonId]));
+                      setCheckpointBlocked(false);
+                    }
+                  } catch {
+                    // Non-fatal — fail open so the lesson still renders
+                  }
+                }
+
+                if (passed) {
                   markComplete();
                 }
               }}
@@ -688,17 +760,33 @@ export default function LessonPage() {
 
         {/* Lesson Content */}
         <div className="max-w-4xl mx-auto p-4 md:p-8">
+          {/* Checkpoint gate banner — shown when previous module checkpoint not passed */}
+          {checkpointBlocked && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl flex items-start gap-3">
+              <ClipboardList className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-amber-800 text-sm">Module checkpoint required</p>
+                <p className="text-amber-700 text-sm mt-1">
+                  You must pass the checkpoint for the previous module before continuing.
+                  Return to that checkpoint and achieve a passing score to unlock this lesson.
+                </p>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
             <h1 className="text-2xl md:text-3xl font-bold">{lesson.title}</h1>
             <button
-              onClick={markComplete}
+              onClick={checkpointBlocked ? undefined : markComplete}
+              disabled={checkpointBlocked}
               className={`px-6 py-3 rounded-lg font-semibold transition ${
-                isCompleted
+                checkpointBlocked
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                  : isCompleted
                   ? 'bg-brand-green-100 text-brand-green-700 border-2 border-brand-green-600'
                   : 'bg-brand-green-600 hover:bg-brand-green-700 text-white'
               }`}
             >
-              {isCompleted ? '• Completed' : 'Mark as Complete'}
+              {checkpointBlocked ? 'Locked — complete checkpoint first' : isCompleted ? '• Completed' : 'Mark as Complete'}
             </button>
           </div>
           {completionError && (

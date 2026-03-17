@@ -4,7 +4,6 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
@@ -74,15 +73,6 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
-    const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = await rateLimit(`barbershop-partner:${identifier}`, RATE_LIMITS.APPLICATION_FORM);
-
-    if (!rateLimitResult.ok) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again in a minute.' },
-        { status: 429 }
-      );
-    }
 
     const body: ApplicationData = await req.json();
 

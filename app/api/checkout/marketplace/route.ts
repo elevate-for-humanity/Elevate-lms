@@ -5,10 +5,6 @@ export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import {
   rateLimit,
-  getClientIdentifier,
-  createRateLimitHeaders,
-  RateLimitPresets,
-} from '@/lib/rateLimit';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
@@ -21,19 +17,6 @@ async function _POST(req: Request) {
     if (auth.error) return auth.error;
 
 
-  // Rate limiting: 10 checkouts per minute per IP
-  const identifier = getClientIdentifier(req.headers);
-  const rateLimitResult = rateLimit(identifier, RateLimitPresets.STRICT);
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      {
-        status: 429,
-        headers: createRateLimitHeaders(rateLimitResult),
-      }
-    );
-  }
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(

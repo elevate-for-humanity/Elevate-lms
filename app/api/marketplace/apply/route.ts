@@ -8,10 +8,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import {
   rateLimit,
-  getClientIdentifier,
-  createRateLimitHeaders,
-  RateLimitPresets,
-} from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -19,22 +15,6 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
-  // Rate limiting: 3 applications per hour per IP
-  const identifier = getClientIdentifier(req.headers);
-  const rateLimitResult = await rateLimit(identifier, {
-    limit: 3,
-    window: 60 * 60 * 1000,
-  });
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many applications. Please try again later.' },
-      {
-        status: 429,
-        headers: createRateLimitHeaders(rateLimitResult),
-      }
-    );
-  }
 
   try {
     const supabase = await createClient();

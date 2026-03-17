@@ -1,3 +1,9 @@
+/**
+ * @legacy HVAC standalone lesson page.
+ * This page is NOT part of the LMS engine. It predates the DB-driven course
+ * engine and is not linked from LMS navigation. Do not add new programs here.
+ * New programs use /lms/courses/[courseId]/lessons/[lessonId] instead.
+ */
 'use client'
 
 import dynamic from 'next/dynamic'

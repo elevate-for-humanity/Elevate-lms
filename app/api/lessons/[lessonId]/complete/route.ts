@@ -10,6 +10,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import {
+  recordStepCompletion,
+  recordStepUncompletion,
+} from '@/lib/lms/engine';
 
 async function _POST(
   request: NextRequest,
@@ -168,51 +172,20 @@ async function _POST(
       lessonTitle: lesson.title,
     });
 
-    // Get updated course progress — count via lms_lessons so curriculum and training lessons both count
-    const { data: allLessons } = await db
-      .from('lms_lessons')
-      .select('id')
-      .eq('course_id', lesson.course_id);
+    // Delegate progress recalculation, enrollment % update, and certificate
+    // issuance to the engine. This is the single path for all three concerns.
+    const completionResult = await recordStepCompletion(
+      user.id,
+      lessonId,
+      lesson.course_id,
+      enrollment.id,
+      timeSpentSeconds
+    );
 
-    const { data: completedLessons } = await db
-      .from('lesson_progress')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('course_id', lesson.course_id)
-      .eq('completed', true);
-
-    const totalLessons = allLessons?.length || 0;
-    const completedCount = completedLessons?.length || 0;
-    const progressPercent = totalLessons > 0 
-      ? Math.round((completedCount / totalLessons) * 100) 
-      : 0;
-
-    // Update enrollment progress (enrollments is a view, update underlying table)
-    const { error: rpcError } = await supabase.rpc('update_enrollment_progress_manual', {
-      p_user_id: user.id,
-      p_course_id: lesson.course_id,
-      p_progress: progressPercent
-    });
-    
-    if (rpcError) {
-      // Fallback: try direct update if RPC doesn't exist
-      await db
-        .from('training_enrollments')
-        .update({ progress: progressPercent, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id)
-        .eq('course_id', lesson.course_id);
-    }
-
-    // Check if course is now complete
-    const courseCompleted = progressPercent === 100;
-
-    // NOTE: Certificate issuance is handled by /api/lms/progress/complete
-    // which enforces quiz pass verification and competency evidence.
-    // This endpoint only tracks lesson-level progress.
+    const { progressPercent, courseCompleted, certificateNumber } = completionResult;
 
     // When a course completes, check if it satisfies all required courses
-    // for any program the learner is enrolled in. If so, mark the program
-    // complete and issue the program credential.
+    // for any program the learner is enrolled in.
     if (courseCompleted) {
       try {
         const { checkProgramCompletion, completeProgramEnrollment } =
@@ -232,7 +205,6 @@ async function _POST(
           });
         }
       } catch (progErr) {
-        // Non-fatal — lesson completion is already recorded
         logger.error('[program-completion] Check failed (non-fatal):', progErr);
       }
     }
@@ -293,10 +265,9 @@ async function _POST(
       completed: true,
       completedAt: progress.completed_at,
       courseProgress: {
-        completedLessons: completedCount,
-        totalLessons,
         progressPercent,
         courseCompleted,
+        certificateNumber: certificateNumber ?? null,
       },
       credentialEligibility: eligibilityResult
         ? {
@@ -329,71 +300,25 @@ async function _DELETE(
     }
 
     const { lessonId } = await params;
-    const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const db = createAdminClient() || await createClient();
 
-    // Mark lesson as incomplete
-    const { error } = await db
-      .from('lesson_progress')
-      .update({
-        completed: false,
-        completed_at: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id)
-      .eq('lesson_id', lessonId);
-
-    if (error) {
-      return NextResponse.json(
-        { error: 'Failed to mark lesson incomplete' },
-        { status: 500 }
-      );
-    }
-
-    // Recalculate enrollment progress (same logic as POST handler)
+    // Resolve course_id for progress recalculation
     const { data: lessonRow } = await db
       .from('lms_lessons')
       .select('course_id')
       .eq('id', lessonId)
       .single();
 
-    if (lessonRow?.course_id) {
-      const courseId = lessonRow.course_id;
+    if (!lessonRow?.course_id) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
 
-      const { data: allLessons } = await db
-        .from('lms_lessons')
-        .select('id')
-        .eq('course_id', courseId);
-
-      const totalLessons = allLessons?.length || 0;
-
-      const { data: completedLessons } = await db
-        .from('lesson_progress')
-        .select('lesson_id')
-        .eq('user_id', user.id)
-        .eq('completed', true)
-        .in('lesson_id', (allLessons || []).map((l: any) => l.id));
-
-      const completedCount = completedLessons?.length || 0;
-      const progressPercent = totalLessons > 0
-        ? Math.round((completedCount / totalLessons) * 100)
-        : 0;
-
-      // Update enrollment progress
-      const { error: rpcError } = await supabase.rpc('update_enrollment_progress_manual', {
-        p_user_id: user.id,
-        p_course_id: courseId,
-        p_progress: progressPercent,
-      });
-
-      if (rpcError) {
-        // Fallback: direct update
-        await db
-          .from('training_enrollments')
-          .update({ progress: progressPercent, updated_at: new Date().toISOString() })
-          .eq('user_id', user.id)
-          .eq('course_id', courseId);
-      }
+    // Delegate uncomplete + progress recalc to engine
+    try {
+      await recordStepUncompletion(user.id, lessonId, lessonRow.course_id);
+    } catch (err) {
+      logger.error('recordStepUncompletion failed:', err);
+      return NextResponse.json({ error: 'Failed to mark lesson incomplete' }, { status: 500 });
     }
 
     return NextResponse.json({

@@ -15,7 +15,7 @@ interface Question {
 
 interface QuizPlayerProps {
   questions: Question[];
-  onComplete: (score: number) => void;
+  onComplete: (score: number, answers?: Record<string, number>) => void;
   passingScore?: number;
   /** Title shown above the quiz (e.g. "Module 6 Quiz — EPA 608 Core") */
   title?: string;
@@ -122,7 +122,10 @@ export default function QuizPlayer({
       const finalCorrect = answeredQuestions.filter((q) => q.correct).length;
       const finalScore = Math.round((finalCorrect / questions.length) * 100);
       setFinished(true);
-      onComplete(finalScore);
+      // Build answers map: { questionId: selectedOptionIndex }
+      const answersMap: Record<string, number> = {};
+      answeredQuestions.forEach((q) => { answersMap[q.questionId] = q.selected; });
+      onComplete(finalScore, answersMap);
     } else {
       setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);

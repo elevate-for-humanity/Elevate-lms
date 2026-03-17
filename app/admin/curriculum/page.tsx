@@ -4,44 +4,28 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BookOpen, Layers, ChevronRight, PlusCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/admin/curriculum',
   },
-  title: 'Curriculum Management | Elevate For Humanity',
-  description:
-    'Manage curriculum, course content, and educational materials for all programs.',
+  title: 'Curriculum Management | Admin | Elevate For Humanity',
+  description: 'Manage curriculum_lessons rows for all DB-driven LMS courses.',
 };
 
 export default async function CurriculumPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient() || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/admin/curriculum');
 
   const { data: profile } = await db
     .from('profiles')
-    .select('*')
+    .select('role')
     .eq('id', user.id)
     .single();
 
@@ -49,136 +33,175 @@ export default async function CurriculumPage() {
     redirect('/unauthorized');
   }
 
-  // Fetch curriculum data
-  const { data: items, count: totalItems } = await db
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(20);
+  // Aggregate lesson counts per course_id from curriculum_lessons
+  const { data: lessonRows } = await db
+    .from('curriculum_lessons')
+    .select('course_id, status, step_type');
 
-  const { count: activeItems } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
+  // Build per-course stats
+  const courseStats = new Map<string, {
+    total: number;
+    published: number;
+    checkpoints: number;
+  }>();
+
+  for (const row of lessonRows ?? []) {
+    const s = courseStats.get(row.course_id) ?? { total: 0, published: 0, checkpoints: 0 };
+    s.total++;
+    if (row.status === 'published') s.published++;
+    if (row.step_type === 'checkpoint' || row.step_type === 'quiz' || row.step_type === 'exam') s.checkpoints++;
+    courseStats.set(row.course_id, s);
+  }
+
+  const courseIds = Array.from(courseStats.keys());
+
+  // Resolve course names from training_courses
+  const { data: trainingCourses } = courseIds.length
+    ? await db
+        .from('training_courses')
+        .select('id, course_name')
+        .in('id', courseIds)
+    : { data: [] };
+
+  // Resolve remaining from programs
+  const resolvedIds = new Set((trainingCourses ?? []).map((c: any) => c.id));
+  const unresolvedIds = courseIds.filter(id => !resolvedIds.has(id));
+
+  const { data: programs } = unresolvedIds.length
+    ? await db
+        .from('programs')
+        .select('id, name')
+        .in('id', unresolvedIds)
+    : { data: [] };
+
+  const nameMap = new Map<string, string>();
+  for (const c of trainingCourses ?? []) nameMap.set(c.id, c.course_name);
+  for (const p of programs ?? []) nameMap.set(p.id, p.name);
+
+  // Build display list sorted by lesson count desc
+  const courses = courseIds
+    .map(id => ({
+      id,
+      name: nameMap.get(id) ?? id,
+      ...courseStats.get(id)!,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  const totalLessons = courses.reduce((sum, c) => sum + c.total, 0);
+  const totalPublished = courses.reduce((sum, c) => sum + c.published, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* Hero Image */}
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Curriculum' }]} />
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/pages/admin-curriculum-detail.jpg"
-          alt="Curriculum Management"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
-
-      </section>
-
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Total Curriculum Items
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {totalItems || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Active
-                </h3>
-                <p className="text-3xl font-bold text-brand-green-600">
-                  {activeItems || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Recent
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {items?.filter((i) => {
-                    const created = new Date(i.created_at);
-                    const weekAgo = new Date();
-                    weekAgo.setDate(weekAgo.getDate() - 7);
-                    return created > weekAgo;
-                  }).length || 0}
-                </p>
-              </div>
-            </div>
-
-            {/* Data Display */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold mb-4">Curriculum Items</h2>
-              {items && items.length > 0 ? (
-                <div className="space-y-4">
-                  {items.map((item: any) => (
-                    <div
-                      key={item.id}
-                      className="p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <p className="font-semibold">
-                        {item.title || item.name || item.id}
-                      </p>
-                      <p className="text-sm text-black">
-                        {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-black text-center py-8">
-                  No curriculum items found
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-brand-blue-600" />
               Curriculum Management
-                        </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Design and organize program curricula and learning paths.
-                        </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/admin/curriculum"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                View Curriculum
-              </Link>
-              <Link
-                href="/admin/programs"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
-              >
-                View Programs
-              </Link>
-            </div>
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              DB-driven LMS courses — edit step types, passing scores, and lesson content.
+            </p>
+          </div>
+          <Link
+            href="/admin/courses/create"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-semibold rounded-lg transition"
+          >
+            <PlusCircle className="w-4 h-4" />
+            New course
+          </Link>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Courses</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{courses.length}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Total Lessons</p>
+            <p className="text-3xl font-bold text-slate-800">{totalLessons}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Published</p>
+            <p className="text-3xl font-bold text-brand-green-600">{totalPublished}</p>
           </div>
         </div>
-      </section>
+
+        {/* Course list */}
+        {courses.length === 0 ? (
+          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+            <Layers className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-500 font-medium">No curriculum_lessons rows found.</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Publish a course via the AI builder to populate this table.
+            </p>
+            <Link
+              href="/admin/courses/ai-builder"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-blue-700 transition"
+            >
+              Open AI builder
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+            {courses.map(course => {
+              const pct = course.total > 0
+                ? Math.round((course.published / course.total) * 100)
+                : 0;
+              return (
+                <Link
+                  key={course.id}
+                  href={`/admin/curriculum/${course.id}`}
+                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition group"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-800 group-hover:text-brand-blue-600 truncate">
+                      {course.name}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5 font-mono">{course.id}</p>
+                  </div>
+
+                  <div className="flex items-center gap-6 ml-4 shrink-0">
+                    {/* Progress bar */}
+                    <div className="hidden sm:flex items-center gap-2">
+                      <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-brand-green-500 rounded-full"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-slate-500 w-8 text-right">{pct}%</span>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-slate-700">{course.total}</p>
+                      <p className="text-xs text-slate-400">lessons</p>
+                    </div>
+
+                    {course.checkpoints > 0 && (
+                      <div className="text-right hidden md:block">
+                        <p className="text-sm font-semibold text-amber-600">{course.checkpoints}</p>
+                        <p className="text-xs text-slate-400">gated</p>
+                      </div>
+                    )}
+
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-400 transition" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

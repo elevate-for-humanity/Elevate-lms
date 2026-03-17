@@ -4,6 +4,105 @@ Codebase audit findings. Issues are ranked by severity: **P0** (breaks productio
 
 ---
 
+## AGENTS.md Accuracy Audit — 2026-03-27
+
+This section audits AGENTS.md against the actual codebase state as of commit `fa4ff2dec`.
+
+### What's Accurate
+
+- Tech stack, commands, key directories — correct.
+- API conventions (auth guards, rate limiting, error shape, redirect param) — match actual code.
+- Brand color convention — `brand-blue-*` migration is real and complete.
+- Multi-provider hub patterns (role model, tenant architecture, RLS helpers, safe-error, admin IP guard) — match `lib/api/` and `lib/admin/`.
+- Key new routes table — matches actual `app/api/` directory structure.
+- Document generation pattern (docx + SendGrid) — accurate.
+- Enrollment schema source-of-truth table — accurate.
+- Canonical portals table — accurate (added in a previous session).
+- API auth pattern, rate limiting, error shape sections — accurate.
+
+### Factual Errors in AGENTS.md
+
+**1. Build page count is stale**
+
+Claims `882/882 pages`. Reality: `find app -name "page.tsx"` returns **1,486 files**. The project has grown substantially.
+
+Fix: Remove the specific count. Replace with: `pnpm next build must complete with zero errors. Page count grows as features are added — do not hardcode it.`
+
+**2. "Remaining Lower-Priority Items" section has three resolved items**
+
+| Claim | Reality |
+|-------|---------|
+| "8 files still have Learn/Certify/Work inline SVG card sections" | 0 files match — already eliminated |
+| "~1,233 files use raw Tailwind blue/green instead of brand tokens" | Only 4 files in `app/` still match — migration is essentially complete |
+| "Missing error.tsx in app/store and app/login" | Both files exist |
+
+The console.log count is also wrong: AGENTS.md says 161, reality is **1,521 lines** across 118 files.
+
+Fix: Remove the three resolved items. Update console.log count to 1,521.
+
+**3. "394 routes expose error.message" is wrong**
+
+FUTURE TASKS item 7 claims 394 routes. Reality: ~22 API route files contain the pattern, with 31 actual response lines. The 394 figure was a total line count, not a route count.
+
+Fix: Change to "~22 API route files return `error.message` in responses. Use `safeInternalError()` from `lib/api/safe-error.ts`."
+
+**4. Incomplete work from the last session is not documented**
+
+The previous session began building three features but was cut off mid-execution:
+- `supabase/migrations/20260327000003_checkpoint_gating.sql` — shown in session context, **never written to disk**
+- `CurriculumLessonManager` component — referenced, **never created**
+- Checkpoint progression gating in the lesson page — **not implemented** (the lesson page has step_type rendering but no gate that blocks the next module until a checkpoint passes)
+
+AGENTS.md has no record of this. An agent starting fresh will not know these are pending.
+
+Fix: Add an "In Progress / Incomplete" section.
+
+**5. Rate limiting dead code not flagged**
+
+AGENTS.md correctly identifies `lib/rate-limit.ts` as canonical but does not say the other two files (`lib/rateLimit.ts`, `lib/rateLimiter.ts`) should be deleted. An agent may import from them.
+
+Fix: Add: "`lib/rateLimit.ts` and `lib/rateLimiter.ts` are dead code — do not import from them."
+
+### Missing Sections
+
+**6. LMS Architecture**
+
+The last session added significant LMS infrastructure with no AGENTS.md entry:
+- `step_type_enum` on `curriculum_lessons` (lesson/quiz/checkpoint/lab/assignment/exam/certification)
+- `lms_lessons` view rebuilt to expose `step_type`, `module_title`, `module_order`, `lesson_order`
+- Module-grouped sidebar in the lesson player
+- `app/lms/(app)/courses/[courseId]/certification/page.tsx` — course end-state page
+
+Without this section, the next agent will write new hardcoded per-program logic instead of using the DB-driven approach.
+
+**7. HVAC Legacy vs. New DB-Driven Pattern**
+
+The lesson page currently has both the old HVAC-specific hardcoded path (`HVAC_QUIZ_MAP`, `HVAC_LESSON_UUID`, `buildLessonContent`, `HVAC_QUICK_CHECKS`) and the new DB-driven path coexisting. An agent adding a new program will not know which to follow.
+
+Needed guidance: new programs use `step_type` and `curriculum_lessons` DB rows. Do not add new entries to `HVAC_QUIZ_MAP` or `HVAC_LESSON_UUID`. Those files are HVAC-only legacy.
+
+**8. Migrations are manually applied**
+
+AGENTS.md FUTURE TASKS item 8 says "Run SQL migrations in Supabase Dashboard" — implying they are not auto-applied. This is critical context buried in a to-do item rather than stated as a convention.
+
+Needed section: files go in `supabase/migrations/`, naming is `YYYYMMDD000NNN_description.sql`, applied manually via Supabase Dashboard SQL editor. Never assume a migration is live until confirmed.
+
+### Recommended Changes to AGENTS.md (Priority Order)
+
+| Priority | Change |
+|----------|--------|
+| P0 | Add "In Progress / Incomplete Work" section with the three cut-off items |
+| P0 | Add LMS Architecture section (step_type routing, module grouping, lms_lessons view, certification page, HVAC legacy warning) |
+| P1 | Remove hardcoded page count from Build State |
+| P1 | Remove three resolved items from "Remaining Lower-Priority Items"; update console.log count to 1,521 |
+| P1 | Add Migrations section (naming convention, manual application) |
+| P2 | Fix error.message count from "394 routes" to "~22 API route files" |
+| P2 | Add dead-code warning for `lib/rateLimit.ts` and `lib/rateLimiter.ts` |
+
+---
+
+---
+
 ## AGENTS.md Assessment
 
 ### What's Good

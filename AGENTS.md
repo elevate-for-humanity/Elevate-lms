@@ -10,7 +10,7 @@
 - **Database**: Supabase (project `cuxzzpsyufcewtmicszk`, 516+ tables)
 - **Hosting**: Netlify with `@netlify/plugin-nextjs`
 - **Package Manager**: pnpm
-- **Build**: `pnpm next build` — expect 882+ pages, zero errors
+- **Build**: `pnpm next build` — must complete with zero errors (page count grows as features are added — do not hardcode it)
 
 ## Common Commands
 
@@ -23,162 +23,156 @@
 - `app/` — Next.js App Router pages
 - `components/` — Reusable UI components
 - `components/marketing/PublicLandingPage.tsx` — Config-driven marketing page template
+- `components/admin/CurriculumLessonManager.tsx` — Admin UI for editing `curriculum_lessons` rows
 - `data/team.ts` — Team member data (7 real members)
 - `lib/tax-software/` — MeF tax stack
+- `lib/curriculum/` — Blueprint system and course generator
 - `netlify/functions/` — Serverless functions (file-return.ts, refund-tracking.ts)
-- `supabase/migrations/` — SQL migration files
+- `supabase/migrations/` — SQL migration files (applied manually — see Migrations section)
 - `public/images/` — All site images
 
-## Available Replacement Images
+---
 
-When replacing stock images (`success-new/` or `students-new/` paths), use these real workforce images:
+## Repository Size
 
-### heroes-hq/
-about-hero.jpg, career-services-hero.jpg, contact-hero.jpg, employer-hero.jpg, funding-hero.jpg, how-it-works-hero.jpg, jri-hero.jpg, programs-hero.jpg, success-hero.jpg, success-stories-hero.jpg, tax-refund-hero.jpg, team-hero.jpg
-
-### programs-hq/
-barber-hero.jpg, barber-training.jpg, business-office.jpg, business-training.jpg, cdl-trucking.jpg, cna-training.jpg, cybersecurity.jpg, electrical.jpg, healthcare-hero.jpg, hvac-technician.jpg, it-support.jpg, medical-assistant.jpg, phlebotomy.jpg, skilled-trades-hero.jpg, students-learning.jpg, tax-preparation.jpg, technology-hero.jpg, training-classroom.jpg, welding.jpg
-
-### trades/
-electrical-hero.jpg, hero-program-carpentry.jpg, hero-program-cdl.jpg, hero-program-electrical.jpg, hero-program-hvac.jpg, hero-program-plumbing.jpg, hero-program-welding.jpg, program-building-construction.jpg, program-building-technology.jpg, program-cdl-commercial-driving.jpg, program-cdl-overview.jpg, program-construction-training.jpg, program-electrical-training.jpg, program-hvac-overview.jpg, program-hvac-technician.jpg, program-plumbing-training.jpg, program-welding-training.jpg, welding-hero.jpg
-
-## Image Replacement Mapping Guide
-
-Choose replacements based on page context:
-- **Admin/dashboard pages** → `heroes-hq/about-hero.jpg` or `heroes-hq/career-services-hero.jpg`
-- **Funding/grants pages** → `heroes-hq/funding-hero.jpg`
-- **Contact/chat pages** → `heroes-hq/contact-hero.jpg`
-- **Student/learning pages** → `programs-hq/students-learning.jpg` or `heroes-hq/success-hero.jpg`
-- **Course/education pages** → `programs-hq/training-classroom.jpg` or `heroes-hq/programs-hero.jpg`
-- **Tax pages** → `heroes-hq/tax-refund-hero.jpg` or `programs-hq/tax-preparation.jpg`
-- **Partner/employer pages** → `heroes-hq/employer-hero.jpg`
-- **Media/content pages** → `heroes-hq/success-stories-hero.jpg`
-- **Auth pages (signin/signup/login)** → `heroes-hq/success-hero.jpg`
-- **Mentorship pages** → `heroes-hq/career-services-hero.jpg`
-- **Orientation pages** → `programs-hq/students-learning.jpg`
-- **Reports pages** → `heroes-hq/how-it-works-hero.jpg`
-- **Store pages** → `heroes-hq/programs-hero.jpg`
-- **Healthcare-related** → `programs-hq/healthcare-hero.jpg` or `programs-hq/cna-training.jpg`
-- **Trades-related** → `programs-hq/skilled-trades-hero.jpg` or specific trade image
-- **Technology pages** → `programs-hq/technology-hero.jpg`
+| Metric | Count |
+|--------|-------|
+| `page.tsx` files | 1,486 |
+| `route.ts` files (API) | 1,079 |
+| Supabase migrations | 278 |
+| `console.log` occurrences | ~1,521 across 118 files — use `lib/logger.ts` instead |
 
 ---
 
-# COMPLETED TASKS
+## Migrations
 
-## Stock Image Replacement ✅
-All 34 files with `success-new/` and `students-new/` stock images replaced with contextual workforce images.
+Files go in `supabase/migrations/`. Naming: `YYYYMMDD000NNN_description.sql`. Increment the suffix for same-day migrations.
 
-## Template Sludge Elimination ✅
-- All "Access your dashboard" broken copy fixed (12 files)
-- All "Join thousands who have launched" CTAs eliminated (87+ files)
-- All public-facing template pages rewritten with real content (27 pages)
-- Auth pages: signin/signup redirect to real forms, forgot/reset-password have real forms
-- Funding pages: how-it-works, federal-programs, state-programs, grant-programs all rewritten
-- Support, training, grievance, forms, orientation pages all rewritten
-- Admin template CTAs fixed to brand colors (52 files)
+**Migrations are NOT auto-applied.** After writing a migration file:
+1. Open Supabase Dashboard → SQL Editor
+2. Paste and run the migration manually
+3. Verify the schema change before marking work complete
 
-## Remaining Lower-Priority Items
-- 8 files still have Learn/Certify/Work inline SVG card sections (complex JSX, admin pages)
-- ~1,233 files use raw Tailwind blue/green/etc instead of brand tokens (gradual migration)
-- 161 console.log statements should use logger utility
-- Missing error.tsx in app/store and app/login
-
-## Build State
-Last verified: 882/882 pages, zero errors
+Never assume a migration is live just because the file exists in `supabase/migrations/`.
 
 ---
 
-# FUTURE TASKS
+## LMS Architecture
 
-1. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
-2. **Navigation streamlining** — audience-based quick links
-3. **Mobile optimization** — touch targets, responsive spacing
-4. **Visual hierarchy improvements**
-5. **Performance optimization**
-6. **JotForm webhook security** — add IP allowlist or HMAC check
-7. **Error message leaks** — 394 routes expose `error.message`
-8. **Run SQL migrations** in Supabase Dashboard
-9. **Commit and push** all accumulated changes
+### Course Engine — DB-Driven, Program-Agnostic
 
----
+The course engine routes rendering and completion rules by `step_type`, a column on `curriculum_lessons`. Do not write per-program hardcoded logic — set `step_type` in the DB and the renderer handles it automatically.
 
-# Key Components Created
+### Data Hierarchy
 
-- **`components/marketing/PublicLandingPage.tsx`** — Reusable config-driven landing page (hero, intro, features, steps, CTA). Used by 7 partner pages.
-- **`data/team.ts`** — Team data with FOUNDER and TEAM_PREVIEW exports
-- **`netlify/functions/file-return.ts`** — Tax filing endpoint (service role key)
-- **`netlify/functions/refund-tracking.ts`** — Public tracking endpoint (anon key, rate limited)
-
-# Key Pages Rewritten
-
-- `app/privacy-policy/page.tsx` — 14-section privacy policy with FERPA, WIOA, cookies table
-- `app/search/page.tsx` — Program search with cards, funding tags
-- `app/about/page.tsx` — Founder section, credentials, team preview
-- `app/funding/dol/page.tsx` — DOL Registered Apprenticeship
-- `app/funding/jri/page.tsx` — JRI = Justice Reinvestment Initiative (Indiana DWD state program, separate from Job Ready Indy)
-- `app/funding/job-ready-indy/page.tsx` — Job Ready Indy = Indianapolis workforce initiative for Marion County residents (separate from JRI)
-- `app/credentials/page.tsx` — 8 credentials with issuer/field
-- `app/training/certifications/page.tsx` — 8 cert programs
-- `app/features/page.tsx` — 6 platform features
-- `app/directory/page.tsx` — Partner directory
-- `app/philanthropy/page.tsx` — Support/donation page
-- `app/resources/page.tsx` — Resource hub
-- 7 partner pages using PublicLandingPage template
-
-# Known Fixed Issues
-
-- `/license` 500 error — `ROUTES.pricing` → `ROUTES.licensePricing`
-- Cookie banner / GlobalAvatar / voice-over issues in ClientWidgets.tsx
-- Partner card JSX nesting bug on homepage
-- Drug-testing instant-tests broken string from sed
-
-# Brand Color Convention
-
-All `blue-*` Tailwind classes have been migrated to `brand-blue-*` tokens across app/ and components/ (1,469 files). The hex values are identical — this enforces naming consistency.
-
-Semantic colors (indigo, teal, purple, emerald, cyan) are intentionally kept for UI state differentiation (status badges, category colors, charts).
-
-When adding new UI, always use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, or `brand-green-*` for brand elements.
-
-# Canonical Portals by Role
-
-When adding new pages for a specific role, use the canonical portal path. Non-canonical paths are legacy redirects — do not add new pages there.
-
-| Role | Canonical path | Legacy (redirect-only) |
-|------|---------------|------------------------|
-| Learner / Student | `/learner/dashboard` | `/student-portal`, `/student` |
-| Admin | `/admin/dashboard` | — |
-| Instructor | `/instructor/dashboard` | — |
-| Employer | `/employer/dashboard` | `/employer-portal` |
-| Partner | `/partner/dashboard` | `/partner-portal` |
-| Program Holder | `/program-holder/dashboard` | — |
-| Staff | `/staff-portal/dashboard` | — |
-| Mentor | `/mentor/dashboard` | — |
-
-# API Conventions
-
-## Auth Pattern
-
-Use these helpers for new API routes. Do not use `getUser()` directly — it does not enforce role.
-
-```ts
-// Any authenticated user
-import { apiAuthGuard } from '@/lib/admin/guards';
-const auth = await apiAuthGuard(request);
-if (auth.error) return auth.error;
-
-// Admin or super_admin only
-import { apiRequireAdmin } from '@/lib/admin/guards';
-const auth = await apiRequireAdmin(request);
-if (auth.error) return auth.error;
+```
+programs → modules → curriculum_lessons (step_type) → lesson_progress
+                                                     → checkpoint_scores
+                                                     → step_submissions
 ```
 
-There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.
+### step_type Values
 
-## Rate Limiting
+| Value | Rendering | Completion Rule |
+|-------|-----------|-----------------|
+| `lesson` | Reading / video | Mark complete button |
+| `quiz` | Quiz player | Pass threshold (`passing_score`) |
+| `checkpoint` | Quiz player | Pass threshold — gates next module |
+| `lab` | Lab UI shell | Instructor sign-off |
+| `assignment` | Assignment UI shell | Instructor sign-off |
+| `exam` | Quiz player | Pass threshold |
+| `certification` | Credential pathway page | Final step — redirects to `/certification` |
 
-Use `applyRateLimit` from `lib/api/withRateLimit.ts`. Choose the tier that matches the route's risk level.
+### Key DB Objects
+
+| Object | Purpose |
+|--------|---------|
+| `curriculum_lessons` | Canonical lesson store — `step_type`, `module_order`, `lesson_order`, `passing_score` |
+| `training_lessons` | Legacy HVAC lesson store (94 rows) — do not add new programs here |
+| `lms_lessons` (view) | Unified lesson source: `curriculum_lessons` (priority) UNION `training_lessons` (fallback) |
+| `modules` | Module definitions — `title`, `slug`, `program_id` |
+| `lesson_progress` | Per-user lesson completion |
+| `checkpoint_scores` | Per-user checkpoint pass/fail records — drives module gating |
+| `step_submissions` | Lab/assignment submissions with instructor sign-off |
+| `completion_rules` | Per-course/program completion rule definitions |
+| `program_completion_certificates` | Auto-issued on course completion when all checkpoints pass |
+
+### Checkpoint Gating
+
+When a learner completes a checkpoint lesson, a `checkpoint_scores` row is written. The next module is locked until the checkpoint for the previous module has a passing row. This is enforced in the lesson page — do not bypass it.
+
+**Requires migration `20260327000003_checkpoint_gating.sql` to be applied in Supabase Dashboard.**
+
+### Certification Chain
+
+```
+All lessons complete + all checkpoints passed
+  → program_completion_certificates row auto-created
+  → exam_funding_authorizations row created (via checkEligibilityAndAuthorize)
+  → learner lands on /lms/courses/[courseId]/certification
+  → public verification at /verify/[certificateId]
+```
+
+### Adding a New Program
+
+1. Create `lib/curriculum/blueprints/[program].ts` following `prs-indiana.ts`
+2. Register it in `lib/curriculum/blueprints/index.ts`
+3. Run the curriculum generator (`lib/services/curriculum-generator.ts`)
+4. Generator seeds `modules` and `curriculum_lessons` rows idempotently
+5. Set `step_type = 'checkpoint'` on module-boundary lessons in the DB
+6. Store `quiz_questions` as JSONB in `curriculum_lessons` rows
+7. LMS renders the course automatically — no new code required
+
+### HVAC Legacy Path — Do Not Replicate
+
+HVAC was built before the DB-driven engine. These files must not be copied for new programs:
+
+| File | Status |
+|------|--------|
+| `lib/courses/hvac-*.ts` (32 files) | HVAC-only — do not replicate |
+| `lib/lms/hvac-enrichment.ts`, `lib/lms/hvac-simulations.ts` | HVAC-only |
+| `app/courses/hvac/` | Standalone hardcoded HVAC lesson — not part of LMS engine |
+
+The lesson page runs both paths in parallel for backward compatibility. New programs use only the DB-driven path.
+
+---
+
+## In Progress / Incomplete Work
+
+### Migration Must Be Applied
+
+`supabase/migrations/20260327000003_checkpoint_gating.sql` has been created but not yet applied. Until applied:
+- `checkpoint_scores` and `step_submissions` tables do not exist
+- `passing_score` column does not exist on `curriculum_lessons`
+- The lesson page fails open (checkpoints render but scores are not recorded)
+
+### Lab / Assignment Instructor Sign-Off UI
+
+`step_submissions` table is defined in the migration above. The lesson page renders lab/assignment UI shells but submission storage requires the migration to be applied. Instructor sign-off UI is not yet built.
+
+### Admin Curriculum Builder Page
+
+`components/admin/CurriculumLessonManager.tsx` is built. It needs to be wired into a new page at `app/admin/curriculum/[courseId]/page.tsx` (does not exist yet).
+
+### HVAC Blueprint Not Registered
+
+`lib/curriculum/blueprints/hvac-epa-608.ts` exists but is not registered in `lib/curriculum/blueprints/index.ts`. Register it before running the HVAC curriculum generator.
+
+---
+
+## Canonical Systems
+
+### Supabase Access
+
+**Canonical** (`lib/supabase/`): `server.ts`, `client.ts`, `admin.ts`, `public.ts`, `server-db.ts`, `static.ts`
+
+Import from `@/lib/supabase/*`. The following deprecated shims still have 78 active importers — do not add new imports from them:
+
+`lib/supabaseServer.ts`, `lib/supabase-server.ts`, `lib/supabaseAdmin.ts`, `lib/supabase-admin.ts`, `lib/supabaseClient.ts`, `lib/supabaseClients.ts`, `lib/supabase.ts`, `lib/supabase-lazy.ts`, `lib/supabase-api.ts`, `lib/getSupabaseServerClient.ts`
+
+### Rate Limiting
+
+Canonical: `lib/rate-limit.ts` (Upstash Redis) + `lib/api/withRateLimit.ts` (`applyRateLimit`)
 
 ```ts
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -195,90 +189,101 @@ if (rateLimited) return rateLimited;
 | `api` | 100 req / 1 min | General authenticated API |
 | `public` | 10 req / 1 min | Public AI tutor, unauthenticated reads |
 
-Do not use `lib/rateLimit.ts` (in-memory, broken in serverless) or `lib/rateLimiter.ts` (different Redis client). Canonical rate limit logic is in `lib/rate-limit.ts`.
+**Dead — do not import:**
+- `lib/rateLimit.ts` — in-memory, broken in serverless, `@deprecated`. All importers migrated.
+- `lib/rateLimiter.ts` — **deleted**
+- `lib/api/rate-limiter.ts` — **deleted**
 
-## Error Response Shape
-
-All API error responses must use `{ error: string }`. Never use `{ message: string }` for errors, and never return `error.message` directly (leaks internal details).
+### API Auth Pattern
 
 ```ts
-// Correct
-return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+// Any authenticated user
+import { apiAuthGuard } from '@/lib/admin/guards';
+const auth = await apiAuthGuard(request);
+if (auth.error) return auth.error;
 
-// Wrong — do not do this
-return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-return NextResponse.json({ error: error.message }, { status: 500 });
+// Admin or super_admin only
+import { apiRequireAdmin } from '@/lib/admin/guards';
+const auth = await apiRequireAdmin(request);
+if (auth.error) return auth.error;
 ```
 
-## Auth Redirect Parameter
+There is no root `middleware.ts`. Auth is enforced per-route. Every route that reads or writes user data must call one of the above before any DB access.
 
-Use `?redirect=<path>` (not `?next=`) when redirecting unauthenticated users to login. The login form reads `redirect`.
+### API Error Response Shape
+
+All API error responses must use `{ error: string }`. Use `lib/api/safe-error.ts`:
+
+```ts
+import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
+
+return safeError('Program not found', 404);
+return safeInternalError(err, 'Failed to enroll');
+if (error) return safeDbError(error, 'DB query failed');
+```
+
+Never return `error.message` directly in a response body. `lib/safe-error.ts` (root) has been deleted — import only from `@/lib/api/safe-error`.
+
+### Auth Redirect Parameter
+
+Use `?redirect=<path>` (not `?next=`):
 
 ```ts
 redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
 ```
 
-# Document Generation (Partnership Proposals)
+---
 
-Elevate uses Node.js + `docx` (npm package) to generate `.docx` partnership proposals programmatically, then emails them via SendGrid.
+## Storage Conventions
 
-## Pattern
+| Asset Type | Bucket | Access Pattern |
+|-----------|--------|----------------|
+| User documents | `documents` | `supabase.storage.from('documents')` via `lib/supabase/server.ts` |
+| Media (images, video) | `media` | `supabase.storage.from('media')` |
+| MOU PDFs | `mous` | `supabase.storage.from('mous').createSignedUrl(filename, 60)` |
+| Certificate PDFs | `module-certificates` | `supabase.storage.from('module-certificates')` |
+| Digital downloads | R2/S3 | `lib/storage/file-storage.ts` — `getDownloadUrl(key)` |
+| Course videos | `course-videos` | Use `supabase.storage.from('course-videos').getPublicUrl(path)` |
 
-```js
-const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-        WidthType, AlignmentType, BorderStyle, ImageRun, ShadingType,
-        convertInchesToTwip } = require('docx');
-```
-
-- Logo: `public/images/Elevate_for_Humanity_logo_81bf0fab.jpg` — render at 60×90px
-- Brand colors: `DARK = '1E293B'`, `RED = 'DC2626'`, `GRAY = '6B7280'`
-- Page margins: 1in top/bottom, 1.25in left/right
-- Font: Arial throughout, body size 22 (11pt), headings size 28 (14pt)
-- Output to `/tmp/` then attach to SendGrid email
-
-## SendGrid
-
-- API key stored in the generation script (not in env — keep as-is for now)
-- From address: `noreply@elevateforhumanity.org`
-- Reply-to: `elevate4humanityedu@gmail.com`
-- Recipient: `elevate4humanityedu@gmail.com` (Elizabeth Greene)
-
-## La Plaza Proposal — Current State (v4)
-
-File: `LaPlaza_Partnership_Proposal_Elevate_v4.docx`
-
-Program table (Section 2):
-| Program Length | 12 weeks (flexible based on hours/days per week) |
-| Classroom Instruction | 12 weeks |
-| Primary Credential | EPA Section 608 Universal (proctored on-site at Elevate) |
-| Additional Credentials | OSHA 10-Hour, ACT WorkKeys / NCRC |
-| Cohort Size | Up to 30 participants per cohort |
-| Service Area | Indianapolis / Marion County |
-
-Key decisions made:
-- OJT Placements row removed (employer agreements still pending)
-- Hands-On Training row removed (redundant with Classroom Instruction)
-- Cohort size: up to 30 participants
+**Rule:** Never hardcode Supabase project URLs. Always use the storage client to generate URLs.
 
 ---
 
-# Cleanup Status
+## Enrollment Schema — Source of Truth
 
-- ✅ All stock images replaced with local workforce images
-- ✅ All "Join thousands" template CTAs eliminated
-- ✅ All inline SVG Learn/Certify/Work cards → Lucide icons
-- ✅ All pexels image references → local images (except preview/[previewId])
-- ✅ All empty alt="" attributes → descriptive alt text
-- ✅ All blue-* → brand-blue-* across app/ and components/
-- ✅ 27+ public pages rewritten with real content
-- ✅ Auth flow: signin/signup redirect to real forms
+| Table | References | Status |
+|-------|-----------|--------|
+| `program_enrollments` | 449 | **Canonical** — use for all new code |
+| `training_enrollments` | 68 | LMS operational (attendance, cohort, progress %) |
+| `enrollments` | 24 | Legacy compatibility view → `program_enrollments` |
+| `student_enrollments` | 36 | Apprenticeship-specific (hours tracking) — distinct purpose, keep |
 
 ---
 
-# Multi-Provider Hub — Canonical Patterns
+## Canonical Portals by Role
 
-## Role Model (complete)
+| Role | Canonical path | Legacy (redirect-only) |
+|------|---------------|------------------------|
+| Learner / Student | `/learner/dashboard` | `/student-portal`, `/student` |
+| Admin | `/admin/dashboard` | — |
+| Instructor | `/instructor/dashboard` | — |
+| Employer | `/employer/dashboard` | `/employer-portal` |
+| Partner | `/partner/dashboard` | `/partner-portal` |
+| Program Holder | `/program-holder/dashboard` | — |
+| Staff | `/staff-portal/dashboard` | — |
+| Mentor | `/mentor/dashboard` | — |
+
+---
+
+## Brand Color Convention
+
+Use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, `brand-green-*` for brand elements. Semantic colors (indigo, teal, purple, emerald, cyan) are kept for UI state differentiation.
+
+---
+
+## Multi-Provider Hub
+
+### Role Model
 
 ```ts
 export type UserRole =
@@ -287,39 +292,15 @@ export type UserRole =
   | 'employer' | 'partner' | 'delegate';
 ```
 
-`provider_admin` — scoped to a single `tenant_id`. Cannot read cross-tenant data.  
-`case_manager` — scoped to assigned learners via `case_manager_assignments`. Read-only except placement verification.
+`provider_admin` — scoped to a single `tenant_id`.
+`case_manager` — scoped to assigned learners via `case_manager_assignments`.
 
-## Tenant Architecture
+### Tenant Architecture
 
 - `tenants.type` enum: `elevate | partner_provider | employer | workforce_agency`
-- `organizations.tenant_id` FK → `tenants` (required for `type = 'training_provider'`)
-- RLS helpers (all `SECURITY DEFINER`, stable):
-  - `get_my_tenant_id()` — returns caller's `tenant_id` from profiles
-  - `is_provider_admin()` — boolean check
-  - `is_case_manager()` — boolean check
-  - `get_my_assigned_learner_ids()` — UUID[] of assigned learners
-  - `get_my_role()` — returns role string
-  - `is_admin_role()` — boolean for admin/super_admin/staff
+- RLS helpers (all `SECURITY DEFINER`): `get_my_tenant_id()`, `is_provider_admin()`, `is_case_manager()`, `get_my_assigned_learner_ids()`, `get_my_role()`, `is_admin_role()`
 
-## Safe Error Responses
-
-Always use `lib/api/safe-error.ts`. Never return `error.message` in API responses.
-
-```ts
-import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
-
-// Expected errors
-return safeError('Program not found', 404);
-
-// Unexpected errors — logs internally, returns generic message
-return safeInternalError(err, 'Failed to create enrollment');
-
-// Supabase errors
-if (error) return safeDbError(error, 'Failed to fetch programs');
-```
-
-## Admin IP Guard
+### Admin IP Guard
 
 ```ts
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
@@ -327,41 +308,9 @@ const blocked = checkAdminIP(request);
 if (blocked) return blocked;
 ```
 
-Controlled by `ADMIN_IP_ALLOWLIST` env var (comma-separated CIDRs). No-op if unset.
+Controlled by `ADMIN_IP_ALLOWLIST` env var. No-op if unset.
 
-## Credential Authority Separation
-
-- Platform stores credential records and verification links
-- Certifications are issued by their respective authorities (EPA, PTCB, CompTIA, NCCER, Indiana SDOH)
-- Elevate does not issue credentials it does not legally control
-- `learner_credentials.verification_source` tracks how verification was obtained
-- External verification: `lib/credentials/verification.ts` (CompTIA implemented; add providers to registry)
-- Badge issuance: `lib/credentials/credly.ts` + job handler `lib/jobs/handlers/credly-badge.ts`
-
-## Enrollment Schema — Source of Truth
-
-Three enrollment tables exist. Use `program_enrollments` for new code:
-
-| Table | References | Status |
-|-------|-----------|--------|
-| `program_enrollments` | 409 | **Canonical** — use this |
-| `training_enrollments` | 68 | LMS operational (attendance, cohort, docs) |
-| `enrollments` | 15 | Legacy — compatibility view → `program_enrollments` |
-
-## Key New Tables (Phase 1–10)
-
-| Table | Purpose |
-|-------|---------|
-| `provider_program_approvals` | External provider program approval workflow |
-| `placement_records` | First-class employment outcome records |
-| `enrollment_funding_records` | Funding source per enrollment (WIOA/WRG/JRI) |
-| `data_deletion_requests` | FERPA/CCPA deletion request tracking |
-| `consent_records` | Structured data sharing consent |
-| `tenant_compliance_records` | Compliance status per tenant per area |
-| `wioa_participants` | WIOA participant records (PIRL-aligned) |
-| `wioa_participant_records` | Individual PIRL data points |
-
-## Key New Routes
+### Key New Routes
 
 | Route | Auth | Purpose |
 |-------|------|---------|
@@ -374,13 +323,113 @@ Three enrollment tables exist. Use `program_enrollments` for new code:
 | `POST/DELETE /api/admin/impersonate` | admin/super_admin | Support impersonation |
 | `POST /api/provider/export` | provider_admin | Queue CSV data export |
 
-## Impersonation
+---
 
-Admin-only. Every session is written to `admin_audit_events` (immutable).  
-Cannot impersonate admin-tier users. Sessions expire after 60 minutes.  
-UI: `/admin/impersonate`
+## Credential Authority Separation
+
+- Platform stores credential records and verification links
+- Certifications are issued by their respective authorities (EPA, PTCB, CompTIA, NCCER, Indiana SDOH)
+- Elevate does not issue credentials it does not legally control
+- External verification: `lib/credentials/verification.ts`
+- Badge issuance: `lib/credentials/credly.ts` + `lib/jobs/handlers/credly-badge.ts`
+
+---
+
+## Key Components
+
+- `components/marketing/PublicLandingPage.tsx` — Config-driven landing page template
+- `components/admin/CurriculumLessonManager.tsx` — Admin UI for `curriculum_lessons` rows
+- `data/team.ts` — Team data with FOUNDER and TEAM_PREVIEW exports
+
+## Key Pages
+
+- `app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx` — Canonical lesson renderer
+- `app/lms/(app)/courses/[courseId]/certification/page.tsx` — Course end-state
+- `app/verify/[certificateId]/page.tsx` — Public certificate verification
+- `app/admin/impersonate/page.tsx` — Admin impersonation UI
+
+## Key Lib Files
+
+- `lib/curriculum/blueprints/index.ts` — Blueprint registry (import from here only)
+- `lib/services/curriculum-generator.ts` — Idempotent course generator
+- `lib/lms/completion-evaluator.ts` — Completion rule evaluator
+- `lib/services/exam-eligibility.ts` — Eligibility check + exam authorization
+- `netlify/functions/file-return.ts` — Tax filing endpoint
+- `netlify/functions/refund-tracking.ts` — Public tracking endpoint
+
+---
+
+## Document Generation (Partnership Proposals)
+
+```js
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+        WidthType, AlignmentType, BorderStyle, ImageRun, ShadingType,
+        convertInchesToTwip } = require('docx');
+```
+
+- Logo: `public/images/Elevate_for_Humanity_logo_81bf0fab.jpg` — render at 60×90px
+- Brand colors: `DARK = '1E293B'`, `RED = 'DC2626'`, `GRAY = '6B7280'`
+- Page margins: 1in top/bottom, 1.25in left/right
+- Font: Arial throughout, body size 22 (11pt), headings size 28 (14pt)
+- Output to `/tmp/` then attach to SendGrid email
+- From: `noreply@elevateforhumanity.org` / Reply-to: `elevate4humanityedu@gmail.com`
+
+---
+
+## Cleanup Status
+
+- ✅ All stock images replaced with local workforce images
+- ✅ All "Join thousands" template CTAs eliminated
+- ✅ All inline SVG Learn/Certify/Work cards → Lucide icons
+- ✅ All pexels image references → local images
+- ✅ All empty alt="" attributes → descriptive alt text
+- ✅ All blue-* → brand-blue-* across app/ and components/
+- ✅ 27+ public pages rewritten with real content
+- ✅ Auth flow: signin/signup redirect to real forms
+- ✅ Dead rate limit files deleted (`lib/rateLimiter.ts`, `lib/api/rate-limiter.ts`)
+- ✅ Dead error helper deleted (`lib/safe-error.ts` root duplicate)
+- ✅ 11 routes migrated from dead `lib/rateLimit` to canonical `applyRateLimit`
+- ✅ Checkpoint gating migration written (`20260327000003_checkpoint_gating.sql`)
+- ✅ Checkpoint gate enforced in lesson page
+- ✅ Auto-certificate issuance wired in lesson completion route
+- ✅ `CurriculumLessonManager` component built
+
+## Remaining Technical Debt
+
+- ~1,521 `console.log` calls — use `import { logger } from '@/lib/logger'`
+- 78 files import from deprecated Supabase shims — migrate to `lib/supabase/*` gradually
+- `lib/rateLimit.ts` still exists (`@deprecated`, 0 active importers) — delete when confirmed
+- `lib/curriculum/blueprints/hvac-epa-608.ts` not registered in `index.ts`
+- `lib/curriculum/blueprints/prs.ts` may be superseded by `prs-indiana.ts` — verify
+- `app/api/auth/login/route.ts` — deprecated duplicate of `/api/auth/signin`
+- 8 certificate-related tables have no migration source — verify in Supabase Dashboard
+- `lib/mou-storage.ts` uses `createBrowserClient` in server context
+- `lib/storage/complianceEvidence.ts` uses deprecated `lib/supabase-api` shim
+- Admin curriculum builder page not yet created (`app/admin/curriculum/[courseId]/page.tsx`)
+
+---
+
+## FUTURE TASKS
+
+1. **Apply migration** — run `20260327000003_checkpoint_gating.sql` in Supabase Dashboard
+2. **Admin curriculum builder page** — wire `CurriculumLessonManager` into `app/admin/curriculum/[courseId]/page.tsx`
+3. **Lab/assignment instructor sign-off UI** — `step_submissions` table is ready, UI not built
+4. **Register HVAC blueprint** — add `hvac-epa-608.ts` to `lib/curriculum/blueprints/index.ts`
+5. **Delete `lib/rateLimit.ts`** — confirm 0 importers, then delete
+6. **Accessibility (WCAG 2.1 AA)** — skip-nav, aria labels, focus styles, keyboard nav
+7. **JotForm webhook security** — add IP allowlist or HMAC check
+8. **Commit and push** all accumulated changes
+
+---
 
 ## Docs
 
 - `docs/platform-readiness-implementation-plan.md` — audit findings and execution plan
 - `docs/platform-readiness-completion-report.md` — full completion report with deployment steps
+- `repo_audit_report.md` — full platform inventory (2026-03-27)
+- `canonical_systems.md` — canonical implementation for each subsystem
+- `lms_architecture.md` — LMS data model, rendering flow, certification chain
+- `schema_audit.md` — DB table audit with migration sources
+- `storage_audit.md` — storage bucket audit and conventions
+- `dead_code_candidates.md` — dead/deprecated files with recommended actions
+- `legacy_program_paths.md` — HVAC legacy path documentation

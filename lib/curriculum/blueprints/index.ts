@@ -7,13 +7,16 @@
 
 export type { CredentialBlueprint, BlueprintModule, BlueprintLessonRef } from './types';
 export { prsIndianaBlueprint } from './prs-indiana';
+export { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 export { validateBlueprint } from './validateBlueprint';
 
 import type { CredentialBlueprint } from './types';
 import { prsIndianaBlueprint } from './prs-indiana';
+import { HVAC_EPA608_BLUEPRINT } from './hvac-epa-608';
 
 const REGISTRY: CredentialBlueprint[] = [
   prsIndianaBlueprint,
+  HVAC_EPA608_BLUEPRINT,
 ];
 
 export function getBlueprintByCredentialSlug(credentialSlug: string): CredentialBlueprint | null {

@@ -8,7 +8,6 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { createClient } from '@/lib/supabase/server';
-import { rateLimitNew as rateLimit } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -35,7 +34,6 @@ const FILE_SIGNATURES: Record<string, number[][]> = {
 };
 
 // Rate limit: 10 uploads per minute per user
-const UPLOAD_RATE_LIMIT = { limit: 10, windowMs: 60_000 };
 
 /**
  * Validate file extension against allowed types
@@ -115,20 +113,6 @@ async function _POST(request: Request) {
 
     // Rate limiting
     const identifier = `upload:${user.id}`;
-    const rateLimitResult = await rateLimit(identifier, UPLOAD_RATE_LIMIT);
-
-    if (!rateLimitResult.ok) {
-      return NextResponse.json(
-        { success: false, error: 'Too many upload requests. Please try again later.' },
-        { 
-          status: 429,
-          headers: {
-            'Retry-After': '60',
-            'X-RateLimit-Remaining': String(rateLimitResult.remaining),
-          }
-        }
-      );
-    }
 
     const formData = await request.formData();
     const file = formData.get('file') as File;

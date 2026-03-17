@@ -5,11 +5,6 @@ export const maxDuration = 60;
 // app/api/applications/route.ts
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import {
-  rateLimitNew as rateLimit,
-  getClientIdentifier,
-  RATE_LIMITS,
-} from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/sendgrid';

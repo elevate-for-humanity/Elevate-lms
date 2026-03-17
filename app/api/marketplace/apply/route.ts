@@ -6,12 +6,6 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
-import {
-  rateLimit,
-  getClientIdentifier,
-  createRateLimitHeaders,
-  RateLimitPresets,
-} from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 

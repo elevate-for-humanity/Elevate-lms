@@ -31,6 +31,8 @@ import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-con
 import dynamic from 'next/dynamic';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { HVAC_QUICK_CHECKS } from '@/lib/courses/hvac-quick-checks';
+import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
+import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
 
 const LessonVideoWithSimulation = dynamic(
   () => import('@/components/lms/LessonVideoWithSimulation'),
@@ -758,10 +760,17 @@ export default function LessonPage() {
             <div className="max-w-4xl mx-auto px-4">
               <div className="bg-white rounded-xl p-8 shadow-sm">
                 {lesson.content ? (
-                  <div
-                    className="prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
-                  />
+                  <>
+                    <div
+                      className="prose max-w-none"
+                      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
+                    />
+                    {/* AI reading aids — only for text lessons with real content */}
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-3">
+                      <ExplainSimply content={lesson.content} />
+                      <TranslateToggle content={lesson.content} />
+                    </div>
+                  </>
                 ) : (
                   <div>
                     <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">

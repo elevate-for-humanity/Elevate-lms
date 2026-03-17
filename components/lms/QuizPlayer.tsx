@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { CheckCircle, XCircle, ChevronRight, RotateCcw, Trophy } from "lucide-react";
+import { CheckpointAssist } from "@/components/lms/ai/CheckpointAssist";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -376,7 +377,7 @@ export default function QuizPlayer({
                 <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                   <XCircle className="w-6 h-6 text-amber-600" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="font-bold text-amber-800 text-lg">Not quite.</p>
                   <p className="text-amber-700 mt-1">
                     The correct answer is:{" "}
@@ -385,6 +386,12 @@ export default function QuizPlayer({
                   {question.explanation && (
                     <p className="text-amber-700 mt-2">{question.explanation}</p>
                   )}
+                  <CheckpointAssist
+                    question={question.question}
+                    userAnswer={selectedAnswer !== null ? question.options[selectedAnswer] : ''}
+                    correctAnswer={question.options[question.correctAnswer]}
+                    explanation={question.explanation}
+                  />
                 </div>
               </div>
             )}

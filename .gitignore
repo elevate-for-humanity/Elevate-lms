@@ -164,7 +164,7 @@ audit_artifacts/
 
 # Build artifacts / audit reports
 audit/
-audits/
+# audits/ — removed: docs/audits/ is tracked source documentation
 lighthouse-*.json
 marketing-audit-report.json
 broken-links-report.json

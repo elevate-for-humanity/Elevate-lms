@@ -108,7 +108,7 @@ export const NAV_ITEMS = [
       { name: 'Young Adult Wellness', href: '/rise-foundation/young-adult-wellness' },
       { name: 'CurvatureBody Sculpting', href: '/rise-foundation/curvature' },
       { name: 'Meri-Go-Round Products', href: '/rise-foundation#products' },
-      { name: 'Free VITA Tax Prep', href: '/tax/rise-up-foundation' },
+      { name: 'Free VITA Tax Prep', href: 'https://www.supersonicfastermoney.com/tax/rise-up-foundation' },
       { name: 'Events', href: '/rise-foundation/events' },
       { name: 'Donate to Rise', href: '/rise-foundation/donate' },
       { name: 'Get Involved', href: '/rise-foundation/get-involved' },

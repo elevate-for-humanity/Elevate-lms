@@ -68,7 +68,7 @@ const footerLinks = {
     { name: 'Governance', href: '/governance' },
     { name: 'Compliance', href: '/compliance' },
     { name: 'Transparency', href: '/transparency' },
-    { name: 'Tax Services', href: '/tax' },
+    { name: 'Tax Services', href: 'https://www.supersonicfastermoney.com' },
     { name: 'Resources', href: '/resources' },
     { name: 'Contact', href: '/contact' },
     { name: 'Site Map', href: '/site-map' },

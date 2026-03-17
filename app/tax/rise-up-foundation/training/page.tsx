@@ -1,336 +1,124 @@
-
 import type { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
 import Link from 'next/link';
+import VITAPageHero from '@/components/supersonic/VITAPageHero';
 
 export const metadata: Metadata = {
-  title: 'Volunteer Training - IRS Link & Learn | Rise Up Foundation',
-  description:
-    'Complete IRS Link & Learn Taxes training to become a certified VITA volunteer. Free online training with certification exam.',
-  keywords: [
-    'IRS Link and Learn',
-    'VITA training',
-    'tax volunteer training',
-    'IRS certification',
-    'volunteer tax preparer',
-  ],
-  alternates: {
-    canonical:
-      'https://www.elevateforhumanity.org/tax/rise-up-foundation/training',
-  },
-  openGraph: {
-    title: 'Volunteer Training - IRS Link & Learn',
-    description:
-      'Free IRS training to become a certified VITA volunteer tax preparer.',
-    url: 'https://www.elevateforhumanity.org/tax/rise-up-foundation/training',
-    type: 'website',
-  },
+  title: 'Volunteer Training — IRS Link & Learn | Rise Up Foundation',
+  description: 'Complete IRS Link & Learn Taxes training to become a certified VITA volunteer. Free online training with certification exam.',
+  alternates: { canonical: 'https://www.supersonicfastermoney.com/tax/rise-up-foundation/training' },
 };
 
+const CERTIFICATIONS = [
+  { level: 'Basic', desc: 'Covers W-2 income, standard deductions, Earned Income Tax Credit, Child Tax Credit, and most common individual returns. Required for all preparers.', image: '/images/pages/admin-tax-apps-hero.jpg' },
+  { level: 'Advanced', desc: 'Adds itemized deductions, Schedule D (capital gains), Schedule E (rental income), and more complex credits. Recommended for experienced volunteers.', image: '/images/pages/admin-tax-training-hero.jpg' },
+  { level: 'Military', desc: 'Covers military-specific tax issues including combat pay exclusion, moving expenses, and state tax considerations for service members.', image: '/images/pages/admin-compliance-hero.jpg' },
+  { level: 'International', desc: 'Covers returns for non-resident aliens, foreign income exclusion, and treaty benefits. Required for sites serving international clients.', image: '/images/pages/admin-ferpa-training-hero.jpg' },
+];
+
+const MODULES = [
+  { title: 'Filing Basics', desc: 'Filing status, dependents, standard vs. itemized deductions, and the basic structure of Form 1040.', image: '/images/pages/admin-tax-filing-hero.jpg' },
+  { title: 'Income', desc: 'Wages, salaries, tips, interest, dividends, unemployment compensation, Social Security benefits, and retirement distributions.', image: '/images/pages/finance-accounting.jpg' },
+  { title: 'Credits', desc: 'Earned Income Tax Credit, Child Tax Credit, Child and Dependent Care Credit, education credits, and retirement savings credits.', image: '/images/pages/supersonic-tax-cert.jpg' },
+  { title: 'Quality Review', desc: 'How to review a completed return for accuracy before filing. Every return must pass quality review by a second certified volunteer.', image: '/images/pages/admin-tax-reports-hero.jpg' },
+  { title: 'Intake Interview', desc: 'How to conduct the client intake interview, complete Form 13614-C, and identify the correct filing status and dependents.', image: '/images/pages/supersonic-page-7.jpg' },
+  { title: 'Ethics & Security', desc: 'IRS Volunteer Standards of Conduct, data security requirements, and taxpayer confidentiality obligations.', image: '/images/pages/admin-compliance-hero.jpg' },
+];
+
 export default function TrainingPage() {
-
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Tax", href: "/tax" }, { label: "Training" }]} />
-      </div>
-<div className="mb-6">
-        <Link
-          href="/tax/rise-up-foundation"
-          className="text-sm text-black hover:text-black"
-        >
-          ← Back to Rise Up Foundation
-        </Link>
-      </div>
+    <div className="min-h-screen bg-white">
+      <VITAPageHero
+        image="/images/pages/admin-tax-training-hero.jpg"
+        alt="IRS Link and Learn VITA volunteer training"
+        title="IRS Link & Learn Volunteer Training"
+        subtitle="Free online certification training for VITA volunteers. Complete at your own pace. No tax background required."
+      />
 
-      <h1 className="text-4xl font-bold">Volunteer Training</h1>
-      <p className="mt-3 text-lg text-black">
-        Complete IRS Link & Learn Taxes training to become a certified VITA
-        volunteer.
-      </p>
-
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">IRS Link & Learn Taxes</h2>
-        <p className="text-black mb-6">
-          Link & Learn Taxes is the official IRS training program for VITA
-          volunteers. It's a free, self-paced online course that teaches you
-          everything you need to know to prepare basic tax returns.
-        </p>
-
-        <div className="rounded-lg bg-brand-green-50 p-6 mb-6">
-          <h3 className="font-semibold text-lg mb-3">Training Includes:</h3>
-          <ul className="space-y-2">
-            <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
-              <span className="text-black">
-                Interactive lessons and videos
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
-              <span className="text-black">
-                Practice exercises and quizzes
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
-              <span className="text-black">Real-world tax scenarios</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
-              <span className="text-black">
-                Certification exam preparation
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
-              <span className="text-black">
-                Reference materials and resources
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <a
-          href="https://linklearncertification.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
-        >
-          Open Link & Learn Taxes
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-        </a>
-      </section>
-
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">Certification Levels</h2>
-        <p className="text-black mb-6">
-          Choose the certification level that matches your experience and the
-          types of returns you want to prepare.
-        </p>
-
-        <div className="space-y-4">
-          <div className="rounded-lg border-2 border-brand-green-200 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg">Basic Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-brand-green-100 text-brand-green-800 text-xs font-semibold">
-                RECOMMENDED FOR NEW VOLUNTEERS
-              </span>
+      {/* OVERVIEW */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 mb-6">About IRS Link & Learn</h2>
+              <p className="text-lg text-slate-600 mb-5 leading-relaxed">
+                IRS Link & Learn Taxes is the free online training and certification program for VITA volunteers. All training is provided by the IRS at no cost. You complete the coursework online at your own pace and take a certification exam at the end.
+              </p>
+              <p className="text-slate-600 mb-5 leading-relaxed">
+                Most volunteers complete Basic certification in 8–12 hours. Advanced certification adds another 4–6 hours. Certification is valid for one tax season and must be renewed annually.
+              </p>
+              <p className="text-slate-600 mb-8 leading-relaxed">
+                You must score 80% or higher on the certification exam. You can retake the exam as many times as needed. Rise Up Foundation provides additional support and practice materials to help you prepare.
+              </p>
+              <a href="https://www.irs.gov/individuals/irs-link-and-learn-taxes" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-emerald-700 text-white font-bold rounded-xl hover:bg-emerald-800 transition-colors">
+                Start IRS Training →
+              </a>
             </div>
-            <p className="text-black mb-3">
-              Covers fundamental tax concepts and simple returns (W-2 income,
-              standard deduction, basic credits).
-            </p>
-            <div className="text-sm text-black">
-              <strong>Training Time:</strong> 15-20 hours
-              <br />
-              <strong>Best For:</strong> First-time volunteers, simple returns
-            </div>
-          </div>
-
-          <div className="rounded-lg border-2 border-brand-blue-200 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg">
-                Intermediate Certification
-              </h3>
-              <span className="px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold">
-                MOST COMMON
-              </span>
-            </div>
-            <p className="text-black mb-3">
-              Includes Basic topics plus itemized deductions, self-employment
-              income, and additional credits.
-            </p>
-            <div className="text-sm text-black">
-              <strong>Training Time:</strong> 20-25 hours
-              <br />
-              <strong>Best For:</strong> Volunteers with some tax knowledge,
-              moderate complexity returns
-            </div>
-          </div>
-
-          <div className="rounded-lg border-2 border-brand-blue-200 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg">Advanced Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold">
-                FOR EXPERIENCED VOLUNTEERS
-              </span>
-            </div>
-            <p className="text-black mb-3">
-              Covers all topics including business income, rental property,
-              capital gains, and complex situations.
-            </p>
-            <div className="text-sm text-black">
-              <strong>Training Time:</strong> 25-30 hours
-              <br />
-              <strong>Best For:</strong> Experienced volunteers, quality
-              reviewers, complex returns
+            <div className="relative h-[420px] rounded-2xl overflow-hidden">
+              <Image src="/images/pages/admin-ferpa-training-hero.jpg" alt="IRS Link and Learn training" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">Training Timeline</h2>
-        <div className="space-y-6">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
-              1
-            </div>
-            <div>
-              <h3 className="font-semibold">Register for Training</h3>
-              <p className="text-sm text-black mt-1">
-                <strong>When:</strong> October - December
-                <br />
-                <strong>Action:</strong> Contact us to get your Link & Learn
-                access code
-              </p>
-            </div>
+      {/* CERTIFICATION LEVELS */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">Certification Levels</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">All preparers must complete Basic certification. Additional levels are available for volunteers who want to handle more complex returns.</p>
           </div>
-
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
-              2
-            </div>
-            <div>
-              <h3 className="font-semibold">Complete Online Training</h3>
-              <p className="text-sm text-black mt-1">
-                <strong>When:</strong> November - January
-                <br />
-                <strong>Duration:</strong> 15-30 hours (self-paced)
-                <br />
-                <strong>Action:</strong> Work through lessons at your own pace
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
-              3
-            </div>
-            <div>
-              <h3 className="font-semibold">Pass Certification Exam</h3>
-              <p className="text-sm text-black mt-1">
-                <strong>When:</strong> December - January
-                <br />
-                <strong>Passing Score:</strong> 80% or higher
-                <br />
-                <strong>Action:</strong> Take exam online (can retake if needed)
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
-              4
-            </div>
-            <div>
-              <h3 className="font-semibold">Attend Orientation</h3>
-              <p className="text-sm text-black mt-1">
-                <strong>When:</strong> January (before tax season)
-                <br />
-                <strong>Duration:</strong> 2-3 hours
-                <br />
-                <strong>Action:</strong> Learn site procedures and meet the team
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold">
-              5
-            </div>
-            <div>
-              <h3 className="font-semibold">Start Volunteering</h3>
-              <p className="text-sm text-black mt-1">
-                <strong>When:</strong> Late January - April 15
-                <br />
-                <strong>Action:</strong> Begin helping taxpayers!
-              </p>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CERTIFICATIONS.map((cert) => (
+              <div key={cert.level} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
+                <div className="relative h-44 flex-shrink-0">
+                  <Image src={cert.image} alt={cert.level} fill className="object-cover" sizes="(max-width: 768px) 100vw, 25vw" />
+                  <div className="absolute top-3 left-3 bg-emerald-700 text-white text-sm font-black px-3 py-1 rounded-lg">{cert.level}</div>
+                </div>
+                <div className="p-5 flex-1 bg-white">
+                  <p className="text-slate-600 text-sm leading-relaxed">{cert.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">Training Tips</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-semibold mb-2">Study Tips</h3>
-            <ul className="space-y-2 text-sm text-black">
-              <li>• Set aside 2-3 hours per week for training</li>
-              <li>• Take notes on key concepts</li>
-              <li>• Complete all practice exercises</li>
-              <li>• Review difficult topics multiple times</li>
-              <li>• Use the reference materials provided</li>
-            </ul>
+      {/* TRAINING MODULES */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">What You Will Learn</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">The Basic certification covers six core modules. Each module includes reading material, interactive scenarios, and a knowledge check.</p>
           </div>
-          <div>
-            <h3 className="font-semibold mb-2">Exam Tips</h3>
-            <ul className="space-y-2 text-sm text-black">
-              <li>• Review all lessons before taking exam</li>
-              <li>• Take practice quizzes multiple times</li>
-              <li>• Read questions carefully</li>
-              <li>• You can retake the exam if needed</li>
-              <li>• Keep reference materials handy</li>
-            </ul>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {MODULES.map((mod) => (
+              <div key={mod.title} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
+                <div className="relative h-44 flex-shrink-0">
+                  <Image src={mod.image} alt={mod.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
+                <div className="p-5 flex-1 bg-white">
+                  <h3 className="font-bold text-slate-900 mb-2">{mod.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{mod.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-brand-green-50 border-l-4 border-brand-green-600 p-6">
-        <h2 className="text-xl font-bold mb-3">Ready to Start Training?</h2>
-        <p className="text-black mb-6">
-          Contact us to get your Link & Learn access code and begin your journey
-          to becoming a certified VITA volunteer.
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <a
-            href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
-          >
-            Call support center
-          </a>
-          <a
-            href="/contact"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
-          >
-            Email for Access Code
-          </a>
-          <Link
-            href="/tax/rise-up-foundation/volunteer"
-            className="px-6 py-3 rounded-lg border font-semibold hover:bg-white transition"
-          >
-            Back to Volunteer Info
-          </Link>
+      {/* CTA */}
+      <section className="relative h-[45vh] min-h-[320px]">
+        <Image src="/images/pages/admin-tax-training-hero.jpg" alt="Start IRS training" fill className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Get Certified?</h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="https://www.irs.gov/individuals/irs-link-and-learn-taxes" target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">Start IRS Training</a>
+              <Link href="/tax/rise-up-foundation/volunteer" className="px-10 py-4 bg-emerald-700 text-white font-black text-xl rounded-xl hover:bg-emerald-600 transition-colors">Apply to Volunteer</Link>
+            </div>
+          </div>
         </div>
-      </section>
-
-      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6">
-        <h3 className="font-semibold text-black">Reference</h3>
-        <p className="mt-2 text-sm text-black">
-          Official IRS training portal:{' '}
-          <a
-            href="https://linklearncertification.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-blue-600 hover:underline"
-          >
-            Link & Learn Taxes
-          </a>
-        </p>
       </section>
     </div>
   );

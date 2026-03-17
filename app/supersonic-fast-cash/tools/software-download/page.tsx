@@ -15,7 +15,7 @@ import Link from 'next/link';
 
 
 
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 export default function SupersonicFastCashDownloadPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {

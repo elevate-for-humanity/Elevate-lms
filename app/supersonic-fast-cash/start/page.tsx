@@ -1,178 +1,133 @@
-
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  FileText, 
-  Upload, 
-  Calendar,
-  Phone,
-  ArrowRight,
-  CheckCircle,
-} from 'lucide-react';
+import SupersonicPageHero from '@/components/supersonic/SupersonicPageHero';
 
 export const metadata: Metadata = {
   title: 'Start Your Tax Return | Supersonic Fast Cash',
-  description: 'Begin your tax preparation. Choose how you want to file - online, in-person, or with document upload.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/start',
-  },
+  description: "Begin your tax preparation. Choose how you'd like to file — online, in-person, or with document upload.",
+  alternates: { canonical: 'https://www.supersonicfastermoney.com/supersonic-fast-cash/start' },
 };
 
-const filingOptions = [
+const OPTIONS = [
   {
     title: 'File Online (DIY)',
-    description: 'Answer guided questions and file from home. Best for simple returns.',
-    icon: FileText,
+    description: "Answer guided questions and file from home. Best for simple W-2 returns. Step-by-step interview format walks you through every section. Import your W-2 directly and e-file in minutes.",
+    image: '/images/pages/supersonic-page-3.jpg',
     href: '/supersonic-fast-cash/diy-taxes',
     cta: 'Start Online Filing',
-    features: ['W-2 income', 'Standard deductions', 'File at your pace'],
   },
   {
     title: 'Upload Documents',
-    description: 'Send us your tax documents and we\'ll prepare your return.',
-    icon: Upload,
+    description: "Send us your tax documents securely and our PTIN-credentialed preparers will handle everything. You review and approve before anything is filed. Best for moderate to complex returns.",
+    image: '/images/pages/admin-documents-upload-hero.jpg',
     href: '/supersonic-fast-cash/upload-documents',
     cta: 'Upload Documents',
-    features: ['We handle preparation', 'Review before filing', 'Email updates'],
   },
   {
-    title: 'Schedule Appointment',
-    description: 'Meet with a tax preparer in person or virtually.',
-    icon: Calendar,
+    title: 'Book Appointment',
+    description: "Meet with a tax preparer in person at our Indianapolis office or virtually. One-on-one attention for complex returns — self-employment, rental income, multiple states, or business filings.",
+    image: '/images/pages/supersonic-page-7.jpg',
     href: '/supersonic-fast-cash/book-appointment',
     cta: 'Book Appointment',
-    features: ['One-on-one help', 'Complex returns', 'Same-day options'],
   },
 ];
 
-export default function StartPage() {
+const BEFORE_STEPS = [
+  { label: 'W-2s from all employers', image: '/images/pages/supersonic-page-6.jpg' },
+  { label: 'All 1099 forms', image: '/images/pages/admin-tax-apps-hero.jpg' },
+  { label: 'Social Security numbers for all household members', image: '/images/pages/supersonic-page-8.jpg' },
+  { label: 'Bank account and routing number for direct deposit', image: '/images/pages/finance-accounting.jpg' },
+];
 
+export default function StartPage() {
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Start" }]} />
-      </div>
-{/* Hero */}
-      <section className="bg-brand-blue-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-semibold text-gray-900 mb-4">
-            Let's Get Your Taxes Filed
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Choose how you'd like to file. We're here to help every step of the way.
-          </p>
-        </div>
-      </section>
+      <SupersonicPageHero
+        image="/images/pages/supersonic-page-1.jpg"
+        alt="Start your tax return with Supersonic Fast Cash"
+        title="Let's Get Your Taxes Filed"
+        subtitle="Choose how you'd like to file. We're here to help every step of the way."
+      />
 
-      {/* Filing Options */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* FILING OPTIONS */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-12 text-center">Choose Your Filing Method</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {filingOptions.map((option) => (
-              <div 
-                key={option.title}
-                className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <option.icon className="w-6 h-6 text-brand-blue-600" />
+            {OPTIONS.map((opt) => (
+              <div key={opt.title} className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition-all duration-300 flex flex-col">
+                <div className="relative h-52 w-full flex-shrink-0">
+                  <Image src={opt.image} alt={opt.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
-                
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  {option.title}
-                </h2>
-                <p className="text-gray-600 text-sm mb-4">
-                  {option.description}
-                </p>
-
-                <ul className="space-y-2 mb-6">
-                  {option.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href={option.href}
-                  className="block w-full text-center py-3 px-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-                >
-                  {option.cta}
-                </Link>
+                <div className="p-6 flex flex-col flex-1 bg-white">
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{opt.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{opt.description}</p>
+                  <Link href={opt.href} className="mt-6 block w-full text-center py-3 px-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition-colors">
+                    {opt.cta}
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Call Option */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-            <Phone className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              Prefer to Talk?
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Contact us to discuss your tax situation or get help choosing the right option.
+      {/* WHAT TO BRING */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">What to Bring</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">
+              Having these documents ready before you start will make the process faster and ensure your return is complete.
             </p>
-            <a
-              href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              <Phone className="w-5 h-5" />
-              (317) 314-3757
-            </a>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {BEFORE_STEPS.map((item) => (
+              <div key={item.label} className="rounded-2xl overflow-hidden border border-slate-200">
+                <div className="relative h-36">
+                  <Image src={item.image} alt={item.label} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
+                </div>
+                <div className="p-4 bg-white">
+                  <p className="text-sm font-semibold text-slate-900 leading-snug">{item.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What to Expect */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
-            What to Expect
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">Before You Start</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Gather your W-2s and 1099s</li>
-                <li>• Have Social Security numbers ready</li>
-                <li>• Know your bank account info for direct deposit</li>
-              </ul>
+      {/* CALL OPTION */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="relative h-64 rounded-2xl overflow-hidden">
+              <Image src="/images/pages/contact-page-1.jpg" alt="Call Supersonic Fast Cash" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">After Filing</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Receive confirmation within 24-48 hours</li>
-                <li>• Track your refund status online</li>
-                <li>• Download your return for your records</li>
-              </ul>
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 mb-4">Prefer to Talk First?</h2>
+              <p className="text-slate-600 mb-6 leading-relaxed">
+                Not sure which option is right for you? Call us and we'll help you figure out the best approach for your tax situation. No commitment required.
+              </p>
+              <a href="tel:+13173143757" className="inline-block px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors">
+                (317) 314-3757
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Link */}
-      <section className="py-16 bg-brand-blue-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-semibold text-white mb-4">
-            Questions about pricing?
-          </h2>
-          <p className="text-brand-blue-200 mb-8">
-            See our transparent pricing before you start.
-          </p>
-          <Link
-            href="/supersonic-fast-cash/pricing"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-white transition-colors"
-          >
-            View Pricing
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+      {/* PRICING CTA */}
+      <section className="relative h-[45vh] min-h-[320px]">
+        <Image src="/images/pages/supersonic-page-5.jpg" alt="Supersonic Fast Cash pricing" fill className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Questions About Pricing?</h2>
+            <p className="text-xl text-slate-200 mb-8">See our transparent pricing before you start.</p>
+            <Link href="/supersonic-fast-cash/pricing" className="px-10 py-4 bg-white text-slate-900 font-black text-xl rounded-xl hover:bg-slate-100 transition-colors">
+              View Pricing
+            </Link>
+          </div>
         </div>
       </section>
     </div>

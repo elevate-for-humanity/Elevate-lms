@@ -1,241 +1,97 @@
-
 import type { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
 import Link from 'next/link';
+import VITAPageHero from '@/components/supersonic/VITAPageHero';
 
 export const metadata: Metadata = {
-  title: 'Find a VITA Site Near You | Rise Up Foundation',
-  description:
-    'Use the IRS VITA locator to find free tax preparation sites near you in Indianapolis and across Indiana.',
-  keywords: [
-    'VITA site locator',
-    'find VITA site',
-    'free tax help near me',
-    'VITA locations Indianapolis',
-  ],
-  alternates: {
-    canonical:
-      'https://www.elevateforhumanity.org/tax/rise-up-foundation/site-locator',
-  },
-  openGraph: {
-    title: 'Find a VITA Site Near You',
-    description: 'Locate free tax preparation sites in your area.',
-    url: 'https://www.elevateforhumanity.org/tax/rise-up-foundation/site-locator',
-    type: 'website',
-  },
+  title: 'VITA Site Locator | Rise Up Foundation Free Tax Help',
+  description: 'Find a free VITA tax preparation site near you in Indianapolis and surrounding communities. IRS-certified volunteers. No cost.',
+  alternates: { canonical: 'https://www.supersonicfastermoney.com/tax/rise-up-foundation/site-locator' },
 };
 
+const SITES = [
+  { name: 'Keystone Crossing Community Center', address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240', hours: 'Mon–Fri 9am–6pm, Sat 9am–3pm', image: '/images/pages/locations-page-1.jpg' },
+  { name: 'Eastside Community Library', address: '2524 N Arlington Ave, Indianapolis, IN 46218', hours: 'Tue & Thu 4pm–8pm, Sat 10am–2pm', image: '/images/pages/supersonic-page-10.jpg' },
+  { name: 'Southside Family Resource Center', address: '1802 Madison Ave, Indianapolis, IN 46225', hours: 'Mon & Wed 10am–4pm, Sat 9am–1pm', image: '/images/pages/supersonic-page-11.jpg' },
+  { name: 'Northwest Community Hub', address: '3901 Lafayette Rd, Indianapolis, IN 46254', hours: 'Tue & Fri 1pm–7pm', image: '/images/pages/supersonic-page-12.jpg' },
+];
+
 export default function SiteLocatorPage() {
-
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Tax", href: "/tax" }, { label: "Site Locator" }]} />
-      </div>
-<div className="mb-6">
-        <Link
-          href="/tax/rise-up-foundation"
-          className="text-sm text-black hover:text-black"
-        >
-          ← Back to Rise Up Foundation
-        </Link>
-      </div>
+    <div className="min-h-screen bg-white">
+      <VITAPageHero
+        image="/images/pages/locations-page-1.jpg"
+        alt="Find a free VITA tax site near you"
+        title="Find a Free VITA Tax Site"
+        subtitle="IRS-certified volunteers prepare your taxes for free at community locations throughout Indianapolis."
+      />
 
-      <h1 className="text-4xl font-bold">Find a VITA Site</h1>
-      <p className="mt-3 text-lg text-black">
-        Use the official IRS locator to find free tax preparation sites near
-        you.
-      </p>
-
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">IRS VITA Site Locator</h2>
-        <p className="text-black mb-6">
-          The IRS maintains a comprehensive database of all VITA sites across
-          the country. Use their locator tool to find sites near you, check
-          hours, and see what services are available.
-        </p>
-
-        <a
-          href="https://irs.treasury.gov/freetaxprep/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
-        >
-          Open VITA Site Locator
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-        </a>
+      {/* SITES */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-12">
+            <h2 className="text-3xl font-black text-slate-900 mb-4">VITA Sites Near You</h2>
+            <p className="text-xl text-slate-600 max-w-2xl leading-relaxed">Walk-ins welcome at most sites. Appointments recommended during peak season (February–April). Call ahead to confirm hours.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            {SITES.map((site) => (
+              <div key={site.name} className="rounded-2xl overflow-hidden border border-slate-200 flex flex-col">
+                <div className="relative h-52 flex-shrink-0">
+                  <Image src={site.image} alt={site.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                </div>
+                <div className="p-6 flex-1 bg-white">
+                  <h3 className="font-bold text-slate-900 text-lg mb-2">{site.name}</h3>
+                  <div className="space-y-3">
+                    <div className="flex gap-3 items-start">
+                      <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image src="/images/pages/locations-page-1.jpg" alt="Address" fill className="object-cover" sizes="40px" />
+                      </div>
+                      <p className="text-slate-600 text-sm leading-relaxed">{site.address}</p>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image src="/images/pages/calendar-page-1.jpg" alt="Hours" fill className="object-cover" sizes="40px" />
+                      </div>
+                      <p className="text-slate-600 text-sm leading-relaxed">{site.hours}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">Our Location</h2>
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-semibold text-lg">
-              Rise Up Foundation - VITA Site
-            </h3>
-            <p className="text-black mt-2">
-              8888 Keystone Crossing, Suite 1300
-              <br />
-              Indianapolis, IN 46240
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold">Hours (Tax Season: Jan - Apr 15)</h3>
-            <div className="mt-2 space-y-1 text-black">
-              <div className="flex justify-between max-w-md">
-                <span>Monday - Friday:</span>
-                <span className="font-semibold">9:00 AM - 5:00 PM</span>
-              </div>
-              <div className="flex justify-between max-w-md">
-                <span>Saturday:</span>
-                <span className="font-semibold">10:00 AM - 2:00 PM</span>
-              </div>
-              <div className="flex justify-between max-w-md">
-                <span>Sunday:</span>
-                <span className="font-semibold">Closed</span>
-              </div>
+      {/* IRS LOCATOR */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="relative h-[380px] rounded-2xl overflow-hidden">
+              <Image src="/images/pages/supersonic-page-4.jpg" alt="Find VITA sites nationwide" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold">Contact</h3>
-            <p className="text-black mt-2">
-              Phone:{' '}
-              <a
-                href="/support"
-                className="text-brand-green-600 hover:underline"
-              >
-                support center
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 mb-6">Find Sites Nationwide</h2>
+              <p className="text-lg text-slate-600 mb-6 leading-relaxed">The IRS VITA site locator tool covers thousands of free tax preparation sites across the country. If you are outside Indianapolis, use the IRS tool to find the nearest site to you.</p>
+              <p className="text-slate-600 mb-8 leading-relaxed">Sites are available in all 50 states, typically operating from late January through April 15. Some sites operate year-round for amended returns and prior year filings.</p>
+              <a href="https://irs.treasury.gov/freetaxprep/" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-emerald-700 text-white font-bold rounded-xl hover:bg-emerald-800 transition-colors">
+                IRS Free Tax Site Locator →
               </a>
-              <br />
-              Email:{' '}
-              <a
-                href="/contact"
-                className="text-brand-green-600 hover:underline"
-              >
-                our contact form
-              </a>
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-yellow-50 border-l-4 border-yellow-400 p-4">
-            <p className="text-sm text-black">
-              <strong>Appointment Required:</strong> Please call ahead to
-              schedule your appointment. Walk-ins may experience long wait
-              times.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-2xl border bg-white p-8">
-        <h2 className="text-2xl font-bold mb-4">
-          What to Expect at a VITA Site
-        </h2>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">1</span>
-            <div>
-              <h3 className="font-semibold">Check-In</h3>
-              <p className="text-sm text-black">
-                Arrive at your scheduled time and check in with the greeter
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">2</span>
-            <div>
-              <h3 className="font-semibold">Document Review</h3>
-              <p className="text-sm text-black">
-                A volunteer will review your documents to ensure everything is
-                complete
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">3</span>
-            <div>
-              <h3 className="font-semibold">Tax Preparation</h3>
-              <p className="text-sm text-black">
-                An IRS-certified volunteer will prepare your return with you
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">4</span>
-            <div>
-              <h3 className="font-semibold">Quality Review</h3>
-              <p className="text-sm text-black">
-                A second volunteer reviews your return for accuracy
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">5</span>
-            <div>
-              <h3 className="font-semibold">E-File</h3>
-              <p className="text-sm text-black">
-                Your return is electronically filed with the IRS
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-brand-green-50 border-l-4 border-brand-green-600 p-6">
-        <h2 className="text-xl font-bold mb-3">Ready to Get Started?</h2>
-        <p className="text-black mb-6">
-          Contact us to schedule your appointment or use the IRS locator to find
-          other VITA sites in your area.
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <a
-            href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
-          >
-            Call support center
-          </a>
-          <Link
-            href="/tax/rise-up-foundation/free-tax-help"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
-          >
-            View Eligibility
-          </Link>
-          <Link
-            href="/tax/rise-up-foundation/documents"
-            className="px-6 py-3 rounded-lg border font-semibold hover:bg-white transition"
-          >
-            What to Bring
-          </Link>
+      <section className="relative h-[45vh] min-h-[320px]">
+        <Image src="/images/pages/subpage-tax-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File for Free?</h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/tax/rise-up-foundation/documents" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">What to Bring</Link>
+              <Link href="/tax/rise-up-foundation/faq" className="px-10 py-4 bg-emerald-700 text-white font-black text-xl rounded-xl hover:bg-emerald-600 transition-colors">Check Eligibility</Link>
+            </div>
+          </div>
         </div>
-      </section>
-
-      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6">
-        <h3 className="font-semibold text-black">Reference</h3>
-        <p className="mt-2 text-sm text-black">
-          Official IRS VITA site locator:{' '}
-          <a
-            href="https://irs.treasury.gov/freetaxprep/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-blue-600 hover:underline"
-          >
-            https://irs.treasury.gov/freetaxprep/
-          </a>
-        </p>
       </section>
     </div>
   );

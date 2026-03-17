@@ -13,21 +13,19 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <>
-      {/* SkipToContent is rendered in app/layout.tsx — no duplicate here */}
-      
       {/* Server-rendered header - always visible */}
       <Header />
-      
+
       {/* Main content */}
       <Suspense>
         <main id="main-content" className="pt-[70px]" role="main" tabIndex={-1}>
           {children}
         </main>
       </Suspense>
-      
+
       {/* Server-rendered footer - always visible */}
       <ServerFooter />
-      
+
       {/* Client-only widgets (chat, analytics, etc.) */}
       <ClientWidgets />
     </>

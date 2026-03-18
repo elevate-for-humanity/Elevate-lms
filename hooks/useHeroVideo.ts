@@ -28,17 +28,29 @@ export function useHeroVideo({
     el.muted = true;
     el.volume = 1;
 
+    let triggered = false;
+
     async function startPlay() {
       if (!el) return;
       try { await el.play(); } catch {}
     }
 
-    startPlay();
+    // Trigger on scroll (80px), not on mount
+    function onScroll() {
+      if (triggered) return;
+      if (window.scrollY < 80) return;
+      triggered = true;
+      window.removeEventListener('scroll', onScroll);
+      startPlay();
+    }
 
-    if (!pauseOffScreen) return;
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (!pauseOffScreen) return () => window.removeEventListener('scroll', onScroll);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        if (!triggered) return;
         if (entry.isIntersecting) startPlay();
         else el.pause();
       },
@@ -46,7 +58,10 @@ export function useHeroVideo({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
   }, [pauseOffScreen, threshold]);
 
   function unmute() {

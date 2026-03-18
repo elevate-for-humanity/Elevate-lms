@@ -42,7 +42,7 @@ const PARTNER_TYPES = [
     ],
     cta: { label: 'Learn More', href: '/partnerships' },
     apply: { label: 'Apply as Employer Partner', href: '/apply/employer' },
-    image: '/images/pages/hp-employer-real.jpg',
+    image: '/images/pages/employer-handshake.jpg',
   },
   {
     icon: Building2,
@@ -72,7 +72,7 @@ const PARTNER_TYPES = [
     ],
     cta: { label: 'Learn More', href: '/partners/training-provider' },
     apply: { label: 'Apply as Training Provider', href: '/apply/program-holder' },
-    image: '/images/pages/training-classroom.jpg',
+    image: '/images/pages/tech-classroom.jpg',
   },
   {
     icon: Shield,
@@ -87,7 +87,7 @@ const PARTNER_TYPES = [
     ],
     cta: { label: 'Learn More', href: '/partners/reentry' },
     apply: { label: 'Refer a Participant', href: '/apply/intake' },
-    image: '/images/pages/career-services-page-1.jpg',
+    image: '/images/pages/community-page-4.jpg',
   },
   {
     icon: Handshake,
@@ -102,7 +102,7 @@ const PARTNER_TYPES = [
     ],
     cta: { label: 'Learn More', href: '/partners/technology' },
     apply: { label: 'Request API Access', href: '/partners/sales' },
-    image: '/images/pages/cybersecurity-code.jpg',
+    image: '/images/pages/technology-sector.jpg',
   },
 ];
 
@@ -123,12 +123,12 @@ export default function PartnersIndexPage() {
 
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[260px] overflow-hidden">
-        <Image src="/images/pages/partners-pub-page-7.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
-        
+        <Image src="/images/pages/workforce-partnership-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute inset-0 bg-slate-900/50" />
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-8 max-w-5xl mx-auto">
           <p className="text-brand-blue-300 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2">Partner With Elevate</h1>
-          <p className="text-slate-200 text-base max-w-2xl">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">Partner With Elevate</h1>
+          <p className="text-white/80 text-base max-w-2xl">
             We work with workforce agencies, employers, barbershops, training providers, and reentry organizations. Find your type below and apply in minutes.
           </p>
         </div>

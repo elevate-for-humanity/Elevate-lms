@@ -1,60 +1,61 @@
-
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
 export const metadata: Metadata = {
-  title: 'Workforce Development Partnership | Elevate for Humanity',
-  description: 'Partner with Elevate for Humanity on workforce development. WIOA-funded training, apprenticeship programs, and employer pipeline services.',
+  title: 'Workforce Agency Partnership | Elevate for Humanity',
+  description: 'Partner with Elevate for Humanity on WIOA-funded workforce training. WorkOne centers, workforce boards, and DWD case managers — refer participants and track outcomes.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/workforce' },
 };
 
 export default function WorkforcePage() {
-
   return (
     <PublicLandingPage config={{
-      breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Workforce' }],
+      breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Workforce Agencies' }],
       hero: {
-        image: '/images/pages/workforce-partners-page-1.jpg',
-        tag: 'Partnership',
-        tagColor: 'text-brand-blue-300',
-        title: 'Workforce Development Partnership',
-        subtitle: 'Connect your workforce board or agency with ETPL-approved training programs and a pipeline of certified candidates.',
+        image: '/images/pages/workforce-partnership-hero.jpg',
+        tag: 'Workforce Agencies',
+        tagColor: 'text-brand-blue-600',
+        title: 'Workforce Agency Partnership',
+        subtitle: 'Refer WIOA, Workforce Ready Grant, and JRI participants to Elevate for funded career training. We handle enrollment, training, testing, and outcome reporting.',
       },
       intro: {
-        heading: 'Build Your Local Workforce Pipeline',
+        heading: 'A Turnkey Training Partner for Your Agency',
         paragraphs: [
-          'Elevate for Humanity partners with workforce development boards, WorkOne offices, and state agencies to deliver WIOA-funded training in high-demand fields. Our programs are ETPL-approved and produce industry-certified graduates ready for employment.',
-          'We handle enrollment, training delivery, certification testing, and job placement — giving your agency a turnkey training partner with measurable outcomes.',
+          'Elevate for Humanity is an ETPL-approved training provider serving WorkOne centers, workforce development boards, and DWD case managers across Indiana. Our programs are designed to meet WIOA performance metrics — credential attainment, employment, and earnings gains.',
+          'When you refer a participant to Elevate, we take it from there. We verify eligibility, enroll them in the right program, deliver the training, administer certification exams, and report outcomes back to your agency. You get a reliable partner with measurable results.',
         ],
-        image: '/images/pages/hvac-technician.jpg',
+        image: '/images/pages/wioa-meeting.jpg',
       },
       features: {
-        heading: 'Partnership Benefits',
+        heading: 'What Your Agency Gets',
         items: [
-          'ETPL-approved training programs across multiple industries',
-          'Registered Apprenticeship programs (DOL-approved)',
-          'Real-time enrollment and outcome reporting',
-          'Dedicated point of contact for your agency',
-          'Job placement support and employer connections',
-          'Flexible scheduling — day, evening, and weekend cohorts',
+          'ETPL-approved programs in HVAC, CDL, healthcare, barbering, and business',
+          'DOL Registered Apprenticeship programs (barber and trades)',
+          'Real-time enrollment and progress reporting for your case managers',
+          'Credential attainment data for WIOA performance reporting',
+          'Dedicated agency liaison — one point of contact for all referrals',
+          'Employment outcome tracking and 90-day follow-up reports',
+          'Flexible cohort scheduling — day, evening, and weekend options',
+          'Wrap-around support: transportation assistance, childcare referrals, career counseling',
         ],
       },
       steps: {
-        heading: 'How to Partner',
+        heading: 'How the Referral Process Works',
         items: [
-          { title: 'Contact Us', desc: 'Reach out to discuss your workforce needs and participant volume.' },
-          { title: 'Review Programs', desc: 'We\'ll match your population to the right training programs and funding streams.' },
-          { title: 'Refer Participants', desc: 'Send eligible participants directly. We handle enrollment and training.' },
-          { title: 'Track Outcomes', desc: 'Receive completion, certification, and employment outcome reports.' },
+          { title: 'Contact Us', desc: 'Reach out to set up a referral agreement. Most agencies are onboarded within one week.' },
+          { title: 'Send Referrals', desc: 'Refer eligible participants via our intake form or direct case manager contact. We confirm eligibility and program fit.' },
+          { title: 'We Enroll and Train', desc: 'Elevate handles enrollment paperwork, training delivery, and certification exam scheduling.' },
+          { title: 'Receive Outcome Reports', desc: 'We send completion, credential attainment, and employment outcome data back to your agency on your reporting schedule.' },
         ],
       },
       cta: {
-        heading: 'Ready to Partner?',
-        subtitle: 'Set up a referral agreement in minutes. Call (317) 314-3757 or apply online.',
-        primaryLabel: 'Start a Referral Partnership',
+        heading: 'Start a Referral Partnership',
+        subtitle: 'Most referral agreements are in place within a week. Call (317) 314-3757 or submit the intake form to get started.',
+        primaryLabel: 'Submit Intake Form',
         primaryHref: '/apply/intake',
         secondaryLabel: 'Call (317) 314-3757',
-        secondaryHref: 'tel:317-314-3757',
+        secondaryHref: 'tel:3173143757',
+        bgColor: 'bg-brand-blue-700',
       },
     }} />
   );

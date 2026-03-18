@@ -55,7 +55,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">
             {config.hero.tag && (
-              <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-brand-blue-300'}`}>
+              <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-brand-blue-600'}`}>
                 {config.hero.tag}
               </p>
             )}
@@ -95,7 +95,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {config.features.items.map((item) => (
                 <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-5 border border-slate-200">
-                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <span className="text-brand-blue-600 font-bold flex-shrink-0">✓</span>
                   <p className="text-slate-700">{item}</p>
                 </div>
               ))}
@@ -127,8 +127,8 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
       {/* CTA */}
       <section className={`py-16 sm:py-24 ${ctaBg}`}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">{config.cta.heading}</h2>
-          <p className="text-xl text-white/90 mb-10">{config.cta.subtitle}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{config.cta.heading}</h2>
+          <p className="text-xl text-white/80 mb-10">{config.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href={config.cta.primaryHref} className="bg-white text-slate-900 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">
               {config.cta.primaryLabel}

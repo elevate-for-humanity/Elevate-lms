@@ -1,9 +1,12 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Award, FileCheck, Briefcase, ChevronRight, BadgeCheck, DollarSign, MapPin } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -51,16 +54,21 @@ export default function CredentialsPage() {
         </div>
       </div>
 
-      {/* Hero banner */}
-      <PageVideoHero
-        videoSrc="/videos/welding-trades.mp4"
-        posterSrc="/images/pages/credentials-page-1.jpg"
-        posterAlt="Credential pathways at Elevate for Humanity"
-        size="program"
-        badge="Credential Pathways"
-        title="Credentials at Elevate"
-        subtitle="Three layers of credentials — completion certificates, industry certifications from national testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours."
-      />
+      {/* Hero */}
+      <HeroVideo
+        videoSrcDesktop="/videos/welding-trades.mp4"
+        posterImage="/images/pages/credentials-page-1.jpg"
+        microLabel="Credential Pathways"
+        analyticsName="credentials"
+      >
+        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Credential Pathways</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+          Credentials at Elevate
+        </h1>
+        <p className="text-slate-600 text-lg leading-relaxed max-w-2xl">
+          Three layers of credentials — completion certificates, industry certifications from national testing bodies, and DOL Registered Apprenticeship credentials backed by employer-verified OJT hours.
+        </p>
+      </HeroVideo>
 
       {/* Stats bar */}
       <div className="bg-white border-t border-slate-200">

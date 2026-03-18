@@ -2,7 +2,6 @@
 
 export const dynamic = 'force-dynamic';
 
-import PageVideoHero from '@/components/ui/PageVideoHero';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';

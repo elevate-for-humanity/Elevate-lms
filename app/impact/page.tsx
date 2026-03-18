@@ -1,13 +1,12 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
-
-export const dynamic = 'force-dynamic';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'Impact & Outcomes | Elevate for Humanity',
@@ -45,22 +44,7 @@ const FUNDER_REASONS = [
   },
 ];
 
-export default async function ImpactPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient();
-  const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
+export default function ImpactPage() {
   return (
     <div className="bg-white">
       <div className="bg-white border-b">
@@ -69,12 +53,12 @@ export default async function ImpactPage() {
         </div>
       </div>
 
-      <PageVideoHero
-        videoSrc="/videos/graduation-success.mp4"
-        posterSrc="/images/pages/impact-video-poster.jpg"
-        audioSrc="/audio/welcome-voiceover.mp3"
-        posterAlt="Elevate graduate outcomes and community impact"
-        size="marketing"
+      <HeroVideo
+        videoSrcDesktop="/videos/graduation-success.mp4"
+        posterImage="/images/pages/impact-video-poster.jpg"
+        voiceoverSrc="/audio/welcome-voiceover.mp3"
+        microLabel="Impact & Outcomes"
+        analyticsName="impact"
       />
 
       {/* Why Funders Choose Elevate */}

@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock, DollarSign, Zap } from 'lucide-react';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'Career Training Programs | Elevate for Humanity',
@@ -111,30 +111,28 @@ export default function ProgramsPage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[700px] overflow-hidden">
-        <ProgramHeroBanner
-          videoSrc="/videos/program-hero.mp4"
-          posterImage="/images/pages/programs-hero.jpg"
-          voiceoverSrc="/audio/heroes/programs.mp3"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 max-w-3xl">
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-4">
-            Start a Career —<br className="hidden sm:block" /> Not Just a Class
-          </h1>
-          <p className="text-white/80 text-base sm:text-lg mb-6">
-            Get trained, certified, and connected to real job opportunities in weeks — not years.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
-              Apply Now
-            </Link>
-            <Link href="#programs" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm backdrop-blur-sm">
-              Find My Program
-            </Link>
-          </div>
+      <HeroVideo
+        videoSrcDesktop="/videos/program-hero.mp4"
+        posterImage="/images/pages/programs-hero.jpg"
+        voiceoverSrc="/audio/heroes/programs.mp3"
+        microLabel="All Programs"
+        analyticsName="programs"
+      >
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+          Start a career — not just a class.
+        </h1>
+        <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
+          Get trained, certified, and connected to real job opportunities in weeks — not years.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
+            Apply Now
+          </Link>
+          <Link href="#programs" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+            Find My Program
+          </Link>
         </div>
-      </section>
+      </HeroVideo>
 
       {/* Decision engine */}
       <section className="bg-slate-900 py-10 px-4">

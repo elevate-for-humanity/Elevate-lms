@@ -1,9 +1,14 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -32,31 +37,36 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Hero — image with overlay text so the page has immediate context */}
-      <section className="relative h-64 md:h-96 overflow-hidden">
-        <Image
-          src="/images/pages/about-hero.jpg"
-          alt="Elevate for Humanity — workforce development in Indianapolis"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-900/55" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-4xl mx-auto px-6 pb-10 w-full">
-            <p className="text-brand-red-300 font-bold text-xs uppercase tracking-widest mb-2">
-              Indianapolis, Indiana
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
-              Elevate for Humanity
+      {/* Hero — video frame only, no text on video */}
+      {(() => {
+        const hero = heroBanners.about;
+        return (
+          <HeroVideo
+            videoSrcDesktop={hero.videoSrcDesktop}
+            posterImage={hero.posterImage}
+            voiceoverSrc={hero.voiceoverSrc}
+            microLabel={hero.microLabel}
+            transcript={hero.transcript}
+            analyticsName={hero.analyticsName}
+          >
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+              Built for workforce outcomes.
             </h1>
-            <p className="text-slate-200 text-base max-w-xl">
-              Workforce development institute providing funded career training to people facing barriers to employment.
+            <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
+              Training, credential preparation, support services, and employer connections.
             </p>
-          </div>
-        </div>
-      </section>
+            <div className="flex flex-wrap gap-3">
+              <a href="/about#who-we-are" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
+                Our Story
+              </a>
+              <a href="/about#team" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                Meet the Team
+              </a>
+            </div>
+          </HeroVideo>
+        );
+      })()}
 
       {/* Who We Are */}
       <section className="py-12 bg-white">

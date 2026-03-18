@@ -1,3 +1,6 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,7 +19,7 @@ import EmployerPartners from '@/components/EmployerPartners';
 import OJTSection from '@/components/employers/OJTSection';
 import WOTCSection from '@/components/employers/WOTCSection';
 import GrantsSection from '@/components/employers/GrantsSection';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'For Employers — OJT Funding, Tax Credits & Trained Talent | Elevate for Humanity',
@@ -39,13 +42,37 @@ export default function EmployersPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      <PageVideoHero
-        videoSrc="/videos/employer-hero.mp4"
-        posterSrc="/images/pages/employers-page-1.jpg"
-        audioSrc="/audio/heroes/career-services.mp3"
-        posterAlt="Employers — Elevate for Humanity"
-        size="marketing"
-      />
+      {/* Single hero — video frame + below-hero copy. Duplicate static image hero removed. */}
+      <HeroVideo
+        videoSrcDesktop="/videos/employer-hero.mp4"
+        posterImage="/images/pages/employers-page-1.jpg"
+        voiceoverSrc="/audio/heroes/career-services.mp3"
+        microLabel="For Employers"
+        analyticsName="employers"
+      >
+        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Employers</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+          The Government Will Pay You to Train Your Next Hire
+        </h1>
+        <p className="text-slate-600 text-lg leading-relaxed mb-2 max-w-2xl">
+          On-the-Job Training (OJT) reimburses employers up to 75% of a new hire&apos;s wages during their training period. The Work Opportunity Tax Credit (WOTC) gives you up to $9,600 in federal tax credits per qualifying hire.
+        </p>
+        <p className="text-slate-500 text-base leading-relaxed mb-6 max-w-2xl">
+          Elevate provides pre-trained, certified candidates and handles all the workforce funding paperwork. You interview, you hire, you get reimbursed.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/contact?type=employer" className="px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-lg transition text-sm">
+            Talk to Our Employer Team
+          </Link>
+          <a href="#ojt" className="px-6 py-3 border border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition text-sm">
+            How OJT Works
+          </a>
+          <a href="#wotc" className="px-6 py-3 border border-slate-300 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition text-sm">
+            WOTC Tax Credits
+          </a>
+        </div>
+      </HeroVideo>
+
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -53,71 +80,25 @@ export default function EmployersPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative min-h-[320px] md:min-h-[400px] flex items-center overflow-hidden">
-        <Image
-          src="/images/pages/employers-page-1.jpg"
-          alt="Employer workforce partnership"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="relative max-w-6xl mx-auto px-4 py-12 text-white">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 max-w-3xl leading-tight">
-            The Government Will Pay You to Train Your Next Hire
-          </h1>
-          <p className="text-lg text-slate-200 max-w-2xl mb-3">
-            On-the-Job Training (OJT) reimburses employers up to 75% of a new hire&apos;s wages
-            during their training period. The Work Opportunity Tax Credit (WOTC) gives you up to
-            $9,600 in federal tax credits per qualifying hire. Both programs can be used on the
-            same employee.
-          </p>
-          <p className="text-slate-400 mb-6 max-w-2xl">
-            Elevate for Humanity provides pre-trained, certified candidates and handles all the
-            workforce funding paperwork. You interview, you hire, you get reimbursed.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/contact?type=employer"
-              className="px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition"
-            >
-              Talk to Our Employer Team
-            </Link>
-            <a
-              href="#ojt"
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/20 transition"
-            >
-              How OJT Works
-            </a>
-            <a
-              href="#wotc"
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/20 transition"
-            >
-              WOTC Tax Credits
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Value Props — Top Line */}
-      <section className="py-6 bg-white text-white">
+      <section className="py-6 bg-white border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-2xl md:text-3xl font-bold text-brand-orange-400">75%</div>
-              <div className="text-xs text-slate-400 mt-1">OJT Wage Reimbursement</div>
+              <div className="text-xs text-slate-600 mt-1">OJT Wage Reimbursement</div>
             </div>
             <div>
               <div className="text-2xl md:text-3xl font-bold text-brand-orange-400">$9,600</div>
-              <div className="text-xs text-slate-400 mt-1">Max WOTC Tax Credit / Hire</div>
+              <div className="text-xs text-slate-600 mt-1">Max WOTC Tax Credit / Hire</div>
             </div>
             <div>
               <div className="text-2xl md:text-3xl font-bold text-brand-orange-400">$0</div>
-              <div className="text-xs text-slate-400 mt-1">Recruiting Fees</div>
+              <div className="text-xs text-slate-600 mt-1">Recruiting Fees</div>
             </div>
             <div>
               <div className="text-2xl md:text-3xl font-bold text-brand-orange-400">28 Days</div>
-              <div className="text-xs text-slate-400 mt-1">WOTC Filing Deadline (We Help)</div>
+              <div className="text-xs text-slate-600 mt-1">WOTC Filing Deadline (We Help)</div>
             </div>
           </div>
         </div>
@@ -231,9 +212,9 @@ export default function EmployersPage() {
       </section>
 
       {/* Host an Apprentice */}
-      <section className="py-16">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-white rounded-2xl p-8 md:p-12 text-white">
+          <div className="rounded-2xl p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-10 items-start">
               <div>
                 <Building2 className="w-10 h-10 text-brand-orange-400 mb-4" />
@@ -316,29 +297,29 @@ export default function EmployersPage() {
       <EmployerPartners variant="full" showStats={true} showCTA={false} />
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Hire Smarter?
           </h2>
-          <p className="text-lg text-brand-orange-100 mb-4 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-300 mb-4 max-w-2xl mx-auto">
             Whether you need one hire or twenty, Elevate can connect you with trained candidates
             and help you access every dollar of workforce funding you are entitled to.
           </p>
-          <p className="text-sm text-brand-orange-200 mb-8 max-w-xl mx-auto">
+          <p className="text-sm text-slate-400 mb-8 max-w-xl mx-auto">
             No contracts. No fees. No obligation. Just a conversation about what you need
             and what programs are available for your business.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=employer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-white transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition text-lg"
             >
               Contact Our Employer Team <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/partners/training-sites"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-700 text-white font-bold rounded-lg hover:bg-brand-orange-800 transition"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/30 text-white font-bold rounded-lg hover:bg-white/10 transition"
             >
               View Current Training Sites
             </Link>

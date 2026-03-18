@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 interface StateCareerTrainingPageProps {
   state: StateConfig;
@@ -24,11 +24,10 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
 
       {/* Hero Section */}
       <section className="relative w-full">
-        <PageVideoHero
-          videoSrc="/videos/training-providers-hero.mp4"
-          posterSrc="/images/pages/comp-state-career-hero.jpg"
-          posterAlt={`Career Training in ${state.name}`}
-          size="marketing"
+        <HeroVideo
+          videoSrcDesktop="/videos/training-providers-hero.mp4"
+          posterImage="/images/pages/comp-state-career-hero.jpg"
+          analyticsName={`state-career-${state.name}`}
         />
         <div className="bg-white py-10 border-t">
           <div className="max-w-5xl mx-auto px-4 text-center">

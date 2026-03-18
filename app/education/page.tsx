@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import { Heart, MapPin, ArrowRight, Clock, Menu, X, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 
 const NAV = [
@@ -112,27 +112,26 @@ export default function EducationLandingPage() {
 
       {/* VIDEO HERO */}
       <section className="pt-16">
-        <PageVideoHero
-          videoSrc="/videos/lms-learning.mp4"
-          posterSrc="/images/pages/training-cohort.jpg"
-          audioSrc="/audio/heroes/programs.mp3"
-          posterAlt="Career training programs at Elevate for Humanity"
-          size="marketing"
-        />
-        <div className="bg-white py-10 md:py-14 px-6">
-          <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+        <HeroVideo
+          videoSrcDesktop="/videos/lms-learning.mp4"
+          posterImage="/images/pages/training-cohort.jpg"
+          voiceoverSrc="/audio/heroes/programs.mp3"
+          microLabel="Career Training"
+          analyticsName="education"
+        >
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 text-slate-600 text-sm font-semibold mb-4">
               <Heart className="w-4 h-4" /> Elevate for Humanity Education
             </div>
             <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">Career Training That Changes Lives</h1>
             <p className="text-base md:text-lg text-slate-600 mb-8 max-w-3xl mx-auto">No-cost career training for eligible participants. Choose your program, pick your location, and build a career in healthcare, skilled trades, technology, and more.</p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-slate-900 px-7 py-3.5 rounded-lg font-bold transition-colors">Browse All Programs <ArrowRight className="w-5 h-5" /></Link>
-              <Link href="/start" className="inline-flex items-center gap-2 bg-white hover:bg-white text-gray-900 px-7 py-3.5 rounded-lg font-bold transition-colors">Apply Now</Link>
-              <Link href="/funding" className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-900 px-7 py-3.5 rounded-lg font-semibold transition-colors">Check Funding</Link>
+              <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-7 py-3.5 rounded-lg font-bold transition-colors">Browse All Programs <ArrowRight className="w-5 h-5" /></Link>
+              <Link href="/start" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-7 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors">Apply Now</Link>
+              <Link href="/funding" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-7 py-3.5 rounded-lg font-semibold hover:bg-slate-50 transition-colors">Check Funding</Link>
             </div>
           </div>
-        </div>
+        </HeroVideo>
       </section>
 
       {/* STATS */}

@@ -330,6 +330,33 @@ redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
 
 ---
 
+## Hero Banner Standard — Non-Negotiable
+
+All hero banners on Elevate for Humanity must use the shared premium video system. These rules are not suggestions.
+
+**Prohibited:**
+- Gradient overlays on the video frame (`bg-gradient-to-t`, `from-black`, `before:`/`after:` pseudo-element overlays, dark opacity wash layers)
+- Headlines, subheadlines, paragraphs, checklists, or CTAs rendered on top of the video
+- Text baked into the video asset
+- Page-specific custom hero markup that bypasses the shared component
+
+**Required:**
+- Use `components/marketing/HeroVideo.tsx` for every hero banner
+- Define all per-page content (headlines, CTAs, transcripts, video sources) in `content/heroBanners.ts`
+- All primary messaging renders **below the video frame**, never on it
+- Provide a `posterImage` on every hero (reduced-motion and load-failure fallback)
+- Provide a `transcript` for every hero with a voiceover
+
+**Allowed on the video frame only:**
+- Discreet sound toggle (bottom-right)
+- Play/pause control (bottom-right)
+- Micro-label of 2–4 words max (bottom-left)
+- Small brand bug if explicitly required (top-left)
+
+Full specification: `docs/hero-video-standard.md`
+
+---
+
 ## Brand Color Convention
 
 Use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, `brand-green-*` for brand elements. Semantic colors (indigo, teal, purple, emerald, cyan) are kept for UI state differentiation.

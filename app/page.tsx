@@ -1,12 +1,15 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TrustStrip from '@/components/TrustStrip';
-import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 import { FadeInUp, StaggerChildren, StaggerItem, BlurIn } from '@/components/animations/PremiumAnimations';
 import { ArrowRight } from 'lucide-react';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Elevate for Humanity | Workforce Training — Indianapolis, Indiana',
@@ -25,43 +28,44 @@ export const metadata: Metadata = {
 
 
 export default function HomePage() {
+  const hero = heroBanners.home;
+
   return (
     <main className="min-h-screen bg-white">
 
-      {/* Audio mounts immediately so scroll listener registers before user scrolls */}
-      <VoiceoverWithMusic audioSrc="/videos/homepage-hero-new.mp3" />
-
-      {/* ── VIDEO HERO ── */}
-      <section className="relative h-[56vw] min-h-[320px] max-h-[700px] overflow-hidden">
-        <HomeHeroVideo />
-      </section>
+      {/* ── VIDEO HERO + BELOW-HERO COPY ── */}
+      {/* HeroVideo renders the video frame and the below-hero content block together */}
+      <HeroVideo
+        videoSrcDesktop={hero.videoSrcDesktop}
+        posterImage={hero.posterImage}
+        voiceoverSrc={hero.voiceoverSrc}
+        microLabel={hero.microLabel}
+        transcript={hero.transcript}
+        analyticsName={hero.analyticsName}
+      >
+        {/* Below-hero content — outside the video frame */}
+        <BlurIn>
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
+            We train adults for real jobs —<br className="hidden sm:block" /> in weeks, not years.
+          </h1>
+          <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
+            Short-term career training in healthcare, skilled trades, CDL, barbering, and technology.
+            Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+              Start Here
+            </Link>
+            <Link href="/programs" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-base">
+              See All Programs
+            </Link>
+          </div>
+        </BlurIn>
+      </HeroVideo>
 
       {/* ── MARQUEE ── */}
       <MarqueeBanner />
-
-      {/* ── HERO COPY ── */}
-      <section className="bg-white py-12 sm:py-16 border-b">
-        <div className="max-w-4xl mx-auto px-6">
-          <BlurIn>
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
-              We train adults for real jobs —<br className="hidden sm:block" /> in weeks, not years.
-            </h1>
-            <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
-              Short-term career training in healthcare, skilled trades, CDL, barbering, and technology.
-              Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
-                Start Here
-              </Link>
-              <Link href="/programs" className="border border-slate-300 text-slate-700 font-bold px-8 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-base">
-                See All Programs
-              </Link>
-            </div>
-          </BlurIn>
-        </div>
-      </section>
 
       {/* ── TRUST STRIP ── */}
       <TrustStrip variant="compact" showAnimation />

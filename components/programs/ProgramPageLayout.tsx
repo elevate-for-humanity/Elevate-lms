@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 /* ------------------------------------------------------------------ */
 /*  Config types — every section is data-driven                        */
@@ -165,27 +165,27 @@ export default function ProgramPageLayout({
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== HERO — video or static image ===== */}
+      {/* ===== HERO — video or poster image, no text on video ===== */}
       {c.videoSrc ? (
-        <ProgramHeroBanner
-          videoSrc={c.videoSrc}
-          voiceoverSrc={c.voiceoverSrc}
+        <HeroVideo
+          videoSrcDesktop={c.videoSrc}
           posterImage={c.heroImage || c.overviewImage}
-          title={c.title}
-          subtitle={c.subtitle}
-          badge={c.badge}
+          voiceoverSrc={c.voiceoverSrc}
+          analyticsName={c.title}
         />
       ) : c.heroImage ? (
-        <div className="relative w-full aspect-[21/9]">
+        <div
+          className="relative w-full overflow-hidden bg-slate-900"
+          style={{ height: 'clamp(280px, 56vw, 680px)' }}
+        >
           <Image
             src={c.heroImage}
             alt={c.heroImageAlt || c.title}
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-center"
             priority
           />
-
         </div>
       ) : null}
 
@@ -758,25 +758,24 @@ export default function ProgramPageLayout({
 
       {/* ===== FINAL CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
-          <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
+        <section className="py-14 sm:py-20 bg-white border-t border-slate-100">
+          <div className="max-w-3xl mx-auto px-6 text-center">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
               Start This Credential Pathway
             </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-lg mx-auto">
+            <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto">
               Apply in minutes. Training may be fully funded. Graduate with nationally recognized credentials.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
                 href={applyHref}
-                className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors"
+                className="bg-brand-red-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-700 transition-colors"
               >
                 Apply Now
               </Link>
               <Link
                 href="/programs"
-                className="bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-800 transition-colors"
+                className="border border-slate-300 text-slate-700 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors"
               >
                 All Credential Pathways
               </Link>

@@ -1,9 +1,14 @@
 
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, FileCheck, GraduationCap, HelpCircle } from 'lucide-react';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/how-it-works' },
@@ -32,19 +37,36 @@ export default function FundingHowItWorksPage() {
         <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'How It Works' }]} />
       </div>
 
-      {/* Hero */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/funding-page-3.jpg" alt="How funding works for career training" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">How Funding Works</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
-          </div>
-        </div>
-      </section>
+      {/* Hero — poster fallback (video asset pending), below-hero copy */}
+      {(() => {
+        const hero = heroBanners['funding-how-it-works'];
+        return (
+          <HeroVideo
+            videoSrcDesktop={hero.videoSrcDesktop}
+            posterImage={hero.posterImage}
+            voiceoverSrc={hero.voiceoverSrc}
+            microLabel={hero.microLabel}
+            transcript={hero.transcript}
+            analyticsName={hero.analyticsName}
+          >
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Funded Training</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+              How funded training works.
+            </h1>
+            <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
+              Many of our training programs may be available at no cost to eligible participants through federal and state funding.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
+                Check Eligibility
+              </Link>
+              <Link href="/contact" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                Contact an Advisor
+              </Link>
+            </div>
+          </HeroVideo>
+        );
+      })()}
 
       {/* Steps */}
       <section className="py-16">

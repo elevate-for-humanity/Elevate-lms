@@ -10,7 +10,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import {
   Award, BookOpen, Briefcase, CheckCircle, Clock, DollarSign,
   GraduationCap, MapPin, Shield, TrendingUp, Users, ChevronRight,
@@ -52,11 +52,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       {/* ═══ A. HERO ════════════════════════════════════════════════ */}
       <section>
         {heroOverride ?? (p.videoSrc ? (
-          <PageVideoHero
-            videoSrc={p.videoSrc}
-            posterSrc={p.heroImage}
-            posterAlt={p.heroImageAlt}
-            size="program"
+          <HeroVideo
+            videoSrcDesktop={p.videoSrc}
+            posterImage={p.heroImage}
+            analyticsName={p.title}
           />
         ) : (
           <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">

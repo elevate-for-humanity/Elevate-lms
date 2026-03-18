@@ -1,9 +1,13 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Workforce Infrastructure Platform | Elevate for Humanity',
@@ -116,38 +120,39 @@ export default function PlatformPage() {
         </div>
       </div>
 
-      {/* HERO */}
-      <section className="relative h-[55vh] sm:h-[60vh] md:h-[65vh] min-h-[360px] overflow-hidden">
-        <ProgramHeroBanner
-          videoSrc="/videos/elevate-overview-with-narration.mp4"
-          posterImage="/images/pages/platform-page-1.jpg"
-          voiceoverSrc="/audio/heroes/programs.mp3"
-        />
-      </section>
-
-      {/* POSITIONING STATEMENT */}
-      <section className="py-16 bg-white border-b">
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-4">What This Is</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
-            Workforce infrastructure for providers, agencies, and employers — not a course platform.
-          </h1>
-          <p className="text-slate-600 text-lg leading-relaxed mb-4 max-w-3xl">
-            Elevate operates a multi-tenant Workforce Development Hub. Training providers deliver programs under the hub. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.
-          </p>
-          <p className="text-slate-500 text-base leading-relaxed max-w-3xl">
-            If you are a workforce board, training provider, government agency, or employer looking for infrastructure built for WIOA, DOL, and state funding compliance — this is what you are looking at.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
-              Schedule a Demo <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/store/licensing" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition text-sm">
-              Licensing Options
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* HERO — video frame only, positioning statement below */}
+      {(() => {
+        const hero = heroBanners.platform;
+        return (
+          <HeroVideo
+            videoSrcDesktop={hero.videoSrcDesktop}
+            posterImage={hero.posterImage}
+            voiceoverSrc={hero.voiceoverSrc}
+            microLabel={hero.microLabel}
+            transcript={hero.transcript}
+            analyticsName={hero.analyticsName}
+          >
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-4">What This Is</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
+              Workforce infrastructure for providers, agencies, and employers — not a course platform.
+            </h1>
+            <p className="text-slate-600 text-lg leading-relaxed mb-4 max-w-3xl">
+              Elevate operates a multi-tenant Workforce Development Hub. Training providers deliver programs under the hub. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.
+            </p>
+            <p className="text-slate-500 text-base leading-relaxed max-w-3xl mb-8">
+              If you are a workforce board, training provider, government agency, or employer looking for infrastructure built for WIOA, DOL, and state funding compliance — this is what you are looking at.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition text-sm">
+                Schedule a Demo <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/store/licensing" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition text-sm">
+                Licensing Options
+              </Link>
+            </div>
+          </HeroVideo>
+        );
+      })()}
 
       {/* CAPABILITIES */}
       <section className="py-16 sm:py-20 bg-white border-b">

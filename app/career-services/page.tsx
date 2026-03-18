@@ -1,10 +1,13 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
 import VirtualCareerFair from '@/components/VirtualCareerFair';
 import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
@@ -26,12 +29,12 @@ export default function CareerServicesPage() {
         </div>
       </div>
 
-      <PageVideoHero
-        videoSrc="/videos/career-services-hero.mp4"
-        posterSrc="/images/pages/career-services-hero.jpg"
-        audioSrc="/audio/heroes/career-services.mp3"
-        posterAlt="Career services — job placement and coaching"
-        size="marketing"
+      <HeroVideo
+        videoSrcDesktop="/videos/career-services-hero.mp4"
+        posterImage="/images/pages/career-services-hero.jpg"
+        voiceoverSrc="/audio/heroes/career-services.mp3"
+        microLabel="Career Services"
+        analyticsName="career-services"
       />
 
       {/* What We Offer — stacked on mobile */}

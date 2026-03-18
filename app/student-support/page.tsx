@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Phone, MessageSquare, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -56,35 +56,29 @@ export default function StudentSupportPage() {
       </div>
 
       {/* Video Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <ProgramHeroBanner videoSrc="/videos/student-portal-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
-        <div className="absolute inset-0 z-10 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
-            <p className="text-sm uppercase tracking-wider text-slate-500 mb-3">Elevate for Humanity</p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-4 max-w-3xl">
-              Student Support Services
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mb-8">
-              Academic help, financial aid, career services, and counseling — everything you need to succeed from enrollment through employment.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/start"
-                className="inline-flex items-center justify-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
-              >
-                Apply Now
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/student-support/schedule"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
-              >
-                Schedule Appointment
-              </Link>
-            </div>
-          </div>
+      <HeroVideo
+        videoSrcDesktop="/videos/student-portal-hero.mp4"
+        posterImage="/images/pages/student-support-hero.jpg"
+        voiceoverSrc="/audio/heroes/programs.mp3"
+        microLabel="Student Support"
+        analyticsName="student-support"
+      >
+        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Elevate for Humanity</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+          Student Support Services
+        </h1>
+        <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
+          Academic help, financial aid, career services, and counseling — everything you need to succeed from enrollment through employment.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/start" className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-7 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition text-sm">
+            Apply Now <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link href="/student-support/schedule" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition text-sm">
+            Schedule Appointment
+          </Link>
         </div>
-      </section>
+      </HeroVideo>
 
       {/* Services — Image Cards */}
       <section className="py-16">

@@ -1,8 +1,11 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Phone } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export const metadata: Metadata = {
   title: 'Hire Trained Graduates | Employer Partnership | Elevate for Humanity',
@@ -39,12 +42,12 @@ export default function EmployerPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      <PageVideoHero
-        videoSrc="/videos/employer-hero.mp4"
-        posterSrc="/images/pages/employer-hero.jpg"
-        audioSrc="/audio/heroes/career-services.mp3"
-        posterAlt="Employer partnerships — hire trained graduates"
-        size="marketing"
+      <HeroVideo
+        videoSrcDesktop="/videos/employer-hero.mp4"
+        posterImage="/images/pages/employer-hero.jpg"
+        voiceoverSrc="/audio/heroes/career-services.mp3"
+        microLabel="For Employers"
+        analyticsName="employer"
       />
 
       {/* Header */}

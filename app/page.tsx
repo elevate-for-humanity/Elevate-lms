@@ -217,12 +217,12 @@ export default function HomePage() {
       </section>
 
       {/* ── FUNDING ── */}
-      <section className="py-16 sm:py-20 bg-brand-blue-700">
+      <section className="py-16 sm:py-20 bg-brand-red-700">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
-            <p className="text-brand-blue-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
+            <p className="text-brand-red-200 font-bold text-xs uppercase tracking-widest mb-3">Funding</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Most participants pay $0 for training</h2>
-            <p className="text-brand-blue-100 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-brand-red-100 leading-relaxed mb-10 max-w-2xl">
               Federal and Indiana state workforce funding covers tuition, books, tools, and certification exam fees for eligible participants.
             </p>
           </FadeInUp>
@@ -234,16 +234,16 @@ export default function HomePage() {
             ].map((f) => (
               <StaggerItem key={f.label}>
                 <div className="bg-white/10 rounded-xl p-6 mb-4 last:mb-0">
-                  <p className="text-brand-blue-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
+                  <p className="text-brand-red-200 text-xs font-bold uppercase tracking-widest mb-1">{f.tag}</p>
                   <h3 className="text-white font-bold text-base mb-2">{f.label}</h3>
-                  <p className="text-brand-blue-100 text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-brand-red-100 text-sm leading-relaxed">{f.desc}</p>
                 </div>
               </StaggerItem>
             ))}
           </StaggerChildren>
           <FadeInUp delay={0.3}>
             <div className="flex flex-wrap gap-4 mt-8">
-              <Link href="/wioa-eligibility" className="bg-white text-brand-blue-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-blue-50 transition-colors">
+              <Link href="/wioa-eligibility" className="bg-white text-brand-red-700 font-bold px-8 py-3.5 rounded-lg hover:bg-brand-red-50 transition-colors">
                 Check My Eligibility
               </Link>
               <Link href="/funding" className="border border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors">

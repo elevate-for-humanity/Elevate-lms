@@ -139,6 +139,18 @@ export default async function StudentDashboardOrchestrated() {
     .then((res) => res)
     .catch(() => ({ data: null, error: null }));
 
+  // Check whether the learner has a pending_workone application — gates WorkOne checklist
+  const { data: workoneApp } = await db
+    .from('applications')
+    .select('id, status, requested_funding_source')
+    .eq('user_id', user.id)
+    .eq('status', 'pending_workone')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const isPendingWorkone = !!workoneApp;
+
   // Calculate state
   const stateData = getStudentState({
     hasCompletedOrientation: profile.orientation_completed || false,
@@ -556,7 +568,10 @@ export default async function StudentDashboardOrchestrated() {
           {/* Sidebar - 1/3 width */}
           <div className="space-y-6">
             {/* WorkOne Visit Checklist */}
-            <WorkOneChecklistSection />
+            <WorkOneChecklistSection
+              pendingWorkone={isPendingWorkone}
+              fundingSource={workoneApp?.requested_funding_source ?? undefined}
+            />
 
             {/* Progress Indicator */}
             <ProgressIndicator steps={progressSteps} />

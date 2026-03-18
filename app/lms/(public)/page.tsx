@@ -1,151 +1,183 @@
-import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
-import { generateInternalMetadata } from '@/lib/seo/metadata';
-
-export const metadata: Metadata = generateInternalMetadata({
-  title: 'Lms (Public)',
-  description: 'Internal page for Lms (Public)',
-  path: '/lms/(public)',
-});
-
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import Image from 'next/image';
+import type { Metadata } from 'next';
+import { BookOpen, Clock, Award, ChevronRight, CheckCircle, Users, Headphones } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Student Training Portal | Elevate for Humanity',
+  description: 'Start your career training. Browse programs, enroll, and earn industry credentials.',
+};
+
+const PROGRAMS = [
+  { title: 'HVAC Technician', desc: 'EPA 608 certification. Hands-on refrigeration and electrical training.', duration: '16 weeks', credential: 'EPA 608', image: '/images/pages/hvac-unit.jpg', slug: 'hvac-technician', funded: true },
+  { title: 'CNA / Nursing Assistant', desc: 'State-certified nursing assistant training for healthcare careers.', duration: '6 weeks', credential: 'State CNA', image: '/images/pages/cna-hero.jpg', slug: 'cna', funded: true },
+  { title: 'CDL Training', desc: 'Commercial driver license training. Class A and B available.', duration: '8 weeks', credential: 'CDL Class A', image: '/images/pages/cdl-hero.jpg', slug: 'cdl-training', funded: true },
+  { title: 'Barber Apprenticeship', desc: 'Indiana DOL registered apprenticeship. Earn while you learn.', duration: '52 weeks', credential: 'Indiana Barber License', image: '/images/pages/barber-hero-main.jpg', slug: 'barber-apprenticeship', funded: true },
+  { title: 'Medical Assistant', desc: 'Clinical and administrative skills for medical office careers.', duration: '12 weeks', credential: 'CCMA', image: '/images/pages/medical-assistant-hero.jpg', slug: 'medical-assistant', funded: true },
+  { title: 'Cybersecurity Analyst', desc: 'CompTIA Security+ and network defense fundamentals.', duration: '12 weeks', credential: 'CompTIA Security+', image: '/images/pages/cybersecurity-hero.jpg', slug: 'cybersecurity-analyst', funded: false },
+];
+
+const STEPS = [
+  { num: '1', title: 'Apply', desc: 'Free application. Takes 5 minutes. No prior experience required.' },
+  { num: '2', title: 'Train', desc: 'Complete lessons, pass checkpoints, and build real skills.' },
+  { num: '3', title: 'Get Certified', desc: 'Earn your industry credential and connect with employers.' },
+];
+
+const TOOLS = [
+  { icon: BookOpen, label: 'Study Guides', href: '/lms/resources' },
+  { icon: CheckCircle, label: 'Practice Exams', href: '/lms/quizzes' },
+  { icon: Headphones, label: 'AI Tutor', href: '/lms/ai-tutor' },
+  { icon: Users, label: 'Community', href: '/lms/community' },
+];
 
 export default async function LmsPublicPage() {
-  // Check if user is logged in and redirect to dashboard
+  // Logged-in users go straight to their dashboard
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect('/lms/dashboard');
+  return (
+    <div className="min-h-screen bg-white">
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
+      {/* NAV */}
+      <nav className="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <Link href="/">
+            <Image src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="Elevate for Humanity" width={120} height={32} className="h-8 w-auto" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/programs" className="text-sm text-slate-600 hover:text-slate-900 font-medium hidden sm:block">Browse Programs</Link>
+            <Link href="/login" className="text-sm text-slate-600 hover:text-slate-900 font-medium border border-slate-200 px-3 py-1.5 rounded-lg">Sign In</Link>
+            <Link href="/programs" className="text-sm bg-slate-900 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-slate-700 transition">Enroll Now</Link>
+          </div>
         </div>
-      </div>
-    );
-  }
-  const { data }: any = await supabase.auth.getUser();
+      </nav>
 
-  if (data?.user) {
-    redirect('/lms/dashboard');
-  }
-
-  return (
-    <div className="px-4 sm:px-6 lg:px-10 py-10">
-      <div className="mx-auto max-w-6xl">
-        <section className="max-w-3xl">
-          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Student Learning Portal
+      {/* HERO */}
+      <section className="bg-white py-16 sm:py-24 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+          <p className="text-xs font-bold text-brand-red-600 uppercase tracking-widest mb-4">Elevate for Humanity · Career Training</p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-5">
+            Start Your Training.<br className="hidden sm:block" /> Build Your Career.
           </h1>
-          <p className="mt-4 text-lg text-zinc-700">
-            Access your courses, track your progress, and earn
-            industry-recognized certifications. Your path to a better career
-            starts here.
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-10">
+            Industry-recognized credentials. Workforce funding available. Real job outcomes.
           </p>
-
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/login?next=/lms/dashboard"
-              className="rounded-xl bg-brand-blue-600 text-white px-5 py-3 font-bold hover:bg-brand-blue-700 text-center"
-            >
-              Student Login
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/login?redirect=/lms/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">
+              Enter Student Portal <ChevronRight className="w-4 h-4" />
             </Link>
-            <Link
-              href="/start"
-              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-white text-center"
-            >
-              Apply Now
+            <Link href="/programs" className="w-full sm:w-auto flex items-center justify-center gap-2 border-2 border-slate-200 hover:border-slate-400 text-slate-900 font-bold px-8 py-4 rounded-xl text-base transition">
+              Browse Programs
             </Link>
           </div>
-        </section>
+          <p className="text-xs text-slate-400 mt-5">Free to apply · WIOA funding available for eligible Indiana residents</p>
+        </div>
+      </section>
 
-        <section className="mt-14 grid md:grid-cols-3 gap-6">
-          <Card
-            title="Your Courses"
-            desc="Access all your enrolled courses, lessons, and training materials in one place."
-            bullets={[
-              'Video lessons & resources',
-              'Interactive assignments',
-              'Track your progress',
-            ]}
-          />
-          <Card
-            title="Earn Certificates"
-            desc="Complete courses and earn industry-recognized certifications to boost your career."
-            bullets={[
-              'Industry certifications',
-              'Downloadable certificates',
-              'LinkedIn-ready credentials',
-            ]}
-          />
-          <Card
-            title="Career Support"
-            desc="Get help every step of the way with dedicated support and career guidance."
-            bullets={[
-              'Instructor support',
-              'Career counseling',
-              'Job placement assistance',
-            ]}
-          />
-        </section>
-
-        <section className="mt-14 rounded-3xl border border-brand-blue-200 bg-brand-blue-50 p-8 sm:p-10">
-          <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-zinc-900">
-            Ready to Start Learning?
-          </h2>
-          <p className="mt-4 text-lg text-zinc-700 max-w-3xl">
-            Students across Indiana are building better careers through
-            our training programs. Eligible participants receive fully funded
-            training — no tuition, no hidden costs.
-          </p>
-          <ol className="mt-6 space-y-3 list-decimal pl-5 text-zinc-700 max-w-3xl">
-            <li>Apply for a program that matches your career goals</li>
-            <li>Get approved and receive your student login credentials</li>
-            <li>Access your courses and start learning immediately</li>
-            <li>Complete lessons, assignments, and earn certificates</li>
-            <li>Graduate with job-ready skills and career support</li>
-          </ol>
-
-          <div className="mt-7 flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/start"
-              className="rounded-xl bg-brand-blue-600 text-white px-5 py-3 font-bold hover:bg-brand-blue-700 text-center"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/login?next=/lms/dashboard"
-              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 font-bold hover:bg-white text-center"
-            >
-              Already Enrolled? Login
+      {/* PROGRAM GRID */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Available Programs</h2>
+            <p className="text-slate-500 text-base">Most programs are fully funded for Indiana residents.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PROGRAMS.map(p => (
+              <div key={p.slug} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition group">
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw" />
+                  {p.funded && (
+                    <span className="absolute top-3 left-3 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">FUNDED</span>
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 text-base mb-1">{p.title}</h3>
+                  <p className="text-sm text-slate-500 mb-4 line-clamp-2">{p.desc}</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="flex items-center gap-1 text-xs text-slate-500"><Clock className="w-3 h-3" />{p.duration}</span>
+                    <span className="flex items-center gap-1 text-xs text-slate-500"><Award className="w-3 h-3" />{p.credential}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Link href={`/programs/${p.slug}`} className="flex-1 text-center text-sm font-semibold text-slate-700 border border-slate-200 py-2 rounded-lg hover:bg-slate-50 transition">View Program</Link>
+                    <Link href={`/programs/${p.slug}/apply`} className="flex-1 text-center text-sm font-bold text-white bg-brand-red-600 hover:bg-brand-red-700 py-2 rounded-lg transition">Enroll Now</Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link href="/programs" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 border border-slate-200 px-5 py-2.5 rounded-xl hover:bg-slate-50 transition">
+              View All Programs <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-        </section>
-      </div>
-    </div>
-  );
-}
+        </div>
+      </section>
 
-function Card({
-  title,
-  desc,
-  bullets,
-}: {
-  title: string;
-  desc: string;
-  bullets: string[];
-}) {
-  return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-bold text-zinc-900">{title}</h3>
-      <p className="mt-2 text-zinc-700">{desc}</p>
-      <ul className="mt-4 space-y-2 text-sm text-zinc-700 list-disc pl-5">
-        {bullets.map((b) => (
-          <li key={b}>{b}</li>
-        ))}
-      </ul>
+      {/* HOW IT WORKS */}
+      <section className="py-16 bg-white border-y border-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-12">How It Works</h2>
+          <div className="grid sm:grid-cols-3 gap-8">
+            {STEPS.map(s => (
+              <div key={s.num} className="flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-slate-900 text-white text-xl font-extrabold flex items-center justify-center mb-4">{s.num}</div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">{s.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FUNDING STRIP */}
+      <section className="py-12 bg-slate-50 border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <h3 className="text-lg font-extrabold text-slate-900 mb-1">Funding Available for Indiana Residents</h3>
+            <p className="text-slate-500 text-sm">WIOA, WorkOne, and employer-sponsored training may cover your full tuition.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-slate-700 border border-slate-200 bg-white px-5 py-2.5 rounded-xl hover:bg-slate-50 transition text-center">Indiana Career Connect →</a>
+            <Link href="/programs/federal-funded" className="text-sm font-semibold text-white bg-slate-900 px-5 py-2.5 rounded-xl hover:bg-slate-700 transition text-center">Check My Eligibility</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* STUDENT TOOLS */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Student Tools</h2>
+          <p className="text-slate-500 text-base mb-10">Everything you need to study, practice, and succeed.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {TOOLS.map(t => {
+              const Icon = t.icon;
+              return (
+                <Link key={t.label} href={t.href} className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition group">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-900 flex items-center justify-center transition">
+                    <Icon className="w-5 h-5 text-slate-600 group-hover:text-white transition" />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-900">{t.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* BOTTOM CTA */}
+      <section className="py-16 bg-slate-900">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Start?</h2>
+          <p className="text-slate-400 text-base mb-8">Create your account and enroll in minutes.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/login?redirect=/lms/dashboard" className="w-full sm:w-auto bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">Enter Student Portal</Link>
+            <Link href="/programs" className="w-full sm:w-auto border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl text-base transition">Browse Programs</Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

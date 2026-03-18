@@ -19,8 +19,8 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
+    const db = createAdminClient() || createClient(supabaseUrl, supabaseKey);
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const search = searchParams.get('search');

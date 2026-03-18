@@ -80,7 +80,8 @@ export default function HeroVideo({
   const wrapperRef = useRef<HTMLDivElement>(null);
   // Start as paused — video does NOT autoplay on load
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
+  // Start muted — video is always muted until user clicks unmute
+  const [muted, setMuted] = useState(true);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -124,15 +125,7 @@ export default function HeroVideo({
           .then(() => setPlaying(true))
           .catch(() => {});
       }
-
-      // Audio plays unmuted — scroll is sufficient user interaction for audio elements
-      if (audio) {
-        audio.volume = 1;
-        audio.currentTime = 0;
-        audio.play()
-          .then(() => setMuted(false))
-          .catch(() => setMuted(true));
-      }
+      // Audio stays paused until user explicitly clicks unmute
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -160,7 +153,8 @@ export default function HeroVideo({
           setPlaying(false);
         }
       },
-      { threshold: 0.1 }
+      // threshold: 0 — only pause when the hero is fully off screen
+      { threshold: 0 }
     );
     observer.observe(el);
     return () => observer.disconnect();

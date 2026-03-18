@@ -120,7 +120,7 @@ export default async function EnrollmentPWAPage() {
             { step: '4', title: 'Start Training', desc: 'Begin your program and track progress in the LMS' },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-3 bg-white rounded-xl border border-slate-200 p-3">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+              <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
               <div>
                 <div className="font-semibold text-slate-900 text-sm">{s.title}</div>
                 <div className="text-xs text-slate-500">{s.desc}</div>

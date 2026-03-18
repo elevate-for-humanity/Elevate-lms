@@ -101,7 +101,7 @@ export default function PartnersPage() {
                 <div className="flex flex-col sm:flex-row">
                   <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
-                    <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
+                    <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
                       {s.step}
                     </div>
                   </div>

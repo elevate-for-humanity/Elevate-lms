@@ -123,7 +123,7 @@ export default function DonationForm() {
       <button
         onClick={handleDonate}
         disabled={loading || (!selectedAmount && !customAmount)}
-        className="w-full bg-white hover: hover: text-white py-4 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-brand-blue-700 hover: hover: text-white py-4 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {loading ? (
           <>

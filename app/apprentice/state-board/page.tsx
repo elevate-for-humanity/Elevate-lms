@@ -93,7 +93,7 @@ export default async function StateBoardExamPage() {
 
         {/* Readiness Status */}
         {isReady ? (
-          <div className="bg-white rounded-2xl p-6 text-white">
+          <div className="bg-brand-blue-700 rounded-2xl p-6 text-white">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="text-slate-500 flex-shrink-0">•</span>
@@ -107,7 +107,7 @@ export default async function StateBoardExamPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl p-6 text-white">
+          <div className="bg-brand-blue-700 rounded-2xl p-6 text-white">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
                 <Lock className="w-10 h-10" />

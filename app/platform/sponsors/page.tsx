@@ -526,7 +526,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white   text-white">
+      <section className="py-20 bg-brand-blue-700   text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to License?

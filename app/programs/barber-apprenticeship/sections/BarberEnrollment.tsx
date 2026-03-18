@@ -148,7 +148,7 @@ export function BarberEnrollment() {
             <div className="space-y-3">
               {ENROLLMENT_STEPS.map((step, i) => (
                 <div key={i} className="flex items-start gap-4 bg-white rounded-lg p-4 border border-slate-200">
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {i + 1}
                   </div>
                   <div>

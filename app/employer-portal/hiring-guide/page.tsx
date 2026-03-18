@@ -153,7 +153,7 @@ export default function HiringGuidePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 text-white text-center">
+        <div className="bg-brand-blue-700 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Hiring?</h3>
           <p className="text-brand-blue-200 mb-6 max-w-2xl mx-auto">
             Post your first job and connect with pre-screened, WOTC-eligible candidates today.

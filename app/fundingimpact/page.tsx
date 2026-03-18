@@ -277,7 +277,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold">
                     MJ
                   </div>
                   <div>
@@ -308,7 +308,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold">
                     ST
                   </div>
                   <div>
@@ -338,7 +338,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold">
                     DW
                   </div>
                   <div>

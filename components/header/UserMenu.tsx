@@ -117,7 +117,7 @@ export function UserMenu({ user, isLoading }: UserMenuProps) {
           aria-expanded={isOpen}
           aria-controls="user-menu"
         >
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white text-sm font-bold">
+          <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
             {initials.toUpperCase()}
           </div>
           <span className="hidden xl:inline">{displayName}</span>

@@ -74,7 +74,7 @@ export function ContentProtection({
       {/* Warning Toast */}
       {warningVisible && (
         <div className="fixed bottom-4 right-4 z-[9999] animate-slide-up">
-          <div className="rounded-lg bg-white px-6 py-4 text-white shadow-xl">
+          <div className="rounded-lg bg-brand-blue-700 px-6 py-4 text-white shadow-xl">
             <div className="flex items-center gap-3">
               <svg
                 className="h-10 w-10"

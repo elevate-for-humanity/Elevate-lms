@@ -299,7 +299,7 @@ export default function ApprenticeForm() {
           
           {/* Left Column - Payment Calculator */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-brand-blue-700 rounded-2xl p-6 text-white sticky top-8">
               <div className="flex items-center gap-3 mb-4">
                 <Calculator className="w-6 h-6" />
                 <h2 className="text-lg font-bold">Payment Calculator</h2>

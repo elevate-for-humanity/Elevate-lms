@@ -61,11 +61,7 @@ const SentryInit = dynamic(
   { ssr: false, loading: () => null }
 );
 
-// Global avatar guide
-const GlobalAvatar = dynamic(
-  () => import('@/components/GlobalAvatar'),
-  { ssr: false, loading: () => null }
-);
+// GlobalAvatar removed — inline video section was appearing unexpectedly on portal pages
 
 // Toast notifications — react-hot-toast uses CommonJS require('react') which
 // Turbopack resolves to null on the server. Must be client-only.
@@ -169,7 +165,6 @@ export default function ClientWidgets() {
           <SearchDialog />
           <SecurityMonitor />
           <OfflineIndicator />
-          <GlobalAvatar />
         </>
       )}
     </>

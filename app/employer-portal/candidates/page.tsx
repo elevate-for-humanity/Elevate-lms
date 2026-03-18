@@ -144,7 +144,7 @@ export default async function CandidatesPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-white flex items-center justify-center text-white text-xl font-bold">
+                        <div className="w-full h-full bg-brand-blue-700 flex items-center justify-center text-white text-xl font-bold">
                           {candidate.name.charAt(0)}
                         </div>
                       )}

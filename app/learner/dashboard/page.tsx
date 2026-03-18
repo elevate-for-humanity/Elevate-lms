@@ -512,7 +512,7 @@ export default async function LearnerDashboardPage() {
             </div>
 
             {/* Resources */}
-            <div className="bg-white rounded-xl p-6 text-white">
+            <div className="bg-brand-blue-700 rounded-xl p-6 text-white">
               <h3 className="font-semibold mb-2">Need Help?</h3>
               <p className="text-sm text-brand-orange-100 mb-4">
                 Our support team is here to help you succeed in your training.

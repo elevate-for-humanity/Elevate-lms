@@ -245,7 +245,7 @@ export default function AIHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white   text-white">
+      <section className="py-16 bg-brand-blue-700   text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Learn with AI?</h2>
           <p className="text-xl opacity-90 mb-8">

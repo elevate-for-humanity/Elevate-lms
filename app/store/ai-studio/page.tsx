@@ -124,12 +124,12 @@ export default function AIStudioPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 AI Studio
-                <span className="block text-slate-100">
+                <span className="block text-brand-blue-600">
                   Create Content at Scale
                 </span>
               </h1>
 
-              <p className="text-xl text-brand-blue-100 mb-8">
+              <p className="text-xl text-slate-600 mb-8">
                 Generate videos, voiceovers, images, and AI instructors for your courses. 
                 No video editing skills required.
               </p>

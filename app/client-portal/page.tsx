@@ -50,14 +50,14 @@ export default function ClientPortalPage() {
       <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Building2 className="w-4 h-4" />
               For Organizations
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Client Portal
             </h1>
-            <p className="text-xl text-slate-600 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Manage your organization's workforce development programs. Track employee progress, access reports, and maximize your training investment.
             </p>
             <div className="flex flex-wrap gap-4">

@@ -111,7 +111,7 @@ export default function RefrigerantTypesDiagram({ onComplete }: { onComplete?: (
   return (
     <div className="space-y-5">
 
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Core — Refrigerant Families</p>
         <h2 className="text-xl font-extrabold">CFC · HCFC · HFC · HFO</h2>
         <p className="text-slate-500 text-sm mt-1">Tap each family to see ODP, GWP, phase-out status, and common refrigerants.</p>

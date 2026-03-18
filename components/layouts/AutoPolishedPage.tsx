@@ -488,7 +488,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               {config.badge && (
-                <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-white mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white mb-6">
                   {config.badge}
                 </div>
               )}

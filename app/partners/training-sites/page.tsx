@@ -247,7 +247,7 @@ export default function TrainingSitesPage() {
       {/* Become a Partner CTA */}
       <section className="py-10 bg-white border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white rounded-xl p-8 text-white text-center">
+          <div className="bg-brand-blue-700 rounded-xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-3">Become a Training Partner</h2>
             <p className="text-white/80 mb-6 max-w-2xl mx-auto">
               Employers, barbershops, healthcare facilities, and training organizations can partner

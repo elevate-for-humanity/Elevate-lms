@@ -57,7 +57,7 @@ export default async function MembersPage() {
           {members?.map((member: any) => (
             <div key={member.id} className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                <div className="w-14 h-14 rounded-full bg-brand-blue-700 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                   {member.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">

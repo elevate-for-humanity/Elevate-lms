@@ -140,7 +140,7 @@ export default function TypeIILeakRepairDiagram({ onComplete }: { onComplete?: (
   return (
     <div className="space-y-5">
 
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type II — High-Pressure Systems</p>
         <h2 className="text-xl font-extrabold">Leak Repair · Evacuation · Charging</h2>
         <p className="text-slate-500 text-sm mt-1">The three most tested topics for Type II. Work through each tab.</p>

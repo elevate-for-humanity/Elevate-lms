@@ -184,7 +184,7 @@ const apprenticeships = (dbRows as any[]) || [];
               <div key={i} className="group">
                 <div className="relative h-48 rounded-2xl overflow-hidden mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image src={step.image} alt={step.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {step.num}
                   </div>
                   <div className="absolute bottom-4 left-4 right-4">

@@ -88,7 +88,7 @@ export function ProtectedImage({
       {/* Warning message */}
       {showWarning && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80">
-          <div className="rounded-lg bg-white px-4 py-3 text-center text-white">
+          <div className="rounded-lg bg-brand-blue-700 px-4 py-3 text-center text-white">
             <p className="text-sm font-semibold">⚠️ Content Protected</p>
             <p className="mt-1 text-xs">
               This image is copyrighted by Elevate for Humanity

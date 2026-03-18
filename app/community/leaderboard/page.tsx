@@ -86,7 +86,7 @@ export default async function LeaderboardPage() {
               <div className="text-center -mt-8">
                 <div className="relative">
                   <Crown className="w-8 h-8 text-yellow-500 absolute -top-8 left-1/2 -translate-x-1/2" />
-                  <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 border-4 border-yellow-400">
+                  <div className="w-24 h-24 rounded-full bg-brand-blue-700 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 border-4 border-yellow-400">
                     {getInitial(topLearners![0]?.full_name)}
                   </div>
                 </div>
@@ -99,7 +99,7 @@ export default async function LeaderboardPage() {
 
               {/* 3rd Place */}
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
+                <div className="w-20 h-20 rounded-full bg-brand-blue-700 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
                   {getInitial(topLearners![2]?.full_name)}
                 </div>
                 <p className="font-bold text-gray-900">{topLearners![2]?.full_name || 'Learner'}</p>
@@ -132,7 +132,7 @@ export default async function LeaderboardPage() {
                   <div className="w-10 flex justify-center">
                     {getRankIcon(index + 1)}
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-white font-medium flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-brand-blue-700 flex items-center justify-center text-white font-medium flex-shrink-0">
                     {getInitial(learner.full_name)}
                   </div>
                   <div className="flex-1 min-w-0">

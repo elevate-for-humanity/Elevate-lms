@@ -118,7 +118,7 @@ export default function EmploymentSupportPage() {
               { step: '6', title: 'Start Working & Get Follow-Up Support', desc: 'Begin your new role with continued support to help you stay employed and advance.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {item.step}
                 </div>
                 <div>

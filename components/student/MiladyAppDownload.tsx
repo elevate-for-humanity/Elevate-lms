@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function MiladyAppDownload() {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 text-white">
+    <div className="bg-brand-blue-700 rounded-xl shadow-lg p-6 text-white">
       <div className="text-center mb-4">
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-3 p-1.5">
           <Image alt="Milady app download" loading="lazy"

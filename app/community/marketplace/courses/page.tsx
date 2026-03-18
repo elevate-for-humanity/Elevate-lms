@@ -183,7 +183,7 @@ export default function CommunityCoursesPage() {
         </div>
 
         {/* Become Instructor CTA */}
-        <div className="mt-12 bg-white rounded-xl p-8 text-white text-center">
+        <div className="mt-12 bg-brand-blue-700 rounded-xl p-8 text-white text-center">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Share Your Knowledge</h2>
           <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">

@@ -102,7 +102,7 @@ export default function RefundAdvancePage() {
               <p className="text-sm text-gray-500">Cover bills and expenses</p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
+            <div className="bg-brand-blue-700 rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
               <div className="bg-yellow-400 text-brand-blue-900 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">
                 MOST POPULAR
               </div>

@@ -153,7 +153,7 @@ export default async function PublicAssistancePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-white rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-blue-700 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Your Career?</h3>
           <p className="text-brand-green-100 mb-6">
             Apply today - your public assistance status qualifies you for free training.

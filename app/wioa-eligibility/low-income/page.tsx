@@ -192,7 +192,7 @@ export default async function LowIncomePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-white rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-blue-700 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Not Sure If You Qualify?</h3>
           <p className="text-brand-blue-100 mb-6">
             Apply anyway! We'll help determine your eligibility and find funding options.

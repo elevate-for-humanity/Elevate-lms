@@ -272,7 +272,7 @@ export default function HvacApplyPage() {
 
           {/* Left Column - Program Info (pricing only shows for self-pay) */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-brand-blue-700 rounded-2xl p-6 text-white sticky top-8">
 
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">

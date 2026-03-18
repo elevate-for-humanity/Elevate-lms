@@ -108,7 +108,7 @@ export default function TypeIRecoveryDiagram({ onComplete }: { onComplete?: () =
   return (
     <div className="space-y-5">
 
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type I — Small Appliances</p>
         <h2 className="text-xl font-extrabold">Recovery Decision Tree</h2>
         <p className="text-slate-500 text-sm mt-1">Work through the decision tree to learn the correct recovery procedure for any Type I scenario.</p>

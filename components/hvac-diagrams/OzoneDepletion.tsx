@@ -234,7 +234,7 @@ export default function OzoneDepletion({ onComplete }: Props) {
     <div className="space-y-5">
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Core — Ozone Depletion</p>
         <h2 className="text-xl font-extrabold">How Chlorine Destroys Ozone</h2>
         <p className="text-slate-500 text-sm mt-1">Step through the chain reaction that led to the Montreal Protocol and the CFC ban.</p>
@@ -284,7 +284,7 @@ export default function OzoneDepletion({ onComplete }: Props) {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-6 text-white space-y-4">
+        <div className="bg-brand-blue-700 rounded-2xl p-6 text-white space-y-4">
           <h3 className="text-xl font-extrabold">Chain Reaction Complete ✓</h3>
           <p className="text-brand-green-200 text-sm leading-relaxed">
             You now understand why CFCs were banned. One chlorine atom destroys up to 100,000 ozone molecules

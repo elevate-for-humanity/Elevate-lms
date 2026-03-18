@@ -132,7 +132,7 @@ export default function JoinPartnerPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-white rounded-2xl p-8 text-center text-white">
+        <div className="bg-brand-blue-700 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-2">Ready to Partner?</h2>
           <p className="text-white/80 mb-6">Submit your application and we will follow up within 2 business days.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

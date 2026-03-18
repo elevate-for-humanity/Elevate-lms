@@ -105,7 +105,7 @@ const programs = (dbRows as any[]) || [];
           ))}
         </div>
 
-        <div className="mt-12 bg-white rounded-2xl p-8 text-white">
+        <div className="mt-12 bg-brand-blue-700 rounded-2xl p-8 text-white">
           <div className="md:flex items-center justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2">Need Help Choosing a Program?</h3>

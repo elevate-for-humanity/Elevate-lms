@@ -9,7 +9,7 @@ export default function SideHeroBanner() {
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Left Side - Content */}
           <div className="text-black">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold mb-6 text-white">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-blue-700 px-4 py-2 text-sm font-bold mb-6 text-white">
               <span>💼</span>
               <span>100% Job Placement Support</span>
             </div>

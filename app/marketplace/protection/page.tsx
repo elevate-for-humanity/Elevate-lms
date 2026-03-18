@@ -88,7 +88,7 @@ export default function BuyerProtectionPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero */}
-        <div className="bg-white rounded-2xl p-8 text-white text-center mb-12">
+        <div className="bg-brand-blue-700 rounded-2xl p-8 text-white text-center mb-12">
           <Shield className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-2">Your Purchase is Protected</h2>
           <p className="text-brand-green-100 max-w-xl mx-auto">

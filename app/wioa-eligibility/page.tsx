@@ -71,7 +71,7 @@ export default function WIOAEligibilityPage() {
               <div key={item.step} className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-[160px] sm:h-[180px] overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-9 h-9 bg-white rounded-full flex items-center justify-center text-white font-bold shadow">
+                  <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
                   </div>
                 </div>

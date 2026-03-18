@@ -280,7 +280,7 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           sizes="(max-width: 640px) 50vw, 25vw"
           className="object-cover"
         />
-        <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
           {step}
         </div>
         <div className="absolute bottom-3 left-3 right-3">

@@ -90,7 +90,7 @@ export default async function ProductPage({
               <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-white font-bold">
+                <div className="w-12 h-12 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold">
                   {product.creator?.display_name?.charAt(0) || '?'}
                 </div>
                 <div>

@@ -91,7 +91,7 @@ export default function PrepaidCardPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="bg-white rounded-2xl p-8 text-white">
+            <div className="bg-brand-blue-700 rounded-2xl p-8 text-white">
               <div className="flex justify-between items-start mb-12">
                 <div>
                   <p className="text-brand-blue-200 text-sm">Prepaid Visa</p>

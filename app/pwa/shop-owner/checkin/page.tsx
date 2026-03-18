@@ -127,7 +127,7 @@ export default function ShopCheckInPage() {
             <div className="bg-white rounded-xl p-4">
               <p className="text-slate-500 text-sm mb-2">Manual Check-In Code</p>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-white rounded-xl px-4 py-3 font-mono text-white text-lg tracking-wider">
+                <div className="flex-1 bg-brand-blue-700 rounded-xl px-4 py-3 font-mono text-white text-lg tracking-wider">
                   {data.qrCode}
                 </div>
                 <button

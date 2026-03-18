@@ -113,24 +113,24 @@ export default function DonationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-brand-red-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Other Ways to Give</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white/10 rounded-lg p-6">
               <Users className="w-10 h-10 mx-auto mb-4" />
               <h3 className="font-bold mb-2">Volunteer</h3>
-              <p className="text-brand-red-100 text-sm">Share your expertise as a mentor or instructor</p>
+              <p className="text-red-100 text-sm">Share your expertise as a mentor or instructor</p>
             </div>
             <div className="bg-white/10 rounded-lg p-6">
               <Award className="w-10 h-10 mx-auto mb-4" />
               <h3 className="font-bold mb-2">Corporate Sponsorship</h3>
-              <p className="text-brand-red-100 text-sm">Partner with us to support workforce development</p>
+              <p className="text-red-100 text-sm">Partner with us to support workforce development</p>
             </div>
             <div className="bg-white/10 rounded-lg p-6">
               <Heart className="w-10 h-10 mx-auto mb-4" />
               <h3 className="font-bold mb-2">Planned Giving</h3>
-              <p className="text-brand-red-100 text-sm">Include Elevate in your estate planning</p>
+              <p className="text-red-100 text-sm">Include Elevate in your estate planning</p>
             </div>
           </div>
           <Link href="/contact" className="mt-8 inline-block bg-white hover:bg-white text-brand-red-700 px-8 py-4 rounded-lg text-lg font-bold transition">

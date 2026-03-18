@@ -144,14 +144,14 @@ export default function TypeIIIChillerDiagram({ onComplete }: { onComplete?: () 
   return (
     <div className="space-y-5">
 
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">EPA 608 Type III — Low-Pressure Systems</p>
         <h2 className="text-xl font-extrabold">Centrifugal Chillers</h2>
         <p className="text-slate-500 text-sm mt-1">The most specialized section. Expand each concept, then take the quiz.</p>
       </div>
 
       {/* Key difference callout */}
-      <div className="bg-white rounded-2xl p-4 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-4 text-white">
         <p className="font-extrabold text-sm mb-1">The Key Difference from Type I and II</p>
         <p className="text-brand-blue-200 text-sm leading-relaxed">
           Type III systems operate <span className="text-white font-bold">below atmospheric pressure</span> (in a vacuum).

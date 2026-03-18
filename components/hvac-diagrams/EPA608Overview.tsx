@@ -125,7 +125,7 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
     <div className="space-y-6">
 
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-6 text-white">
         <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">EPA Section 608</p>
         <h2 className="text-2xl font-extrabold mb-2">Certification Structure</h2>
         <p className="text-slate-600 text-sm leading-relaxed">
@@ -209,7 +209,7 @@ export default function EPA608Overview({ mode = 'explore', onComplete }: Props) 
       )}
 
       {/* Universal cert callout */}
-      <div className="bg-white rounded-2xl p-5 text-white">
+      <div className="bg-brand-blue-700 rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3 mb-2">
           <CheckCircle className="w-6 h-6 text-brand-green-400 flex-shrink-0" />
           <p className="font-extrabold text-lg">Universal Certification</p>

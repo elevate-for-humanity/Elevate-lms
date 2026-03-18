@@ -183,7 +183,7 @@ export default function TestingPage() {
               { step: '4', title: 'Receive Credential', desc: 'Credentials are issued by the certifying body upon passing. Results are recorded in your student record.' },
             ].map((s) => (
               <div key={s.step} className="bg-white rounded-xl p-5 border border-slate-200">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm mb-3">{s.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3">{s.step}</div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">{s.title}</h3>
                 <p className="text-slate-600 text-xs">{s.desc}</p>
               </div>

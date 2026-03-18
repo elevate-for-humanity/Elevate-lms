@@ -104,8 +104,8 @@ export default function InstructorPortalLanding() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Start Teaching</h2>
           <p className="text-lg text-slate-600 mb-8">Already an instructor? Sign in. Want to teach? Apply today.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login?redirect=/instructor/dashboard" className="px-8 py-4 bg-indigo-600 text-slate-900 font-bold rounded-lg hover:bg-indigo-700">Sign In</Link>
-            <Link href="/apply?role=instructor" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200">Become an Instructor</Link>
+            <Link href="/login?redirect=/instructor/dashboard" className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition">Sign In</Link>
+            <Link href="/apply?role=instructor" className="px-8 py-4 bg-slate-100 text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition">Become an Instructor</Link>
           </div>
         </div>
       </section>

@@ -401,7 +401,7 @@ export default async function TutorialsPage() {
 
         {/* Help CTA */}
         <section className="mt-12">
-          <div className="bg-white rounded-xl p-8 text-white">
+          <div className="bg-brand-blue-700 rounded-xl p-8 text-white">
             <div className="max-w-2xl">
               <h2 className="text-2xl font-bold mb-2">Can't Find What You Need?</h2>
               <p className="text-brand-blue-100 mb-6">

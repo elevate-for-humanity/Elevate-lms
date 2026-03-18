@@ -232,7 +232,7 @@ export default function ServerFooter() {
                 { abbr: 'EPA 608', label: 'Certification Prep' },
                 { abbr: 'OSHA', label: 'Safety Training' },
               ].map((b) => (
-                <span key={b.abbr} className="inline-flex items-center text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-600 border border-slate-700">
+                <span key={b.abbr} className="inline-flex items-center text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                   {b.abbr}
                 </span>
               ))}

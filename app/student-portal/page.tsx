@@ -233,7 +233,20 @@ export default function StudentPortalPage() {
 
       </section>
 
-      {/* Avatar Guide */}
+      {/* Login / enroll strip */}
+      <section className="bg-brand-blue-50 border-b border-brand-blue-100 py-4">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-brand-blue-900 font-medium text-sm">Already enrolled? Log in to access your courses, grades, and progress.</p>
+          <div className="flex gap-3 flex-shrink-0">
+            <Link href="/login?redirect=/learner/dashboard" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition">
+              Log In
+            </Link>
+            <Link href="/start" className="inline-flex items-center gap-2 border border-brand-blue-600 text-brand-blue-700 px-5 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-100 transition">
+              Apply Now
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* My Enrollments - Shows for logged-in users */}
       <section className="py-8 bg-white">
@@ -391,25 +404,25 @@ export default function StudentPortalPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-black mb-6">
+          <h2 className="text-4xl font-black text-white mb-6">
             Questions? Contact Us
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Need help with your enrollment, courses, or funding? We&apos;re here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-white transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-50 transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-800 transition border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-900 transition border-2 border-white/30"
             >
               Browse Pathways
               <BookOpen className="w-5 h-5" />

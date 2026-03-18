@@ -21,7 +21,7 @@ export default function ContractsPage() {
   return (
     <div className="bg-white">
       {/* Hero */}
-      <section className="bg-white    text-white py-20 md:py-32">
+      <section className="bg-brand-blue-700    text-white py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold mb-6">
@@ -382,7 +382,7 @@ export default function ContractsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white   text-white">
+      <section className="py-20 bg-brand-blue-700   text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">Need Custom Contracts?</h2>
           <p className="text-xl mb-10 text-white/90">

@@ -244,7 +244,7 @@ export default function FundingPage() {
               { step: '5', title: 'Start Training', desc: 'Begin your program with funding in place.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>

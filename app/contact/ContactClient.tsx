@@ -201,7 +201,7 @@ export default function ContactClient() {
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center bg-white text-black px-10 py-4 rounded-2xl font-bold text-lg hover:bg-brand-orange-600 hover:text-white transition-all shadow-xl"
+                className="inline-flex items-center justify-center bg-brand-blue-700 text-black px-10 py-4 rounded-2xl font-bold text-lg hover:bg-brand-orange-600 hover:text-white transition-all shadow-xl"
               >
                 Sign In to Portal
               </Link>

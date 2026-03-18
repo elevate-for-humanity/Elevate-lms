@@ -254,7 +254,7 @@ export default function ProvidersPage() {
           <div className="space-y-4">
             {onboardingSteps.map((step) => (
               <div key={step.step} className="flex gap-5">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0 mt-0.5">
+                <div className="w-8 h-8 bg-brand-blue-700 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0 mt-0.5">
                   {step.step}
                 </div>
                 <div className="border-b border-slate-100 pb-4 flex-1">

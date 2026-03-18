@@ -82,7 +82,7 @@ export default function TestimonialsSection() {
               {current.quote}
             </p>
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-white font-bold text-xl">
+              <div className="w-14 h-14 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-xl">
                 {current.name[0]}
               </div>
               <div>

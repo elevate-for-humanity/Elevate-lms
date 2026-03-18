@@ -244,7 +244,7 @@ export default function PathwaysPage() {
                 <div className="flex flex-col lg:flex-row">
                   <div className="relative h-64 lg:h-auto lg:w-96 flex-shrink-0 overflow-hidden">
                     <Image src={s.image} alt={s.title} fill sizes="(max-width: 1024px) 100vw, 384px" className="object-cover" />
-                    <div className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {s.num}
                     </div>
                   </div>

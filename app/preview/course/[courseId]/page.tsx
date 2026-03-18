@@ -301,7 +301,7 @@ export default function CoursePreviewPage() {
                     <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Topics Covered</h3>
                     <div className="flex flex-wrap gap-2">
                       {activeLesson.topics.map((topic: string, i: number) => (
-                        <span key={i} className="bg-slate-800 text-slate-600 px-3 py-1 rounded-full text-sm">
+                        <span key={i} className="bg-slate-800 text-slate-300 px-3 py-1 rounded-full text-sm">
                           {topic}
                         </span>
                       ))}

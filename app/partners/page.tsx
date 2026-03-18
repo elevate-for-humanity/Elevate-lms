@@ -145,7 +145,7 @@ export default function PartnersIndexPage() {
               { step: '3', heading: 'Apply or call us', body: 'Click the application button for your type, or call (317) 314-3757 to talk first.' },
             ].map((s) => (
               <div key={s.step} className="flex flex-col items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-white text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0">{s.step}</div>
+                <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <h3 className="font-bold text-slate-900">{s.heading}</h3>
                 <p className="text-slate-600 text-sm">{s.body}</p>
               </div>

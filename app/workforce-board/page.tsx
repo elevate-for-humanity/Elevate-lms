@@ -208,7 +208,7 @@ export default async function WorkforceBoardPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-6 bg-white text-white">
+      <section className="py-16 px-6 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Get Started?

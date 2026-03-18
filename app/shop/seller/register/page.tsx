@@ -65,7 +65,7 @@ export default function SellerRegisterPage() {
         </div>
       </div>
 
-      <div className="bg-white text-white py-12">
+      <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Store className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h1 className="text-3xl font-bold mb-2">Become a Seller</h1>

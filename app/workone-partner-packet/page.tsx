@@ -216,7 +216,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Referral</h3>
                 <p className="text-gray-600 text-sm">
                   WorkOne case manager identifies eligible participant and submits referral through our online portal or via email.
@@ -229,7 +229,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Enrollment</h3>
                 <p className="text-gray-600 text-sm">
                   We complete intake, verify eligibility, and enroll participant in appropriate training program within 48 hours.
@@ -242,7 +242,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-packet-1.jpg" alt="Training" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Training</h3>
                 <p className="text-gray-600 text-sm">
                   Participant completes training with progress updates sent to case manager weekly. Support services available.
@@ -255,7 +255,7 @@ export default function WorkOnePartnerPacketPage() {
                 <Image src="/images/pages/workone-packet-2.jpg" alt="Placement" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Placement</h3>
                 <p className="text-gray-600 text-sm">
                   Upon completion, we provide job placement assistance and report employment outcomes for WIOA performance measures.
@@ -368,7 +368,7 @@ export default function WorkOnePartnerPacketPage() {
                   { step: '4', title: 'Completion & Invoice', desc: 'Invoice submitted upon successful completion with credential documentation' },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-4">
-                    <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{item.step}</div>
+                    <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{item.step}</div>
                     <div>
                       <div className="font-semibold text-gray-900">{item.title}</div>
                       <div className="text-gray-600 text-sm">{item.desc}</div>

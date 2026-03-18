@@ -47,7 +47,7 @@ export default function ClientPortalPage() {
         <Breadcrumbs items={[{ label: "Client Portal" }]} />
       </div>
 {/* Hero */}
-      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-white text-white">
+      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -131,7 +131,7 @@ export default function ClientPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-white text-white">
+      <section className="py-16 lg:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Already Have an Account?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

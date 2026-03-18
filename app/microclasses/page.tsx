@@ -71,7 +71,7 @@ export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-white text-white py-16 lg:py-24">
+      <section className="bg-brand-blue-700 text-white py-16 lg:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center">
             <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-4">

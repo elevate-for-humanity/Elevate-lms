@@ -283,7 +283,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* LEARNING OUTCOMES */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8">What You Will Learn</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -333,7 +333,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             <div className="space-y-8">
               {config.path.map((step, i) => (
                 <div key={i} className="flex gap-6 items-start">
-                  <div className="w-16 h-16 rounded-full bg-white text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-brand-blue-700 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
                     {step.step}
                   </div>
                   <div className="pt-3">

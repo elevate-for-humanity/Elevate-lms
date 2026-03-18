@@ -135,7 +135,7 @@ export default async function StaffOnboardingPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-white text-white py-10">
+      <div className="bg-brand-blue-700 text-white py-10">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl font-bold mb-1">Welcome to Elevate, {firstName}!</h1>
           <p className="text-slate-400 text-sm mb-6">Complete the steps below to finish your onboarding. Required steps must be done before your first day.</p>

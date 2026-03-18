@@ -43,7 +43,7 @@ interface LessonProgressIndicatorProps {
 export function LessonProgressIndicator({ completed, current }: LessonProgressIndicatorProps) {
   if (completed) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white text-white">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-blue-700 text-white">
         <span className="text-slate-400 flex-shrink-0">•</span>
       </div>
     );

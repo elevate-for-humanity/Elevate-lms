@@ -69,7 +69,7 @@ export default function InstantTestsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Instant Tests" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-white text-white">
+      <section className="relative py-20 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-green-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
@@ -142,7 +142,7 @@ export default function InstantTestsPage() {
                     className="object-cover"
                   />
                   {test.popular && (
-                    <div className="absolute top-4 left-4 bg-white text-white px-3 py-1 rounded-full text-sm font-bold">
+                    <div className="absolute top-4 left-4 bg-brand-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                       BEST VALUE
                     </div>
                   )}
@@ -207,7 +207,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Fast Results?</h2>
           <p className="text-xl text-brand-green-100 mb-8">

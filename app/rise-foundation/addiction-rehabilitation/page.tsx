@@ -74,7 +74,7 @@ export default async function AddictionRehabilitationPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white text-white py-20">
+      <section className="bg-brand-blue-700 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Addiction Rehabilitation</h1>

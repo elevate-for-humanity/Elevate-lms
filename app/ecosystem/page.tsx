@@ -107,7 +107,7 @@ export default function EcosystemPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

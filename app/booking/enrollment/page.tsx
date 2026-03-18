@@ -119,7 +119,7 @@ export default function EnrollmentBookingPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-white text-white py-8">
+      <div className="bg-brand-blue-700 text-white py-8">
         <div className="max-w-3xl mx-auto px-4">
           <Link href="/booking" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />

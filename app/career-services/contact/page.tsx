@@ -33,7 +33,7 @@ export default function CareerServicesContactPage() {
       </div>
 
       {/* Header */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Contact Career Services
@@ -270,7 +270,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Take the Next Step?

@@ -35,7 +35,7 @@ export default function InstitutionalGovernancePage() {
             <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">
               <div className="flex flex-col items-center gap-0">
                 {/* Level 1 */}
-                <div className="w-full max-w-md bg-white text-white rounded-lg px-6 py-4 text-center">
+                <div className="w-full max-w-md bg-brand-blue-700 text-white rounded-lg px-6 py-4 text-center">
                   <p className="font-bold text-sm">2Exclusive LLC-S</p>
                   <p className="text-slate-500 text-xs mt-1">Legal Entity &amp; Registered Apprenticeship Sponsor</p>
                   <p className="text-slate-500 text-[10px] mt-1">EIN 88-2609728 | RAPIDS 2025-IN-132301</p>
@@ -45,7 +45,7 @@ export default function InstitutionalGovernancePage() {
                 <div className="w-px h-6 bg-slate-400" />
 
                 {/* Level 2 */}
-                <div className="w-full max-w-md bg-white text-white rounded-lg px-6 py-4 text-center">
+                <div className="w-full max-w-md bg-brand-blue-700 text-white rounded-lg px-6 py-4 text-center">
                   <p className="font-bold text-sm">Elevate for Humanity Career &amp; Training Institute</p>
                   <p className="text-brand-blue-200 text-xs mt-1">Instruction, Programs &amp; Related Technical Instruction (RTI)</p>
                 </div>
@@ -138,7 +138,7 @@ export default function InstitutionalGovernancePage() {
           {/* Sponsor Disclosure */}
           <section className="mb-10">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Apprenticeship Sponsor Disclosure</h2>
-            <div className="bg-white text-white rounded-lg p-6">
+            <div className="bg-brand-blue-700 text-white rounded-lg p-6">
               <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="text-slate-400 text-xs uppercase tracking-wider">Sponsor of Record</dt>

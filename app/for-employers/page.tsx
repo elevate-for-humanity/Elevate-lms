@@ -81,7 +81,7 @@ export default async function ForEmployersPage() {
       </div>
 
       {/* Stats Bar */}
-      <section className="bg-white text-white py-6">
+      <section className="bg-brand-blue-700 text-white py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -178,7 +178,7 @@ export default async function ForEmployersPage() {
               { step: '4', title: 'Claim Tax Credits', description: 'We help you file WOTC paperwork for eligible hires. Credits range from $2,400 to $9,600 per employee.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -223,7 +223,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Hire?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

@@ -132,7 +132,7 @@ function CertiportExamContent() {
             <h1 className="text-2xl font-bold mb-2">Your Exam Voucher</h1>
             <p className="text-slate-600 mb-6">Present this code at the testing center.</p>
 
-            <div className="bg-white text-white rounded-xl p-6 mb-6">
+            <div className="bg-brand-blue-700 text-white rounded-xl p-6 mb-6">
               <p className="text-sm text-slate-500 mb-1">Voucher Code</p>
               <p className="text-3xl font-mono font-bold tracking-wider">{existingRequest.voucherCode}</p>
             </div>

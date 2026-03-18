@@ -251,7 +251,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-white text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Learn to Code?</h2>
           <p className="text-purple-100 text-lg mb-8">Apply now or check if you qualify for free training through workforce funding.</p>

@@ -111,7 +111,7 @@ export default function TrainingSitesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-5xl mx-auto px-4">
           <Breadcrumbs
             items={[

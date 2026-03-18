@@ -58,7 +58,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="WIOA workforce funding" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WIOA — Workforce Innovation & Opportunity Act</h3>
@@ -83,7 +83,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WRG — Workforce Ready Grant</h3>
@@ -108,7 +108,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-5.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Job Ready Indy</h3>
@@ -133,7 +133,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] w-full overflow-hidden">
                 <Image src="/images/pages/jri-hero.jpg" alt="Job Ready Indy Indianapolis workforce initiative" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Indianapolis</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Indianapolis</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Ready Indy</h3>
@@ -158,7 +158,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="Vocational rehabilitation services" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">VR — Vocational Rehabilitation</h3>
@@ -183,7 +183,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px] overflow-hidden">
                 <Image src="/images/pages/funding-page-3.jpg" alt="On-the-job training with employer" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-white text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">OJT — On-the-Job Training</h3>

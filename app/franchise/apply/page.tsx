@@ -108,7 +108,7 @@ function FranchiseApplyPageInner() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Request Franchise Information

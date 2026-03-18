@@ -101,7 +101,7 @@ export default function IncidentResponsePage() {
             
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   1
                 </div>
                 <div>
@@ -113,7 +113,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   2
                 </div>
                 <div>
@@ -125,7 +125,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   3
                 </div>
                 <div>
@@ -137,7 +137,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   4
                 </div>
                 <div>
@@ -149,7 +149,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-white rounded-lg">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   5
                 </div>
                 <div>

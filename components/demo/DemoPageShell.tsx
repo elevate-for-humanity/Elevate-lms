@@ -57,7 +57,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Demo banner */}
-      <div className="bg-white text-white text-center py-2 px-4 text-xs font-medium flex items-center justify-center gap-2">
+      <div className="bg-brand-blue-700 text-white text-center py-2 px-4 text-xs font-medium flex items-center justify-center gap-2">
         <Info className="w-3.5 h-3.5" />
         <span>Interactive Demo — Sample data, click through every section</span>
         <Link href="/store/demos" className="underline ml-2">Back to demos</Link>

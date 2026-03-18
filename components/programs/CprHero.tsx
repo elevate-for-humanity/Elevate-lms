@@ -154,7 +154,7 @@ export default function CprHero() {
       </div>
 
       {/* Price badge */}
-      <div className="absolute top-4 right-4 bg-white text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg">
+      <div className="absolute top-4 right-4 bg-brand-blue-700 text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg">
         $130 · Live Instructor
       </div>
     </section>

@@ -153,7 +153,7 @@ export default function ApplyPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="bg-white text-white rounded-xl p-6 text-center">
+        <div className="bg-brand-blue-700 text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
             Call <a href="/support" className="text-brand-orange-400 font-bold hover:underline">(317) 314-3757</a> or email{' '}

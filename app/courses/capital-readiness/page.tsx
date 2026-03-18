@@ -105,7 +105,7 @@ export default function CapitalReadinessCoursePage() {
 
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative bg-white text-white py-20 lg:py-28">
+        <section className="relative bg-brand-blue-700 text-white py-20 lg:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -217,7 +217,7 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* Who It's For */}
-        <section className="py-16 lg:py-24 bg-white text-white">
+        <section className="py-16 lg:py-24 bg-brand-blue-700 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-4">Who This Course Is For</h2>
             <p className="text-center text-slate-500 mb-12">Designed for organizations seeking institutional credibility and funding access</p>

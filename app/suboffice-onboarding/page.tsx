@@ -118,7 +118,7 @@ export default function SubofficeOnboardingPage() {
                 <span>Payment released to main office</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">
                   5
                 </div>
                 <span>

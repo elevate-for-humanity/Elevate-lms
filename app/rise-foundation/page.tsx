@@ -120,7 +120,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* Entity Info Bar */}
-      <section className="bg-white text-white py-4">
+      <section className="bg-brand-blue-700 text-white py-4">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
             <span className="flex items-center gap-2">
@@ -499,7 +499,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Support Our Mission</h2>
           <p className="text-slate-600 mb-8 max-w-2xl mx-auto">

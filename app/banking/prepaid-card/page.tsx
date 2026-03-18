@@ -161,7 +161,7 @@ export default function PrepaidCardPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">File Your Taxes</h3>
@@ -169,7 +169,7 @@ export default function PrepaidCardPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Choose Prepaid Card</h3>
@@ -177,7 +177,7 @@ export default function PrepaidCardPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Receive Your Card</h3>
@@ -185,7 +185,7 @@ export default function PrepaidCardPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Start Using It</h3>

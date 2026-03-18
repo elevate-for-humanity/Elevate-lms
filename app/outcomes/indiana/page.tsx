@@ -109,7 +109,7 @@ export default function IndianaOutcomesPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-white text-white py-16">
+      <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="w-6 h-6 text-brand-blue-400" />

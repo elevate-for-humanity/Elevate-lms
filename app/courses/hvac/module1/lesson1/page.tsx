@@ -66,7 +66,7 @@ export default function HVACModule1Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* Module header */}
-      <div className="bg-white text-white">
+      <div className="bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 py-10">
           <div className="text-sm font-medium text-brand-blue-400 mb-2">Module 1</div>
           <h1 className="text-3xl md:text-4xl font-bold">HVAC System Overview</h1>

@@ -32,7 +32,7 @@ export default function ApprenticeshipSponsorPage() {
 
         {/* Sponsor Identity */}
         <section className="mb-14">
-          <div className="bg-white text-white rounded-2xl p-8 sm:p-10">
+          <div className="bg-brand-blue-700 text-white rounded-2xl p-8 sm:p-10">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-8 h-8 text-brand-red-400" />
               <h2 className="text-2xl font-bold">Sponsor of Record</h2>
@@ -166,14 +166,14 @@ export default function ApprenticeshipSponsorPage() {
             Governance Hierarchy
           </h2>
           <div className="space-y-3">
-            <div className="bg-white text-white rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-brand-blue-700 text-white rounded-xl p-5 flex items-center gap-4">
               <span className="bg-brand-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">1</span>
               <div>
                 <p className="font-bold">2Exclusive LLC-S — Sponsor &amp; Governing Entity</p>
                 <p className="text-slate-500 text-sm">Standards, compliance, apprentice registration, oversight</p>
               </div>
             </div>
-            <div className="bg-white text-white rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-brand-blue-700 text-white rounded-xl p-5 flex items-center gap-4">
               <span className="bg-white text-brand-red-600 text-xs font-bold px-2.5 py-1 rounded">2</span>
               <div>
                 <p className="font-bold">Elevate for Humanity Career &amp; Technical Institute — Training Division</p>

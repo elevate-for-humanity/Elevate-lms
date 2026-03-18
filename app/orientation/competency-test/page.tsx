@@ -79,7 +79,7 @@ export default function CompetencyTestPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">The competency assessment is administered during your orientation session.</p>

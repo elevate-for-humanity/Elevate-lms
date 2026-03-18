@@ -60,7 +60,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-12 sm:py-16">
+      <section className="bg-brand-blue-700 text-white py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">Privacy Policy</h1>
           <p className="text-slate-300 text-lg mb-1">{ORG_NAME}</p>

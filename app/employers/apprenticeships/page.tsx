@@ -42,7 +42,7 @@ export default async function ApprenticeshipPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Apprenticeships" }]} />
       </div>
-<div className="bg-white text-white py-12">
+<div className="bg-brand-blue-700 text-white py-12">
         <div className="container mx-auto px-4">
           <Link
             href="/employers"

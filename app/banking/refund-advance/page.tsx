@@ -134,7 +134,7 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   1
                 </div>
                 <div className="ml-4">
@@ -147,7 +147,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   2
                 </div>
                 <div className="ml-4">
@@ -160,7 +160,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   3
                 </div>
                 <div className="ml-4">
@@ -173,7 +173,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   4
                 </div>
                 <div className="ml-4">

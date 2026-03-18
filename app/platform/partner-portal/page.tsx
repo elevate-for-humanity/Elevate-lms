@@ -96,7 +96,7 @@ export default function PartnerPortalPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {partnerTypes.map((p, i) => (
               <Link key={i} href={p.href} className="bg-white rounded-xl p-6 border hover:shadow-md transition flex items-start gap-4 group">
-                <div className="w-10 h-10 bg-white text-white rounded-lg flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-700 text-white rounded-lg flex items-center justify-center font-bold flex-shrink-0">
                   {i + 1}
                 </div>
                 <div>
@@ -141,7 +141,7 @@ export default function PartnerPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
           <p className="text-brand-blue-100 text-lg mb-8">Join our network of training providers and community organizations.</p>

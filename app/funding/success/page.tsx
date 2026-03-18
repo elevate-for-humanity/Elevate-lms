@@ -57,7 +57,7 @@ export default async function FundingSuccessPage() {
 
           <div className="text-left space-y-4">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -71,7 +71,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -85,7 +85,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>

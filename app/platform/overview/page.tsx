@@ -256,7 +256,7 @@ export default async function PlatformLicensingPage() {
             {/* License Type 1: Program Holder Network */}
             <div className="bg-white   rounded-2xl shadow-2xl p-8 text-white relative border-4 border-brand-orange-400">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-brand-blue-700 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>
@@ -625,7 +625,7 @@ export default async function PlatformLicensingPage() {
             {/* Tier 2: Government Approved - MOST POPULAR */}
             <div className="bg-white   rounded-2xl shadow-2xl border-4 border-brand-orange-400 p-6 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-brand-blue-700 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>

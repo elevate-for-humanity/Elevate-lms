@@ -164,7 +164,7 @@ export default async function SponsorLicensingPage() {
             {/* Professional */}
             <div className="bg-white   rounded-3xl shadow-2xl border-4 border-indigo-400 p-8 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-white text-white px-6 py-2 rounded-full text-sm font-bold">
+                <div className="bg-brand-blue-700 text-white px-6 py-2 rounded-full text-sm font-bold">
                   MOST POPULAR
                 </div>
               </div>

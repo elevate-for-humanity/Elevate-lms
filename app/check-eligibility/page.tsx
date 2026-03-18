@@ -24,7 +24,7 @@ export default function CheckEligibilityPage() {
         <Breadcrumbs items={[{ label: "Check Eligibility" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-white text-white py-16 px-4">
+      <section className="bg-brand-blue-700 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Check Eligibility (Before WorkOne)
@@ -124,7 +124,7 @@ export default function CheckEligibilityPage() {
                 { step: 4, text: 'Begin training and career support' },
               ].map((item) => (
                 <div key={item.step} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white text-white flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
                     {item.step}
                   </div>
                   <p className="text-gray-700">{item.text}</p>

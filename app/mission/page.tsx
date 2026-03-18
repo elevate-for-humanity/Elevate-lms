@@ -127,21 +127,21 @@ export default function MissionPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">How It Works</h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Enroll in a Training Program</h3>
                 <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Most are fully funded through WIOA, WRG, or employer sponsorship.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Complete Training and Earn Credentials</h3>
                 <p className="text-slate-600">Finish your program, pass certification exams, and earn industry-recognized credentials that employers value.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Get Placed in Employment</h3>
                 <p className="text-slate-600">Our employer partners hire directly from our programs. Career services support you through placement and beyond.</p>

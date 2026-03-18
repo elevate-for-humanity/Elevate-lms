@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function PartnerRequirementsPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-white text-white py-16">
+      <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-3xl md:text-4xl font-bold">Partner Site Requirements</h1>
           <p className="mt-3 text-slate-300 text-lg">

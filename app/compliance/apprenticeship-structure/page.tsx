@@ -130,7 +130,7 @@ export default function ApprenticeshipStructurePage() {
               const Icon = item.icon;
               return (
                 <div key={item.level} className="flex gap-4 items-start bg-white rounded-lg p-4 border print:border-gray-300">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold print:bg-white">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold print:bg-white">
                     {item.level}
                   </div>
                   <div className="flex-1">

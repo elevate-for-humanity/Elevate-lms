@@ -210,7 +210,7 @@ export function TutorialSystem({
           {currentStep.action && currentStep.type === 'interactive' && (
             <div className="mt-6 p-4 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                   !
                 </div>
                 <div className="flex-1">

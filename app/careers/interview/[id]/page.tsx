@@ -153,7 +153,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
 
       <div className="max-w-3xl mx-auto px-4 py-10">
         {/* Header */}
-        <div className="bg-white text-white rounded-2xl p-8 mb-6">
+        <div className="bg-brand-blue-700 text-white rounded-2xl p-8 mb-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center">
               <Video className="w-7 h-7 text-white" />

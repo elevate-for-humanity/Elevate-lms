@@ -78,7 +78,7 @@ export default function OngoingSupportPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">You Do Not Have to Do This Alone</h2>
           <p className="text-xl text-teal-100 mb-8">Get the ongoing support you need to succeed.</p>

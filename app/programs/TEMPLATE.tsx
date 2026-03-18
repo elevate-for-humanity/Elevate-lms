@@ -134,7 +134,7 @@ export default function ProgramTemplate() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 1
               </div>
               <h3 className="text-xl font-bold text-black mb-2">Apply</h3>
@@ -143,7 +143,7 @@ export default function ProgramTemplate() {
               </p>
             </div>
             <div>
-              <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 2
               </div>
               <h3 className="text-xl font-bold text-black mb-2">Train</h3>
@@ -152,7 +152,7 @@ export default function ProgramTemplate() {
               </p>
             </div>
             <div>
-              <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 3
               </div>
               <h3 className="text-xl font-bold text-black mb-2">

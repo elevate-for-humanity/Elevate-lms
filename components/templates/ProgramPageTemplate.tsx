@@ -269,7 +269,7 @@ export function ProgramPageTemplate({
               <ul className="space-y-4">
                 {requirements.map((req, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-800">
-                    <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                       {i + 1}
                     </div>
                     <span>{req}</span>

@@ -71,7 +71,7 @@ export default function GaugeReadingLab() {
       </div>
 
       {/* Scenario Card */}
-      <div className="bg-white text-white rounded-xl p-6">
+      <div className="bg-brand-blue-700 text-white rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-bold text-lg">{ex.title}</h4>
           <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${

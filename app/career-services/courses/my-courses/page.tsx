@@ -66,7 +66,7 @@ export default async function MyCoursesPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl font-bold mb-2">My Courses</h1>
           <p className="text-brand-blue-100">Continue learning and advancing your career</p>

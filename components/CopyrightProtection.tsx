@@ -159,7 +159,7 @@ function showCopyrightNotice() {
  */
 export function CopyrightFooter() {
   return (
-    <div className="bg-white text-white py-3 px-4 text-center text-sm">
+    <div className="bg-brand-blue-700 text-white py-3 px-4 text-center text-sm">
       <p className="mb-2 text-gray-300">
         © 2025 Elevate for Humanity. All Rights Reserved.
       </p>

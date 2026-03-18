@@ -147,7 +147,7 @@ export default async function EmployeeHandbookPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-white text-white py-12">
+      <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">

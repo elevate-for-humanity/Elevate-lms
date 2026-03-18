@@ -156,7 +156,7 @@ export default async function CommunityMarketplacePage() {
         </div>
 
         {/* Hero Section */}
-        <section className="bg-white text-white">
+        <section className="bg-brand-blue-700 text-white">
           <div className="max-w-7xl mx-auto px-4 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -457,7 +457,7 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Become a Seller CTA */}
-        <section className="py-20 bg-white text-white">
+        <section className="py-20 bg-brand-blue-700 text-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-brand-green-400 text-sm font-medium mb-6">
               <TrendingUp className="w-4 h-4" />

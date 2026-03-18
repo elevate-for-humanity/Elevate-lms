@@ -18,7 +18,7 @@ export default function SAPPolicyPage() {
         <Breadcrumbs items={[{ label: "Satisfactory Academic Progress" }]} />
       </div>
 {/* Header */}
-      <div className="bg-white text-white py-16">
+      <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-4">Satisfactory Academic Progress (SAP) Policy</h1>
           <p className="text-xl text-slate-600">
@@ -301,7 +301,7 @@ export default function SAPPolicyPage() {
           </div>
         </div>
       {/* CTA Section */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

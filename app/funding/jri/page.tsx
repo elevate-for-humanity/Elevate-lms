@@ -90,7 +90,7 @@ export default function JRIFundingPage() {
               { step: '4', title: 'Start Training', desc: 'Begin your program. For approved participants, JRI covers tuition and related costs.' },
             ].map((s) => (
               <div key={s.step} className="flex gap-5 items-start">
-                <div className="w-10 h-10 rounded-full bg-white text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
+                <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
                   <p className="text-slate-600">{s.desc}</p>

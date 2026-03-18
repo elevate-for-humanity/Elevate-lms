@@ -59,7 +59,7 @@ export default async function ProgramHolderRightsPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-white text-white py-12">
+      <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-4">
             <Shield size={48} />

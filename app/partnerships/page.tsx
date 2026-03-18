@@ -72,7 +72,7 @@ export default function PartnershipsPage() {
               { step: '4', title: 'Completion & Reporting', desc: 'We issue credentials, submit completion data to your agency, and provide job placement support including resume prep and employer matching.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2 text-sm">{item.title}</h3>
@@ -153,7 +153,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-white text-white">
+      <section className="py-12 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Set Up a Referral Pathway</h2>
           <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">

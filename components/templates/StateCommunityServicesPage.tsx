@@ -89,7 +89,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
       {/* CTA */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white text-white p-10 rounded-2xl text-center">
+          <div className="bg-brand-blue-700 text-white p-10 rounded-2xl text-center">
             <Phone className="w-12 h-12 mx-auto mb-4 text-brand-green-200" />
             <h2 className="text-3xl font-bold mb-4">Need Support? We&apos;re Here to Help</h2>
             <p className="text-brand-green-100 text-lg mb-8 max-w-xl mx-auto">

@@ -119,7 +119,7 @@ export default function TrainingProvidersPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {howItWorks.map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -162,7 +162,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Training Business?</h2>
           <p className="text-teal-100 text-lg mb-8">Join our provider network and start receiving funded students.</p>

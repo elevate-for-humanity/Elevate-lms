@@ -90,7 +90,7 @@ export function UpdatePrompt({ onUpdate }: UpdatePromptProps) {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-white text-white px-4 py-3 z-50 safe-area-inset-top">
+    <div className="fixed top-0 left-0 right-0 bg-brand-blue-700 text-white px-4 py-3 z-50 safe-area-inset-top">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <RefreshCw className={`w-5 h-5 ${updating ? 'animate-spin' : ''}`} />

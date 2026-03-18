@@ -99,7 +99,7 @@ export default function JobPlacementPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   1
                 </div>
                 <div>
@@ -112,7 +112,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   2
                 </div>
                 <div>
@@ -125,7 +125,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   3
                 </div>
                 <div>
@@ -140,7 +140,7 @@ export default function JobPlacementPage() {
             </div>
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   4
                 </div>
                 <div>
@@ -153,7 +153,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   5
                 </div>
                 <div>
@@ -166,7 +166,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   6
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export default function JobPlacementPage() {
         </div>
       </section>
 
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black mb-6 text-center">
             Success Stories
@@ -421,7 +421,7 @@ export default function JobPlacementPage() {
         </div>
       </section>
 
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-black mb-6">
             Ready to Start Your Career?

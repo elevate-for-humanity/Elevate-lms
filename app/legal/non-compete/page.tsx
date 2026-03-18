@@ -24,7 +24,7 @@ export default function NonCompetePage() {
         </Link>
 
         {/* Header */}
-        <div className="bg-white text-white rounded-xl p-8 mb-8">
+        <div className="bg-brand-blue-700 text-white rounded-xl p-8 mb-8">
           <div className="flex items-center gap-4 mb-3">
             <Ban size={40} />
             <div>

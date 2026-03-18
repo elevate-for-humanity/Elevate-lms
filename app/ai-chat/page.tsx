@@ -58,7 +58,7 @@ export default function AIChatPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white text-white py-20">
+      <section className="bg-brand-blue-700 text-white py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-6">
             <Sparkles className="w-5 h-5" />
@@ -119,7 +119,7 @@ export default function AIChatPage() {
 
               {/* User Message */}
               <div className="flex gap-3 justify-end">
-                <div className="bg-white text-white rounded-2xl rounded-tr-none p-4 max-w-md">
+                <div className="bg-brand-blue-700 text-white rounded-2xl rounded-tr-none p-4 max-w-md">
                   <p>What certifications should I get for a healthcare career?</p>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function AIChatPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-brand-blue-100 mb-8">
@@ -233,7 +233,7 @@ export default function AIChatPage() {
       <ChatAssistantWrapper />
 
       {/* CTA Section */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

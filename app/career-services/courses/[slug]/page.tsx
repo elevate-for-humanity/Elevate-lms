@@ -90,7 +90,7 @@ export default async function CourseDetailPage({
       </div>
 
       {/* Hero */}
-      <section className="bg-white text-white">
+      <section className="bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -259,7 +259,7 @@ export default async function CourseDetailPage({
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Improve Your Career?</h2>
           <p className="text-brand-blue-100 mb-8">

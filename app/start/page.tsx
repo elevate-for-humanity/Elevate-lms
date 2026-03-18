@@ -54,7 +54,7 @@ export default function StartPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-white text-white">
+      <section className="relative overflow-hidden bg-brand-blue-700 text-white">
         <Image
           src="/images/pages/how-it-works-hero.jpg"
           alt="Career training students"

@@ -85,7 +85,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <GraduationCap className="w-4 h-4" /> Funding Available
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
@@ -269,7 +269,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
           <div className="grid md:grid-cols-4 gap-6">
             {steps.map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-blue-700 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>

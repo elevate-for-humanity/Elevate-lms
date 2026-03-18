@@ -94,7 +94,7 @@ export default async function EmployerCompliancePage() {
       </div>
 
       {/* Header */}
-      <div className="bg-white text-white py-12">
+      <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-slate-300" />

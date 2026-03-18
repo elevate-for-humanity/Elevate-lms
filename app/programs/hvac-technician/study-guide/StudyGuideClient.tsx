@@ -204,7 +204,7 @@ export default function StudyGuideClient() {
 
         {/* Cover */}
         <div className="text-center py-8 print:py-4">
-          <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-1.5 rounded-full text-xs font-bold mb-4 print:hidden">
+          <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-bold mb-4 print:hidden">
             <BookOpen className="w-3.5 h-3.5" />
             OFFICIAL STUDY GUIDE
           </div>

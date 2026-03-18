@@ -145,7 +145,7 @@ export default function SolutionsPage() {
         <Breadcrumbs items={[{ label: "Solutions" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative bg-white text-white py-20">
+      <section className="relative bg-brand-blue-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -285,7 +285,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6">
             Questions About Our Programs?
@@ -311,7 +311,7 @@ export default function SolutionsPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

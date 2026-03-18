@@ -165,7 +165,7 @@ export default function WorkforceAnalyticsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">See Your Data in Action</h2>
           <p className="text-indigo-100 text-lg mb-8">Schedule a demo to see how our analytics platform can transform your workforce reporting.</p>

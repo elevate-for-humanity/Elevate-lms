@@ -97,7 +97,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
       </section>
 
       {/* Secondary CTA - Indiana Career Connect */}
-      <section className="py-16 sm:py-20 bg-white text-white">
+      <section className="py-16 sm:py-20 bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-2xl order-2 md:order-1">
@@ -229,7 +229,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
       </section>
 
       {/* Final CTA - Contact */}
-      <section className="py-16 sm:py-20 bg-white text-white">
+      <section className="py-16 sm:py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Questions? We're Here to Help

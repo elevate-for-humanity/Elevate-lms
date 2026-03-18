@@ -159,7 +159,7 @@ export function HSICoursePlayer({
 
       {/* Completion Banner */}
       {completed && (
-        <div className="bg-white text-white px-6 py-4 shadow-lg">
+        <div className="bg-brand-blue-700 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-slate-500 flex-shrink-0">•</span>

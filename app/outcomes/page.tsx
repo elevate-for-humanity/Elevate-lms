@@ -25,7 +25,7 @@ export default function OutcomesMethodologyPage() {
         <Image src="/images/pages/outcomes-page-1.jpg" alt="Student outcomes and placement rates" fill sizes="100vw" className="object-cover" priority />
       </section>
 
-      <div className="bg-white text-white py-12">
+      <div className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
             href="/admin/governance"

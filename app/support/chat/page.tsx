@@ -111,7 +111,7 @@ export default function LiveChatPage() {
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Chat" }]} />
       </div>
 {/* Header */}
-      <div className="bg-white text-white py-4 px-4 shadow-md">
+      <div className="bg-brand-blue-700 text-white py-4 px-4 shadow-md">
         <div className="max-w-3xl mx-auto flex items-center gap-4">
           <Link href="/support" className="p-2 hover:bg-brand-blue-700 rounded-lg transition">
             <ArrowLeft className="w-5 h-5" />

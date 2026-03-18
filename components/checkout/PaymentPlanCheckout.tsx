@@ -146,7 +146,7 @@ export default function PaymentPlanCheckout({
   if (isFullyPaid) {
     return (
       <div className="bg-white rounded-xl border-2 border-brand-green-500 overflow-hidden">
-        <div className="bg-white text-white p-4 text-center">
+        <div className="bg-brand-blue-700 text-white p-4 text-center">
           <h3 className="font-bold text-xl">✓ Payment Complete</h3>
         </div>
         <div className="p-6 text-center">
@@ -178,7 +178,7 @@ export default function PaymentPlanCheckout({
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-white text-white p-4">
+      <div className="bg-brand-blue-700 text-white p-4">
         <h3 className="font-bold text-lg">{programName}</h3>
         <p className="text-slate-600">Total Program Cost: {formatCurrency(totalAmount)}</p>
       </div>

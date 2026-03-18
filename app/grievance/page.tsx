@@ -30,7 +30,7 @@ export default function GrievancePage() {
       </section>
 
       {/* Header */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Scale className="w-10 h-10 mx-auto mb-4 text-gray-300" />
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Grievance Procedure</h1>
@@ -63,7 +63,7 @@ export default function GrievancePage() {
           <div className="space-y-8">
             {STEPS.map((s) => (
               <div key={s.step} className="flex gap-4">
-                <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0">
                   {s.step}
                 </div>
                 <div>

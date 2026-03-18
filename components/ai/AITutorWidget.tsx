@@ -111,7 +111,7 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-50">
           {/* Header */}
-          <div className="bg-white text-white p-4 rounded-t-lg flex justify-between items-center">
+          <div className="bg-brand-blue-700 text-white p-4 rounded-t-lg flex justify-between items-center">
             <div>
               <h3 className="font-bold">AI Tutor</h3>
               <p className="text-xs opacity-90">{courseName}</p>

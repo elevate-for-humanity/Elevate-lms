@@ -30,7 +30,7 @@ export default function FundingVerificationPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-slate-300" />
@@ -84,7 +84,7 @@ export default function FundingVerificationPage() {
               { step: '4', title: 'Enrollment Confirmation', desc: 'Once funding is verified, you will receive your enrollment agreement and program start date.' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4 bg-white rounded-xl p-5 border">
-                <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   {item.step}
                 </div>
                 <div>

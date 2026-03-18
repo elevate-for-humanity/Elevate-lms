@@ -102,7 +102,7 @@ export default async function ApprenticePortalPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* NEXT REQUIRED ACTION - Always visible at top */}
-        <div className="bg-white text-white rounded-xl p-6 mb-8 shadow-lg">
+        <div className="bg-brand-blue-700 text-white rounded-xl p-6 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-brand-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>

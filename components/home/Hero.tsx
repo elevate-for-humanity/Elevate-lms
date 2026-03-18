@@ -108,7 +108,7 @@ export function Hero() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   1
                 </div>
                 <h3 className="font-semibold text-black">Schedule Your Appointment</h3>
@@ -134,7 +134,7 @@ export function Hero() {
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   2
                 </div>
                 <h3 className="font-semibold text-black">Get Approved for Funded Training</h3>
@@ -154,7 +154,7 @@ export function Hero() {
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   3
                 </div>
                 <h3 className="font-semibold text-black">Start Your Training</h3>

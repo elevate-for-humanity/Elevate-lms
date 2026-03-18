@@ -141,7 +141,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white text-white">
+      <section className="py-12 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
@@ -178,7 +178,7 @@ export default async function TalentPipelinePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {pipelineSteps.map((item) => (
               <div key={item.step} className="relative">
-                <div className="bg-white text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
+                <div className="bg-brand-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -246,7 +246,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Funding Info */}
-      <section className="py-16 md:py-24 bg-white text-white">
+      <section className="py-16 md:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -291,7 +291,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-white text-white">
+      <section className="py-16 md:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Build Your Talent Pipeline?

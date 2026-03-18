@@ -148,7 +148,7 @@ export default async function ApprenticeCourseDetailPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white text-white">
+      <div className="bg-brand-blue-700 text-white">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <Link
             href="/apprentice"

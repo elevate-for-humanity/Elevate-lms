@@ -132,7 +132,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
     <div className="min-h-screen bg-white">
       <div className="flex flex-col h-screen">
         {/* Header */}
-        <div className="bg-white text-white px-6 py-4 flex justify-between items-center">
+        <div className="bg-brand-blue-700 text-white px-6 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold">JavaScript Advanced Concepts</h1>
             <p className="text-sm text-gray-400">Live Session • 45 participants</p>
@@ -156,7 +156,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
               </div>
 
               {/* Screen Share Indicator */}
-              <div className="absolute top-4 left-4 bg-white text-white px-3 py-2 rounded text-sm">
+              <div className="absolute top-4 left-4 bg-brand-blue-600 text-white px-3 py-2 rounded text-sm">
                 🖥️ Screen Sharing
               </div>
 

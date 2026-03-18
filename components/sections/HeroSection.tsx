@@ -33,7 +33,7 @@ export function HeroSection({
   secondaryCTA = { text: 'Talk to an Advisor', href: '/contact' },
 }: HeroSectionProps) {
   return (
-    <section className="bg-white text-white py-20">
+    <section className="bg-brand-blue-700 text-white py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Badges */}
         {badges.length > 0 && (

@@ -120,7 +120,7 @@ export default function JoinPartnerPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
           {STEPS.map((s) => (
             <div key={s.n} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-white text-white flex items-center justify-center font-bold text-sm shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
                 {s.n}
               </div>
               <div>

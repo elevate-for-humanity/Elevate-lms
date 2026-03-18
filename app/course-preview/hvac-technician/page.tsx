@@ -233,7 +233,7 @@ export default function HVACClassroomPreview() {
       `}</style>
     <div className="flex h-screen bg-white">
       {/* Banner */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-white text-white text-center py-3 text-sm font-medium shadow-lg">
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-brand-blue-700 text-white text-center py-3 text-sm font-medium shadow-lg">
         <GraduationCap className="w-4 h-4 inline mr-2" />
         <span className="font-bold">HVAC Technician Program</span>
         <span className="hidden sm:inline text-slate-500 mx-2">|</span>

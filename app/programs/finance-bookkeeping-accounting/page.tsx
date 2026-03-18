@@ -136,7 +136,7 @@ export default function FinancePathwayPage() {
             <div className="grid sm:grid-cols-3 gap-6">
               {phases.map((p) => (
                 <div key={p.phase} className="bg-white rounded-xl p-6 border border-slate-200">
-                  <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
+                  <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
                   <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
                   <p className="text-sm text-slate-600">{p.desc}</p>
                 </div>

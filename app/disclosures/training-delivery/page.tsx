@@ -15,7 +15,7 @@ export default function TrainingDeliveryDisclosure() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Breadcrumbs
             items={[
@@ -235,7 +235,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Contact */}
-      <section className="py-10 bg-white text-white">
+      <section className="py-10 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-3">Questions About Our Training Model?</h2>
           <p className="text-white/80 mb-6">

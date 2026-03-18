@@ -122,7 +122,7 @@ export default function TrainingProviderPage() {
               <div key={item.step} className="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-44 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="33vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
+                  <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
                     {item.step}
                   </div>
                 </div>

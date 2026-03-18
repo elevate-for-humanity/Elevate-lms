@@ -22,7 +22,7 @@ export default function FederalCompliancePage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white text-white py-20">
+      <section className="bg-brand-blue-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">

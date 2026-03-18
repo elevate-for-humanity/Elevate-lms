@@ -112,7 +112,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
             <div className="space-y-6">
               {config.steps.items.map((s, i) => (
                 <div key={i} className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-white text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{i + 1}</div>
+                  <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{i + 1}</div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
                     <p className="text-slate-600">{s.desc}</p>

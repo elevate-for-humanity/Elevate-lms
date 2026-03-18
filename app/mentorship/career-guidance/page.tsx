@@ -65,7 +65,7 @@ export default function CareerGuidancePage() {
           <div className="space-y-6">
             {['Apply for mentorship and share your goals', 'Get matched with an experienced mentor in your field', 'Schedule regular sessions to discuss your career', 'Receive guidance, feedback, and support'].map((step, i) => (
               <div key={i} className="flex items-start bg-white rounded-lg p-6 shadow-sm">
-                <div className="w-10 h-10 bg-white text-white rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">{i + 1}</div>
+                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4 flex-shrink-0">{i + 1}</div>
                 <p className="text-gray-700 pt-2">{step}</p>
               </div>
             ))}

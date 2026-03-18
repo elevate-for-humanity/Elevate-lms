@@ -718,7 +718,7 @@ export default function ProgramPageLayout({
                 {c.steps.map((step, i) => (
                   <ScrollReveal key={step.title} delay={i * 100} direction="up">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                      <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                         {i + 1}
                       </div>
                       <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>

@@ -56,7 +56,7 @@ export default function FormsPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <FileText className="w-10 h-10 mx-auto mb-4 text-gray-300" />
           <h1 className="text-3xl md:text-4xl font-bold mb-3">Forms & Documents</h1>

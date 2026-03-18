@@ -112,7 +112,7 @@ export default async function FeaturesPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white text-white py-20">
+      <section className="bg-brand-blue-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Platform Features</h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">

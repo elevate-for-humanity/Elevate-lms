@@ -90,22 +90,22 @@ const services = (dbRows as any[]) || [];
           <h2 className="text-3xl font-bold text-center mb-12">How Our Community Ecosystem Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
               <h3 className="font-bold mb-2">Get Free Tax Help</h3>
               <p className="text-gray-600 text-sm">Start at our VITA site for free tax preparation</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
               <h3 className="font-bold mb-2">Access Wellness Support</h3>
               <p className="text-gray-600 text-sm">Connect with Selfish Inc. for mental health services</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
               <h3 className="font-bold mb-2">Get Free Training</h3>
               <p className="text-gray-600 text-sm">Enroll in WIOA-funded career programs</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">4</div>
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">4</div>
               <h3 className="font-bold mb-2">Get Hired</h3>
               <p className="text-gray-600 text-sm">Job placement with our employer partners</p>
             </div>
@@ -158,7 +158,7 @@ const services = (dbRows as any[]) || [];
       </section>
 
       {/* Eligibility */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Who Qualifies?</h2>
           <p className="text-slate-600 mb-8">

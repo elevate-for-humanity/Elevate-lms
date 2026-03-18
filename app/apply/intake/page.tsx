@@ -110,7 +110,7 @@ function IntakeForm() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-white text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-2xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             Funding & Apprenticeship Intake

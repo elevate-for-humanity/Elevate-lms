@@ -421,7 +421,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       )}
 
       {/* Career Path */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className={`inline-block bg-white/10 ${c.dark} text-sm font-semibold px-4 py-1 rounded-full mb-4`}>

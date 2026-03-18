@@ -38,7 +38,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
           posterImage={program.heroImage}
         />
       ) : (
-        <section className="bg-white text-white py-16">
+        <section className="bg-brand-blue-700 text-white py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="max-w-4xl">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -485,7 +485,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-white/90 mb-8">
@@ -545,7 +545,7 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-white text-xl font-bold mb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-700 text-white text-xl font-bold mb-4">
           {n}
         </div>
         <div className="font-bold text-black mb-2">{title}</div>

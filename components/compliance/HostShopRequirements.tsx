@@ -227,7 +227,7 @@ export function HostShopRequirements({
             <div className="grid md:grid-cols-2 gap-4">
               {APPROVAL_STEPS.map((step) => (
                 <div key={step.step} className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                     {step.step}
                   </div>
                   <div>

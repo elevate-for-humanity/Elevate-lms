@@ -133,7 +133,7 @@ export default function SecurityAndDataProtectionPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-white text-white py-14">
+      <div className="bg-brand-blue-700 text-white py-14">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-8 h-8 text-brand-red-400" />
@@ -215,7 +215,7 @@ export default function SecurityAndDataProtectionPage() {
         })}
 
         {/* Contact */}
-        <div className="bg-white text-white rounded-xl p-8">
+        <div className="bg-brand-blue-700 text-white rounded-xl p-8">
           <div className="flex items-center gap-3 mb-4">
             <Mail className="w-6 h-6 text-brand-red-400" />
             <h2 className="text-xl font-bold">Contact Our Data Protection Officer</h2>

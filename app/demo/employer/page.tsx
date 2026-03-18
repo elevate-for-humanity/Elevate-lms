@@ -41,7 +41,7 @@ export default function DemoEmployerPage() {
   return (
     <DemoPageShell title="Employer Dashboard" description="Manage apprentices, find candidates, and track hiring incentives." portal="employer">
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-white text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
+        <div className="fixed top-20 right-4 z-50 bg-brand-blue-700 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">{toast}</div>
       )}
 
       <div className="space-y-6">

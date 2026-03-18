@@ -53,7 +53,7 @@ export default async function BlogPage() {
         </div>
       </div>
 
-      <div className="bg-white text-white py-16">
+      <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3">Blog</h1>
           <p className="text-lg text-slate-600 max-w-2xl">
@@ -153,7 +153,7 @@ export default async function BlogPage() {
         )}
       </div>
 
-      <section className="bg-white text-white py-14">
+      <section className="bg-brand-blue-700 text-white py-14">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">Ready to Start Your Career?</h2>
           <p className="text-slate-500 mb-7">Check your eligibility for funded career training programs in Indiana.</p>

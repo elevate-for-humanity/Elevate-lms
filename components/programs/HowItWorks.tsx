@@ -18,7 +18,7 @@ export function HowItWorks({ steps, variant = 'horizontal' }: HowItWorksProps) {
         {steps.map((step, index) => (
           <div key={step.number} className="flex gap-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 rounded-full bg-brand-blue-700 text-white flex items-center justify-center font-bold text-lg">
                 {step.number}
               </div>
             </div>
@@ -47,7 +47,7 @@ export function HowItWorks({ steps, variant = 'horizontal' }: HowItWorksProps) {
           )}
 
           <div className="relative bg-white rounded-lg p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-white text-white flex items-center justify-center font-bold text-lg mx-auto mb-4 relative z-10">
+            <div className="w-12 h-12 rounded-full bg-brand-blue-700 text-white flex items-center justify-center font-bold text-lg mx-auto mb-4 relative z-10">
               {step.number}
             </div>
             {step.icon && (

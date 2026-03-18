@@ -107,7 +107,7 @@ export default function PortalsPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="bg-white text-white py-20">
+      <section className="bg-brand-blue-700 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Access Your Portal</h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
@@ -198,7 +198,7 @@ export default function PortalsPage() {
       </section>
 
       {/* Quick Access for Returning Users */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Returning User?</h2>

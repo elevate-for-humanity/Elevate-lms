@@ -242,7 +242,7 @@ export function BlockchainCredentialVerification() {
               <h3 className="font-bold mb-3">How It Works</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                     1
                   </div>
                   <div>
@@ -253,7 +253,7 @@ export function BlockchainCredentialVerification() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                     2
                   </div>
                   <div>
@@ -264,7 +264,7 @@ export function BlockchainCredentialVerification() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-white text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                     3
                   </div>
                   <div>

@@ -208,7 +208,7 @@ export default function InstructionalFrameworkPage() {
               { role: 'Central Compliance System', entity: 'Institutional LMS', detail: 'Single system of record for RTI attendance, module completion, assessments, instructor verification, OJT hour logging, and cohort progress reporting.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 items-start bg-white rounded-lg p-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-white flex items-center justify-center text-sm font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   {i + 1}
                 </div>
                 <div>

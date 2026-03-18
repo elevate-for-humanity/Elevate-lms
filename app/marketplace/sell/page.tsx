@@ -114,7 +114,7 @@ export default async function SellOnMarketplacePage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-white text-white py-16">
+      <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">Share Your Expertise, Earn Revenue</h1>
           <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
@@ -190,7 +190,7 @@ export default async function SellOnMarketplacePage() {
           <div className="grid sm:grid-cols-4 gap-6">
             {steps.map((step) => (
               <div key={step.number} className="text-center">
-                <div className="w-12 h-12 bg-white text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   {step.number}
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{step.title}</h3>

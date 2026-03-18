@@ -258,7 +258,7 @@ export default function PartnersPage() {
       </section>
 
       {/* How Partnership Works */}
-      <section className="bg-white text-white">
+      <section className="bg-brand-blue-700 text-white">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">How Partnership Works</h2>
           <p className="text-lg text-slate-500 text-center mb-12 max-w-2xl mx-auto">
@@ -426,7 +426,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Become a Partner CTA */}
-      <section className="bg-white text-white">
+      <section className="bg-brand-blue-700 text-white">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Partner?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

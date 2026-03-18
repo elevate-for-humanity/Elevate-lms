@@ -238,7 +238,7 @@ export default async function TaxSelfPrepPage() {
 
               {/* Premier - Most Popular */}
               <div className="bg-white border-2 border-brand-orange-600 rounded-lg p-6 shadow-xl relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-white text-xs font-bold rounded-full">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-blue-700 text-white text-xs font-bold rounded-full">
                   MOST POPULAR
                 </div>
                 <div className="text-center mb-6">

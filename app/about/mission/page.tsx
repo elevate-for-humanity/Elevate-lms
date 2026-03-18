@@ -159,7 +159,7 @@ export default function MissionPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-white text-white">
+      <section className="py-16 md:py-24 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Join Our Mission

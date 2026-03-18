@@ -176,7 +176,7 @@ export default function EnrollPage({
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
           {/* Course Header */}
-          <div className="bg-white text-white p-8">
+          <div className="bg-brand-blue-700 text-white p-8">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <span className="inline-block px-3 py-2 bg-white/20 text-white text-xs font-semibold rounded-full mb-3">

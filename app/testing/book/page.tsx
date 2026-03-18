@@ -116,7 +116,7 @@ function BookingForm() {
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white text-white">
+      <div className="bg-brand-blue-700 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
           <Link href="/testing" className="text-xs text-slate-400 hover:text-white mb-4 inline-flex items-center gap-1">
             ← Testing Center

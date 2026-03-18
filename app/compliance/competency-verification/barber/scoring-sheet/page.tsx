@@ -79,7 +79,7 @@ export default function BarberScoringSheetPage() {
       <div className="max-w-4xl mx-auto px-4 pb-8 print:px-6 print:pb-4">
         {BARBER_SECTIONS.map((section) => (
           <div key={section.section} className="mb-6 print:mb-4 print:break-inside-avoid">
-            <div className="bg-white text-white px-4 py-2 rounded-t print:rounded-none">
+            <div className="bg-brand-blue-700 text-white px-4 py-2 rounded-t print:rounded-none">
               <div className="flex justify-between items-center">
                 <h2 className="font-bold text-sm print:text-[11px]">
                   Section {section.section}: {section.title}

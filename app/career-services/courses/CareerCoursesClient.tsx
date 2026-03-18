@@ -96,7 +96,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
     <>
       {/* Cart Summary (if items) */}
       {cart.length > 0 && (
-        <div className="bg-white text-white py-3 sticky top-0 z-50">
+        <div className="bg-brand-blue-700 text-white py-3 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ShoppingCart className="w-5 h-5" />

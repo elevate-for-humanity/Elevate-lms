@@ -107,7 +107,7 @@ export default function HiringGuidePage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">
+                  <div className="absolute top-4 left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
                     {step.number}
                   </div>
                 </div>

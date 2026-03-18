@@ -158,7 +158,7 @@ export default function ComponentIDLab() {
 
         {/* Component Detail */}
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div className="bg-white text-white px-6 py-4">
+          <div className="bg-brand-blue-700 text-white px-6 py-4">
             <h4 className="text-lg font-bold">{comp.name}</h4>
             <p className="text-sm text-slate-600">{comp.system}</p>
           </div>

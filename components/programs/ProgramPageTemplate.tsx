@@ -171,7 +171,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step 1: Apply Online */}
             <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
               <div className="pt-4">
@@ -208,7 +208,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 2: Complete Training */}
             <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border border-purple-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 2
               </div>
               <div className="pt-4">
@@ -245,7 +245,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 3: Start Working */}
             <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-8 border border-brand-green-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 3
               </div>
               <div className="pt-4">

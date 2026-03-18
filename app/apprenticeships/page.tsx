@@ -57,7 +57,7 @@ const apprenticeships = (dbRows as any[]) || [];
         <Image src="/images/pages/apprenticeships-hero.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Zap className="w-4 h-4" /> USDOL Registered Programs
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">

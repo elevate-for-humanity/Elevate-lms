@@ -254,7 +254,7 @@ export default async function HubWelcomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -270,7 +270,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -286,7 +286,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image

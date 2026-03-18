@@ -31,7 +31,7 @@ export default function DrugTestingSuccessPage() {
           <h2 className="text-lg font-bold mb-4">What Happens Next?</h2>
           <div className="text-left space-y-3">
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 1
               </div>
               <p className="text-black">
@@ -40,7 +40,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 2
               </div>
               <p className="text-black">
@@ -49,7 +49,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-white text-white rounded-full flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex-shrink-0 text-sm font-bold">
                 3
               </div>
               <p className="text-black">
@@ -57,7 +57,7 @@ export default function DrugTestingSuccessPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 bg-white text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 4
               </div>
               <p className="text-black">

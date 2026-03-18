@@ -315,7 +315,7 @@ export default function CourseLeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brand-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
                     👑
                   </div>
                 </div>
@@ -346,7 +346,7 @@ export default function CourseLeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brand-blue-700 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                     3
                   </div>
                 </div>

@@ -5,7 +5,23 @@
 DO $$
 DECLARE
   prog_id uuid := '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7';
+  expected_slugs text[] := ARRAY[
+    'hvac-lesson-4','hvac-lesson-9','hvac-lesson-14','hvac-lesson-20',
+    'hvac-lesson-26','hvac-lesson-34','hvac-lesson-76','hvac-lesson-87'
+  ];
+  missing_count int;
 BEGIN
+  -- Fail loudly if any target rows are absent before touching data
+  SELECT COUNT(*) INTO missing_count
+  FROM unnest(expected_slugs) s(slug)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM curriculum_lessons
+    WHERE program_id = prog_id AND lesson_slug = s.slug
+  );
+  IF missing_count > 0 THEN
+    RAISE EXCEPTION 'Migration aborted: % target lesson_slug(s) not found in curriculum_lessons for program %',
+      missing_count, prog_id;
+  END IF;
 
   -- hvac-lesson-14: Electrical Basics Quiz (10q)
   UPDATE curriculum_lessons

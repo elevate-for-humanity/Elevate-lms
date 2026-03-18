@@ -254,44 +254,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── EMPLOYERS ── */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row gap-10 items-center">
-            <FadeInUp className="w-full sm:w-1/2">
-              <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                <Image src="/images/pages/graduation-ceremony.jpg" alt="Credentialed Elevate graduates" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
-              </div>
-            </FadeInUp>
-            <FadeInUp delay={0.15} className="w-full sm:w-1/2">
-              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Employers</p>
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">We build your next workforce pipeline</h2>
-              <p className="text-slate-600 leading-relaxed mb-4">
-                Every graduate holds a nationally recognized credential, has completed hands-on training,
-                and has been pre-screened before we make an introduction.
-              </p>
-              <ul className="space-y-2 mb-6">
-                {[
-                  'WOTC tax credits: $2,400–$9,600 per qualifying hire',
-                  'OJT wage reimbursement: 50–75% of wages during training',
-                  'Registered Apprenticeship pathways with DOL compliance handled',
-                  'Custom cohorts trained to your specifications',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-red-600 mt-1.5 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
-                  Employer Portal
-                </Link>
-                <Link href="/apply/program-holder" className="border border-slate-300 text-slate-700 font-bold px-6 py-3 rounded-lg hover:bg-white transition-colors text-sm">
-                  Become a Training Partner
-                </Link>
-              </div>
-            </FadeInUp>
+      {/* ── PARTNERS STRIP ── */}
+      <section className="py-10 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">For Employers &amp; Agencies</p>
+            <p className="text-slate-700 text-sm max-w-md">Pre-screened graduates, WOTC credits, OJT reimbursement, and WIOA compliance reporting — all in one place.</p>
+          </div>
+          <div className="flex gap-3 flex-shrink-0">
+            <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-lg transition-colors text-sm">
+              Employer Portal
+            </Link>
+            <Link href="/workforce-board" className="border border-slate-300 text-slate-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-white transition-colors text-sm">
+              Workforce Board
+            </Link>
           </div>
         </div>
       </section>

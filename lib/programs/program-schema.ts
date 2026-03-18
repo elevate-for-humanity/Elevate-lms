@@ -113,6 +113,10 @@ export interface CTALinks {
   applyHref: string;
   /** Link for enrolled students — goes to their LMS dashboard or course */
   enrollHref?: string;
+  /** Request Information — program-specific inquiry, pre-fills program context */
+  requestInfoHref?: string;
+  /** Indiana Career Connect — only include for WIOA/apprenticeship programs */
+  careerConnectHref?: string;
   advisorHref?: string;
   courseHref?: string;
 }

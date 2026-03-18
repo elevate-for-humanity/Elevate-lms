@@ -146,11 +146,21 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   </Link>
 
                   <Link
-                    href={p.cta.advisorHref || '/contact'}
-                    className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
+                    href={p.cta.requestInfoHref || `/contact?program=${p.slug}`}
+                    className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm mb-2"
                   >
-                    Talk to an Advisor
+                    Request Information
                   </Link>
+                  {p.cta.careerConnectHref && (
+                    <a
+                      href={p.cta.careerConnectHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
+                    >
+                      Indiana Career Connect ↗
+                    </a>
+                  )}
                   {p.cta.courseHref && (
                     <Link
                       href={p.cta.courseHref}
@@ -339,49 +349,84 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         </section>
       )}
 
+      {/* ═══ OUTCOMES ═══════════════════════════════════════════════ */}
+      {p.outcomes && p.outcomes.length > 0 && (
+        <section className="py-14 bg-white border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-4">
+            <SectionHeader icon={TrendingUp} title="What You Will Be Able to Do" />
+            <p className="text-slate-600 mb-8 max-w-2xl">Measurable competencies assessed during training. These are the skills you demonstrate before you graduate.</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {p.outcomes.map((o, i) => (
+                <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <div>
+                    <p className="text-slate-800 text-sm font-medium">{o.statement}</p>
+                    {o.assessedAt && <p className="text-xs text-slate-500 mt-0.5">Assessed: {o.assessedAt}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ═══ CTA ════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-16" style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #dc2626 100%)' }}>
-        <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-white/10" />
-        <div className="max-w-3xl mx-auto px-4 text-center relative">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">
+      <section className="py-16 bg-slate-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
-          <p className="text-slate-600 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
+          <p className="text-white/80 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
 
-          {/* Two distinct paths — applicant vs enrolled */}
-          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
-            {/* New applicant */}
+          {/* Primary actions */}
+          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-6">
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">New Applicant</span>
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">New Applicant</span>
               <Link
                 href={p.cta.applyHref}
-                className="bg-white text-brand-red-600 px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-brand-red-50 transition-colors shadow-xl whitespace-nowrap"
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap"
               >
                 Apply to This Program
               </Link>
-              <span className="text-slate-500 text-xs">Free to apply · takes 5 min</span>
+              <span className="text-white/50 text-xs">Free to apply · takes 5 min</span>
             </div>
 
-            {/* Already enrolled */}
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Already Enrolled</span>
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Already Enrolled</span>
               <Link
                 href={p.cta.enrollHref || '/lms/dashboard'}
-                className="bg-brand-blue-500 hover:bg-brand-blue-400 text-white px-10 py-4 rounded-2xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap border-2 border-white/30"
+                className="bg-brand-blue-600 hover:bg-brand-blue-500 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap border border-white/20"
               >
                 Go to My Courses
               </Link>
-              <span className="text-slate-500 text-xs">Log in to access your training</span>
+              <span className="text-white/50 text-xs">Log in to access your training</span>
             </div>
           </div>
 
-          <Link
-            href={p.cta.advisorHref || '/contact'}
-            className="inline-block border-2 border-white/40 text-slate-600 px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors mt-2"
-          >
-            Questions? Talk to an Advisor
-          </Link>
+          {/* Secondary actions */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href={p.cta.requestInfoHref || `/contact?program=${p.slug}`}
+              className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors"
+            >
+              Request Information
+            </Link>
+            {p.cta.careerConnectHref && (
+              <a
+                href={p.cta.careerConnectHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors"
+              >
+                Indiana Career Connect ↗
+              </a>
+            )}
+          </div>
+
+          {/* Payment plan note */}
+          <p className="mt-6 text-white/50 text-xs">
+            Payment plans available for self-pay students. Workforce funding may cover 100% for eligible Indiana residents.
+          </p>
         </div>
       </section>
 

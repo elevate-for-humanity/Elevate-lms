@@ -166,10 +166,10 @@ export default function PartnerPageClient() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white border-t border-slate-100">
+      <section className="py-16 bg-slate-900 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-black mb-4">Ready to Partner With Us?</h2>
-          <p className="text-lg text-slate-600 mb-8">
+          <h2 className="text-3xl font-extrabold text-white mb-4">Ready to Partner With Us?</h2>
+          <p className="text-lg text-slate-300 mb-8">
             Join the Indiana Barber Apprenticeship program and start developing talent for your shop.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -181,14 +181,14 @@ export default function PartnerPageClient() {
             </Link>
             <a
               href="tel:+13173143757"
-              className="inline-flex items-center justify-center px-10 py-4 border-2 border-brand-blue-600 text-brand-blue-600 rounded-xl font-extrabold text-lg hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-white rounded-xl font-extrabold text-lg hover:bg-white/10 transition-colors"
             >
               (317) 314-3757
             </a>
           </div>
           <Link
             href="/partners/requirements"
-            className="inline-block mt-4 text-sm text-orange-100 underline hover:text-white transition-colors"
+            className="inline-block mt-6 text-sm text-slate-400 underline hover:text-white transition-colors"
           >
             View full partner site requirements including insurance
           </Link>

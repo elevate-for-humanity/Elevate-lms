@@ -80,12 +80,9 @@ async function checkDatabase() {
   try {
     const supabase = await createClient();
     const db = createAdminClient() ?? supabase;
-    const { error } = await db.from('profiles').select('count').limit(1).single();
+    const { error } = await db.from('profiles').select('id', { count: 'exact', head: true });
     const latency = Date.now() - startTime;
-    // "multiple rows" error means the query ran — DB is connected
-    if (error && !error.message.includes('multiple')) {
-      return { status: 'fail', connected: false, latency };
-    }
+    if (error) return { status: 'fail', connected: false, latency };
     return { status: 'pass', connected: true, latency };
   } catch {
     return { status: 'fail', connected: false, latency: Date.now() - startTime };

@@ -96,9 +96,14 @@ export default function HeroVideo({
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // On scroll: play video muted (browser requires muted for scroll-triggered autoplay)
-  // and play voiceover audio unmuted (audio element is not subject to the same restriction
-  // once the user has interacted with the page via scrolling)
+  // Preload audio on mount so it's buffered before scroll fires
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || prefersReducedMotion) return;
+    audio.load();
+  }, [prefersReducedMotion]);
+
+  // On scroll: play video muted (browser requires this) + voiceover audio unmuted
   useEffect(() => {
     if (prefersReducedMotion) return;
 
@@ -112,7 +117,7 @@ export default function HeroVideo({
       const video = videoRef.current;
       const audio = audioRef.current;
 
-      // Video always plays muted — browser blocks unmuted video autoplay
+      // Video plays muted — browser policy requires this for scroll-triggered play
       if (video) {
         video.muted = true;
         video.play()
@@ -120,17 +125,13 @@ export default function HeroVideo({
           .catch(() => {});
       }
 
-      // Voiceover audio plays unmuted — scroll counts as user interaction
+      // Audio plays unmuted — scroll is sufficient user interaction for audio elements
       if (audio) {
         audio.volume = 1;
         audio.currentTime = 0;
         audio.play()
           .then(() => setMuted(false))
-          .catch(() => {
-            // Still blocked — user hasn't interacted enough yet
-            // Toggle remains available for manual unmute
-            setMuted(true);
-          });
+          .catch(() => setMuted(true));
       }
     }
 
@@ -237,9 +238,9 @@ export default function HeroVideo({
           />
         )}
 
-        {/* Voiceover audio — not loaded until scroll triggers playback */}
+        {/* Voiceover audio — preload metadata so it's ready when scroll fires */}
         {voiceoverSrc && (
-          <audio ref={audioRef} src={voiceoverSrc} preload="none" aria-hidden="true" loop />
+          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" loop />
         )}
 
         {/* ── ON-VIDEO ELEMENTS (only these three are allowed) ── */}

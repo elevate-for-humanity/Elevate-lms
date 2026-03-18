@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 };
 
 const complianceFeatures = [
-  { image: '/images/pages/admin-compliance-hero.jpg', alt: 'DOL Registered apprenticeship compliance', title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor' },
-  { image: '/images/pages/admin-wioa-hero.jpg', alt: 'ETPL approved training provider listing', title: 'ETPL Approved', description: "Listed on Indiana's Eligible Training Provider List" },
-  { image: '/images/pages/admin-compliance-audit-hero.jpg', alt: 'WIOA compliance documentation and reporting', title: 'WIOA Compliant', description: 'Full compliance with Workforce Innovation and Opportunity Act' },
-  { image: '/images/pages/admin-wioa-reports-hero.jpg', alt: 'Real-time outcome tracking and placement reporting', title: 'Outcome Tracking', description: 'Real-time reporting on placement, retention, and wages' },
+  { image: '/images/pages/government-1.jpg', alt: 'DOL Registered apprenticeship compliance', title: 'DOL Registered', description: 'Registered apprenticeship sponsor with the Department of Labor', href: '/programs/apprenticeship', cta: 'View Apprenticeships' },
+  { image: '/images/pages/government-2.jpg', alt: 'ETPL approved training provider listing', title: 'ETPL Approved', description: "Listed on Indiana's Eligible Training Provider List", href: '/funding/how-it-works', cta: 'How Funding Works' },
+  { image: '/images/pages/government-3.jpg', alt: 'WIOA compliance documentation and reporting', title: 'WIOA Compliant', description: 'Full compliance with Workforce Innovation and Opportunity Act', href: '/funding/how-it-works#wioa', cta: 'WIOA Details' },
+  { image: '/images/pages/government-4.jpg', alt: 'Real-time outcome tracking and placement reporting', title: 'Outcome Tracking', description: 'Real-time reporting on placement, retention, and wages', href: '/contact', cta: 'Request a Report' },
 ];
 
 const platformFeatures = [
@@ -68,13 +68,18 @@ export default function AgenciesPage() {
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Built for Government Compliance</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {complianceFeatures.map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div key={index} className="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
                 <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
                   <Image src={feature.image} alt={feature.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
-                <div className="p-5">
+                <div className="p-5 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 text-lg mb-2">{feature.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
+                  <p className="text-slate-600 text-sm leading-relaxed flex-1">{feature.description}</p>
+                  <div className="mt-4">
+                    <Link href={feature.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
+                      {feature.cta}
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

@@ -465,6 +465,89 @@ async function _POST(request: NextRequest) {
         break;
       }
 
+      // ========== EXTERNAL COURSE PURCHASE (STUDENT SELF-PAY) ==========
+      // Student paid for a partner-hosted external course.
+      // Record the completion row and email login credentials to the student.
+      // Login instructions are stored on the external_course_completions row by staff
+      // after they purchase on the partner site; the system emails them automatically
+      // when staff saves the record (see admin approval route).
+      if (session.metadata?.kind === 'external_course_purchase') {
+        try {
+          const studentId       = session.metadata.student_id;
+          const externalCourseId = session.metadata.external_course_id;
+          const programId       = session.metadata.program_id;
+          const studentEmail    = session.metadata.student_email || session.customer_email;
+          const partnerName     = session.metadata.partner_name;
+          const courseTitle     = session.metadata.course_title;
+          const programSlug     = session.metadata.program_slug;
+
+          if (!studentId || !externalCourseId || !programId) {
+            logger.error('[webhook] external_course_purchase missing metadata', session.metadata);
+            break;
+          }
+
+          // Upsert completion row — not yet complete, just purchased
+          const { data: completion, error: upsertErr } = await supabase
+            .from('external_course_completions')
+            .upsert(
+              {
+                user_id:            studentId,
+                external_course_id: externalCourseId,
+                program_id:         programId,
+                completed_at:       null,
+                stripe_session_id:  session.id,
+              },
+              { onConflict: 'user_id,external_course_id' },
+            )
+            .select('id')
+            .single();
+
+          if (upsertErr) {
+            logger.error('[webhook] external_course_purchase upsert failed', upsertErr);
+          } else {
+            logger.info(`✅ External course purchase recorded: ${courseTitle} for ${studentId}`);
+          }
+
+          // Alert staff to purchase on partner site and enter login credentials
+          try {
+            const { sendAdminExternalCoursePurchaseAlert } = await import('@/lib/email/external-course');
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', studentId)
+              .maybeSingle();
+
+            const { data: course } = await supabase
+              .from('program_external_courses')
+              .select('external_url')
+              .eq('id', externalCourseId)
+              .maybeSingle();
+
+            const { data: program } = await supabase
+              .from('programs')
+              .select('title')
+              .eq('id', programId)
+              .maybeSingle();
+
+            await sendAdminExternalCoursePurchaseAlert({
+              courseTitle:    courseTitle ?? 'External Course',
+              partnerName:    partnerName ?? 'Partner',
+              partnerUrl:     course?.external_url ?? '#',
+              studentName:    profile?.full_name ?? 'Student',
+              studentEmail:   studentEmail ?? '',
+              programTitle:   program?.title ?? programSlug ?? '',
+              completionId:   completion?.id ?? '',
+            });
+          } catch (emailErr) {
+            logger.error('[webhook] Failed to send admin purchase alert', emailErr);
+          }
+        } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
+          logger.error('[webhook] Error processing external_course_purchase:', err);
+        }
+        break;
+      }
+
       // ========== APPRENTICESHIP ENROLLMENT (SELF-PAY) ==========
       // Payment moves student from applied → enrolled_pending_approval
       // Training access unlocks ONLY after admin approval (→ active)

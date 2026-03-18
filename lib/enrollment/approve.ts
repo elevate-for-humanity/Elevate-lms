@@ -34,7 +34,10 @@ export async function approveApplication(
   db: SupabaseClient,
   input: ApproveApplicationInput,
 ): Promise<ApproveApplicationResult> {
-  const { applicationId, programId, fundingType, role: assignedRole = 'student' } = input;
+  const { applicationId, programId, role: assignedRole = 'student' } = input;
+  // fundingType from the caller takes precedence; fall back to what the student
+  // selected on the application (verified by WorkOne where required).
+  let fundingType = input.fundingType;
 
   // Load application
   const { data: app, error: appError } = await db
@@ -49,6 +52,16 @@ export async function approveApplication(
 
   if (app.status === 'approved') {
     return { success: true, userId: app.user_id, error: 'Already approved' };
+  }
+
+  // Block approval of WorkOne-pending applications until external confirmation is on record.
+  // Staff must update has_workone_approval = true (and optionally workone_approval_ref)
+  // before approving. This prevents enrolling students whose WIOA eligibility is unconfirmed.
+  if (app.status === 'pending_workone' && !app.has_workone_approval) {
+    return {
+      success: false,
+      error: 'This application is pending WorkOne eligibility confirmation. Update has_workone_approval before approving.',
+    };
   }
 
   const email = (app.email || '').trim().toLowerCase();
@@ -116,6 +129,11 @@ export async function approveApplication(
     await db.from('profiles').update({ role: assignedRole }).eq('id', userId);
   }
 
+  // Resolve funding source: caller override → application's requested source → 'pending'
+  if (!fundingType) {
+    fundingType = app.requested_funding_source || 'pending';
+  }
+
   // Step 2: Create program_enrollments (students only)
   const resolvedProgramId = programId || app.program_id || null;
   let enrollmentId: string | null = null;
@@ -166,6 +184,7 @@ export async function approveApplication(
       status: 'approved',
       user_id: userId,
       program_id: resolvedProgramId,
+      eligibility_status: 'verified',
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId);

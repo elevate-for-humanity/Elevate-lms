@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { approveApplication } from '@/lib/enrollment/approve';
+import { sendWorkOneHoldEmail } from '@/lib/email/workone-hold';
 
 // info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
 // but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
@@ -210,6 +211,18 @@ export interface StudentApplicationData extends BaseApplicationData {
   employmentStatus?: string;
   educationLevel?: string;
   goals?: string;
+  // Funding eligibility fields
+  requestedFundingSource?: string;
+  householdSize?: number | null;
+  annualIncomeUsd?: number | null;
+  justiceInvolved?: boolean;
+  hasEmployerSponsor?: boolean;
+  hasWorkOneApproval?: boolean;
+  workoneApprovalRef?: string | null;
+  eligibilityData?: {
+    recommended: string;
+    options: { source: string; status: string }[];
+  } | null;
 }
 
 export interface ProgramHolderApplicationData extends BaseApplicationData {
@@ -559,19 +572,73 @@ export async function submitStudentApplication(data: StudentApplicationData) {
       data.dateOfBirth ? `DOB: ${data.dateOfBirth}` : '',
       data.address ? `Address: ${data.address}` : '',
       data.state ? `State: ${data.state}` : '',
+      data.requestedFundingSource ? `Funding: ${data.requestedFundingSource}` : '',
+      data.householdSize ? `Household: ${data.householdSize}` : '',
+      data.annualIncomeUsd ? `Income: $${data.annualIncomeUsd}` : '',
     ].filter(Boolean).join(' | '),
     source: 'student-application',
   });
 
-  if (result.success) {
+  if (!result.success) return result;
+
+  // Persist funding eligibility fields and set status for WorkOne-pending applications
+  const supabase = createAdminClient();
+  if (supabase && result.applicationId) {
+    const requestedSource = data.requestedFundingSource ?? 'self_pay';
+    const needsWorkOne = ['workone', 'workforce_ready_grant'].includes(requestedSource)
+      && !data.hasWorkOneApproval;
+
+    const { error: updateErr } = await supabase
+      .from('applications')
+      .update({
+        requested_funding_source:   requestedSource,
+        household_size:             data.householdSize ?? null,
+        annual_income_usd:          data.annualIncomeUsd ?? null,
+        justice_involved:           data.justiceInvolved ?? false,
+        has_employer_sponsor:       data.hasEmployerSponsor ?? false,
+        has_workone_approval:       data.hasWorkOneApproval ?? false,
+        workone_approval_ref:       data.workoneApprovalRef ?? null,
+        recommended_funding_source: data.eligibilityData?.recommended ?? requestedSource,
+        eligibility_data:           data.eligibilityData ?? null,
+        eligibility_status:         needsWorkOne ? 'pending_workone' : 'pending',
+        eligibility_evaluated_at:   new Date().toISOString(),
+        // Hold WorkOne applications — don't auto-approve until WorkOne confirms
+        status:                     needsWorkOne ? 'pending_workone' : 'submitted',
+      })
+      .eq('id', result.applicationId);
+
+    if (updateErr) {
+      logger.error('[Apply] Failed to persist funding eligibility fields', updateErr);
+    }
+
+    // Send WorkOne hold email — non-blocking, failure does not abort the submission
+    if (needsWorkOne && !updateErr) {
+      sendWorkOneHoldEmail({
+        firstName:       data.firstName,
+        lastName:        data.lastName,
+        email:           data.email,
+        programName:     data.programInterest || 'your selected program',
+        referenceNumber: result.referenceNumber,
+      }).catch(err => logger.error('[Apply] WorkOne hold email failed', err));
+    }
+
     return {
       success: true,
       applicationId: result.applicationId,
       referenceNumber: result.referenceNumber,
       email: result.email || data.email,
+      // Signal to the form so it can redirect to the right page
+      status: needsWorkOne ? 'pending_workone' : 'submitted',
     };
   }
-  return result;
+
+  return {
+    success: true,
+    applicationId: result.applicationId,
+    referenceNumber: result.referenceNumber,
+    email: result.email || data.email,
+    status: 'submitted',
+  };
 }
 
 export async function submitProgramHolderApplication(data: ProgramHolderApplicationData) {

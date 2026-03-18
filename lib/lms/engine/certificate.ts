@@ -14,6 +14,9 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { getCertificateIssuedEmail } from '@/lib/email/career-course-sequences';
+import { setAuditContext } from '@/lib/audit-context';
 
 export async function issueCertificateIfEligible(
   userId: string,
@@ -68,6 +71,38 @@ export async function issueCertificateIfEligible(
 
   const programId = enrollment?.program_id ?? null;
 
+  // All required external courses must have an approved completion before
+  // the Elevate certificate is issued. Staff approval sets approved_at.
+  if (programId) {
+    const { data: requiredExternal } = await db
+      .from('program_external_courses')
+      .select('id')
+      .eq('program_id', programId)
+      .eq('is_required', true)
+      .eq('is_active', true);
+
+    if (requiredExternal && requiredExternal.length > 0) {
+      const requiredIds = requiredExternal.map((r: any) => r.id);
+
+      const { data: approvedCompletions } = await db
+        .from('external_course_completions')
+        .select('external_course_id')
+        .eq('user_id', userId)
+        .in('external_course_id', requiredIds)
+        .not('approved_at', 'is', null);
+
+      const approvedIds = new Set((approvedCompletions ?? []).map((r: any) => r.external_course_id));
+      const allApproved = requiredIds.every((id: string) => approvedIds.has(id));
+
+      if (!allApproved) {
+        logger.info('[engine/certificate] Blocked — required external courses not yet approved', {
+          userId, courseId, requiredIds, approvedIds: [...approvedIds],
+        });
+        return null;
+      }
+    }
+  }
+
   const checkpointsPassed = totalCheckpoints; // all required checkpoints passed (verified above)
 
   const certNumber = `EFH-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
@@ -91,5 +126,38 @@ export async function issueCertificateIfEligible(
   }
 
   logger.info('[engine/certificate] Issued', { userId, courseId, certNumber });
+
+  // Send certificate notification email — non-blocking, never throws
+  try {
+    const [profileResult, courseResult] = await Promise.all([
+      db.from('profiles').select('email, first_name').eq('id', userId).maybeSingle(),
+      db.from('training_courses').select('title, slug').eq('id', courseId).maybeSingle(),
+    ]);
+
+    const profile  = profileResult.data;
+    const course   = courseResult.data;
+
+    if (profile?.email) {
+      const emailPayload = getCertificateIssuedEmail({
+        email:         profile.email,
+        firstName:     profile.first_name ?? undefined,
+        courseName:    course?.title ?? 'your program',
+        certificateId: certNumber,
+        programSlug:   course?.slug ?? '',
+      });
+      await sendEmail({
+        to:      profile.email,
+        subject: emailPayload.subject,
+        html:    emailPayload.html,
+        from:    'Elevate for Humanity <noreply@elevateforhumanity.org>',
+        replyTo: 'elevate4humanityedu@gmail.com',
+      });
+      logger.info('[engine/certificate] Certificate email sent', { userId, certNumber });
+    }
+  } catch (emailErr) {
+    // Email failure must never block certificate issuance
+    logger.error('[engine/certificate] Certificate email failed', emailErr);
+  }
+
   return certNumber;
 }

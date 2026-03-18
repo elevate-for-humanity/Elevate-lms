@@ -185,6 +185,18 @@ export default async function LearnerDashboardPage() {
     .limit(1)
     .maybeSingle();
 
+  // Check whether the learner has a pending_workone application — gates WorkOne checklist
+  const { data: workoneApp } = await db
+    .from('applications')
+    .select('id, status, requested_funding_source')
+    .eq('user_id', user.id)
+    .eq('status', 'pending_workone')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const isPendingWorkone = !!workoneApp;
+
   // Calculate stats
   const activeEnrollments = enrollments?.filter(e => e.status === 'active') || [];
   const completedEnrollments = enrollments?.filter(e => e.status === 'completed') || [];
@@ -374,7 +386,7 @@ export default async function LearnerDashboardPage() {
                               </div>
                             </div>
                             <Link
-                              href={`/courses/${enrollment.course_id}/learn`}
+                              href={`/lms/courses/${enrollment.course_id}`}
                               className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-medium rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
                             >
                               <Play className="w-4 h-4" />
@@ -443,8 +455,11 @@ export default async function LearnerDashboardPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* WorkOne Checklist */}
-            <WorkOneChecklistSection />
+            {/* WorkOne Checklist — only shown for pending_workone applicants */}
+            <WorkOneChecklistSection
+              pendingWorkone={isPendingWorkone}
+              fundingSource={workoneApp?.requested_funding_source ?? undefined}
+            />
 
             {/* Achievements */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">

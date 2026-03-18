@@ -305,7 +305,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     requestInfoHref: '/programs/hvac-technician/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=hvac+technician&location=Indiana',
     advisorHref: '/contact',
-    courseHref: '/programs/hvac-technician/course',
+    courseHref: '/lms/courses/f0593164-55be-5867-98e7-8a86770a8dd0',
   },
 
   // ─── J. Institutional Footer ─────────────────────────────────────

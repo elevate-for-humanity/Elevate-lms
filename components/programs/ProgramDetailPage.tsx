@@ -40,13 +40,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
   const totalHours = getTotalHoursFromBreakdown(p);
   const hoursRange = getTotalHoursRange(p);
 
-  // Module accent colors — cycles through brand palette
-  const MODULE_COLORS = [
-    { light: 'bg-brand-red-50',    border: 'border-brand-red-200',    text: 'text-brand-red-700',    num: 'bg-brand-red-500 text-white' },
-    { light: 'bg-brand-blue-50',   border: 'border-brand-blue-200',   text: 'text-brand-blue-700',   num: 'bg-brand-blue-600 text-white' },
-    { light: 'bg-brand-orange-50', border: 'border-brand-orange-200', text: 'text-brand-orange-700', num: 'bg-brand-orange-500 text-white' },
-    { light: 'bg-brand-green-50',  border: 'border-brand-green-200',  text: 'text-brand-green-700',  num: 'bg-brand-green-600 text-white' },
-  ];
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -169,42 +163,32 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       </section>
 
       {/* ═══ CREDIBILITY STRIP ══════════════════════════════════════ */}
-      <section className="bg-slate-900 py-8 border-b border-slate-800">
+      <section className="bg-white py-8 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            {/* Wage range */}
             <div>
-              <DollarSign className="w-5 h-5 text-brand-green-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{p.laborMarket?.salaryRange ?? '—'}</div>
-              <div className="text-xs text-slate-400">Typical wage range</div>
+              <div className="text-2xl font-extrabold text-slate-900">{p.laborMarket?.salaryRange ?? '—'}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Typical wage range</div>
             </div>
-            {/* Training hours */}
             <div>
-              <Clock className="w-5 h-5 text-brand-blue-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{totalHours > 0 ? `${totalHours} hrs` : hoursRange}</div>
-              <div className="text-xs text-slate-400">Total training hours</div>
+              <div className="text-2xl font-extrabold text-slate-900">{totalHours > 0 ? `${totalHours} hrs` : hoursRange}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Total training hours</div>
             </div>
-            {/* Credentials */}
             <div>
-              <Award className="w-5 h-5 text-brand-orange-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{p.credentials.length} credential{p.credentials.length !== 1 ? 's' : ''}</div>
-              <div className="text-xs text-slate-400">{p.credentials[0]?.issuingBody ?? 'Industry recognized'}</div>
+              <div className="text-2xl font-extrabold text-slate-900">{p.credentials.length} credential{p.credentials.length !== 1 ? 's' : ''}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{p.credentials[0]?.issuingBody ?? 'Industry recognized'}</div>
             </div>
-            {/* Job growth */}
             <div>
-              <TrendingUp className="w-5 h-5 text-brand-red-400 mx-auto mb-1.5" />
-              <div className="text-lg font-extrabold text-white">{p.laborMarket?.growthRate ?? '—'}</div>
-              <div className="text-xs text-slate-400">Job growth ({p.laborMarket?.sourceYear ?? ''})</div>
+              <div className="text-2xl font-extrabold text-slate-900">{p.laborMarket?.growthRate ?? '—'}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Job growth ({p.laborMarket?.sourceYear ?? ''})</div>
             </div>
           </div>
-
-          {/* Regulatory / compliance alignment */}
           {p.complianceAlignment.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-slate-800 flex flex-wrap items-center gap-3 justify-center">
+            <div className="mt-6 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-2 justify-center">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Aligned with:</span>
               {p.complianceAlignment.map((a) => (
-                <span key={a.standard} className="inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-700">
-                  <Shield className="w-3 h-3 text-brand-green-400" />
+                <span key={a.standard} className="inline-flex items-center gap-1.5 bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+                  <Shield className="w-3 h-3 text-slate-400" />
                   {a.standard}
                 </span>
               ))}
@@ -219,32 +203,29 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
           <p className="text-slate-500 text-sm mb-8">Full curriculum broken down by module. Every topic is covered in class and assessed before you advance.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {p.curriculum.map((mod, i) => {
-              const color = MODULE_COLORS[i % MODULE_COLORS.length];
-              return (
-                <div key={i} className={`rounded-xl border ${color.border} ${color.light} p-5`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 ${color.num}`}>{i + 1}</span>
-                    <h3 className={`font-bold text-sm ${color.text}`}>{mod.title}</h3>
-                  </div>
-                  <ul className="space-y-1.5">
-                    {mod.topics.map((t, j) => (
-                      <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
-                        <span className="mt-0.5 text-slate-500 flex-shrink-0">·</span>
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
+            {p.curriculum.map((mod, i) => (
+              <div key={i} className="rounded-xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 bg-slate-900 text-white">{i + 1}</span>
+                  <h3 className="font-bold text-sm text-slate-900">{mod.title}</h3>
                 </div>
-              );
-            })}
+                <ul className="space-y-1.5">
+                  {mod.topics.map((t, j) => (
+                    <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
+                      <span className="mt-0.5 text-slate-400 flex-shrink-0">·</span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ═══ ENROLLMENT TRACKS ══════════════════════════════════════ */}
       {p.enrollmentTracks && (
-        <section className="py-14 bg-slate-50 border-y border-slate-200">
+        <section className="py-14 bg-white border-y border-slate-100">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-10">
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">How to Enroll</h2>

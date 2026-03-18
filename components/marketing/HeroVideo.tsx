@@ -78,9 +78,7 @@ export default function HeroVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  // Start as paused — video does NOT autoplay on load
   const [playing, setPlaying] = useState(false);
-  // Start muted — video is always muted until user clicks unmute
   const [muted, setMuted] = useState(true);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -104,32 +102,16 @@ export default function HeroVideo({
     audio.load();
   }, [prefersReducedMotion]);
 
-  // On scroll: play video muted (browser requires this) + voiceover audio unmuted
+  // Autoplay muted on load — browser allows muted autoplay
   useEffect(() => {
     if (prefersReducedMotion) return;
-
-    function onScroll() {
-      if (triggeredRef.current) return;
-      if (window.scrollY < 80) return;
-
-      triggeredRef.current = true;
-      window.removeEventListener('scroll', onScroll);
-
-      const video = videoRef.current;
-      const audio = audioRef.current;
-
-      // Video plays muted — browser policy requires this for scroll-triggered play
-      if (video) {
-        video.muted = true;
-        video.play()
-          .then(() => setPlaying(true))
-          .catch(() => {});
-      }
-      // Audio stays paused until user explicitly clicks unmute
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const video = videoRef.current;
+    if (!video) return;
+    triggeredRef.current = true;
+    video.muted = true;
+    video.play()
+      .then(() => setPlaying(true))
+      .catch(() => {});
   }, [prefersReducedMotion]);
 
   // Pause video + audio when scrolled out of view; resume when back in view

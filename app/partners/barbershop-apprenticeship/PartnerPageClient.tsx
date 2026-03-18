@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ClipboardList, BookOpen, FileText, PenLine, CheckCircle2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import VideoHero from '@/components/ui/VideoHero';
 
@@ -166,6 +166,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* CTA */}
+      {/* Apply CTA */}
       <section className="py-16 bg-slate-900 border-t border-slate-800">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-extrabold text-white mb-4">Ready to Partner With Us?</h2>
@@ -192,6 +193,88 @@ export default function PartnerPageClient() {
           >
             View full partner site requirements including insurance
           </Link>
+        </div>
+      </section>
+
+      {/* Onboarding — shown after application section as next steps */}
+      <section className="py-16 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-2">
+            <CheckCircle2 className="w-6 h-6 text-brand-green-600 flex-shrink-0" />
+            <h2 className="text-2xl font-bold text-slate-900">After Your Application Is Approved</h2>
+          </div>
+          <p className="text-slate-600 mb-8 text-sm">
+            Once your partner application is reviewed and approved, complete these four steps to receive your first apprentice placement.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Link
+              href="/partners/barbershop-apprenticeship/handbook"
+              className="flex items-start gap-4 bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-blue-400 hover:shadow-sm transition group"
+            >
+              <div className="w-10 h-10 rounded-full bg-brand-blue-100 text-brand-blue-700 flex items-center justify-center flex-shrink-0 font-bold text-lg group-hover:bg-brand-blue-600 group-hover:text-white transition">
+                1
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="w-4 h-4 text-brand-blue-600" />
+                  <h3 className="font-bold text-slate-900">Read the Partner Handbook</h3>
+                </div>
+                <p className="text-sm text-slate-600">Covers your responsibilities, supervision requirements, hour tracking, and compensation rules.</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/partners/barbershop-apprenticeship/policy-acknowledgment"
+              className="flex items-start gap-4 bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-blue-400 hover:shadow-sm transition group"
+            >
+              <div className="w-10 h-10 rounded-full bg-brand-blue-100 text-brand-blue-700 flex items-center justify-center flex-shrink-0 font-bold text-lg group-hover:bg-brand-blue-600 group-hover:text-white transition">
+                2
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <ClipboardList className="w-4 h-4 text-brand-blue-600" />
+                  <h3 className="font-bold text-slate-900">Acknowledge Policies</h3>
+                </div>
+                <p className="text-sm text-slate-600">Review and acknowledge the program policies, wage requirements, and supervision standards.</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/partners/barbershop-apprenticeship/forms"
+              className="flex items-start gap-4 bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-blue-400 hover:shadow-sm transition group"
+            >
+              <div className="w-10 h-10 rounded-full bg-brand-blue-100 text-brand-blue-700 flex items-center justify-center flex-shrink-0 font-bold text-lg group-hover:bg-brand-blue-600 group-hover:text-white transition">
+                3
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <FileText className="w-4 h-4 text-brand-blue-600" />
+                  <h3 className="font-bold text-slate-900">Complete Required Forms</h3>
+                </div>
+                <p className="text-sm text-slate-600">Submit your shop license, insurance certificate, and barber-on-file documentation.</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/partners/barbershop-apprenticeship/sign-mou"
+              className="flex items-start gap-4 bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-blue-400 hover:shadow-sm transition group"
+            >
+              <div className="w-10 h-10 rounded-full bg-brand-blue-100 text-brand-blue-700 flex items-center justify-center flex-shrink-0 font-bold text-lg group-hover:bg-brand-blue-600 group-hover:text-white transition">
+                4
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <PenLine className="w-4 h-4 text-brand-blue-600" />
+                  <h3 className="font-bold text-slate-900">Sign the MOU</h3>
+                </div>
+                <p className="text-sm text-slate-600">Sign the Memorandum of Understanding to formalize the partnership and receive your first apprentice.</p>
+              </div>
+            </Link>
+          </div>
+
+          <p className="mt-6 text-xs text-slate-500 text-center">
+            These steps are only available to approved partners. Questions? Call <a href="tel:3173143757" className="underline">(317) 314-3757</a>.
+          </p>
         </div>
       </section>
     </div>

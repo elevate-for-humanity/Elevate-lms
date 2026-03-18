@@ -146,21 +146,11 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   </Link>
 
                   <Link
-                    href={p.cta.requestInfoHref || `/contact?program=${p.slug}`}
-                    className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm mb-2"
+                    href={p.cta.advisorHref || '/contact'}
+                    className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
                   >
-                    Request Information
+                    Talk to an Advisor
                   </Link>
-                  {p.cta.careerConnectHref && (
-                    <a
-                      href={p.cta.careerConnectHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
-                    >
-                      Indiana Career Connect ↗
-                    </a>
-                  )}
                   {p.cta.courseHref && (
                     <Link
                       href={p.cta.courseHref}
@@ -291,6 +281,14 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                     Apply — Check My Eligibility
                   </Link>
                   <p className="text-center text-xs text-slate-500 mt-1">Free to apply · eligibility verified before enrollment</p>
+                  <a
+                    href="https://www.indianacareerconnect.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center border border-brand-green-300 text-brand-green-700 hover:bg-brand-green-50 font-semibold py-2.5 rounded-xl transition-colors text-xs mt-2"
+                  >
+                    Register at Indiana Career Connect →
+                  </a>
                 </div>
               </div>
 
@@ -349,84 +347,68 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         </section>
       )}
 
-      {/* ═══ OUTCOMES ═══════════════════════════════════════════════ */}
-      {p.outcomes && p.outcomes.length > 0 && (
-        <section className="py-14 bg-white border-t border-slate-100">
-          <div className="max-w-5xl mx-auto px-4">
-            <SectionHeader icon={TrendingUp} title="What You Will Be Able to Do" />
-            <p className="text-slate-600 mb-8 max-w-2xl">Measurable competencies assessed during training. These are the skills you demonstrate before you graduate.</p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {p.outcomes.map((o, i) => (
-                <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-xl p-4 border border-slate-200">
-                  <span className="w-6 h-6 rounded-full bg-brand-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <div>
-                    <p className="text-slate-800 text-sm font-medium">{o.statement}</p>
-                    {o.assessedAt && <p className="text-xs text-slate-500 mt-0.5">Assessed: {o.assessedAt}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* ═══ CTA ════════════════════════════════════════════════════ */}
       <section className="py-16 bg-slate-900">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
-          <p className="text-white/80 text-base max-w-xl mx-auto mb-8">{p.fundingStatement}</p>
+          <p className="text-slate-400 text-base max-w-xl mx-auto mb-10">{p.fundingStatement}</p>
 
-          {/* Primary actions */}
+          {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-6">
+            {/* New applicant */}
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">New Applicant</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">New Applicant</span>
               <Link
                 href={p.cta.applyHref}
-                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap"
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
               >
-                Apply to This Program
+                Apply Now
               </Link>
-              <span className="text-white/50 text-xs">Free to apply · takes 5 min</span>
+              <span className="text-slate-500 text-xs">Free to apply · takes 5 min</span>
             </div>
 
+            {/* Already enrolled */}
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Already Enrolled</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Already Enrolled</span>
               <Link
                 href={p.cta.enrollHref || '/lms/dashboard'}
-                className="bg-brand-blue-600 hover:bg-brand-blue-500 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors shadow-xl whitespace-nowrap border border-white/20"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
               >
                 Go to My Courses
               </Link>
-              <span className="text-white/50 text-xs">Log in to access your training</span>
+              <span className="text-slate-500 text-xs">Log in to access your training</span>
+            </div>
+
+            {/* Request information */}
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Have Questions?</span>
+              <Link
+                href={p.cta.advisorHref || '/contact'}
+                className="border-2 border-slate-600 hover:border-slate-400 text-slate-200 hover:text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+              >
+                Request Information
+              </Link>
+              <span className="text-slate-500 text-xs">Talk to an advisor</span>
             </div>
           </div>
 
-          {/* Secondary actions */}
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href={p.cta.requestInfoHref || `/contact?program=${p.slug}`}
-              className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors"
-            >
-              Request Information
-            </Link>
-            {p.cta.careerConnectHref && (
+          {/* Indiana Career Connect — shown for WIOA-eligible programs */}
+          {p.enrollmentTracks?.funded && (
+            <div className="mt-4 pt-6 border-t border-slate-800">
+              <p className="text-slate-400 text-sm mb-3">Indiana residents — check your funding eligibility first:</p>
               <a
-                href={p.cta.careerConnectHref}
+                href="https://www.indianacareerconnect.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition-colors"
+                className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-colors"
               >
-                Indiana Career Connect ↗
+                Register at Indiana Career Connect →
               </a>
-            )}
-          </div>
-
-          {/* Payment plan note */}
-          <p className="mt-6 text-white/50 text-xs">
-            Payment plans available for self-pay students. Workforce funding may cover 100% for eligible Indiana residents.
-          </p>
+              <p className="text-slate-500 text-xs mt-2">Required to access WIOA, WorkOne, and state workforce funding</p>
+            </div>
+          )}
         </div>
       </section>
 

@@ -76,15 +76,12 @@ function ProgramCard({ p }: { p: Program }) {
     <Link href={`/programs/${p.slug}`} className="group block bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3">
-          <p className="text-white font-bold text-sm leading-tight">{p.title}</p>
-        </div>
         {p.funded && (
-          <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Funded</span>
+          <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">Funded</span>
         )}
       </div>
       <div className="p-3">
+        <p className="font-semibold text-slate-900 text-sm mb-1">{p.title}</p>
         <p className="text-slate-500 text-xs mb-2 line-clamp-2">{p.desc}</p>
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1 text-xs text-slate-400"><Clock className="w-3 h-3" />{p.duration}</span>
@@ -216,11 +213,10 @@ export default function ProgramsPage() {
               <Link key={a.slug} href={`/programs/${a.slug}`} className="group block bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image src={a.image} alt={a.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <p className="text-white font-bold text-sm leading-tight">{a.title}</p>
-                    <p className="text-white/70 text-xs mt-0.5">{a.duration} · In Person · Funded</p>
-                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="font-semibold text-slate-900 text-sm leading-tight">{a.title}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{a.duration} · In Person · Funded</p>
                 </div>
               </Link>
             ))}

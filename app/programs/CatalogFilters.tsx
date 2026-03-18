@@ -77,7 +77,7 @@ function ProgramCard({ p }: { p: CatalogProgram }) {
       href={`/programs/${p.slug}`}
       className="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
     >
-      {/* Cover image with gradient overlay */}
+      {/* Cover image — no overlay, no text on image */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <Image
           src={p.heroImage}
@@ -86,33 +86,28 @@ function ProgramCard({ p }: { p: CatalogProgram }) {
           className="object-cover transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/15 to-transparent" />
-
-        {/* Top badges */}
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+        {/* Top badges only — no overlay, no text */}
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           {p.badge && (
-            <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${badgeBg(p.badgeColor)}`}>
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${badgeBg(p.badgeColor)}`}>
               {p.badge}
             </span>
           )}
-          <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${modeBg(p.deliveryMode)}`}>
+          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${modeBg(p.deliveryMode)}`}>
             {modeLabel(p.deliveryMode)}
           </span>
         </div>
-
-        {/* Title + duration overlaid on image */}
-        <div className="absolute inset-x-4 bottom-4 text-white">
-          <h3 className="text-lg font-semibold leading-tight">{p.title}</h3>
-          <p className="mt-1 flex items-center gap-1 text-xs font-medium text-white/75">
-            <Clock className="w-3 h-3" />
-            {p.durationWeeks} weeks
-          </p>
-        </div>
       </div>
 
-      {/* Card body */}
+      {/* Card body — title and meta below image */}
       <div className="px-4 py-3">
-        <p className="text-xs text-slate-500">{p.isSelfPay ? 'Self-pay' : 'WIOA / Grant funded'}</p>
+        <h3 className="font-semibold text-slate-900 text-sm leading-tight mb-1">{p.title}</h3>
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1 text-xs text-slate-400">
+            <Clock className="w-3 h-3" />{p.durationWeeks} weeks
+          </span>
+          <span className="text-xs text-slate-500">{p.isSelfPay ? 'Self-pay' : 'WIOA / Grant funded'}</span>
+        </div>
       </div>
     </Link>
   );

@@ -60,7 +60,7 @@ export const NETWORK_ADMIN: ProgramSchema = {
     { title: 'Network Engineer', salary: '$75,000–$100,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=network-administration',
+    requestInfoHref: '/programs/network-administration/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=network+administrator&location=Indiana', advisorHref: '/contact', courseHref: '/programs/network-administration' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'CompTIA A+ or equivalent knowledge recommended', 'Basic computer skills'],
   equipmentIncluded: 'Lab equipment, practice switches/routers, and certification exam fee included.',

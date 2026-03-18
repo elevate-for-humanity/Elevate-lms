@@ -58,13 +58,16 @@ export async function POST(req: Request) {
         last_name: validated.lastName,
         email: validated.email,
         phone: validated.phone,
-        date_of_birth: validated.dateOfBirth,
-        address: validated.address,
         city: validated.city,
-        state: validated.state,
         zip: validated.zipCode,
         program_interest: 'Barber Apprenticeship',
         status: 'pending_payment',
+        // date_of_birth, address, state stored in eligibility_data (not in applications schema)
+        eligibility_data: {
+          date_of_birth: validated.dateOfBirth,
+          address: validated.address,
+          state: validated.state,
+        },
         support_notes: JSON.stringify({
           programType: 'apprenticeship',
           fundingSource: 'self-pay',

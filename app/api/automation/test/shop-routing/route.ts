@@ -135,10 +135,9 @@ async function _POST() {
       const { data: application } = await adminClient
         .from('applications')
         .insert({
-          applicant_id: user.id,
+          user_id: user.id,
           program_id: '00000000-0000-0000-0000-000000000001', // Placeholder
           status: 'pending',
-          created_at: new Date().toISOString(),
         })
         .select()
         .single();

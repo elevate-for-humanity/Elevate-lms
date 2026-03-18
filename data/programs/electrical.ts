@@ -102,7 +102,7 @@ export const ELECTRICAL: ProgramSchema = {
   ],
 
   cta: { applyHref: '/programs/electrical/apply',
-    requestInfoHref: '/contact?program=electrical',
+    requestInfoHref: '/programs/electrical/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=electrician&location=Indiana', advisorHref: '/contact', courseHref: '/programs/electrical' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior electrical experience required'],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',

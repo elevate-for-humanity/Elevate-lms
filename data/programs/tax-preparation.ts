@@ -61,7 +61,7 @@ export const TAX_PREPARATION: ProgramSchema = {
     { title: 'Tax Business Owner', salary: '$60,000–$120,000+' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=tax-preparation',
+    requestInfoHref: '/programs/tax-preparation/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=tax+preparer&location=Indiana', advisorHref: '/contact', courseHref: '/programs/tax-preparation' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic math and computer skills', 'No prior tax experience required'],
   equipmentIncluded: 'Laptop provided during training. Tax software licenses and PTIN registration fee included.',

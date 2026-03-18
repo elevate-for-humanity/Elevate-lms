@@ -31,18 +31,17 @@ async function _POST(request: NextRequest) {
     const { data, error } = await db
       .from('applications')
       .insert({
-        type: 'supersonic_career',
         full_name: name,
         email,
         phone,
         status: 'pending',
-        metadata: {
-          position,
+        source: 'supersonic-fast-cash',
+        program_interest: position,
+        notes: message || null,
+        eligibility_data: {
+          type: 'supersonic_career',
           experience,
-          message,
-          source: 'supersonic-fast-cash',
         },
-        created_at: new Date().toISOString(),
       })
       .select()
       .single();

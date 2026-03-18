@@ -60,7 +60,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
     { title: 'Construction Worker (OSHA + CPR)', salary: '$32,000–$45,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=cpr-first-aid', advisorHref: '/contact', courseHref: '/programs/cpr-first-aid' },
+    requestInfoHref: '/programs/cpr-first-aid/request-info', advisorHref: '/contact', courseHref: '/programs/cpr-first-aid' },
   admissionRequirements: ['16 years or older', 'No prerequisites', 'No prior medical training required'],
   equipmentIncluded: 'Training mannequin shipped directly to your home. AED trainer and certification card included.',
   modality: 'Online — live instructor-led session. Train from the comfort of your own home.',

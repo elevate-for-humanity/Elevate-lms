@@ -55,7 +55,7 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
     { title: 'Art Director', salary: '$70,000–$100,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=graphic-design',
+    requestInfoHref: '/programs/graphic-design/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=graphic+designer&location=Indiana', advisorHref: '/contact', courseHref: '/programs/graphic-design' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior design experience required'],
   equipmentIncluded: 'Workstation provided during training. Adobe Creative Cloud licenses and certification exam fees included.',

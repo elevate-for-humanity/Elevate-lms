@@ -53,7 +53,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
     { title: 'Business Development', salary: '$45,000–$65,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=entrepreneurship', advisorHref: '/contact', courseHref: '/programs/entrepreneurship' },
+    requestInfoHref: '/programs/entrepreneurship/request-info', advisorHref: '/contact', courseHref: '/programs/entrepreneurship' },
   admissionRequirements: ['18 years or older', 'Business idea or existing business', 'Basic computer skills'],
   equipmentIncluded: 'Laptop provided during training. All software and certification exam fees included.',
   modality: 'Hybrid — Evening classes, Saturday workshops, LMS-supported coursework',

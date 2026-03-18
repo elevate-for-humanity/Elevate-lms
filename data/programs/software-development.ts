@@ -56,7 +56,7 @@ export const SOFTWARE_DEV: ProgramSchema = {
     { title: 'Senior Developer', salary: '$85,000–$120,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=software-development',
+    requestInfoHref: '/programs/software-development/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=software+developer&location=Indiana', advisorHref: '/contact', courseHref: '/programs/software-development' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior coding experience required'],
   equipmentIncluded: 'Laptop provided during training. All software and certification exam fees included.',

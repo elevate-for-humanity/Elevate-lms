@@ -71,7 +71,7 @@ export const FORKLIFT: ProgramSchema = {
     { title: 'Warehouse Supervisor', salary: '$45,000–$60,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=forklift',
+    requestInfoHref: '/programs/forklift/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=forklift+operator&location=Indiana', advisorHref: '/contact', courseHref: '/programs/forklift' },
   admissionRequirements: ['18 years or older', 'Valid government-issued ID', 'Able to lift 50 lbs', 'No prior forklift experience required'],
   equipmentIncluded: 'All training materials and certification card included',

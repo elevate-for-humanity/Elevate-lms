@@ -65,7 +65,7 @@ export const PEER_RECOVERY: ProgramSchema = {
     { title: 'Community Health Worker', salary: '$35,000–$45,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=peer-recovery-specialist',
+    requestInfoHref: '/programs/peer-recovery-specialist/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=peer+recovery+specialist&location=Indiana', advisorHref: '/contact', courseHref: '/programs/peer-recovery-specialist' },
   admissionRequirements: ['18 years or older', 'Lived experience with recovery (self or family)', 'High school diploma or GED', 'Background check required'],
   equipmentIncluded: 'All training materials, naloxone kit, and CPRS exam fee included upon successful program completion',

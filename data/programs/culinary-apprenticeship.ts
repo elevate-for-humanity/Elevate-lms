@@ -55,7 +55,7 @@ export const CULINARY: ProgramSchema = {
     { title: 'Executive Chef', salary: '$55,000–$80,000' },
   ],
   cta: { applyHref: '/programs/culinary-apprenticeship/apply',
-    requestInfoHref: '/contact?program=culinary-apprenticeship',
+    requestInfoHref: '/programs/culinary-apprenticeship/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=culinary+chef&location=Indiana', advisorHref: '/contact', courseHref: '/programs/culinary-apprenticeship' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Interest in culinary career', 'Able to stand for extended periods'],
   equipmentIncluded: 'Knife kit provided. Kitchen uniforms and supplies provided by host kitchen.',

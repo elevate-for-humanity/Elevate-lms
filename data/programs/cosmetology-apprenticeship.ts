@@ -78,7 +78,7 @@ export const COSMETOLOGY: ProgramSchema = {
     { title: 'Salon Owner', salary: '$50,000–$100,000+' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=cosmetology-apprenticeship',
+    requestInfoHref: '/programs/cosmetology-apprenticeship/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cosmetologist&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cosmetology-apprenticeship' },
   admissionRequirements: ['16 years or older', 'High school diploma or GED (or actively pursuing)', 'Interest in cosmetology career', 'Background check required'],
   equipmentIncluded: 'Basic tool kit provided. Salon supplies provided by host salon.',

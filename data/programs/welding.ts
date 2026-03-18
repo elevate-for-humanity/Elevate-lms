@@ -95,7 +95,7 @@ export const WELDING: ProgramSchema = {
   ],
 
   cta: { applyHref: '/programs/welding/apply',
-    requestInfoHref: '/contact?program=welding',
+    requestInfoHref: '/programs/welding/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=welder&location=Indiana', advisorHref: '/contact', courseHref: '/programs/welding' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Ability to lift 50 lbs', 'No prior welding experience required'],
   equipmentIncluded: 'Welding helmet, gloves, and all consumables provided. Certification exam fees included.',

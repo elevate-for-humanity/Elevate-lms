@@ -144,7 +144,7 @@ export const CDL_TRAINING: ProgramSchema = {
   ],
 
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=cdl-training',
+    requestInfoHref: '/programs/cdl-training/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cdl+truck+driver&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cdl-training' },
 
   admissionRequirements: [

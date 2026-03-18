@@ -80,15 +80,16 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<boolean> {
       .insert({
         action: entry.action,
         user_id: entry.userId,
-        organization_id: entry.organizationId,
+        tenant_id: entry.organizationId || null,
         resource_type: entry.resourceType,
         resource_id: entry.resourceId,
-        details: entry.details || {},
+        details: {
+          ...(entry.details || {}),
+          ...(entry.errorMessage ? { error_message: entry.errorMessage } : {}),
+        },
         ip_address: entry.ipAddress,
         user_agent: entry.userAgent,
         success: entry.success,
-        error_message: entry.errorMessage,
-        created_at: new Date().toISOString(),
       });
 
     if (error) {

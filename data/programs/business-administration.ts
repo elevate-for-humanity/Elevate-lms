@@ -59,7 +59,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
     { title: 'Small Business Owner', salary: 'Varies' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=business-administration',
+    requestInfoHref: '/programs/business-administration/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=business+administration&location=Indiana', advisorHref: '/contact', courseHref: '/programs/business' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior business experience required'],
   equipmentIncluded: 'Laptop provided during training. All software licenses and certification exam fees included.',

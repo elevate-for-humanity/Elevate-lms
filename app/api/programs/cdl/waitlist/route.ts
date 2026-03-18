@@ -47,10 +47,10 @@ export async function POST(request: NextRequest) {
         email: body.email.toLowerCase().trim(),
         phone: body.phone.trim(),
         city: body.city.trim(),
-        state: body.state?.trim() || 'Indiana',
         zip: body.zip.trim(),
         program_interest: 'CDL Training - October 2026 Cohort',
         status: 'waitlist',
+        eligibility_data: { state: body.state?.trim() || 'Indiana' },
         support_notes: [
           body.currentLicense ? `License: ${body.currentLicense}` : '',
           body.employmentStatus ? `Employment: ${body.employmentStatus}` : '',

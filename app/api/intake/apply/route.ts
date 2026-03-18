@@ -76,19 +76,22 @@ export async function POST(request: NextRequest) {
     const { data: application, error: appError } = await supabase
       .from('applications')
       .insert({
-        lead_id: lead.id,
         full_name: body.full_name.trim(),
         email: normalizedEmail,
         phone: body.phone?.trim() || null,
         program_interest: body.program_interest || null,
-        state: body.state || null,
-        has_indiana_career_connect: !!body.has_indiana_career_connect,
-        has_workone_appointment: !!body.has_workone_appointment,
-        intake_stage: stage,
         status: 'submitted',
         source: 'start-page',
+        // intake flags and stage stored in eligibility_data (JSONB)
+        eligibility_data: {
+          lead_id: lead.id,
+          state: body.state || null,
+          has_indiana_career_connect: !!body.has_indiana_career_connect,
+          has_workone_appointment: !!body.has_workone_appointment,
+          intake_stage: stage,
+        },
       })
-      .select('id, public_status_token, intake_stage')
+      .select('id, public_status_token')
       .single();
 
     if (appError) {
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
       success: true,
       applicationId: application.id,
       statusToken: application.public_status_token,
-      stage: application.intake_stage,
+      stage: stage,
     });
   } catch (error) {
     logger.error('Intake application error', error instanceof Error ? error : undefined);

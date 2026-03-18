@@ -80,7 +80,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
     { title: 'Trade Apprentice', salary: '$35,000–$48,000' },
   ],
   cta: { applyHref: '/apply',
-    requestInfoHref: '/contact?program=construction-trades-certification',
+    requestInfoHref: '/programs/construction-trades-certification/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=construction+trades&location=Indiana', advisorHref: '/contact', courseHref: '/programs/construction-trades-certification' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior construction experience required'],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',

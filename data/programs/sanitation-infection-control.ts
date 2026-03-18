@@ -60,7 +60,7 @@ export const SANITATION: ProgramSchema = {
     { title: 'Barber/Cosmetologist (with license)', salary: '$30,000–$50,000' },
   ],
   cta: { applyHref: '/programs/sanitation-infection-control/apply',
-    requestInfoHref: '/contact?program=sanitation-infection-control', advisorHref: '/contact', courseHref: '/programs/sanitation-infection-control' },
+    requestInfoHref: '/programs/sanitation-infection-control/request-info', advisorHref: '/contact', courseHref: '/programs/sanitation-infection-control' },
   admissionRequirements: ['16 years or older', 'No prerequisites', 'No prior training required'],
   equipmentIncluded: 'All PPE, supplies, and certification exam fees included',
   modality: 'Hybrid — In-person hands-on practice, LMS-supported theory',

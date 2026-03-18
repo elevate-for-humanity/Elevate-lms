@@ -91,7 +91,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     { title: 'Clinical Coordinator', salary: '$42,000–$55,000' },
   ],
   cta: { applyHref: '/programs/medical-assistant/apply',
-    requestInfoHref: '/contact?program=medical-assistant',
+    requestInfoHref: '/programs/medical-assistant/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=medical+assistant&location=Indiana', advisorHref: '/contact', courseHref: '/programs/medical-assistant' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'No prior healthcare experience required', 'Background check required for clinical placement'],
   equipmentIncluded: 'All clinical supplies, lab equipment, and NHA certification exam fees included',

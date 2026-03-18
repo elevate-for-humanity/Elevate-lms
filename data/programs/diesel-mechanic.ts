@@ -97,7 +97,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   ],
 
   cta: { applyHref: '/inquiry?program=diesel-mechanic',
-    requestInfoHref: '/contact?program=diesel-mechanic',
+    requestInfoHref: '/programs/diesel-mechanic/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=diesel+mechanic&location=Indiana', advisorHref: '/contact', courseHref: '/programs/diesel-mechanic' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Able to lift 50 lbs', 'Basic mechanical aptitude helpful but not required'],
   equipmentIncluded: 'All tools, diagnostic equipment, PPE, and certification exam fees included',

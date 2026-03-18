@@ -97,7 +97,7 @@ export const PLUMBING: ProgramSchema = {
   ],
 
   cta: { applyHref: '/programs/plumbing/apply',
-    requestInfoHref: '/contact?program=plumbing',
+    requestInfoHref: '/programs/plumbing/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=plumber&location=Indiana', advisorHref: '/contact', courseHref: '/programs/plumbing' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior plumbing experience required'],
   equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',

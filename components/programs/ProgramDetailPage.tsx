@@ -146,10 +146,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   </Link>
 
                   <Link
-                    href={p.cta.advisorHref || '/contact'}
+                    href={p.cta.requestInfoHref || `/programs/${p.slug}/request-info`}
                     className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
                   >
-                    Talk to an Advisor
+                    Request Information
                   </Link>
                   {p.cta.courseHref && (
                     <Link
@@ -385,7 +385,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             <div className="flex flex-col items-center gap-1.5">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Have Questions?</span>
               <Link
-                href={p.cta.advisorHref || '/contact'}
+                href={p.cta.requestInfoHref || `/programs/${p.slug}/request-info`}
                 className="border-2 border-slate-600 hover:border-slate-400 text-slate-200 hover:text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
               >
                 Request Information

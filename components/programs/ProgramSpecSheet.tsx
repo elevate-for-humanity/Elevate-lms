@@ -204,7 +204,7 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
               <div className="flex flex-wrap gap-2">
                 {spec.materialsIncluded.map((item, i) => (
                   <span key={i} className="inline-block bg-brand-green-50 text-brand-green-700 text-xs px-2.5 py-1 rounded-full">
-                    ✓ {item}
+                    {item}
                   </span>
                 ))}
               </div>
@@ -246,7 +246,7 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
         <div className="mt-8 text-center">
           <Link
             href={`/apply?program=${spec.slug}`}
-            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold text-base transition"
           >
             Apply for {spec.name} <ArrowRight className="w-5 h-5" />
           </Link>

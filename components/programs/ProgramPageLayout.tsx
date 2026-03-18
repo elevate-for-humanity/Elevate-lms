@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Award, Briefcase, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 /* ------------------------------------------------------------------ */
 /*  Config types — every section is data-driven                        */
@@ -144,7 +145,7 @@ const badgeMap: Record<string, string> = {
   green: 'bg-brand-green-600',
   blue: 'bg-brand-blue-600',
   orange: 'bg-brand-orange-500',
-  purple: 'bg-purple-600',
+  purple: 'bg-brand-blue-600',
 };
 
 /* ------------------------------------------------------------------ */
@@ -165,25 +166,21 @@ export default function ProgramPageLayout({
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== HERO — video or poster image, no text on video ===== */}
+      {/* ===== HERO — clean media, no text overlay ===== */}
       {c.videoSrc ? (
-        <HeroVideo
-          videoSrcDesktop={c.videoSrc}
-          posterImage={c.heroImage || c.overviewImage}
+        <ProgramHeroBanner
+          videoSrc={c.videoSrc}
           voiceoverSrc={c.voiceoverSrc}
-          analyticsName={c.title}
+          posterImage={c.heroImage || c.overviewImage}
         />
       ) : c.heroImage ? (
-        <div
-          className="relative w-full overflow-hidden bg-slate-900"
-          style={{ height: 'clamp(280px, 56vw, 680px)' }}
-        >
+        <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
           <Image
             src={c.heroImage}
             alt={c.heroImageAlt || c.title}
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover"
             priority
           />
         </div>
@@ -290,10 +287,8 @@ export default function ProgramPageLayout({
                 <ul className="mt-6 space-y-3">
                   {c.highlights.map((h) => (
                     <li key={h} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-5 h-5 bg-brand-green-100 rounded-full flex items-center justify-center mt-0.5">
-                        <span className="text-brand-green-600 text-xs font-bold">✓</span>
-                      </span>
-                      <span className="text-slate-700 text-sm">{h}</span>
+                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-2" />
+                      <span className="text-slate-700 text-sm leading-relaxed">{h}</span>
                     </li>
                   ))}
                 </ul>
@@ -446,7 +441,7 @@ export default function ProgramPageLayout({
                   <ul className="space-y-3 mb-6">
                     {c.assessmentStructure.requirements.map((req) => (
                       <li key={req} className="flex items-start gap-3 text-sm text-slate-700">
-                        <CheckCircle2 className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-2" />
                         {req}
                       </li>
                     ))}
@@ -485,8 +480,7 @@ export default function ProgramPageLayout({
                 )}
                 <div className="grid sm:grid-cols-2 gap-4 mb-8">
                   {c.employerPathway.sectors.map((sector) => (
-                    <div key={sector} className="flex items-center gap-3 bg-white rounded-xl p-4 border border-slate-100">
-                      <Briefcase className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
+                    <div key={sector} className="bg-white rounded-xl p-4 border border-slate-200">
                       <span className="font-medium text-slate-900 text-sm">{sector}</span>
                     </div>
                   ))}
@@ -522,10 +516,7 @@ export default function ProgramPageLayout({
                   const issuer = parts[1] || '';
                   return (
                     <ScrollReveal key={cr} delay={i * 60} direction="up">
-                      <div className="bg-white rounded-xl p-5 border border-slate-200 text-center h-full flex flex-col items-center justify-center shadow-sm hover:shadow-md transition-shadow">
-                        <div className="w-12 h-12 rounded-full bg-brand-green-50 flex items-center justify-center mb-3">
-                          <Award className="w-6 h-6 text-brand-green-600" />
-                        </div>
+                      <div className="bg-white rounded-xl p-5 border border-slate-200 h-full shadow-sm hover:shadow-md transition-shadow">
                         <h3 className="font-bold text-slate-900 text-sm leading-snug mb-1">{name}</h3>
                         {issuer && <p className="text-xs text-slate-500 leading-snug">{issuer}</p>}
                       </div>
@@ -603,8 +594,7 @@ export default function ProgramPageLayout({
                     </div>
                   )}
                   {c.nextLevelJobsEligible && (
-                    <div className="flex items-center gap-2 text-sm bg-brand-green-50 border border-brand-green-200 rounded-lg p-3">
-                      <CheckCircle2 className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
+                    <div className="text-sm bg-brand-green-50 border border-brand-green-200 rounded-lg p-3">
                       <span className="font-semibold text-brand-green-800">Next Level Jobs Eligible</span>
                     </div>
                   )}
@@ -614,7 +604,7 @@ export default function ProgramPageLayout({
                       <ul className="space-y-1">
                         {c.admissionRequirements.map((req) => (
                           <li key={req} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
                             <span className="text-slate-700">{req}</span>
                           </li>
                         ))}
@@ -646,7 +636,7 @@ export default function ProgramPageLayout({
                           <ul className="space-y-1">
                             {c.pricingIncludes.map((item) => (
                               <li key={item} className="flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                                <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
                                 <span className="text-slate-700">{item}</span>
                               </li>
                             ))}
@@ -664,7 +654,7 @@ export default function ProgramPageLayout({
                       <ul className="space-y-2">
                         {c.employerPartners.map((partner) => (
                           <li key={partner} className="flex items-center gap-2 text-sm">
-                            <Briefcase className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-0.5" />
                             <span className="text-slate-700">{partner}</span>
                           </li>
                         ))}
@@ -691,11 +681,10 @@ export default function ProgramPageLayout({
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {c.careers.map((career, i) => (
                   <ScrollReveal key={career.title} delay={i * 80} direction="up">
-                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 text-center hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-                      <Briefcase className="w-7 h-7 text-brand-blue-600 mx-auto mb-3" />
-                      <h3 className="font-bold text-slate-900">{career.title}</h3>
-                      <div className="text-brand-green-600 font-bold text-lg mt-1">{career.salary}</div>
-                      {career.growth && <p className="text-xs text-slate-500 mt-1">{career.growth}</p>}
+                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                      <h3 className="font-bold text-slate-900 mb-2">{career.title}</h3>
+                      <div className="text-brand-green-700 font-bold text-lg">{career.salary}</div>
+                      {career.growth && <p className="text-sm text-slate-500 mt-1">{career.growth}</p>}
                     </div>
                   </ScrollReveal>
                 ))}
@@ -714,18 +703,32 @@ export default function ProgramPageLayout({
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Get Started</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">How to Enroll</h2>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 {c.steps.map((step, i) => (
                   <ScrollReveal key={step.title} delay={i * 100} direction="up">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                      <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                         {i + 1}
                       </div>
                       <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
-                      <p className="text-slate-600 text-sm">{step.desc}</p>
+                      <p className="text-slate-600 text-sm leading-relaxed">{step.desc}</p>
                     </div>
                   </ScrollReveal>
                 ))}
+              </div>
+
+              {/* Indiana Career Connect — shown for all WIOA-eligible programs */}
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+                <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
+                <p className="text-brand-blue-800 text-sm leading-relaxed mb-4">{ICC_INSTRUCTION}</p>
+                <a
+                  href={ICC_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
+                >
+                  Go to Indiana Career Connect
+                </a>
               </div>
             </div>
           </section>
@@ -758,26 +761,26 @@ export default function ProgramPageLayout({
 
       {/* ===== FINAL CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-white border-t border-slate-100">
+        <section className="py-14 sm:py-20 bg-slate-900">
           <div className="max-w-3xl mx-auto px-6 text-center">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
               Start This Credential Pathway
             </h2>
-            <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto">
-              Apply in minutes. Training may be fully funded. Graduate with nationally recognized credentials.
+            <p className="text-slate-300 text-base sm:text-lg mb-8 max-w-lg mx-auto leading-relaxed">
+              Apply in minutes. Training may be fully funded for eligible Indiana residents. Graduate with nationally recognized credentials.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
                 href={applyHref}
-                className="bg-brand-red-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-700 transition-colors"
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-bold text-base transition-colors"
               >
                 Apply Now
               </Link>
               <Link
-                href="/programs"
-                className="border border-slate-300 text-slate-700 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors"
+                href={inquiryHref}
+                className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition-colors"
               >
-                All Credential Pathways
+                Request Information
               </Link>
             </div>
           </div>

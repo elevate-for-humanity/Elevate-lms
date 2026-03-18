@@ -15,7 +15,8 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 // belongs in the LMS navigation (components/lms/LMSNavigation.tsx), not here.
 export const NAV_ITEMS = [
   {
-    name: 'Get Trained',
+    name: 'Programs',
+    href: '/programs',
     subItems: [
       { name: '— Training Areas —', href: '/programs', isHeader: true },
       { name: 'Healthcare', href: '/programs/healthcare' },

@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import { useEffect, useRef, useState } from 'react';
 import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
 
 interface ProgramHeroBannerProps {
@@ -15,8 +13,20 @@ interface ProgramHeroBannerProps {
 }
 
 export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage, title, subtitle, badge }: ProgramHeroBannerProps) {
-  const { videoRef } = useHeroVideo();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [videoFailed, setVideoFailed] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    // Try unmuted. Fall back to muted if browser blocks it.
+    el.muted = false;
+    el.volume = 0.8;
+    el.play().catch(() => {
+      el.muted = true;
+      el.play().catch(() => {});
+    });
+  }, []);
 
   return (
     <div className="relative w-full h-full">
@@ -26,7 +36,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage,
           className="absolute inset-0 w-full h-full object-cover"
           src={videoSrc}
           poster={posterImage}
-          autoPlay loop muted playsInline preload="auto"
+          loop playsInline preload="auto"
           onError={() => setVideoFailed(true)}
         />
       ) : posterImage ? (

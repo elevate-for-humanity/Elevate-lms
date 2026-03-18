@@ -325,7 +325,7 @@ export default function ApprenticeshipPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-slate-900" />
+                <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">✓</span>
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Classic Cuts
@@ -352,7 +352,7 @@ export default function ApprenticeshipPage() {
 
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-slate-900" />
+                <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">✓</span>
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Grooming Services
@@ -379,7 +379,7 @@ export default function ApprenticeshipPage() {
 
             <div className="bg-white rounded-3xl p-8 hover:shadow-xl transition">
               <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="w-8 h-8 text-slate-900" />
+                <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">✓</span>
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">
                 Business Skills

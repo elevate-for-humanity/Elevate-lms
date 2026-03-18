@@ -10,14 +10,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 import {
-  Award, BookOpen, Briefcase, CheckCircle, Clock, DollarSign,
-  GraduationCap, MapPin, Shield, TrendingUp, Users, ChevronRight,
-  Phone, FileText, Wrench, Building2,
+  BookOpen, Clock, DollarSign,
+  MapPin, Shield, TrendingUp, ChevronRight,
+  Award,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown } from '@/lib/programs/program-schema';
+import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 
 interface Props {
   program: ProgramSchema;
@@ -52,10 +53,11 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       {/* ═══ A. HERO ════════════════════════════════════════════════ */}
       <section>
         {heroOverride ?? (p.videoSrc ? (
-          <HeroVideo
-            videoSrcDesktop={p.videoSrc}
-            posterImage={p.heroImage}
-            analyticsName={p.title}
+          <PageVideoHero
+            videoSrc={p.videoSrc}
+            posterSrc={p.heroImage}
+            posterAlt={p.heroImageAlt}
+            size="program"
           />
         ) : (
           <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
@@ -146,10 +148,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                   </Link>
 
                   <Link
-                    href={p.cta.requestInfoHref || `/programs/${p.slug}/request-info`}
+                    href={p.cta.advisorHref || '/contact'}
                     className="block w-full text-center border-2 border-slate-200 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-xl transition-colors text-sm"
                   >
-                    Request Information
+                    Talk to an Advisor
                   </Link>
                   {p.cta.courseHref && (
                     <Link
@@ -262,7 +264,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 </div>
                 <h3 className="text-lg font-extrabold text-slate-900 mb-1">{p.enrollmentTracks.funded.label}</h3>
                 <p className="text-xs font-semibold text-brand-green-700 mb-3">
-                  ✓ {p.enrollmentTracks.funded.requirement}
+                  Requirement: {p.enrollmentTracks.funded.requirement}
                 </p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
                   {p.enrollmentTracks.funded.description}
@@ -281,14 +283,6 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                     Apply — Check My Eligibility
                   </Link>
                   <p className="text-center text-xs text-slate-500 mt-1">Free to apply · eligibility verified before enrollment</p>
-                  <a
-                    href="https://www.indianacareerconnect.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-center border border-brand-green-300 text-brand-green-700 hover:bg-brand-green-50 font-semibold py-2.5 rounded-xl transition-colors text-xs mt-2"
-                  >
-                    Register at Indiana Career Connect →
-                  </a>
                 </div>
               </div>
 
@@ -309,10 +303,17 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 </p>
                 <div className="bg-slate-50 rounded-xl p-4 mb-5 text-sm text-slate-600 space-y-1.5">
                   <p className="font-semibold text-slate-700 text-xs uppercase tracking-wider mb-2">What you get</p>
-                  <p>✓ Full online HVAC training curriculum</p>
-                  <p>✓ Prepares for EPA Section 608 Universal certification</p>
-                  <p>✓ OSHA 10-Hour included</p>
-                  <p>✓ Exam proctored on-site at Elevate (Indianapolis)</p>
+                  {[
+                    'Full online training curriculum',
+                    'Industry certification exam preparation',
+                    'OSHA 10-Hour included',
+                    'Exam proctored on-site at Elevate (Indianapolis)',
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2">
+                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
                 </div>
                 {p.enrollmentTracks.selfPay.available ? (
                   <Link
@@ -343,6 +344,20 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
               Workforce-funded training currently available for Indiana residents.
               Additional states will be added as partnerships develop.
             </p>
+
+            {/* Indiana Career Connect */}
+            <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+              <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
+              <p className="text-brand-blue-800 text-sm leading-relaxed mb-4">{ICC_INSTRUCTION}</p>
+              <a
+                href={ICC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
+              >
+                Go to Indiana Career Connect
+              </a>
+            </div>
           </div>
         </section>
       )}
@@ -353,10 +368,10 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
-          <p className="text-slate-400 text-base max-w-xl mx-auto mb-10">{p.fundingStatement}</p>
+          <p className="text-slate-300 text-base max-w-xl mx-auto mb-10 leading-relaxed">{p.fundingStatement}</p>
 
           {/* Two distinct paths — applicant vs enrolled */}
-          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
             {/* New applicant */}
             <div className="flex flex-col items-center gap-1.5">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">New Applicant</span>
@@ -364,9 +379,9 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
                 href={p.cta.applyHref}
                 className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
               >
-                Apply Now
+                Apply to This Program
               </Link>
-              <span className="text-slate-500 text-xs">Free to apply · takes 5 min</span>
+              <span className="text-slate-400 text-xs">Free to apply · takes 5 min</span>
             </div>
 
             {/* Already enrolled */}
@@ -378,37 +393,16 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
               >
                 Go to My Courses
               </Link>
-              <span className="text-slate-500 text-xs">Log in to access your training</span>
-            </div>
-
-            {/* Request information */}
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Have Questions?</span>
-              <Link
-                href={p.cta.requestInfoHref || `/programs/${p.slug}/request-info`}
-                className="border-2 border-slate-600 hover:border-slate-400 text-slate-200 hover:text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-              >
-                Request Information
-              </Link>
-              <span className="text-slate-500 text-xs">Talk to an advisor</span>
+              <span className="text-slate-400 text-xs">Log in to access your training</span>
             </div>
           </div>
 
-          {/* Indiana Career Connect — shown for WIOA-eligible programs */}
-          {p.enrollmentTracks?.funded && (
-            <div className="mt-4 pt-6 border-t border-slate-800">
-              <p className="text-slate-400 text-sm mb-3">Indiana residents — check your funding eligibility first:</p>
-              <a
-                href="https://www.indianacareerconnect.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-colors"
-              >
-                Register at Indiana Career Connect →
-              </a>
-              <p className="text-slate-500 text-xs mt-2">Required to access WIOA, WorkOne, and state workforce funding</p>
-            </div>
-          )}
+          <Link
+            href={p.cta.advisorHref || '/contact'}
+            className="inline-block border-2 border-slate-600 hover:border-slate-400 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors mt-2"
+          >
+            Questions? Talk to an Advisor
+          </Link>
         </div>
       </section>
 

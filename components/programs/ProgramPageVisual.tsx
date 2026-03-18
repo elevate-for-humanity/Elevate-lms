@@ -49,8 +49,8 @@ export function ProgramPageVisual({ program }: Props) {
             <video
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
-              autoPlay
-              muted
+              
+              
               loop
               playsInline
               preload="metadata"
@@ -76,7 +76,7 @@ export function ProgramPageVisual({ program }: Props) {
           >
             ← {program.category}
           </Link>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
             {program.title}
           </h1>
           <p className="text-xl text-white/90 mb-8 max-w-2xl">
@@ -108,7 +108,7 @@ export function ProgramPageVisual({ program }: Props) {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/apply"
-              className="inline-flex items-center bg-white text-slate-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg"
+              className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-xl font-bold text-base transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -269,7 +269,7 @@ export function ProgramPageVisual({ program }: Props) {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/apply"
-              className="inline-flex items-center bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-50 transition shadow-lg"
+              className="inline-flex items-center border-2 border-white/40 hover:border-white text-white px-8 py-4 rounded-xl font-bold text-base transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5 ml-2" />

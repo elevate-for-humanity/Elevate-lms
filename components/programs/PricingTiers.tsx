@@ -85,7 +85,7 @@ export function PricingTiers({
             <p className="text-brand-green-700">No cost to eligible participants</p>
           </div>
         </div>
-        <p className="text-gray-700 mb-4">
+        <p className="text-slate-700 mb-4">
           This program is available at no cost through workforce funding programs. 
           Training, materials, and certification exam fees may be covered.
         </p>
@@ -102,8 +102,8 @@ export function PricingTiers({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Package</h3>
-        <p className="text-gray-600">Select the option that best fits your needs</p>
+        <h3 className="text-2xl font-bold text-slate-900 mb-2">Choose Your Package</h3>
+        <p className="text-slate-600">Select the option that best fits your needs</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -115,7 +115,7 @@ export function PricingTiers({
                 ? 'border-brand-blue-500 shadow-lg scale-105'
                 : selectedTier === tier.id
                 ? 'border-brand-blue-400 shadow-md'
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-slate-200 hover:border-slate-300'
             }`}
             onClick={() => setSelectedTier(tier.id)}
           >
@@ -128,8 +128,8 @@ export function PricingTiers({
             )}
 
             <div className="text-center mb-4">
-              <h4 className="text-lg font-bold text-gray-900">{tier.name}</h4>
-              <p className="text-sm text-gray-500">{tier.description}</p>
+              <h4 className="text-lg font-bold text-slate-900">{tier.name}</h4>
+              <p className="text-sm text-slate-500">{tier.description}</p>
             </div>
 
             <div className="text-center mb-6">
@@ -137,7 +137,7 @@ export function PricingTiers({
                 <div className="text-3xl font-bold text-brand-green-600">FREE</div>
               ) : (
                 <div>
-                  <span className="text-3xl font-bold text-gray-900">${tier.price.toLocaleString()}</span>
+                  <span className="text-3xl font-bold text-slate-900">${tier.price.toLocaleString()}</span>
                 </div>
               )}
             </div>
@@ -146,7 +146,7 @@ export function PricingTiers({
               {tier.includes.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm">
                   <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">{item}</span>
+                  <span className="text-slate-700">{item}</span>
                 </li>
               ))}
             </ul>
@@ -156,7 +156,7 @@ export function PricingTiers({
               className={`block w-full text-center py-3 rounded-xl font-semibold transition ${
                 tier.popular
                   ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
               }`}
             >
               Select {tier.name}

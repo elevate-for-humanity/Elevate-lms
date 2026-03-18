@@ -18,39 +18,35 @@ export function useHeroVideo({
   threshold = 0.3,
 }: UseHeroVideoOptions = {}): UseHeroVideoReturn {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
+  // Track muted state — starts false (we attempt unmuted)
+  const [muted, setMuted] = useState(false);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
 
-    // Must start muted — required for autoplay across all browsers
-    el.muted = true;
-    el.volume = 1;
-
-    let triggered = false;
-
     async function startPlay() {
       if (!el) return;
-      try { await el.play(); } catch {}
+      // Attempt unmuted play first
+      el.muted = false;
+      el.volume = 0.8;
+      try {
+        await el.play();
+        setMuted(false);
+      } catch {
+        // Browser blocked unmuted autoplay — fall back to muted
+        el.muted = true;
+        setMuted(true);
+        try { await el.play(); } catch {}
+      }
     }
 
-    // Trigger on scroll (80px), not on mount
-    function onScroll() {
-      if (triggered) return;
-      if (window.scrollY < 80) return;
-      triggered = true;
-      window.removeEventListener('scroll', onScroll);
-      startPlay();
-    }
+    startPlay();
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    if (!pauseOffScreen) return () => window.removeEventListener('scroll', onScroll);
+    if (!pauseOffScreen) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!triggered) return;
         if (entry.isIntersecting) startPlay();
         else el.pause();
       },
@@ -58,38 +54,23 @@ export function useHeroVideo({
     );
 
     observer.observe(el);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [pauseOffScreen, threshold]);
 
+  // Toggle mute/unmute manually (for any component that still exposes a button)
   function unmute() {
     const el = videoRef.current;
     if (!el) return;
 
     if (!muted) {
-      // Toggle back to muted
       el.muted = true;
       setMuted(true);
-      // Also mute any audio track on the page
-      const audio = document.getElementById('hero-audio') as HTMLAudioElement | null;
-      if (audio) { audio.pause(); audio.currentTime = 0; }
       return;
     }
 
-    // Unmute video
     el.muted = false;
+    el.volume = 0.8;
     setMuted(false);
-
-    // If there's a separate audio track, play it in sync
-    const audio = document.getElementById('hero-audio') as HTMLAudioElement | null;
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    }
-
-    // Fallback: if browser blocks unmuted video, stay muted silently
     el.play().catch(() => {
       el.muted = true;
       setMuted(true);

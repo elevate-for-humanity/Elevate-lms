@@ -61,34 +61,41 @@ export function BarberEnrollment() {
       </section>
 
       {/* Partner Shop Application CTA */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="text-slate-900">
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            <div>
               <div className="flex items-center gap-3 mb-4">
-                <Scissors className="w-8 h-8" />
-                <h2 className="text-2xl md:text-3xl font-black">Own a Barbershop?</h2>
+                <Scissors className="w-7 h-7 text-slate-700" />
+                <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900">Own a Barbershop?</h2>
               </div>
-              <p className="text-white/90 text-lg mb-2">
+              <p className="text-slate-600 text-base leading-relaxed mb-4">
                 Become a partner training site and host apprentices in your shop. We handle the paperwork — you train the next generation.
               </p>
-              <ul className="text-slate-600 text-sm space-y-1 mb-6">
-                <li>&#x2022; Get pre-screened, motivated apprentices</li>
-                <li>&#x2022; Zero administrative burden — we handle compliance</li>
-                <li>&#x2022; First pick to hire graduates</li>
-                <li>&#x2022; Recognition as an approved training site</li>
+              <ul className="text-slate-600 text-sm space-y-1.5 mb-6">
+                {[
+                  'Get pre-screened, motivated apprentices',
+                  'Zero administrative burden — we handle compliance',
+                  'First pick to hire graduates',
+                  'Recognition as an approved training site',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-1.5" />
+                    {item}
+                  </li>
+                ))}
               </ul>
               <div className="flex flex-wrap gap-3">
-                <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-white transition-colors">
+                <Link href="/programs/barber-apprenticeship/apply?type=partner_shop" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
                   Apply as Partner Shop <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-white/20 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/30 transition-colors border border-white/40">
+                <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-6 py-3 rounded-xl transition-colors text-sm">
                   Learn More
                 </Link>
               </div>
             </div>
-            <div className="bg-white/10 rounded-xl p-6 border border-white/20">
-              <h3 className="text-slate-900 font-bold text-lg mb-4">Quick Application Checklist</h3>
+            <div className="bg-white rounded-xl p-6 border border-slate-200">
+              <h3 className="text-slate-900 font-bold text-base mb-4">Quick Application Checklist</h3>
               <div className="space-y-3">
                 {[
                   'Active Indiana barbershop license',
@@ -97,8 +104,8 @@ export function BarberEnrollment() {
                   'Physical shop location in Indiana',
                   'Willingness to sign MOU',
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 text-white/90 text-sm">
-                    <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <div key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <span className="w-6 h-6 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span>{item}</span>
                   </div>
                 ))}

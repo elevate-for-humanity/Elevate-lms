@@ -104,9 +104,9 @@ Notes: ${formData.get('notes') || 'None'}
 
   return (
     <>
-      <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Career Services</h3>
-        <p className="text-gray-600 mb-6">
+      <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+        <h3 className="text-xl font-bold text-slate-900 mb-2">Career Services</h3>
+        <p className="text-slate-600 mb-6">
           Get support finding employment after completing {programName}
         </p>
 
@@ -122,8 +122,8 @@ Notes: ${formData.get('notes') || 'None'}
                 <div className={`w-10 h-10 bg-${service.color}-100 rounded-lg flex items-center justify-center mb-3`}>
                   <Icon className={`w-5 h-5 text-${service.color}-600`} />
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">{service.title}</h4>
-                <p className="text-sm text-gray-500">{service.description}</p>
+                <h4 className="font-semibold text-slate-900 mb-1">{service.title}</h4>
+                <p className="text-sm text-slate-500">{service.description}</p>
                 <span className={`inline-flex items-center gap-1 text-sm text-${service.color}-600 mt-2 group-hover:gap-2 transition-all`}>
                   Request <ArrowRight className="w-4 h-4" />
                 </span>
@@ -132,7 +132,7 @@ Notes: ${formData.get('notes') || 'None'}
           })}
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
           <Link
             href="/career-services"
             className="text-brand-blue-600 hover:text-brand-blue-700 font-medium inline-flex items-center gap-2"
@@ -148,7 +148,7 @@ Notes: ${formData.get('notes') || 'None'}
           <div className="bg-white rounded-2xl max-w-md w-full p-6 relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -158,17 +158,17 @@ Notes: ${formData.get('notes') || 'None'}
                 <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-slate-500 flex-shrink-0">•</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Request Submitted!</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Request Submitted!</h3>
+                <p className="text-slate-600">
                   Our career services team will contact you within 1-2 business days.
                 </p>
               </div>
             ) : (
               <>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Request {services.find(s => s.id === selectedService)?.title}
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-slate-600 mb-6">
                   Fill out this form and our career services team will reach out to schedule your session.
                 </p>
 
@@ -181,42 +181,42 @@ Notes: ${formData.get('notes') || 'None'}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Full Name
                     </label>
                     <input
                       type="text"
                       name="name"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Email
                     </label>
                     <input
                       type="email"
                       name="email"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="your@email.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Phone (optional)
                     </label>
                     <input
                       type="tel"
                       name="phone"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="(317) 314-3757"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Program
                     </label>
                     <input
@@ -224,17 +224,17 @@ Notes: ${formData.get('notes') || 'None'}
                       name="program"
                       value={programName}
                       readOnly
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       Additional Notes (optional)
                     </label>
                     <textarea
                       name="notes"
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="Any specific questions or needs?"
                     />
                   </div>

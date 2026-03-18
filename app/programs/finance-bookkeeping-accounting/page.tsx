@@ -3,7 +3,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Award, Briefcase, GraduationCap, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
 
@@ -74,24 +74,7 @@ const phases = [
 export default function FinancePathwayPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
-        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
-          <source src="/videos/business-finance.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 flex items-center px-6">
-          <div className="max-w-5xl mx-auto w-full">
-            <span className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-3 bg-brand-orange-500">Funding Available</span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-[1.1]">
-              Finance, Bookkeeping &amp; Accounting
-            </h1>
-            <p className="text-white/85 text-lg mt-3 max-w-2xl leading-relaxed">
-              A tiered credential pathway preparing participants for entry-level and growth-track roles in tax preparation, bookkeeping, payroll support, and small business financial services.
-            </p>
-          </div>
-        </div>
-      </section>
-
+      {/* Breadcrumbs */}
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-6 py-3">
           <Breadcrumbs items={[
@@ -100,6 +83,43 @@ export default function FinancePathwayPage() {
           ]} />
         </div>
       </div>
+
+      {/* Hero — clean video, no text overlay */}
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
+          <source src="/videos/business-finance.mp4" type="video/mp4" />
+        </video>
+      </section>
+
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
+            Credential Pathway · Business
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Finance, Bookkeeping &amp; Accounting
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            A tiered credential pathway preparing participants for entry-level and growth-track roles
+            in tax preparation, bookkeeping, payroll support, and small business financial services.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/apply?program=finance-bookkeeping-accounting"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Apply Now
+            </Link>
+            <Link
+              href="/contact?program=finance-bookkeeping-accounting"
+              className="border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Request Information
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ===== HEADER ===== */}
       <InView animation="fade-up">
@@ -136,7 +156,7 @@ export default function FinancePathwayPage() {
             <div className="grid sm:grid-cols-3 gap-6">
               {phases.map((p) => (
                 <div key={p.phase} className="bg-white rounded-xl p-6 border border-slate-200">
-                  <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
+                  <div className="w-10 h-10 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">{p.phase}</div>
                   <h3 className="font-bold text-slate-900 mb-2">{p.title}</h3>
                   <p className="text-sm text-slate-600">{p.desc}</p>
                 </div>
@@ -168,7 +188,7 @@ export default function FinancePathwayPage() {
                         <ul className="space-y-1.5">
                           {tier.credentials.map((c) => (
                             <li key={c} className="flex items-start gap-2 text-sm text-slate-700">
-                              <Award className="w-3.5 h-3.5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                              <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-green-600 mt-1.5" />
                               {c}
                             </li>
                           ))}
@@ -179,7 +199,7 @@ export default function FinancePathwayPage() {
                         <ul className="space-y-1.5">
                           {tier.outcomes.map((o) => (
                             <li key={o} className="flex items-start gap-2 text-sm text-slate-700">
-                              <Briefcase className="w-3.5 h-3.5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                              <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-blue-600 mt-1.5" />
                               {o}
                             </li>
                           ))}
@@ -190,7 +210,7 @@ export default function FinancePathwayPage() {
                         <ul className="space-y-1.5">
                           {tier.tracks.map((t) => (
                             <li key={t} className="flex items-start gap-2 text-sm text-slate-700">
-                              <GraduationCap className="w-3.5 h-3.5 text-brand-red-600 mt-0.5 flex-shrink-0" />
+                              <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-600 mt-1.5" />
                               {t}
                             </li>
                           ))}
@@ -329,18 +349,28 @@ export default function FinancePathwayPage() {
 
       {/* ===== CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
-          <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Start This Credential Pathway</h2>
-            <p className="text-xl text-white/90 mb-8">Apply in minutes. Training may be fully funded for eligible participants.</p>
+        <section className="py-14 sm:py-20 bg-slate-900">
+          <div className="max-w-3xl mx-auto px-6 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Start This Credential Pathway</h2>
+            <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+              Apply in minutes. Training may be fully funded for eligible Indiana residents through
+              WIOA and state workforce programs.
+            </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/apply?program=finance-bookkeeping-accounting" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors">
+              <Link
+                href="/apply?program=finance-bookkeeping-accounting"
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-bold text-base transition-colors"
+              >
                 Apply Now
               </Link>
-              <Link href="/programs" className="bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-800 transition-colors">
-                All Credential Pathways
-              </Link>
+              <a
+                href="https://www.indianacareerconnect.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-bold text-base transition-colors"
+              >
+                Go to Indiana Career Connect
+              </a>
             </div>
           </div>
         </section>

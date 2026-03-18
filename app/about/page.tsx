@@ -1,14 +1,9 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import heroBanners from '@/content/heroBanners';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -37,36 +32,32 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Hero — video frame only, no text on video */}
-      {(() => {
-        const hero = heroBanners.about;
-        return (
-          <HeroVideo
-            videoSrcDesktop={hero.videoSrcDesktop}
-            posterImage={hero.posterImage}
-            voiceoverSrc={hero.voiceoverSrc}
-            microLabel={hero.microLabel}
-            transcript={hero.transcript}
-            analyticsName={hero.analyticsName}
-          >
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-              Built for workforce outcomes.
-            </h1>
-            <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
-              Training, credential preparation, support services, and employer connections.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <a href="/about#who-we-are" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
-                Our Story
-              </a>
-              <a href="/about#team" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-                Meet the Team
-              </a>
-            </div>
-          </HeroVideo>
-        );
-      })()}
+      {/* Hero — clean image, no overlay */}
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
+        <Image
+          src="/images/pages/about-hero.jpg"
+          alt="Elevate for Humanity — workforce development in Indianapolis"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+      </section>
+
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
+            Indianapolis, Indiana
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+            Elevate for Humanity
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+            Workforce development institute providing funded career training to people facing barriers to employment.
+          </p>
+        </div>
+      </section>
 
       {/* Who We Are */}
       <section className="py-12 bg-white">
@@ -75,7 +66,7 @@ export default function AboutPage() {
             <Image src="/logo.png" alt="Elevate for Humanity logo" width={64} height={64} />
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Who We Are</h2>
           </div>
-          <div className="text-gray-700 space-y-4">
+          <div className="text-slate-700 space-y-4">
             <p>
               Elevate for Humanity is a workforce development institute based in
               Indianapolis, Indiana. We provide funded career training to people who need it most —
@@ -137,7 +128,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-slate-700 mb-2">
                   We run certification programs in healthcare (CNA, Medical Assistant, Phlebotomy),
                   skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking (Class A and B),
                   IT and cybersecurity (Certiport IT Specialist, Cisco CCST), barbering (DOL Registered Apprenticeship),
@@ -156,7 +147,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-slate-700 mb-2">
                   Most people do not know they may qualify for funded training. We walk every participant
                   through the eligibility process for WIOA (covers tuition, books, supplies, and
                   sometimes transportation and childcare), the Workforce Ready Grant (covers
@@ -175,7 +166,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Placement &amp; Employer Partnerships</h3>
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-slate-700 mb-2">
                   Our career services team helps every graduate with resume building, interview
                   preparation, and direct introductions to employers who are hiring. We partner
                   with HVAC contractors, hospitals, trucking companies, barbershops, IT firms, and
@@ -194,7 +185,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-slate-700">
                   Training alone is not enough if someone cannot get to class or keep the lights on.
                   We provide career counseling, mental health support (through our board-certified
                   Psychiatric Mental Health Nurse Practitioner), housing assistance, transportation
@@ -208,33 +199,33 @@ export default function AboutPage() {
       </section>
 
       {/* Training Delivery Model */}
-      <section className="py-10 bg-white border-t border-gray-200">
+      <section className="py-10 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-slate-600 mb-4">
             Elevate for Humanity is a hybrid workforce training hub and DOL Registered Apprenticeship
             Sponsor (RAPIDS: 2025-IN-132301). We coordinate employer-based hands-on instruction with
             online didactic learning — not a traditional campus model.
           </p>
           <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Didactic Instruction</h3>
-              <p className="text-xs text-gray-600">Delivered online via the Elevate LMS platform. Curriculum, assessments, and progress tracking are managed digitally.</p>
+              <p className="text-xs text-slate-600">Delivered online via the Elevate LMS platform. Curriculum, assessments, and progress tracking are managed digitally.</p>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Hands-On / OJT Training</h3>
-              <p className="text-xs text-gray-600">Conducted at approved employer partner sites, licensed shops, clinical facilities, and OJT placements. Training sites vary by program.</p>
+              <p className="text-xs text-slate-600">Conducted at approved employer partner sites, licensed shops, clinical facilities, and OJT placements. Training sites vary by program.</p>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Support Services</h3>
-              <p className="text-xs text-gray-600">Career counseling, case management, and advising available virtually and in-person by appointment.</p>
+              <p className="text-xs text-slate-600">Career counseling, case management, and advising available virtually and in-person by appointment.</p>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Administrative Office</h3>
-              <p className="text-xs text-gray-600">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
+              <p className="text-xs text-slate-600">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
             </div>
           </div>
-          <div className="text-sm text-gray-700 space-y-2">
+          <div className="text-sm text-slate-700 space-y-2">
             <p>
               <strong>Training sites by program:</strong> Barber and cosmetology apprentices train at
               licensed partner barbershops. Healthcare students complete clinicals at partner medical
@@ -262,27 +253,27 @@ export default function AboutPage() {
       </section>
 
       {/* Institutional Governance */}
-      <section className="py-12 bg-white border-t border-gray-200">
+      <section className="py-12 bg-white border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Centralized Workforce Development &amp; Apprenticeship Sponsor</h2>
-          <p className="text-sm text-gray-700 mb-4">
+          <p className="text-sm text-slate-700 mb-4">
             Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
           </p>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-slate-600 mb-6">
             Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Related Technical Instruction</h3>
-              <p className="text-xs text-gray-600">Delivered by the institute through structured curriculum and learning systems.</p>
+              <p className="text-xs text-slate-600">Delivered by the institute through structured curriculum and learning systems.</p>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">On-the-Job Training</h3>
-              <p className="text-xs text-gray-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
+              <p className="text-xs text-slate-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Oversight &amp; Compliance</h3>
-              <p className="text-xs text-gray-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
+              <p className="text-xs text-slate-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
             </div>
           </div>
           <div className="mt-4">
@@ -330,13 +321,13 @@ export default function AboutPage() {
                 desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
               },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="relative h-40 overflow-hidden">
                   <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover" />
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-600">{item.desc}</p>
+                  <p className="text-sm text-slate-600">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -353,7 +344,7 @@ export default function AboutPage() {
       <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">Our Credentials</h2>
-          <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
+          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
             These are the government agencies and workforce organizations that have approved,
             registered, or partnered with Elevate for Humanity.
           </p>
@@ -365,13 +356,13 @@ export default function AboutPage() {
               { logo: '/images/partners/workone.webp', name: 'WorkOne', role: 'Workforce Partner', desc: 'We work with WorkOne career centers across Central Indiana for participant referrals and eligibility screening.' },
               { logo: '/images/partners/nextleveljobs.webp', name: 'Next Level Jobs', role: 'Workforce Ready Grant Provider', desc: 'Our high-demand certification programs qualify for the Workforce Ready Grant through Next Level Jobs.' },
             ].map((cred) => (
-              <div key={cred.name} className="bg-white rounded-lg border border-gray-200 p-5 text-center">
+              <div key={cred.name} className="bg-white rounded-lg border border-slate-200 p-5 text-center">
                 <div className="relative w-16 h-16 mx-auto mb-3 overflow-hidden">
                   <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
-                <p className="text-xs text-gray-600">{cred.desc}</p>
+                <p className="text-xs text-slate-600">{cred.desc}</p>
               </div>
             ))}
           </div>
@@ -383,19 +374,19 @@ export default function AboutPage() {
               { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
               { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
             ].map((cred) => (
-              <div key={cred.name} className="bg-white rounded-lg border border-gray-200 p-5 text-center">
-                <div className="w-16 h-16 mx-auto mb-3 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
+              <div key={cred.name} className="bg-white rounded-lg border border-slate-200 p-5 text-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
                   <span className="text-slate-700 font-bold text-xs">{cred.name}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
-                <p className="text-xs text-gray-600">{cred.desc}</p>
+                <p className="text-xs text-slate-600">{cred.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Verification Links */}
-          <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+          <div className="mt-8 bg-white rounded-lg border border-slate-200 p-6">
             <h3 className="font-bold text-slate-900 text-sm mb-3 uppercase tracking-wider">Verify Our Credentials</h3>
             <div className="grid sm:grid-cols-2 gap-3 text-sm">
               <a href="https://intraining.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
@@ -423,7 +414,7 @@ export default function AboutPage() {
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
             <div className="flex flex-col sm:flex-row">
               <div className="relative w-full sm:w-72 flex-shrink-0 overflow-hidden" style={{ aspectRatio: '3/4' }}>
                 <Image
@@ -438,8 +429,8 @@ export default function AboutPage() {
               <div className="p-6 flex-1">
                 <h3 className="text-xl font-bold text-slate-900">{founder.name}</h3>
                 <p className="text-brand-red-600 font-semibold text-sm mb-4">{founder.title}</p>
-                <p className="text-sm text-gray-700 mb-4">{founder.bio}</p>
-                <p className="text-sm text-gray-700 mb-4">
+                <p className="text-sm text-slate-700 mb-4">{founder.bio}</p>
+                <p className="text-sm text-slate-700 mb-4">
                   Elizabeth is a U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA) with an EFIN 
                   and PTIN, and EPA 608 Certified Proctor through Mainstream Engineering. She 
                   is authorized to represent taxpayers before the IRS and to proctor EPA Section 
@@ -451,7 +442,7 @@ export default function AboutPage() {
                     Meet the Full Team <ArrowRight className="ml-1 w-4 h-4" />
                   </Link>
                   {founder.email && (
-                    <a href={`mailto:${founder.email}`} className="text-gray-500 text-sm hover:text-gray-700">
+                    <a href={`mailto:${founder.email}`} className="text-slate-500 text-sm hover:text-slate-700">
                       {founder.email}
                     </a>
                   )}
@@ -467,7 +458,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Our Team</h2>
-            <p className="text-gray-600">
+            <p className="text-slate-600">
               The people behind the mission — workforce professionals, healthcare specialists,
               financial experts, and community advocates.
             </p>
@@ -489,7 +480,7 @@ export default function AboutPage() {
                   />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
-                <p className="text-gray-500 text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
+                <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
                 <span className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold mt-2 group-hover:gap-2 transition-all">
                   View Bio <ArrowRight className="w-3.5 h-3.5" />
                 </span>
@@ -505,20 +496,20 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/cna-patient-care.jpg', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/cdl-training.jpg', href: '/programs/cdl-training' },
-              { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', image: '/images/pages/comp-pathway-trades.jpg', href: '/programs/hvac-technician' },
-              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/electrical-panel.jpg', href: '/programs/electrical' },
-              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/barber-client-consult.jpg', href: '/programs/barber-apprenticeship' },
-              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/cybersecurity.jpg', href: '/programs/technology' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cna' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cdl-training' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/about-hero.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/technology' },
             ].map((p) => (
-              <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
+              <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36 overflow-hidden">
                   <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
-                  <p className="text-xs text-gray-500">{p.duration}</p>
+                  <p className="text-xs text-slate-500">{p.duration}</p>
                 </div>
               </Link>
             ))}
@@ -536,37 +527,37 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
           <div className="grid sm:grid-cols-3 gap-6">
-            <Link href="/pathways/partners" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/pathways/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-partner-cta.jpg" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
-                <p className="text-sm text-gray-600 mb-2">Workforce boards, community organizations, and employers — see how custom cohort training works.</p>
+                <p className="text-sm text-slate-600 mb-2">Workforce boards, community organizations, and employers — see how custom cohort training works.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   Partnership Details <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
               </div>
             </Link>
-            <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/hp-employer-real.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>
-                <p className="text-sm text-gray-600 mb-2">Employers, workforce boards, and community organizations we work with across Central Indiana.</p>
+                <p className="text-sm text-slate-600 mb-2">Employers, workforce boards, and community organizations we work with across Central Indiana.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   View Partners <ArrowRight className="ml-1 w-4 h-4" />
                 </span>
               </div>
             </Link>
-            <Link href="/pathways" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+            <Link href="/pathways" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/job-placement.jpg" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>
-                <p className="text-sm text-gray-600 mb-2">See our structured 5-stage pathway model: eligibility, training, credentialing, placement, and advancement.</p>
+                <p className="text-sm text-slate-600 mb-2">See our structured 5-stage pathway model: eligibility, training, credentialing, placement, and advancement.</p>
                 <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
                   View Pathways <ArrowRight className="ml-1 w-4 h-4" />
                 </span>

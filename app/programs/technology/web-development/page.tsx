@@ -1,56 +1,46 @@
-
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
-  ArrowRight, Code, Layout, Database,
-  Globe, GitBranch, Palette, Server, Smartphone,
-} from 'lucide-react';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
   title: 'Web Development Training | Full-Stack Bootcamp | Elevate for Humanity',
-  description: 'Learn to build modern websites and web applications in 16-20 weeks. HTML, CSS, JavaScript, React, and Node.js. Free training through WIOA funding.',
+  description:
+    'Learn to build modern websites and web applications. HTML, CSS, JavaScript, React, and Node.js. Free training through WIOA funding for eligible Indiana residents.',
   alternates: { canonical: `${SITE_URL}/programs/technology/web-development` },
-  keywords: [
-    'web development training Indianapolis',
-    'coding bootcamp Indiana',
-    'free web development course',
-    'full stack developer training',
-    'JavaScript training',
-    'React training',
-    'WIOA coding program',
-  ],
   openGraph: {
     title: 'Web Development Training | Full-Stack Bootcamp | Elevate',
-    description: 'Learn to build modern websites and web applications in 16-20 weeks. Free training through WIOA funding.',
+    description:
+      'Learn to build modern websites and web applications. Free training through WIOA funding.',
     url: `${SITE_URL}/programs/technology/web-development`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/hero-images/technology-hero.jpg`, width: 1200, height: 630, alt: 'Web Development Training' }],
+    images: [{ url: '/images/pages/web-development.jpg', width: 1200, height: 630, alt: 'Web Development Training' }],
     type: 'website',
   },
 };
 
-const curriculum = [
-  { icon: Layout, title: 'HTML5 & CSS3', desc: 'Semantic markup, Flexbox, Grid, and responsive design fundamentals' },
-  { icon: Code, title: 'JavaScript & ES6+', desc: 'Modern JavaScript, DOM manipulation, async programming, and APIs' },
-  { icon: Palette, title: 'React Framework', desc: 'Component architecture, state management, hooks, and routing' },
-  { icon: Server, title: 'Node.js & Express', desc: 'Server-side JavaScript, REST APIs, and middleware' },
-  { icon: Database, title: 'Databases', desc: 'SQL and NoSQL databases, data modeling, and CRUD operations' },
-  { icon: GitBranch, title: 'Git & Deployment', desc: 'Version control, collaboration workflows, and cloud deployment' },
+const CURRICULUM = [
+  { title: 'HTML5 & CSS3', desc: 'Semantic markup, Flexbox, Grid, and responsive design fundamentals.' },
+  { title: 'JavaScript & ES6+', desc: 'Modern JavaScript, DOM manipulation, async programming, and APIs.' },
+  { title: 'React Framework', desc: 'Component architecture, state management, hooks, and routing.' },
+  { title: 'Node.js & Express', desc: 'Server-side JavaScript, REST APIs, and middleware.' },
+  { title: 'Databases', desc: 'SQL and NoSQL databases, data modeling, and CRUD operations.' },
+  { title: 'Git & Deployment', desc: 'Version control, collaboration workflows, and cloud deployment.' },
 ];
 
-const careers = [
-  { title: 'Junior Web Developer', salary: '$50K-$65K', growth: 'High demand' },
-  { title: 'Frontend Developer', salary: '$55K-$75K', growth: 'Very high demand' },
-  { title: 'Full-Stack Developer', salary: '$60K-$85K', growth: 'Premium pay' },
-  { title: 'Web Designer', salary: '$45K-$65K', growth: 'Creative roles' },
+const CAREERS = [
+  { title: 'Junior Web Developer', salary: '$50K–$65K' },
+  { title: 'Frontend Developer', salary: '$55K–$75K' },
+  { title: 'Full-Stack Developer', salary: '$60K–$85K' },
+  { title: 'Web Designer', salary: '$45K–$65K' },
 ];
 
-const projectPortfolio = [
+const PORTFOLIO_PROJECTS = [
   'Personal portfolio website',
   'E-commerce storefront with shopping cart',
   'Social media dashboard application',
@@ -59,25 +49,11 @@ const projectPortfolio = [
 ];
 
 export default function WebDevelopmentPage() {
-
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="bg-white py-10 border-t">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Web Development</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Full-Stack Development Bootcamp</p>
-          </div>
-        </div>
-      </section>
 
       {/* Breadcrumbs */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
             { label: 'Programs', href: '/programs' },
@@ -87,101 +63,106 @@ export default function WebDevelopmentPage() {
         </div>
       </div>
 
-      {/* CTA Buttons */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-black mb-4">Build Your Future in Tech</h2>
-          <p className="text-lg text-gray-600 mb-8">Learn to code and launch a career as a web developer</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply?program=web-development" className="bg-purple-600 text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-purple-700 transition-colors">
+      {/* Hero — clean image, no text overlay */}
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+        <Image
+          src="/images/pages/web-development.jpg"
+          alt="Web development training at Elevate for Humanity"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+      </section>
+
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
+            Technology · Indianapolis
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Web Development
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
+            Full-stack development training covering HTML, CSS, JavaScript, React, Node.js, and databases.
+            Graduate with a portfolio of real projects and the skills employers are hiring for.
+          </p>
+          <div className="flex flex-wrap gap-3 mt-6">
+            <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+              16–20 weeks
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+              Hybrid
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-brand-green-50 text-brand-green-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-brand-green-200">
+              WIOA Funding Available
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-6">
+            <Link
+              href="/apply?program=web-development"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
               Apply Now
             </Link>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="bg-white border-2 border-purple-600 text-purple-600 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-purple-50 transition-colors">
-              Register at Indiana Career Connect
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Go to Indiana Career Connect
             </a>
+            <Link
+              href="/contact?program=web-development"
+              className="border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Request Information
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Program Overview */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-black">What Is This Program?</h2>
-            <p className="text-lg text-gray-700 mb-4">
-              Our Web Development bootcamp teaches you to build modern, responsive websites and full-stack web
-              applications from scratch. You will learn HTML, CSS, JavaScript, React, Node.js, and databases
-              while building a portfolio of real projects.
-            </p>
-            <p className="text-lg text-gray-700 mb-4">
-              Training is project-based: you learn by building. By graduation, you will have a professional
-              portfolio demonstrating your skills to employers.
-            </p>
-            <p className="text-lg text-gray-700">
-              This program may be available at no cost if you qualify through WIOA, WRG, or JRI funding.
-            </p>
-          </div>
-          <div className="bg-purple-50 rounded-2xl p-8">
-            <h3 className="text-xl font-bold text-black mb-6">Program at a Glance</h3>
-            <div className="space-y-4">
-              {[
-                ['Duration', '16-20 Weeks'],
-                ['Format', 'Hybrid (Online + Projects)'],
-                ['Schedule', 'Full-time or Part-time'],
-                ['Cost', 'Free with WIOA funding'],
-                ['Projects', '5+ Portfolio Projects'],
-                ['Outcome', 'Job-Ready Portfolio'],
-              ].map(([label, value]) => (
-                <div key={label} className="flex justify-between border-b border-purple-100 pb-3">
-                  <span className="text-gray-700">{label}</span>
-                  <span className="font-bold text-black">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-black mb-4">What You Will Learn</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A full-stack curriculum covering frontend, backend, and everything in between.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {curriculum.map((item, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-purple-600" />
-                </div>
-                <h3 className="font-bold text-black mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Portfolio Projects */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/pages/programs-tech-webdev-hero.jpg" alt="Student coding" fill sizes="100vw" className="object-cover" />
-            </div>
+      {/* What this program is */}
+      <section className="py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
-              <h2 className="text-3xl font-bold text-black mb-6">Build a Professional Portfolio</h2>
-              <p className="text-gray-600 mb-6">
-                Graduate with a portfolio of real projects that demonstrate your skills to employers.
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+                Program Overview
               </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
+                What This Program Is
+              </h2>
+              <p className="text-slate-600 text-base leading-relaxed mb-4">
+                Our Web Development bootcamp teaches you to build modern, responsive websites and
+                full-stack web applications from scratch. You will learn HTML, CSS, JavaScript,
+                React, Node.js, and databases while building a portfolio of real projects.
+              </p>
+              <p className="text-slate-600 text-base leading-relaxed mb-4">
+                Training is project-based: you learn by building. By graduation, you will have a
+                professional portfolio demonstrating your skills to employers.
+              </p>
+              <p className="text-slate-600 text-base leading-relaxed">
+                This program may be available at no cost if you qualify through WIOA, WRG, or JRI
+                funding. Students from outside Indiana can enroll through the self-pay option.
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-4">Program at a Glance</h3>
               <div className="space-y-3">
-                {projectPortfolio.map((project, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">{project}</span>
+                {[
+                  ['Duration', '16–20 weeks'],
+                  ['Format', 'Hybrid (online + in-person labs)'],
+                  ['Schedule', 'Full-time or part-time cohorts'],
+                  ['Cost', 'Free with WIOA funding · self-pay available'],
+                  ['Portfolio', '5+ real projects'],
+                  ['Outcome', 'Job-ready portfolio + career placement support'],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between gap-4 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
+                    <span className="text-slate-500 text-sm">{label}</span>
+                    <span className="font-semibold text-slate-900 text-sm text-right">{value}</span>
                   </div>
                 ))}
               </div>
@@ -190,58 +171,60 @@ export default function WebDevelopmentPage() {
         </div>
       </section>
 
-      {/* Career Outcomes */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-black mb-4">Career Opportunities</h2>
-            <p className="text-lg text-gray-600">Web development is one of the fastest-growing career fields.</p>
+      {/* What you will learn */}
+      <section className="py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+              Curriculum
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              What You Will Learn
+            </h2>
+            <p className="text-slate-600 text-base mt-2 max-w-xl mx-auto leading-relaxed">
+              A full-stack curriculum covering frontend, backend, and everything in between.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {careers.map((c, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 border shadow-sm text-center">
-                <h3 className="font-bold text-black mb-2">{c.title}</h3>
-                <p className="text-2xl font-bold text-purple-600 mb-1">{c.salary}</p>
-                <span className="text-sm text-brand-green-600 font-medium">{c.growth}</span>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {CURRICULUM.map((item) => (
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 className="font-bold text-slate-900 mb-2 text-sm">{item.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Requirements */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-black mb-8 text-center">Who Should Apply</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm border">
-              <h3 className="text-xl font-bold text-brand-green-700 mb-4">Requirements</h3>
-              <ul className="space-y-3">
-                {[
-                  'High school diploma or GED',
-                  'Basic computer skills (typing, web browsing)',
-                  'Motivation to learn and practice daily',
-                  'Reliable internet access',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
+      {/* Portfolio projects */}
+      <section className="py-14 bg-white border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg">
+              <Image
+                src="/images/pages/programs-tech-webdev-hero.jpg"
+                alt="Student coding a web application"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm border">
-              <h3 className="text-xl font-bold text-purple-700 mb-4">No Experience Needed</h3>
-              <ul className="space-y-3">
-                {[
-                  'No prior coding experience required',
-                  'We start from the very basics',
-                  'Structured curriculum with mentorship',
-                  'Career support included after graduation',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">{item}</span>
+            <div>
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+                Real Projects
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">
+                Build a Professional Portfolio
+              </h2>
+              <p className="text-slate-600 text-base leading-relaxed mb-6">
+                Graduate with a portfolio of real projects that demonstrate your skills to employers.
+                Every project is built from scratch — not copied from tutorials.
+              </p>
+              <ul className="space-y-2">
+                {PORTFOLIO_PROJECTS.map((project) => (
+                  <li key={project} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-2" />
+                    <span className="text-slate-700 text-sm leading-relaxed">{project}</span>
                   </li>
                 ))}
               </ul>
@@ -250,21 +233,152 @@ export default function WebDevelopmentPage() {
         </div>
       </section>
 
+      {/* Career outcomes */}
+      <section className="py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+              After Graduation
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              Career Opportunities
+            </h2>
+            <p className="text-slate-600 text-base mt-2 max-w-xl mx-auto leading-relaxed">
+              Web development is one of the fastest-growing career fields. Graduates work across
+              industries — from startups to healthcare to government.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {CAREERS.map((c) => (
+              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 className="font-bold text-slate-900 mb-2 text-sm">{c.title}</h3>
+                <p className="text-brand-green-700 font-bold text-lg">{c.salary}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who should apply */}
+      <section className="py-14 bg-white border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+              Admissions
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              Who Should Apply
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-3">Requirements</h3>
+              <ul className="space-y-2">
+                {[
+                  'High school diploma or GED',
+                  'Basic computer skills (typing, web browsing)',
+                  'Motivation to learn and practice daily',
+                  'Reliable internet access',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-2" />
+                    <span className="text-slate-700 text-sm leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-3">No Experience Needed</h3>
+              <ul className="space-y-2">
+                {[
+                  'No prior coding experience required',
+                  'We start from the very basics',
+                  'Structured curriculum with mentorship',
+                  'Career support included after graduation',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-400 mt-2" />
+                    <span className="text-slate-700 text-sm leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Funding & Indiana Career Connect */}
+      <section className="py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+                Funding
+              </p>
+              <h2 className="text-xl font-extrabold text-slate-900 mb-3">
+                How Training Gets Paid For
+              </h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                This program may be available at no cost for eligible Indiana residents through
+                WIOA, Workforce Ready Grant, or JRI funding. Eligibility is determined through
+                WorkOne — not Elevate.
+              </p>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Students who do not qualify for funding can enroll through flexible self-pay and
+                buy-now-pay-later options.
+              </p>
+              <Link
+                href="/funding"
+                className="inline-block mt-4 text-brand-blue-600 font-semibold text-sm hover:underline"
+              >
+                Explore all funding options →
+              </Link>
+            </div>
+            <div className="bg-brand-blue-50 rounded-xl border border-brand-blue-200 p-6">
+              <p className="text-brand-blue-900 font-bold text-sm mb-1">Indiana Career Connect</p>
+              <p className="text-brand-blue-800 text-sm leading-relaxed mb-4">
+                For WIOA-eligible and apprenticeship pathway applicants, the next step may require
+                Indiana Career Connect. Register for free to begin the eligibility process.
+              </p>
+              <a
+                href="https://www.indianacareerconnect.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
+              >
+                Go to Indiana Career Connect
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
-      <section className="py-20 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Learn to Code?</h2>
-          <p className="text-purple-100 text-lg mb-8">Apply now or check if you qualify for free training through workforce funding.</p>
+      <section className="py-14 bg-slate-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Learn to Code?</h2>
+          <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
+            Apply now or check if you qualify for free training through workforce funding.
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply?program=web-development" className="bg-white text-purple-700 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-purple-50 transition inline-flex items-center justify-center gap-2">
-              Apply Now <ArrowRight className="w-5 h-5" />
+            <Link
+              href="/apply?program=web-development"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base"
+            >
+              Apply Now
             </Link>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-white/10 transition">
-              Register at Indiana Career Connect
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base"
+            >
+              Go to Indiana Career Connect
             </a>
           </div>
         </div>
       </section>
+
     </main>
   );
 }

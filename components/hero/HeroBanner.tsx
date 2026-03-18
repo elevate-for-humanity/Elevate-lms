@@ -40,12 +40,12 @@ export default function HeroBanner({
     playedRef.current = true;
     const audio = audioRef.current;
     audio.volume = 1;
-    audio.muted = false;
+    audio. = false;
     audio.play().catch(() => {
-      audio.muted = true;
+      audio. = true;
       audio.play().catch(() => {});
       const unmute = () => {
-        audio.muted = false;
+        audio. = false;
         window.removeEventListener('scroll', unmute, true);
         window.removeEventListener('touchmove', unmute, true);
       };

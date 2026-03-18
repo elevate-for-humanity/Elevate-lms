@@ -39,7 +39,7 @@ export function StickyMobileCTA({
 
   return (
     <div
-      className={`md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 z-40 ${
+      className={`md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg transition-transform duration-300 z-40 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
@@ -53,7 +53,7 @@ export function StickyMobileCTA({
         </a>
         <a
           href={secondaryHref}
-          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
         >
           {secondaryText}
         </a>

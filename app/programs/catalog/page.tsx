@@ -196,7 +196,7 @@ function ProgramCard({ prog }: { prog: ProgramRow }) {
         {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-3">
           {prog.wioa_eligible && (
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">WIOA</span>
+            <span className="text-xs bg-brand-blue-50 text-brand-blue-700 border border-brand-blue-200 px-2 py-0.5 rounded-full font-medium">WIOA</span>
           )}
           {(prog.funding_tags ?? []).filter(t => t !== 'wioa').slice(0, 2).map(tag => (
             <span key={tag} className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded-full">{tag}</span>

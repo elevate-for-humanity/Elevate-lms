@@ -106,9 +106,9 @@ export function ProgramPageTemplate({
             src={heroVideo}
             poster={heroImage}
             className="w-full h-full object-cover"
-            autoPlay
+            
             loop
-            muted
+            
             playsInline
             preload="metadata"
           />

@@ -24,8 +24,8 @@ export default async function StaffApplicationPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
+          <p className="text-slate-600">Please try again later.</p>
         </div>
       </div>
     );

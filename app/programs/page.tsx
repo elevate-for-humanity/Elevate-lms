@@ -3,8 +3,8 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Clock, DollarSign, Zap } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import { Clock, DollarSign } from 'lucide-react';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 export const metadata: Metadata = {
   title: 'Career Training Programs | Elevate for Humanity',
@@ -45,8 +45,8 @@ const TECHNOLOGY = [
   { title: 'Network Support Technician', desc: 'Install and maintain network systems', duration: '6 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'network-support-technician', image: '/images/pages/networking-hero.jpg' },
   { title: 'Web Development', desc: 'Build websites and digital applications', duration: '12 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'web-development', image: '/images/pages/web-development.jpg' },
   { title: 'Software Development', desc: 'Learn coding fundamentals and programming logic', duration: '12 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'software-development', image: '/images/pages/software-development.jpg' },
-  { title: 'Graphic Design', desc: 'Digital design for business, branding, and media', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'graphic-design', image: '/images/pages/graphic-design.jpg' },
-  { title: 'CAD/Drafting Technician', desc: 'Design technical drawings for engineering and construction', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'cad-drafting', image: '/images/pages/cad-drafting.jpg' },
+  { title: 'Graphic Design', desc: 'Digital design for business, branding, and media', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'graphic-design', image: '/images/pages/tech-classroom.jpg' },
+  { title: 'CAD/Drafting Technician', desc: 'Design technical drawings for engineering and construction', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'cad-drafting', image: '/images/pages/tech-classroom.jpg' },
 ];
 
 const BUSINESS = [
@@ -77,11 +77,11 @@ function ProgramCard({ p }: { p: Program }) {
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         {p.funded && (
-          <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10">Funded</span>
+          <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Funded</span>
         )}
       </div>
-      <div className="p-3">
-        <p className="font-semibold text-slate-900 text-sm mb-1">{p.title}</p>
+      <div className="p-4">
+        <p className="font-bold text-slate-900 text-sm leading-snug mb-1">{p.title}</p>
         <p className="text-slate-500 text-xs mb-2 line-clamp-2">{p.desc}</p>
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1 text-xs text-slate-400"><Clock className="w-3 h-3" />{p.duration}</span>
@@ -107,29 +107,36 @@ export default function ProgramsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero */}
-      <HeroVideo
-        videoSrcDesktop="/videos/program-hero.mp4"
-        posterImage="/images/pages/programs-hero.jpg"
-        voiceoverSrc="/audio/heroes/programs.mp3"
-        microLabel="All Programs"
-        analyticsName="programs"
-      >
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-          Start a career — not just a class.
-        </h1>
-        <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
-          Get trained, certified, and connected to real job opportunities in weeks — not years.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
-            Apply Now
-          </Link>
-          <Link href="#programs" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-            Find My Program
-          </Link>
+      {/* Hero — clean media, no text overlay */}
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
+        <ProgramHeroBanner
+          videoSrc="/videos/program-hero.mp4"
+          posterImage="/images/pages/programs-hero.jpg"
+          voiceoverSrc="/audio/heroes/programs.mp3"
+        />
+      </section>
+
+      {/* Page identity — below hero, white background */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Start a Career — Not Just a Class
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg mb-6 max-w-2xl leading-relaxed">
+            Get trained, certified, and connected to real job opportunities in weeks — not years.
+            Most programs are available at no cost to eligible Indiana residents.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm">
+              Apply Now
+            </Link>
+            <Link href="#programs" className="border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm">
+              Find My Program
+            </Link>
+          </div>
         </div>
-      </HeroVideo>
+      </section>
 
       {/* Decision engine */}
       <section className="bg-slate-900 py-10 px-4">
@@ -215,8 +222,8 @@ export default function ProgramsPage() {
                   <Image src={a.image} alt={a.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
                 </div>
                 <div className="p-3">
-                  <p className="font-semibold text-slate-900 text-sm leading-tight">{a.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{a.duration} · In Person · Funded</p>
+                  <p className="font-bold text-slate-900 text-sm leading-snug mb-0.5">{a.title}</p>
+                  <p className="text-slate-500 text-xs">{a.duration} · In Person · Funded</p>
                 </div>
               </Link>
             ))}
@@ -229,14 +236,16 @@ export default function ProgramsPage() {
       {/* Final CTA */}
       <section className="bg-slate-900 py-16 px-4 text-center">
         <div className="max-w-2xl mx-auto">
-          <Zap className="w-8 h-8 text-brand-red-500 mx-auto mb-4" />
           <h2 className="text-3xl font-extrabold text-white mb-3">Your Career Starts Here</h2>
-          <p className="text-slate-400 mb-8">Stop waiting. Start training for a career that pays.</p>
+          <p className="text-slate-300 text-base mb-8 leading-relaxed">
+            Short-term training. Real credentials. Job placement support.
+            Most programs are available at no cost to eligible Indiana residents.
+          </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base w-full sm:w-auto">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base w-full sm:w-auto">
               Apply Now
             </Link>
-            <Link href="/contact" className="border border-slate-600 hover:border-slate-400 text-white font-bold px-10 py-4 rounded-lg transition-colors text-base w-full sm:w-auto">
+            <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base w-full sm:w-auto">
               Talk to an Advisor
             </Link>
           </div>

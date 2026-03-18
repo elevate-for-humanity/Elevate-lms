@@ -67,7 +67,7 @@ export function ProgramPaymentButton({
         <button
           onClick={() => handlePayment('full')}
           disabled={loading}
-          className="w-full py-4 bg-brand-orange-500 text-white font-bold rounded-lg hover:bg-brand-orange-600 transition flex items-center justify-center gap-2"
+          className="w-full py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5" />
           Pay ${price.toLocaleString()} Now

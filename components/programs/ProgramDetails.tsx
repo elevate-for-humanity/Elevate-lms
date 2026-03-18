@@ -298,7 +298,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                       <strong>How it works:</strong> Click &quot;Pay Now&quot; → Select your BNPL provider at checkout → Get instant approval → Start training today
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-slate-500 mt-2">
                     * Pay-in-4 options subject to approval. Interest-free when you pay on time.
                   </p>
                 </div>
@@ -327,9 +327,9 @@ export function ProgramDetails({ program }: { program: Program }) {
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
             <video
               ref={videoRef}
-              autoPlay
+              
               loop
-              muted
+              
               playsInline
               preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"

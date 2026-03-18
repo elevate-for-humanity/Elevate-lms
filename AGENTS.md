@@ -551,6 +551,46 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 
 ---
 
+## Page Design System — Non-Negotiable
+
+All student-facing marketing and program pages must follow the locked design system.
+Full specification: `docs/page-design-standard.md`
+Hero video rules: `docs/hero-video-standard.md`
+Design tokens: `lib/page-design-tokens.ts`
+
+### Required for every new student-facing page
+
+1. Use `ProgramDetailPage`, `ProgramPageLayout`, or `ProgramCategoryPage` — do not build custom page layouts
+2. Hero: clean media only, no text/gradient overlay, content in white panel below
+3. Hero height: `h-[45vh] min-h-[280px] max-h-[560px]`
+4. Typography: `text-slate-*` only — never `text-gray-*`
+5. Dark CTA sections: `bg-slate-900` — never `bg-white text-white`
+6. Step numbers: `bg-brand-red-600 text-white` — never `bg-white text-white`
+7. List bullets: `w-1.5 h-1.5 rounded-full bg-brand-red-500` dot — never `CheckCircle2` or `✓`
+8. Program cards: use `components/programs/ProgramCard.tsx` — no custom card layouts
+9. Indiana Career Connect block required on all WIOA/apprenticeship-eligible pages
+10. Funding section required on all program pages — WIOA, WRG, JRI, self-pay, BNPL
+
+### Prohibited patterns
+
+- `text-gray-*` → use `text-slate-*`
+- `CheckCircle2`, `Award`, `Briefcase`, `GraduationCap` as content icons
+- Green checkmarks (`✓`) as list bullets
+- `bg-green-*` / `text-green-*` → use `brand-green-*`
+- Gradient overlays on hero images/videos
+- `text-white` or `text-white/90` on white/light backgrounds
+- `bg-white/10 border-white/10` on white backgrounds
+- `muted` or `autoPlay` attributes on hero `<video>` elements — use `useHeroVideo` hook
+- Sparse pages (hero + cards + CTA with no explanatory content)
+- Icon-led content sections (icons replacing real images or text)
+
+### Hero video
+
+All hero videos use `useHeroVideo` hook. No `muted`/`autoPlay` attributes on `<video>` elements.
+The hook attempts unmuted play and falls back silently. No mute button shown.
+
+---
+
 ## Docs
 
 - `docs/platform-readiness-implementation-plan.md` — audit findings and execution plan

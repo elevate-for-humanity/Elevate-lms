@@ -158,48 +158,58 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Inquiry Application */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="w-6 h-6 text-brand-blue-400" />
-              </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-2">Inquiry Application</h3>
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
                 Not sure if this program is right for you? Submit an inquiry and a career advisor will
                 contact you to discuss eligibility, funding options, and next steps. No commitment required.
-                {' '}<Link href="/forms/barber-apprenticeship-inquiry" className="underline font-medium">Use the inquiry form →</Link>
+                {' '}<Link href="/forms/barber-apprenticeship-inquiry" className="underline font-medium text-brand-blue-600">Use the inquiry form →</Link>
               </p>
               <Link
                 href="/contact?program=barber-apprenticeship"
-                className="inline-block bg-brand-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+                className="inline-block bg-brand-blue-600 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
               >
                 Submit Inquiry
               </Link>
             </div>
             {/* Enrollment Application */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4">
-                <ClipboardList className="w-6 h-6 text-brand-green-400" />
-              </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-2">Enrollment Application</h3>
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">
                 Ready to enroll? Complete the full application to begin the admissions process.
                 Includes funding eligibility check, background information, and program agreement.
                 BNPL payment plans available.
               </p>
               <Link
                 href="/programs/barber-apprenticeship/apply"
-                className="inline-block bg-brand-green-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-green-700 transition-colors"
+                className="inline-block bg-brand-red-600 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-brand-red-700 transition-colors"
               >
                 Apply to Enroll
               </Link>
             </div>
           </div>
+          {/* Indiana Career Connect */}
+          <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 max-w-4xl mx-auto">
+            <p className="text-brand-blue-900 font-semibold text-sm mb-1">Indiana Career Connect</p>
+            <p className="text-brand-blue-800 text-sm leading-relaxed mb-3">
+              For WIOA-eligible and apprenticeship pathway applicants, the next step may require Indiana Career Connect.
+            </p>
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
+            >
+              Go to Indiana Career Connect
+            </a>
+          </div>
+
           {/* BNPL + Calculator links */}
           <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-sm">
-            <Link href="/programs/barber-apprenticeship/apply#payment" className="text-brand-blue-400 hover:text-brand-blue-300 underline flex items-center gap-1">
+            <Link href="/programs/barber-apprenticeship/apply#payment" className="text-brand-blue-600 hover:text-brand-blue-700 underline flex items-center gap-1">
               <DollarSign className="w-4 h-4" /> Buy Now, Pay Later (BNPL) Options
             </Link>
-            <Link href="/programs/barber-apprenticeship/apply#calculator" className="text-brand-blue-400 hover:text-brand-blue-300 underline flex items-center gap-1">
+            <Link href="/programs/barber-apprenticeship/apply#calculator" className="text-brand-blue-600 hover:text-brand-blue-700 underline flex items-center gap-1">
               <DollarSign className="w-4 h-4" /> Payment Calculator
             </Link>
           </div>

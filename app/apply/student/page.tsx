@@ -38,30 +38,28 @@ export default async function StudentApplicationPage({
   const initialProgram = resolveSlug(params?.program || '') || '';
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        <Image src="/images/pages/apply-page-4.jpg" alt="Student application" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
-          <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>
-        </div>
+      {/* Hero — standard height, no text overlay */}
+      <div className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
+        <Image src="/images/pages/apply-page-4.jpg" alt="Student application — Elevate for Humanity" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       {/* Breadcrumbs */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Student' }]} />
         </div>
       </div>
 
-      <section className="border-b border-slate-200 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase mb-2">
+      {/* Page identity */}
+      <section className="border-b border-slate-100 bg-white py-10 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
             Student Application
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-3">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
             Start Your Career Journey
           </h1>
-          <p className="text-base sm:text-lg text-black max-w-3xl">
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
             This application helps us understand your goals and match you with the right
             training program. Many programs have funding available through WIOA, WRG, and JRI grants.
           </p>

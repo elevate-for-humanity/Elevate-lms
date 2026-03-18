@@ -76,7 +76,7 @@ export function ProgramHero({ program }: { program: Program }) {
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
                   <a
                     href={`/apply?program=${program.slug}`}
-                    className="inline-flex items-center justify-center bg-brand-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition shadow-lg text-center whitespace-nowrap text-sm sm:text-base"
+                    className="inline-flex items-center justify-center bg-brand-red-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold hover:bg-brand-red-700 transition shadow-lg text-center whitespace-nowrap text-sm sm:text-base"
                   >
                     Apply Now
                   </a>

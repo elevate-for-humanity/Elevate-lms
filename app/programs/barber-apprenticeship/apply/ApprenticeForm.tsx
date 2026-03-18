@@ -417,7 +417,7 @@ export default function ApprenticeForm() {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8">
               <h2 className="text-2xl font-bold text-black mb-6">Your Information</h2>
               
               <div className="space-y-5">
@@ -432,7 +432,7 @@ export default function ApprenticeForm() {
                       required
                       value={formData.firstName}
                       onChange={(e) => updateField('firstName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="First name"
                     />
                   </div>
@@ -445,7 +445,7 @@ export default function ApprenticeForm() {
                       required
                       value={formData.lastName}
                       onChange={(e) => updateField('lastName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Last name"
                     />
                   </div>
@@ -461,7 +461,7 @@ export default function ApprenticeForm() {
                     required
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -475,7 +475,7 @@ export default function ApprenticeForm() {
                     required
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="(317) 314-3757"
                   />
                 </div>
@@ -487,9 +487,9 @@ export default function ApprenticeForm() {
                     id="smsConsent"
                     checked={smsConsent}
                     onChange={(e) => setSmsConsent(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-brand-blue-600 border-gray-300 rounded"
+                    className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded"
                   />
-                  <label htmlFor="smsConsent" className="text-sm text-gray-600">
+                  <label htmlFor="smsConsent" className="text-sm text-slate-600">
                     I agree to receive text messages from Elevate for Humanity about my enrollment, program updates, and important notices. Message and data rates may apply. Reply STOP to opt out.
                   </label>
                 </div>
@@ -534,7 +534,7 @@ export default function ApprenticeForm() {
                     Do you have a barbershop for your training hours?
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white">
+                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-white">
                       <input
                         type="radio"
                         name="hasHostShop"
@@ -545,7 +545,7 @@ export default function ApprenticeForm() {
                       />
                       <span className="text-black">Yes, I have a shop</span>
                     </label>
-                    <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white">
+                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-white">
                       <input
                         type="radio"
                         name="hasHostShop"
@@ -568,7 +568,7 @@ export default function ApprenticeForm() {
                       type="text"
                       value={formData.hostShopName}
                       onChange={(e) => updateField('hostShopName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Name of the barbershop"
                     />
                   </div>
@@ -585,7 +585,7 @@ export default function ApprenticeForm() {
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'full' 
                         ? 'border-brand-green-600 bg-brand-green-50' 
-                        : 'border-gray-300 bg-white hover:border-gray-400'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -607,7 +607,7 @@ export default function ApprenticeForm() {
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'weekly' 
                         ? 'border-brand-orange-600 bg-brand-orange-50' 
-                        : 'border-gray-300 bg-white hover:border-gray-400'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -629,7 +629,7 @@ export default function ApprenticeForm() {
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'custom' 
                         ? 'border-brand-blue-600 bg-brand-blue-50' 
-                        : 'border-gray-300 bg-white hover:border-gray-400'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -681,7 +681,7 @@ export default function ApprenticeForm() {
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'affirm' 
                         ? 'border-brand-blue-600 bg-brand-blue-50' 
-                        : 'border-gray-300 bg-white hover:border-gray-400'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -733,7 +733,7 @@ export default function ApprenticeForm() {
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'sezzle' 
                         ? 'border-indigo-600 bg-indigo-50' 
-                        : 'border-gray-300 bg-white hover:border-gray-400'
+                        : 'border-slate-300 bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -798,7 +798,7 @@ export default function ApprenticeForm() {
                       <span className="px-3 py-1 bg-brand-orange-400 text-white rounded-full text-xs font-bold">Amazon Pay</span>
                       <span className="px-3 py-1 bg-brand-blue-600 text-white rounded-full text-xs font-bold">Bank (ACH)</span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-3 text-center">
+                    <p className="text-xs text-slate-600 mt-3 text-center">
                       Payment options subject to eligibility. Terms and availability vary by provider.
                     </p>
                   </div>
@@ -808,7 +808,7 @@ export default function ApprenticeForm() {
                 <button
                   onClick={handlePayNow}
                   disabled={loading || !formData.email || !formData.firstName || !formData.lastName || !formData.phone}
-                  className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-gray-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+                  className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
                 >
                   {loading ? (
                     <>

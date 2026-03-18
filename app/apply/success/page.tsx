@@ -132,10 +132,10 @@ export default async function ApplicationSuccessPage({
             <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
               <CheckCircle className="w-10 h-10 text-brand-green-600" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               {config.title}
             </h1>
-            <p className="text-lg text-gray-600">{config.message}</p>
+            <p className="text-lg text-slate-600">{config.message}</p>
             {referenceNumber && (
               <div className="mt-4 inline-block bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-2">
                 <span className="text-sm text-brand-green-700">Reference: </span>
@@ -156,9 +156,9 @@ export default async function ApplicationSuccessPage({
                   <div className="flex-1 pt-0.5">
                     <div className="flex items-center gap-2 mb-1">
                       {step.icon}
-                      <h3 className="font-semibold text-gray-900">{step.title}</h3>
+                      <h3 className="font-semibold text-slate-900">{step.title}</h3>
                     </div>
-                    <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                    <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
                     {'link' in step && step.link && (
                       <Link
                         href={step.link}
@@ -223,7 +223,7 @@ export default async function ApplicationSuccessPage({
             </Link>
             <Link
               href="/"
-              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-white transition"
+              className="flex-1 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-white transition"
             >
               Return Home
             </Link>

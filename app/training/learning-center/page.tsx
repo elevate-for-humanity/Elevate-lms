@@ -47,10 +47,10 @@ export default function LearningCenterPage() {
             {RESOURCES.map((r) => {
               const Icon = r.icon;
               return (
-                <div key={r.title} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all">
+                <div key={r.title} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all">
                   <Icon className="w-8 h-8 text-brand-blue-600 mb-4" />
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{r.title}</h3>
-                  <p className="text-gray-600 text-sm">{r.desc}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{r.title}</h3>
+                  <p className="text-slate-600 text-sm">{r.desc}</p>
                 </div>
               );
             })}
@@ -61,8 +61,8 @@ export default function LearningCenterPage() {
       {/* Access Note */}
       <section className="py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Enrolled Students</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Enrolled Students</h2>
+          <p className="text-slate-600 mb-6">
             Full access to learning center resources is available through your student portal after enrollment. Log in to access your program-specific materials.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">

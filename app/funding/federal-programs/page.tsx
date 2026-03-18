@@ -69,18 +69,18 @@ export default function FederalProgramsPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-8">
           {PROGRAMS.map((p) => (
-            <div key={p.name} className="bg-white border border-gray-200 rounded-xl p-6 md:p-8">
+            <div key={p.name} className="bg-white border border-slate-200 rounded-xl p-6 md:p-8">
               <div className="flex items-start gap-4 mb-4">
                 <Building2 className="w-6 h-6 text-brand-blue-600 mt-1 flex-shrink-0" />
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{p.name}</h2>
-                  <p className="text-sm text-gray-500">{p.agency}</p>
+                  <h2 className="text-xl font-bold text-slate-900">{p.name}</h2>
+                  <p className="text-sm text-slate-500">{p.agency}</p>
                 </div>
               </div>
-              <p className="text-gray-700 mb-4">{p.desc}</p>
+              <p className="text-slate-700 mb-4">{p.desc}</p>
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Who May Be Eligible:</h3>
-                <p className="text-gray-600 text-sm">{p.eligible.join('. ')}.</p>
+                <h3 className="text-sm font-semibold text-slate-900 mb-1">Who May Be Eligible:</h3>
+                <p className="text-slate-600 text-sm">{p.eligible.join('. ')}.</p>
               </div>
             </div>
           ))}
@@ -99,7 +99,7 @@ export default function FederalProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Find Out If You Qualify</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team can help determine which funding sources apply to your situation.</p>

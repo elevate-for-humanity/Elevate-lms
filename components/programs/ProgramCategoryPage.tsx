@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
 import { Clock, ArrowRight } from 'lucide-react';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 interface Program {
   title: string;
@@ -83,7 +82,18 @@ export default function ProgramCategoryPage({
   avatarVideoSrc,
   avatarName,
 }: ProgramCategoryPageProps) {
-  const { videoRef } = useHeroVideo();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = false;
+    el.volume = 0.8;
+    el.play().catch(() => {
+      el.muted = true;
+      el.play().catch(() => {});
+    });
+  }, []);
   const [showContent, setShowContent] = useState(false);
   const colors = colorClasses[accentColor];
 
@@ -100,9 +110,7 @@ export default function ProgramCategoryPage({
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover brightness-75"
           loop
-          muted
           playsInline
-          autoPlay
           preload="metadata"
           poster={heroPosterImage}
         >
@@ -113,7 +121,7 @@ export default function ProgramCategoryPage({
             <span className={`inline-block ${colors.badge} text-white text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
               {tagline}
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-4 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
               {categoryName}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
@@ -222,7 +230,7 @@ export default function ProgramCategoryPage({
       {/* CTA Section */}
       <section className={`py-16 ${colors.button.replace('hover:', '')}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Start Your {categoryName} Career?
           </h2>
           <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">

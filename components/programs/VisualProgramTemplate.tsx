@@ -67,9 +67,9 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       </section>
 
       {/* PROGRAM SNAPSHOT - 4 Photo Cards */}
-      <section className="py-12 px-4 bg-gray-50">
+      <section className="py-12 px-4 bg-slate-50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">Program at a Glance</h2>
+          <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">Program at a Glance</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <SnapshotCard
               image={images.snapshot.jobOutcome}
@@ -99,7 +99,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       {program.whatYouLearn && program.whatYouLearn.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">What You'll Learn</h2>
+            <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">What You'll Learn</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {program.whatYouLearn.slice(0, 6).map((item: string, index: number) => (
                 <div key={index} className="relative aspect-[4/3] rounded-xl overflow-hidden group">
@@ -123,14 +123,14 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       {/* ELIGIBILITY & FUNDING */}
       <section className="py-12 px-4 bg-brand-blue-50">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Eligibility & Funding</h2>
-          <p className="text-gray-700 mb-2">
+          <h2 className="text-2xl font-bold mb-4 text-slate-900">Eligibility & Funding</h2>
+          <p className="text-slate-700 mb-2">
             This program requires eligibility approval through WorkOne / Indiana Career Connect.
           </p>
-          <p className="text-gray-700 mb-2">
+          <p className="text-slate-700 mb-2">
             Training is funded through state or federal workforce programs.
           </p>
-          <p className="text-gray-600 text-sm mb-6">
+          <p className="text-slate-600 text-sm mb-6">
             Final eligibility is confirmed after review with WorkOne.
           </p>
           <Link
@@ -181,7 +181,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       {/* WHAT HAPPENS NEXT - 4-Step Visual Flow */}
       <section className="py-12 px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">Your Path Forward</h2>
+          <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">Your Path Forward</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <StepCard
               image={images.steps.apply}
@@ -261,8 +261,8 @@ function SnapshotCard({ image, label, description }: { image: string; label: str
         />
       </div>
       <div className="p-4">
-        <h3 className="font-bold text-gray-900 mb-1">{label}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
+        <h3 className="font-bold text-slate-900 mb-1">{label}</h3>
+        <p className="text-sm text-slate-600">{description}</p>
       </div>
     </div>
   );
@@ -280,7 +280,7 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           sizes="(max-width: 640px) 50vw, 25vw"
           className="object-cover"
         />
-        <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="absolute top-3 left-3 w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
           {step}
         </div>
         <div className="absolute bottom-3 left-3 right-3">

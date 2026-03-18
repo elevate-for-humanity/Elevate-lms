@@ -26,7 +26,7 @@ export function CredentialsOutcomes({
             <p className="text-black font-medium">
               Certificate of Completion issued by Elevate for Humanity Career & Training Institute
             </p>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               Documents successful completion of the {programName} training program
             </p>
           </div>
@@ -40,10 +40,10 @@ export function CredentialsOutcomes({
               <p className="text-black font-medium">
                 Preparation for third-party industry certifications
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Issued by the credentialing organization upon passing their exam:
               </p>
-              <ul className="text-sm text-gray-700 mt-2 space-y-1">
+              <ul className="text-sm text-slate-700 mt-2 space-y-1">
                 {partnerCertifications.map((cert, i) => (
                   <li key={i}>• {cert}</li>
                 ))}
@@ -60,7 +60,7 @@ export function CredentialsOutcomes({
               <p className="text-black font-medium">
                 Workforce-aligned training for employment pathways
               </p>
-              <ul className="text-sm text-gray-700 mt-2 space-y-1">
+              <ul className="text-sm text-slate-700 mt-2 space-y-1">
                 {employmentOutcomes.map((outcome, i) => (
                   <li key={i}>• {outcome}</li>
                 ))}
@@ -72,7 +72,7 @@ export function CredentialsOutcomes({
 
       {/* Disclaimer */}
       <div className="mt-6 pt-4 border-t border-brand-blue-200">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-slate-500">
           Note: Third-party certifications and state licenses are issued by external credentialing bodies, 
           not by Elevate for Humanity. Exam fees may apply separately.
         </p>

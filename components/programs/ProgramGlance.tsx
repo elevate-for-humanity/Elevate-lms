@@ -76,7 +76,7 @@ export function ProgramGlance({
         </div>
 
         {/* Next Steps */}
-        <div className="pt-4 border-t border-gray-200">
+        <div className="pt-4 border-t border-slate-200">
           <div className="font-semibold text-black mb-2">Next Steps</div>
           <div className="text-black mb-4">{nextSteps}</div>
           <div className="flex flex-col gap-2">
@@ -89,7 +89,7 @@ export function ProgramGlance({
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
             >
               Talk to an Advisor
             </a>

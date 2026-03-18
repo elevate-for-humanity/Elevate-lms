@@ -201,13 +201,11 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
   return (
     <>
       {/* Video Hero Banner */}
+      {/* Hero — clean media, no text overlay. Identity block renders below. */}
       <ProgramHeroBanner
         videoSrc={config.videoSrc}
         voiceoverSrc={config.voiceoverSrc}
         posterImage={config.posterImage}
-        title={config.heroTitle || config.title}
-        subtitle={config.heroSubtitle}
-        badge={config.badge}
       />
 
       {/* Breadcrumbs */}
@@ -217,8 +215,8 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
         </div>
       </div>
 
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      {/* Hero Image — clean, no text overlay */}
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
         <Image
           src={config.heroImage.src}
           alt={config.heroImage.alt}
@@ -242,8 +240,8 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                 className="text-center"
               >
                 <stat.icon className={`w-8 h-8 ${c.iconText} mx-auto mb-2`} />
-                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
+                <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
+                <div className="text-sm text-slate-500">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -257,10 +255,10 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             <span className={`inline-block ${c.bg} ${c.text} text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
               Program Structure
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               {config.overview.title}
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
               {program?.description || config.overview.description}
             </p>
           </div>
@@ -277,9 +275,9 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                 <div className={`w-14 h-14 ${c.iconBg} rounded-full flex items-center justify-center mx-auto mb-4`}>
                   <block.icon className={`w-7 h-7 ${c.iconText}`} />
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{block.hours}</div>
-                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{block.label}</div>
-                <p className="text-gray-600 text-sm">{block.description}</p>
+                <div className="text-3xl font-bold text-slate-900 mb-1">{block.hours}</div>
+                <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">{block.label}</div>
+                <p className="text-slate-600 text-sm">{block.description}</p>
               </div>
             ))}
           </div>
@@ -287,7 +285,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
           {config.fundingNote && (
             <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
               <h3 className="text-xl font-bold mb-3">Funding Options</h3>
-              <p className="text-gray-600">{config.fundingNote}</p>
+              <p className="text-slate-600">{config.fundingNote}</p>
             </div>
           )}
         </div>
@@ -313,10 +311,10 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             <span className={`inline-block ${c.bg} ${c.text} text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
               {config.features.sectionTitle}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               {config.features.sectionSubtitle}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               {config.features.sectionDescription}
             </p>
           </div>
@@ -333,8 +331,8 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                 <div className={`w-12 h-12 ${c.iconBg} rounded-xl flex items-center justify-center mb-4`}>
                   <card.icon className={`w-6 h-6 ${c.iconText}`} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{card.title}</h3>
-                <p className="text-gray-600">{card.description}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{card.title}</h3>
+                <p className="text-slate-600">{card.description}</p>
               </motion.div>
             ))}
           </div>
@@ -348,11 +346,11 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             <span className={`inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
               Curriculum
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               What You&apos;ll Learn
             </h2>
             {program?.what_you_learn && program.what_you_learn.length > 0 && (
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                 {program.estimated_weeks ? `${program.estimated_weeks} weeks` : ''}{program.training_hours ? ` · ${program.training_hours} instructional hours` : ''}
               </p>
             )}
@@ -373,9 +371,9 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                     <span className={`text-sm font-bold ${c.iconText}`}>{mod.order_index}</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">{mod.title}</h4>
+                    <h4 className="font-semibold text-slate-900">{mod.title}</h4>
                     {mod.description && (
-                      <p className="text-sm text-gray-600 mt-1">{mod.description}</p>
+                      <p className="text-sm text-slate-600 mt-1">{mod.description}</p>
                     )}
                     {mod.duration && (
                       <p className="text-xs text-slate-500 mt-1">{mod.duration}</p>
@@ -390,18 +388,18 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                 {program.what_you_learn.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <GraduationCap className={`w-5 h-5 ${c.iconText} flex-shrink-0 mt-0.5`} />
-                    <span className="text-gray-700">{item}</span>
+                    <span className="text-slate-700">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
           ) : !loading ? (
-            <div className="text-center text-gray-500 py-8">
+            <div className="text-center text-slate-500 py-8">
               <p>Detailed curriculum provided upon enrollment. Contact us for the full course outline.</p>
             </div>
           ) : null}
 
-          <p className="text-sm text-gray-500 mt-6 text-center">
+          <p className="text-sm text-slate-500 mt-6 text-center">
             Detailed curriculum provided upon enrollment. Program content may be customized per cohort.
           </p>
         </div>
@@ -421,7 +419,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       )}
 
       {/* Career Path */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className={`inline-block bg-white/10 ${c.dark} text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
@@ -476,7 +474,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
               <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
                 Common Questions
               </span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
                 Frequently Asked Questions
               </h2>
             </div>
@@ -494,16 +492,16 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
                     className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
                   >
-                    <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+                    <span className="font-semibold text-slate-900 pr-4">{faq.question}</span>
                     {openFaq === index ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
                     )}
                   </button>
                   {openFaq === index && (
                     <div className="px-6 pb-5">
-                      <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                      <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
                     </div>
                   )}
                 </motion.div>
@@ -516,10 +514,10 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       {/* CTA */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
             {config.cta.title}
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
             {config.cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -532,7 +530,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             </Link>
             <Link
               href={config.cta.secondaryHref}
-              className={`inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-full transition-all`}
+              className={`inline-flex items-center justify-center px-8 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-xl transition-all`}
             >
               <ArrowRight className="w-5 h-5 mr-2" />
               {config.cta.secondaryLabel}

@@ -67,14 +67,14 @@ export default function StateProgramsPage() {
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 space-y-8">
           {PROGRAMS.map((p) => (
-            <div key={p.name} className="bg-white border border-gray-200 rounded-xl p-6 md:p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">{p.name}</h2>
-              <p className="text-sm text-gray-500 mb-4">Administered by: {p.admin}</p>
-              <p className="text-gray-700 mb-4">{p.desc}</p>
+            <div key={p.name} className="bg-white border border-slate-200 rounded-xl p-6 md:p-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-1">{p.name}</h2>
+              <p className="text-sm text-slate-500 mb-4">Administered by: {p.admin}</p>
+              <p className="text-slate-700 mb-4">{p.desc}</p>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Eligible Fields:</h3>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Eligible Fields:</h3>
                   <div className="flex flex-wrap gap-2">
                     {p.fields.map((f) => (
                       <span key={f} className="bg-brand-blue-50 text-brand-blue-700 text-xs font-medium px-3 py-1 rounded-full">{f}</span>
@@ -82,8 +82,8 @@ export default function StateProgramsPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">Who May Be Eligible:</h3>
-                  <p className="text-gray-600 text-sm">{p.eligible.join('. ')}.</p>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-1">Who May Be Eligible:</h3>
+                  <p className="text-slate-600 text-sm">{p.eligible.join('. ')}.</p>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function StateProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Explore Your Funding Options</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">Our enrollment team will help match you with the right state funding program.</p>

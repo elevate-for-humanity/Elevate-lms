@@ -96,7 +96,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
       </section>
 
       {/* Authority badges */}
-      <div className="bg-white py-4 border-b border-gray-100">
+      <div className="bg-white py-4 border-b border-slate-100">
         <AuthorityStrip />
       </div>
 

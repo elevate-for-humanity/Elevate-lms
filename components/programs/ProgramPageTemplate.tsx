@@ -45,7 +45,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </div>
 
       {/* Hero Image - Compact */}
-      <section className="relative h-[35vh] min-h-[250px] lg:h-[40vh] lg:min-h-[300px] bg-gray-100">
+      <section className="relative h-[35vh] min-h-[250px] lg:h-[40vh] lg:min-h-[300px] bg-slate-100">
         <Image
           src={program.image}
           alt={program.title}
@@ -68,7 +68,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Funding Badge */}
       {program.fundingType && (
-        <section className="bg-white border-b border-gray-100">
+        <section className="bg-white border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <FundingBadge type={program.fundingType} />
           </div>
@@ -76,19 +76,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       )}
 
       {/* Badges + CTA */}
-      <section className="bg-white border-b border-gray-100">
+      <section className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 text-sm font-medium rounded-full">
                 <Clock className="w-4 h-4" />
                 {program.duration}
               </span>
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 text-sm font-medium rounded-full">
                 <DollarSign className="w-4 h-4" />
                 {program.tuition} Tuition
               </span>
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 text-sm font-medium rounded-full">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 text-sm font-medium rounded-full">
                 <TrendingUp className="w-4 h-4" />
                 {program.salary} Avg. Salary
               </span>
@@ -109,25 +109,25 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="max-w-3xl mb-16">
             <Link 
               href={program.categoryHref} 
-              className="text-sm text-gray-500 hover:text-gray-900 mb-4 inline-block"
+              className="text-sm text-slate-500 hover:text-slate-900 mb-4 inline-block"
             >
               ← {program.category}
             </Link>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-6">
               {program.title}
             </h1>
-            <p className="text-xl text-gray-500">
+            <p className="text-xl text-slate-500">
               {program.description}
             </p>
           </div>
 
           {program.highlights && program.highlights.length > 0 && (
-            <div className="border-t border-gray-100 pt-12">
+            <div className="border-t border-slate-100 pt-12">
               <p className="text-sm text-slate-500 uppercase tracking-wider mb-8">This program includes</p>
               <div className="grid md:grid-cols-3 gap-8">
                 {program.highlights.map((highlight, index) => (
                   <div key={index}>
-                    <h3 className="text-lg font-semibold text-gray-900">{highlight}</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{highlight}</h3>
                   </div>
                 ))}
               </div>
@@ -137,16 +137,16 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-16 lg:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-12">
+          <h2 className="text-2xl font-bold text-slate-900 mb-12">
             What you'll learn
           </h2>
           <div className="grid md:grid-cols-2 gap-x-16 gap-y-4">
             {(program.skills || []).map((skill, index) => (
-              <div key={index} className="flex items-start gap-3 py-3 border-b border-gray-200">
-                <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">{skill}</span>
+              <div key={index} className="flex items-start gap-3 py-3 border-b border-slate-200">
+                <ArrowRight className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-700">{skill}</span>
               </div>
             ))}
           </div>
@@ -160,10 +160,10 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Your Journey
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               How It Works
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               From application to employment - here's exactly what to expect at each step of your training journey.
             </p>
           </div>
@@ -171,30 +171,30 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step 1: Apply Online */}
             <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
               <div className="pt-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Apply Online</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Apply Online</h3>
+                <p className="text-slate-600 mb-6">
                   Complete our simple online application in just 10-15 minutes. We'll review your eligibility for free WIOA-funded training.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Fill out basic information and career goals</span>
+                    <span className="text-slate-700">Fill out basic information and career goals</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Upload ID and proof of residency</span>
+                    <span className="text-slate-700">Upload ID and proof of residency</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Schedule your enrollment appointment</span>
+                    <span className="text-slate-700">Schedule your enrollment appointment</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Get approved within 24-48 hours</span>
+                    <span className="text-slate-700">Get approved within 24-48 hours</span>
                   </li>
                 </ul>
                 <div className="mt-6 pt-6 border-t border-brand-blue-100">
@@ -208,30 +208,30 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 2: Complete Training */}
             <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border border-purple-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 2
               </div>
               <div className="pt-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Complete Training</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Complete Training</h3>
+                <p className="text-slate-600 mb-6">
                   Attend classes, complete hands-on practice, and earn your industry-recognized certification with expert instructors.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Attend instructor-led classroom sessions</span>
+                    <span className="text-slate-700">Attend instructor-led classroom sessions</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Complete hands-on clinical practice</span>
+                    <span className="text-slate-700">Complete hands-on clinical practice</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Pass skills assessments and exams</span>
+                    <span className="text-slate-700">Pass skills assessments and exams</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Earn your state certification</span>
+                    <span className="text-slate-700">Earn your state certification</span>
                   </li>
                 </ul>
                 <div className="mt-6 pt-6 border-t border-purple-100">
@@ -245,30 +245,30 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
             {/* Step 3: Start Working */}
             <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-8 border border-brand-green-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 3
               </div>
               <div className="pt-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Start Working</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Start Working</h3>
+                <p className="text-slate-600 mb-6">
                   Our career services team helps you land your first job with resume support, interview prep, and employer connections.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Professional resume and cover letter</span>
+                    <span className="text-slate-700">Professional resume and cover letter</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Mock interviews and coaching</span>
+                    <span className="text-slate-700">Mock interviews and coaching</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">Direct introductions to hiring employers</span>
+                    <span className="text-slate-700">Direct introductions to hiring employers</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-gray-700">90-day post-employment support</span>
+                    <span className="text-slate-700">90-day post-employment support</span>
                   </li>
                 </ul>
                 <div className="mt-6 pt-6 border-t border-brand-green-100">
@@ -295,16 +295,16 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* Career Outcomes - Enhanced with images and details */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-16 lg:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Career Paths
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               Where This Training Takes You
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Graduates from this program work in a variety of high-demand roles with competitive pay and growth opportunities.
             </p>
           </div>
@@ -316,7 +316,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
               const image = isObject && 'image' in outcome ? outcome.image : null;
               
               return (
-                <div key={index} className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div key={index} className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100">
                   {image && (
                     <div className="relative h-48 overflow-hidden">
                       <Image
@@ -327,7 +327,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                         quality={85}
                       />
                       <div className="absolute bottom-4 left-4">
-                        <span className="inline-flex items-center gap-1 bg-white/90 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 bg-white/90 text-slate-900 text-xs font-semibold px-3 py-1 rounded-full">
                           <Briefcase className="w-3 h-3" />
                           Career Path
                         </span>
@@ -335,11 +335,11 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                     </div>
                   )}
                   <div className="p-6">
-                    <h3 className="font-bold text-gray-900 text-xl mb-3 group-hover:text-brand-blue-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 text-xl mb-3 group-hover:text-brand-blue-600 transition-colors">
                       {title}
                     </h3>
                     {description && (
-                      <p className="text-gray-600 leading-relaxed mb-4">{description}</p>
+                      <p className="text-slate-600 leading-relaxed mb-4">{description}</p>
                     )}
                     <div className="flex items-center text-brand-blue-600 font-medium text-sm">
                       <TrendingUp className="w-4 h-4 mr-2" />
@@ -357,14 +357,14 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       {program.requirements && program.requirements.length > 0 && (
         <section className="py-16 lg:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-12">
               Requirements
             </h2>
             <div className="grid md:grid-cols-2 gap-x-16 gap-y-4">
               {program.requirements.map((req, index) => (
-                <div key={index} className="flex items-start gap-3 py-3 border-b border-gray-100">
-                  <Briefcase className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">{req}</span>
+                <div key={index} className="flex items-start gap-3 py-3 border-b border-slate-100">
+                  <Briefcase className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-700">{req}</span>
                 </div>
               ))}
             </div>
@@ -374,9 +374,9 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Related Programs */}
       {program.relatedPrograms && program.relatedPrograms.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-16 lg:py-24 bg-slate-50">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-12">
               Looking for a different program?
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -386,10 +386,10 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                   href={related.href}
                   className="group p-6 bg-white rounded-xl hover:shadow-md transition-shadow"
                 >
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:underline">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:underline">
                     {related.title}
                   </h3>
-                  <p className="text-gray-500 text-sm">{related.description}</p>
+                  <p className="text-slate-500 text-sm">{related.description}</p>
                 </Link>
               ))}
             </div>
@@ -417,7 +417,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-slate-900 font-semibold rounded-full hover:bg-slate-100 transition-colors"
             >
               Check Eligibility Requirements
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -432,7 +432,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="mt-6">
             <Link
               href="/contact"
-              className="inline-flex items-center text-gray-400 hover:text-white transition-colors"
+              className="inline-flex items-center text-slate-400 hover:text-white transition-colors"
             >
               Questions? Contact Us
               <ArrowRight className="w-4 h-4 ml-1" />

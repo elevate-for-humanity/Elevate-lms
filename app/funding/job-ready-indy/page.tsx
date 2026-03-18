@@ -89,7 +89,7 @@ export default function JobReadyIndyPage() {
               { step: '4', title: 'Earn Your Credential', desc: 'Complete your program and earn a nationally recognized credential. Our career services team connects you with employer partners.' },
             ].map((s) => (
               <div key={s.step} className="flex gap-5 items-start">
-                <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
+                <div className="w-10 h-10 rounded-full bg-brand-red-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
                   <p className="text-slate-600">{s.desc}</p>
@@ -101,13 +101,13 @@ export default function JobReadyIndyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-white/90 mb-10">Job Ready Indy funding may be available for your career training. Apply today and our team will confirm your eligibility.</p>
+          <p className="text-slate-300 text-base leading-relaxed mb-10">Job Ready Indy funding may be available for your career training. Apply today and our team will confirm your eligibility.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/start" className="bg-white text-brand-blue-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-white transition hover:scale-105 shadow-lg">Apply Now</Link>
-            <Link href="/contact" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-bold text-base transition">Apply Now</Link>
+            <Link href="/contact" className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition">Contact Us</Link>
           </div>
         </div>
       </section>

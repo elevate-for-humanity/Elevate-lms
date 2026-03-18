@@ -143,7 +143,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
             <div className={`inline-flex items-center gap-2 ${c.bg} text-white px-4 py-2 rounded-full text-sm font-bold mb-4`}>
               <Award className="w-4 h-4" /> {program.structure.fundingNote}
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
               {program.title}
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mb-6">
@@ -306,7 +306,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {program.competencies.map((comp, i) => (
               <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
-                <CheckCircle className={`w-5 h-5 ${c.text} flex-shrink-0 mt-0.5`} />
+                <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-2" />
                 <span className="text-slate-700">{comp}</span>
               </div>
             ))}

@@ -209,7 +209,7 @@ export default function BarberChatAssistant() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 w-[calc(100%-3rem)] sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all ${
+      className={`fixed bottom-6 right-6 z-50 w-[calc(100%-3rem)] sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transition-all ${
         isMinimized ? 'h-14' : 'h-[500px]'
       }`}
     >
@@ -253,7 +253,7 @@ export default function BarberChatAssistant() {
                   className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
                     msg.role === 'user'
                       ? 'bg-brand-blue-600 text-white rounded-br-md'
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
+                      : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md shadow-sm'
                   }`}
                 >
                   {msg.content}
@@ -262,7 +262,7 @@ export default function BarberChatAssistant() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white text-gray-500 px-4 py-2 rounded-2xl rounded-bl-md border border-gray-200 shadow-sm">
+                <div className="bg-white text-slate-500 px-4 py-2 rounded-2xl rounded-bl-md border border-slate-200 shadow-sm">
                   <div className="flex gap-1">
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -276,7 +276,7 @@ export default function BarberChatAssistant() {
 
           {/* Quick Actions */}
           {messages.length <= 2 && (
-            <div className="px-3 py-2 border-t border-gray-100 bg-white">
+            <div className="px-3 py-2 border-t border-slate-100 bg-white">
               <div className="flex flex-wrap gap-2">
                 {quickActions.map((action, i) => (
                   <button
@@ -295,7 +295,7 @@ export default function BarberChatAssistant() {
           )}
 
           {/* Input */}
-          <div className="p-3 border-t border-gray-200 bg-white">
+          <div className="p-3 border-t border-slate-200 bg-white">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -308,7 +308,7 @@ export default function BarberChatAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about the program..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 disabled={isLoading}
               />
               <button

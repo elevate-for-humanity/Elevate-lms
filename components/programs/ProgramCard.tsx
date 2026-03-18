@@ -1,35 +1,61 @@
-import Link from "next/link";
-import Image from "next/image";
-import type { Program } from "@/lib/programs/programs.data";
+import Link from 'next/link';
+import Image from 'next/image';
+import type { Program } from '@/lib/programs/programs.data';
 
+/**
+ * Standard program card — system-locked structure.
+ * Top image (16:9, flush) → program name → short description → metadata chips → CTA.
+ * Do not add icons, checkmarks, or colored badges here.
+ */
 export default function ProgramCard({ program }: { program: Program }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-      <div className="relative w-full h-[220px] rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50">
+    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
+      {/* Flush top image — 16:9 */}
+      <div className="relative aspect-[16/9] overflow-hidden">
         <Image
-          src={program.cardImage || program.heroImage || "/images/pages/training-cohort.jpg"}
+          src={program.cardImage || program.heroImage || '/images/pages/training-cohort.jpg'}
           alt={program.title}
           fill
-          sizes="100vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover"
         />
       </div>
 
-      <div className="mt-4 text-lg font-black text-zinc-900">{program.title}</div>
-      <div className="mt-2 text-sm text-zinc-700">{program.tagline}</div>
+      {/* Card body */}
+      <div className="p-4 sm:p-5">
+        <h3 className="text-base font-bold text-slate-900 leading-snug mb-1">{program.title}</h3>
+        {program.tagline && (
+          <p className="text-slate-600 text-sm leading-relaxed mb-3">{program.tagline}</p>
+        )}
 
-      <div className="mt-3 text-xs text-zinc-600 flex flex-wrap gap-2">
-        {program.duration ? <span className="rounded-full border px-3 py-2">{program.duration}</span> : null}
-        {program.format ? <span className="rounded-full border px-3 py-2">{program.format}</span> : null}
-        {program.level ? <span className="rounded-full border px-3 py-2">{program.level}</span> : null}
+        {/* Metadata chips */}
+        {(program.duration || program.format || program.level) && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {program.duration && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200">
+                {program.duration}
+              </span>
+            )}
+            {program.format && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200">
+                {program.format}
+              </span>
+            )}
+            {program.level && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200">
+                {program.level}
+              </span>
+            )}
+          </div>
+        )}
+
+        <Link
+          href={`/programs/${program.slug}`}
+          className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
+        >
+          View Program
+        </Link>
       </div>
-
-      <Link
-        href={`/programs/${program.slug}`}
-        className="mt-4 inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
-      >
-        View Program
-      </Link>
     </div>
   );
 }

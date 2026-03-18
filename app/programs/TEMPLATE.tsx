@@ -92,7 +92,7 @@ export default function ProgramTemplate() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-black mb-8">
             What You'll Learn
@@ -127,14 +127,14 @@ export default function ProgramTemplate() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-black mb-8">
             How It Works
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 1
               </div>
               <h3 className="text-xl font-bold text-black mb-2">Apply</h3>
@@ -143,7 +143,7 @@ export default function ProgramTemplate() {
               </p>
             </div>
             <div>
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 2
               </div>
               <h3 className="text-xl font-bold text-black mb-2">Train</h3>
@@ -152,7 +152,7 @@ export default function ProgramTemplate() {
               </p>
             </div>
             <div>
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                 3
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
@@ -203,18 +203,18 @@ export default function ProgramTemplate() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-slate-300 text-base leading-relaxed mb-8">
             Apply today and take the first step toward your new career.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/start"
-              className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-white transition text-center"
+              className="px-8 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-xl transition text-center"
             >
               Apply Now
             </Link>

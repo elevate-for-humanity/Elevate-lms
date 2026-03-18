@@ -1,14 +1,9 @@
 
-export const dynamic = 'force-static';
-export const revalidate = 3600;
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, FileCheck, GraduationCap, HelpCircle } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/how-it-works' },
@@ -37,41 +32,24 @@ export default function FundingHowItWorksPage() {
         <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'How It Works' }]} />
       </div>
 
-      {/* Hero — poster fallback (video asset pending), below-hero copy */}
-      {(() => {
-        const hero = heroBanners['funding-how-it-works'];
-        return (
-          <HeroVideo
-            videoSrcDesktop={hero.videoSrcDesktop}
-            posterImage={hero.posterImage}
-            voiceoverSrc={hero.voiceoverSrc}
-            microLabel={hero.microLabel}
-            transcript={hero.transcript}
-            analyticsName={hero.analyticsName}
-          >
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Funded Training</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-              How funded training works.
-            </h1>
-            <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
-              Many of our training programs may be available at no cost to eligible participants through federal and state funding.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
-                Check Eligibility
-              </Link>
-              <Link href="/contact" className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-                Contact an Advisor
-              </Link>
-            </div>
-          </HeroVideo>
-        );
-      })()}
+      {/* Hero */}
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
+          <Image src="/images/pages/funding-page-3.jpg" alt="How funding works for career training" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-white py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">How Funding Works</h1>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Many of our training programs may be available at no cost to eligible participants through federal and state funding.</p>
+          </div>
+        </div>
+      </section>
 
       {/* Steps */}
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-12 text-center">Four Steps to Funded Training</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-12 text-center">Four Steps to Funded Training</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {STEPS.map((s) => {
               const Icon = s.icon;
@@ -80,8 +58,8 @@ export default function FundingHowItWorksPage() {
                   <div className="w-14 h-14 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     {s.step}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
-                  <p className="text-gray-600 text-sm">{s.desc}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{s.title}</h3>
+                  <p className="text-slate-600 text-sm">{s.desc}</p>
                 </div>
               );
             })}
@@ -92,15 +70,15 @@ export default function FundingHowItWorksPage() {
       {/* Funding Sources */}
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Available Funding Sources</h2>
-          <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 text-center">Available Funding Sources</h2>
+          <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
             Eligibility varies by program and individual circumstances. Our enrollment team will help identify the right funding path for you.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             {FUNDING_SOURCES.map((f) => (
-              <Link key={f.name} href={f.href} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-brand-blue-300 transition-all group">
-                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600">{f.name}</h3>
-                <p className="text-gray-600 text-sm">{f.desc}</p>
+              <Link key={f.name} href={f.href} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md hover:border-brand-blue-300 transition-all group">
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600">{f.name}</h3>
+                <p className="text-slate-600 text-sm">{f.desc}</p>
               </Link>
             ))}
           </div>
@@ -120,7 +98,7 @@ export default function FundingHowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to See If You Qualify?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">

@@ -28,7 +28,7 @@ export default function ApplyPage() {
             DOL REGISTERED APPRENTICESHIP
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Apply for Sanitation & Infection Control Apprenticeship</h1>
-          <p className="text-white/90 mt-2">2Exclusive Apprenticeship Program - 32 Weeks with Paid OJT</p>
+          <p className="text-slate-600 mt-2 text-base">Exclusive Apprenticeship Program - 32 Weeks with Paid OJT</p>
         </div>
       </section>
 
@@ -175,7 +175,7 @@ export default function ApplyPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="bg-brand-blue-700 text-white rounded-xl p-6 text-center">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
             Call <a href="/support" className="text-brand-green-400 font-bold hover:underline">(317) 314-3757</a> or email{' '}

@@ -129,9 +129,9 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
     : config.applyUrl;
 
   return (
-    <main className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen bg-white text-slate-900">
       {/* BREADCRUMBS */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <Breadcrumbs
             items={[
@@ -148,9 +148,9 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
           <>
             <video
               ref={videoRef}
-              autoPlay
+              
               loop
-              muted
+              
               playsInline
               preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
@@ -186,7 +186,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             )}
 
             {/* H1 */}
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-slate-900 drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-lg">
               {config.title}
             </h1>
 
@@ -206,7 +206,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               {config.inquiryUrl && (
                 <Link
                   href={config.inquiryUrl}
-                  className="rounded-2xl bg-white text-slate-900 px-8 py-4 font-semibold shadow-lg hover:bg-gray-100 transition text-center"
+                  className="rounded-2xl bg-white text-slate-900 px-8 py-4 font-semibold shadow-lg hover:bg-slate-100 transition text-center"
                 >
                   Request Information
                 </Link>
@@ -217,29 +217,29 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* PROGRAM SNAPSHOT */}
-      <section className="bg-gray-50 py-12">
+      <section className="bg-slate-50 py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Program at a Glance</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Program at a Glance</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="text-sm text-gray-500 mb-1">Program Type</div>
-              <div className="font-semibold text-gray-900">{config.snapshot.programType}</div>
+              <div className="text-sm text-slate-500 mb-1">Program Type</div>
+              <div className="font-semibold text-slate-900">{config.snapshot.programType}</div>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="text-sm text-gray-500 mb-1">Duration</div>
-              <div className="font-semibold text-gray-900">{config.snapshot.duration}</div>
+              <div className="text-sm text-slate-500 mb-1">Duration</div>
+              <div className="font-semibold text-slate-900">{config.snapshot.duration}</div>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="text-sm text-gray-500 mb-1">Format</div>
-              <div className="font-semibold text-gray-900">{config.snapshot.format}</div>
+              <div className="text-sm text-slate-500 mb-1">Format</div>
+              <div className="font-semibold text-slate-900">{config.snapshot.format}</div>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="text-sm text-gray-500 mb-1">Cost</div>
-              <div className="font-semibold text-gray-900">{config.snapshot.cost}</div>
+              <div className="text-sm text-slate-500 mb-1">Cost</div>
+              <div className="font-semibold text-slate-900">{config.snapshot.cost}</div>
             </div>
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="text-sm text-gray-500 mb-1">Credential</div>
-              <div className="font-semibold text-gray-900">{config.snapshot.credential}</div>
+              <div className="text-sm text-slate-500 mb-1">Credential</div>
+              <div className="font-semibold text-slate-900">{config.snapshot.credential}</div>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {/* WHO THIS IS FOR */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Who This Is For</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Who This Is For</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-brand-green-50 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-brand-green-900 mb-4 flex items-center gap-2">
@@ -283,7 +283,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* LEARNING OUTCOMES */}
-      <section className="bg-brand-blue-700 text-white py-16">
+      <section className="bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8">What You Will Learn</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -327,18 +327,18 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {/* THE PATH */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Your Path to Completion</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Your Path to Completion</h2>
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 hidden md:block" />
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden md:block" />
             <div className="space-y-8">
               {config.path.map((step, i) => (
                 <div key={i} className="flex gap-6 items-start">
-                  <div className="w-16 h-16 rounded-full bg-brand-blue-700 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-brand-red-600 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
                     {step.step}
                   </div>
                   <div className="pt-3">
-                    <h3 className="text-xl font-semibold text-gray-900">{step.title}</h3>
-                    <p className="mt-2 text-gray-600">{step.description}</p>
+                    <h3 className="text-xl font-semibold text-slate-900">{step.title}</h3>
+                    <p className="mt-2 text-slate-600">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -348,24 +348,24 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* CREDENTIAL & OUTCOME */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-slate-50 py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">What You Receive</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">What You Receive</h2>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <div className="flex items-start gap-4 mb-6">
               <Award className="w-12 h-12 text-purple-600 flex-shrink-0" />
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{config.credential.name}</h3>
-                <p className="mt-2 text-gray-600">{config.credential.description}</p>
+                <h3 className="text-2xl font-bold text-slate-900">{config.credential.name}</h3>
+                <p className="mt-2 text-slate-600">{config.credential.description}</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mt-8">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3">This credential can be used for:</h4>
+                <h4 className="font-semibold text-slate-900 mb-3">This credential can be used for:</h4>
                 <ul className="space-y-2">
                   {config.credential.usedFor.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-700">
+                    <li key={i} className="flex items-start gap-2 text-slate-700">
                       <span className="text-slate-500 flex-shrink-0">•</span>
                       {item}
                     </li>
@@ -374,10 +374,10 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </div>
               {config.credential.notIncluded && config.credential.notIncluded.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">Important to note:</h4>
+                  <h4 className="font-semibold text-slate-900 mb-3">Important to note:</h4>
                   <ul className="space-y-2">
                     {config.credential.notIncluded.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-gray-600">
+                      <li key={i} className="flex items-start gap-2 text-slate-600">
                         <span className="text-amber-500">⚠️</span>
                         {item}
                       </li>
@@ -393,7 +393,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {/* FUNDING */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Funding & Payment</h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Funding & Payment</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {config.funding.options.map((option, i) => (
               <div
@@ -401,14 +401,14 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
                 className={`rounded-2xl p-6 ${
                   option === config.funding.primaryOption
                     ? 'bg-brand-green-50 border-2 border-brand-green-500'
-                    : 'bg-white border border-gray-200'
+                    : 'bg-white border border-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className={`w-5 h-5 ${
-                    option === config.funding.primaryOption ? 'text-brand-green-600' : 'text-gray-500'
+                    option === config.funding.primaryOption ? 'text-brand-green-600' : 'text-slate-500'
                   }`} />
-                  <span className="font-semibold text-gray-900">{getFundingLabel(option)}</span>
+                  <span className="font-semibold text-slate-900">{getFundingLabel(option)}</span>
                 </div>
                 {option === config.funding.primaryOption && (
                   <span className="text-sm text-brand-green-700">Most common option</span>
@@ -417,7 +417,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             ))}
           </div>
           {config.funding.notes && (
-            <p className="mt-6 text-gray-600 text-sm">{config.funding.notes}</p>
+            <p className="mt-6 text-slate-600 text-sm">{config.funding.notes}</p>
           )}
         </div>
       </section>
@@ -426,16 +426,16 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {config.additionalSections}
 
       {/* FINAL CTA */}
-      <section className="bg-white py-20 border-t">
+      <section className="bg-slate-900 py-16">
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold">Ready to Get Started?</h2>
-          <p className="mt-4 text-lg text-white/90">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Ready to Get Started?</h2>
+          <p className="mt-2 text-slate-300 text-base leading-relaxed mb-8 max-w-xl mx-auto">
             Take the next step toward your new career.
           </p>
-          <div className="mt-10 flex justify-center gap-4 flex-col sm:flex-row">
+          <div className="flex justify-center gap-4 flex-col sm:flex-row">
             <Link
               href={primaryUrl}
-              className="rounded-2xl bg-purple-600 text-white px-8 py-4 font-semibold hover:bg-purple-700 transition inline-flex items-center justify-center gap-2"
+              className="rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 font-bold transition inline-flex items-center justify-center gap-2"
             >
               {primaryCTA}
               <ArrowRight className="w-5 h-5" />
@@ -443,7 +443,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             {config.inquiryUrl && (
               <Link
                 href={config.inquiryUrl}
-                className="rounded-2xl bg-white text-slate-900 px-8 py-4 font-semibold hover:bg-gray-100 transition"
+                className="rounded-xl border-2 border-slate-600 hover:border-slate-400 text-white px-8 py-4 font-bold transition"
               >
                 Request Information
               </Link>

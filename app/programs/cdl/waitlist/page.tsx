@@ -54,8 +54,8 @@ export default function CDLWaitlistPage() {
     }
   };
 
-  const inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition text-gray-900';
-  const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
+  const inputClass = 'w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition text-slate-900';
+  const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
 
   if (submitted) {
     return (
@@ -67,14 +67,14 @@ export default function CDLWaitlistPage() {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-green-600 text-3xl">✓</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">You&apos;re on the Waitlist!</h1>
-          <p className="text-lg text-gray-600 mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 mb-4">You&apos;re on the Waitlist!</h1>
+          <p className="text-lg text-slate-600 mb-8">
             Thank you, {formData.firstName}! You&apos;ve been added to the CDL Training waitlist for the
             <strong> October 2026 cohort</strong>. We&apos;ll send you updates as the start date approaches.
           </p>
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
-            <h3 className="font-bold text-gray-900 mb-2">What Happens Next</h3>
-            <ul className="text-sm text-gray-600 text-left space-y-2">
+            <h3 className="font-bold text-slate-900 mb-2">What Happens Next</h3>
+            <ul className="text-sm text-slate-600 text-left space-y-2">
               <li>1. You&apos;ll receive a confirmation email with program details</li>
               <li>2. We&apos;ll contact you about funding options (WIOA, grants, self-pay)</li>
               <li>3. Enrollment opens 60 days before the cohort start date</li>
@@ -112,23 +112,23 @@ export default function CDLWaitlistPage() {
           <div className="grid sm:grid-cols-4 gap-6 text-center">
             <div>
               <Truck className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-              <p className="font-bold text-gray-900">Class A CDL</p>
-              <p className="text-sm text-gray-500">Full commercial license</p>
+              <p className="font-bold text-slate-900">Class A CDL</p>
+              <p className="text-sm text-slate-500">Full commercial license</p>
             </div>
             <div>
               <Clock className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-              <p className="font-bold text-gray-900">160 Hours</p>
-              <p className="text-sm text-gray-500">Classroom + behind-the-wheel</p>
+              <p className="font-bold text-slate-900">160 Hours</p>
+              <p className="text-sm text-slate-500">Classroom + behind-the-wheel</p>
             </div>
             <div>
               <Calendar className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-              <p className="font-bold text-gray-900">October 2026</p>
-              <p className="text-sm text-gray-500">Next cohort start</p>
+              <p className="font-bold text-slate-900">October 2026</p>
+              <p className="text-sm text-slate-500">Next cohort start</p>
             </div>
             <div>
               <MapPin className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-              <p className="font-bold text-gray-900">Indianapolis, IN</p>
-              <p className="text-sm text-gray-500">Training location</p>
+              <p className="font-bold text-slate-900">Indianapolis, IN</p>
+              <p className="text-sm text-slate-500">Training location</p>
             </div>
           </div>
         </div>
@@ -137,10 +137,10 @@ export default function CDLWaitlistPage() {
       {/* Form */}
       <section className="py-12">
         <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Join the Waitlist</h2>
-          <p className="text-gray-600 text-center mb-8">Fill out the form below to reserve your spot. Waitlist members get priority enrollment.</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2 text-center">Join the Waitlist</h2>
+          <p className="text-slate-600 text-center mb-8">Fill out the form below to reserve your spot. Waitlist members get priority enrollment.</p>
 
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-8 space-y-5">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 p-8 space-y-5">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className={labelClass}>First Name <span className="text-red-500">*</span></label>

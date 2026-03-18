@@ -23,8 +23,8 @@ export default async function WrgPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
+          <p className="text-slate-600">Please try again later.</p>
         </div>
       </div>
     );
@@ -298,7 +298,7 @@ export default async function WrgPage() {
 
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 1
               </div>
               <div>
@@ -318,7 +318,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 2
               </div>
               <div>
@@ -333,7 +333,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 3
               </div>
               <div>
@@ -346,7 +346,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 4
               </div>
               <div>
@@ -359,7 +359,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 5
               </div>
               <div>
@@ -476,7 +476,7 @@ export default async function WrgPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white text-center">
+      <section className="py-16 bg-slate-900 text-center">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Apply for WRG?

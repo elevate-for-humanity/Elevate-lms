@@ -13,22 +13,22 @@ export default function ApplicationSuccessPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">
             Application Submitted
           </h1>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-slate-600 mb-8">
             Thank you for applying to the Cosmetology Apprenticeship program. 
             We&apos;ve received your application and will be in touch soon.
           </p>
 
           <div className="bg-white rounded-xl p-6 text-left mb-8">
-            <h2 className="font-semibold text-gray-900 mb-4">What Happens Next</h2>
+            <h2 className="font-semibold text-slate-900 mb-4">What Happens Next</h2>
             <div className="space-y-3">
               {[
                 'We review your application within 5-10 business days',
@@ -40,25 +40,25 @@ export default function ApplicationSuccessPage() {
                   <div className="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium mt-0.5">
                     {i + 1}
                   </div>
-                  <p className="text-sm text-gray-600">{text}</p>
+                  <p className="text-sm text-slate-600">{text}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
-            <p className="text-sm text-gray-500 mb-4">Questions in the meantime?</p>
+          <div className="border-t border-slate-200 pt-6">
+            <p className="text-sm text-slate-500 mb-4">Questions in the meantime?</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
                 href="/support"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-sm"
               >
                 <Phone className="w-4 h-4" />
                 (317) 314-3757
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />
                 Email Us

@@ -97,8 +97,8 @@ export default function ApplicationStatusPage() {
       />
       <div className="max-w-xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Check Application Status</h1>
-          <p className="text-gray-600">Enter your Application ID and email from your confirmation to check status</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Check Application Status</h1>
+          <p className="text-slate-600">Enter your Application ID and email from your confirmation to check status</p>
         </div>
 
         <form onSubmit={handleSearch} className="bg-white rounded-lg shadow-sm border p-6 mb-6">
@@ -109,7 +109,7 @@ export default function ApplicationStatusPage() {
               onChange={(e) => setApplicationId(e.target.value)}
               placeholder="Application ID (from your confirmation email)"
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
             <div className="flex gap-3">
               <input
@@ -118,7 +118,7 @@ export default function ApplicationStatusPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address"
                 required
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
               <button
                 type="submit"
@@ -145,18 +145,18 @@ export default function ApplicationStatusPage() {
               <h2 className={`text-2xl font-bold mt-4 ${getStatusDisplay(application.status).textColor}`}>
                 {getStatusDisplay(application.status).title}
               </h2>
-              <p className="text-gray-700 mt-2">
+              <p className="text-slate-700 mt-2">
                 {getStatusDisplay(application.status).message}
               </p>
               
               <div className="mt-6 w-full bg-white rounded-lg p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500">Program</span>
+                    <span className="text-slate-500">Program</span>
                     <p className="font-medium">{application.program_id || 'Not specified'}</p>
                   </div>
                   <div>
-                    <span className="text-gray-500">Submitted</span>
+                    <span className="text-slate-500">Submitted</span>
                     <p className="font-medium">
                       {new Date(application.submitted_at).toLocaleDateString()}
                     </p>
@@ -178,11 +178,11 @@ export default function ApplicationStatusPage() {
 
         {searched && !application && !error && (
           <div className="bg-white rounded-lg p-6 text-center">
-            <p className="text-gray-600">No application found. Did you use a different email?</p>
+            <p className="text-slate-600">No application found. Did you use a different email?</p>
           </div>
         )}
 
-        <div className="mt-8 text-center text-gray-600">
+        <div className="mt-8 text-center text-slate-600">
           <p>Need help? Contact us at <a href="tel:317-314-3757" className="text-emerald-600 font-medium">317-314-3757</a></p>
           <p className="mt-2">
             <Link href="/start" className="text-emerald-600 hover:underline">Submit a new application</Link>

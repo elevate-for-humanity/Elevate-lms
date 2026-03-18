@@ -370,7 +370,7 @@ export default function HvacApplyPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8">
               <h2 className="text-2xl font-bold text-black mb-6">Your Information</h2>
 
               <div className="space-y-5">
@@ -383,7 +383,7 @@ export default function HvacApplyPage() {
                       required
                       value={formData.firstName}
                       onChange={(e) => updateField('firstName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="First name"
                     />
                   </div>
@@ -394,7 +394,7 @@ export default function HvacApplyPage() {
                       required
                       value={formData.lastName}
                       onChange={(e) => updateField('lastName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Last name"
                     />
                   </div>
@@ -408,7 +408,7 @@ export default function HvacApplyPage() {
                     required
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -420,7 +420,7 @@ export default function HvacApplyPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="(317) 314-3757"
                   />
                 </div>
@@ -431,7 +431,7 @@ export default function HvacApplyPage() {
                   <select
                     value={formData.experience}
                     onChange={(e) => updateField('experience', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   >
                     <option value="">Select experience level</option>
                     <option value="none">No prior experience</option>
@@ -524,10 +524,10 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('weekly')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'weekly' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'weekly' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Structured Weekly Plan</p>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-slate-600 mt-1">
                           ${PRICING.depositAmount.toLocaleString()} down today, then <strong>${structuredWeekly.toFixed(2)}/week</strong> for {weeksNeeded} weeks
                         </p>
                         <p className="text-xs text-slate-500 mt-0.5">Minimum weekly payment — balance paid in full by program end</p>
@@ -537,18 +537,18 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('custom')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'custom' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'custom' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Custom Weekly Amount</p>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-slate-600 mt-1">
                           Pay more per week to finish faster. Minimum ${structuredWeekly.toFixed(2)}/week.
                         </p>
                       </button>
 
                       {paymentOption === 'custom' && (
-                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200 space-y-3">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-slate-200 space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
                               Weekly payment amount (min ${structuredWeekly.toFixed(2)})
                             </label>
                             <input
@@ -558,12 +558,12 @@ export default function HvacApplyPage() {
                               step={5}
                               value={customWeekly}
                               onChange={(e) => setCustomWeekly(Math.max(MIN_WEEKLY, parseFloat(e.target.value) || MIN_WEEKLY))}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                              className="w-full px-4 py-3 border border-slate-300 rounded-lg"
                             />
                           </div>
-                          <div className="bg-white rounded-lg p-3 border border-gray-200 text-sm space-y-1">
-                            <p className="text-gray-700"><strong>${userWeekly.toFixed(2)}/week</strong> × {userWeeks - 1} weeks</p>
-                            <p className="text-gray-500">Final payment: ${lastPayment.toFixed(2)}</p>
+                          <div className="bg-white rounded-lg p-3 border border-slate-200 text-sm space-y-1">
+                            <p className="text-slate-700"><strong>${userWeekly.toFixed(2)}/week</strong> × {userWeeks - 1} weeks</p>
+                            <p className="text-slate-500">Final payment: ${lastPayment.toFixed(2)}</p>
                             <p className="text-brand-green-700 font-semibold">Total: ${PRICING.fullPrice.toLocaleString()}</p>
                           </div>
                         </div>
@@ -573,10 +573,10 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('full')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'full' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'full' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Pay in Full</p>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-slate-600 mt-1">
                           ${PRICING.fullPrice.toLocaleString()} — Visa, Mastercard, Amex, Apple Pay, Google Pay
                         </p>
                       </button>
@@ -585,15 +585,15 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('affirm')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'affirm' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'affirm' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Affirm</p>
-                        <p className="text-sm text-gray-600 mt-1">Monthly installments. 0% APR available for qualifying applicants.</p>
+                        <p className="text-sm text-slate-600 mt-1">Monthly installments. 0% APR available for qualifying applicants.</p>
                       </button>
 
                       {paymentOption === 'affirm' && (
-                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-slate-200">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
                             Amount to finance with Affirm (min ${PRICING.depositAmount.toLocaleString()})
                           </label>
                           <input
@@ -603,9 +603,9 @@ export default function HvacApplyPage() {
                             step={50}
                             value={customAmount}
                             onChange={(e) => setCustomAmount(Math.max(PRICING.depositAmount, parseInt(e.target.value) || PRICING.depositAmount))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg"
                           />
-                          <p className="text-xs text-gray-500 mt-2">Affirm checks eligibility and shows payment options at checkout</p>
+                          <p className="text-xs text-slate-500 mt-2">Affirm checks eligibility and shows payment options at checkout</p>
                         </div>
                       )}
 
@@ -613,15 +613,15 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('sezzle')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'sezzle' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'sezzle' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <p className="font-bold text-black text-lg">Sezzle</p>
-                        <p className="text-sm text-gray-600 mt-1">4 interest-free payments over 6 weeks (up to $2,500)</p>
+                        <p className="text-sm text-slate-600 mt-1">4 interest-free payments over 6 weeks (up to $2,500)</p>
                       </button>
 
                       {paymentOption === 'sezzle' && (
-                        <div className="ml-4 p-4 bg-white rounded-lg border border-gray-200">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <div className="ml-4 p-4 bg-white rounded-lg border border-slate-200">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
                             Amount to pay with Sezzle (${PRICING.depositAmount.toLocaleString()} – $2,500)
                           </label>
                           <input
@@ -631,9 +631,9 @@ export default function HvacApplyPage() {
                             step={50}
                             value={customAmount}
                             onChange={(e) => setCustomAmount(Math.min(2500, Math.max(PRICING.depositAmount, parseInt(e.target.value) || PRICING.depositAmount)))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg"
                           />
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="text-xs text-slate-500 mt-2">
                             4 payments of ${Math.round((customAmount || 0) / 4).toLocaleString()} every 2 weeks
                           </p>
                         </div>
@@ -643,13 +643,13 @@ export default function HvacApplyPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentOption('stripe-bnpl')}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'stripe-bnpl' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${paymentOption === 'stripe-bnpl' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
                       >
                         <div className="flex items-center justify-between">
                           <p className="font-bold text-black text-lg">Afterpay / Klarna</p>
                           <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full">via Stripe</span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-slate-600 mt-1">
                           4 interest-free payments with Afterpay, or flexible monthly payments with Klarna.
                         </p>
                       </button>
@@ -666,14 +666,14 @@ export default function HvacApplyPage() {
                     </div>
 
                     {/* Payment methods accepted */}
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="bg-white rounded-lg p-4 border border-slate-200">
                       <p className="text-sm text-black font-medium mb-3">Payment methods accepted at checkout:</p>
                       <div className="flex flex-wrap gap-2">
                         {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay', 'Afterpay', 'Klarna', 'Affirm', 'Sezzle'].map(m => (
-                          <span key={m} className="px-2 py-1 bg-white border border-gray-200 rounded text-xs text-gray-600">{m}</span>
+                          <span key={m} className="px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-600">{m}</span>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-500 mt-3">
+                      <p className="text-xs text-slate-500 mt-3">
                         Secure payment via Stripe. BNPL options (Afterpay, Klarna, Affirm, Sezzle) available for self-pay enrollments.
                       </p>
                     </div>
@@ -720,7 +720,7 @@ export default function HvacApplyPage() {
                   )}
                 </button>
 
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-slate-500 text-center">
                   By submitting, you agree to our{' '}
                   <Link href="/terms-of-service" className="underline">Terms of Service</Link> and{' '}
                   <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
@@ -729,9 +729,9 @@ export default function HvacApplyPage() {
             </div>
 
             {/* Help */}
-            <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200">
-              <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
-              <p className="text-sm text-gray-600 mb-3">
+            <div className="mt-6 bg-white rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">Need Help?</h3>
+              <p className="text-sm text-slate-600 mb-3">
                 Our enrollment team can help you find funding, answer questions, or walk you through the application.
               </p>
               <div className="flex flex-wrap gap-3">

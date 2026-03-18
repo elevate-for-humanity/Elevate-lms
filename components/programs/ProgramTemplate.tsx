@@ -37,50 +37,54 @@ export function ProgramTemplate({ program }: { program: Program }) {
           voiceoverSrc={program.voiceoverSrc}
           posterImage={program.heroImage}
         />
-      ) : (
-        <section className="bg-brand-blue-700 text-white py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="max-w-4xl">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                {program.heroTitle}
-              </h1>
-              <p className="text-xl text-white/90 mb-6">
-                {program.heroSubtitle}
-              </p>
+      ) : null}
 
-              {/* Format chips - hide pricing for apprenticeships */}
-              <div className="flex flex-wrap gap-3 mb-8">
-                <span className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-sm font-medium">
-                  {program.duration}
-                </span>
-                <span className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-sm font-medium">
-                  {program.delivery}
-                </span>
-                {!isApprenticeship && (
-                  <span className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-sm font-medium">
-                    {program.price ? `$${program.price}` : '$0 with funding'}
-                  </span>
-                )}
-                {isApprenticeship && (
-                  <span className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-sm font-medium">
-                    Apply to see funding options
-                  </span>
-                )}
-              </div>
-
-              {/* Single CTA - Check Eligibility */}
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href={`/apply?program=${program.slug}`}
-                  className="inline-flex items-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg"
-                >
-                  Check Eligibility
-                </Link>
-              </div>
-            </div>
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+            {program.heroTitle || program.title}
+          </h1>
+          {program.heroSubtitle && (
+            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-5">
+              {program.heroSubtitle}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {program.duration && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+                {program.duration}
+              </span>
+            )}
+            {program.delivery && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+                {program.delivery}
+              </span>
+            )}
+            {!isApprenticeship && program.price && (
+              <span className="inline-flex items-center bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200">
+                ${program.price}
+              </span>
+            )}
           </div>
-        </section>
-      )}
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/apply?program=${program.slug}`}
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Apply Now
+            </Link>
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+            >
+              Go to Indiana Career Connect
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* AT-A-GLANCE CARDS */}
       <section className="max-w-6xl mx-auto px-4 py-12">
@@ -148,8 +152,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
                     <span className="text-brand-blue-600 font-bold">📜</span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900">Certificate of Completion</h4>
-                    <p className="text-sm text-gray-600">
+                    <h4 className="font-bold text-slate-900">Certificate of Completion</h4>
+                    <p className="text-sm text-slate-600">
                       Issued by Elevate for Humanity upon successful program completion
                     </p>
                   </div>
@@ -164,11 +168,11 @@ export function ProgramTemplate({ program }: { program: Program }) {
                       <span className="text-brand-green-600 font-bold">•</span>
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900">Industry Certification</h4>
-                      <p className="text-sm text-gray-600 mb-2">
+                      <h4 className="font-bold text-slate-900">Industry Certification</h4>
+                      <p className="text-sm text-slate-600 mb-2">
                         {program.credential}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-500">
                         Third-party certification recognized by employers nationwide
                       </p>
                     </div>
@@ -179,7 +183,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {/* Post-Completion Pathway */}
               <div className="mt-4 pt-4 border-t border-brand-blue-200">
                 <h4 className="font-semibold text-brand-blue-900 mb-2">What Happens After Completion?</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <ul className="space-y-2 text-sm text-slate-700">
                   <li className="flex items-center gap-2">
                     <span className="text-brand-green-500">→</span>
                     Career services support and job placement assistance
@@ -282,7 +286,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
       {/* PROGRAM HIGHLIGHTS */}
       {program.highlights && program.highlights.length > 0 && (
-        <section className="bg-gray-50 py-12">
+        <section className="bg-slate-50 py-12">
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8 text-black text-center">
               Why This Program
@@ -291,7 +295,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {program.highlights.map((highlight, i) => (
                 <div
                   key={i}
-                  className="bg-white border border-gray-200 rounded-xl p-6"
+                  className="bg-white border border-slate-200 rounded-xl p-6"
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">⭐</span>
@@ -397,7 +401,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
       {/* REQUIREMENTS */}
       {program.requirements && program.requirements.length > 0 && (
-        <section className="bg-gray-50 py-12">
+        <section className="bg-slate-50 py-12">
           <div className="max-w-4xl mx-auto px-4">
             <h2 className="text-3xl font-bold mb-6 text-black">
               Who This Is For
@@ -439,36 +443,27 @@ export function ProgramTemplate({ program }: { program: Program }) {
       </section>
 
       {/* POST-COMPLETION PATHWAY */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-12">
+      <section className="bg-slate-50 border-t border-slate-100 py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-slate-900 text-center">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 text-center">
             What Happens After Completion?
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Career Services</h3>
-              <p className="text-slate-600">
+            <div className="bg-white rounded-2xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Career Services</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
                 Resume review, interview prep, and job search assistance from our career services team.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                <span className="text-2xl">🤝</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Employer Connections</h3>
-              <p className="text-slate-600">
+            <div className="bg-white rounded-2xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Employer Connections</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
                 Direct introductions to hiring employers in our partner network actively seeking graduates.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                <span className="text-2xl">📈</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Career Advancement</h3>
-              <p className="text-slate-600">
+            <div className="bg-white rounded-2xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Career Advancement</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
                 Pathways to advanced certifications, specializations, and leadership roles in your field.
               </p>
             </div>
@@ -476,7 +471,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
           <div className="mt-8 text-center">
             <Link
               href="/career-services"
-              className="inline-flex items-center gap-2 bg-white text-indigo-600 hover:bg-gray-100 px-6 py-3 rounded-xl font-semibold transition"
+              className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline"
             >
               Learn About Career Services →
             </Link>
@@ -485,42 +480,33 @@ export function ProgramTemplate({ program }: { program: Program }) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-brand-blue-700 text-white py-16">
+      <section className="bg-slate-900 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-white/90 mb-8">
-            Apply now and we'll guide you step-by-step through the enrollment
-            process.
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Ready to Get Started?</h2>
+          <p className="text-slate-300 text-base leading-relaxed mb-10 max-w-xl mx-auto">
+            Apply now and we will guide you step-by-step through the enrollment process.
           </p>
-
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mb-8">
             <Link
               href={program.ctaPrimary.href}
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-50 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-bold text-base transition"
             >
               {program.ctaPrimary.label}
             </Link>
             <a
-              href="/support"
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border-2 border-white text-white px-10 py-5 rounded-xl font-bold text-lg transition"
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-bold text-base transition"
             >
-              <Phone className="w-5 h-5" />
-              Get Help Online
+              Go to Indiana Career Connect
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border-2 border-white text-white px-10 py-5 rounded-xl font-bold text-lg transition"
+              className="border-2 border-slate-600 hover:border-slate-400 text-white px-10 py-4 rounded-xl font-bold text-base transition"
             >
-              <Mail className="w-5 h-5" />
-              Email Us
+              Talk to an Advisor
             </a>
-          </div>
-
-          <div className="pt-8 border-t border-white/20">
-            <p className="text-sm text-slate-500">
-              Questions? Call us at Get Help Online or email
-              our contact form
-            </p>
           </div>
         </div>
       </section>
@@ -533,9 +519,9 @@ function Card({ title, value, highlight }: { title: string; value: string; highl
     <div className={`rounded-xl p-6 shadow-sm ${
       highlight 
         ? 'bg-brand-blue-50 border-2 border-brand-blue-200' 
-        : 'bg-white border border-gray-200'
+        : 'bg-white border border-slate-200'
     }`}>
-      <div className={`text-sm mb-2 ${highlight ? 'text-brand-blue-600 font-medium' : 'text-gray-500'}`}>{title}</div>
+      <div className={`text-sm mb-2 ${highlight ? 'text-brand-blue-600 font-medium' : 'text-slate-500'}`}>{title}</div>
       <div className={`text-base font-semibold ${highlight ? 'text-brand-blue-900' : 'text-black'}`}>{value}</div>
     </div>
   );
@@ -543,9 +529,9 @@ function Card({ title, value, highlight }: { title: string; value: string; highl
 
 function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6">
+    <div className="bg-white border border-slate-200 rounded-xl p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-700 text-white text-xl font-bold mb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-red-600 text-white text-xl font-bold mb-4">
           {n}
         </div>
         <div className="font-bold text-black mb-2">{title}</div>

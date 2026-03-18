@@ -26,13 +26,23 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
       {items.map((item) => (
         <div key={item.name} className="relative group">
           {item.subItems && item.subItems.length > 0 ? (
-            <button
-              type="button"
-              className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2 cursor-default"
-              aria-haspopup="true"
-            >
-              {item.name}
-            </button>
+            item.href ? (
+              <Link
+                href={item.href}
+                className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2"
+                aria-haspopup="true"
+              >
+                {item.name}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2 cursor-default"
+                aria-haspopup="true"
+              >
+                {item.name}
+              </button>
+            )
           ) : item.href ? (
             <Link
               href={item.href}

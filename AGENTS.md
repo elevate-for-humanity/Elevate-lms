@@ -168,11 +168,45 @@ These files exist in `supabase/migrations/` but have **not** been applied to the
 | File | Effect |
 |------|--------|
 | `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
+| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` |
 
 Until `20260401000005` is applied:
 - `curriculum_lessons.quiz_questions` column does not exist
 - `lms_lessons` view returns `NULL` for `quiz_questions` on curriculum rows
 - HVAC checkpoint quiz player falls back to `HVAC_QUIZ_MAP` (still functional, but not DB-driven)
+
+Until `20260402000003` is applied:
+- `programs.short_description` column does not exist
+- `lib/lms/api.ts` `getPrograms()` falls back to `excerpt` then `description` (functional, but verbose)
+- `/lms/programs` catalog shows empty state if no `published=true` programs exist in DB
+
+**Verify after applying `20260402000003`:**
+```sql
+-- Confirm columns exist
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'programs'
+  AND column_name IN ('short_description', 'display_order');
+
+-- Confirm live programs are published
+SELECT id, slug, title, published, is_active, status
+FROM public.programs
+WHERE published = true AND is_active = true AND status != 'archived'
+ORDER BY title LIMIT 10;
+```
+
+### Programs vs Courses — Tracked UX Debt
+
+**Status:** Explicit debt. Not forgotten. Do not resolve casually.
+
+The public LMS uses "Programs" (`/lms/programs`) while the authenticated app uses "Courses" (`/lms/courses`) for the same top-level student offering. This creates a terminology split that confuses users navigating between public and authenticated views.
+
+**Root cause:** `/lms/courses` was established before the public LMS layer existed and has 20+ inbound links across the codebase. Renaming it requires:
+1. Adding redirect rules: `/lms/courses` → `/lms/programs` (or vice versa)
+2. Updating all 20+ inbound `href` references
+3. Deciding canonical term: **Program** is correct (a student enrolls in a Program, not a Course)
+4. Updating nav labels in `LmsAppShell.tsx` and `LMSNavigation.tsx`
+
+**Do not rename without a migration plan.** Until resolved, use "Program" in all new public-facing UI and "Course" only where it refers to the internal `training_courses` table object.
 
 ### Lab / Assignment Instructor Sign-Off UI
 

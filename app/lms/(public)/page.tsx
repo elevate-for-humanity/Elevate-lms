@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
+import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { BookOpen, Clock, Award, ChevronRight, CheckCircle, Users, Headphones } from 'lucide-react';
+import { Clock, Award, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Student Training Portal | Elevate for Humanity',
@@ -26,12 +27,7 @@ const STEPS = [
   { num: '3', title: 'Get Certified', desc: 'Earn your industry credential and connect with employers.' },
 ];
 
-const TOOLS = [
-  { icon: BookOpen, label: 'Study Guides', href: '/lms/resources' },
-  { icon: CheckCircle, label: 'Practice Exams', href: '/lms/quizzes' },
-  { icon: Headphones, label: 'AI Tutor', href: '/lms/ai-tutor' },
-  { icon: Users, label: 'Community', href: '/lms/community' },
-];
+
 
 export default async function LmsPublicPage() {
   // Logged-in users go straight to their dashboard
@@ -148,22 +144,9 @@ export default async function LmsPublicPage() {
 
       {/* STUDENT TOOLS */}
       <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Student Tools</h2>
-          <p className="text-slate-500 text-base mb-10">Everything you need to study, practice, and succeed.</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {TOOLS.map(t => {
-              const Icon = t.icon;
-              return (
-                <Link key={t.label} href={t.href} className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition group">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-900 flex items-center justify-center transition">
-                    <Icon className="w-5 h-5 text-slate-600 group-hover:text-white transition" />
-                  </div>
-                  <span className="text-sm font-semibold text-slate-900">{t.label}</span>
-                </Link>
-              );
-            })}
-          </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-slate-600 text-base mb-2 text-center">Everything you need to study, practice, and succeed.</p>
+          <StudentToolsStrip />
         </div>
       </section>
 

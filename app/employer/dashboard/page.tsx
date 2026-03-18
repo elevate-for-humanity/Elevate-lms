@@ -57,7 +57,7 @@ export default async function EmployerDashboardOrchestrated() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  if (!user) redirect('/login?redirect=/employer/dashboard');
 
   // Get employer profile
   const { data: profile } = await db
@@ -67,7 +67,31 @@ export default async function EmployerDashboardOrchestrated() {
     .single();
 
   if (!profile || profile.role !== 'employer') {
-    redirect('/');
+    // Application submitted but not yet approved — show pending state
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-brand-blue-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Application Under Review</h1>
+          <p className="text-slate-600 mb-6">
+            Your employer application has been received. Our team will review it and activate your account within 1–2 business days.
+          </p>
+          <p className="text-sm text-slate-500 mb-6">
+            You will receive an email at <strong>{profile?.email}</strong> when your account is approved.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link href="/for-employers" className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
+              Learn About Employer Partnership
+            </Link>
+            <a href="tel:3173143757" className="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition">
+              Call (317) 314-3757
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Get job postings

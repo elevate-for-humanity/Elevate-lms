@@ -101,6 +101,11 @@ export default async function EmployerLayout({
     return <>{children}</>;
   }
 
-  // Not active and not in approved-onboarding state → redirect to onboarding
+  // No onboarding row = application pending admin review — don't redirect
+  if (!onboarding) {
+    return <>{children}</>;
+  }
+
+  // Has an onboarding row but not active/approved → redirect to onboarding
   redirect('/onboarding/employer');
 }

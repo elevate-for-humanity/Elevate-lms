@@ -48,6 +48,11 @@ import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import { CertificationTracker } from '@/components/lms/CertificationTracker';
 import { RequirementsChecklist } from '@/components/lms/RequirementsChecklist';
 import { RecommendedCourses } from '@/components/lms/RecommendedCourses';
+import { DashboardHero } from '@/components/lms/dashboard/DashboardHero';
+import { EnrolledProgramsList } from '@/components/lms/dashboard/EnrolledProgramsList';
+import { EmptyEnrollmentState } from '@/components/lms/dashboard/EmptyEnrollmentState';
+import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
+import { PendingApprovalNotice } from '@/components/lms/dashboard/PendingApprovalNotice';
 
 /**
  * STUDENT PORTAL - ORCHESTRATED
@@ -226,85 +231,15 @@ export default async function StudentDashboardOrchestrated() {
       </div>
 
       {/* Hero Welcome Banner */}
-      <div className="mb-8 rounded-2xl overflow-hidden shadow-lg">
-        <div className="relative h-[200px] sm:h-[280px] md:h-[340px]">
-          <Image
-            src={LMS_HEROES.dashboard}
-            alt="Students celebrating training completion"
-            fill
-            sizes="100vw"
-            className="object-cover"
-            quality={100}
-            priority
-          />
-        </div>
-        <div className="bg-slate-900 py-8 px-8 md:px-12">
-          <div className="flex items-center gap-3 mb-3">
-            <GraduationCap className="w-10 h-10 text-white" />
-            <h1 className="text-3xl md:text-4xl font-black text-white">
-              Welcome Back, {profile?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
-            </h1>
-          </div>
-          <p className="text-base md:text-lg text-white/90 mb-4">
-            Start your next lesson, track progress, and complete quizzes and assessments.
-          </p>
-
-          {activeEnrollment && (
-            <div className="bg-white/15 rounded-xl p-4 border border-white/20 max-w-md">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm text-white">Course Progress</span>
-                <span className="font-black text-white">{Math.round(courseProgress)}%</span>
-              </div>
-              <div className="w-full bg-white/20 rounded-full h-3">
-                <div
-                  className="bg-white rounded-full h-3 transition-all duration-500"
-                  style={{ width: `${courseProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <DashboardHero
+        firstName={profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Student'}
+        courseProgress={courseProgress}
+        hasActiveEnrollment={!!activeEnrollment}
+      />
 
       {/* Pending Enrollment Notice */}
       {activeEnrollment && (activeEnrollment.status === 'pending_approval' || activeEnrollment.status === 'enrolled_pending_approval') && (
-        <div className="mb-8 bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 sm:p-8">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-amber-900 mb-2">Pending Admin Approval</h3>
-              <p className="text-amber-800 mb-3">
-                Your onboarding is complete and your enrollment is under review. An administrator will review your application and documents.
-              </p>
-              <p className="text-amber-700 text-sm mb-4">
-                Once approved, you will receive an email confirming when you can start class. Your courses will be unlocked at that time.
-              </p>
-              <div className="flex flex-wrap gap-3 text-sm">
-                <div className="flex items-center gap-1.5 bg-brand-green-100 text-brand-green-800 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-brand-green-500" />
-                  Onboarding Complete
-                </div>
-                <div className="flex items-center gap-1.5 bg-brand-green-100 text-brand-green-800 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-brand-green-500" />
-                  Documents Submitted
-                </div>
-                <div className="flex items-center gap-1.5 bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  Awaiting Approval
-                </div>
-                <div className="flex items-center gap-1.5 bg-white text-slate-500 px-3 py-1 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-slate-300" />
-                  Course Access Locked
-                </div>
-              </div>
-              <p className="text-amber-600 text-sm mt-4">
-                Questions? Call <strong>(317) 314-3757</strong> or <a href="/support" className="underline hover:text-amber-800">get help online</a>.
-              </p>
-            </div>
-          </div>
-        </div>
+        <PendingApprovalNotice />
       )}
 
       <StateAwareDashboard
@@ -322,44 +257,10 @@ export default async function StudentDashboardOrchestrated() {
         </div>
 
         {/* My Programs — program-level enrollment cards */}
-        {(programEnrollments?.length || 0) > 0 && (
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold text-black mb-4">My Programs</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {programEnrollments!.map((pe: any) => {
-                const prog = pe.programs as { id: string; title: string; slug: string; code: string } | null;
-                const progPercent = pe.progress_percent || 0;
-                const isActive = pe.status === 'active' || pe.status === 'confirmed';
-                return (
-                  <Link
-                    key={pe.id}
-                    href={`/lms/program/${prog?.slug || prog?.code || prog?.id || pe.program_id}`}
-                    className="bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition p-6 group"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
-                        {prog?.title || 'Program'}
-                      </h4>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        isActive ? 'bg-brand-green-100 text-brand-green-700' :
-                        pe.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {isActive ? 'Active' : pe.status === 'completed' ? 'Completed' : 'Pending'}
-                      </span>
-                    </div>
-                    <div className="w-full bg-white rounded-full h-2 mb-1">
-                      <div
-                        className={`h-2 rounded-full transition-all ${progPercent === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`}
-                        style={{ width: `${progPercent}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500">{progPercent}% complete</p>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+        {(programEnrollments?.length || 0) > 0 ? (
+          <EnrolledProgramsList enrollments={programEnrollments} />
+        ) : (
+          <EmptyEnrollmentState />
         )}
 
         {/* Certification Progress & Requirements */}

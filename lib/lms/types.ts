@@ -22,6 +22,7 @@ export interface Program {
   modules?: ProgramModule[];
   is_active?: boolean;
   funded?: boolean;
+  wioa_approved?: boolean;
 }
 
 export interface CourseProgress {

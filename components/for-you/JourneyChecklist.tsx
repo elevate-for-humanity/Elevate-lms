@@ -65,7 +65,7 @@ export function JourneyChecklist() {
           {STEPS.map((step, index) => (
             <div key={step.number} className="relative flex gap-6 items-start">
               {/* Step number circle */}
-              <div className="relative z-10 flex-shrink-0 w-12 h-12 bg-white text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+              <div className="relative z-10 flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                 {step.number}
               </div>
 

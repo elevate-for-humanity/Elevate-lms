@@ -44,8 +44,8 @@ export default function CareerServicesPage() {
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
             {[
               { title: 'Resume Building', desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.', image: '/images/pages/resume-building-hero.jpg' },
-              { title: 'Interview Preparation', desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.', image: '/images/pages/resume-building-hero.jpg' },
-              { title: 'Job Fairs & Hiring Events', desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.', image: '/images/pages/resume-building-hero.jpg' },
+              { title: 'Interview Preparation', desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.', image: '/images/pages/networking-hero.jpg' },
+              { title: 'Job Fairs & Hiring Events', desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.', image: '/images/pages/job-placement.jpg' },
               { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/pages/career-services-hero.jpg' },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
@@ -75,7 +75,7 @@ export default function CareerServicesPage() {
               { step: '5', title: 'Get Hired', desc: 'Interview, receive an offer, and start your new career.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>

@@ -77,7 +77,7 @@ export default function FundingHowItWorksPage() {
               const Icon = s.icon;
               return (
                 <div key={s.step} className="text-center">
-                  <div className="w-14 h-14 bg-white text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  <div className="w-14 h-14 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     {s.step}
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>

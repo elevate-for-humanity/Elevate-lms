@@ -505,12 +505,12 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/cdl-training' },
-              { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/hvac-technician' },
-              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/electrical' },
-              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/about-hero.jpg', href: '/programs/barber-apprenticeship' },
-              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/about-hero.jpg', href: '/programs/technology' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/cna-patient-care.jpg', href: '/programs/cna' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/cdl-training.jpg', href: '/programs/cdl-training' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12 weeks', image: '/images/pages/comp-pathway-trades.jpg', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/electrical-panel.jpg', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/barber-client-consult.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/cybersecurity.jpg', href: '/programs/technology' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36 overflow-hidden">
@@ -550,7 +550,7 @@ export default function AboutPage() {
             </Link>
             <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/hp-employer-real.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>

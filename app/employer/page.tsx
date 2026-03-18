@@ -124,7 +124,7 @@ export default function EmployerPage() {
               <div key={n} className="flex flex-col">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-3 flex-shrink-0">
                   <Image src={img} alt={title} fill sizes="300px" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white text-white font-extrabold text-sm flex items-center justify-center shadow">{n}</div>
+                  <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-sm flex items-center justify-center shadow">{n}</div>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 text-sm">{title}</h3>
                 <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>

@@ -45,8 +45,8 @@ const TECHNOLOGY = [
   { title: 'Network Support Technician', desc: 'Install and maintain network systems', duration: '6 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'network-support-technician', image: '/images/pages/networking-hero.jpg' },
   { title: 'Web Development', desc: 'Build websites and digital applications', duration: '12 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'web-development', image: '/images/pages/web-development.jpg' },
   { title: 'Software Development', desc: 'Learn coding fundamentals and programming logic', duration: '12 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'software-development', image: '/images/pages/software-development.jpg' },
-  { title: 'Graphic Design', desc: 'Digital design for business, branding, and media', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'graphic-design', image: '/images/pages/tech-classroom.jpg' },
-  { title: 'CAD/Drafting Technician', desc: 'Design technical drawings for engineering and construction', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'cad-drafting', image: '/images/pages/tech-classroom.jpg' },
+  { title: 'Graphic Design', desc: 'Digital design for business, branding, and media', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'graphic-design', image: '/images/pages/graphic-design.jpg' },
+  { title: 'CAD/Drafting Technician', desc: 'Design technical drawings for engineering and construction', duration: '10 weeks', format: 'Hybrid', funded: true, pay: null, slug: 'cad-drafting', image: '/images/pages/cad-drafting.jpg' },
 ];
 
 const BUSINESS = [

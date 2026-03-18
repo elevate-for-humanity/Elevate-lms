@@ -37,12 +37,12 @@ export const metadata: Metadata = {
 };
 
 const services = [
-  { title: 'Academic Support', description: 'One-on-one tutoring, study groups, and academic advising. Get help with coursework, exam prep, and staying on track in your program.', link: '/student-support/academic', image: '/images/pages/employment-support-page-1.jpg' },
-  { title: 'Financial Aid', description: 'WIOA funding, scholarships, grants, and flexible payment plans. Our team helps you find and apply for every dollar available.', link: '/student-support/financial-aid', image: '/images/pages/employment-support-page-1.jpg' },
-  { title: 'Career Services', description: 'Job placement assistance, resume writing, interview coaching, and employer connections. We stay with you through your first 90 days on the job.', link: '/student-support/career', image: '/images/pages/employment-support-page-1.jpg' },
-  { title: 'Counseling & Wellness', description: 'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.', link: '/student-support/counseling', image: '/images/pages/employment-support-page-1.jpg' },
-  { title: 'Accessibility Services', description: 'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.', link: '/student-support/accessibility', image: '/images/pages/employment-support-page-1.jpg' },
-  { title: 'Scheduling & Advising', description: 'Class scheduling, program advising, and calendar management. Flexible scheduling for working adults and parents.', link: '/student-support/scheduling', image: '/images/pages/employment-support-page-1.jpg' },
+  { title: 'Academic Support', description: 'One-on-one tutoring, study groups, and academic advising. Get help with coursework, exam prep, and staying on track in your program.', link: '/student-support/academic', image: '/images/pages/student-portal-page-1.jpg' },
+  { title: 'Financial Aid', description: 'WIOA funding, scholarships, grants, and flexible payment plans. Our team helps you find and apply for every dollar available.', link: '/student-support/financial-aid', image: '/images/pages/financial-aid-page-1.jpg' },
+  { title: 'Career Services', description: 'Job placement assistance, resume writing, interview coaching, and employer connections. We stay with you through your first 90 days on the job.', link: '/student-support/career', image: '/images/pages/career-services-page-1.jpg' },
+  { title: 'Counseling & Wellness', description: 'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.', link: '/student-support/counseling', image: '/images/pages/student-portal-page-2.jpg' },
+  { title: 'Accessibility Services', description: 'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.', link: '/student-support/accessibility', image: '/images/pages/accessibility-hero.jpg' },
+  { title: 'Scheduling & Advising', description: 'Class scheduling, program advising, and calendar management. Flexible scheduling for working adults and parents.', link: '/student-support/scheduling', image: '/images/pages/student-portal-page-3.jpg' },
 ];
 
 export default function StudentSupportPage() {

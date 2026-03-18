@@ -108,7 +108,7 @@ export default function WOTCSection() {
             </div>
 
             {/* Stacking callout */}
-            <div className="bg-white text-white rounded-xl p-6">
+            <div className="bg-brand-blue-700 text-white rounded-xl p-6">
               <h4 className="font-bold text-lg mb-2">WOTC + OJT = Maximum Savings</h4>
               <p className="text-brand-blue-100 text-sm mb-3">
                 These two programs can be used on the <strong>same hire</strong>. That means you get

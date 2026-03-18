@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, ClipboardList, BookOpen, FileText, PenLine, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ClipboardList, BookOpen, FileText, PenLine, CheckCircle2, Lock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import VideoHero from '@/components/ui/VideoHero';
 
@@ -203,9 +203,13 @@ export default function PartnerPageClient() {
             <CheckCircle2 className="w-6 h-6 text-brand-green-600 flex-shrink-0" />
             <h2 className="text-2xl font-bold text-slate-900">After Your Application Is Approved</h2>
           </div>
-          <p className="text-slate-600 mb-8 text-sm">
+          <p className="text-slate-600 mb-6 text-sm">
             Once your partner application is reviewed and approved, complete these four steps to receive your first apprentice placement.
           </p>
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6">
+            <Lock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <p className="text-sm text-amber-800 font-medium">These steps require a partner account. You will be prompted to log in.</p>
+          </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <Link
               href="/partners/barbershop-apprenticeship/handbook"
@@ -273,7 +277,7 @@ export default function PartnerPageClient() {
           </div>
 
           <p className="mt-6 text-xs text-slate-500 text-center">
-            These steps are only available to approved partners. Questions? Call <a href="tel:3173143757" className="underline">(317) 314-3757</a>.
+            Already approved? <Link href="/login?redirect=/partners/barbershop-apprenticeship/forms" className="underline text-brand-blue-600">Log in to your partner account</Link> to access these steps. Questions? Call <a href="tel:3173143757" className="underline">(317) 314-3757</a>.
           </p>
         </div>
       </section>

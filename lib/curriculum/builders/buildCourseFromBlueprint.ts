@@ -100,12 +100,12 @@ export async function buildCourseFromBlueprint({
 
   // 6. Assemble in blueprint order — never DB order
   const resolved: BuiltBlueprintLesson[] = blueprint.modules.flatMap(mod =>
-    mod.lessons.map(lessonRef => {
+    (mod.lessons ?? []).map(lessonRef => {
       const dbLesson = lessonMap.get(lessonRef.slug)!;
       return {
-        moduleKey:   mod.key,
+        moduleKey:   mod.slug,
         moduleTitle: mod.title,
-        moduleOrder: mod.order,
+        moduleOrder: mod.orderIndex,
         lessonOrder: lessonRef.order,
         lessonSlug:  lessonRef.slug,
         lessonTitle: lessonRef.title,

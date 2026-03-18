@@ -387,3 +387,40 @@ export const EPA608_SECTIONS = [
 
 /** Pass all four sections = Universal certification */
 export const EPA608_UNIVERSAL_NOTE = 'Pass Core + Type I + Type II + Type III = EPA 608 Universal Certification. Universal is what employers want — it covers all equipment types.';
+
+// ─── QUIZ MAP ADAPTER ───────────────────────────────────
+// EPA608Question uses `answer`; QuizPlayer expects `correctAnswer`.
+// Use this to convert before inserting into HVAC_QUIZ_MAP.
+export interface QuizPlayerQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+}
+
+export function toQuizPlayerQuestions(questions: EPA608Question[]): QuizPlayerQuestion[] {
+  return questions.map(({ id, question, options, answer, explanation }) => ({
+    id,
+    question,
+    options,
+    correctAnswer: answer,
+    explanation,
+  }));
+}
+
+/** All prep questions converted for use in QuizPlayer / HVAC_QUIZ_MAP */
+export const EPA608_PREP_CORE = toQuizPlayerQuestions(
+  EPA608_QUESTIONS.filter((q) => q.section === 'core'),
+);
+export const EPA608_PREP_TYPE1 = toQuizPlayerQuestions(
+  EPA608_QUESTIONS.filter((q) => q.section === 'type1'),
+);
+export const EPA608_PREP_TYPE2 = toQuizPlayerQuestions(
+  EPA608_QUESTIONS.filter((q) => q.section === 'type2'),
+);
+export const EPA608_PREP_TYPE3 = toQuizPlayerQuestions(
+  EPA608_QUESTIONS.filter((q) => q.section === 'type3'),
+);
+/** All 71 prep questions as a single bank for universal mock use */
+export const EPA608_PREP_ALL = toQuizPlayerQuestions(EPA608_QUESTIONS);

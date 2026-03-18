@@ -33,9 +33,9 @@ const examCategories = [
   {
     id: 'epa-608',
     name: 'EPA Section 608 Certification',
-    provider: 'ESCO Institute (Authorized Proctor Site)',
+    provider: 'ESCO Group (ID: 358010) & Mainstream Engineering',
     image: '/images/pages/hvac-technician.jpg',
-    description: 'Elevate for Humanity is an authorized EPA 608 proctor testing site through the ESCO Institute. Universal certification covering Core, Type I, II, and III refrigerant handling — required by federal law for HVAC technicians. All sections available on-site.',
+    description: 'Elevate for Humanity is an authorized EPA 608 proctor testing site through both the ESCO Group and Mainstream Engineering — both EPA-approved certifying organizations. Universal certification covering Core, Type I, II, and III refrigerant handling — required by federal law for HVAC technicians. All sections available on-site.',
     exams: [
       'EPA 608 Core',
       'EPA 608 Type I — Small Appliances',
@@ -43,7 +43,7 @@ const examCategories = [
       'EPA 608 Type III — Low-Pressure Systems',
       'EPA 608 Universal (all types)',
     ],
-    access: 'Proctored on-site — ESCO Authorized',
+    access: 'Proctored on-site — ESCO & Mainstream Authorized',
     bookable: true,
   },
   {
@@ -228,42 +228,63 @@ export default function TestingPage() {
           <div className="bg-white rounded-2xl p-8 sm:p-10">
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-1">EPA 608 Authorized Proctor Site</h2>
-                <p className="text-slate-500 text-sm">ESCO Institute — Authorized Testing Center</p>
+                <p className="text-slate-500 text-sm">ESCO Group (Proctor ID: 358010) &amp; Mainstream Engineering — both EPA-approved certifying organizations</p>
               </div>
             </div>
-            <p className="text-slate-600 leading-relaxed mb-4">
-              Elevate for Humanity is an authorized EPA Section 608 proctor testing site through the <strong className="text-white">ESCO Institute</strong>. We administer EPA 608 Universal certification exams on-site for HVAC technicians and students. The EPA 608 credential is required by federal law to purchase and handle refrigerants.
-            </p>
             <p className="text-slate-600 leading-relaxed mb-6">
-              ESCO continuously adds new features and content to the proctor login area and eLearning network to enhance the proctor experience and aid with training. Proctors should log in periodically to check for updates.
+              Elevate for Humanity is an authorized EPA Section 608 proctor testing site through both the <strong>ESCO Group</strong> and <strong>Mainstream Engineering</strong>. We administer EPA 608 Universal certification exams on-site for HVAC technicians and students. The EPA 608 credential is required by federal law to purchase and handle refrigerants.
             </p>
+
+            {/* Two provider cards */}
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                <h3 className="font-bold text-slate-900 mb-3">Proctor Portal</h3>
-                <p className="text-slate-500 text-sm mb-4">Access the ESCO proctor login to manage exam sessions, review candidate records, and check for new features.</p>
+              {/* ESCO */}
+              <div className="border border-slate-200 rounded-xl p-5">
+                <div className="mb-3">
+                  {/* Logo placeholder — upload via /public/images/logos/esco-logo.png */}
+                  <div className="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 mb-3">ESCO Logo</div>
+                  <h3 className="font-bold text-slate-900">ESCO Group</h3>
+                  <p className="text-xs text-slate-500">Proctor ID: 358010</p>
+                </div>
+                <ul className="text-sm text-slate-600 space-y-1 mb-4">
+                  <li>Paper &amp; online exams available</li>
+                  <li>Free study kit (guide + software)</li>
+                  <li>Weekly instructor PowerPoint course</li>
+                  <li>200+ page Reference Manual available</li>
+                </ul>
                 <a
-                  href="https://www.escogroupinc.com/proctor"
+                  href="https://escogroup.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors"
+                  className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
                 >
-                  ESCO Proctor Login →
+                  escogroup.org →
                 </a>
               </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                <h3 className="font-bold text-slate-900 mb-3">eLearning Center</h3>
-                <p className="text-slate-500 text-sm mb-4">Visit the ESCO eLearning center for proctor training resources, new content, and continuing education materials.</p>
+
+              {/* Mainstream */}
+              <div className="border border-slate-200 rounded-xl p-5">
+                <div className="mb-3">
+                  {/* Logo placeholder — upload via /public/images/logos/mainstream-logo.png */}
+                  <div className="h-10 w-32 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-400 mb-3">Mainstream Logo</div>
+                  <h3 className="font-bold text-slate-900">Mainstream Engineering</h3>
+                  <p className="text-xs text-slate-500">EPATest.com</p>
+                </div>
+                <ul className="text-sm text-slate-600 space-y-1 mb-4">
+                  <li>Paper &amp; online exams available</li>
+                  <li>Free study kit (guide + software)</li>
+                  <li>Also offers R-410A, PM Tech, IAQ, Green, 609 &amp; HC/HFO certs</li>
+                </ul>
                 <a
-                  href="https://elearning.escogroup.org"
+                  href="https://ww2.epatest.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/20 transition-colors"
+                  className="inline-flex items-center gap-2 bg-brand-blue-700 hover:bg-brand-blue-800 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
                 >
-                  ESCO eLearning Center →
+                  epatest.com →
                 </a>
               </div>
             </div>

@@ -254,7 +254,7 @@ export default async function CohortTrackerPage() {
                   { label: 'DOL Registered Sponsor', ok: true },
                   { label: 'ETPL Approved', ok: true },
                   { label: 'Certiport Testing Center', ok: true },
-                  { label: 'EPA 608 Exam Partner', ok: false, note: 'Pending — contact Mainstream/ESCO' },
+                  { label: 'EPA 608 Exam Partner', ok: true, note: 'ESCO Group (ID: 358010) & Mainstream Engineering — both authorized' },
                   { label: 'Employer Externship MOU', ok: false, note: 'Pending — secure by Week 10' },
                 ].map((s) => (
                   <div key={s.label} className="flex items-center justify-between">

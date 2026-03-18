@@ -69,7 +69,7 @@ export default function EPA608CoursePage() {
               { icon: CheckCircle, title: 'Study Kits Provided Free', desc: 'Every student receives a study kit at no cost — reference materials, practice questions, and exam prep guides.' },
               { icon: Shield, title: 'Full Practice Test Bank', desc: 'Practice exams for Core, Type I, Type II, and Type III sections. Take them as many times as needed.' },
               { icon: Award, title: 'Proctored Exam Access', desc: 'Certification exam administered on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering).' },
-              { icon: Users, title: 'Retesting Available', desc: 'Exam fees and retesting policies vary by certifying organization.' },
+              { icon: Users, title: 'On-Site Proctored Exam', desc: 'Administered on-site by Elizabeth Greene, certified proctor for both ESCO Group (Proctor ID: 358010) and Mainstream Engineering. Paper and online exams available.' },
               { icon: Clock, title: 'Certification Does Not Expire', desc: 'Once you pass, your EPA 608 certification is valid for life. No renewal required.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-white/50">
@@ -141,7 +141,8 @@ export default function EPA608CoursePage() {
               <ul className="space-y-2 text-sm text-slate-700">
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exams proctored on-site through ESCO Institute and Mainstream Engineering</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Available online — no travel to a testing center required</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exam fees and retesting policies vary by certifying organization</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> ESCO Group (Proctor ID: 358010) — paper and online exams available</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Mainstream Engineering — paper and online exams available</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Certification does not expire</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Recognized nationwide by all HVAC employers</li>
               </ul>

@@ -73,6 +73,16 @@ const HvacLessonVideo = dynamic(
   { ssr: false }
 );
 
+const HvacDiagramPanel = dynamic(
+  () => import('@/components/lms/HvacDiagramPanel'),
+  { ssr: false }
+);
+
+const ExternalCoursesPanel = dynamic(
+  () => import('@/components/lms/ExternalCoursesPanel'),
+  { ssr: false }
+);
+
 interface ModuleGroup {
   id: string;
   title: string;
@@ -680,6 +690,17 @@ export default function LessonPage() {
                     </div>
                     {lessonCaptions && (
                       <VideoCaptions segments={lessonCaptions} videoSelector="[data-lesson-video]" />
+                    )}
+                    {/* Interactive diagram — rendered below video when the lesson's module has one */}
+                    {hvacVideo.diagramModuleId && (
+                      <HvacDiagramPanel diagramModuleId={hvacVideo.diagramModuleId} />
+                    )}
+                    {/* External training panel — shown on Module 14 (OSHA) lessons */}
+                    {defId?.startsWith('hvac-14') && (
+                      <ExternalCoursesPanel
+                        programSlug="hvac-technician"
+                        requiredOnly={false}
+                      />
                     )}
                   </>
                 );

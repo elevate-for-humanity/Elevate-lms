@@ -33,6 +33,10 @@ create table if not exists tax_clients (
   updated_at  timestamptz not null default now()
 );
 
+-- Add columns that may be missing from the live table (created before this migration)
+alter table tax_clients add column if not exists firm_id uuid references tax_firms(id) on delete set null;
+alter table tax_clients add column if not exists dob     date;
+
 create index if not exists idx_tax_clients_firm_id on tax_clients(firm_id);
 
 -- ── Returns ───────────────────────────────────────────────────────────────
@@ -65,6 +69,15 @@ create table if not exists tax_returns (
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
 );
+
+-- Add firm-side columns to tax_returns if missing (live table predates this migration)
+alter table tax_returns add column if not exists client_id           uuid references tax_clients(id) on delete restrict;
+alter table tax_returns add column if not exists firm_id             uuid references tax_firms(id) on delete set null;
+alter table tax_returns add column if not exists office_id           uuid;
+alter table tax_returns add column if not exists preparer_user_id    uuid;
+alter table tax_returns add column if not exists reviewer_user_id    uuid;
+alter table tax_returns add column if not exists return_json         jsonb not null default '{}'::jsonb;
+alter table tax_returns add column if not exists created_by_user_id  uuid;
 
 create index if not exists idx_tax_returns_client_id  on tax_returns(client_id);
 create index if not exists idx_tax_returns_firm_id    on tax_returns(firm_id);

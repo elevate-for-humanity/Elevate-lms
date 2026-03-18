@@ -82,7 +82,7 @@ const CREDENTIAL_PARTNERS = [
     credentialIssuer: 'EPA-approved testing organization',
     licenseStatus: 'WIOA / WRG Eligible',
     instructorReq: 'EPA 608 Universal certified technician with 3+ years field experience',
-    notes: 'EPA 608 exam fee ~$150. NCCER credentials also available for advanced students.',
+    notes: 'EPA 608 exam fee: $38 (ESCO) or $26.51 online / $31.82 paper (Mainstream). Proctored on-site by Elizabeth Greene — certified proctor for both. NCCER credentials also available for advanced students.',
   },
   {
     program: 'CDL — Commercial Driver License',

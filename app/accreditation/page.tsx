@@ -174,18 +174,18 @@ export default function AccreditationPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               {
-                org: 'ESCO Institute',
+                org: 'ESCO Group',
                 cert: 'EPA Section 608 Universal',
-                detail: 'Federal refrigerant handling certification required by the Clean Air Act. Proctored on-site at Elevate.',
-                verifyUrl: 'https://www.escogroup.org/esco/certifications/epa608.aspx',
-                verifyLabel: 'ESCO Institute — EPA 608',
+                detail: 'Federal refrigerant handling certification required by the Clean Air Act. Proctored on-site at Elevate by Elizabeth Greene. Proctor ID: 358010. Paper and online exams available.',
+                verifyUrl: 'https://escogroup.org',
+                verifyLabel: 'ESCO Group — EPA 608',
               },
               {
-                org: 'Mainstream Engineering',
+                org: 'Mainstream Engineering (EPATest.com)',
                 cert: 'EPA Section 608 Universal',
-                detail: 'Second EPA-approved certifying organization. Elevate is authorized to proctor exams for both ESCO and Mainstream.',
-                verifyUrl: 'https://www.mainstream-engr.com/certification/',
-                verifyLabel: 'Mainstream Engineering Certification',
+                detail: 'EPA-approved certifying organization. Paper and online exams available. Also offers R-410A, PM Tech, IAQ, Green, 609 &amp; HC/HFO supplemental certifications.',
+                verifyUrl: 'https://ww2.epatest.com',
+                verifyLabel: 'Mainstream Engineering — EPATest.com',
               },
               {
                 org: 'Certiport',

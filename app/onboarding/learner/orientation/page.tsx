@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 async function completeOrientation() {
   'use server';
   const { createClient } = await import('@/lib/supabase/server');
+  const { logger } = await import('@/lib/logger');
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
@@ -38,7 +39,56 @@ async function completeOrientation() {
     }, { onConflict: 'user_id', ignoreDuplicates: true }),
   ]);
 
-  redirect('/onboarding/learner');
+  // Send "you're ready to start" email — non-blocking
+  try {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('email, first_name, full_name')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.email) {
+      const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there';
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+      await fetch(`${siteUrl}/api/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: profile.email,
+          subject: 'Orientation complete — your course is ready',
+          html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1e293b">
+  <div style="background:#1e293b;padding:24px 32px">
+    <p style="margin:0;color:#fff;font-size:18px;font-weight:700">Elevate for Humanity</p>
+    <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">Career &amp; Technical Institute</p>
+  </div>
+  <div style="padding:32px">
+    <h1 style="margin:0 0 16px;font-size:22px">You're ready to start, ${firstName}!</h1>
+    <p style="color:#475569;line-height:1.6;margin:0 0 16px">
+      You've completed orientation. Your coursework is now unlocked and waiting for you.
+    </p>
+    <p style="color:#475569;line-height:1.6;margin:0 0 24px">
+      Log in to your learner dashboard to begin your first lesson. Work at your own pace —
+      your progress is saved automatically.
+    </p>
+    <a href="${siteUrl}/learner/dashboard"
+       style="display:inline-block;background:#dc2626;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px">
+      Go to My Dashboard →
+    </a>
+    <p style="margin:32px 0 0;color:#94a3b8;font-size:12px">
+      Questions? Call <strong>(317) 314-3757</strong> or reply to this email.<br>
+      Elevate for Humanity Career &amp; Technical Institute
+    </p>
+  </div>
+</div>`,
+        }),
+      });
+    }
+  } catch (emailErr) {
+    logger.error('[orientation] Post-orientation email failed', emailErr);
+  }
+
+  redirect('/learner/dashboard');
 }
 
 export default async function OrientationPage() {

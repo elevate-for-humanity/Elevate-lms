@@ -1,309 +1,222 @@
-// Email sequences for career course purchasers
+// Email sequences for career course purchasers.
+// All CTA links route to the canonical LMS paths, not /career-services/.
 
 export interface CourseEmailData {
   email: string;
   firstName?: string;
   courseName: string;
   courseSlug: string;
+  /** LMS course UUID — used to build /lms/courses/[courseId] links */
+  courseId?: string;
   purchaseDate: string;
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
 
-// Welcome email - sent immediately after purchase
+// Maps program slug → LMS course UUID for direct deep-linking.
+// Add new programs here as they are seeded.
+const COURSE_ID_MAP: Record<string, string> = {
+  'hvac-technician': 'f0593164-55be-5867-98e7-8a86770a8dd0',
+};
+
+function lmsUrl(data: CourseEmailData): string {
+  const id = data.courseId ?? COURSE_ID_MAP[data.courseSlug];
+  return id
+    ? `${SITE_URL}/lms/courses/${id}`
+    : `${SITE_URL}/learner/dashboard`;
+}
+
+// ─── Brand colors ─────────────────────────────────────────────────────────────
+const BLUE   = '#1E3A5F';
+const ORANGE = '#EA580C';
+const LIGHT  = '#F8FAFC';
+
+// ─── Shared layout wrapper ────────────────────────────────────────────────────
+function wrap(body: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+  <div style="text-align: center; margin-bottom: 28px;">
+    <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="Elevate for Humanity" style="height: 60px;">
+  </div>
+  ${body}
+  <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+  <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">
+    Elevate for Humanity &nbsp;|&nbsp; 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br>
+    <a href="${SITE_URL}/unsubscribe" style="color: #94a3b8;">Unsubscribe</a>
+  </p>
+</body>
+</html>`;
+}
+
+function btn(href: string, label: string, color = ORANGE): string {
+  return `<div style="text-align: center; margin: 28px 0;">
+    <a href="${href}" style="display: inline-block; background: ${color}; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">${label}</a>
+  </div>`;
+}
+
+// ─── Welcome (day 0) ──────────────────────────────────────────────────────────
 export function getWelcomeEmail(data: CourseEmailData) {
+  const courseUrl = lmsUrl(data);
   return {
-    subject: `Welcome to ${data.courseName}! Let's Get Started`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${SITE_URL}/images/logo.png" alt="Elevate for Humanity" style="height: 50px;">
-        </div>
-        
-        <h1 style="color: #7c3aed; margin-bottom: 20px;">Welcome to ${data.courseName}!</h1>
-        
-        <p>Hi${data.firstName ? ` ${data.firstName}` : ''},</p>
-        
-        <p>Thank you for investing in your career! You now have <strong>lifetime access</strong> to ${data.courseName}.</p>
-        
-        <div style="padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center; border: 2px solid #e5e7eb;">
-          <h2 style="margin: 0 0 15px 0; color: white;">Start Learning Now</h2>
-          <p style="margin: 0 0 20px 0; opacity: 0.9;">Your course is ready and waiting for you.</p>
-          <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: white; color: #7c3aed; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Go to My Course →
-          </a>
-        </div>
-        
-        <h3 style="color: #1f2937;">Here's what to expect:</h3>
-        <ul style="padding-left: 20px;">
-          <li style="margin-bottom: 10px;"><strong>Video Lessons:</strong> Watch at your own pace, anytime</li>
-          <li style="margin-bottom: 10px;"><strong>Downloadable Resources:</strong> Templates and worksheets included</li>
-          <li style="margin-bottom: 10px;"><strong>Certificate:</strong> Earn your certificate upon completion</li>
-          <li style="margin-bottom: 10px;"><strong>Lifetime Access:</strong> Come back anytime, including future updates</li>
+    subject: `Welcome to ${data.courseName} — let's get started`,
+    html: wrap(`
+      <h1 style="color: ${BLUE}; margin-bottom: 8px;">Welcome, ${data.firstName ?? 'there'}!</h1>
+      <p>You're enrolled in <strong>${data.courseName}</strong>. Your first lesson is ready right now.</p>
+
+      <div style="background: ${LIGHT}; border-left: 4px solid ${ORANGE}; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 24px 0;">
+        <strong>What to expect:</strong>
+        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+          <li>Video lessons with interactive checkpoints</li>
+          <li>Module quizzes — 70% passing threshold, EPA 608 standard</li>
+          <li>OSHA 10 through CareerSafe (included, self-paced)</li>
+          <li>Certificate issued automatically when all modules are complete</li>
         </ul>
-        
-        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
-          <h4 style="margin: 0 0 10px 0; color: #1f2937;">💡 Pro Tip</h4>
-          <p style="margin: 0; color: #4b5563;">Set aside 30 minutes each day to work through the course. Consistent progress leads to better results!</p>
-        </div>
-        
-        <p>Questions? Just reply to this email - we're here to help!</p>
-        
-        <p>Here's to your success,<br>
-        <strong>The Elevate for Humanity Team</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          Elevate for Humanity | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br>
-          <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </body>
-      </html>
-    `,
+      </div>
+
+      ${btn(courseUrl, 'Start My Course →')}
+
+      <p style="color: #64748b; font-size: 14px;">Questions? Reply to this email — we respond within one business day.</p>
+      <p>— The Elevate for Humanity Team</p>
+    `),
   };
 }
 
-// Day 3 email - check in and encourage progress
+// ─── Day 3 check-in ───────────────────────────────────────────────────────────
 export function getDay3Email(data: CourseEmailData) {
+  const courseUrl = lmsUrl(data);
   return {
-    subject: `How's ${data.courseName} going? 📚`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${SITE_URL}/images/logo.png" alt="Elevate for Humanity" style="height: 50px;">
-        </div>
-        
-        <h1 style="color: #7c3aed;">Quick Check-In 👋</h1>
-        
-        <p>Hi${data.firstName ? ` ${data.firstName}` : ''},</p>
-        
-        <p>It's been a few days since you started <strong>${data.courseName}</strong>. How's it going?</p>
-        
-        <p>If you haven't started yet, that's okay! Here are some tips to get going:</p>
-        
-        <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 15px; margin: 20px 0;">
-          <strong>🎯 Start Small:</strong> Just watch the first lesson today. It's only about 10-15 minutes!
-        </div>
-        
-        <h3 style="color: #1f2937;">Your Next Steps:</h3>
-        <ol style="padding-left: 20px;">
-          <li style="margin-bottom: 10px;">Log in to your course</li>
-          <li style="margin-bottom: 10px;">Watch Lesson 1 (it's a preview - you can do this!)</li>
-          <li style="margin-bottom: 10px;">Take notes on one key takeaway</li>
-        </ol>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Continue Learning →
-          </a>
-        </div>
-        
-        <p>Remember: Every expert was once a beginner. You've got this!</p>
-        
-        <p>Cheering you on,<br>
-        <strong>The Elevate Team</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </body>
-      </html>
-    `,
+    subject: `Day 3 — how is ${data.courseName} going?`,
+    html: wrap(`
+      <h1 style="color: ${BLUE};">Quick check-in</h1>
+      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>It's been three days since you enrolled in <strong>${data.courseName}</strong>. If you haven't started yet, today is a good day — the first module takes about 20 minutes.</p>
+
+      <div style="background: ${LIGHT}; padding: 16px 20px; border-radius: 8px; margin: 20px 0;">
+        <strong>Where to start:</strong><br>
+        Module 1 → Foundations and Career Orientation. No prior experience needed.
+      </div>
+
+      ${btn(courseUrl, 'Continue Learning →')}
+
+      <p>— The Elevate Team</p>
+    `),
   };
 }
 
-// Day 7 email - motivation and resources
+// ─── Day 7 ────────────────────────────────────────────────────────────────────
 export function getDay7Email(data: CourseEmailData) {
+  const courseUrl = lmsUrl(data);
   return {
-    subject: `Week 1 Complete! Here's a bonus for you 🎁`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${SITE_URL}/images/logo.png" alt="Elevate for Humanity" style="height: 50px;">
-        </div>
-        
-        <h1 style="color: #7c3aed;">One Week In! 🎉</h1>
-        
-        <p>Hi${data.firstName ? ` ${data.firstName}` : ''},</p>
-        
-        <p>It's been one week since you enrolled in <strong>${data.courseName}</strong>!</p>
-        
-        <p>Whether you've completed several lessons or are just getting started, we want to share some bonus resources to help you succeed:</p>
-        
-        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="margin: 0 0 10px 0; color: #166534;">🎁 Bonus Resources</h3>
-          <ul style="margin: 0; padding-left: 20px;">
-            <li>Download all course worksheets from your dashboard</li>
-            <li>Join our private community for support</li>
-            <li>Book a free 15-min Q&A call with our team</li>
-          </ul>
-        </div>
-        
-        <h3 style="color: #1f2937;">Success Stories</h3>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; font-style: italic;">
-          "I completed the course in 2 weeks and landed 3 interviews within a month. The resume templates alone were worth it!"
-          <br><br>
-          <strong style="font-style: normal;">— Sarah M., Marketing Professional</strong>
-        </div>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Keep Going →
-          </a>
-        </div>
-        
-        <p>You're doing great!<br>
-        <strong>The Elevate Team</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </body>
-      </html>
-    `,
+    subject: `One week in — keep the momentum going`,
+    html: wrap(`
+      <h1 style="color: ${BLUE};">One week in</h1>
+      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>You've had access to <strong>${data.courseName}</strong> for a week. Students who complete at least 3 modules in the first two weeks are 4× more likely to finish the full program.</p>
+
+      <div style="background: ${LIGHT}; border-left: 4px solid ${BLUE}; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+        <strong>Reminder:</strong> Your OSHA 10 training through CareerSafe is included with your enrollment.
+        Complete it alongside the course — employers want to see both EPA 608 and OSHA 10 on your resume.
+      </div>
+
+      ${btn(courseUrl, 'Go to My Course →')}
+
+      <p>— The Elevate Team</p>
+    `),
   };
 }
 
-// Completion email - congratulations and next steps
-export function getCompletionEmail(data: CourseEmailData & { certificateUrl?: string }) {
+// ─── Completion ───────────────────────────────────────────────────────────────
+export function getCompletionEmail(data: CourseEmailData & { certificateId?: string }) {
+  const courseUrl  = lmsUrl(data);
+  const certUrl    = data.certificateId
+    ? `${SITE_URL}/verify/${data.certificateId}`
+    : courseUrl;
+
   return {
-    subject: `🎓 Congratulations! You've completed ${data.courseName}!`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${SITE_URL}/images/logo.png" alt="Elevate for Humanity" style="height: 50px;">
-        </div>
-        
-        <div style="text-align: center; margin-bottom: 30px;">
-          <div style="font-size: 60px;">🎓</div>
-          <h1 style="color: #7c3aed; margin: 10px 0;">Congratulations!</h1>
-          <p style="font-size: 18px; color: #4b5563;">You've completed <strong>${data.courseName}</strong>!</p>
-        </div>
-        
-        <p>Hi${data.firstName ? ` ${data.firstName}` : ''},</p>
-        
-        <p>This is a huge accomplishment! You've invested in yourself and completed the entire course. That puts you ahead of 90% of people who never finish what they start.</p>
-        
-        <div style="padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center; border: 2px solid #e5e7eb;">
-          <h2 style="margin: 0 0 15px 0; color: white;">Your Certificate is Ready!</h2>
-          <p style="margin: 0 0 20px 0; opacity: 0.9;">Download and share your achievement.</p>
-          <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/certificate" 
-             style="display: inline-block; background: white; color: #7c3aed; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Download Certificate →
-          </a>
-        </div>
-        
-        <h3 style="color: #1f2937;">What's Next?</h3>
-        <ul style="padding-left: 20px;">
-          <li style="margin-bottom: 10px;"><strong>Apply what you learned:</strong> Start using your new skills today</li>
-          <li style="margin-bottom: 10px;"><strong>Share your certificate:</strong> Add it to LinkedIn and your resume</li>
-          <li style="margin-bottom: 10px;"><strong>Continue learning:</strong> Check out our other courses</li>
-        </ul>
-        
-        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-          <h4 style="margin: 0 0 10px 0; color: #92400e;">🎁 Graduate Discount</h4>
-          <p style="margin: 0 0 15px 0; color: #92400e;">Get 25% off any other course with code: <strong>GRADUATE25</strong></p>
-          <a href="${SITE_URL}/career-services/courses" 
-             style="display: inline-block; background: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-            Browse Courses
-          </a>
-        </div>
-        
-        <p>We're so proud of you!</p>
-        
-        <p>Congratulations again,<br>
-        <strong>The Elevate for Humanity Team</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </body>
-      </html>
-    `,
+    subject: `You completed ${data.courseName} — your certificate is ready`,
+    html: wrap(`
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 56px; line-height: 1;">🎓</div>
+        <h1 style="color: ${BLUE}; margin: 12px 0 4px;">Congratulations, ${data.firstName ?? 'Graduate'}!</h1>
+        <p style="color: #64748b; margin: 0;">You completed <strong>${data.courseName}</strong>.</p>
+      </div>
+
+      <div style="background: ${LIGHT}; border: 2px solid ${ORANGE}; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+        <p style="margin: 0 0 16px; font-size: 15px;">Your completion certificate is issued and publicly verifiable.</p>
+        ${btn(certUrl, 'View My Certificate →', BLUE)}
+      </div>
+
+      <h3 style="color: ${BLUE};">What comes next</h3>
+      <ul style="padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>EPA 608 exam:</strong> Schedule with ESCO Institute or Mainstream Engineering. Your exam fee is covered by your enrollment.</li>
+        <li style="margin-bottom: 8px;"><strong>OSHA 10 card:</strong> If you haven't completed CareerSafe yet, do it now — employers require it on day one.</li>
+        <li style="margin-bottom: 8px;"><strong>Career services:</strong> Reply to this email to connect with our employer partners in Indianapolis.</li>
+      </ul>
+
+      <p>We're proud of you.</p>
+      <p>— The Elevate for Humanity Team</p>
+    `),
   };
 }
 
-// Re-engagement email - for users who haven't logged in
+// ─── Re-engagement ────────────────────────────────────────────────────────────
 export function getReengagementEmail(data: CourseEmailData & { lastLoginDays: number }) {
+  const courseUrl = lmsUrl(data);
   return {
-    subject: `We miss you! Your course is waiting 👋`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${SITE_URL}/images/logo.png" alt="Elevate for Humanity" style="height: 50px;">
-        </div>
-        
-        <h1 style="color: #7c3aed;">We Miss You! 👋</h1>
-        
-        <p>Hi${data.firstName ? ` ${data.firstName}` : ''},</p>
-        
-        <p>It's been ${data.lastLoginDays} days since you last visited <strong>${data.courseName}</strong>. Life gets busy - we get it!</p>
-        
-        <p>But your course is still there, waiting for you. And the skills you'll learn can change your career trajectory.</p>
-        
-        <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 15px; margin: 20px 0;">
-          <strong>💡 Quick Win:</strong> Just log in and watch ONE lesson today. That's it. Small steps lead to big results.
-        </div>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Jump Back In →
-          </a>
-        </div>
-        
-        <p>Need help or have questions? Just reply to this email - we're here for you.</p>
-        
-        <p>Rooting for you,<br>
-        <strong>The Elevate Team</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-          <a href="${SITE_URL}/unsubscribe" style="color: #9ca3af;">Unsubscribe</a>
-        </p>
-      </body>
-      </html>
-    `,
+    subject: `Your course is waiting — ${data.lastLoginDays} days since your last visit`,
+    html: wrap(`
+      <h1 style="color: ${BLUE};">Still with us?</h1>
+      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>It's been <strong>${data.lastLoginDays} days</strong> since you last visited <strong>${data.courseName}</strong>. Your progress is saved — pick up exactly where you left off.</p>
+
+      <div style="background: ${LIGHT}; border-left: 4px solid ${ORANGE}; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+        If something is getting in the way — schedule, questions, technical issues — reply to this email.
+        We'll help you get back on track.
+      </div>
+
+      ${btn(courseUrl, 'Jump Back In →')}
+
+      <p>— The Elevate Team</p>
+    `),
+  };
+}
+
+// ─── Certificate issued (new) ─────────────────────────────────────────────────
+export function getCertificateIssuedEmail(data: {
+  email: string;
+  firstName?: string;
+  courseName: string;
+  certificateId: string;
+  programSlug: string;
+}) {
+  const certUrl = `${SITE_URL}/verify/${data.certificateId}`;
+  return {
+    subject: `Your ${data.courseName} certificate is ready`,
+    html: wrap(`
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 48px; line-height: 1;">📜</div>
+        <h1 style="color: ${BLUE}; margin: 12px 0 4px;">Your certificate is issued</h1>
+        <p style="color: #64748b; margin: 0;">${data.courseName}</p>
+      </div>
+
+      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>Your completion certificate for <strong>${data.courseName}</strong> has been issued and is publicly verifiable at the link below.</p>
+
+      ${btn(certUrl, 'View & Share Certificate →', BLUE)}
+
+      <div style="background: ${LIGHT}; padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: 14px; color: #475569;">
+        <strong>Certificate ID:</strong> ${data.certificateId}<br>
+        <strong>Verify at:</strong> <a href="${certUrl}" style="color: ${BLUE};">${certUrl}</a><br><br>
+        Share this link with employers, on LinkedIn, or anywhere you want to show your credential.
+        It is permanently accessible and does not expire.
+      </div>
+
+      <p>— The Elevate for Humanity Team</p>
+    `),
   };
 }

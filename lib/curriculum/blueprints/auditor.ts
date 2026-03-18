@@ -88,7 +88,7 @@ export function auditAgainstBlueprint(
   }
 
   return {
-    blueprintSlug: blueprint.slug,
+    blueprintSlug: blueprint.id,
     passed: violations.length === 0,
     violations,
     warnings,

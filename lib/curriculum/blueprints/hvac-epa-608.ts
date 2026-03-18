@@ -12,20 +12,27 @@
  *   - 11 modules, fixed order, fixed competency coverage.
  *   - Lesson count per module is bounded (min/max).
  *   - Generator may expand lessons inside bounds; may not invent modules.
+ *
+ * lessons[] is not pre-defined for HVAC — the generator produces lesson slugs
+ * dynamically. expectedLessonCount is 0 for generation-rules blueprints.
  */
 
-// HVAC_EPA608_BLUEPRINT is a generation-rules blueprint, not a CredentialBlueprint.
-// It has a different schema (generationRules, trackVariants, competencies, assessments)
-// and is consumed by the AI course generator, not CurriculumGenerator.
-// Access via getHvacBlueprint() from lib/curriculum/blueprints/index.ts.
-export const HVAC_EPA608_BLUEPRINT = {
-  slug: 'epa-608-core-v1',
-  title: 'HVAC Technician / EPA Section 608 Certification',
+import type { CredentialBlueprint } from './types';
+
+export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
+  id: 'hvac-epa608-v1',
   version: '1.0.0',
+  credentialSlug: 'epa-608',
+  credentialTitle: 'EPA Section 608 Technician Certification',
+  state: 'federal',
   programSlug: 'hvac-technician',
   credentialCode: 'EPA-608',
   trackVariants: ['type_i', 'type_ii', 'type_iii', 'universal'],
   status: 'active',
+
+  // Generation-rules blueprint — lessons are produced by the generator, not pre-defined.
+  expectedModuleCount: 11,
+  expectedLessonCount: 0,
 
   generationRules: {
     allowRemediation: true,
@@ -421,3 +428,12 @@ export const HVAC_EPA608_BLUEPRINT = {
     },
   ],
 };
+
+// ── Hard guard — fail at module load, not at runtime ─────────────────────────
+
+const _actualModuleCount = HVAC_EPA608_BLUEPRINT.modules.length;
+if (_actualModuleCount !== HVAC_EPA608_BLUEPRINT.expectedModuleCount) {
+  throw new Error(
+    `hvac-epa608 blueprint invalid: expected ${HVAC_EPA608_BLUEPRINT.expectedModuleCount} modules, got ${_actualModuleCount}`
+  );
+}

@@ -74,5 +74,6 @@ export const EPA_EXAMS = [
   'EPA 608 — Universal',
 ];
 
-export const DEFAULT_PROCTOR_ID = 'SYZXYXSE';
-export const DEFAULT_PROCTOR_NAME = 'Elizabeth Greene';
+export const DEFAULT_PROCTOR_NAME  = 'Elizabeth Greene';
+export const ESCO_PROCTOR_ID       = '358010';   // ESCO Group
+export const MAINSTREAM_PROCTOR_ID = 'SYZXYXSE'; // Mainstream Engineering

@@ -334,7 +334,7 @@ export default function HVACStandardsContent() {
                   <li>EPA 608 section exams: 25 questions each</li>
                   <li>EPA 608 Universal exam: 105 questions</li>
                   <li>Cumulative mastery exams at Modules 5, 10, and 13</li>
-                  <li>Exam fees and retesting policies vary by certifying organization</li>
+                  <li>ESCO Group: $38/attempt. Mainstream Engineering: $26.51 online (unlimited free retests) or $31.82 paper</li>
                   <li>Wrong-answer explanations for remediation</li>
                 </ul>
               </div>

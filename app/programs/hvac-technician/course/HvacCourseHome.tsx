@@ -25,7 +25,7 @@ import { CertificationTracker } from '@/components/lms/CertificationTracker';
 
 /* ── Helpers ── */
 
-function lessonUrl(id: string) { return `/courses/${HVAC_COURSE_ID}/lessons/${id}`; }
+function lessonUrl(id: string) { return `/lms/courses/${HVAC_COURSE_ID}/lessons/${id}`; }
 function lessonUrlById(defId: string) {
   const uuid = LESSON_UUID[defId];
   if (uuid) return lessonUrl(uuid);

@@ -68,10 +68,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Load credential for display name and fee
+  // Load credential for display name, fee, and stored Stripe price
   const { data: credential } = await db
     .from('credentials')
-    .select('name, abbreviation')
+    .select('name, abbreviation, stripe_price_id, exam_fee_cents')
     .eq('id', attempt.credential_id)
     .single();
 
@@ -86,8 +86,8 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
     .single();
 
-  // Determine amount — use authorization record if present, else program default, else 0
-  const amountCents = decision.amountCents ?? 0;
+  // Determine amount — authorization record takes precedence, then credential row, else 0
+  const amountCents = decision.amountCents ?? credential.exam_fee_cents ?? 0;
   if (amountCents <= 0) {
     return NextResponse.json(
       { error: 'Exam fee amount not configured for this credential. Contact (317) 314-3757.' },
@@ -97,11 +97,10 @@ export async function POST(req: NextRequest) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    customer_email: profile?.email ?? undefined,
-    line_items: [
-      {
+  // Use stored Stripe price ID when available — avoids creating duplicate products
+  const lineItem = credential.stripe_price_id
+    ? { price: credential.stripe_price_id, quantity: 1 }
+    : {
         price_data: {
           currency: 'usd',
           unit_amount: amountCents,
@@ -111,8 +110,12 @@ export async function POST(req: NextRequest) {
           },
         },
         quantity: 1,
-      },
-    ],
+      };
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    customer_email: profile?.email ?? undefined,
+    line_items: [lineItem],
     metadata: {
       payment_type: 'exam_fee',
       attempt_id: attempt.id,

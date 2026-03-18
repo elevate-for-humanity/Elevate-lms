@@ -9,7 +9,8 @@ import type {
 } from './types';
 import {
   PROVIDER_LABELS, STATUS_LABELS, RESULT_LABELS,
-  EPA_EXAMS, DEFAULT_PROCTOR_ID, DEFAULT_PROCTOR_NAME,
+  EPA_EXAMS, DEFAULT_PROCTOR_NAME,
+  ESCO_PROCTOR_ID, MAINSTREAM_PROCTOR_ID,
 } from './types';
 
 interface Props {
@@ -462,7 +463,9 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
             <div>
               <Label required>Proctor Name</Label>
               <input type="text" value={proctorName} onChange={e => setProctorName(e.target.value)} className={inputCls} />
-              <p className="text-xs text-slate-400 mt-1">Proctor ID: {DEFAULT_PROCTOR_ID}</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Proctor ID: {provider === 'esco_epa608' ? ESCO_PROCTOR_ID : MAINSTREAM_PROCTOR_ID}
+              </p>
             </div>
             <div>
               <Label>Proctor Notes</Label>

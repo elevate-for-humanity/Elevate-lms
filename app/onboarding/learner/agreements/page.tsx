@@ -5,8 +5,30 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, CheckSquare, Square } from 'lucide-react';
 import { AgreementSignature } from '@/components/compliance/AgreementSignature';
+
+// Documents the student must acknowledge reading before signing.
+const REQUIRED_READINGS = [
+  {
+    id: 'privacy',
+    label: 'Privacy Policy',
+    description: 'How we collect, use, and protect your personal data (FERPA, WIOA, Indiana law).',
+    href: '/privacy-policy',
+  },
+  {
+    id: 'terms',
+    label: 'Terms of Service',
+    description: 'Platform usage terms, program conditions, and governing law.',
+    href: '/terms-of-service',
+  },
+  {
+    id: 'handbook',
+    label: 'Student Handbook',
+    description: 'Attendance policy, dress code, conduct standards, and grievance procedures.',
+    href: '/onboarding/learner/handbook',
+  },
+];
 
 const AGREEMENT = {
   type: 'enrollment',
@@ -43,6 +65,13 @@ export default function AgreementsPage() {
   const router = useRouter();
   const [signed, setSigned] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Track which documents the student has acknowledged reading
+  const [readAcks, setReadAcks] = useState<Record<string, boolean>>({});
+  const allRead = REQUIRED_READINGS.every((r) => readAcks[r.id]);
+
+  function toggleAck(id: string) {
+    setReadAcks((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
 
   useEffect(() => {
     const supabase = createClient();
@@ -121,6 +150,43 @@ export default function AgreementsPage() {
           ))}
         </div>
 
+        {/* REQUIRED READINGS — must acknowledge before signature form unlocks */}
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-slate-900 mb-1">Read before you sign</h2>
+          <p className="text-sm text-slate-500 mb-4">Open each document, then check the box to confirm you&apos;ve read it. The signature form unlocks when all three are acknowledged.</p>
+          <div className="space-y-3">
+            {REQUIRED_READINGS.map((doc) => {
+              const checked = !!readAcks[doc.id];
+              return (
+                <div key={doc.id} className={`flex items-start gap-4 rounded-xl border p-4 transition ${checked ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
+                  <button
+                    type="button"
+                    onClick={() => toggleAck(doc.id)}
+                    className="mt-0.5 flex-shrink-0 text-emerald-600"
+                    aria-label={checked ? `Uncheck ${doc.label}` : `Check ${doc.label}`}
+                  >
+                    {checked ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5 text-slate-400" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-slate-900 text-sm">{doc.label}</span>
+                      <Link
+                        href={doc.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-brand-blue-600 hover:text-brand-blue-800 transition"
+                      >
+                        Read <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">{doc.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* SIGNED */}
         {signed ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
@@ -135,8 +201,12 @@ export default function AgreementsPage() {
               </Link>
             </div>
           </div>
+        ) : !allRead ? (
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-slate-500 text-sm">
+            Acknowledge all three documents above to unlock the signature form.
+          </div>
         ) : (
-          /* SIGNATURE FORM */
+          /* SIGNATURE FORM — only shown after all readings acknowledged */
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">

@@ -435,6 +435,76 @@ async function _POST(request: NextRequest) {
           }
 
           logger.info(`✅ Program enrollment provisioned: ${programSlug} for student ${studentId}`);
+
+          // Send enrollment confirmation + onboarding link email
+          const customerEmail = session.customer_email || session.customer_details?.email;
+          if (customerEmail) {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('first_name, full_name')
+                .eq('id', studentId)
+                .maybeSingle();
+
+              const firstName = profile?.first_name
+                || profile?.full_name?.split(' ')[0]
+                || 'there';
+              const programTitle = (programSlug || '')
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, (c: string) => c.toUpperCase());
+              const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+              const isDeposit = (session.amount_total || 0) < 500000; // < $5,000 = deposit
+
+              await fetch(`${siteUrl}/api/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  to: customerEmail,
+                  subject: `Enrollment confirmed — ${programTitle}`,
+                  html: `
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1e293b">
+  <div style="background:#1e293b;padding:24px 32px">
+    <p style="margin:0;color:#fff;font-size:18px;font-weight:700">Elevate for Humanity</p>
+    <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">Career &amp; Technical Institute</p>
+  </div>
+  <div style="padding:32px">
+    <h1 style="margin:0 0 16px;font-size:22px">You're enrolled, ${firstName}!</h1>
+    <p style="color:#475569;line-height:1.6;margin:0 0 8px">
+      Your payment has been received and your enrollment in <strong>${programTitle}</strong> is confirmed.
+    </p>
+    ${isDeposit ? `<p style="color:#d97706;font-size:13px;margin:0 0 16px">
+      <strong>Deposit received.</strong> Your remaining balance will be due before your program start date.
+      We will contact you with payment instructions.
+    </p>` : ''}
+    <p style="color:#475569;line-height:1.6;margin:0 0 24px">
+      Your next step is to complete onboarding — it takes about 10 minutes and unlocks your coursework.
+    </p>
+    <a href="${siteUrl}/onboarding/learner"
+       style="display:inline-block;background:#dc2626;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px">
+      Complete Onboarding →
+    </a>
+    <div style="margin:32px 0 0;padding:20px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+      <p style="margin:0 0 8px;font-weight:700;font-size:14px">What happens next:</p>
+      <ol style="margin:0;padding-left:20px;color:#475569;font-size:14px;line-height:2">
+        <li>Complete your onboarding profile and documents</li>
+        <li>Watch the orientation video</li>
+        <li>Start your first lesson — work at your own pace</li>
+        <li>Earn your EPA 608 certification on-site at Elevate</li>
+      </ol>
+    </div>
+    <p style="margin:24px 0 0;color:#94a3b8;font-size:12px">
+      Questions? Call <strong>(317) 314-3757</strong> or reply to this email.<br>
+      Elizabeth Greene — Director, Elevate for Humanity Career &amp; Technical Institute
+    </p>
+  </div>
+</div>`,
+                }),
+              });
+              logger.info('[webhook] Enrollment confirmation email sent', { customerEmail, programSlug });
+            } catch (emailErr) {
+              logger.error('[webhook] Enrollment confirmation email failed', emailErr);
+            }
+          }
         } catch (err: any) {
           Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing program_enrollment:', err);

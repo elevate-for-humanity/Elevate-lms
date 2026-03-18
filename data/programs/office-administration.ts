@@ -163,6 +163,8 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
 
   cta: {
     applyHref: '/apply',
+    requestInfoHref: '/contact?program=office-administration',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=office+administrator&location=Indiana',
     advisorHref: '/contact',
     courseHref: '/programs/office-administration',
   },

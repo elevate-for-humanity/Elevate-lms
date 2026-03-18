@@ -357,6 +357,23 @@ Full specification: `docs/hero-video-standard.md`
 
 ---
 
+## CTA System — Non-Negotiable
+
+Every program page must have these CTAs in this order:
+1. **Apply Now** — `cta.applyHref`
+2. **Request Information** — `cta.requestInfoHref` (defaults to `/contact?program=<slug>`)
+3. **Indiana Career Connect** — `cta.careerConnectHref` — **only on WIOA/apprenticeship pages**, opens in new tab
+
+Rules:
+- No `href="#"` anywhere
+- No buttons without routes
+- No conflicting CTAs on the same page
+- Payment plan note required on every self-pay program page
+- `requestInfoHref` and `careerConnectHref` are set in the program data file (`data/programs/<slug>.ts`), not hardcoded in components
+- Indiana Career Connect is never shown on non-WIOA programs (e.g. CPR, short courses)
+
+---
+
 ## Brand Color Convention
 
 Use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, `brand-green-*` for brand elements. Semantic colors (indigo, teal, purple, emerald, cyan) are kept for UI state differentiation.
@@ -538,6 +555,7 @@ Do not tighten without replacing admin remediation and enrollment-management beh
 
 - `docs/platform-readiness-implementation-plan.md` — audit findings and execution plan
 - `docs/platform-readiness-completion-report.md` — full completion report with deployment steps
+- `docs/page-design-standard.md` — **non-negotiable rules for every page**: hero system, program page section order, CTA system, Indiana Career Connect rules, typography, invisible text patterns, shared component requirements, form completeness, routing, mobile. All new pages must comply.
 - `repo_audit_report.md` — full platform inventory (2026-03-27)
 - `canonical_systems.md` — canonical implementation for each subsystem
 - `lms_architecture.md` — LMS data model, rendering flow, certification chain

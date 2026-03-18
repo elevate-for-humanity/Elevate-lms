@@ -168,6 +168,8 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   cta: {
     applyHref: '/apply?program=phlebotomy',
+    requestInfoHref: '/contact?program=phlebotomy',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=phlebotomist&location=Indiana',
     advisorHref: '/contact',
   },
 

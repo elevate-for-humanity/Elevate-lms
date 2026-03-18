@@ -96,7 +96,9 @@ export const DIESEL_MECHANIC: ProgramSchema = {
     { title: 'Mobile Diesel Technician', salary: '$50,000–$70,000' },
   ],
 
-  cta: { applyHref: '/inquiry?program=diesel-mechanic', advisorHref: '/contact', courseHref: '/programs/diesel-mechanic' },
+  cta: { applyHref: '/inquiry?program=diesel-mechanic',
+    requestInfoHref: '/contact?program=diesel-mechanic',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=diesel+mechanic&location=Indiana', advisorHref: '/contact', courseHref: '/programs/diesel-mechanic' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Able to lift 50 lbs', 'Basic mechanical aptitude helpful but not required'],
   equipmentIncluded: 'All tools, diagnostic equipment, PPE, and certification exam fees included',
   modality: 'Hybrid — Online theory via LMS, hands-on diesel shop at Elevate training facility',

@@ -152,6 +152,8 @@ export const BOOKKEEPING: ProgramSchema = {
 
   cta: {
     applyHref: '/apply',
+    requestInfoHref: '/contact?program=bookkeeping',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=bookkeeper&location=Indiana',
     advisorHref: '/contact',
     courseHref: '/programs/bookkeeping',
   },

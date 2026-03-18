@@ -94,7 +94,9 @@ export const WELDING: ProgramSchema = {
     { title: 'Welding Inspector', salary: '$70,000–$95,000' },
   ],
 
-  cta: { applyHref: '/programs/welding/apply', advisorHref: '/contact', courseHref: '/programs/welding' },
+  cta: { applyHref: '/programs/welding/apply',
+    requestInfoHref: '/contact?program=welding',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=welder&location=Indiana', advisorHref: '/contact', courseHref: '/programs/welding' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Ability to lift 50 lbs', 'No prior welding experience required'],
   equipmentIncluded: 'Welding helmet, gloves, and all consumables provided. Certification exam fees included.',
   modality: 'Hybrid — Online theory via LMS, hands-on welding lab at Elevate training facility',

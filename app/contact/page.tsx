@@ -21,7 +21,8 @@ const contactInfo = [
 function ContactPageInner() {
   const searchParams = useSearchParams();
   const prefillProgram = searchParams.get('program') || '';
-  const prefillSubject = searchParams.get('subject') || '';
+  // Auto-select subject: explicit ?subject= wins, else default to 'programs' when ?program= is set
+  const prefillSubject = searchParams.get('subject') || (prefillProgram ? 'programs' : '');
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);

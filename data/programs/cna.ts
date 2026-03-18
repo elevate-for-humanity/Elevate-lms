@@ -236,6 +236,8 @@ export const CNA: ProgramSchema = {
 
   cta: {
     applyHref: '/apply?program=cna',
+    requestInfoHref: '/contact?program=cna',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=certified+nursing+assistant&location=Indiana',
     advisorHref: '/contact',
   },
 

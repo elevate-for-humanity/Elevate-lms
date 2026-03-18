@@ -143,7 +143,9 @@ export const CDL_TRAINING: ProgramSchema = {
     { title: 'Owner-Operator', salary: '$80,000–$150,000+' },
   ],
 
-  cta: { applyHref: '/apply', advisorHref: '/contact', courseHref: '/programs/cdl-training' },
+  cta: { applyHref: '/apply',
+    requestInfoHref: '/contact?program=cdl-training',
+    careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cdl+truck+driver&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cdl-training' },
 
   admissionRequirements: [
     '21 years or older (18 for intrastate only)',

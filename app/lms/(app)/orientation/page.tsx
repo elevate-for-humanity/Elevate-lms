@@ -29,7 +29,7 @@ export default async function OrientationPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Orientation" }]} />
+        <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Orientation" }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
@@ -80,7 +80,7 @@ export default async function OrientationPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Orientation" }]} />
+        <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Orientation" }]} />
       </div>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>

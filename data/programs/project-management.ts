@@ -53,7 +53,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
     { title: 'Project Manager', salary: '$55,000–$75,000' },
     { title: 'Senior Project Manager', salary: '$75,000–$100,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=project-management',
     requestInfoHref: '/programs/project-management/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=project+manager&location=Indiana', advisorHref: '/contact', courseHref: '/programs/project-management' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior PM experience required'],

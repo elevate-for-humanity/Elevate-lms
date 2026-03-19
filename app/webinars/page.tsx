@@ -2,29 +2,39 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Video, Calendar, Clock, Users, Play, Bell } from 'lucide-react';
+import { Calendar, Clock, Users, Play } from 'lucide-react';
+import { createPublicClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Webinars | Elevate For Humanity',
   description: 'Join live webinars and watch recordings on career development, industry trends, and skill building.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/webinars',
-  },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/webinars' },
 };
 
-const upcomingWebinars = [
-  { title: 'Healthcare Career Paths in 2026', date: 'Feb 15, 2026', time: '2:00 PM EST', host: 'Dr. Sarah Johnson', attendees: 156 },
-  { title: 'Resume Writing Workshop', date: 'Feb 18, 2026', time: '1:00 PM EST', host: 'Career Services Team', attendees: 89 },
-  { title: 'WIOA Funding Explained', date: 'Feb 22, 2026', time: '11:00 AM EST', host: 'Funding Department', attendees: 234 },
-];
+export default async function WebinarsPage() {
+  const supabase = await createPublicClient();
 
-const pastWebinars = [
-  { title: 'Getting Started with CDL Training', views: 1250, duration: '45 min' },
-  { title: 'Interview Tips for Healthcare Jobs', views: 890, duration: '38 min' },
-  { title: 'Understanding Your Benefits', views: 567, duration: '52 min' },
-];
+  const { data: upcoming } = await supabase
+    .from('webinars')
+    .select('id, title, description, host_name, host_title, scheduled_at, duration_minutes, registration_url, attendee_count')
+    .eq('status', 'upcoming')
+    .eq('is_public', true)
+    .order('scheduled_at', { ascending: true })
+    .limit(9);
 
-export default function WebinarsPage() {
+  const { data: past } = await supabase
+    .from('webinars')
+    .select('id, title, host_name, duration_minutes, recording_url, view_count, scheduled_at')
+    .eq('status', 'completed')
+    .eq('is_public', true)
+    .order('scheduled_at', { ascending: false })
+    .limit(6);
+
+  const upcomingList = upcoming ?? [];
+  const pastList     = past ?? [];
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -33,62 +43,111 @@ export default function WebinarsPage() {
         </div>
       </div>
 
-      {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
+        <div className="relative h-[40vh] min-h-[240px] w-full overflow-hidden">
           <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Live Webinars</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Learn from experts, ask questions, and connect with the community</p>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              Learn from experts, ask questions, and connect with the Elevate community.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8">Upcoming Webinars</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {upcomingWebinars.map((webinar, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="flex items-center gap-2 text-brand-red-600 text-sm font-medium mb-3">
-                  <Calendar className="w-4 h-4" /> {webinar.date}
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{webinar.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">Hosted by {webinar.host}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                  <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {webinar.time}</span>
-                  <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {webinar.attendees}</span>
-                </div>
-                <button className="w-full py-2 bg-brand-red-600 text-slate-900 rounded-lg hover:bg-brand-red-700 flex items-center justify-center gap-2">
-                  <Bell className="w-4 h-4" /> Register
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="max-w-6xl mx-auto px-4 pb-20">
 
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8">Past Recordings</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {pastWebinars.map((webinar, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 border hover:shadow-md transition-all cursor-pointer">
-                <div className="aspect-video bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                  <Play className="w-12 h-12 text-slate-500" />
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Upcoming Webinars</h2>
+
+          {upcomingList.length === 0 ? (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-10 text-center">
+              <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-700 font-semibold mb-1">No upcoming webinars scheduled</p>
+              <p className="text-slate-500 text-sm mb-5">
+                Sign up to be notified when new sessions are added.
+              </p>
+              <Link
+                href="/contact?subject=webinar-notifications"
+                className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors"
+              >
+                Notify Me
+              </Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {upcomingList.map((w: any) => (
+                <div key={w.id} className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col">
+                  {w.scheduled_at && (
+                    <div className="flex items-center gap-2 text-brand-red-600 text-sm font-medium mb-3">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(w.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                  )}
+                  <h3 className="font-bold text-slate-900 mb-2 leading-snug">{w.title}</h3>
+                  {w.description && <p className="text-slate-500 text-sm mb-3 line-clamp-2">{w.description}</p>}
+                  <p className="text-slate-600 text-sm mb-4">
+                    <span className="font-medium">{w.host_name}</span>
+                    {w.host_title && <span className="text-slate-400"> · {w.host_title}</span>}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-slate-500 mb-5">
+                    {w.duration_minutes && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {w.duration_minutes} min</span>}
+                    {w.attendee_count > 0 && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {w.attendee_count.toLocaleString()} registered</span>}
+                  </div>
+                  <div className="mt-auto">
+                    {w.registration_url ? (
+                      <a href={w.registration_url} target="_blank" rel="noopener noreferrer"
+                        className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">
+                        Register Free
+                      </a>
+                    ) : (
+                      <Link href={`/contact?subject=webinar-${w.id}`}
+                        className="block w-full text-center border border-slate-300 hover:border-brand-blue-400 text-slate-700 font-semibold py-2.5 rounded-lg text-sm transition-colors">
+                        Request Access
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{webinar.title}</h3>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span>{webinar.views.toLocaleString()} views</span>
-                  <span>{webinar.duration}</span>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {pastList.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Past Recordings</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pastList.map((w: any) => (
+                <div key={w.id} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col">
+                  <div className="flex items-center gap-2 text-slate-400 text-xs mb-3">
+                    <Play className="w-3.5 h-3.5" />
+                    {w.scheduled_at && new Date(w.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                  <h3 className="font-bold text-slate-900 mb-1 leading-snug">{w.title}</h3>
+                  <p className="text-slate-500 text-sm mb-4">
+                    {w.host_name}
+                    {w.duration_minutes && <span className="text-slate-400"> · {w.duration_minutes} min</span>}
+                    {w.view_count > 0 && <span className="text-slate-400"> · {w.view_count.toLocaleString()} views</span>}
+                  </p>
+                  <div className="mt-auto">
+                    {w.recording_url ? (
+                      <a href={w.recording_url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full border border-slate-200 hover:border-brand-blue-400 text-slate-700 hover:text-brand-blue-700 font-semibold py-2.5 rounded-lg text-sm transition-colors">
+                        <Play className="w-4 h-4" /> Watch Recording
+                      </a>
+                    ) : (
+                      <span className="block w-full text-center text-slate-400 text-sm py-2.5">Recording not available</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              ))}
+            </div>
+          </section>
+        )}
+
+      </div>
     </div>
   );
 }

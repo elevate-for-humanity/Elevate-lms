@@ -110,7 +110,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
-            <Link href="/lms/dashboard" className="hover:text-slate-700">Dashboard</Link>
+            <Link href="/lms/courses" className="hover:text-slate-700">Dashboard</Link>
             <ChevronRight className="w-3 h-3" />
             <Link href="/lms/courses" className="hover:text-slate-700">My Courses</Link>
             <ChevronRight className="w-3 h-3" />

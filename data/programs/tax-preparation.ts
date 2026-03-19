@@ -60,7 +60,7 @@ export const TAX_PREPARATION: ProgramSchema = {
     { title: 'Enrolled Agent', salary: '$50,000–$75,000' },
     { title: 'Tax Business Owner', salary: '$60,000–$120,000+' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=tax-prep',
     requestInfoHref: '/programs/tax-preparation/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=tax+preparer&location=Indiana', advisorHref: '/contact', courseHref: '/programs/tax-preparation' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic math and computer skills', 'No prior tax experience required'],

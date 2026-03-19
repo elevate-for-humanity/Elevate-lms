@@ -101,7 +101,7 @@ export default function AITutorPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Ai Tutor" }]} />
+        <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Ai Tutor" }]} />
       </div>
       {/* Header */}
       <div className="bg-brand-blue-600 text-white py-6">

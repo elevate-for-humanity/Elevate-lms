@@ -127,7 +127,7 @@ function getAutoConfig(section: string, label: string, route: string): AutoConfi
         description:
           `The "${baseLabel}" page is part of our LMS experience. It connects video, assignments, quizzes, and progress tracking with the case management and funding pieces behind the scenes.`,
         primaryCta: { href: "/courses/catalog", label: "Browse course catalog" },
-        secondaryCta: { href: "/lms/dashboard", label: "Go to LMS Dashboard" },
+        secondaryCta: { href: "/lms/courses", label: "Go to LMS Dashboard" },
         bullets: [
           "Modern course player with video, downloads, and transcripts",
           "Progress tracking you can share with employers and workforce boards",

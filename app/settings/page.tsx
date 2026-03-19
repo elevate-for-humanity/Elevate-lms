@@ -134,17 +134,18 @@ export default async function SettingsPage() {
               {activeSection === 'billing' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold">Billing & Payments</h2>
-                  <div className="bg-white rounded-lg p-4">
-                    <p className="font-medium">Current Plan: <span className="text-brand-orange-600">Pro</span></p>
-                    <p className="text-sm text-gray-600">$29/month, renews on Feb 15, 2024</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium mb-2">Payment Method</h3>
-                    <div className="flex items-center gap-3 p-3 border rounded-lg">
-                      <CreditCard className="w-6 h-6 text-gray-400" />
-                      <span>•••• •••• •••• 4242</span>
-                      <span className="text-sm text-gray-500">Expires 12/25</span>
-                    </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+                    <CreditCard className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+                    <p className="font-medium text-slate-700 mb-1">No active subscription</p>
+                    <p className="text-sm text-slate-500 mb-4">
+                      Billing details will appear here once you have an active enrollment or payment plan.
+                    </p>
+                    <a
+                      href="/contact"
+                      className="inline-block text-sm font-semibold text-brand-blue-600 hover:underline"
+                    >
+                      Contact support for billing questions
+                    </a>
                   </div>
                 </div>
               )}

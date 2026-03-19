@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 function SignupFormContent() {
   const searchParams = useSearchParams();
-  const next = validateRedirect(searchParams.get('next'), '/lms/dashboard');
+  const next = validateRedirect(searchParams.get('next') || searchParams.get('redirect'), '/lms/dashboard');
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',

@@ -39,7 +39,7 @@ export default async function AchievementsPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Achievements" }]} />
+          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Achievements" }]} />
         </div>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
@@ -232,7 +232,7 @@ export default async function AchievementsPage() {
   return (
     <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Achievements" }]} />
+          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Achievements" }]} />
         </div>
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}

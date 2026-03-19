@@ -340,7 +340,7 @@ export default function LessonPage() {
             Course access is locked until an admin approves your enrollment.
           </p>
           <Link
-            href="/lms/dashboard"
+            href="/lms/courses"
             className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700"
           >
             Back to Dashboard
@@ -404,7 +404,7 @@ export default function LessonPage() {
     <div className="flex flex-col h-[100dvh] bg-white">
       <div className="px-4 py-2 border-b border-slate-100 bg-white flex-shrink-0">
         <Breadcrumbs items={[
-          { label: "Dashboard", href: "/lms/dashboard" },
+          { label: "Dashboard", href: "/lms/courses" },
           { label: course?.title || "Course", href: `/lms/courses/${courseId}` },
           { label: lesson.title },
         ]} />

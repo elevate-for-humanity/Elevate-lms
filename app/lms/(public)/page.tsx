@@ -62,7 +62,7 @@ export default async function LmsPublicPage() {
             Industry-recognized credentials. Workforce funding available. Real job outcomes.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href={buildLoginRedirect("/lms/dashboard")} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">
+            <Link href={buildLoginRedirect("/lms/courses")} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">
               Enter Student Portal <ChevronRight className="w-4 h-4" />
             </Link>
             <Link href="/programs" className="w-full sm:w-auto flex items-center justify-center gap-2 border-2 border-slate-200 hover:border-slate-400 text-slate-900 font-bold px-8 py-4 rounded-xl text-base transition">
@@ -156,7 +156,7 @@ export default async function LmsPublicPage() {
           <h2 className="text-3xl font-extrabold text-white mb-3">Ready to Start?</h2>
           <p className="text-slate-400 text-base mb-8">Create your account and enroll in minutes.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href={buildLoginRedirect("/lms/dashboard")} className="w-full sm:w-auto bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">Enter Student Portal</Link>
+            <Link href={buildLoginRedirect("/lms/courses")} className="w-full sm:w-auto bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl text-base transition">Enter Student Portal</Link>
             <Link href="/programs" className="w-full sm:w-auto border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl text-base transition">Browse Programs</Link>
           </div>
         </div>

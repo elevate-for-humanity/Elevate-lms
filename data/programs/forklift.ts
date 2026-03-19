@@ -70,7 +70,7 @@ export const FORKLIFT: ProgramSchema = {
     { title: 'Shipping/Receiving Clerk', salary: '$34,000–$44,000' },
     { title: 'Warehouse Supervisor', salary: '$45,000–$60,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=forklift',
     requestInfoHref: '/programs/forklift/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=forklift+operator&location=Indiana', advisorHref: '/contact', courseHref: '/programs/forklift' },
   admissionRequirements: ['18 years or older', 'Valid government-issued ID', 'Able to lift 50 lbs', 'No prior forklift experience required'],

@@ -57,7 +57,7 @@ export const WEB_DEVELOPMENT: ProgramSchema = {
     { title: 'WordPress Developer', salary: '$45,000–$65,000' },
     { title: 'Full-Stack Developer', salary: '$80,000–$120,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=web-development',
     requestInfoHref: '/programs/web-development/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=web+developer&location=Indiana', advisorHref: '/contact', courseHref: '/programs/web-development' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior coding experience required'],

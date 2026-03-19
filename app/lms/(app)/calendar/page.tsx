@@ -134,7 +134,7 @@ export default async function CalendarPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Calendar" }]} />
+        <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Calendar" }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">

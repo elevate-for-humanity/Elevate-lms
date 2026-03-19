@@ -52,7 +52,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
     { title: 'Freelance Consultant', salary: '$40,000–$80,000' },
     { title: 'Business Development', salary: '$45,000–$65,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=entrepreneurship',
     requestInfoHref: '/programs/entrepreneurship/request-info', advisorHref: '/contact', courseHref: '/programs/entrepreneurship' },
   admissionRequirements: ['18 years or older', 'Business idea or existing business', 'Basic computer skills'],
   equipmentIncluded: 'Laptop provided during training. All software and certification exam fees included.',

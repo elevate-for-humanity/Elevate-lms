@@ -126,7 +126,7 @@ export default function StudentApplicationPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Apply" }]} />
+          <Breadcrumbs items={[{ label: "LMS", href: "/lms/courses" }, { label: "Apply" }]} />
         </div>
         <div className="animate-spin rounded-full h-11 w-11 border-b-2 border-emerald-600"></div>
       </div>

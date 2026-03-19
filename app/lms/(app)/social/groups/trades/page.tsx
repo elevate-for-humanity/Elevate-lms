@@ -272,7 +272,7 @@ export default async function TradesGroupPage() {
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900">Members</h3>
-                <Link href="#" className="text-brand-orange-600 hover:text-brand-orange-700 text-sm">See All</Link>
+                <Link href="/lms/social/groups/trades" className="text-brand-orange-600 hover:text-brand-orange-700 text-sm">See All</Link>
               </div>
               <div className="flex -space-x-2">
                 {[...Array(8)].map((_, i) => (

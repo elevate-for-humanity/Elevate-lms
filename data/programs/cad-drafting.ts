@@ -56,7 +56,7 @@ export const CAD_DRAFTING: ProgramSchema = {
     { title: 'BIM Modeler', salary: '$55,000–$75,000' },
     { title: 'Design Manager', salary: '$70,000–$95,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=cad-drafting',
     requestInfoHref: '/programs/cad-drafting/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cad+drafter&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cad-drafting' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior CAD experience required'],

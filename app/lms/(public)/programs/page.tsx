@@ -56,7 +56,7 @@ export default async function LmsProgramsPage() {
               Sign In
             </Link>
             <Link
-              href={buildLoginRedirect('/lms/dashboard')}
+              href={buildLoginRedirect('/lms/courses')}
               className="text-sm bg-slate-900 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-slate-700 transition"
             >
               Student Portal
@@ -106,7 +106,7 @@ export default async function LmsProgramsPage() {
                 No published programs are available yet. If you&apos;re already enrolled, sign in to access your training.
               </p>
               <Link
-                href={buildLoginRedirect('/lms/dashboard')}
+                href={buildLoginRedirect('/lms/courses')}
                 className="inline-flex items-center gap-2 bg-slate-900 text-white font-semibold px-6 py-3 rounded-xl text-sm hover:bg-slate-700 transition"
               >
                 Student Login <ChevronRight className="w-4 h-4" />
@@ -191,7 +191,7 @@ export default async function LmsProgramsPage() {
             Sign in to access your courses, track progress, and continue your training.
           </p>
           <Link
-            href={buildLoginRedirect('/lms/dashboard')}
+            href={buildLoginRedirect('/lms/courses')}
             className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-xl text-sm transition"
           >
             Enter Student Portal <ChevronRight className="w-4 h-4" />

@@ -25,7 +25,10 @@ export const prsIndianaBlueprint: CredentialBlueprint = {
   credentialSlug: 'prs',
   credentialTitle: 'Certified Peer Recovery Specialist',
   state: 'IN',
-  programSlug: 'peer-recovery-specialist',
+  // DB canonical slug is 'peer-recovery-specialist-jri'.
+  // Public program page uses 'peer-recovery-specialist'.
+  // Both resolve via getBlueprintForProgram() — see PRS_PROGRAM_SLUGS set.
+  programSlug: 'peer-recovery-specialist-jri',
   credentialCode: 'IN-PRS',
   trackVariants: ['standard'],
   status: 'active',

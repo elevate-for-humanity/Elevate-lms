@@ -100,7 +100,7 @@ export default async function StudentDashboardOrchestrated() {
     .not('course_id', 'is', null)
     .order('enrolled_at', { ascending: false });
 
-  // Keep both sets separate for display, but combine for active enrollment check
+  // Combine only for active enrollment check — display stays separated
   const allEnrollments = [
     ...(courseEnrollments || []),
     ...(partnerEnrollments || []),
@@ -108,6 +108,19 @@ export default async function StudentDashboardOrchestrated() {
 
   const activeEnrollment = allEnrollments.find(
     (e) => e.status === 'active' || e.status === 'pending' || e.status === 'pending_approval'
+  );
+
+  // Separate counts for stats display
+  const internalEnrollmentCount = (programEnrollments?.length || 0) + (regularEnrollments?.length || 0);
+  const partnerEnrollmentCount  = partnerEnrollments?.length || 0;
+
+  // Active partner enrollments (not completed)
+  const activePartnerEnrollments = (partnerEnrollments || []).filter(
+    (e) => e.status !== 'completed' && e.status !== 'cancelled'
+  );
+  // Completed partner enrollments = credentials earned
+  const completedPartnerEnrollments = (partnerEnrollments || []).filter(
+    (e) => e.status === 'completed'
   );
 
   // Get course progress (use progress_percentage from enrollments if course_progress table doesn't exist)
@@ -245,58 +258,123 @@ export default async function StudentDashboardOrchestrated() {
           <BadgeShowcase userId={user.id} limit={3} />
         </div>
 
-        {/* My Programs — program-level enrollment cards */}
-        {(programEnrollments?.length || 0) > 0 && (
-          <EnrolledProgramsList enrollments={programEnrollments} />
-        )}
 
-        {/* My Courses — canonical course enrollments (program_enrollments with course_id) */}
-        {(courseEnrollments?.length || 0) > 0 && (
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold text-black mb-4">My Courses</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {(courseEnrollments || []).map((ce: any) => {
-                const course = ce.courses;
-                const progress = ce.progress_percent ?? 0;
-                const isActive = ce.status === 'active' || ce.status === 'confirmed';
-                const isComplete = ce.status === 'completed';
+        {/* ── MY PROGRAMS (internal LMS) ─────────────────────────── */}
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-slate-900">My Programs</h2>
+            <Link href="/lms/courses" className="text-sm text-brand-blue-600 hover:underline font-medium">
+              View all →
+            </Link>
+          </div>
+          {(programEnrollments?.length || 0) > 0 ? (
+            <EnrolledProgramsList enrollments={programEnrollments} />
+          ) : (
+            <EmptyEnrollmentState />
+          )}
+        </section>
+
+        {/* ── PARTNER TRAINING ──────────────────────────────────── */}
+        {activePartnerEnrollments.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-slate-900">Partner Training</h2>
+              <span className="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-full">
+                External providers
+              </span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activePartnerEnrollments.map((enrollment: any) => {
+                const course   = enrollment.partner_lms_courses;
+                const provider = enrollment.partner_lms_providers;
+                const pct      = enrollment.progress_percentage ?? 0;
                 return (
-                  <a
-                    key={ce.id}
-                    href={`/lms/courses/${ce.course_id}`}
-                    className="bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition p-6 group block"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
-                        {course?.title ?? 'Course'}
-                      </h4>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        isActive   ? 'bg-brand-green-100 text-brand-green-700' :
-                        isComplete ? 'bg-brand-blue-100 text-brand-blue-700' :
-                                     'bg-amber-100 text-amber-700'
+                  <div key={enrollment.id} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-slate-900 text-sm leading-snug">
+                          {course?.course_name ?? 'Partner Course'}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {provider?.provider_name ?? 'External Provider'}
+                        </p>
+                      </div>
+                      <span className={`flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        enrollment.status === 'completed'
+                          ? 'bg-brand-green-100 text-brand-green-700'
+                          : enrollment.status === 'active'
+                          ? 'bg-brand-blue-100 text-brand-blue-700'
+                          : 'bg-slate-100 text-slate-600'
                       }`}>
-                        {isActive ? 'Active' : isComplete ? 'Completed' : 'Pending'}
+                        {enrollment.status}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 rounded-full h-2 mb-1">
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
-                        }`}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500">{progress}% complete</p>
-                  </a>
+                    {pct > 0 && (
+                      <div>
+                        <div className="flex justify-between text-xs text-slate-500 mb-1">
+                          <span>Progress</span>
+                          <span className="font-medium">{pct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    )}
+                    {enrollment.metadata?.access_url && (
+                      <a
+                        href={enrollment.metadata.access_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-auto text-center text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-800 border border-brand-blue-200 rounded-lg py-2 transition-colors"
+                      >
+                        Continue on {provider?.provider_name ?? 'Partner Site'} →
+                      </a>
+                    )}
+                  </div>
                 );
               })}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Empty state — no enrollments at all */}
-        {(programEnrollments?.length || 0) === 0 && (courseEnrollments?.length || 0) === 0 && (
-          <EmptyEnrollmentState />
+        {/* ── MY CERTIFICATIONS (completed partner + program certs) ── */}
+        {((certifications?.length || 0) > 0 || completedPartnerEnrollments.length > 0) && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-slate-900">My Certifications</h2>
+              <Link href="/lms/certificates" className="text-sm text-brand-blue-600 hover:underline font-medium">
+                View all →
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {/* Program completion certificates */}
+              {(certifications || []).map((cert: any) => (
+                <div key={cert.id} className="bg-white border border-brand-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <Award className="w-5 h-5 text-brand-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm">{cert.title ?? cert.certificate_type ?? 'Certificate'}</p>
+                    <p className="text-xs text-slate-500">{cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : 'Issued'}</p>
+                  </div>
+                </div>
+              ))}
+              {/* Completed partner course credentials */}
+              {completedPartnerEnrollments.map((enrollment: any) => {
+                const course = enrollment.partner_lms_courses;
+                return (
+                  <div key={enrollment.id} className="bg-white border border-brand-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                    <Award className="w-5 h-5 text-brand-green-600 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-slate-900 text-sm">{course?.course_name ?? 'Partner Certification'}</p>
+                      <p className="text-xs text-slate-500">
+                        {enrollment.partner_lms_providers?.provider_name ?? 'Partner'} ·{' '}
+                        {enrollment.completed_at ? new Date(enrollment.completed_at).toLocaleDateString() : 'Completed'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         )}
 
         {/* Certification Progress & Requirements */}
@@ -515,27 +593,25 @@ export default async function StudentDashboardOrchestrated() {
 
             {/* Quick Stats */}
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h3 className="text-lg font-bold text-black mb-4">
-                Your Stats
-              </h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Your Stats</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-black">Programs Enrolled</span>
-                  <span className="font-bold text-black">
-                    {allEnrollments?.length || 0}
+                  <span className="text-slate-700 text-sm">Programs</span>
+                  <span className="font-bold text-slate-900">{internalEnrollmentCount}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700 text-sm">Partner Courses</span>
+                  <span className="font-bold text-slate-900">{partnerEnrollmentCount}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700 text-sm">Certifications</span>
+                  <span className="font-bold text-slate-900">
+                    {(certifications?.length || 0) + completedPartnerEnrollments.length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-black">Certificates Earned</span>
-                  <span className="font-bold text-black">
-                    {certifications?.length || 0}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-black">Overall Progress</span>
-                  <span className="font-bold text-black">
-                    {stateData.progressPercentage}%
-                  </span>
+                  <span className="text-slate-700 text-sm">Overall Progress</span>
+                  <span className="font-bold text-slate-900">{stateData.progressPercentage}%</span>
                 </div>
               </div>
             </div>

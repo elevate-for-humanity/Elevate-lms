@@ -1,19 +1,30 @@
-'use client';
-
 import Link from 'next/link';
-import { Archive, ArrowLeft, Mail, Trash2, RotateCcw } from 'lucide-react';
+import { Archive, ArrowLeft, Mail } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function ArchivedMessagesPage() {
-  const archivedMessages = [
-    { id: '1', from: 'Career Services', subject: 'Your resume has been reviewed', date: 'Dec 15, 2025', preview: 'Thank you for submitting your resume...' },
-    { id: '2', from: 'Admissions', subject: 'Welcome to Elevate!', date: 'Nov 20, 2025', preview: 'Congratulations on your enrollment...' },
-    { id: '3', from: 'Financial Aid', subject: 'WIOA funding approved', date: 'Nov 15, 2025', preview: 'Your funding application has been...' },
-  ];
+export const dynamic = 'force-dynamic';
+
+export default async function ArchivedMessagesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/messages/archived');
+
+  // Archived messages: recipient is current user, is_read = true, older than 30 days
+  const { data: archived } = await supabase
+    .from('messages')
+    .select('id, subject, body, created_at, sender_id, profiles!messages_sender_id_fkey(full_name)')
+    .eq('recipient_id', user.id)
+    .eq('is_read', true)
+    .lt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const messages = archived ?? [];
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Messages', href: '/messages' }, { label: 'Archived' }]} />
@@ -21,50 +32,49 @@ export default function ArchivedMessagesPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
+        <Link href="/messages" className="inline-flex items-center text-slate-600 hover:text-brand-blue-600 mb-6 text-sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Messages
         </Link>
 
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Archive className="w-8 h-8 text-gray-400 mr-3" />
-            <h1 className="text-2xl font-bold text-gray-900">Archived Messages</h1>
+          <div className="flex items-center gap-3">
+            <Archive className="w-7 h-7 text-brand-blue-600" />
+            <h1 className="text-2xl font-bold text-slate-900">Archived Messages</h1>
           </div>
-          <span className="text-gray-500">{archivedMessages.length} messages</span>
+          <span className="text-slate-500 text-sm">{messages.length} message{messages.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {archivedMessages.length > 0 ? (
-            <div className="divide-y divide-gray-200">
-              {archivedMessages.map((message) => (
-                <div key={message.id} className="p-4 hover:bg-white flex items-center">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-4">
-                    <Mail className="w-5 h-5 text-gray-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium text-gray-900">{message.from}</p>
-                      <span className="text-sm text-gray-500">{message.date}</span>
-                    </div>
-                    <p className="text-gray-900 truncate">{message.subject}</p>
-                    <p className="text-sm text-gray-500 truncate">{message.preview}</p>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition" title="Restore">
-                      <RotateCcw className="w-5 h-5" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-brand-red-600 transition" title="Delete">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          {messages.length === 0 ? (
+            <div className="py-16 text-center">
+              <Mail className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-600 font-medium mb-1">No archived messages</p>
+              <p className="text-slate-500 text-sm">Read messages older than 30 days appear here.</p>
             </div>
           ) : (
-            <div className="p-12 text-center">
-              <Archive className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">No archived messages</p>
+            <div className="divide-y divide-slate-100">
+              {messages.map((msg: any) => {
+                const senderName = msg.profiles?.full_name ?? 'Sender';
+                const preview = msg.body?.slice(0, 100) ?? '';
+                return (
+                  <div key={msg.id} className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-slate-600 text-xs font-bold">{senderName.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <p className="font-semibold text-slate-900 text-sm truncate">{senderName}</p>
+                        <span className="text-xs text-slate-400 flex-shrink-0">
+                          {new Date(msg.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      {msg.subject && <p className="text-sm text-slate-700 font-medium truncate">{msg.subject}</p>}
+                      <p className="text-xs text-slate-500 truncate mt-0.5">{preview}{msg.body?.length > 100 ? '…' : ''}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

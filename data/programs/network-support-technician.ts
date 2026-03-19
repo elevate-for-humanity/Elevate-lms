@@ -52,7 +52,7 @@ export const NETWORK_SUPPORT: ProgramSchema = {
     { title: 'Network Support Technician', salary: '$38,000–$50,000' },
     { title: 'Network Administrator', salary: '$55,000–$75,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=network-support-technician',
     requestInfoHref: '/programs/network-support-technician/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=network+support+technician&location=Indiana', advisorHref: '/contact', courseHref: '/programs/network-support-technician' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior IT experience required'],

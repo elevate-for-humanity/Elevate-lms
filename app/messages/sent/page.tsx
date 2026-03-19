@@ -1,19 +1,27 @@
-'use client';
-
 import Link from 'next/link';
-import { Send, ArrowLeft, Mail, Trash2, Eye } from 'lucide-react';
+import { Send, ArrowLeft, Mail } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function SentMessagesPage() {
-  const sentMessages = [
-    { id: '1', to: 'Career Services', subject: 'Question about job placement', date: 'Jan 15, 2026', preview: 'I wanted to ask about the job placement...' },
-    { id: '2', to: 'Financial Aid', subject: 'Funding status inquiry', date: 'Jan 10, 2026', preview: 'Could you please provide an update on...' },
-    { id: '3', to: 'My Instructor', subject: 'Assignment clarification', date: 'Jan 5, 2026', preview: 'I have a question about the assignment...' },
-  ];
+export const dynamic = 'force-dynamic';
+
+export default async function SentMessagesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/messages/sent');
+
+  const { data: sent } = await supabase
+    .from('messages')
+    .select('id, subject, body, created_at, recipient_id, profiles!messages_recipient_id_fkey(full_name)')
+    .eq('sender_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const messages = sent ?? [];
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Messages', href: '/messages' }, { label: 'Sent' }]} />
@@ -21,50 +29,55 @@ export default function SentMessagesPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
+        <Link href="/messages" className="inline-flex items-center text-slate-600 hover:text-brand-blue-600 mb-6 text-sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Messages
         </Link>
 
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Send className="w-8 h-8 text-brand-blue-600 mr-3" />
-            <h1 className="text-2xl font-bold text-gray-900">Sent Messages</h1>
+          <div className="flex items-center gap-3">
+            <Send className="w-7 h-7 text-brand-blue-600" />
+            <h1 className="text-2xl font-bold text-slate-900">Sent Messages</h1>
           </div>
-          <span className="text-gray-500">{sentMessages.length} messages</span>
+          <span className="text-slate-500 text-sm">{messages.length} message{messages.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {sentMessages.length > 0 ? (
-            <div className="divide-y divide-gray-200">
-              {sentMessages.map((message) => (
-                <div key={message.id} className="p-4 hover:bg-white flex items-center">
-                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <Mail className="w-5 h-5 text-brand-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium text-gray-900">To: {message.to}</p>
-                      <span className="text-sm text-gray-500">{message.date}</span>
-                    </div>
-                    <p className="text-gray-900 truncate">{message.subject}</p>
-                    <p className="text-sm text-gray-500 truncate">{message.preview}</p>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition" title="View">
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-brand-red-600 transition" title="Delete">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          {messages.length === 0 ? (
+            <div className="py-16 text-center">
+              <Mail className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-600 font-medium mb-1">No sent messages</p>
+              <p className="text-slate-500 text-sm mb-5">Messages you send will appear here.</p>
+              <Link
+                href="/messages/new"
+                className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors"
+              >
+                Compose Message
+              </Link>
             </div>
           ) : (
-            <div className="p-12 text-center">
-              <Send className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">No sent messages</p>
+            <div className="divide-y divide-slate-100">
+              {messages.map((msg: any) => {
+                const recipientName = msg.profiles?.full_name ?? 'Recipient';
+                const preview = msg.body?.slice(0, 100) ?? '';
+                return (
+                  <div key={msg.id} className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-slate-600 text-xs font-bold">{recipientName.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <p className="font-semibold text-slate-900 text-sm truncate">To: {recipientName}</p>
+                        <span className="text-xs text-slate-400 flex-shrink-0">
+                          {new Date(msg.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      {msg.subject && <p className="text-sm text-slate-700 font-medium truncate">{msg.subject}</p>}
+                      <p className="text-xs text-slate-500 truncate mt-0.5">{preview}{msg.body?.length > 100 ? '…' : ''}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

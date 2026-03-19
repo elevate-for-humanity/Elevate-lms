@@ -23,6 +23,7 @@ export default async function MyCoursesPage() {
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses');
 
@@ -50,9 +51,8 @@ export default async function MyCoursesPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'LMS', href: '/lms/dashboard' }, { label: 'Courses' }]} />
       </div>
-
       {/* Hero */}
-      <section className="relative h-[200px] sm:h-[280px]">
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
         <Image
           src={LMS_HEROES.courses}
           alt="Training classroom"

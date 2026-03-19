@@ -174,7 +174,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   ],
 
   cta: {
-    applyHref: '/apply',
+    applyHref: '/apply?program=cybersecurity-analyst',
     requestInfoHref: '/programs/cybersecurity-analyst/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cybersecurity+analyst&location=Indiana',
     advisorHref: '/contact',

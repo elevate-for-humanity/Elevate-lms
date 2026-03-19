@@ -60,7 +60,7 @@ export const NAIL_TECH: ProgramSchema = {
     { title: 'Senior Nail Tech', salary: '$35,000–$55,000' },
     { title: 'Salon Owner', salary: '$45,000–$80,000+' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=nail-technician-apprenticeship',
     requestInfoHref: '/programs/nail-technician-apprenticeship/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=nail+technician&location=Indiana', advisorHref: '/contact', courseHref: '/programs/nail-technician-apprenticeship' },
   admissionRequirements: ['16 years or older', 'High school diploma or GED (or actively pursuing)', 'Interest in nail technology career'],

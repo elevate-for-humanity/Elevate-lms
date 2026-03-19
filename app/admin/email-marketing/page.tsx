@@ -165,89 +165,13 @@ export default function EmailMarketingPage() {
               </button>
             </div>
 
-            {/* Campaign List */}
-            <div className="space-y-3">
-              {[
-                {
-                  name: 'New CNA Program Launch',
-                  status: 'Sent',
-                  sent: 'Dec 5, 2025',
-                  recipients: 456,
-                  opens: '45.2%',
-                  clicks: '12.3%',
-                },
-                {
-                  name: 'Barber Apprenticeship Enrollment',
-                  status: 'Scheduled',
-                  sent: 'Dec 10, 2025',
-                  recipients: 234,
-                  opens: '-',
-                  clicks: '-',
-                },
-                {
-                  name: 'HVAC Program Update',
-                  status: 'Draft',
-                  sent: '-',
-                  recipients: 0,
-                  opens: '-',
-                  clicks: '-',
-                },
-              ].map((campaign, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-xl bg-white p-6 shadow-sm border border-slate-200 hover:border-slate-300 transition cursor-pointer"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-black">
-                          {campaign.name}
-                        </h3>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            campaign.status === 'Sent'
-                              ? 'bg-brand-green-100 text-brand-green-800'
-                              : campaign.status === 'Scheduled'
-                                ? 'bg-brand-blue-100 text-brand-blue-800'
-                                : 'bg-slate-100 text-black'
-                          }`}
-                        >
-                          {campaign.status}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <div className="text-slate-500">Sent</div>
-                          <div className="font-semibold text-black">
-                            {campaign.sent}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-500">Recipients</div>
-                          <div className="font-semibold text-black">
-                            {campaign.recipients}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-500">Opens</div>
-                          <div className="font-semibold text-black">
-                            {campaign.opens}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-500">Clicks</div>
-                          <div className="font-semibold text-black">
-                            {campaign.clicks}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <button className="ml-4 text-sm font-semibold text-brand-orange-600 hover:text-brand-orange-700" aria-label="Action button">
-                      View →
-                    </button>
-                  </div>
-                </div>
-              ))}
+            {/* Campaign List — populated from DB when campaigns are created */}
+            <div className="rounded-xl bg-slate-50 border border-slate-200 p-10 text-center">
+              <Mail className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="font-semibold text-slate-700 mb-1">No campaigns yet</p>
+              <p className="text-sm text-slate-500">
+                Create your first campaign using the button above. Sent, scheduled, and draft campaigns will appear here.
+              </p>
             </div>
           </div>
         )}

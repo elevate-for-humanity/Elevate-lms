@@ -21,6 +21,10 @@ import { DIESEL_MECHANIC } from './diesel-mechanic';
 import { FORKLIFT } from './forklift';
 import { COSMETOLOGY } from './cosmetology-apprenticeship';
 import { NAIL_TECH } from './nail-technician-apprenticeship';
+import { BEAUTY_CAREER_EDUCATOR } from './beauty-career-educator';
+import { EMERGENCY_HEALTH_SAFETY } from './emergency-health-safety';
+import { HOME_HEALTH_AIDE } from './home-health-aide';
+import { ESTHETICIAN } from './esthetician';
 import { CULINARY } from './culinary-apprenticeship';
 import { CPR_FIRST_AID } from './cpr-first-aid';
 import { SANITATION } from './sanitation-infection-control';
@@ -46,6 +50,8 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   PEER_RECOVERY,
   CPR_FIRST_AID,
   SANITATION,
+  EMERGENCY_HEALTH_SAFETY,
+  HOME_HEALTH_AIDE,
   // Skilled Trades
   HVAC_TECHNICIAN,
   ELECTRICAL,
@@ -61,6 +67,8 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   COSMETOLOGY,
   NAIL_TECH,
   CULINARY,
+  BEAUTY_CAREER_EDUCATOR,
+  ESTHETICIAN,
   // Technology
   IT_HELP_DESK,
   CYBERSECURITY_ANALYST,

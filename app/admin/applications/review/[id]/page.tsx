@@ -29,6 +29,8 @@ const statusColors: Record<string, string> = {
   rejected: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
   in_review: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
   enrolled: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  // revoked is a derived state (revoked_at IS NOT NULL), not a DB status value
+  revoked: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
 };
 
 export default async function ReviewApplicationPage({
@@ -80,6 +82,10 @@ export default async function ReviewApplicationPage({
     app.full_name ||
     'Unknown Applicant';
 
+  // Effective status: revoked_at IS NOT NULL overrides the DB status value.
+  // applications.status stays 'enrolled' (terminal) after revocation.
+  const effectiveStatus = app.revoked_at ? 'revoked' : app.status;
+
   // Resolve program_interest slug to a training_courses ID for enrollment creation
   const programSlug = (app.program_interest || '') as string;
   let resolvedProgramId: string | null = null;
@@ -120,9 +126,9 @@ export default async function ReviewApplicationPage({
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-gray-900">{displayName}</h1>
               <span
-                className={`inline-flex px-3 py-1 text-sm font-medium rounded-full border ${statusColors[app.status] || 'bg-gray-100 text-gray-800 border-gray-300'}`}
+                className={`inline-flex px-3 py-1 text-sm font-medium rounded-full border ${statusColors[effectiveStatus] || 'bg-gray-100 text-gray-800 border-gray-300'}`}
               >
-                {statusLabels[app.status] || app.status}
+                {effectiveStatus === 'revoked' ? 'Revoked' : (statusLabels[app.status] || app.status)}
               </span>
             </div>
             <p className="text-gray-600">{app.email}</p>
@@ -241,6 +247,14 @@ export default async function ReviewApplicationPage({
                     <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
                     <dd className="text-sm text-gray-900">
                       {new Date(app.updated_at).toLocaleString('en-US')}
+                    </dd>
+                  </div>
+                )}
+                {app.revoked_at && (
+                  <div className="pt-2 border-t border-red-200">
+                    <dt className="text-sm font-medium text-brand-red-600">Revoked</dt>
+                    <dd className="text-sm text-brand-red-700">
+                      {new Date(app.revoked_at).toLocaleString('en-US')}
                     </dd>
                   </div>
                 )}

@@ -16,6 +16,7 @@ const STATUS_LABELS: Record<string, string> = {
   clinical:   'Clinical',
   completed:  'Completed',
   withdrawn:  'Withdrawn',
+  revoked:    'Revoked',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -24,6 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
   clinical:  'bg-purple-100 text-purple-800',
   completed: 'bg-green-100 text-green-800',
   withdrawn: 'bg-slate-100 text-slate-600',
+  revoked:   'bg-red-100 text-red-700',
 };
 
 export default async function CMIDashboardPage() {
@@ -47,7 +49,10 @@ export default async function CMIDashboardPage() {
     redirect('/admin');
   }
 
-  // Fetch CMI students with linked application data
+  // Fetch CMI students with linked application data.
+  // applications.revoked_at is the authoritative revocation signal —
+  // cmi_students.status = 'withdrawn' alone is not sufficient because
+  // a student can withdraw voluntarily without being revoked.
   const { data: students, error } = await db
     .from('cmi_students')
     .select(`
@@ -63,14 +68,20 @@ export default async function CMIDashboardPage() {
         last_name,
         email,
         phone,
-        program_slug
+        program_slug,
+        revoked_at,
+        revoked_by
       )
     `)
     .order('enrolled_at', { ascending: false });
 
-  // Summary counts
+  // Summary counts — revoked is a derived state, not a cmi_students.status value
   const counts = (students ?? []).reduce<Record<string, number>>((acc, s) => {
-    acc[s.status] = (acc[s.status] ?? 0) + 1;
+    const app = Array.isArray(s.applications) ? s.applications[0] : s.applications;
+    const effectiveStatus = (app as { revoked_at?: string | null } | null)?.revoked_at
+      ? 'revoked'
+      : s.status;
+    acc[effectiveStatus] = (acc[effectiveStatus] ?? 0) + 1;
     return acc;
   }, {});
 
@@ -135,16 +146,23 @@ export default async function CMIDashboardPage() {
             <tbody className="divide-y divide-slate-100">
               {students.map((s) => {
                 const app = Array.isArray(s.applications) ? s.applications[0] : s.applications;
-                const name = app
-                  ? `${app.first_name ?? ''} ${app.last_name ?? ''}`.trim()
+                const typedApp = app as {
+                  first_name?: string; last_name?: string; email?: string;
+                  revoked_at?: string | null; revoked_by?: string | null;
+                } | null;
+                const name = typedApp
+                  ? `${typedApp.first_name ?? ''} ${typedApp.last_name ?? ''}`.trim()
                   : s.user_id?.slice(0, 8) ?? '—';
-                const email = app?.email ?? '—';
+                const email = typedApp?.email ?? '—';
                 const enrolledDate = new Date(s.enrolled_at).toLocaleDateString('en-US', {
                   month: 'short', day: 'numeric', year: 'numeric',
                 });
+                // Revoked is derived from applications.revoked_at, not cmi_students.status
+                const effectiveStatus = typedApp?.revoked_at ? 'revoked' : s.status;
+                const isRevoked = effectiveStatus === 'revoked';
 
                 return (
-                  <tr key={s.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={s.id} className={`hover:bg-slate-50 transition-colors ${isRevoked ? 'opacity-60' : ''}`}>
                     <td className="px-6 py-4">
                       <p className="font-medium text-slate-900">{name}</p>
                       <p className="text-xs text-slate-500">{email}</p>
@@ -153,9 +171,16 @@ export default async function CMIDashboardPage() {
                       {s.cohort ?? <span className="text-slate-400">Unassigned</span>}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[s.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                        {STATUS_LABELS[s.status] ?? s.status}
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[effectiveStatus] ?? 'bg-slate-100 text-slate-600'}`}>
+                        {STATUS_LABELS[effectiveStatus] ?? effectiveStatus}
                       </span>
+                      {isRevoked && typedApp?.revoked_at && (
+                        <p className="mt-0.5 text-xs text-red-500">
+                          {new Date(typedApp.revoked_at).toLocaleDateString('en-US', {
+                            month: 'short', day: 'numeric', year: 'numeric',
+                          })}
+                        </p>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-slate-600">{enrolledDate}</td>
                     <td className="px-6 py-4">

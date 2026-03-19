@@ -259,11 +259,13 @@ Three programs have `has_lms_course=false` because they were seeded via `curricu
 
 | Slug | Title | Blocker |
 |------|-------|---------|
-| `peer-recovery-specialist` | Peer Recovery Specialist | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
-| `bookkeeping` | Bookkeeping | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
-| `cna` | Certified Nursing Assistant | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
+| `peer-recovery-specialist` | Peer Recovery Specialist | Empty — was always a dead slug. No content anywhere. Needs content authored from scratch. |
+| `bookkeeping` | Bookkeeping | No content in `curriculum_lessons` or `training_lessons`. Needs content authored from scratch. |
+| `cna` | Certified Nursing Assistant | No content in `curriculum_lessons` or `training_lessons`. Needs content authored from scratch. |
 
-**Migration order:** Run `peer-recovery-specialist` first (most content-complete). Verify with `pnpm lms:test:integrity` after each. Do not set `has_lms_course=true` until `createAndPublishProgram()` succeeds and `validate-lms-integrity.ts` passes.
+**These are not migration candidates — they are content authoring gaps.** There is nothing to migrate. Content must be authored first (via blueprint + `createAndPublishProgram()`), then `has_lms_course` set to `true` after `validate-lms-integrity.ts` passes.
+
+**Proven migration pattern** (for programs that DO have content in `curriculum_lessons`): see `scripts/migrate-prs-jri-to-canonical.ts`. PRS-JRI was migrated this way — 8 modules, 39 lessons, published first pass.
 
 ### Lab / Assignment Instructor Sign-Off UI
 

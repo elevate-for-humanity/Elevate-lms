@@ -101,7 +101,7 @@ export default async function LmsProgramsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {programs.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center max-w-lg mx-auto">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Programs launching soon</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">More programs enrolling now</h2>
               <p className="text-slate-700 text-sm mb-6">
                 No published programs are available yet. If you&apos;re already enrolled, sign in to access your training.
               </p>

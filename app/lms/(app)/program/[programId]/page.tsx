@@ -72,8 +72,8 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
 
   // Get courses for this program
   const { data: courses } = await db
-    .from('training_courses')
-    .select('id, course_name, description, duration_hours, is_active')
+    .from('courses')
+    .select('id, title, description, is_active')
     .eq('program_id', program.id)
     .order('created_at', { ascending: true });
 
@@ -211,7 +211,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
               >
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
-                    {course.course_name}
+                    {course.title}
                   </h3>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600 transition flex-shrink-0" />
                 </div>
@@ -232,7 +232,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-full bg-white rounded-full h-2 mb-1">
+                <div className="w-full bg-slate-200 rounded-full h-2 mb-1">
                   <div
                     className={`h-2 rounded-full transition-all ${
                       course.percent === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
@@ -318,7 +318,7 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-3">
           <Link
-            href="/learner/dashboard"
+            href="/lms/dashboard"
             className="bg-white rounded-xl border p-4 hover:border-brand-blue-300 transition text-center"
           >
             <span className="text-sm font-medium text-gray-700">Back to Dashboard</span>

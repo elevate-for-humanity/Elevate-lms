@@ -1,5 +1,7 @@
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { setAuditContext } from '@/lib/audit-context';
 
 export interface EnrollmentData {
   userId: string;
@@ -22,71 +24,91 @@ export interface EnrollmentResult {
 }
 
 /**
- * Complete enrollment flow - Production ready
- * Based on Docebo/Cornerstone patterns
+ * Canonical enrollment flow.
+ *
+ * Reads from:  courses (canonical), program_enrollments (canonical)
+ * Writes to:   program_enrollments (canonical)
+ *
+ * Does NOT touch training_courses, training_enrollments, or course_progress.
  */
 export async function completeEnrollment(data: EnrollmentData): Promise<EnrollmentResult> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
+  const supabase = admin || (await createClient());
 
   try {
-    // Step 1: Verify user exists and is active
+    // Step 1: Verify user exists
     const { data: user, error: userError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, email')
       .eq('id', data.userId)
       .single();
 
     if (userError || !user) {
-      return { success: false, error: 'User not found or inactive' };
+      return { success: false, error: 'User not found' };
     }
 
-    // Step 2: Verify course exists and is available
+    // Step 2: Verify course exists and is published — canonical table only
     const { data: course, error: courseError } = await supabase
-      .from('training_courses')
-      .select('*')
+      .from('courses')
+      .select('id, title, slug, status, is_active')
       .eq('id', data.courseId)
       .single();
 
     if (courseError || !course) {
-      return { success: false, error: 'Course not found or unavailable' };
+      return { success: false, error: 'Course not found' };
     }
 
-    // Step 3: Check if already enrolled
+    if (course.status !== 'published' || !course.is_active) {
+      return { success: false, error: 'Course is not available for enrollment' };
+    }
+
+    // Step 3: Check for existing enrollment — canonical table only
     const { data: existing } = await supabase
-      .from('training_enrollments')
-      .select('id')
+      .from('program_enrollments')
+      .select('id, status')
       .eq('user_id', data.userId)
       .eq('course_id', data.courseId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
-      return { success: false, error: 'Already enrolled in this course' };
+      // Idempotent: already enrolled — return success with existing ID
+      return {
+        success: true,
+        enrollmentId: existing.id,
+        courseAccessUrl: `/lms/courses/${data.courseId}`,
+      };
     }
 
-    // Step 4: Check prerequisites (if any)
-    if (course.prerequisites && course.prerequisites.length > 0) {
-      const { data: completedCourses } = await supabase
-        .from('training_enrollments')
-        .select('course_id')
-        .eq('user_id', data.userId)
-        .eq('status', 'completed')
-        .in('course_id', course.prerequisites);
+    // Step 4: Resolve latest published course version
+    const { data: version } = await supabase
+      .from('course_versions')
+      .select('id')
+      .eq('course_id', data.courseId)
+      .eq('is_published', true)
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .catch(() => ({ data: null })) as { data: { id: string } | null };
 
-      if (!completedCourses || completedCourses.length < course.prerequisites.length) {
-        return { success: false, error: 'Prerequisites not met' };
-      }
-    }
+    // Step 5: Resolve program_slug — required by DB trigger on program_enrollments
+    // Look up the course slug directly (courses.slug matches programs.slug for canonical courses)
+    const programSlug = course.slug ?? data.programId ?? null;
 
-    // Step 5: Create training enrollment
+    // Step 6: Create enrollment — canonical table
+    await setAuditContext(supabase, { actorUserId: data.userId, systemActor: 'enrollment_flow' });
     const enrollmentStatus = data.requireApproval ? 'pending_approval' : 'active';
     const { data: enrollment, error: enrollError } = await supabase
-      .from('training_enrollments')
+      .from('program_enrollments')
       .insert({
-        user_id: data.userId,
-        course_id: data.courseId,
-        status: enrollmentStatus,
-        progress: 0,
-        enrolled_at: new Date().toISOString(),
+        user_id:           data.userId,
+        course_id:         data.courseId,
+        program_id:        data.programId ?? null,
+        program_slug:      programSlug,
+        course_version_id: version?.id ?? null,
+        status:            enrollmentStatus,
+        progress_percent:  0,
+        enrolled_at:       new Date().toISOString(),
+        funding_source:    data.paymentMethod ?? null,
       })
       .select('id')
       .single();
@@ -96,40 +118,23 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       return { success: false, error: 'Failed to create enrollment' };
     }
 
-    // Step 6: Initialize progress tracking
-    const { error: progressError } = await supabase
-      .from('course_progress')
-      .insert({
-        enrollment_id: enrollment.id,
-        user_id: data.userId,
-        course_id: data.courseId,
-        completed_lessons: [],
-        current_lesson: null,
-        last_accessed: new Date().toISOString(),
-      });
-
-    if (progressError) {
-      logger.error('Progress tracking initialization failed', progressError);
-    }
-
-    // Step 7: Send welcome email (async, don't wait)
-    sendEnrollmentEmail(user.email, course.title, enrollment.id).catch(err => {
-      logger.error('Welcome email failed', err);
-    });
-
-    // Step 8: Log enrollment event
-    await supabase
+    // Step 6: Audit log (fire-and-forget)
+    supabase
       .from('audit_logs')
       .insert({
-        user_id: data.userId,
-        action: 'enrollment_created',
+        user_id:       data.userId,
+        action:        'enrollment_created',
         resource_type: 'enrollment',
-        resource_id: enrollment.id,
+        resource_id:   enrollment.id,
         metadata: {
-          course_id: data.courseId,
+          course_id:    data.courseId,
           course_title: course.title,
+          version_id:   version?.id ?? null,
+          table:        'program_enrollments',
         },
-      });
+      })
+      .then(() => {})
+      .catch((err: unknown) => logger.error('Audit log failed', err));
 
     return {
       success: true,
@@ -137,37 +142,26 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       courseAccessUrl: `/lms/courses/${data.courseId}`,
     };
 
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) {
     logger.error('Enrollment flow error', error);
-    return {
-      success: false,
-      error: 'An unexpected error occurred during enrollment',
-    };
+    return { success: false, error: 'An unexpected error occurred during enrollment' };
   }
 }
 
 /**
- * Send enrollment confirmation email
- */
-async function sendEnrollmentEmail(email: string, courseTitle: string, enrollmentId: string) {
-  logger.info('Sending enrollment email', { email, courseTitle, enrollmentId });
-}
-
-/**
- * Verify course access - call this before showing course content
+ * Verify course access — reads program_enrollments (canonical).
  */
 export async function verifyCourseAccess(userId: string, courseId: string): Promise<boolean> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
+  const supabase = admin || (await createClient());
 
   const { data: enrollment } = await supabase
-    .from('training_enrollments')
+    .from('program_enrollments')
     .select('status')
     .eq('user_id', userId)
     .eq('course_id', courseId)
-    .single();
+    .maybeSingle();
 
   if (!enrollment) return false;
-  if (enrollment.status !== 'active' && enrollment.status !== 'completed') return false;
-
-  return true;
+  return ['active', 'completed', 'confirmed'].includes(enrollment.status);
 }

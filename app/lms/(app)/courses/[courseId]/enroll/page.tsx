@@ -30,13 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const { data: course } = await db
-    .from('training_courses')
-    .select('course_name')
+    .from('courses')
+    .select('title')
     .eq('id', courseId)
     .single();
 
   return {
-    title: course ? `Enroll in ${course.course_name} | Elevate LMS` : 'Enroll | Elevate LMS',
+    title: course ? `Enroll in ${course.title} | Elevate LMS` : 'Enroll | Elevate LMS',
     description: 'Enroll in this course to start learning.',
   };
 }
@@ -63,10 +63,10 @@ export default async function CourseEnrollPage({ params }: Props) {
     redirect('/login?redirect=/lms/courses/' + courseId + '/enroll');
   }
 
-  // Fetch course details
+  // Fetch course details — canonical courses table
   const { data: course, error } = await db
-    .from('training_courses')
-    .select('*')
+    .from('courses')
+    .select('id, title, description, short_description, status, is_active, program_id')
     .eq('id', courseId)
     .single();
 
@@ -74,15 +74,25 @@ export default async function CourseEnrollPage({ params }: Props) {
     notFound();
   }
 
-  // Check if already enrolled — training_enrollments is the canonical LMS enrollment table
-  const { data: existingEnrollment } = await db
-    .from('training_enrollments')
+  // Check if already enrolled — match on course_id OR program_id
+  const { data: existingByCourse } = await db
+    .from('program_enrollments')
     .select('id, status')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
 
-  if (existingEnrollment) {
+  const existingByProgram = course.program_id
+    ? await db
+        .from('program_enrollments')
+        .select('id, status')
+        .eq('user_id', user.id)
+        .eq('program_id', course.program_id)
+        .maybeSingle()
+        .then(r => r.data)
+    : null;
+
+  if (existingByCourse || existingByProgram) {
     redirect(`/lms/courses/${courseId}`);
   }
 
@@ -93,19 +103,19 @@ export default async function CourseEnrollPage({ params }: Props) {
     .eq('id', user.id)
     .single();
 
-  // Get lesson count
+  // Get lesson count from canonical table
   const { count: lessonCount } = await db
-    .from('training_lessons')
-    .select('*', { count: 'exact', head: true })
+    .from('course_lessons')
+    .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
   // Get enrolled student count
   const { count: studentCount } = await db
-    .from('training_enrollments')
-    .select('*', { count: 'exact', head: true })
+    .from('program_enrollments')
+    .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
-  const isFree = !course.price || course.price === 0;
+  const isFree = true; // pricing handled at program level
 
   return (
     <div className="min-h-screen bg-white py-8">
@@ -124,7 +134,7 @@ export default async function CourseEnrollPage({ params }: Props) {
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl border border-slate-200 p-8">
               <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                Enroll in {course.course_name}
+                Enroll in {course.title}
               </h1>
               <p className="text-slate-600 mb-8">
                 Complete your enrollment to start learning immediately.
@@ -132,7 +142,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
               <EnrollmentForm 
                 courseId={courseId}
-                courseName={course.course_name}
+                courseName={course.title}
                 price={course.price || 0}
                 userEmail={profile?.email || user.email || ''}
                 userName={profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : ''}
@@ -148,7 +158,7 @@ export default async function CourseEnrollPage({ params }: Props) {
                 <div className="relative h-40">
                   <Image
                     src={course.thumbnail_url}
-                    alt={course.course_name}
+                    alt={course.title}
                     fill
                     className="object-cover"
                   />
@@ -160,7 +170,7 @@ export default async function CourseEnrollPage({ params }: Props) {
               )}
 
               <div className="p-6">
-                <h2 className="font-bold text-lg text-slate-900 mb-4">{course.course_name}</h2>
+                <h2 className="font-bold text-lg text-slate-900 mb-4">{course.title}</h2>
 
                 {/* Price */}
                 <div className="mb-6">

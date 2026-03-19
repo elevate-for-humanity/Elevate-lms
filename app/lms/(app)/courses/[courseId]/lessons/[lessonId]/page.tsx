@@ -101,8 +101,8 @@ export default function LessonPage() {
       .order('order_index');
 
     const { data: courseData } = await supabase
-      .from('training_courses')
-      .select('*')
+      .from('courses')
+      .select('id, title, description, short_description, status')
       .eq('id', courseId)
       .single();
 
@@ -340,7 +340,7 @@ export default function LessonPage() {
             Course access is locked until an admin approves your enrollment.
           </p>
           <Link
-            href="/learner/dashboard"
+            href="/lms/dashboard"
             className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700"
           >
             Back to Dashboard
@@ -401,10 +401,15 @@ export default function LessonPage() {
   }
 
   return (
-    <div className="flex h-[100dvh] bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Lms", href: "/lms" }, { label: "[Lessonid]" }]} />
+    <div className="flex flex-col h-[100dvh] bg-white">
+      <div className="px-4 py-2 border-b border-slate-100 bg-white flex-shrink-0">
+        <Breadcrumbs items={[
+          { label: "Dashboard", href: "/lms/dashboard" },
+          { label: course?.title || "Course", href: `/lms/courses/${courseId}` },
+          { label: lesson.title },
+        ]} />
       </div>
+      <div className="flex flex-1 overflow-hidden">
 {/* Mobile Sidebar Toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -869,18 +874,18 @@ export default function LessonPage() {
           <div className="mb-8">
             {activeTab === 'overview' && (
               <div className="prose max-w-none">
-                <p className="text-black text-lg leading-relaxed">
-                  {lesson.description}
+                <p className="text-slate-700 text-base leading-relaxed">
+                  {lesson.description || 'Complete this lesson to continue your progress.'}
                 </p>
               </div>
             )}
 
             {activeTab === 'resources' && (
               <div className="space-y-3">
-                {lesson.resources.map((resource: any, idx: number) => (
+                {lesson.resources?.length > 0 ? lesson.resources.map((resource: any, idx: number) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-white transition"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-slate-50 transition"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
@@ -902,20 +907,17 @@ export default function LessonPage() {
                       Download
                     </a>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-10 text-slate-400">
+                    <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                    <p className="text-sm">No downloadable resources for this lesson.</p>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === 'notes' && (
-              <div>
-                <textarea
-                  placeholder="Take notes while you learn..."
-                  className="w-full h-64 p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                />
-                <button className="mt-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-2 rounded-lg font-semibold" aria-label="Action button">
-                  Save Notes
-                </button>
-              </div>
+              <NoteTaking courseId={courseId} lessonId={lessonId} />
             )}
           </div>
 
@@ -974,16 +976,12 @@ export default function LessonPage() {
             </button>
           </div>
 
-          {/* Note Taking */}
-          <div className="mt-8">
-            <NoteTaking courseId={courseId} lessonId={lessonId} />
-          </div>
-
           {/* Digital Binder */}
           <div className="mt-8">
             <DigitalBinder />
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

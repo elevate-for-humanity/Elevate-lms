@@ -18,9 +18,9 @@ type Params = Promise<{ courseId: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { courseId } = await params;
   const db = createAdminClient();
-  const { data: course } = await db.from('training_courses').select('course_name, description').eq('id', courseId).single();
+  const { data: course } = await db.from('courses').select('title, description').eq('id', courseId).single();
   return {
-    title: course ? `${course.course_name} | Elevate LMS` : 'Course | Elevate LMS',
+    title: course ? `${course.title} | Elevate LMS` : 'Course | Elevate LMS',
     description: course?.description || 'View course details and lessons.',
   };
 }
@@ -49,12 +49,20 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses/' + courseId);
 
-  const { data: course, error } = await db.from('training_courses').select('*').eq('id', courseId).single();
+  const { data: course, error } = await db.from('courses').select('id, title, description, short_description, status, is_active, program_id').eq('id', courseId).single();
   if (error || !course) notFound();
 
+  // Pull richer metadata from programs table when available
+  const { data: program } = course.program_id
+    ? await db.from('programs').select('image_url, hero_image_url, credential_name, credential_type, credential').eq('id', course.program_id).single()
+    : { data: null };
+
+  const heroImage = program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.jpg';
+  const credentialName = program?.credential_name || program?.credential || null;
+
   const { data: enrollment } = await db
-    .from('training_enrollments')
-    .select('status, approved_at')
+    .from('program_enrollments')
+    .select('status, enrolled_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
@@ -90,8 +98,8 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* HERO — image only, no text on top */}
       <div className="relative h-[280px] sm:h-[360px] w-full overflow-hidden">
         <Image
-          src={course.thumbnail_url || '/images/pages/hvac-unit.jpg'}
-          alt={course.course_name}
+          src={heroImage}
+          alt={course.title}
           fill
           className="object-cover object-center"
           priority
@@ -102,17 +110,17 @@ export default async function CoursePage({ params }: { params: Params }) {
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
-            <Link href="/learner/dashboard" className="hover:text-slate-700">Dashboard</Link>
+            <Link href="/lms/dashboard" className="hover:text-slate-700">Dashboard</Link>
             <ChevronRight className="w-3 h-3" />
-            <Link href="/learner/courses" className="hover:text-slate-700">My Courses</Link>
+            <Link href="/lms/courses" className="hover:text-slate-700">My Courses</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-700 font-medium">{course.course_name}</span>
+            <span className="text-slate-700 font-medium">{course.title}</span>
           </nav>
 
           <div className="flex flex-col lg:flex-row lg:items-start gap-8">
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
-                {course.course_name}
+                {course.title}
               </h1>
               {course.description && (
                 <p className="text-slate-600 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl">
@@ -131,12 +139,11 @@ export default async function CoursePage({ params }: { params: Params }) {
                   </span>
                 ))}
               </div>
-              {course.certification_name && (
+              {credentialName && (
                 <div className="inline-flex items-center gap-2 bg-slate-900 rounded-xl px-4 py-2.5">
                   <Award className="w-4 h-4 text-white flex-shrink-0" />
                   <p className="text-sm text-white font-semibold">
-                    Prepares for {course.certification_name}
-                    {course.certification_body && <span className="font-normal opacity-70"> · {course.certification_body}</span>}
+                    Prepares for {credentialName}
                   </p>
                 </div>
               )}
@@ -286,8 +293,8 @@ export default async function CoursePage({ params }: { params: Params }) {
                 <h2 className="text-xl font-extrabold text-slate-900 mb-4">AI Study Assistant</h2>
                 <AIInstructor
                   courseId={courseId}
-                  courseName={course.course_name}
-                  systemPrompt="You are an expert HVAC instructor helping students prepare for EPA 608 certification. Answer questions clearly and accurately."
+                  courseName={course.title}
+                  systemPrompt={`You are an expert instructor for the "${course.title}" course. Help students understand the material, answer questions clearly and accurately, and guide them toward successful completion.`}
                 />
               </div>
             )}
@@ -310,7 +317,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                   { label: 'Duration', value: totalHours > 0 ? `${totalHours}h ${remainingMinutes}m` : `${remainingMinutes}m` },
                   { label: 'Checkpoints', value: checkpoints.length },
                   { label: 'Certificate', value: 'Yes' },
-                  { label: 'Level', value: course.difficulty_level || 'Beginner' },
+                  { label: 'Level', value: 'Beginner' },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between">
                     <dt className="text-sm text-slate-500">{label}</dt>
@@ -320,30 +327,39 @@ export default async function CoursePage({ params }: { params: Params }) {
               </dl>
             </div>
 
-            {course.certification_name && (
+            {credentialName && (
               <div className="rounded-xl border border-slate-200 p-5">
                 <h3 className="font-bold text-slate-900 mb-3">Credential</h3>
                 <div className="flex items-start gap-3">
                   <Award className="w-5 h-5 text-brand-orange-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">{course.certification_name}</p>
-                    {course.certification_body && <p className="text-xs text-slate-500 mt-0.5">{course.certification_body}</p>}
+                    <p className="text-sm font-semibold text-slate-900">{credentialName}</p>
+                    {program?.credential_type && <p className="text-xs text-slate-500 mt-0.5">{program.credential_type}</p>}
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="rounded-xl border border-slate-200 p-5">
-              <h3 className="font-bold text-slate-900 mb-3">Aligned With</h3>
-              <div className="space-y-2">
-                {['EPA 608', 'ASHRAE Standards', 'DOL Apprenticeship'].map(s => (
-                  <div key={s} className="flex items-center gap-2">
-                    <Shield className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-sm text-slate-700">{s}</span>
+            {(() => {
+              const standards: string[] = Array.isArray(course.standards_alignment)
+                ? course.standards_alignment
+                : typeof course.standards_alignment === 'string' && course.standards_alignment
+                  ? [course.standards_alignment]
+                  : [];
+              return standards.length > 0 ? (
+                <div className="rounded-xl border border-slate-200 p-5">
+                  <h3 className="font-bold text-slate-900 mb-3">Aligned With</h3>
+                  <div className="space-y-2">
+                    {standards.map((s: string) => (
+                      <div key={s} className="flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-sm text-slate-700">{s}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              ) : null;
+            })()}
 
             {!enrollment && (
               <Link

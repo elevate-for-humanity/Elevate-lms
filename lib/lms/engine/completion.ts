@@ -12,6 +12,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { setAuditContext } from '@/lib/audit-context';
 import type { StepCompletionResult, CheckpointAttemptResult } from './types';
 import { issueCertificateIfEligible } from './certificate';
 import { isCheckpointGateError, CheckpointGateError } from './gate';
@@ -62,9 +63,9 @@ export async function recordStepCompletion(
     throw new Error(`recordStepCompletion: ${progressError.message}`);
   }
 
-  // Recalculate progress %
+  // Recalculate progress % — canonical table: course_lessons
   const [{ data: allLessons }, { data: completedLessons }] = await Promise.all([
-    db.from('curriculum_lessons').select('id').eq('course_id', courseId).eq('status', 'published'),
+    db.from('course_lessons').select('id').eq('course_id', courseId),
     db.from('lesson_progress').select('id').eq('user_id', userId).eq('course_id', courseId).eq('completed', true),
   ]);
 
@@ -75,19 +76,30 @@ export async function recordStepCompletion(
     : 0;
   const courseCompleted = progressPercent === 100 && totalLessons > 0;
 
-  // Persist progress % on enrollment
-  const { error: rpcError } = await db.rpc('update_enrollment_progress_manual', {
-    p_user_id:  userId,
-    p_course_id: courseId,
-    p_progress: progressPercent,
-  });
-  if (rpcError) {
-    // Fallback direct update
-    await db
-      .from('training_enrollments')
-      .update({ progress: progressPercent, updated_at: new Date().toISOString() })
-      .eq('user_id', userId)
-      .eq('course_id', courseId);
+  // Persist progress % — canonical table: program_enrollments
+  // Try by course_id first (direct enrollment), then by program_id (program-level enrollment).
+  await setAuditContext(db, { actorUserId: userId, systemActor: 'lms_completion_engine' });
+  const { error: directUpdateError } = await db
+    .from('program_enrollments')
+    .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .eq('course_id', courseId);
+
+  if (directUpdateError) {
+    // Fallback: program-level enrollment — resolve program_id from courses
+    const { data: courseRow } = await db
+      .from('courses')
+      .select('program_id')
+      .eq('id', courseId)
+      .maybeSingle();
+
+    if (courseRow?.program_id) {
+      await db
+        .from('program_enrollments')
+        .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('program_id', courseRow.program_id);
+    }
   }
 
   // Auto-issue certificate when course is complete
@@ -132,9 +144,9 @@ export async function recordStepUncompletion(
 
   if (error) throw new Error(`recordStepUncompletion: ${error.message}`);
 
-  // Recalculate progress %
+  // Recalculate progress % — canonical table: course_lessons
   const [{ data: allLessons }, { data: completedLessons }] = await Promise.all([
-    db.from('curriculum_lessons').select('id').eq('course_id', courseId).eq('status', 'published'),
+    db.from('course_lessons').select('id').eq('course_id', courseId),
     db.from('lesson_progress').select('id').eq('user_id', userId).eq('course_id', courseId).eq('completed', true),
   ]);
 
@@ -144,17 +156,27 @@ export async function recordStepUncompletion(
     ? Math.round((completedCount / totalLessons) * 100)
     : 0;
 
-  const { error: rpcError } = await db.rpc('update_enrollment_progress_manual', {
-    p_user_id:   userId,
-    p_course_id: courseId,
-    p_progress:  progressPercent,
-  });
-  if (rpcError) {
-    await db
-      .from('training_enrollments')
-      .update({ progress: progressPercent, updated_at: new Date().toISOString() })
-      .eq('user_id', userId)
-      .eq('course_id', courseId);
+  // Persist progress % — canonical table: program_enrollments
+  const { error: directUpdateError } = await db
+    .from('program_enrollments')
+    .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .eq('course_id', courseId);
+
+  if (directUpdateError) {
+    const { data: courseRow } = await db
+      .from('courses')
+      .select('program_id')
+      .eq('id', courseId)
+      .maybeSingle();
+
+    if (courseRow?.program_id) {
+      await db
+        .from('program_enrollments')
+        .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('program_id', courseRow.program_id);
+    }
   }
 
   return { progressPercent };
@@ -186,13 +208,27 @@ export async function recordCheckpointAttempt(
   const attemptNumber = (prior?.attempt_number ?? 0) + 1;
   const passed = score >= passingScore;
 
+  // Resolve module_order from course_modules if not provided or zero.
+  // module_order is required (NOT NULL) on checkpoint_scores.
+  let resolvedModuleOrder = moduleOrder;
+  if (!resolvedModuleOrder) {
+    const { data: lessonRow } = await db
+      .from('course_lessons')
+      .select('course_modules(order_index)')
+      .eq('id', lessonId)
+      .maybeSingle();
+    resolvedModuleOrder = (lessonRow as any)?.course_modules?.order_index ?? 1;
+  }
+
+  // NOTE: checkpoint_scores.passed is a generated column (score >= passing_score).
+  // Do NOT include it in the insert — Postgres computes it automatically.
   const { error } = await db.from('checkpoint_scores').insert({
-    user_id:       userId,
-    lesson_id:     lessonId,
-    course_id:     courseId,
-    module_order:  moduleOrder,
+    user_id:        userId,
+    lesson_id:      lessonId,
+    course_id:      courseId,
+    module_order:   resolvedModuleOrder,
     score,
-    passing_score: passingScore,
+    passing_score:  passingScore,
     attempt_number: attemptNumber,
     answers,
   });

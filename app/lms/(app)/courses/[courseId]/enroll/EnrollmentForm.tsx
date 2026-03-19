@@ -48,14 +48,14 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
       }
 
       if (data.checkoutUrl) {
-        // Redirect to payment
         window.location.href = data.checkoutUrl;
+      } else if (data.courseAccessUrl) {
+        window.location.href = data.courseAccessUrl;
       } else {
-        // Free course - enrolled successfully
-        router.push(`/lms/courses/${courseId}?enrolled=true`);
+        router.push(`/lms/courses/${courseId}`);
       }
     } catch (err) {
-      setError('An error occurred');
+      setError(err instanceof Error ? err.message : 'Enrollment failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -125,10 +125,8 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
             Processing...
           </>
         ) : isFree ? (
-          <>
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            Enroll Now - Free
-          </>
+          <>Enroll Now — Free</>
+        
         ) : (
           <>
             <CreditCard className="w-5 h-5" />

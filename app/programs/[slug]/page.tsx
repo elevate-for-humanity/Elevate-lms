@@ -198,22 +198,22 @@ export default async function ProgramDetailPage({
   // Try static data first (fast, no network)
   program = await loadProgram(slug);
 
-  // If no static data, query DB
+  // If no static data, query DB using canonical data layer
   if (!program) {
     try {
-      const supabase = createAdminClient();
-      if (supabase) {
-        const { data: dbProgram } = await supabase
-          .from('programs')
-          .select('*')
-          .eq('slug', slug)
-          .eq('status', 'active')
-          .single();
-
-        program = dbProgram;
-      }
+      const { getProgramBySlug: getDbProgram } = await import('@/lib/db/programs');
+      const dbProgram = await getDbProgram(slug);
+      // Map DbProgram shape to the display shape expected by this page
+      program = {
+        ...dbProgram,
+        name: dbProgram.title,
+        // Map DB funding to display-compatible shape
+        fundingOptions: dbProgram.program_funding
+          ?.filter(f => f.is_active)
+          .map(f => f.type) ?? [],
+      };
     } catch {
-      // DB unavailable — static-only
+      // Program not in DB — will 404 below
     }
   }
 

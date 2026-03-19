@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS public.lms_security_audit_log;
 -- PHASE 2: After code migration (do NOT run until code is updated)
 -- ============================================================
 
--- TODO: Update app/api/apprentice/email-alerts/route.ts to use 'notification_logs'
+-- Dropped in 20260402000004_drop_notification_log.sql (code updated to use notification_logs)
 -- DROP TABLE IF EXISTS public.notification_log;
 
 -- TODO: Migrate 1 row from tenant_memberships to tenant_members

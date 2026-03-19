@@ -45,7 +45,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
   const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
 
   const { data: courses } = await db
-    .from('training_courses')
+    .from('courses')
     .select('id, title');
 
   if (!courses?.length) return null;

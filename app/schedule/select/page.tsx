@@ -78,7 +78,7 @@ async function confirmSchedule(formData: FormData) {
   if (!existing) {
     await db.from('training_enrollments').insert({
       user_id: user.id,
-      course_id: 'f0593164-55be-5867-98e7-8a86770a8dd0',
+      course_id: '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',
       status: 'pending_approval',
       enrolled_at: new Date().toISOString(),
     });

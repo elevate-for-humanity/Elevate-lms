@@ -37,11 +37,12 @@ export async function issueCertificateIfEligible(
 
   // Every checkpoint/exam lesson for this course must have at least one passing score.
   // A learner with zero checkpoint attempts is not eligible.
+  // Reads course_lessons (canonical) — lesson_type column.
   const { data: requiredCheckpoints } = await db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select('id')
     .eq('course_id', courseId)
-    .in('step_type', ['checkpoint', 'exam']);
+    .in('lesson_type', ['checkpoint', 'exam']);
 
   const totalCheckpoints = requiredCheckpoints?.length ?? 0;
 
@@ -62,9 +63,9 @@ export async function issueCertificateIfEligible(
     }
   }
 
-  // Resolve program_id from enrollment
+  // Resolve program_id from enrollment — canonical table
   const { data: enrollment } = await db
-    .from('training_enrollments')
+    .from('program_enrollments')
     .select('program_id')
     .eq('id', enrollmentId)
     .maybeSingle();
@@ -131,7 +132,7 @@ export async function issueCertificateIfEligible(
   try {
     const [profileResult, courseResult] = await Promise.all([
       db.from('profiles').select('email, first_name').eq('id', userId).maybeSingle(),
-      db.from('training_courses').select('title, slug').eq('id', courseId).maybeSingle(),
+      db.from('courses').select('title, slug').eq('id', courseId).maybeSingle(),
     ]);
 
     const profile  = profileResult.data;

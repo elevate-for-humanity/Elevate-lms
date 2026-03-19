@@ -42,7 +42,7 @@ export async function GET(
     .from('program_courses')
     .select(`
       id, order_index, is_required,
-      course:training_courses(id, title, course_name, slug, status, duration_hours, category)
+      course:courses(id, title, slug, status, short_description)
     `)
     .eq('program_id', programId)
     .order('order_index');

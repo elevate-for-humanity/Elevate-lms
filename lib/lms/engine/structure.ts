@@ -1,9 +1,8 @@
 /**
  * getProgramStructure
  *
- * Returns the ordered module/lesson tree for a course from curriculum_lessons.
- * Only published lessons are returned by default; pass includeUnpublished=true
- * for admin views.
+ * Returns the ordered module/lesson tree for a course.
+ * Reads course_lessons + course_modules (canonical tables only).
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -15,64 +14,69 @@ export async function getProgramStructure(
 ): Promise<ProgramStructure> {
   const db = createAdminClient();
 
+  // Resolve course title — canonical table
+  const { data: course } = await db
+    .from('courses')
+    .select('title')
+    .eq('id', courseId)
+    .maybeSingle();
+
+  const courseName = course?.title ?? courseId;
+
+  // Fetch lessons with module join — canonical tables
   let query = db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select(
-      'id, lesson_slug, lesson_title, step_type, passing_score, ' +
-      'module_order, lesson_order, duration_minutes, status, ' +
-      'module_title, video_file, script_text'
+      'id, slug, title, lesson_type, passing_score, order_index, ' +
+      'module_id, course_modules(id, title, order_index)'
     )
     .eq('course_id', courseId)
-    .order('module_order')
-    .order('lesson_order');
-
-  if (!options.includeUnpublished) {
-    query = query.eq('status', 'published');
-  }
+    .order('order_index');
 
   const { data: rows, error } = await query;
   if (error) throw new Error(`getProgramStructure: ${error.message}`);
 
-  // Resolve course name
-  const { data: course } = await db
-    .from('training_courses')
-    .select('course_name')
-    .eq('id', courseId)
-    .maybeSingle();
+  // Group into modules by module_id
+  const moduleMap = new Map<string, EngineModule & { _order: number }>();
 
-  const courseName = course?.course_name ?? courseId;
-
-  // Group into modules
-  const moduleMap = new Map<number, EngineModule>();
   for (const row of rows ?? []) {
+    const mod = (row as any).course_modules;
+    const moduleId    = row.module_id ?? '__none__';
+    const moduleOrder = mod?.order_index ?? 0;
+    const moduleTitle = mod?.title ?? `Module ${moduleOrder + 1}`;
+
     const lesson: EngineLesson = {
       id:              row.id,
-      lessonSlug:      row.lesson_slug,
-      lessonTitle:     row.lesson_title,
-      stepType:        row.step_type as StepType,
+      lessonSlug:      row.slug,
+      lessonTitle:     row.title,
+      stepType:        (row.lesson_type ?? 'lesson') as StepType,
       passingScore:    row.passing_score ?? 70,
-      moduleOrder:     row.module_order,
-      lessonOrder:     row.lesson_order,
-      durationMinutes: row.duration_minutes,
-      status:          row.status,
-      moduleTitle:     row.module_title ?? null,
-      videoFile:       row.video_file ?? null,
-      scriptText:      row.script_text ?? null,
+      moduleOrder,
+      lessonOrder:     row.order_index,
+      durationMinutes: null,
+      status:          'published',
+      moduleTitle,
+      videoFile:       null,
+      scriptText:      null,
     };
 
-    const existing = moduleMap.get(row.module_order);
+    const existing = moduleMap.get(moduleId);
     if (existing) {
       existing.lessons.push(lesson);
     } else {
-      moduleMap.set(row.module_order, {
-        moduleOrder: row.module_order,
-        moduleTitle: row.module_title ?? `Module ${row.module_order + 1}`,
+      moduleMap.set(moduleId, {
+        moduleOrder,
+        moduleTitle,
         lessons: [lesson],
+        _order:  moduleOrder,
       });
     }
   }
 
-  const modules = Array.from(moduleMap.values()).sort((a, b) => a.moduleOrder - b.moduleOrder);
+  const modules = Array.from(moduleMap.values())
+    .sort((a, b) => a._order - b._order)
+    .map(({ _order: _, ...m }) => m);
+
   const allLessons = modules.flatMap(m => m.lessons);
 
   return {
@@ -80,6 +84,6 @@ export async function getProgramStructure(
     courseName,
     modules,
     totalLessons:     allLessons.length,
-    publishedLessons: allLessons.filter(l => l.status === 'published').length,
+    publishedLessons: allLessons.length,
   };
 }

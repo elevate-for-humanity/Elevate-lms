@@ -10,6 +10,7 @@ import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 async function _GET(request: Request) {
   
@@ -65,35 +66,7 @@ const cookieStore = await cookies();
       return NextResponse.json({ redirectTo: '/auth/login' });
     }
 
-    const role = profile.role as string;
-
-    let redirectTo = '/';
-
-    switch (role) {
-      case 'student':
-        redirectTo = '/app/learner/dashboard';
-        break;
-      case 'program_holder':
-      case 'instructor':
-        redirectTo = '/program-holder/dashboard';
-        break;
-      case 'admin':
-      case 'super_admin':
-        redirectTo = '/app/admin/dashboard';
-        break;
-      case 'grant_client':
-        redirectTo = '/app/grants';
-        break;
-      case 'vita_staff':
-        redirectTo = '/tax';
-        break;
-      case 'supersonic_staff':
-        redirectTo = '/app/supersonic';
-        break;
-      default:
-        redirectTo = '/app/learner/dashboard';
-    }
-
+    const redirectTo = getRoleDestination(profile.role as string);
     return NextResponse.json({ redirectTo });
   } catch (error) { 
     logger.error('Auth landing error:', error);

@@ -350,7 +350,7 @@ async function _POST(req: NextRequest) {
             email: studentProfile.email,
             name: studentProfile.full_name || 'Student',
             programName: program?.name || 'Your Program',
-            dashboardUrl: `${siteUrl}/learner/dashboard`,
+            dashboardUrl: `${siteUrl}/lms/dashboard`,
           });
           logger.info('Student approval email sent directly via SendGrid', {
             userId: enrollment.user_id,

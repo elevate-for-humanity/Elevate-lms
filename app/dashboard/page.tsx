@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,45 +13,8 @@ export const metadata: Metadata = {
 
 /**
  * Role-based dashboard router.
- *
- * Every known role maps to an explicit destination.
- * Unknown roles get a hard redirect to /unauthorized — never silently
- * fall through to the learner dashboard.
+ * Destinations are defined in lib/auth/role-destinations.ts — edit there, not here.
  */
-const ROLE_ROUTES: Record<string, string> = {
-  // Admin tier
-  super_admin: '/admin/dashboard',
-  admin: '/admin/dashboard',
-  org_admin: '/admin/dashboard',
-
-  // Staff / operations
-  staff: '/staff-portal/dashboard',
-  instructor: '/instructor/dashboard',
-
-  // Program holders / delegates
-  program_holder: '/program-holder/dashboard',
-  delegate: '/program-holder/dashboard',
-
-  // Partners / sponsors
-  partner: '/partner-portal',
-  sponsor: '/partner-portal',
-
-  // Workforce oversight
-  workforce_board: '/workforce-board/dashboard',
-
-  // Employer
-  employer: '/employer/dashboard',
-
-  // Mentor
-  mentor: '/mentor/dashboard',
-
-  // Creator
-  creator: '/creator/dashboard',
-
-  // Student (explicit, not a fallthrough)
-  student: '/learner/dashboard',
-};
-
 export default async function DashboardRouterPage() {
   try {
     const supabase = await createClient();
@@ -69,10 +33,7 @@ export default async function DashboardRouterPage() {
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      redirect('/login?redirect=/dashboard');
-    }
+    if (!user) redirect('/login?redirect=/dashboard');
 
     const { data: profile } = await db
       .from('profiles')
@@ -80,15 +41,7 @@ export default async function DashboardRouterPage() {
       .eq('id', user.id)
       .single();
 
-    const role = profile?.role;
-    const target = role ? ROLE_ROUTES[role] : null;
-
-    if (!target) {
-      // Hard fail — never silently misroute
-      redirect('/unauthorized?reason=unknown_role');
-    }
-
-    redirect(target);
+    redirect(getRoleDestination(profile?.role));
   } catch {
     redirect('/login?redirect=/dashboard');
   }

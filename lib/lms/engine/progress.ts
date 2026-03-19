@@ -54,10 +54,9 @@ export async function getLearnerProgress(
       .maybeSingle(),
 
     db
-      .from('curriculum_lessons')
+      .from('course_lessons')
       .select('id')
-      .eq('course_id', courseId)
-      .eq('status', 'published'),
+      .eq('course_id', courseId),
   ]);
 
   // Completed lesson IDs

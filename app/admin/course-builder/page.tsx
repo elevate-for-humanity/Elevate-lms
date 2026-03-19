@@ -27,7 +27,7 @@ export default async function CourseBuilderPage() {
 
   // Fetch courses from database
   const { data: courses } = await db
-    .from('training_courses')
+    .from('courses')
     .select('*, programs(id, title)')
     .order('created_at', { ascending: false });
 

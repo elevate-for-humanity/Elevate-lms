@@ -26,7 +26,7 @@ export default async function NewCoursePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/learner/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li><Link href="/learner/courses" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">New</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/lms/dashboard" className="hover:text-primary">LMS</Link></li><li>/</li><li><Link href="/lms/courses" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">New</li></ol></nav>
           <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
           <p className="text-gray-600 mt-2">Set up a new course for learners</p>
         </div>
@@ -41,7 +41,7 @@ export default async function NewCoursePage() {
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail</label><div className="border-2 border-dashed rounded-lg p-6 text-center"><p className="text-gray-500">Drag and drop or click to upload</p></div></div>
             <div className="flex gap-4 pt-4 border-t">
               <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Create Course</button>
-              <Link href="/learner/courses" className="px-4 py-2 border rounded-lg hover:bg-white">Cancel</Link>
+              <Link href="/lms/courses" className="px-4 py-2 border rounded-lg hover:bg-white">Cancel</Link>
             </div>
           </form>
         </div>

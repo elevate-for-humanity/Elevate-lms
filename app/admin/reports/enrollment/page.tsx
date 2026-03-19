@@ -25,11 +25,11 @@ export default async function EnrollmentReportPage() {
   ] = await Promise.all([
     db
       .from('training_enrollments')
-      .select('*, course:training_courses(course_name), student:profiles(full_name, email)')
+      .select('*, course:training_courses(title), student:profiles(full_name, email)')
       .order('enrolled_at', { ascending: false })
       .limit(50),
     db.from('training_enrollments').select('*', { count: 'exact', head: true }),
-    db.from('training_courses').select('id, course_name'),
+    db.from('courses').select('id, title'),
   ]);
 
   const recentEnrollments = enrollments?.filter(e => 
@@ -44,7 +44,7 @@ export default async function EnrollmentReportPage() {
   // Enrollment by course
   const enrollmentByCourse: Record<string, number> = {};
   enrollments?.forEach(e => {
-    const name = (e.course as { course_name: string } | null)?.course_name || 'Unknown';
+    const name = (e.course as { title: string } | null)?.title || 'Unknown';
     enrollmentByCourse[name] = (enrollmentByCourse[name] || 0) + 1;
   });
 
@@ -145,7 +145,7 @@ export default async function EnrollmentReportPage() {
                           </p>
                         </td>
                         <td className="py-3 px-2 text-gray-600">
-                          {(enrollment.course as { course_name: string } | null)?.course_name || 'N/A'}
+                          {(enrollment.course as { title: string } | null)?.title || 'N/A'}
                         </td>
                         <td className="py-3 px-2">
                           <span className={`px-2 py-1 text-xs rounded-full ${statusColors[enrollment.status] || 'bg-gray-100'}`}>

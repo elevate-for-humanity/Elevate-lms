@@ -8,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 // Skip the DB existence check for these — the child pages and API
 // routes fall back to lib/courses/definitions.ts.
 const KNOWN_COURSE_IDS = new Set([
-  'f0593164-55be-5867-98e7-8a86770a8dd0', // HVAC Technician
+  '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0', // HVAC Technician
 ]);
 
 export default async function CourseLayout({

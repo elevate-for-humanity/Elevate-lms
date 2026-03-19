@@ -354,7 +354,7 @@ export async function notifyApprenticeDecision(
   
   if (approved) {
     portalUrl = await buildTokenUrl(
-      '/learner/dashboard',
+      '/lms/dashboard',
       {
         purpose: 'continue_enrollment',
         email,

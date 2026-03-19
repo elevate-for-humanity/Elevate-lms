@@ -82,7 +82,7 @@ async function importStudents(
         email.split('@')[0];
 
       // Check if profile exists
-      const { data: existing } = await db
+      const { data: existing } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
@@ -91,7 +91,7 @@ async function importStudents(
 
       if (existing) {
         // Update existing profile
-        await db
+        await supabase
           .from('profiles')
           .update({
             full_name: fullName,
@@ -103,7 +103,7 @@ async function importStudents(
         result.imported++;
       } else {
         // Create new profile (without auth user for CSV import)
-        const { error } = await db.from('profiles').insert({
+        const { error } = await supabase.from('profiles').insert({
           id: crypto.randomUUID(),
           email,
           full_name: fullName,
@@ -145,31 +145,32 @@ async function importCourses(
 
       const code = record.code || record.course_code || name.toUpperCase().replace(/\s+/g, '_').substring(0, 20);
 
-      // Check if course exists
-      const { data: existing } = await db
-        .from('training_courses')
+      // Check if course exists in canonical table
+      const { data: existing } = await supabase
+        .from('courses')
         .select('id')
-        .eq('course_code', code)
-        .eq('tenant_id', tenantId)
-        .single();
+        .eq('slug', code.toLowerCase().replace(/_/g, '-'))
+        .maybeSingle();
 
-      const courseData = {
-        course_name: name,
-        course_code: code,
-        description: record.description || '',
-        duration_weeks: parseInt(record.duration_weeks) || 8,
-        is_active: record.is_active !== 'false',
-        tenant_id: tenantId,
-        updated_at: new Date().toISOString(),
-      };
+      const slug = code.toLowerCase().replace(/_/g, '-');
 
       if (existing) {
-        await db.from('training_courses').update(courseData).eq('id', existing.id);
+        await supabase.from('courses').update({
+          title: name,
+          description: record.description || '',
+          is_active: record.is_active !== 'false',
+          updated_at: new Date().toISOString(),
+        }).eq('id', existing.id);
       } else {
-        await db.from('training_courses').insert({
-          ...courseData,
+        await supabase.from('courses').insert({
           id: crypto.randomUUID(),
+          slug,
+          title: name,
+          description: record.description || '',
+          status: 'draft',
+          is_active: record.is_active !== 'false',
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         });
       }
       result.imported++;
@@ -202,7 +203,7 @@ async function importEnrollments(
       }
 
       // Find student
-      const { data: student } = await db
+      const { data: student } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', studentEmail)
@@ -215,13 +216,12 @@ async function importEnrollments(
         continue;
       }
 
-      // Find course
-      const { data: course } = await db
-        .from('training_courses')
+      // Find course in canonical table
+      const { data: course } = await supabase
+        .from('courses')
         .select('id')
-        .eq('course_code', courseCode)
-        .eq('tenant_id', tenantId)
-        .single();
+        .eq('slug', courseCode.toLowerCase().replace(/_/g, '-'))
+        .maybeSingle();
 
       if (!course) {
         result.failed++;
@@ -230,7 +230,7 @@ async function importEnrollments(
       }
 
       // Check existing enrollment
-      const { data: existing } = await db
+      const { data: existing } = await supabase
         .from('program_enrollments')
         .select('id')
         .eq('user_id', student.id)
@@ -247,9 +247,9 @@ async function importEnrollments(
       };
 
       if (existing) {
-        await db.from('program_enrollments').update(enrollmentData).eq('id', existing.id);
+        await supabase.from('program_enrollments').update(enrollmentData).eq('id', existing.id);
       } else {
-        await db.from('program_enrollments').insert({
+        await supabase.from('program_enrollments').insert({
           ...enrollmentData,
           id: crypto.randomUUID(),
         });
@@ -282,7 +282,7 @@ async function importEmployers(
       }
 
       // Check if employer exists
-      const { data: existing } = await db
+      const { data: existing } = await supabase
         .from('employers')
         .select('id')
         .eq('company_name', companyName)
@@ -300,9 +300,9 @@ async function importEmployers(
       };
 
       if (existing) {
-        await db.from('employers').update(employerData).eq('id', existing.id);
+        await supabase.from('employers').update(employerData).eq('id', existing.id);
       } else {
-        await db.from('employers').insert({
+        await supabase.from('employers').insert({
           ...employerData,
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
@@ -407,7 +407,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error('Import error:', error);
+    logger.error('Import error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { 
         success: false, 
@@ -419,4 +419,4 @@ async function _POST(request: NextRequest) {
     );
   }
 }
-export const POST = withApiAudit('/api/admin/import', _POST);
+export const POST = withApiAudit('/api/admin/import', _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>);

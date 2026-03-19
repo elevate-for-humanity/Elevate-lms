@@ -69,34 +69,46 @@ export async function enforceCheckpointGate(
 ): Promise<void> {
   const db = createAdminClient();
 
-  // Fetch the target lesson's module_order
+  // Fetch the target lesson and its module — canonical tables
   const { data: targetLesson, error: lessonErr } = await db
-    .from('curriculum_lessons')
-    .select('module_order, lesson_order, lesson_title, step_type')
+    .from('course_lessons')
+    .select('id, title, lesson_type, module_id, course_modules(id, order_index)')
     .eq('id', lessonId)
     .eq('course_id', courseId)
     .maybeSingle();
 
   if (lessonErr || !targetLesson) {
-    // Not a curriculum_lessons row (e.g. legacy training_lessons) — skip gate
+    // Lesson not found in course_lessons — skip gate
     return;
   }
+
+  const moduleOrder = (targetLesson as any).course_modules?.order_index ?? 0;
 
   // First module has no prior checkpoint to pass
-  if (targetLesson.module_order <= 1) {
+  if (moduleOrder <= 1) {
     return;
   }
 
-  const prevModuleOrder = targetLesson.module_order - 1;
+  const prevModuleOrder = moduleOrder - 1;
 
-  // Find the checkpoint for the previous module
-  const { data: prevCheckpoint } = await db
-    .from('curriculum_lessons')
-    .select('id, lesson_title, passing_score')
+  // Find the checkpoint for the previous module via course_modules join
+  const { data: prevModuleRow } = await db
+    .from('course_modules')
+    .select('id')
     .eq('course_id', courseId)
-    .eq('module_order', prevModuleOrder)
-    .eq('step_type', 'checkpoint')
-    .order('lesson_order', { ascending: false })
+    .eq('order_index', prevModuleOrder)
+    .maybeSingle();
+
+  if (!prevModuleRow) return;
+
+  // Find the checkpoint lesson in the previous module
+  const { data: prevCheckpoint } = await db
+    .from('course_lessons')
+    .select('id, title, passing_score')
+    .eq('course_id', courseId)
+    .eq('module_id', prevModuleRow.id)
+    .eq('lesson_type', 'checkpoint')
+    .order('order_index', { ascending: false })
     .limit(1)
     .maybeSingle();
 
@@ -119,9 +131,9 @@ export async function enforceCheckpointGate(
   if (!bestScore) {
     const err: CheckpointGateError = {
       code:               'CHECKPOINT_NOT_PASSED',
-      message:            `You must pass "${prevCheckpoint.lesson_title}" (≥${prevCheckpoint.passing_score}%) before continuing.`,
+      message:            `You must pass "${prevCheckpoint.title}" (≥${prevCheckpoint.passing_score}%) before continuing.`,
       checkpointLessonId: prevCheckpoint.id,
-      checkpointTitle:    prevCheckpoint.lesson_title,
+      checkpointTitle:    prevCheckpoint.title,
       requiredScore:      prevCheckpoint.passing_score ?? 80,
       bestScore:          null,
     };

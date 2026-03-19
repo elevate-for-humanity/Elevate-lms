@@ -29,7 +29,7 @@ async function _GET(request: Request) {
       .eq('status', 'active');
 
     const { count: courseCount } = await db
-      .from('training_courses')
+      .from('courses')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published');
 

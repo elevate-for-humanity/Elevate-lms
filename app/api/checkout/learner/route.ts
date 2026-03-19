@@ -86,7 +86,7 @@ async function _POST(request: NextRequest) {
         sessionConfig = {
           mode: 'subscription',
           line_items: [{ price: stripePriceId, quantity: 1 }],
-          success_url: `${SITE_URL}/learner/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+          success_url: `${SITE_URL}/lms/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${SITE_URL}/pricing?checkout=cancelled`,
           customer_email: user.email || undefined,
           subscription_data: {
@@ -150,7 +150,7 @@ async function _POST(request: NextRequest) {
             },
             quantity: 1,
           }],
-          success_url: `${SITE_URL}/learner/dashboard?checkout=success&program=${program.slug}&session_id={CHECKOUT_SESSION_ID}`,
+          success_url: `${SITE_URL}/lms/dashboard?checkout=success&program=${program.slug}&session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${SITE_URL}/programs/${program.slug}?checkout=cancelled`,
           customer_email: user.email || undefined,
           metadata: {

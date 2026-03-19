@@ -134,7 +134,7 @@ export function MobileMenu({ isOpen, onClose, items, user }: MobileMenuProps) {
               <div className="mt-8 pt-6 border-t border-gray-100">
                 {user ? (
                   <Link
-                    href="/learner/dashboard"
+                    href="/lms/dashboard"
                     onClick={onClose}
                     className="block w-full text-center px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
                   >

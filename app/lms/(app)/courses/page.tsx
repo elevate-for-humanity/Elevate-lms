@@ -5,12 +5,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Users, Star } from 'lucide-react';
-import { LMS_HEROES, LMS_CATEGORIES } from '@/lib/lms/image-map';
+import { Clock, Users, BookOpen } from 'lucide-react';
+import { LMS_HEROES } from '@/lib/lms/image-map';
 
 export const metadata: Metadata = {
-  title: 'Interactive Courses | LMS',
-  description: 'Browse and enroll in interactive courses with quizzes, assignments, and hands-on activities.',
+  title: 'My Courses | LMS',
+  description: 'Your enrolled courses and available training programs.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/lms/courses',
   },
@@ -18,103 +18,44 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function InteractiveCoursesPage() {
+export default async function MyCoursesPage() {
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Courses" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/lms/courses');
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  // Get active, published courses only
+  // Canonical: published courses only
   const { data: courses } = await db
-    .from('training_courses')
-    .select('*')
+    .from('courses')
+    .select('id, title, description, short_description, status, is_active, thumbnail_url, program_id')
+    .eq('status', 'published')
     .eq('is_active', true)
-    .eq('is_published', true)
     .order('created_at', { ascending: false });
 
-  // Get student's enrollments
+  // Canonical: student enrollments
   const { data: enrollments } = await db
-    .from('training_enrollments')
-    .select('course_id, status, progress')
+    .from('program_enrollments')
+    .select('course_id, status, progress_percent')
     .eq('user_id', user.id);
 
   const enrolledCourseIds = new Set(enrollments?.map(e => e.course_id) || []);
   const enrollmentMap = new Map(enrollments?.map(e => [e.course_id, e]) || []);
 
-  // Category images mapping
-  const categoryImages: Record<string, string> = {
-    healthcare: '/images/pages/training-classroom.jpg',
-    trades: '/images/pages/training-classroom.jpg',
-    technology: '/images/pages/training-classroom.jpg',
-    business: '/hero-images/business-hero.jpg',
-    default: '/images/pages/training-classroom.jpg',
-  };
-
-  const courseCategories = [
-    {
-      image: '/images/pages/training-classroom.jpg',
-      title: 'Healthcare',
-      count: courses?.filter(c => c.category === 'healthcare').length || 0,
-      href: '/lms/courses?category=healthcare',
-    },
-    {
-      image: '/images/pages/hvac-technician.jpg',
-      title: 'Skilled Trades',
-      count: courses?.filter(c => c.category === 'trades').length || 0,
-      href: '/lms/courses?category=trades',
-    },
-    {
-      image: '/images/pages/training-classroom.jpg',
-      title: 'Technology',
-      count: courses?.filter(c => c.category === 'technology').length || 0,
-      href: '/lms/courses?category=technology',
-    },
-    {
-      image: '/hero-images/business-hero.jpg',
-      title: 'Business',
-      count: courses?.filter(c => c.category === 'business').length || 0,
-      href: '/lms/courses?category=business',
-    },
-  ];
-
-  // Use database courses with fallback image mapping
-  const displayCourses = (courses || []).map((course: any) => ({
-    ...course,
-    image: course.thumbnail_url || categoryImages[course.category] || categoryImages.default,
-    duration: course.duration || 'Self-paced',
-    students: course.enrollment_count || 0,
-    rating: course.rating || 4.5,
-    level: course.level || 'All Levels',
-  }));
+  const displayCourses = courses || [];
 
   return (
     <div className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Courses" }]} />
-        </div>
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'LMS', href: '/lms/dashboard' }, { label: 'Courses' }]} />
+      </div>
+
+      {/* Hero */}
+      <section className="relative h-[200px] sm:h-[280px]">
         <Image
           src={LMS_HEROES.courses}
-          alt="Students in a training classroom"
+          alt="Training classroom"
           fill
           sizes="100vw"
           className="object-cover"
@@ -122,123 +63,110 @@ export default async function InteractiveCoursesPage() {
         />
       </section>
 
-      {/* Title */}
       <section className="bg-slate-900 py-8">
         <div className="max-w-5xl mx-auto px-8">
           <span className="inline-block text-xs font-bold uppercase tracking-wider text-brand-blue-300 mb-2">Student Portal</span>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-3">My Courses</h1>
-          <p className="text-lg text-slate-300 max-w-2xl">Engaging lessons with quizzes, assignments, and hands-on activities</p>
+          <h1 className="text-4xl font-black text-white mb-2">My Courses</h1>
+          <p className="text-slate-300 text-base">Your enrolled training programs and available courses.</p>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-12 px-6 bg-white">
+      <section className="py-10 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Browse by Category</h2>
-          <div className="grid md:grid-cols-4 gap-4 mb-12">
-            {courseCategories.map((category) => (
-              <Link
-                key={category.title}
-                href={category.href}
-                className="group relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition"
-              >
-                <div className="relative h-36">
-                  <Image
-                    src={category.image}
-                    alt={category.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-300"
-                  />
-                  <div className="absolute bottom-3 left-3 text-white">
-                    <h3 className="font-bold text-lg">{category.title}</h3>
-                    <p className="text-white/80 text-sm">{category.count} courses</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Course Grid */}
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">All Courses</h2>
           {displayCourses.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-md p-12 text-center">
-              <p className="text-gray-500">No courses assigned yet. Contact your advisor or browse available programs.</p>
+            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center max-w-lg mx-auto">
+              <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-slate-900 mb-2">No courses yet</h2>
+              <p className="text-slate-600 text-sm mb-6">
+                Browse available programs and enroll to start learning.
+              </p>
+              <Link
+                href="/lms/programs"
+                className="inline-flex items-center gap-2 bg-slate-900 text-white font-semibold px-6 py-3 rounded-xl text-sm hover:bg-slate-700 transition"
+              >
+                Browse Programs
+              </Link>
             </div>
           ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayCourses.map((course: any) => {
-              const isEnrolled = enrolledCourseIds.has(course.id);
-              const enrollment = enrollmentMap.get(course.id);
-              
-              return (
-                <div
-                  key={course.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition"
-                >
-                  <div className="relative h-44">
-                    <Image
-                      src={course.image}
-                      alt={course.course_name}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-brand-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-                        {course.level}
-                      </span>
-                    </div>
-                    {isEnrolled && (
-                      <div className="absolute top-3 right-3">
-                        <span className="bg-brand-green-600 text-white px-2 py-1 rounded text-xs font-medium">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayCourses.map((course: any) => {
+                const isEnrolled = enrolledCourseIds.has(course.id);
+                const enrollment = enrollmentMap.get(course.id);
+                const progress = enrollment?.progress_percent ?? 0;
+
+                return (
+                  <div
+                    key={course.id}
+                    className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col"
+                  >
+                    <div className="relative h-44 bg-slate-100 flex-shrink-0">
+                      {course.thumbnail_url ? (
+                        <Image
+                          src={course.thumbnail_url}
+                          alt={course.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <BookOpen className="w-12 h-12 text-slate-300" />
+                        </div>
+                      )}
+                      {isEnrolled && (
+                        <span className="absolute top-3 right-3 bg-brand-green-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
                           Enrolled
                         </span>
-                      </div>
-                    )}
-                    <div className="absolute bottom-3 right-3 bg-slate-800 text-white px-2 py-1 rounded text-sm flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      {course.rating}
+                      )}
+                    </div>
+
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-bold text-slate-900 mb-1 text-base">{course.title}</h3>
+                      {(course.short_description || course.description) && (
+                        <p className="text-slate-600 text-sm mb-4 flex-1 line-clamp-2">
+                          {course.short_description || course.description}
+                        </p>
+                      )}
+
+                      {isEnrolled && (
+                        <div className="mb-4">
+                          <div className="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Progress</span>
+                            <span>{progress}%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 rounded-full h-1.5">
+                            <div
+                              className="h-1.5 rounded-full bg-brand-blue-500 transition-all"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {enrollment?.status === 'pending_approval' ? (
+                        <div className="block w-full bg-amber-50 text-amber-800 border border-amber-200 text-center py-2.5 rounded-lg text-sm font-medium">
+                          Pending Approval
+                        </div>
+                      ) : isEnrolled ? (
+                        <Link
+                          href={`/lms/courses/${course.id}`}
+                          className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center py-2.5 rounded-lg text-sm font-semibold transition"
+                        >
+                          {progress > 0 ? 'Continue Learning' : 'Start Course'}
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/lms/courses/${course.id}`}
+                          className="block w-full bg-slate-900 hover:bg-slate-700 text-white text-center py-2.5 rounded-lg text-sm font-semibold transition"
+                        >
+                          View Course
+                        </Link>
+                      )}
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-slate-900 mb-2">{course.course_name}</h3>
-                    <p className="text-slate-600 text-sm mb-3 line-clamp-2">{course.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {course.duration}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {(course.students || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    {isEnrolled && enrollment?.status === 'pending_approval' ? (
-                      <div className="block w-full bg-amber-100 text-amber-800 text-center py-2 rounded-lg font-medium cursor-not-allowed">
-                        Pending Admin Approval
-                      </div>
-                    ) : isEnrolled ? (
-                      <Link
-                        href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-brand-green-600 hover:bg-brand-green-700 text-white text-center py-2 rounded-lg font-medium transition"
-                      >
-                        Continue Learning ({enrollment?.progress || 0}%)
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center py-2 rounded-lg font-medium transition"
-                      >
-                        View Course
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
           )}
-
-
         </div>
       </section>
     </div>

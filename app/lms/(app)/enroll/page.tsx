@@ -281,7 +281,7 @@ export default async function EnrollPage({ searchParams }: Props) {
               You&apos;re enrolled in all available courses. New courses will appear here when added to your program.
             </p>
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               View My Courses
@@ -301,7 +301,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                 </p>
               </div>
               <Link
-                href="/learner/dashboard"
+                href="/lms/dashboard"
                 className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to Dashboard

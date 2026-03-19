@@ -55,7 +55,7 @@ export async function GET(
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { data: course, error } = await auth.db
-    .from('training_courses')
+    .from('courses')
     .select('metadata')
     .eq('id', id)
     .single();
@@ -103,9 +103,17 @@ export async function PUT(
     }
   }
 
+  // Quiz data is stored per-lesson in course_lessons.quiz_questions.
+  // Course-level quiz metadata is no longer supported.
+  // Use PATCH /api/admin/lms/courses/[courseId]/lessons/[lessonId] to update quiz questions.
+  return NextResponse.json(
+    { error: 'LEGACY_SYSTEM_DISABLED: quiz data is stored in course_lessons.quiz_questions — update via lesson API' },
+    { status: 410 }
+  );
+
   // Load existing metadata to merge (preserve non-quiz keys)
   const { data: existing } = await auth.db
-    .from('training_courses')
+    .from('courses')
     .select('metadata')
     .eq('id', id)
     .single();
@@ -119,7 +127,7 @@ export async function PUT(
   };
 
   const { error: updateError } = await auth.db
-    .from('training_courses')
+    .from('courses')
     .update({ metadata: updatedMeta, updated_at: new Date().toISOString() })
     .eq('id', id);
 

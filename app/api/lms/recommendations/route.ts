@@ -44,7 +44,7 @@ async function _GET(request: NextRequest) {
 
     // Fetch available courses
     const { data: courses } = await db
-      .from('training_courses')
+      .from('courses')
       .select('id, title, description, category, difficulty, duration_hours, rating')
       .eq('published', true)
       .limit(100);

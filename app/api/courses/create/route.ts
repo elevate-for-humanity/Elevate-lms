@@ -48,6 +48,12 @@ async function _POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
 
+    // LEGACY_SYSTEM_DISABLED — new courses must be created via /api/admin/lms/courses
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use POST /api/admin/lms/courses to create courses' },
+      { status: 410 }
+    );
+
     // Insert course
     const { data: course, error: courseError } = await db
       .from('training_courses')

@@ -115,6 +115,12 @@ async function _POST(request: NextRequest) {
       lessonCount: draft.lessons.length,
     });
 
+    // LEGACY_SYSTEM_DISABLED — AI-generated courses must use /api/admin/lms/courses/generate
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use POST /api/admin/lms/courses/generate' },
+      { status: 410 }
+    );
+
     // ── Step 2: Insert training_courses ──────────────────────────────────────
     const { data: course, error: courseErr } = await adminDb
       .from('training_courses')

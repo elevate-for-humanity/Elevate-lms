@@ -209,7 +209,7 @@ function mapDbLesson(row: Record<string, unknown>): CurriculumLesson {
     videoUrl: (row.video_url as string) || null,
     audioFile: `/generated/lessons/${lessonId}.mp3`,
     captionFile: null,
-    contentType: (row.content_type as string) || 'video',
+    contentType: (row.content_type as string) ?? 'lesson',
     durationMinutes: (row.duration_minutes as number) || 20,
     topics: (row.topics as string[]) || [],
     quizQuestions: ((row.quiz_questions as any[]) || []).map((q: any) => ({

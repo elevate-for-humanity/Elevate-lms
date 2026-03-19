@@ -64,7 +64,7 @@ async function _POST(
 
   // Optional: verify user is instructor for this course
   const { data: course, error: courseError } = await db
-    .from('training_courses')
+    .from('courses')
     .select('instructor_id')
     .eq('id', courseId)
     .single();

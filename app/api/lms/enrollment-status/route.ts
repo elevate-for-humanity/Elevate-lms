@@ -6,8 +6,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
+ * GET /api/lms/enrollment-status?courseId=<uuid>
+ *
  * Returns the current user's enrollment status for a course.
- * Uses admin client to bypass RLS (training_enrollments has no student SELECT policy).
+ * Reads from program_enrollments (canonical). Admin client bypasses RLS.
  */
 export async function GET(req: NextRequest) {
   const courseId = req.nextUrl.searchParams.get('courseId');
@@ -25,16 +27,16 @@ export async function GET(req: NextRequest) {
   const db = admin || supabase;
 
   const { data: enrollment } = await db
-    .from('training_enrollments')
-    .select('id, status, progress, approved_at')
+    .from('program_enrollments')
+    .select('id, status, progress_percent, enrolled_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
 
   return NextResponse.json({
-    enrolled: !!enrollment,
-    status: enrollment?.status || null,
-    progress: enrollment?.progress || 0,
-    approved: !!enrollment?.approved_at,
+    enrolled:  !!enrollment,
+    status:    enrollment?.status ?? null,
+    progress:  enrollment?.progress_percent ?? 0,
+    approved:  enrollment ? !['pending_approval', 'pending'].includes(enrollment.status) : false,
   });
 }

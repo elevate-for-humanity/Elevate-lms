@@ -47,7 +47,7 @@ export default function ProtectedRoute({ children, requireRole }: Props) {
             <p className="mt-2 text-black">
               You don't have permission to access this page.
             </p>
-            <a href="/learner/dashboard" className="btn mt-4">
+            <a href="/lms/dashboard" className="btn mt-4">
               Go to Dashboard
             </a>
           </div>

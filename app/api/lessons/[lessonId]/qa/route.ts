@@ -9,15 +9,13 @@ import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const { lessonId } = await params;
+  const { lessonId } = await params;
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
@@ -63,6 +61,13 @@ async function _POST(
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await assertLessonAccess(user.id, lessonId);
+  } catch (e) {
+    const { status, body: errBody } = accessErrorResponse(e);
+    return NextResponse.json(errBody, { status });
   }
 
   const { kind, questionId, title, body } = await req.json();
@@ -127,5 +132,5 @@ async function _POST(
 
   return NextResponse.json({ answer: data });
 }
-export const GET = withApiAudit('/api/lessons/[lessonId]/qa', _GET);
-export const POST = withApiAudit('/api/lessons/[lessonId]/qa', _POST);
+export const GET  = withApiAudit('/api/lessons/[lessonId]/qa', _GET  as unknown as (req: Request, ...args: any[]) => Promise<Response>);
+export const POST = withApiAudit('/api/lessons/[lessonId]/qa', _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>);

@@ -428,7 +428,7 @@ export default async function AchievementsPage() {
               Begin learning to unlock achievements and earn points!
             </p>
             <Link
-              href="/learner/courses"
+              href="/lms/courses"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
@@ -449,7 +449,7 @@ export default async function AchievementsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/learner/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+          <Link href="/lms/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Dashboard
           </Link>
         </div>

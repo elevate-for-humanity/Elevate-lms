@@ -3,7 +3,8 @@
 // Used by the course viewer, lesson player, and API fallback when the
 // Supabase migration hasn't been run yet.
 
-export const HVAC_COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
+// Canonical course ID — migrated from f0593164 to 0ba9a61c (2025-Q2)
+export const HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
 export const HVAC_PROGRAM_ID = '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7';
 
 /** Maps definition lesson ID (e.g. 'hvac-01-01') → deterministic UUID */

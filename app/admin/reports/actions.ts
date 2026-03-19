@@ -21,7 +21,7 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
       .gte('created_at', startDate)
       .order('created_at', { ascending: false }),
     db
-      .from('training_courses')
+      .from('courses')
       .select('id, title'),
     db
       .from('program_enrollments')
@@ -184,18 +184,18 @@ export async function exportEnrollmentCSV(): Promise<string> {
 
   const { data: enrollments } = await db
     .from('training_enrollments')
-    .select('*, course:training_courses(course_name), student:profiles(full_name, email)')
+    .select('*, course:training_courses(title), student:profiles(full_name, email)')
     .order('enrolled_at', { ascending: false })
     .limit(500);
 
   let csv = 'Date,Student,Email,Course,Status,Progress\n';
   (enrollments || []).forEach((e: Record<string, unknown>) => {
     const student = e.student as { full_name: string | null; email: string } | null;
-    const course = e.course as { course_name: string } | null;
+    const course = e.course as { title: string } | null;
     const date = new Date(e.enrolled_at as string).toLocaleDateString();
     const name = (student?.full_name || 'Unknown').replace(/,/g, ' ');
     const email = (student?.email || '').replace(/,/g, ' ');
-    const courseName = (course?.course_name || 'N/A').replace(/,/g, ' ');
+    const courseName = (course?.title || 'N/A').replace(/,/g, ' ');
     csv += `${date},${name},${email},${courseName},${e.status},${e.progress}%\n`;
   });
 

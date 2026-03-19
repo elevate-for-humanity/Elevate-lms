@@ -26,7 +26,7 @@ export async function GET(
 
   // Resolve program_id from course
   const { data: course } = await db
-    .from('training_courses')
+    .from('courses')
     .select('program_id')
     .eq('id', courseId)
     .maybeSingle();
@@ -80,7 +80,7 @@ export async function GET(
 
       // Get checkpoint lessons tagged to this domain
       const { data: checkpointLessons } = await db
-        .from('curriculum_lessons')
+        .from('course_lessons')
         .select('id')
         .eq('program_id', programId)
         .eq('step_type', 'checkpoint')

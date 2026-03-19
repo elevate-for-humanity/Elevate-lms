@@ -108,10 +108,10 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
 
     setLoading(true);
     try {
-      const { error: deleteError } = await supabase
-        .from('training_courses')
-        .delete()
-        .eq('id', courseId);
+      // Archive via canonical API — never hard-delete
+      const res = await fetch(`/api/admin/lms/courses/${courseId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
+      const deleteError = null;
 
       if (deleteError) throw deleteError;
       setCourses(courses.filter(c => c.id !== courseId));
@@ -124,10 +124,15 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
 
   const togglePublish = async (course: Course) => {
     try {
-      const { error: updateError } = await supabase
-        .from('training_courses')
-        .update({ is_published: !course.is_published })
-        .eq('id', course.id);
+      // Publish via canonical API — enforces health check + versioning
+      const endpoint = course.is_published
+        ? `/api/admin/lms/courses/${course.id}`
+        : `/api/admin/lms/courses/${course.id}/publish`;
+      const method = course.is_published ? 'PATCH' : 'POST';
+      const body = course.is_published ? JSON.stringify({ status: 'draft' }) : undefined;
+      const res = await fetch(endpoint, { method, body, headers: { 'Content-Type': 'application/json' } });
+      if (!res.ok) throw new Error('Publish toggle failed');
+      const updateError = null;
 
       if (updateError) throw updateError;
       setCourses(courses.map(c => c.id === course.id ? { ...c, is_published: !c.is_published } : c));

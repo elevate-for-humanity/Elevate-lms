@@ -71,8 +71,8 @@ async function _POST(req: NextRequest) {
         userId: user.id,
         courseId,
         programId: programCode,
-        paymentStatus: 'pending',
-        requireApproval: true,
+        paymentStatus: 'completed',
+        requireApproval: false, // direct course enrollment is self-service; program enrollments use /api/enroll/apply
       });
 
       if (!result.success) {

@@ -1,77 +1,65 @@
 /**
- * Canonical course types and mappers.
+ * Canonical course types and mapper.
  *
- * Normalizes raw `training_courses` rows. The DB has both `title` and
- * `course_name` columns due to schema drift — the mapper resolves that once.
+ * Reads from the canonical `courses` table only.
+ * `course_name` and `training_courses` are legacy — do not add them back.
  */
 
-// ── Raw DB shape ──────────────────────────────────────────────────────────
+// ── Raw DB shape (canonical `courses` table) ──────────────────────────────
 
 export interface RawCourseRow {
   id: string;
   title: string | null;
-  course_name: string | null; // legacy column, same semantic as title
   slug: string | null;
   description: string | null;
+  short_description: string | null;
   status: string | null;
-  category: string | null;
-  duration_hours: number | null;
-  duration_minutes: number | null;
-  is_published: boolean | null;
   is_active: boolean | null;
-  thumbnail_url: string | null;
+  published_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  // Optional fields present on some selects
+  program_id?: string | null;
+  thumbnail_url?: string | null;
 }
 
 // ── Canonical type ────────────────────────────────────────────────────────
 
-export type CourseStatus = 'draft' | 'published' | 'archived' | 'review';
+export type CourseStatus = 'draft' | 'published' | 'archived';
 
 export interface CourseRecord {
   id: string;
   title: string;
   slug: string;
   description: string;
+  shortDescription: string | null;
   status: CourseStatus;
-  category: string | null;
-  durationHours: number | null;
-  durationMinutes: number | null;
-  isPublished: boolean;
   isActive: boolean;
+  publishedAt: string | null;
   thumbnailUrl: string | null;
-}
-
-// ── Normalizers ───────────────────────────────────────────────────────────
-
-const VALID_STATUSES: CourseStatus[] = ['draft', 'published', 'archived', 'review'];
-
-function normalizeCourseStatus(raw: string | null, isPublished: boolean | null): CourseStatus {
-  if (raw && (VALID_STATUSES as string[]).includes(raw)) {
-    return raw as CourseStatus;
-  }
-  // Fall back to published/draft based on is_published flag
-  return isPublished ? 'published' : 'draft';
+  programId: string | null;
 }
 
 // ── Mapper ────────────────────────────────────────────────────────────────
 
+const VALID_STATUSES: CourseStatus[] = ['draft', 'published', 'archived'];
+
 export function mapCourseRow(row: RawCourseRow): CourseRecord {
-  // Resolve title: prefer `title`, fall back to `course_name`, then sentinel
-  const title = row.title?.trim() || row.course_name?.trim() || 'Untitled Course';
-  const isPublished = row.is_published ?? false;
+  const status: CourseStatus =
+    row.status && (VALID_STATUSES as string[]).includes(row.status)
+      ? (row.status as CourseStatus)
+      : 'draft';
 
   return {
-    id: row.id,
-    title,
-    slug: row.slug ?? row.id,
-    description: row.description ?? '',
-    status: normalizeCourseStatus(row.status, isPublished),
-    category: row.category ?? null,
-    durationHours: row.duration_hours ?? null,
-    durationMinutes: row.duration_minutes ?? null,
-    isPublished,
-    isActive: row.is_active ?? true,
-    thumbnailUrl: row.thumbnail_url ?? null,
+    id:               row.id,
+    title:            row.title?.trim() || 'Untitled Course',
+    slug:             row.slug ?? row.id,
+    description:      row.description ?? '',
+    shortDescription: row.short_description ?? null,
+    status,
+    isActive:         row.is_active ?? true,
+    publishedAt:      row.published_at ?? null,
+    thumbnailUrl:     row.thumbnail_url ?? null,
+    programId:        row.program_id ?? null,
   };
 }

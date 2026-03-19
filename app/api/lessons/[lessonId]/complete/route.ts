@@ -16,6 +16,7 @@ import {
   enforceCheckpointGate,
 } from '@/lib/lms/engine';
 import type { CheckpointGateError } from '@/lib/lms/engine';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 async function _POST(
   request: NextRequest,
@@ -31,6 +32,14 @@ async function _POST(
     }
 
     const { lessonId } = await params;
+
+    // Server-side module gating — must pass before any lesson data is read
+    try {
+      await assertLessonAccess(user.id, lessonId);
+    } catch (e) {
+      const { status, body } = accessErrorResponse(e);
+      return NextResponse.json(body, { status });
+    }
     const body = await request.json().catch(() => ({}));
     // Clamp seat time: minimum 1s, maximum 4 hours per lesson
     const MAX_LESSON_SECONDS = 4 * 60 * 60;
@@ -56,47 +65,40 @@ async function _POST(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
     }
 
-    // Check enrollment — try training_enrollments first (legacy), then
-    // program_enrollments (canonical). Both tables are valid sources.
-    // Normalise to { id, status, approved_at, program_id } so downstream
-    // code is table-agnostic.
-    let enrollment: { id: string; status: string; approved_at: string | null; program_id: string | null } | null = null;
+    // Check enrollment — canonical path only: program_enrollments.
+    // Match by course_id directly (canonical), or by program_id (program-level enrollment).
+    let enrollment: { id: string; status: string; program_id: string | null } | null = null;
 
-    const { data: trainingEnrollment } = await db
-      .from('training_enrollments')
-      .select('id, status, approved_at, program_id')
+    // 1. Direct course enrollment (canonical — course_id set on program_enrollments)
+    const { data: directEnrollment } = await db
+      .from('program_enrollments')
+      .select('id, status, program_id')
       .eq('user_id', user.id)
       .eq('course_id', lesson.course_id)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
       .maybeSingle();
 
-    if (trainingEnrollment) {
-      enrollment = trainingEnrollment;
+    if (directEnrollment) {
+      enrollment = directEnrollment;
     } else {
-      // Resolve program_id from the lesson's course_id via curriculum_lessons,
-      // then look up program_enrollments.
-      const { data: lessonProgram } = await db
-        .from('curriculum_lessons')
+      // 2. Program-level enrollment — resolve program_id from courses table
+      const { data: courseRow } = await db
+        .from('courses')
         .select('program_id')
-        .eq('course_id', lesson.course_id)
-        .limit(1)
+        .eq('id', lesson.course_id)
         .maybeSingle();
 
-      if (lessonProgram?.program_id) {
+      if (courseRow?.program_id) {
         const { data: programEnrollment } = await db
           .from('program_enrollments')
-          .select('id, status, confirmed_at, program_id')
+          .select('id, status, program_id')
           .eq('user_id', user.id)
-          .eq('program_id', lessonProgram.program_id)
-          .in('status', ['active', 'enrolled', 'in_progress', 'completed'])
+          .eq('program_id', courseRow.program_id)
+          .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
           .maybeSingle();
 
         if (programEnrollment) {
-          enrollment = {
-            id:          programEnrollment.id,
-            status:      programEnrollment.status,
-            approved_at: programEnrollment.confirmed_at,
-            program_id:  programEnrollment.program_id,
-          };
+          enrollment = programEnrollment;
         }
       }
     }
@@ -108,7 +110,7 @@ async function _POST(
       );
     }
 
-    if (enrollment.status === 'pending_approval' || !enrollment.approved_at) {
+    if (enrollment.status === 'pending_approval') {
       return NextResponse.json(
         { error: 'Enrollment pending approval' },
         { status: 403 }
@@ -137,13 +139,27 @@ async function _POST(
     }
 
     // Fetch lesson details for type-specific enforcement
-    const { data: lessonDetail } = await db
+    const { data: lessonDetail, error: detailError } = await db
       .from('lms_lessons')
       .select('content_type, duration_minutes')
       .eq('id', lessonId)
       .single();
 
-    const contentType = lessonDetail?.content_type || 'video';
+    if (detailError || !lessonDetail) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    if (!lessonDetail.content_type) {
+      // Lesson has no content_type — cannot enforce seat time or quiz rules.
+      // This is a data integrity failure, not a client error.
+      logger.error(`INVALID_LESSON_CONTENT_TYPE lessonId=${lessonId}`);
+      return NextResponse.json(
+        { error: 'INVALID_LESSON_CONTENT_TYPE' },
+        { status: 422 }
+      );
+    }
+
+    const contentType = lessonDetail.content_type;
 
     // Quiz lessons require a passing attempt before they can be marked complete.
     // HVAC quizzes use a local question bank (not the quizzes table), so
@@ -163,7 +179,7 @@ async function _POST(
       if (!passingAttempt) {
         // Allow completion if this is an HVAC course lesson (local quiz bank,
         // no quiz_attempts rows). Client already enforced pass score.
-        const HVAC_COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
+        const HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
         if (lesson.course_id !== HVAC_COURSE_ID) {
           return NextResponse.json(
             { error: 'Quiz must be passed before marking complete' },
@@ -265,18 +281,18 @@ async function _POST(
           });
         }
       } catch (progErr) {
-        logger.error('[program-completion] Check failed (non-fatal):', progErr);
+        logger.error('[program-completion] Check failed (non-fatal):', progErr instanceof Error ? progErr : new Error(String(progErr)));
       }
     }
 
     // HVAC workflow: advance credential sequence when all lessons complete
-    if (courseCompleted && lesson.course_id === 'f0593164-55be-5867-98e7-8a86770a8dd0') {
+    if (courseCompleted && lesson.course_id === '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0') {
       try {
         const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
         const wfResult = await advanceHvacWorkflow(user.id);
         logger.info('[hvac-workflow] Auto-advanced on course completion', { userId: user.id, ...wfResult });
       } catch (wfErr) {
-        logger.error('[hvac-workflow] Auto-advance failed (non-fatal):', wfErr);
+        logger.error('[hvac-workflow] Auto-advance failed (non-fatal):', wfErr instanceof Error ? wfErr : new Error(String(wfErr)));
       }
     }
 
@@ -314,7 +330,7 @@ async function _POST(
           }
         }
       } catch (eligErr) {
-        logger.error('[credential-pipeline] Eligibility check failed (non-fatal):', eligErr);
+        logger.error('[credential-pipeline] Eligibility check failed (non-fatal):', eligErr instanceof Error ? eligErr : new Error(String(eligErr)));
       }
     }
 
@@ -338,7 +354,7 @@ async function _POST(
         : null,
     });
   } catch (error) {
-    logger.error('Lesson complete API error:', error);
+    logger.error('Lesson complete API error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to complete lesson' },
       { status: 500 }
@@ -377,7 +393,7 @@ async function _DELETE(
     try {
       await recordStepUncompletion(user.id, lessonId, lessonRow.course_id);
     } catch (err) {
-      logger.error('recordStepUncompletion failed:', err);
+      logger.error('recordStepUncompletion failed:', err instanceof Error ? err : new Error(String(err)));
       return NextResponse.json({ error: 'Failed to mark lesson incomplete' }, { status: 500 });
     }
 
@@ -387,12 +403,12 @@ async function _DELETE(
       completed: false,
     });
   } catch (error) {
-    logger.error('Lesson uncomplete API error:', error);
+    logger.error('Lesson uncomplete API error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to uncomplete lesson' },
       { status: 500 }
     );
   }
 }
-export const POST = withApiAudit('/api/lessons/[lessonId]/complete', _POST);
-export const DELETE = withApiAudit('/api/lessons/[lessonId]/complete', _DELETE);
+export const POST   = withApiAudit('/api/lessons/[lessonId]/complete', _POST   as unknown as (req: Request, ...args: any[]) => Promise<Response>);
+export const DELETE = withApiAudit('/api/lessons/[lessonId]/complete', _DELETE as unknown as (req: Request, ...args: any[]) => Promise<Response>);

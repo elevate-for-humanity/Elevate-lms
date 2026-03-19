@@ -84,12 +84,12 @@ export default async function ReviewApplicationPage({
   const programSlug = (app.program_interest || '') as string;
   let resolvedProgramId: string | null = null;
   if (programSlug) {
-    // Try exact match on slug-like patterns in course_name
+    // Try exact match on slug-like patterns in title
     const searchTerm = programSlug.replace(/-/g, ' ');
     const { data: matchedCourse } = await db
-      .from('training_courses')
-      .select('id, course_name')
-      .ilike('course_name', `%${searchTerm}%`)
+      .from('courses')
+      .select('id, title')
+      .ilike('title', `%${searchTerm}%`)
       .eq('is_active', true)
       .limit(1)
       .single();

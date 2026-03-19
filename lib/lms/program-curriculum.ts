@@ -228,7 +228,7 @@ function mapLesson(row: any): ProgramLesson {
     lessonNumber: row.lesson_number,
     orderIndex: row.order_index || row.lesson_number,
     content: row.content || '',
-    contentType: row.content_type || 'video',
+    contentType: row.content_type ?? 'lesson',
     videoUrl: row.video_url || null,
     durationMinutes: row.duration_minutes || 20,
     topics: row.topics || [],

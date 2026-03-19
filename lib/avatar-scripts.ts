@@ -126,7 +126,7 @@ export const PAGE_SCRIPTS: Record<string, {
     nextAction: `Open Requirements/Documents and complete the first incomplete item.`,
   },
 
-  '/learner/dashboard': {
+  '/lms/dashboard': {
     opening: `This dashboard shows your status and next required action. Most delays are missing documents or unsigned agreements.`,
     nextAction: `Check your status card and complete any pending items.`,
   },

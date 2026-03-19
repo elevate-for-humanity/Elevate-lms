@@ -95,10 +95,10 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    // Validate course exists and is available
+    // Validate course exists and is available — canonical courses table only
     const { data: course, error: courseError } = await db
-      .from('training_courses')
-      .select('id, title, status, is_published')
+      .from('courses')
+      .select('id, title, status, is_active')
       .eq('id', courseId)
       .single();
 
@@ -109,12 +109,25 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    if (course.status === 'archived') {
+    if (course.status === 'archived' || !course.is_active) {
       return NextResponse.json(
         { error: 'Course is no longer available' },
         { status: 400 }
       );
     }
+
+    if (course.status !== 'published') {
+      return NextResponse.json(
+        { error: 'Course is not published' },
+        { status: 400 }
+      );
+    }
+
+    // Resolve latest published version — students are locked to this forever
+    const { data: courseVersion } = await db.rpc('get_latest_published_version', {
+      p_course_id: courseId,
+    });
+    const courseVersionId: string | null = courseVersion?.id ?? null;
 
     // Check existing enrollment
     const { data: existing } = await db
@@ -146,7 +159,7 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (reactivateError) {
-        logger.error('Enrollment reactivation failed', { error: reactivateError, requestId });
+        logger.error('Enrollment reactivation failed', reactivateError instanceof Error ? reactivateError : new Error(String(reactivateError)));
         return NextResponse.json(
           { error: 'Failed to reactivate enrollment' },
           { status: 500 }
@@ -160,23 +173,24 @@ async function _POST(request: NextRequest) {
       });
     }
 
-    // Create new enrollment
+    // Create new enrollment — locked to current published version
     const { data: enrollment, error } = await db
       .from('program_enrollments')
       .insert({
-        user_id: user.id,
-        course_id: courseId,
-        status: 'active',
-        progress_percent: 0,
-        started_at: new Date().toISOString(),
+        user_id:           user.id,
+        course_id:         courseId,
+        course_version_id: courseVersionId,
+        status:            'active',
+        progress_percent:  0,
+        started_at:        new Date().toISOString(),
         enrollment_method: 'direct',
-        funding_source: fundingSource || null,
+        funding_source:    fundingSource || null,
       })
       .select()
       .single();
 
     if (error) {
-      logger.error('Enrollment creation failed', { error, requestId });
+      logger.error('Enrollment creation failed', error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { error: 'Failed to create enrollment' },
         { status: 500 }
@@ -185,15 +199,17 @@ async function _POST(request: NextRequest) {
 
     // Record idempotency key if provided (graceful if table doesn't exist)
     if (idempotencyKey) {
-      db
-        .from('enrollment_idempotency')
-        .insert({
+      void Promise.resolve(
+        db.from('enrollment_idempotency').insert({
           idempotency_key: idempotencyKey,
           enrollment_id: `${user.id}_${courseId}`,
           user_id: user.id,
         })
-        .then(() => logger.info('Idempotency key recorded', { idempotencyKey, requestId }))
-        .catch(err => logger.warn('Failed to record idempotency key (table may not exist)', { requestId }));
+      ).then(() => {
+        logger.info('Idempotency key recorded', { idempotencyKey, requestId });
+      }).catch(() => {
+        logger.warn('Failed to record idempotency key (table may not exist)');
+      });
     }
 
     logger.info('Course enrollment created', {
@@ -208,11 +224,11 @@ async function _POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    logger.error('Enrollment API error', { error: 'Internal server error', requestId });
+    logger.error('Enrollment API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
-export const POST = withApiAudit('/api/enrollments/create', _POST);
+export const POST = withApiAudit('/api/enrollments/create', _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>);

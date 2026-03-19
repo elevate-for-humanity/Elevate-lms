@@ -15,6 +15,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { recordCheckpointAttempt } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 export async function POST(
   request: NextRequest,
@@ -29,6 +30,13 @@ export async function POST(
   }
 
   const { lessonId } = await params;
+
+  try {
+    await assertLessonAccess(user.id, lessonId);
+  } catch (e) {
+    const { status, body } = accessErrorResponse(e);
+    return NextResponse.json(body, { status });
+  }
 
   let body: {
     courseId: string;
@@ -76,7 +84,7 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (err) {
-    logger.error('[checkpoint] recordCheckpointAttempt failed:', err);
+    logger.error('[checkpoint] recordCheckpointAttempt failed:', err instanceof Error ? err : new Error(String(err)));
     return NextResponse.json({ error: 'Failed to record checkpoint attempt' }, { status: 500 });
   }
 }

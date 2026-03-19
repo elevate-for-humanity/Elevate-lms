@@ -238,7 +238,7 @@ export default function StudentPortalPage() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-brand-blue-900 font-medium text-sm">Already enrolled? Log in to access your courses, grades, and progress.</p>
           <div className="flex gap-3 flex-shrink-0">
-            <Link href="/login?redirect=/learner/dashboard" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition">
+            <Link href="/login?redirect=/lms/dashboard" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition">
               Log In
             </Link>
             <Link href="/start" className="inline-flex items-center gap-2 border border-brand-blue-600 text-brand-blue-700 px-5 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-100 transition">

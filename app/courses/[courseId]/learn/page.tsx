@@ -41,7 +41,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
               <h2 className="font-semibold mb-4">Course Content</h2>
               <div className="space-y-2">
                 {lessons && lessons.length > 0 ? lessons.map((lesson: any, i: number) => (
-                  <Link key={lesson.id} href={`/courses/${courseId}/lessons/${lesson.id}`} className="block p-2 rounded hover:bg-white">
+                  <Link key={lesson.id} href={`/lms/courses/${courseId}/lessons/${lesson.id}`} className="block p-2 rounded hover:bg-white">
                     <div className="flex items-center gap-2">
                       <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center text-xs">{i + 1}</span>
                       <span className="text-sm">{lesson.title}</span>

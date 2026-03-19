@@ -16,14 +16,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity
 // Maps program slug → LMS course UUID for direct deep-linking.
 // Add new programs here as they are seeded.
 const COURSE_ID_MAP: Record<string, string> = {
-  'hvac-technician': 'f0593164-55be-5867-98e7-8a86770a8dd0',
+  'hvac-technician': '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',
 };
 
 function lmsUrl(data: CourseEmailData): string {
   const id = data.courseId ?? COURSE_ID_MAP[data.courseSlug];
   return id
     ? `${SITE_URL}/lms/courses/${id}`
-    : `${SITE_URL}/learner/dashboard`;
+    : `${SITE_URL}/lms/dashboard`;
 }
 
 // ─── Brand colors ─────────────────────────────────────────────────────────────

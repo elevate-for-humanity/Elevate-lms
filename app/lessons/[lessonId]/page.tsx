@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!supabase) return { title: 'Lesson | Elevate LMS' };
   
   const { data: lesson } = await db
-    .from('training_lessons')
+    .from('course_lessons')
     .select('title, course_id')
     .eq('id', lessonId)
     .single();
@@ -45,7 +45,7 @@ export default async function LessonRedirectPage({ params }: Props) {
 
   // Get the lesson to find its course
   const { data: lesson, error } = await db
-    .from('training_lessons')
+    .from('course_lessons')
     .select('course_id')
     .eq('id', lessonId)
     .single();

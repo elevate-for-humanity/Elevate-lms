@@ -39,7 +39,7 @@ async function _GET(req: NextRequest) {
 
     // Get courses created by this user or all if admin
     let query = db
-      .from("training_courses")
+      .from("courses")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -105,9 +105,15 @@ async function _POST(req: NextRequest) {
       settings,
     } = body;
 
+    // LEGACY_SYSTEM_DISABLED — use POST /api/admin/lms/courses
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use POST /api/admin/lms/courses' },
+      { status: 410 }
+    );
+
     // Create course
     const { data: course, error: courseError } = await db
-      .from("training_courses")
+      .from("courses")
       .insert({
         title,
         description,

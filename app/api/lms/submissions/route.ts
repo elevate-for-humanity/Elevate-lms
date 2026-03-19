@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   // Verify the lesson exists and belongs to the course
   const { data: lesson, error: lessonErr } = await db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select('id, step_type, course_id')
     .eq('id', lesson_id)
     .eq('course_id', course_id)

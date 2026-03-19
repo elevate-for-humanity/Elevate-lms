@@ -43,7 +43,7 @@ export default async function ImpactPage() {
     db.from('program_enrollments').select('id', { count: 'exact', head: true }),
     db.from('certificates').select('id', { count: 'exact', head: true }),
     db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('training_courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    db.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
     db.from('employment_outcomes').select('employment_status, wage_at_placement, wage_at_followup').limit(500),
     db.from('certificates').select('id, user_id, issued_at, profiles(full_name)').order('issued_at', { ascending: false }).limit(10),
     db.from('programs').select('id, name, status').eq('status', 'active').limit(20),

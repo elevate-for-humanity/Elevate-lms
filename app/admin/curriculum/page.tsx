@@ -35,7 +35,7 @@ export default async function CurriculumPage() {
 
   // Aggregate lesson counts per course_id from curriculum_lessons
   const { data: lessonRows } = await db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select('course_id, status, step_type');
 
   // Build per-course stats
@@ -58,8 +58,8 @@ export default async function CurriculumPage() {
   // Resolve course names from training_courses
   const { data: trainingCourses } = courseIds.length
     ? await db
-        .from('training_courses')
-        .select('id, course_name')
+        .from('courses')
+        .select('id, title')
         .in('id', courseIds)
     : { data: [] };
 
@@ -75,7 +75,7 @@ export default async function CurriculumPage() {
     : { data: [] };
 
   const nameMap = new Map<string, string>();
-  for (const c of trainingCourses ?? []) nameMap.set(c.id, c.course_name);
+  for (const c of trainingCourses ?? []) nameMap.set(c.id, c.title);
   for (const p of programs ?? []) nameMap.set(p.id, p.name);
 
   // Build display list sorted by lesson count desc

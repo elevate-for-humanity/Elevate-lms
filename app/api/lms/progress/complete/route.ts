@@ -57,12 +57,12 @@ async function _POST(req: NextRequest) {
     // ── ENROLLMENT OWNERSHIP ─────────────────────────────────────────
     // Verify the user is enrolled in this course before allowing completion.
     const { data: enrollment } = await db
-      .from('training_enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
-      .in('status', ['active', 'in_progress'])
-      .single();
+      .in('status', ['active', 'in_progress', 'enrolled', 'confirmed'])
+      .maybeSingle();
 
     if (!enrollment) {
       return NextResponse.json(
@@ -112,7 +112,7 @@ async function _POST(req: NextRequest) {
 
     // Get course details
     const { data: course } = await db
-      .from('training_courses')
+      .from('courses')
       .select('slug, title, metadata')
       .eq('id', courseId)
       .single();
@@ -206,7 +206,7 @@ async function _POST(req: NextRequest) {
     try {
       const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
       await issueCertificate({
-        supabase,
+        supabase: db,
         studentId: user.id,
         courseId,
         studentName: profile?.full_name || 'Student',
@@ -241,7 +241,7 @@ async function _POST(req: NextRequest) {
 
     try {
       const { data: courseCredential } = await db
-        .from('training_courses')
+        .from('courses')
         .select('credential_id, program_id')
         .eq('id', courseId)
         .maybeSingle();
@@ -298,10 +298,10 @@ async function verifyQuizzesPassed(
 ): Promise<{ allPassed: boolean; failedQuizzes: string[]; scores: Record<string, number> }> {
   // Get all quiz-type lessons for this course
   const { data: quizLessons } = await db
-    .from('training_lessons')
+    .from('course_lessons')
     .select('id, title')
     .eq('course_id', courseId)
-    .eq('type', 'quiz');
+    .eq('lesson_type', 'quiz');
 
   if (!quizLessons || quizLessons.length === 0) {
     return { allPassed: true, failedQuizzes: [], scores: {} };
@@ -367,7 +367,7 @@ async function getLatestExamSession(
 ): Promise<any | null> {
   // Look up the course slug to match against exam_sessions.program_slug
   const { data: course } = await db
-    .from('training_courses')
+    .from('courses')
     .select('slug')
     .eq('id', courseId)
     .single();
@@ -387,4 +387,4 @@ async function getLatestExamSession(
   return session;
 }
 
-export const POST = withApiAudit('/api/lms/progress/complete', _POST);
+export const POST = withApiAudit('/api/lms/progress/complete', _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>);

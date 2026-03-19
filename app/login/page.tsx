@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -66,49 +67,13 @@ function LoginForm() {
 
       const role = profile.role;
       const onboardingDone = profile.onboarding_completed === true;
-      const isActiveStudent = profile.enrollment_status === 'active';
 
-      // Students go to LMS — onboarding is optional and separate.
-      // No gate blocking course access.
-
-      switch (role) {
-        case 'admin':
-        case 'super_admin':
-        case 'org_admin':
-          router.push('/admin/dashboard');
-          break;
-        case 'staff':
-          router.push('/staff-portal/dashboard');
-          break;
-        case 'instructor':
-          router.push('/instructor/dashboard');
-          break;
-        case 'mentor':
-          router.push('/mentor/dashboard');
-          break;
-        case 'creator':
-          router.push('/creator/dashboard');
-          break;
-        case 'program_holder':
-        case 'delegate':
-          router.push('/program-holder/dashboard');
-          break;
-        case 'partner':
-        case 'sponsor':
-          router.push('/partner-portal');
-          break;
-        case 'employer':
-          router.push(onboardingDone ? '/employer/dashboard' : '/onboarding/employer');
-          break;
-        case 'workforce_board':
-          router.push('/workforce-board/dashboard');
-          break;
-        case 'student':
-          router.push('/lms/dashboard');
-          break;
-        default:
-          router.push('/lms/dashboard');
-          break;
+      // Employer: gate on onboarding completion before sending to dashboard.
+      // All other roles: use canonical destination map.
+      if (role === 'employer' && !onboardingDone) {
+        router.push('/onboarding/employer');
+      } else {
+        router.push(getRoleDestination(role));
       }
     } catch (err: any) {
       const msg = err?.message || 'Invalid email or password';
@@ -211,7 +176,7 @@ function LoginForm() {
             <div className="mt-6 text-center text-sm text-black">
               Don't have an account?{' '}
               <Link
-                href={`/signup${next ? `?next=${encodeURIComponent(next)}` : ''}`}
+                href={`/signup${next ? `?redirect=${encodeURIComponent(next)}` : ''}`}
                 className="text-brand-blue-600 font-semibold hover:text-brand-blue-700"
               >
                 Sign up
@@ -224,7 +189,7 @@ function LoginForm() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Link
-                  href="/learner/dashboard"
+                  href="/lms/dashboard"
                   prefetch={false}
                   className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >

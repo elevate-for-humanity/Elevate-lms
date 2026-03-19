@@ -9,7 +9,7 @@ import Image from 'next/image';
 // Known course UUIDs → program slug for courses with dedicated pages.
 // These redirect immediately without querying Supabase.
 const COURSE_ID_TO_PROGRAM_SLUG: Record<string, string> = {
-  'f0593164-55be-5867-98e7-8a86770a8dd0': 'hvac-technician',
+  '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0': 'hvac-technician',
 };
 
 export async function generateMetadata({
@@ -460,7 +460,7 @@ export default async function CourseDetailPage({
                 )}
                 {isEnrolled && (
                   <Link
-                    href="/learner/dashboard"
+                    href="/lms/dashboard"
                     className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-semibold hover:border-slate-400 transition-colors"
                   >
                     Back to Dashboard

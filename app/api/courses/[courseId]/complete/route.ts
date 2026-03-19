@@ -29,7 +29,7 @@ async function _POST(
 
     // Get course info
     const { data: course, error: courseError } = await db
-      .from('training_courses')
+      .from('courses')
       .select('id, title')
       .eq('id', courseId)
       .single();
@@ -55,7 +55,7 @@ async function _POST(
 
     // Check if all lessons are completed
     const { data: lessons } = await db
-      .from('training_lessons')
+      .from('course_lessons')
       .select('id')
       .eq('course_id', courseId);
 
@@ -105,7 +105,7 @@ async function _POST(
 
     // Proctored exam gate (course-specific)
     const { data: courseDetail } = await db
-      .from('training_courses')
+      .from('courses')
       .select('slug')
       .eq('id', courseId)
       .single();
@@ -214,7 +214,7 @@ async function _POST(
     return NextResponse.json({
       success: true,
       courseId,
-      courseTitle: course.course_name,
+      courseTitle: course.title,
       completedAt: new Date().toISOString(),
       certificate: certificate
         ? {
@@ -267,7 +267,7 @@ async function _GET(
       .single();
 
     const { data: lessons } = await db
-      .from('training_lessons')
+      .from('course_lessons')
       .select('id')
       .eq('course_id', courseId);
 

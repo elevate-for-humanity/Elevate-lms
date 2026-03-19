@@ -60,7 +60,7 @@ async function _GET(_req: Request, { params }: Params) {
   const launchUrl = await client.getSsoLaunchUrl({
     accountExternalId: enrollment.metadata?.external_account_id,
     externalEnrollmentId: enrollment.external_enrollment_id,
-    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/learner/dashboard`,
+    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/lms/dashboard`,
   });
 
   return NextResponse.redirect(launchUrl);

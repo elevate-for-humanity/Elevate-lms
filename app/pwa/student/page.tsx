@@ -191,7 +191,7 @@ export default async function StudentPWAPage() {
       {/* Primary CTA — context-aware */}
       <div className="px-4 mt-5">
         {hasCourses ? (
-          <Link href="/learner/dashboard" className="block w-full bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-blue-700 transition-colors">
+          <Link href="/lms/dashboard" className="block w-full bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-blue-700 transition-colors">
             Resume Learning →
           </Link>
         ) : hasProgram && !onboardingDone ? (

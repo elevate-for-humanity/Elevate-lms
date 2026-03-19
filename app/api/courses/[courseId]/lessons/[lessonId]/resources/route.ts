@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getCurrentUser } from '@/lib/auth';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 async function _GET(
   request: Request,
@@ -17,9 +19,19 @@ async function _GET(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const _admin = createAdminClient(); const db = _admin || supabase;
     const { lessonId } = await params;
+
+    try {
+      await assertLessonAccess(user.id, lessonId);
+    } catch (e) {
+      const { status, body } = accessErrorResponse(e);
+      return NextResponse.json(body, { status });
+    }
 
     const { data: resources, error } = await db
       .from('course_materials')

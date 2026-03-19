@@ -40,7 +40,7 @@ export default async function LaunchCourse({ params }: { params: Params }) {
   if (!user) redirect('/login');
 
   const { data: course, error } = await db
-    .from('training_courses')
+    .from('courses')
     .select(
       'id, slug, title, delivery_mode, partner_url, launch_mode, allow_iframe'
     )

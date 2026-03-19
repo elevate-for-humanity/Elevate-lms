@@ -191,10 +191,10 @@ export class EmailService {
           <li style="margin: 6px 0;">Dedicated advisor throughout your program</li>
         </ul>
         <p style="margin: 0 0 24px;">Log in to your student portal to get started.</p>
-        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/learner/dashboard', 'Go to Student Portal')}</div>
+        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/lms/dashboard', 'Go to Student Portal')}</div>
         <p style="margin: 0; color: #6b7280; font-size: 14px;">Questions? Reply to this email or call (317) 314-3757.</p>
       `),
-      text: `Hello ${userName},\n\nYour Elevate for Humanity account is active. Log in to get started.\n\nhttps://www.elevateforhumanity.org/learner/dashboard\n\n— Elevate for Humanity`,
+      text: `Hello ${userName},\n\nYour Elevate for Humanity account is active. Log in to get started.\n\nhttps://www.elevateforhumanity.org/lms/dashboard\n\n— Elevate for Humanity`,
     };
   }
 
@@ -211,7 +211,7 @@ export class EmailService {
           <li style="margin: 6px 0;">Begin your coursework</li>
         </ol>
         <p style="margin: 0 0 24px;">Your advisor will be in touch with any additional details.</p>
-        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/learner/dashboard', 'Start Learning')}</div>
+        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/lms/dashboard', 'Start Learning')}</div>
       `),
       text: `Hello ${userName},\n\nYou are enrolled in ${courseName}.\n\nNext steps:\n1. Log in to the student portal\n2. Complete the orientation module\n3. Begin your coursework\n\n— Elevate for Humanity`,
     };
@@ -228,7 +228,7 @@ export class EmailService {
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;"><strong>${assignmentName}</strong> is due on <strong>${dueDate}</strong>.</p>
         <p style="margin: 0 0 24px;">Make sure you've reviewed the requirements and submitted your work before the deadline.</p>
-        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/learner/dashboard', 'View Assignment')}</div>
+        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/lms/dashboard', 'View Assignment')}</div>
         <p style="margin: 0; color: #6b7280; font-size: 14px;">Need help? Contact your instructor or advisor.</p>
       `),
       text: `Hello ${userName},\n\n${assignmentName} is due on ${dueDate}. Submit before the deadline.\n\n— Elevate for Humanity`,
@@ -260,7 +260,7 @@ export class EmailService {
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;">You've earned the <strong>${achievementName}</strong> achievement.</p>
         <p style="margin: 0 0 24px;">View your achievements in the student portal.</p>
-        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/learner/dashboard', 'View Achievements')}</div>
+        <div style="margin: 0 0 16px;">${this.btn('https://www.elevateforhumanity.org/lms/dashboard', 'View Achievements')}</div>
       `),
       text: `Hello ${userName},\n\nYou've earned the ${achievementName} achievement.\n\n— Elevate for Humanity`,
     };

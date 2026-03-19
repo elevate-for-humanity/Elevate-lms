@@ -31,12 +31,12 @@ async function _POST(req: NextRequest) {
 
     // Verify enrollment before allowing progress tracking
     const { data: enrollment } = await db
-      .from('training_enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
-      .in('status', ['active', 'in_progress'])
-      .single();
+      .in('status', ['active', 'in_progress', 'enrolled', 'confirmed'])
+      .maybeSingle();
 
     if (!enrollment) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ async function _POST(req: NextRequest) {
 
     // Get course details
     const { data: course } = await db
-      .from('training_courses')
+      .from('courses')
       .select('slug')
       .eq('id', courseId)
       .single();

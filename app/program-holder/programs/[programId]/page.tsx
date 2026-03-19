@@ -69,7 +69,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
 
   // Fetch courses in program
   const { data: courses, count: courseCount } = await db
-    .from('training_courses')
+    .from('courses')
     .select('*', { count: 'exact' })
     .eq('program_id', programId);
 

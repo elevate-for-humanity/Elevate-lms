@@ -111,7 +111,7 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
     const { count: totalLessons } = await supabase
       .from('training_lessons')
       .select('*', { count: 'exact', head: true })
-      .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0');
+      .eq('course_id', '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0');
 
     const { count: completedLessons } = await supabase
       .from('lesson_progress')
@@ -123,7 +123,7 @@ export default function NewSessionForm({ session, onSaved, onCancel }: Props) {
     const { data: quizLessons } = await supabase
       .from('training_lessons')
       .select('id')
-      .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0')
+      .eq('course_id', '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0')
       .eq('content_type', 'quiz');
 
     let quizzesPassed = 0;

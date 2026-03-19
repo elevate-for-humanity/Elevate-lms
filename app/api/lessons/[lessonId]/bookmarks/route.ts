@@ -9,15 +9,13 @@ import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const supabase = await createClient();
+  const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
@@ -26,6 +24,13 @@ const supabase = await createClient();
   }
 
   const { lessonId } = await params;
+
+  try {
+    await assertLessonAccess(user.id, lessonId);
+  } catch (e) {
+    const { status, body } = accessErrorResponse(e);
+    return NextResponse.json(body, { status });
+  }
 
   const { data, error }: any = await db
     .from("video_bookmarks")
@@ -58,6 +63,14 @@ async function _POST(
   }
 
   const { lessonId } = await params;
+
+  try {
+    await assertLessonAccess(user.id, lessonId);
+  } catch (e) {
+    const { status, body: errBody } = accessErrorResponse(e);
+    return NextResponse.json(errBody, { status });
+  }
+
   const body = await req.json();
   const { label, positionSeconds } = body;
 
@@ -82,5 +95,5 @@ async function _POST(
 
   return NextResponse.json({ success: true });
 }
-export const GET = withApiAudit('/api/lessons/[lessonId]/bookmarks', _GET);
-export const POST = withApiAudit('/api/lessons/[lessonId]/bookmarks', _POST);
+export const GET  = withApiAudit('/api/lessons/[lessonId]/bookmarks', _GET  as unknown as (req: Request, ...args: any[]) => Promise<Response>);
+export const POST = withApiAudit('/api/lessons/[lessonId]/bookmarks', _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>);

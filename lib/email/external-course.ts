@@ -65,7 +65,7 @@ export async function sendExternalCourseLoginEmail(params: ExternalCourseLoginEm
             <li style="margin-bottom:8px">Download your completion certificate or DOL wallet card.</li>
             <li style="margin-bottom:8px">
               Upload it in your
-              <a href="${SITE_URL}/learner/dashboard" style="color:#dc2626">Elevate dashboard</a>
+              <a href="${SITE_URL}/lms/dashboard" style="color:#dc2626">Elevate dashboard</a>
               to unlock your next module.
             </li>
             <li>Staff will verify your credential within 1–2 business days.</li>
@@ -96,7 +96,7 @@ interface ExternalCourseApprovedEmailParams {
 export async function sendExternalCourseApprovedEmail(params: ExternalCourseApprovedEmailParams) {
   const {
     to, studentName, courseTitle, programTitle,
-    dashboardUrl = `${SITE_URL}/learner/dashboard`,
+    dashboardUrl = `${SITE_URL}/lms/dashboard`,
   } = params;
 
   return sendEmail({

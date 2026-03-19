@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 // Known course UUID → definition slug mapping for pre-migration fallback
 const COURSE_ID_TO_SLUG: Record<string, string> = {
-  'f0593164-55be-5867-98e7-8a86770a8dd0': 'hvac-technician',
+  '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0': 'hvac-technician',
 };
 
 // Lesson definition ID → UUID lookup (currently only HVAC)
@@ -41,7 +41,7 @@ function buildLocalFallback(courseId: string, slug: string) {
   const course = {
     id: courseId,
     title: def.title,
-    course_name: def.title,
+    title: def.title,
     description: def.subtitle,
     is_active: true,
   };
@@ -89,7 +89,7 @@ function buildLocalFallback(courseId: string, slug: string) {
     }),
   );
 
-  return { course: { ...course, title: course.course_name }, lessons, modules };
+  return { course: { ...course, title: course.title }, lessons, modules };
 }
 
 /**
@@ -158,8 +158,8 @@ async function _GET(
 
   // Fetch course
   const { data: course, error: courseErr } = await supabase
-    .from('training_courses')
-    .select('id, course_name, description, is_active')
+    .from('courses')
+    .select('id, title, description, is_active')
     .eq('id', courseId)
     .single();
 
@@ -177,7 +177,7 @@ async function _GET(
 
   // Fetch published lessons via admin client (bypasses RLS)
   const { data: lessons, error: lessonsErr } = await supabase
-    .from('training_lessons')
+    .from('course_lessons')
     .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id, quiz_questions, passing_score, description, topics')
     .eq('course_id', courseId)
     .eq('is_published', true)
@@ -209,7 +209,7 @@ async function _GET(
     return lesson;
   });
 
-  const normalizedCourse = { ...course, title: course.course_name };
+  const normalizedCourse = { ...course, title: course.title };
   const payload = {
     course: normalizedCourse,
     lessons: enrichedLessons,

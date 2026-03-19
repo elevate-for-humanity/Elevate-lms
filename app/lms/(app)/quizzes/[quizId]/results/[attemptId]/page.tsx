@@ -217,7 +217,7 @@ export default async function QuizResultsPage({ params }: Props) {
             </Link>
           )}
           <Link
-            href="/learner/dashboard"
+            href="/lms/dashboard"
             className="flex items-center gap-2 px-6 py-3 border border-slate-300 rounded-xl font-semibold hover:bg-white transition"
           >
             <Home className="w-5 h-5" />

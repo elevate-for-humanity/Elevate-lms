@@ -36,9 +36,18 @@ CREATE INDEX IF NOT EXISTS idx_checkpoint_scores_user_course
 -- RLS
 ALTER TABLE checkpoint_scores ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Users can read own checkpoint scores"
-  ON checkpoint_scores FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'checkpoint_scores'
+      AND policyname = 'Users can read own checkpoint scores'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can read own checkpoint scores"
+      ON checkpoint_scores FOR SELECT
+      USING (auth.uid() = user_id)';
+  END IF;
+END $$;
 
 -- 3. Fix practice exam question counts
 -- Universal Full Practice Exam: trim to 25 best questions

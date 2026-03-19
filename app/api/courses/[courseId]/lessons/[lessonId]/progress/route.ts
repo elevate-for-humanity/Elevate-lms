@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 
 async function _POST(
   request: Request,
@@ -18,7 +19,7 @@ async function _POST(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const _admin = createAdminClient(); const db = _admin || supabase;
     const { lessonId } = await params;
     const {
       data: { user },
@@ -26,6 +27,13 @@ async function _POST(
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+      await assertLessonAccess(user.id, lessonId);
+    } catch (e) {
+      const { status, body } = accessErrorResponse(e);
+      return NextResponse.json(body, { status });
     }
 
     const { progress } = await request.json();

@@ -29,7 +29,7 @@ async function _GET(
       );
 
     // Get course with lessons
-    const query = db.from('training_courses').select(`
+    const query = db.from('courses').select(`
         *,
         lessons (
           id,
@@ -104,10 +104,16 @@ async function _PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // LEGACY_SYSTEM_DISABLED
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use PATCH /api/admin/lms/courses/[courseId]' },
+      { status: 410 }
+    );
+
     const updates = await request.json();
 
     const { data: course, error } = await db
-      .from('training_courses')
+      .from('courses')
       .update(updates)
       .eq('id', courseId)
       .select()
@@ -167,8 +173,14 @@ async function _DELETE(
       );
     }
 
+    // LEGACY_SYSTEM_DISABLED
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use DELETE /api/admin/lms/courses/[courseId]' },
+      { status: 410 }
+    );
+
     const { error } = await db
-      .from('training_courses')
+      .from('courses')
       .delete()
       .eq('id', courseId);
 

@@ -34,6 +34,12 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing course id' }, { status: 400 });
     }
 
+    // LEGACY_SYSTEM_DISABLED — course updates must go through /api/admin/lms/courses/[courseId]
+    return NextResponse.json(
+      { error: 'LEGACY_SYSTEM_DISABLED: use PATCH /api/admin/lms/courses/[courseId]' },
+      { status: 410 }
+    );
+
     const updateData: any = {};
     if (metadata) updateData.metadata = metadata;
     if (slug) updateData.slug = slug;

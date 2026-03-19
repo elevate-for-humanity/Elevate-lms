@@ -55,7 +55,7 @@ export default async function AnalyticsPage() {
     .select('*', { count: 'exact', head: true });
 
   const { count: totalCourses } = await db
-    .from('training_courses')
+    .from('courses')
     .select('*', { count: 'exact', head: true });
 
   const { count: totalEnrollments } = await db

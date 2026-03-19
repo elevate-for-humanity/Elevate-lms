@@ -30,59 +30,79 @@ async function _POST(request: Request) {
     return NextResponse.json({ error: 'Apprenticeship not found' }, { status: 404 });
   }
 
-  const notifications = [];
+  const notifications: Array<{
+    user_id: string;
+    type: string;
+    title: string;
+    body: string;
+    status: string;
+    sent_at: string;
+  }> = [];
+
+  const now = new Date().toISOString();
 
   switch (type) {
     case 'checkin_reminder':
       notifications.push({
-        recipient_id: apprenticeship.student_id,
-        notification_type: 'checkin_reminder',
-        subject: '⏰ Time to Check In - ' + apprenticeship.employer_name,
-        message: `Hi ${apprenticeship.student.full_name},\n\nReminder to check in for your shift at ${apprenticeship.employer_name}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/lms/apprenticeship-hours`
+        user_id: apprenticeship.student_id,
+        type: 'checkin_reminder',
+        title: '⏰ Time to Check In - ' + apprenticeship.employer_name,
+        body: `Hi ${apprenticeship.student.full_name},\n\nReminder to check in for your shift at ${apprenticeship.employer_name}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/lms/apprenticeship-hours`,
+        status: 'sent',
+        sent_at: now,
       });
       break;
 
     case 'missed_checkin':
       notifications.push({
-        recipient_id: apprenticeship.employer_contact_id,
-        notification_type: 'missed_checkin_alert',
-        subject: '⚠️ Apprentice Missed Check-In - ' + apprenticeship.student.full_name,
-        message: `${apprenticeship.student.full_name} has not checked in today.\n\nExpected check-in time: ${data.expectedTime}\nCurrent time: ${new Date().toLocaleTimeString()}`
+        user_id: apprenticeship.employer_contact_id,
+        type: 'missed_checkin_alert',
+        title: '⚠️ Apprentice Missed Check-In - ' + apprenticeship.student.full_name,
+        body: `${apprenticeship.student.full_name} has not checked in today.\n\nExpected check-in time: ${data.expectedTime}\nCurrent time: ${new Date().toLocaleTimeString()}`,
+        status: 'sent',
+        sent_at: now,
       });
       break;
 
     case 'hours_approved':
       notifications.push({
-        recipient_id: apprenticeship.student_id,
-        notification_type: 'hours_approved',
-        subject: '✅ Your Hours Have Been Approved',
-        message: `Hi ${apprenticeship.student.full_name},\n\nYour ${data.hours} hours for ${data.date} have been approved!\n\nTotal hours: ${apprenticeship.total_hours_completed}/${apprenticeship.total_hours_required}\nProgress: ${((apprenticeship.total_hours_completed / apprenticeship.total_hours_required) * 100).toFixed(1)}%`
+        user_id: apprenticeship.student_id,
+        type: 'hours_approved',
+        title: '✅ Your Hours Have Been Approved',
+        body: `Hi ${apprenticeship.student.full_name},\n\nYour ${data.hours} hours for ${data.date} have been approved!\n\nTotal hours: ${apprenticeship.total_hours_completed}/${apprenticeship.total_hours_required}\nProgress: ${((apprenticeship.total_hours_completed / apprenticeship.total_hours_required) * 100).toFixed(1)}%`,
+        status: 'sent',
+        sent_at: now,
       });
       break;
 
     case 'payroll_ready':
       notifications.push({
-        recipient_id: apprenticeship.student_id,
-        notification_type: 'payroll_ready',
-        subject: '💰 Payroll Ready - ' + data.periodEnd,
-        message: `Hi ${apprenticeship.student.full_name},\n\nYour payroll is ready:\n\nPeriod: ${data.periodStart} to ${data.periodEnd}\nHours: ${data.hours}\nRate: $${apprenticeship.wage_current}/hr\nGross Pay: $${data.grossPay}`
+        user_id: apprenticeship.student_id,
+        type: 'payroll_ready',
+        title: '💰 Payroll Ready - ' + data.periodEnd,
+        body: `Hi ${apprenticeship.student.full_name},\n\nYour payroll is ready:\n\nPeriod: ${data.periodStart} to ${data.periodEnd}\nHours: ${data.hours}\nRate: $${apprenticeship.wage_current}/hr\nGross Pay: $${data.grossPay}`,
+        status: 'sent',
+        sent_at: now,
       });
       break;
 
-    case 'daily_summary':
+    case 'daily_summary': {
       const progress = ((data.totalHours / data.requiredHours) * 100).toFixed(1);
       notifications.push({
-        recipient_id: apprenticeship.student_id,
-        notification_type: 'daily_summary',
-        subject: '📊 Daily Hours Summary - ' + data.date,
-        message: `Hi ${data.studentName},\n\nHere's your summary for ${data.date}:\n\nCheck-in: ${data.checkInTime}\nCheck-out: ${data.checkOutTime || 'Not yet'}\nHours Today: ${data.todayHours}\n\nTotal Progress:\n${data.totalHours}/${data.requiredHours} hours (${progress}%)\n\nStatus: ${data.approved ? '✅ Approved' : '⏳ Pending approval'}`
+        user_id: apprenticeship.student_id,
+        type: 'daily_summary',
+        title: '📊 Daily Hours Summary - ' + data.date,
+        body: `Hi ${data.studentName},\n\nHere's your summary for ${data.date}:\n\nCheck-in: ${data.checkInTime}\nCheck-out: ${data.checkOutTime || 'Not yet'}\nHours Today: ${data.todayHours}\n\nTotal Progress:\n${data.totalHours}/${data.requiredHours} hours (${progress}%)\n\nStatus: ${data.approved ? '✅ Approved' : '⏳ Pending approval'}`,
+        status: 'sent',
+        sent_at: now,
       });
       break;
+    }
   }
 
-  // Insert notifications
+  // Insert notifications into the canonical notification_logs table
   for (const notif of notifications) {
-    await db.from('notification_log').insert(notif);
+    await db.from('notification_logs').insert(notif);
   }
 
   return NextResponse.json({ success: true, sent: notifications.length });

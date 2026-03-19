@@ -19,7 +19,7 @@ async function _GET(req: NextRequest) {
   const _admin = createAdminClient(); const db = _admin || supabase;
 
     const { data, error }: any = await db
-      .from('training_courses')
+      .from('courses')
       .select('*')
       .order('created_at', { ascending: false });
 

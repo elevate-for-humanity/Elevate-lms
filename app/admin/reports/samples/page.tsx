@@ -26,7 +26,7 @@ export default async function SampleReportsPage() {
     db.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
     db.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
     db.from('programs').select('id, name, status', { count: 'exact' }),
-    db.from('training_courses').select('id, course_name, is_active', { count: 'exact' }),
+    db.from('courses').select('id, title, is_active', { count: 'exact' }),
   ]);
 
   const reportSections = [

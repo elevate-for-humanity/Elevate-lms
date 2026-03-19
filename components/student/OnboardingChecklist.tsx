@@ -116,7 +116,7 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
               done={onboarding.milady_orientation_completed}
               label="Complete Milady Orientation"
               action="Start"
-              href="/learner/dashboard"
+              href="/lms/dashboard"
             />
             <OnboardingItem
               done={onboarding.ai_instructor_met}

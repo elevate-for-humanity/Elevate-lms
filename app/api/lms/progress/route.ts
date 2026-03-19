@@ -49,7 +49,7 @@ async function _GET(req: NextRequest) {
   const db = createAdminClient() || supabase;
   const { data: legacyProgress } = await db
     .from('lesson_progress')
-    .select('id, completed_at, lesson:training_lessons(title, course_id)')
+    .select('id, completed_at, lesson:course_lessons(title, course_id)')
     .eq('user_id', user.id)
     .eq('completed', true)
     .order('completed_at', { ascending: false })
@@ -58,4 +58,4 @@ async function _GET(req: NextRequest) {
   return NextResponse.json({ progress: legacyProgress || [] });
 }
 
-export const GET = withApiAudit('/api/lms/progress', _GET);
+export const GET = withApiAudit('/api/lms/progress', _GET as unknown as (req: Request, ...args: any[]) => Promise<Response>);

@@ -30,7 +30,7 @@ export default async function AdminEnrollmentsPage() {
     .select(`
       *,
       student:profiles(id, full_name, email),
-      course:training_courses(id, course_name)
+      course:training_courses(id, title)
     `)
     .order('enrolled_at', { ascending: false });
 
@@ -42,13 +42,13 @@ export default async function AdminEnrollmentsPage() {
 
   // Fetch courses for dropdown
   const { data: coursesRaw } = await db
-    .from('training_courses')
-    .select('id, course_name')
+    .from('courses')
+    .select('id, title')
     .eq('is_active', true)
-    .order('course_name');
+    .order('title');
 
-  // Map course_name to title for the client component
-  const courses = (coursesRaw || []).map(c => ({ id: c.id, title: c.course_name }));
+  // Map title to title for the client component
+  const courses = (coursesRaw || []).map(c => ({ id: c.id, title: c.title }));
 
   // Fetch cohorts for dropdown
   const { data: cohortsRaw } = await db

@@ -37,8 +37,8 @@ export default async function CurriculumCourseEditorPage({
 
   // Resolve course name — try training_courses first, then programs table
   const { data: trainingCourse } = await db
-    .from('training_courses')
-    .select('id, course_name')
+    .from('courses')
+    .select('id, title')
     .eq('id', courseId)
     .maybeSingle();
 
@@ -47,11 +47,11 @@ export default async function CurriculumCourseEditorPage({
     : { data: null };
 
   const courseName =
-    trainingCourse?.course_name ?? program?.name ?? null;
+    trainingCourse?.title ?? program?.name ?? null;
 
   // Verify at least one curriculum_lessons row exists for this courseId
   const { count: lessonCount } = await db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select('id', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
@@ -65,7 +65,7 @@ export default async function CurriculumCourseEditorPage({
   // and must NOT be published or marketed as the live course until a full
   // content parity migration is completed and verified.
   const LEGACY_DRIVEN_COURSES: Record<string, string> = {
-    'f0593164-55be-5867-98e7-8a86770a8dd0':
+    '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0':
       'HVAC Technician — live learner path is training_lessons (95 lessons). ' +
       'These curriculum_lessons rows are an unpopulated migration skeleton. ' +
       'Do not publish or route learners here until content parity is verified.',
@@ -74,7 +74,7 @@ export default async function CurriculumCourseEditorPage({
 
   // Module summary for the sidebar
   const { data: moduleSummary } = await db
-    .from('curriculum_lessons')
+    .from('course_lessons')
     .select('module_order, module_title, step_type, status')
     .eq('course_id', courseId)
     .order('module_order')

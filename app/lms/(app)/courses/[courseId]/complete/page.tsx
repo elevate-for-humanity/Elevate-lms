@@ -45,8 +45,8 @@ export default async function CompleteCourse({ params }: { params: Params }) {
   if (!user) redirect('/login');
 
   const { data: course } = await db
-    .from('training_courses')
-    .select('id, course_name, delivery_mode')
+    .from('courses')
+    .select('id, title, description')
     .eq('id', courseId)
     .single();
 
@@ -85,7 +85,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
       ) : (
         <>
           <p className="mt-2 opacity-80">
-            Upload proof of completion for <b>{course.course_name}</b>
+            Upload proof of completion for <b>{course.title}</b>
           </p>
           <p className="mt-1 text-sm opacity-70">
             (Certificate PDF, screenshot, or completion code)

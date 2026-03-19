@@ -181,7 +181,7 @@ async function _GET(request: NextRequest) {
           id: l.id,
           title: l.title,
           duration: l.duration_minutes || 15,
-          type: l.content_type || 'video',
+          type: l.content_type ?? 'lesson',
           completed: completedIds.has(l.id),
         })),
       } : null,

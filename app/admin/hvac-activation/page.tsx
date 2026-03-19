@@ -16,7 +16,7 @@ export default function HVACActivationPage() {
   const [videoStep, setVideoStep] = useState<StepStatus>({ status: 'idle' });
   const [statusStep, setStatusStep] = useState<StepStatus>({ status: 'idle' });
 
-  const COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
+  const COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
 
   // Step 1: Check if SQL migration has been run
   const checkSqlStatus = async () => {

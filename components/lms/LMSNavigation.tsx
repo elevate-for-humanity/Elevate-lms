@@ -114,7 +114,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link 
-            href="/learner/dashboard" 
+            href="/lms/dashboard" 
             aria-label="Learning Portal Home" 
             className="flex items-center gap-3 group"
           >
@@ -200,7 +200,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
 
             {/* Settings - Desktop */}
             <Link
-              href="/learner/settings"
+              href="/lms/settings"
               className="hidden md:flex p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label="Settings"
             >
@@ -333,7 +333,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
               
               <div className="mt-2 space-y-1">
                 <Link
-                  href="/learner/profile"
+                  href="/lms/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >
@@ -341,7 +341,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                   Profile
                 </Link>
                 <Link
-                  href="/learner/settings"
+                  href="/lms/settings"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >

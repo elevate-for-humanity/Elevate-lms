@@ -43,7 +43,7 @@ export default async function LessonsPage() {
   }
 
   const { data: lessons, count: totalLessons } = await db
-    .from('training_lessons')
+    .from('course_lessons')
     .select('id, title, course_id, order_index, duration, video_url, created_at, updated_at', { count: 'exact' })
     .order('updated_at', { ascending: false })
     .limit(100);
@@ -51,13 +51,13 @@ export default async function LessonsPage() {
   // Get courses for display names
   const courseIds = [...new Set((lessons || []).map(l => l.course_id).filter(Boolean))];
   const { data: courses } = courseIds.length > 0
-    ? await db.from('training_courses').select('id, course_name').in('id', courseIds)
+    ? await db.from('courses').select('id, title').in('id', courseIds)
     : { data: [] };
 
   const courseMap = new Map((courses || []).map(c => [c.id, c.title]));
 
   const { count: withVideo } = await db
-    .from('training_lessons')
+    .from('course_lessons')
     .select('*', { count: 'exact', head: true })
     .not('video_url', 'is', null);
 

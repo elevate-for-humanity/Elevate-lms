@@ -28,7 +28,7 @@ export default async function CertificationPage({ params }: Props) {
 
   // Course info
   const { data: course } = await db
-    .from('training_courses')
+    .from('courses')
     .select('id, title, program_id')
     .eq('id', courseId)
     .single();
@@ -215,7 +215,7 @@ export default async function CertificationPage({ params }: Props) {
               </Link>
             )}
             <Link
-              href="/learner/dashboard"
+              href="/lms/dashboard"
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
             >
               <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0" />

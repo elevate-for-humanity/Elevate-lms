@@ -25,7 +25,7 @@ async function _GET(request: NextRequest) {
 
     // Build query
     let query = db
-      .from('training_courses')
+      .from('courses')
       .select(
         `
         id,

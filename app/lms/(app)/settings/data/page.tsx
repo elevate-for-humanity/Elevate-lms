@@ -70,7 +70,7 @@ export default function DataSettingsPage() {
 <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/learner/dashboard" className="hover:text-gray-700">LMS</Link>
+            <Link href="/lms/dashboard" className="hover:text-gray-700">LMS</Link>
             <ChevronRight className="w-4 h-4" />
             <Link href="/learner/settings" className="hover:text-gray-700">Settings</Link>
             <ChevronRight className="w-4 h-4" />

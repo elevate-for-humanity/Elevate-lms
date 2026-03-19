@@ -92,17 +92,17 @@ export default async function StudentDashboardOrchestrated() {
     .eq('student_id', user.id)
     .order('created_at', { ascending: false });
 
-  // Get regular enrollments (internal LMS courses)
-  // Query training_enrollments directly and join courses for display
-  const { data: regularEnrollments } = await db
-    .from('training_enrollments')
-    .select('*, course:training_courses(id, course_name, description, duration_hours, is_active)')
+  // Get canonical course enrollments (program_enrollments with course_id set)
+  const { data: courseEnrollments } = await db
+    .from('program_enrollments')
+    .select('id, status, enrolled_at, progress_percent, course_id, courses(id, title, description)')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
+    .not('course_id', 'is', null)
+    .order('enrolled_at', { ascending: false });
 
   // Keep both sets separate for display, but combine for active enrollment check
   const allEnrollments = [
-    ...(regularEnrollments || []),
+    ...(courseEnrollments || []),
     ...(partnerEnrollments || []),
   ];
 
@@ -113,19 +113,8 @@ export default async function StudentDashboardOrchestrated() {
   // Get course progress (use progress_percentage from enrollments if course_progress table doesn't exist)
   let courseProgress = 0;
   if (activeEnrollment) {
-    // Try to get from course_progress table first
-    const { data: progress, error: progressError } = await db
-      .from('course_progress')
-      .select('progress_percentage')
-      .eq('enrollment_id', activeEnrollment.id)
-      .single();
-
-    if (!progressError && progress) {
-      courseProgress = progress.progress_percentage || 0;
-    } else {
-      // Fallback to progress or progress_percentage column in enrollments
-      courseProgress = activeEnrollment.progress_percentage || activeEnrollment.progress || 0;
-    }
+    // Use progress_percent from program_enrollments (canonical)
+    courseProgress = activeEnrollment.progress_percent ?? activeEnrollment.progress_percentage ?? 0;
   }
 
   // Get certifications from certificates table
@@ -257,9 +246,56 @@ export default async function StudentDashboardOrchestrated() {
         </div>
 
         {/* My Programs — program-level enrollment cards */}
-        {(programEnrollments?.length || 0) > 0 ? (
+        {(programEnrollments?.length || 0) > 0 && (
           <EnrolledProgramsList enrollments={programEnrollments} />
-        ) : (
+        )}
+
+        {/* My Courses — canonical course enrollments (program_enrollments with course_id) */}
+        {(courseEnrollments?.length || 0) > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-black mb-4">My Courses</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {(courseEnrollments || []).map((ce: any) => {
+                const course = ce.courses;
+                const progress = ce.progress_percent ?? 0;
+                const isActive = ce.status === 'active' || ce.status === 'confirmed';
+                const isComplete = ce.status === 'completed';
+                return (
+                  <a
+                    key={ce.id}
+                    href={`/lms/courses/${ce.course_id}`}
+                    className="bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition p-6 group block"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
+                        {course?.title ?? 'Course'}
+                      </h4>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        isActive   ? 'bg-brand-green-100 text-brand-green-700' :
+                        isComplete ? 'bg-brand-blue-100 text-brand-blue-700' :
+                                     'bg-amber-100 text-amber-700'
+                      }`}>
+                        {isActive ? 'Active' : isComplete ? 'Completed' : 'Pending'}
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 mb-1">
+                      <div
+                        className={`h-2 rounded-full transition-all ${
+                          progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500">{progress}% complete</p>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state — no enrollments at all */}
+        {(programEnrollments?.length || 0) === 0 && (courseEnrollments?.length || 0) === 0 && (
           <EmptyEnrollmentState />
         )}
 

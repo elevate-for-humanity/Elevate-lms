@@ -8,12 +8,23 @@
  *   cna        → CMI (Choice Medical Institute, School Code #015188)
  *   ekg        → NHA
  *   phlebotomy → NHA
+ *
+ * All writes are idempotent:
+ *   - Pre-insert existence check (fast path for retries)
+ *   - Postgres unique constraint violation (23505) caught and resolved
+ *     to the existing row — never surfaces as a 500
+ *
+ * Every approval emits a structured log entry with a correlation ID
+ * so individual approvals are traceable across retries.
  */
 
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
 
-type ApplicationRow = {
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+export type ApplicationRow = {
   id: string;
   user_id: string | null;
   program_slug: string | null;
@@ -30,6 +41,10 @@ type ProgramRow = {
   id: string;
   slug: string;
 };
+
+type WriteOutcome = 'created' | 'already_exists';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function isCmiProgram(slug: string | null | undefined): boolean {
   return slug === 'cna';
@@ -65,16 +80,20 @@ async function getProgramBySlug(db: SupabaseClient, slug: string): Promise<Progr
   return data;
 }
 
+// ── Idempotent writes ─────────────────────────────────────────────────────────
+
 async function ensurePartnerEnrollment(params: {
   db: SupabaseClient;
   partnerId: string;
   studentId: string;
   programId: string;
   status: string;
-}): Promise<string> {
-  const { db, partnerId, studentId, programId, status } = params;
+  correlationId: string;
+}): Promise<{ id: string; outcome: WriteOutcome }> {
+  const { db, partnerId, studentId, programId, status, correlationId } = params;
 
-  const { data: existing, error: existingErr } = await db
+  // Fast path: check before insert (handles sequential retries cheaply)
+  const { data: existing, error: checkErr } = await db
     .from('partner_enrollments')
     .select('id')
     .eq('partner_id', partnerId)
@@ -82,79 +101,134 @@ async function ensurePartnerEnrollment(params: {
     .eq('program_id', programId)
     .maybeSingle();
 
-  if (existingErr) {
-    throw new Error(`Failed checking partner_enrollments duplicate: ${existingErr.message}`);
-  }
+  if (checkErr) throw new Error(`partner_enrollments check failed: ${checkErr.message}`);
 
   if (existing) {
-    logger.info('[partner-routing] partner_enrollment already exists, skipping', { partnerId, studentId, programId });
-    return existing.id;
+    logger.info('[partner-routing] partner_enrollment already exists', {
+      correlationId, partnerId, studentId, programId, id: existing.id,
+    });
+    return { id: existing.id, outcome: 'already_exists' };
   }
 
-  const { data, error } = await db
-    .from('partner_enrollments')
-    .insert({
-      partner_id: partnerId,
-      student_id: studentId,
-      program_id: programId,
-      status,
-      enrollment_date: new Date().toISOString(),
-    })
-    .select('id')
-    .single();
+  // Insert — catch unique constraint violation (concurrent race)
+  try {
+    const { data, error } = await db
+      .from('partner_enrollments')
+      .insert({
+        partner_id: partnerId,
+        student_id: studentId,
+        program_id: programId,
+        status,
+        enrollment_date: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
 
-  if (error) throw new Error(`Failed creating partner_enrollment: ${error.message}`);
+    if (error) throw error;
 
-  return data.id;
+    return { id: data.id, outcome: 'created' };
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      // Another concurrent request won the race — fetch and return existing row
+      const { data: raceRow, error: raceErr } = await db
+        .from('partner_enrollments')
+        .select('id')
+        .eq('partner_id', partnerId)
+        .eq('student_id', studentId)
+        .eq('program_id', programId)
+        .single();
+
+      if (raceErr || !raceRow) {
+        throw new Error(`partner_enrollment race recovery failed: ${raceErr?.message}`);
+      }
+
+      logger.info('[partner-routing] partner_enrollment race resolved', {
+        correlationId, partnerId, studentId, programId, id: raceRow.id,
+      });
+      return { id: raceRow.id, outcome: 'already_exists' };
+    }
+    throw new Error(`Failed creating partner_enrollment: ${err.message}`);
+  }
 }
 
 async function ensureCmiStudent(params: {
   db: SupabaseClient;
   applicationId: string;
   userId: string;
-}): Promise<string> {
-  const { db, applicationId, userId } = params;
+  correlationId: string;
+}): Promise<{ id: string; outcome: WriteOutcome }> {
+  const { db, applicationId, userId, correlationId } = params;
 
-  const { data: existing, error: existingErr } = await db
+  // Fast path
+  const { data: existing, error: checkErr } = await db
     .from('cmi_students')
     .select('id')
     .eq('application_id', applicationId)
     .maybeSingle();
 
-  if (existingErr) {
-    throw new Error(`Failed checking cmi_students duplicate: ${existingErr.message}`);
-  }
+  if (checkErr) throw new Error(`cmi_students check failed: ${checkErr.message}`);
 
   if (existing) {
-    logger.info('[partner-routing] cmi_student already exists, skipping', { applicationId });
-    return existing.id;
+    logger.info('[partner-routing] cmi_student already exists', {
+      correlationId, applicationId, id: existing.id,
+    });
+    return { id: existing.id, outcome: 'already_exists' };
   }
 
-  const { data, error } = await db
-    .from('cmi_students')
-    .insert({
-      application_id: applicationId,
-      user_id: userId,
-      status: 'enrolled',
-    })
-    .select('id')
-    .single();
+  // Insert — catch unique constraint violation (concurrent race)
+  try {
+    const { data, error } = await db
+      .from('cmi_students')
+      .insert({ application_id: applicationId, user_id: userId, status: 'enrolled' })
+      .select('id')
+      .single();
 
-  if (error) throw new Error(`Failed creating cmi_student: ${error.message}`);
+    if (error) throw error;
 
-  return data.id;
+    return { id: data.id, outcome: 'created' };
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      const { data: raceRow, error: raceErr } = await db
+        .from('cmi_students')
+        .select('id')
+        .eq('application_id', applicationId)
+        .single();
+
+      if (raceErr || !raceRow) {
+        throw new Error(`cmi_student race recovery failed: ${raceErr?.message}`);
+      }
+
+      logger.info('[partner-routing] cmi_student race resolved', {
+        correlationId, applicationId, id: raceRow.id,
+      });
+      return { id: raceRow.id, outcome: 'already_exists' };
+    }
+    throw new Error(`Failed creating cmi_student: ${err.message}`);
+  }
 }
+
+// ── Public API ────────────────────────────────────────────────────────────────
+
+export type PartnerRoutingResult = {
+  correlationId: string;
+  route: 'cmi' | 'nha' | 'none';
+  partnerEnrollmentId?: string;
+  cmiStudentId?: string;
+  outcomes: Record<string, WriteOutcome>;
+};
 
 export async function attachPartnerRouting(params: {
   db: SupabaseClient;
   application: ApplicationRow;
-}): Promise<void> {
+  /** Optional caller-supplied correlation ID. Generated if not provided. */
+  correlationId?: string;
+}): Promise<PartnerRoutingResult> {
   const { db, application } = params;
+  const correlationId = params.correlationId ?? randomUUID();
   const slug = application.program_slug;
 
   if (!isCmiProgram(slug) && !isNhaProgram(slug)) {
-    // Not a partner-routed program — nothing to do
-    return;
+    return { correlationId, route: 'none', outcomes: {} };
   }
 
   if (!slug) {
@@ -169,48 +243,67 @@ export async function attachPartnerRouting(params: {
 
   const program = await getProgramBySlug(db, slug);
 
+  // ── CNA → CMI ──────────────────────────────────────────────────────────────
   if (isCmiProgram(slug)) {
     const cmi = await getPartnerByName(db, 'Choice Medical Institute');
 
-    await ensurePartnerEnrollment({
-      db,
+    const pe = await ensurePartnerEnrollment({
+      db, correlationId,
       partnerId: cmi.id,
       studentId: application.user_id,
       programId: program.id,
       status: 'assigned',
     });
 
-    await ensureCmiStudent({
-      db,
+    const cs = await ensureCmiStudent({
+      db, correlationId,
       applicationId: application.id,
       userId: application.user_id,
     });
 
-    logger.info('[partner-routing] CNA → CMI enrolled', {
+    logger.info('[partner-routing] CNA → CMI complete', {
+      correlationId,
       applicationId: application.id,
       userId: application.user_id,
       programId: program.id,
       partnerId: cmi.id,
+      partnerEnrollmentOutcome: pe.outcome,
+      cmiStudentOutcome: cs.outcome,
     });
-    return;
+
+    return {
+      correlationId,
+      route: 'cmi',
+      partnerEnrollmentId: pe.id,
+      cmiStudentId: cs.id,
+      outcomes: { partnerEnrollment: pe.outcome, cmiStudent: cs.outcome },
+    };
   }
 
-  if (isNhaProgram(slug)) {
-    const nha = await getPartnerByName(db, 'NHA');
+  // ── EKG / Phlebotomy → NHA ─────────────────────────────────────────────────
+  const nha = await getPartnerByName(db, 'NHA');
 
-    await ensurePartnerEnrollment({
-      db,
-      partnerId: nha.id,
-      studentId: application.user_id,
-      programId: program.id,
-      status: 'enrolled',
-    });
+  const pe = await ensurePartnerEnrollment({
+    db, correlationId,
+    partnerId: nha.id,
+    studentId: application.user_id,
+    programId: program.id,
+    status: 'enrolled',
+  });
 
-    logger.info('[partner-routing] NHA enrolled', {
-      applicationId: application.id,
-      userId: application.user_id,
-      programId: program.id,
-      partnerId: nha.id,
-    });
-  }
+  logger.info('[partner-routing] NHA complete', {
+    correlationId,
+    applicationId: application.id,
+    userId: application.user_id,
+    programId: program.id,
+    partnerId: nha.id,
+    partnerEnrollmentOutcome: pe.outcome,
+  });
+
+  return {
+    correlationId,
+    route: 'nha',
+    partnerEnrollmentId: pe.id,
+    outcomes: { partnerEnrollment: pe.outcome },
+  };
 }

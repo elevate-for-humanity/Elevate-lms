@@ -199,9 +199,41 @@ export async function approveApplication(
   }
 
   // ── Partner routing ──────────────────────────────────────────────────────
-  // Dynamically resolves partner + program. Throws on missing records.
-  // Handles: CNA → CMI, EKG/Phlebotomy → NHA
-  await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+  // CNA uses the full atomic RPC: financial gate + compliance gate +
+  // state-machine transitions + training_enrollments + partner_enrollments +
+  // cmi_students + audit log, all in one transaction with FOR UPDATE row lock.
+  // NHA and future partners fall through to the application-layer path.
+  const ATOMIC_SLUGS = new Set(['cna']);
+
+  if (ATOMIC_SLUGS.has(app.program_slug ?? '')) {
+    const { data: atomicResult, error: atomicErr } = await db.rpc(
+      'approve_application_and_grant_access_atomic',
+      {
+        p_application_id: applicationId,
+        p_actor_user_id: userId,
+      },
+    );
+
+    if (atomicErr) {
+      throw new Error(`Atomic approval failed (${app.program_slug}): ${atomicErr.message}`);
+    }
+
+    if (atomicResult?.status === 'blocked') {
+      return {
+        success: false,
+        error: `Approval blocked: ${(atomicResult.blockers as string[]).join(', ')}`,
+      };
+    }
+
+    logger.info('[approve] atomic approval complete', {
+      applicationId,
+      userId,
+      result: atomicResult,
+    });
+  } else {
+    // NHA and non-partner programs — application-layer idempotent path
+    await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+  }
 
   // Generate password setup link for new users
   let passwordSetupLink: string | null = null;

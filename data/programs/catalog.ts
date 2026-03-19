@@ -2,7 +2,6 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 // HVAC_TECHNICIAN removed — hvac-technician is now DB-driven (lib/programs/getProgramBySlug.ts)
 import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { BARBER_APPRENTICESHIP } from './barber-apprenticeship';
-import { CNA } from './cna';
 import { IT_HELP_DESK } from './it-help-desk';
 import { CYBERSECURITY_ANALYST } from './cybersecurity-analyst';
 import { BOOKKEEPING } from './bookkeeping';

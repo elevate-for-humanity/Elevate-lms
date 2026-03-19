@@ -18,6 +18,7 @@ import { getPublishedProgramBySlug } from './getProgramBySlug';
 const DB_MIGRATED_SLUGS = new Set([
   'hvac-technician',
   'peer-recovery-specialist',
+  'cna',
 ]);
 
 // Static registry — add new programs here when created
@@ -29,7 +30,6 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>
   'business-administration':       () => import('@/data/programs/business-administration'),
   'cad-drafting':                  () => import('@/data/programs/cad-drafting'),
   'cdl-training':                  () => import('@/data/programs/cdl-training'),
-  'cna':                           () => import('@/data/programs/cna'),
   'construction-trades-certification': () => import('@/data/programs/construction-trades-certification'),
   'cosmetology-apprenticeship':    () => import('@/data/programs/cosmetology-apprenticeship'),
   'culinary-apprenticeship':       () => import('@/data/programs/culinary-apprenticeship'),

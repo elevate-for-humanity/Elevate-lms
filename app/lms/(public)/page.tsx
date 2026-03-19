@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
-import { StudentToolsStrip } from '@/components/learner/dashboard/StudentToolsStrip';
+import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';

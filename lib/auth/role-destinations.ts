@@ -81,7 +81,7 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
 
 /**
  * Returns the canonical post-auth destination for a given role.
- * Falls back to /lms/dashboard for unknown roles.
+ * Falls back to /learner/dashboard for unknown roles.
  */
 export function getRoleDestination(role: string | null | undefined): string {
   if (!role) return '/learner/dashboard';

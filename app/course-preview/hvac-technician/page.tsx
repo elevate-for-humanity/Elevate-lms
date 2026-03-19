@@ -235,7 +235,7 @@ export default function HVACClassroomPreview() {
       {/* Banner */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-brand-blue-700 text-white text-center py-3 text-sm font-medium shadow-lg">
         <GraduationCap className="w-4 h-4 inline mr-2" />
-        <span className="font-bold">HVAC Technician Program</span>
+        <span className="font-bold">HVAC Technician</span>
         <span className="hidden sm:inline text-slate-500 mx-2">|</span>
         <span className="hidden sm:inline text-slate-600">640 Hours &middot; EPA 608 &middot; OSHA 10 &middot; CPR/AED</span>
         <Link href="/apply?program=hvac-technician" className="ml-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-3 py-1 rounded-full text-xs font-bold transition">Apply Now</Link>

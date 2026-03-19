@@ -179,7 +179,7 @@ export default function StudyGuideClient() {
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="font-bold text-slate-900">EPA 608 Study Guide</h1>
-            <p className="text-xs text-slate-500">Elevate for Humanity · HVAC Technician Program</p>
+            <p className="text-xs text-slate-500">Elevate for Humanity · HVAC Technician</p>
           </div>
           <div className="flex gap-2">
             <button

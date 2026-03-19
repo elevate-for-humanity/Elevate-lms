@@ -15,7 +15,10 @@ import { getPublishedProgramBySlug } from './getProgramBySlug';
 
 // Slugs fully migrated to DB — no static data/programs/<slug>.ts file exists.
 // For these, a minimal ProgramSchema is synthesized from the DB record.
-const DB_MIGRATED_SLUGS = new Set(['hvac-technician']);
+const DB_MIGRATED_SLUGS = new Set([
+  'hvac-technician',
+  'peer-recovery-specialist',
+]);
 
 // Static registry — add new programs here when created
 const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>> = {
@@ -46,7 +49,6 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>
   'network-administration':        () => import('@/data/programs/network-administration'),
   'network-support-technician':    () => import('@/data/programs/network-support-technician'),
   'office-administration':         () => import('@/data/programs/office-administration'),
-  'peer-recovery-specialist':      () => import('@/data/programs/peer-recovery-specialist'),
   'pharmacy-technician':           () => import('@/data/programs/pharmacy-technician'),
   'phlebotomy':                    () => import('@/data/programs/phlebotomy'),
   'plumbing':                      () => import('@/data/programs/plumbing'),

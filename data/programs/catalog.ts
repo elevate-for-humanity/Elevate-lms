@@ -10,7 +10,6 @@ import { OFFICE_ADMINISTRATION } from './office-administration';
 import { CONSTRUCTION_TRADES } from './construction-trades-certification';
 import { NETWORK_SUPPORT } from './network-support-technician';
 import { WEB_DEVELOPMENT } from './web-development';
-import { PEER_RECOVERY } from './peer-recovery-specialist';
 import { CDL_TRAINING } from './cdl-training';
 import { WELDING } from './welding';
 import { ELECTRICAL } from './electrical';

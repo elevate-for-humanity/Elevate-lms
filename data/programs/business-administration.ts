@@ -58,7 +58,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
     { title: 'Bookkeeper', salary: '$35,000–$48,000' },
     { title: 'Small Business Owner', salary: 'Varies' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=business-administration',
     requestInfoHref: '/programs/business-administration/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=business+administration&location=Indiana', advisorHref: '/contact', courseHref: '/programs/business' },
   admissionRequirements: ['18 years or older', 'High school diploma or GED', 'Basic computer skills', 'No prior business experience required'],
@@ -68,6 +68,44 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   employerPartners: ['Indianapolis-area small businesses and offices'],
   pricingIncludes: ['140 instructional hours', 'MOS certification exam', 'QuickBooks certification exam', 'ESB certification exam', 'Laptop use during training', 'Career placement support'],
   paymentTerms: 'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $2,500 with payment plans.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'partner',
+  deliveryModelDetail: 'hybrid',
+  partnerProvider: 'employindy',
+  fundingOptions: ['wioa', 'self_pay'],
+  enrollmentType: 'internal',
+  partnerCourses: [
+    {
+      courseId: 'jri-work-ethic',
+      label: 'Work Ethic & Professionalism',
+      partnerName: 'Job Ready Indy (EmployIndy)',
+      credentialIssued: 'JRI Work Readiness Certificate',
+      duration: '8 hours',
+      required: true,
+      enrollmentUrl: 'https://employindy.tovutilms.com',
+    },
+    {
+      courseId: 'jri-communication',
+      label: 'Communication Skills',
+      partnerName: 'Job Ready Indy (EmployIndy)',
+      credentialIssued: 'JRI Communication Certificate',
+      duration: '6 hours',
+      required: true,
+      enrollmentUrl: 'https://employindy.tovutilms.com',
+    },
+  ],
+  microCourses: [
+    {
+      courseId: 'careersafe-osha10-general',
+      label: 'OSHA 10-Hour General Industry',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'OSHA 10-Hour Card',
+      duration: '10 hours',
+      required: false,
+      enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
+    },
+  ],
+
   faqs: [
     { question: 'Do I need computer experience?', answer: 'Basic computer skills (typing, using a mouse, navigating the internet) are required. No prior business or accounting experience needed.' },
     { question: 'What certifications will I earn?', answer: 'Microsoft Office Specialist, QuickBooks Certified User, and Entrepreneurship & Small Business — three Certiport certifications.' },

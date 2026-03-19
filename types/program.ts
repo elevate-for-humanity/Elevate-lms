@@ -1,4 +1,5 @@
 import type { PartnerCourse } from "./partnerCourse";
+export type { DeliveryModel, FundingType, EnrollmentType } from '@/lib/programs/program-schema';
 
 export type DeliveryEngine = "NATIVE" | "SCORM";
 

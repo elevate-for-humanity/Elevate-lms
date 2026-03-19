@@ -151,7 +151,7 @@ export const BOOKKEEPING: ProgramSchema = {
   ],
 
   cta: {
-    applyHref: '/apply',
+    applyHref: '/apply?program=bookkeeping',
     requestInfoHref: '/programs/bookkeeping/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=bookkeeper&location=Indiana',
     advisorHref: '/contact',
@@ -176,6 +176,13 @@ export const BOOKKEEPING: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms: 'Self-pay: $1,500 or 3-month payment plan ($500/month).',
+
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'internal_lms',
+  fundingOptions: ['self_pay'],
+  enrollmentType: 'internal',
+  lmsCourseSlug: 'bookkeeping-quickbooks',
 
   faqs: [
     { question: 'Do I need accounting experience?', answer: 'No. This program starts from the fundamentals of double-entry bookkeeping and builds to QuickBooks proficiency.' },

@@ -64,7 +64,7 @@ export const PEER_RECOVERY: ProgramSchema = {
     { title: 'Behavioral Health Technician', salary: '$38,000–$50,000' },
     { title: 'Community Health Worker', salary: '$35,000–$45,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=peer-recovery-specialist',
     requestInfoHref: '/programs/peer-recovery-specialist/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=peer+recovery+specialist&location=Indiana', advisorHref: '/contact', courseHref: '/programs/peer-recovery-specialist' },
   admissionRequirements: ['18 years or older', 'Lived experience with recovery (self or family)', 'High school diploma or GED', 'Background check required'],
@@ -74,6 +74,56 @@ export const PEER_RECOVERY: ProgramSchema = {
   employerPartners: ['Community mental health centers', 'Recovery housing organizations', 'Hospital behavioral health departments'],
   pricingIncludes: ['46 instructional hours', 'CPRS exam fee (paid by Elevate upon completion)', 'Naloxone training and kit', 'CPR/First Aid certification', 'Career placement support'],
   paymentTerms: 'WIOA and grant funding accepted. Self-pay: $1,200.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'hybrid',
+  deliveryModelDetail: 'hybrid',
+  partnerProvider: 'employindy',
+  fundingOptions: ['wioa', 'self_pay'],
+  enrollmentType: 'internal',
+  // DB program slug is 'peer-recovery-specialist-jri' — public page uses 'peer-recovery-specialist'.
+  // The LMS course link uses the DB slug so enrollment routing resolves correctly.
+  lmsCourseSlug: 'peer-recovery-specialist-jri',
+  partnerCourses: [
+    {
+      courseId: 'jri-work-ethic',
+      label: 'Work Ethic & Professionalism',
+      partnerName: 'Job Ready Indy (EmployIndy)',
+      credentialIssued: 'JRI Work Readiness Certificate',
+      duration: '8 hours',
+      required: true,
+      enrollmentUrl: 'https://employindy.tovutilms.com',
+    },
+    {
+      courseId: 'jri-communication',
+      label: 'Communication Skills',
+      partnerName: 'Job Ready Indy (EmployIndy)',
+      credentialIssued: 'JRI Communication Certificate',
+      duration: '6 hours',
+      required: true,
+      enrollmentUrl: 'https://employindy.tovutilms.com',
+    },
+  ],
+  microCourses: [
+    {
+      courseId: 'careersafe-bloodborne-pathogens',
+      label: 'Bloodborne Pathogens Training',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'Bloodborne Pathogens Certificate',
+      duration: '1 hour',
+      required: true,
+      enrollmentUrl: 'https://www.careersafeonline.com/bloodborne-pathogens',
+    },
+    {
+      courseId: 'hsi-cpr-aed',
+      label: 'CPR/AED Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'CPR/AED Certification',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+    },
+  ],
+
   faqs: [
     { question: 'Do I need to be in recovery?', answer: 'Yes. Indiana CPRS requires lived experience with recovery — either personal or as a family member of someone in recovery.' },
     { question: 'How does certification work?', answer: 'The 46-hour training takes 4 weeks. After completing training, Elevate provides your completion documentation. You then apply to ICAADA for exam eligibility. Once approved, you sit for the CPRS exam — Elevate covers the exam fee. ICAADA issues the credential after you pass.' },

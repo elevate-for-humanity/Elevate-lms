@@ -143,7 +143,7 @@ export const CDL_TRAINING: ProgramSchema = {
     { title: 'Owner-Operator', salary: '$80,000–$150,000+' },
   ],
 
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=cdl-training',
     requestInfoHref: '/programs/cdl-training/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cdl+truck+driver&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cdl-training' },
 
@@ -160,6 +160,12 @@ export const CDL_TRAINING: ProgramSchema = {
   employerPartners: ['Werner Enterprises', 'Schneider National', 'FedEx Freight', 'Indianapolis-area trucking companies'],
   pricingIncludes: ['CDL Class A exam fees', 'DOT physical exam', 'Drug screen', 'Training vehicle and fuel', 'Career placement support'],
   paymentTerms: 'WIOA funding available for eligible Indiana residents. Self-pay: $4,500 with payment plans available. Eligibility is determined through WorkOne.',
+
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'internal_lms',
+  fundingOptions: ['wioa', 'self_pay'],
+  enrollmentType: 'internal',
 
   faqs: [
     { question: 'Is CDL training really free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, DOT physical, drug screen, and CDL exam fees.' },

@@ -101,6 +101,53 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   employerPartners: ['Indianapolis-area clinics and physician offices', 'Urgent care centers', 'Hospital outpatient departments'],
   pricingIncludes: ['280 instructional hours', 'NHA CCMA certification exam', 'NHA CPT certification exam', 'NHA CET certification exam', 'CPR/First Aid certification', 'All clinical supplies', 'Career placement support'],
   paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'hybrid',
+  deliveryModelDetail: 'hybrid',
+  partnerProvider: 'careersafe',
+  fundingOptions: ['wioa', 'self_pay'],
+  enrollmentType: 'internal',
+  partnerCourses: [
+    {
+      courseId: 'careersafe-patient-safety',
+      label: 'Patient Safety & Care',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'Patient Safety Certificate',
+      duration: '2 hours',
+      required: true,
+      enrollmentUrl: 'https://www.careersafeonline.com/patient-safety',
+    },
+    {
+      courseId: 'hsi-bloodborne-pathogens',
+      label: 'Bloodborne Pathogens Training',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'Bloodborne Pathogens Certificate',
+      duration: '2 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
+    },
+  ],
+  microCourses: [
+    {
+      courseId: 'careersafe-infection-control',
+      label: 'Infection Control & Prevention',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'Infection Control Certificate',
+      duration: '2 hours',
+      required: true,
+      enrollmentUrl: 'https://www.careersafeonline.com/infection-control',
+    },
+    {
+      courseId: 'hsi-cpr-aed',
+      label: 'CPR/AED Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'CPR/AED Certification',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+    },
+  ],
+
   faqs: [
     { question: 'What certifications will I earn?', answer: 'You will earn CCMA, CPT (phlebotomy), CET (EKG), and CPR/First Aid — four healthcare certifications in 12 weeks.' },
     { question: 'Do I need healthcare experience?', answer: 'No. This program starts from the fundamentals and builds to certification-level competency.' },

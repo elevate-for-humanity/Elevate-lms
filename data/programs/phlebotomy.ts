@@ -137,6 +137,26 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   paymentTerms: 'Self-pay program. $1,500 total tuition. 20% deposit ($300) required at enrollment. Pay the balance weekly, in full, or via BNPL (Affirm, Sezzle, Afterpay, Klarna).',
 
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'internal_lms',
+  fundingOptions: ['self_pay'],
+  enrollmentType: 'internal',
+
+  careerPathway: [
+    { title: 'Phlebotomist', timeframe: '0–3 months', requirements: 'CPT certification + background check', salaryRange: '$32,000–$42,000' },
+    { title: 'Lead Phlebotomist / Supervisor', timeframe: '2–4 years', requirements: 'Experience + leadership skills', salaryRange: '$40,000–$52,000' },
+    { title: 'Medical Laboratory Technician', timeframe: '2–3 years', requirements: 'Additional MLT training', salaryRange: '$45,000–$58,000' },
+  ],
+
+  weeklySchedule: [
+    { week: 'Weeks 1–2', title: 'Anatomy & Blood Collection Fundamentals', competencyMilestone: 'Identify venipuncture sites and demonstrate proper technique on mannequin' },
+    { week: 'Weeks 3–4', title: 'Specimen Handling & Safety', competencyMilestone: 'Process and label specimens correctly; pass OSHA bloodborne pathogens assessment' },
+    { week: 'Week 5', title: 'Clinical Practicum & Certification Prep', competencyMilestone: 'Complete 50 supervised venipunctures; pass NHA CPT practice exam' },
+  ],
+
+  employerPartners: ['IU Health', 'Eskenazi Health', 'Community Health Network', 'Clinical laboratories'],
+
   faqs: [
     {
       question: 'Do I need healthcare experience?',

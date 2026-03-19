@@ -385,6 +385,24 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   },
 
   // ─── FAQ ─────────────────────────────────────────────────────────
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'internal_lms',
+  fundingOptions: ['wioa', 'wrg', 'self_pay'],
+  enrollmentType: 'internal',
+  lmsCourseSlug: 'hvac-technician',
+  microCourses: [
+    {
+      courseId: 'careersafe-osha10-general',
+      label: 'OSHA 10-Hour General Industry',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'OSHA 10-Hour Card',
+      duration: '10 hours',
+      required: true,
+      enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
+    },
+  ],
+
   faqs: [
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. Week 1 covers orientation, tools, and safety. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
     { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA, Next Level Jobs, and Workforce Ready Grant funding covers tuition, tools, certification exam fees, and materials. Self-pay is $5,000 with payment plans available.' },

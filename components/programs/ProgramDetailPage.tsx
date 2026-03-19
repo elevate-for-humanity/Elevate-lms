@@ -14,10 +14,11 @@ import PageVideoHero from '@/components/ui/PageVideoHero';
 import {
   BookOpen, Clock, DollarSign,
   MapPin, Shield, TrendingUp, ChevronRight,
-  Award,
+  Award, ExternalLink, CheckCircle2, Layers,
 } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown } from '@/lib/programs/program-schema';
+import { validateProgram, getTotalHoursRange, getTotalHoursFromBreakdown, getPrimaryCTA } from '@/lib/programs/program-schema';
+import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 
 interface Props {
@@ -39,6 +40,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
 
   const totalHours = getTotalHoursFromBreakdown(p);
   const hoursRange = getTotalHoursRange(p);
+  const primaryCTA = getPrimaryCTA(p);
 
 
 
@@ -85,17 +87,22 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
 
             <div className="flex flex-col lg:flex-row lg:items-start gap-8">
               <div className="flex-1">
-                {/* Badge */}
-                {p.badge && (
-                  <span className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-3 ${
-                    p.badgeColor === 'orange' ? 'bg-brand-orange-500' :
-                    p.badgeColor === 'green'  ? 'bg-brand-green-500' :
-                    p.badgeColor === 'red'    ? 'bg-brand-red-500' :
-                    'bg-brand-blue-500'
-                  }`}>
-                    {p.badge}
-                  </span>
-                )}
+                {/* Badges row — program badge + delivery model */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {p.badge && (
+                    <span className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full ${
+                      p.badgeColor === 'orange' ? 'bg-brand-orange-500' :
+                      p.badgeColor === 'green'  ? 'bg-brand-green-500' :
+                      p.badgeColor === 'red'    ? 'bg-brand-red-500' :
+                      'bg-brand-blue-500'
+                    }`}>
+                      {p.badge}
+                    </span>
+                  )}
+                  {p.deliveryModelDetail && (
+                    <DeliveryBadge model={p.deliveryModelDetail} />
+                  )}
+                </div>
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
                 </h1>
@@ -121,25 +128,43 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
               {/* CTA card */}
               <div className="lg:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-xl p-5">
-                  <p className="text-xs font-bold text-brand-green-600 uppercase tracking-wider mb-1">Grant Funding Available</p>
+                  {/* Cost */}
                   <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
-                  <p className="text-xs text-slate-500 mb-4">self-pay · funding may cover 100%</p>
 
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">New Applicant</p>
-                  <Link
-                    href={p.cta.applyHref}
-                    className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
-                  >
-                    Apply Now
-                  </Link>
+                  {/* Funding — only verified options, no fallback text */}
+                  {p.fundingOptions && p.fundingOptions.length > 0 && (
+                    <div className="mb-4 mt-2">
+                      <FundingSection fundingOptions={p.fundingOptions} />
+                    </div>
+                  )}
 
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
-                  <Link
-                    href={p.cta.enrollHref || '/lms/dashboard'}
-                    className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
-                  >
-                    Go to My Courses
-                  </Link>
+                  {primaryCTA && (
+                    <>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                        {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
+                      </p>
+                      <Link
+                        href={primaryCTA.href}
+                        target={primaryCTA.external ? '_blank' : '_self'}
+                        rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
+                        className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
+                      >
+                        {primaryCTA.label}
+                      </Link>
+                    </>
+                  )}
+
+                  {p.cta.enrollHref && (
+                    <>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Already Enrolled?</p>
+                      <Link
+                        href={p.cta.enrollHref}
+                        className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
+                      >
+                        Go to My Courses
+                      </Link>
+                    </>
+                  )}
 
                   <Link
                     href={p.cta.advisorHref || '/contact'}
@@ -223,6 +248,104 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
         </div>
       </section>
 
+      {/* ═══ WHAT'S INCLUDED ════════════════════════════════════════ */}
+      {((p.partnerCourses && p.partnerCourses.length > 0) || (p.microCourses && p.microCourses.length > 0) || p.lmsCourseSlug) && (
+        <section className="py-12 bg-slate-50 border-y border-slate-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
+                <Layers className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-extrabold text-slate-900">What&apos;s Included in This Program</h2>
+                <p className="text-slate-500 text-sm mt-0.5">All training components delivered as part of your enrollment</p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+
+              {/* Internal LMS training */}
+              {p.lmsCourseSlug && (
+                <div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Elevate Internal Training</p>
+                  <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-brand-blue-700" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-slate-900 text-sm">{p.title} — Full Curriculum</h3>
+                        <span className="bg-brand-blue-100 text-brand-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Elevate LMS</span>
+                      </div>
+                      <p className="text-slate-500 text-xs mt-1">
+                        Modules, lessons, quizzes, and checkpoints delivered through the Elevate learning platform.
+                        Progress is tracked and gated — you advance when you&apos;re ready.
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <span className="flex items-center gap-1 text-brand-green-600 text-xs font-semibold">
+                        <CheckCircle2 className="w-4 h-4" /> Required
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Partner courses */}
+              {p.partnerCourses && p.partnerCourses.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Partner-Delivered Training</p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {p.partnerCourses.map((c) => (
+                      <div key={c.courseId} className="bg-white rounded-xl border border-slate-200 p-5 flex items-start gap-4">
+                        <div className="w-10 h-10 bg-brand-orange-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <ExternalLink className="w-4 h-4 text-brand-orange-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-bold text-slate-900 text-sm">{c.label}</h3>
+                            {c.required && (
+                              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Required</span>
+                            )}
+                          </div>
+                          <p className="text-slate-500 text-xs mt-0.5">
+                            {c.partnerName}{c.duration ? ` · ${c.duration}` : ''}
+                          </p>
+                          {c.credentialIssued && (
+                            <p className="text-brand-green-700 text-xs font-semibold mt-1 flex items-center gap-1">
+                              <Award className="w-3 h-3" /> {c.credentialIssued}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Micro courses / certifications */}
+              {p.microCourses && p.microCourses.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Included Certifications</p>
+                  <div className="flex flex-wrap gap-3">
+                    {p.microCourses.map((c) => (
+                      <div key={c.courseId} className="bg-white rounded-xl border border-slate-200 px-4 py-3 flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold text-slate-900 text-sm">{c.label}</p>
+                          <p className="text-slate-500 text-xs">{c.partnerName}{c.duration ? ` · ${c.duration}` : ''}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ═══ ENROLLMENT TRACKS ══════════════════════════════════════ */}
       {p.enrollmentTracks && (
         <section className="py-14 bg-white border-y border-slate-100">
@@ -230,7 +353,11 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
             <div className="text-center mb-10">
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">How to Enroll</h2>
               <p className="text-slate-500 text-base max-w-2xl mx-auto">
-                Workforce funding is available for Indiana residents. Students from other states can enroll through the self-pay option.
+                {p.fundingOptions && p.fundingOptions.some(f => f === 'wioa' || f === 'wrg')
+                  ? 'Workforce funding is available for eligible Indiana residents. Students from other states can enroll through the self-pay option.'
+                  : p.fundingOptions?.includes('employer_paid')
+                  ? 'This is a paid apprenticeship — you earn wages while you train. A self-pay option is available for those without an employer sponsor.'
+                  : 'Choose the enrollment option that works for you.'}
               </p>
             </div>
 
@@ -353,29 +480,39 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
 
           {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
-            {/* New applicant */}
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">New Applicant</span>
-              <Link
-                href={p.cta.applyHref}
-                className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-              >
-                Apply to This Program
-              </Link>
-              <span className="text-slate-400 text-xs">Free to apply · takes 5 min</span>
-            </div>
+            {/* Primary CTA — driven by enrollmentType */}
+            {primaryCTA && (
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
+                </span>
+                <Link
+                  href={primaryCTA.href}
+                  target={primaryCTA.external ? '_blank' : '_self'}
+                  rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
+                  className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                >
+                  {primaryCTA.external ? primaryCTA.label : 'Apply to This Program'}
+                </Link>
+                {!primaryCTA.external && (
+                  <span className="text-slate-400 text-xs">Free to apply · takes 5 min</span>
+                )}
+              </div>
+            )}
 
-            {/* Already enrolled */}
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Already Enrolled</span>
-              <Link
-                href={p.cta.enrollHref || '/lms/dashboard'}
-                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-              >
-                Go to My Courses
-              </Link>
-              <span className="text-slate-400 text-xs">Log in to access your training</span>
-            </div>
+            {/* Already enrolled — only render when an LMS course exists for this program */}
+            {p.cta.enrollHref && (
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Already Enrolled</span>
+                <Link
+                  href={p.cta.enrollHref}
+                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                >
+                  Go to My Courses
+                </Link>
+                <span className="text-slate-400 text-xs">Log in to access your training</span>
+              </div>
+            )}
           </div>
 
           <Link

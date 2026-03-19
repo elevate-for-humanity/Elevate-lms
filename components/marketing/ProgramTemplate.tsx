@@ -59,7 +59,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               </p>
             </div>
             <Link
-              href="/apply"
+              href={`/apply?program=${program.slug}`}
               className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-brand-orange-600 hover:bg-brand-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
             >
               Apply Now →
@@ -118,7 +118,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/apply"
+                  href={`/apply?program=${program.slug}`}
                   className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded hover:bg-brand-orange-600 transition-colors shadow-lg"
                 >
                   Apply Now
@@ -393,7 +393,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/apply"
+                  href={`/apply?program=${program.slug}`}
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-brand-orange-50 transition-colors shadow-lg"
                 >
                   Apply Now

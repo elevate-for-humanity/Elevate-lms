@@ -269,6 +269,12 @@ export const CNA: ProgramSchema = {
   ],
   paymentTerms: 'Self-pay program. $2,800 total tuition. Pay in full, split into installments, or use our income-share option. Pricing is Indiana-based — tuition rates vary by state.',
 
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'internal_lms',
+  fundingOptions: ['self_pay'],
+  enrollmentType: 'internal',
+
   faqs: [
     { question: 'Do I need healthcare experience?', answer: 'No. This program starts from the basics and prepares you for the Indiana CNA competency exam in 6 weeks.' },
     { question: 'What is the CNA exam?', answer: 'The Indiana CNA competency exam has two parts: a 75-question written test (90 minutes) and a clinical skills test where you perform 5 randomly selected skills in front of an evaluator.' },

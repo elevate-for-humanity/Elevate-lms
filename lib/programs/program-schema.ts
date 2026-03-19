@@ -107,6 +107,66 @@ export interface CredentialPipeline {
   jobRole: string;
 }
 
+// ─── Content Model ───────────────────────────────────────────────────
+
+/**
+ * How Elevate delivers this program's training content.
+ *   internal  — Elevate owns and delivers the full curriculum via the LMS
+ *   partner   — Training is delivered by a third-party partner (Milady, HSI, etc.)
+ *   hybrid    — Mix of internal LMS content and partner-delivered components
+ */
+export type ProgramDeliveryModel = 'internal' | 'partner' | 'hybrid';
+
+/**
+ * Granular delivery classification used for CTA routing and UI badges.
+ *   internal_lms       — Elevate LMS only; learner stays on platform
+ *   partner_scorm      — SCORM/LMS content hosted by a partner; learner redirects out
+ *   external_redirect  — Enrollment handled entirely by an external provider
+ *   hybrid             — Mix of internal LMS + partner/external components
+ */
+export type DeliveryModel =
+  | 'internal_lms'
+  | 'partner_scorm'
+  | 'external_redirect'
+  | 'hybrid';
+
+/**
+ * Funding sources that may cover this program.
+ * Only include options that are actually available — do not guess.
+ */
+export type FundingType =
+  | 'wioa'
+  | 'wrg'
+  | 'self_pay'
+  | 'employer_paid'
+  | 'unknown';
+
+/**
+ * How a learner enrolls.
+ *   internal  — Enrollment handled on this platform (apply form → LMS)
+ *   external  — Enrollment handled by an external provider (redirect out)
+ *   waitlist  — Program not currently open; collect interest only
+ */
+export type EnrollmentType = 'internal' | 'external' | 'waitlist';
+
+/** A partner or micro course attached to a wraparound program. */
+export interface AttachedCourse {
+  /** Matches a partner_lms_courses.id or the static id in link-based-integration.ts */
+  courseId: string;
+  /** Display label shown on the program page */
+  label: string;
+  /** Partner name (e.g. "CareerSafe", "Health & Safety Institute") */
+  partnerName: string;
+  /** Credential issued on completion, if any */
+  credentialIssued?: string;
+  /** Approximate duration shown to learner */
+  duration?: string;
+  /** Whether this component is required to complete the program */
+  required: boolean;
+  /** External enrollment/access URL */
+  enrollmentUrl?: string;
+}
+
 // ─── CTA Links ───────────────────────────────────────────────────────
 export interface CTALinks {
   /** Link for new applicants — goes to the application form */
@@ -242,6 +302,64 @@ export interface ProgramSchema {
   pricingIncludes: string[];
   paymentTerms: string;
 
+  // ─── Content Model ──────────────────────────────────────────────
+  /**
+   * How training is delivered for this program.
+   * Defaults to 'internal' if omitted (backward-compatible).
+   */
+  deliveryModel?: ProgramDeliveryModel;
+
+  /**
+   * Granular delivery classification — drives CTA routing and UI badges.
+   * If omitted, derived from deliveryModel at render time.
+   */
+  deliveryModelDetail?: DeliveryModel;
+
+  /**
+   * Primary partner provider for partner/hybrid programs.
+   * Only set when verified — do not guess.
+   */
+  partnerProvider?: 'hsi' | 'careersafe' | 'milady' | 'jri' | 'employindy' | 'nrf' | null;
+
+  /**
+   * Funding sources actually available for this program.
+   * Only include verified options.
+   */
+  fundingOptions?: FundingType[];
+
+  /**
+   * How a learner enrolls. Drives primary CTA behavior.
+   *   internal  — apply form → LMS (default for internal/hybrid)
+   *   external  — redirect to externalUrl (default for partner)
+   *   waitlist  — collect interest only
+   */
+  enrollmentType?: EnrollmentType;
+
+  /**
+   * External enrollment URL for partner/external programs.
+   * Required when enrollmentType is 'external'.
+   */
+  externalEnrollmentUrl?: string;
+
+  /**
+   * Slug of the internal LMS course (courses.slug) for programs where
+   * Elevate delivers curriculum directly. Only set when deliveryModel
+   * is 'internal' or 'hybrid'.
+   */
+  lmsCourseSlug?: string;
+
+  /**
+   * Partner-delivered courses attached to this wraparound program.
+   * Rendered in the "What's Included" section of the program page.
+   */
+  partnerCourses?: AttachedCourse[];
+
+  /**
+   * Short supplemental certifications or micro-courses attached to
+   * this program (OSHA 10, CPR, Bloodborne Pathogens, etc.).
+   */
+  microCourses?: AttachedCourse[];
+
   // ─── FAQ ────────────────────────────────────────────────────────
   faqs: { question: string; answer: string }[];
 
@@ -303,34 +421,78 @@ export function validateProgram(p: ProgramSchema): ValidationError[] {
   }
 
   // Career pathway: at least 2 steps
-  if (p.careerPathway.length < 2) {
+  if (!p.careerPathway || p.careerPathway.length < 2) {
     errors.push({ field: 'careerPathway', message: `Need at least 2 career pathway steps` });
   }
 
   // Weekly schedule must match duration
-  if (p.weeklySchedule.length === 0) {
+  if (!p.weeklySchedule || p.weeklySchedule.length === 0) {
     errors.push({ field: 'weeklySchedule', message: 'Weekly schedule is empty' });
   }
 
   // Compliance: at least 1
-  if (p.complianceAlignment.length === 0) {
+  if (!p.complianceAlignment || p.complianceAlignment.length === 0) {
     errors.push({ field: 'complianceAlignment', message: 'Need at least 1 compliance alignment' });
   }
 
   // Labor market must have source and year
-  if (!p.laborMarket.source) {
+  if (!p.laborMarket?.source) {
     errors.push({ field: 'laborMarket', message: 'Labor market stats must include source' });
   }
-  if (!p.laborMarket.sourceYear) {
+  if (!p.laborMarket?.sourceYear) {
     errors.push({ field: 'laborMarket', message: 'Labor market stats must include source year' });
   }
 
   // Employer partners: at least 1
-  if (p.employerPartners.length === 0) {
+  if (!p.employerPartners || p.employerPartners.length === 0) {
     errors.push({ field: 'employerPartners', message: 'Need at least 1 employer partner' });
   }
 
   return errors;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CTA ROUTING
+// ═══════════════════════════════════════════════════════════════════════
+
+export interface PrimaryCTA {
+  label: string;
+  href: string;
+  external: boolean;
+}
+
+/**
+ * Derive the single primary CTA for a program page from its enrollmentType.
+ *
+ * Rules:
+ *   internal  → Apply Now → /programs/[slug]/apply or cta.applyHref
+ *   external  → Continue to Enrollment → externalEnrollmentUrl (opens new tab)
+ *   waitlist  → Join Waitlist → /programs/[slug]/request-info
+ *   unset     → falls back to cta.applyHref as internal
+ *
+ * Returns null only when no valid destination can be determined.
+ */
+export function getPrimaryCTA(p: ProgramSchema): PrimaryCTA | null {
+  const type = p.enrollmentType ?? 'internal';
+
+  if (type === 'external') {
+    const url = p.externalEnrollmentUrl;
+    if (!url) return null; // external without URL — suppress CTA rather than show dead link
+    return { label: 'Continue to Enrollment', href: url, external: true };
+  }
+
+  if (type === 'waitlist') {
+    return {
+      label: 'Join Waitlist',
+      href: p.cta.requestInfoHref || `/programs/${p.slug}/request-info`,
+      external: false,
+    };
+  }
+
+  // internal (default)
+  const href = p.cta.applyHref;
+  if (!href) return null;
+  return { label: 'Apply Now', href, external: false };
 }
 
 // ═══════════════════════════════════════════════════════════════════════

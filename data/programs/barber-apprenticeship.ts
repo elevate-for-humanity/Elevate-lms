@@ -262,6 +262,44 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
   paymentTerms: 'Employer-sponsored through DOL Registered Apprenticeship. Apprentices earn wages during training. Self-pay option: $3,500 with payment plans.',
 
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'partner',
+  deliveryModelDetail: 'hybrid',
+  partnerProvider: 'milady',
+  fundingOptions: ['employer_paid', 'wioa', 'self_pay'],
+  enrollmentType: 'internal',
+  partnerCourses: [
+    {
+      courseId: 'milady-barbering',
+      label: 'Milady Standard Barbering',
+      partnerName: 'Milady/Cengage',
+      credentialIssued: 'Barbering Certificate',
+      duration: '1,500 hours RTI',
+      required: true,
+      enrollmentUrl: 'https://www.milady.com/barbering',
+    },
+  ],
+  microCourses: [
+    {
+      courseId: 'careersafe-osha10-general',
+      label: 'OSHA 10-Hour General Industry',
+      partnerName: 'CareerSafe',
+      credentialIssued: 'OSHA 10-Hour Card',
+      duration: '10 hours',
+      required: true,
+      enrollmentUrl: 'https://www.careersafeonline.com/osha-10-hour-general-industry',
+    },
+    {
+      courseId: 'hsi-cpr-aed',
+      label: 'CPR/AED Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'CPR/AED Certification',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+    },
+  ],
+
   faqs: [
     { question: 'Do I get paid during the apprenticeship?', answer: 'Yes. As a DOL Registered Apprentice, you earn wages while training at your host barbershop. Starting pay is typically $12–$15/hour, increasing as you gain skills.' },
     { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },

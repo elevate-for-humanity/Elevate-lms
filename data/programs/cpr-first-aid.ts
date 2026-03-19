@@ -59,7 +59,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
     { title: 'Medical Assistant (with additional training)', salary: '$35,000–$42,000' },
     { title: 'Construction Worker (OSHA + CPR)', salary: '$32,000–$45,000' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=cpr-first-aid',
     requestInfoHref: '/programs/cpr-first-aid/request-info', advisorHref: '/contact', courseHref: '/programs/cpr-first-aid' },
   admissionRequirements: ['16 years or older', 'No prerequisites', 'No prior medical training required'],
   equipmentIncluded: 'Training mannequin shipped directly to your home. AED trainer and certification card included.',
@@ -68,6 +68,33 @@ export const CPR_FIRST_AID: ProgramSchema = {
   employerPartners: ['Required by most healthcare, construction, and childcare employers'],
   pricingIncludes: ['AHA course materials', 'Hands-on skills practice', 'Written and practical evaluation', 'AHA certification card (2-year validity)'],
   paymentTerms: 'Included free with any Elevate program enrollment. Stand-alone: $130.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'partner',
+  deliveryModelDetail: 'partner_scorm',
+  partnerProvider: 'hsi',
+  fundingOptions: ['self_pay'],
+  enrollmentType: 'internal',
+  partnerCourses: [
+    {
+      courseId: 'hsi-cpr-aed',
+      label: 'CPR/AED Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'AHA BLS / Heartsaver CPR/AED',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+    },
+    {
+      courseId: 'hsi-first-aid',
+      label: 'First Aid Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'AHA Heartsaver First Aid',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
+    },
+  ],
+
   faqs: [
     { question: 'How does the at-home training work?', answer: 'After you enroll, a training mannequin is shipped directly to your door. You join a live instructor-led session online and complete your hands-on skills practice at home using the mannequin.' },
     { question: 'Do I have to return the mannequin?', answer: 'Yes. A prepaid return label is included in your shipment. Return the mannequin within 7 days of completing your course.' },

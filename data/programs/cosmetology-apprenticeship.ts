@@ -77,7 +77,7 @@ export const COSMETOLOGY: ProgramSchema = {
     { title: 'Salon Manager', salary: '$40,000–$55,000' },
     { title: 'Salon Owner', salary: '$50,000–$100,000+' },
   ],
-  cta: { applyHref: '/apply',
+  cta: { applyHref: '/apply?program=cosmetology-apprenticeship',
     requestInfoHref: '/programs/cosmetology-apprenticeship/request-info',
     careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=cosmetologist&location=Indiana', advisorHref: '/contact', courseHref: '/programs/cosmetology-apprenticeship' },
   admissionRequirements: ['16 years or older', 'High school diploma or GED (or actively pursuing)', 'Interest in cosmetology career', 'Background check required'],
@@ -87,6 +87,35 @@ export const COSMETOLOGY: ProgramSchema = {
   employerPartners: ['Licensed salons in Indianapolis area'],
   pricingIncludes: ['2,000 hours supervised training', 'Related instruction', 'Infection control certification', 'CPR/First Aid', 'Licensing exam prep', 'Career placement support'],
   paymentTerms: 'Earn while you learn — apprentices are paid by the host salon. No tuition cost.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'partner',
+  deliveryModelDetail: 'hybrid',
+  partnerProvider: 'milady',
+  fundingOptions: ['employer_paid', 'wioa'],
+  enrollmentType: 'internal',
+  partnerCourses: [
+    {
+      courseId: 'milady-cosmetology',
+      label: 'Milady Standard Cosmetology',
+      partnerName: 'Milady/Cengage',
+      credentialIssued: 'Cosmetology Certificate',
+      duration: '1,500 hours RTI',
+      required: true,
+      enrollmentUrl: 'https://www.milady.com/cosmetology',
+    },
+  ],
+  microCourses: [
+    {
+      courseId: 'hsi-cpr-aed',
+      label: 'CPR/AED Certification',
+      partnerName: 'Health & Safety Institute',
+      credentialIssued: 'CPR/AED Certification',
+      duration: '4 hours',
+      required: true,
+      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+    },
+  ],
+
   faqs: [
     { question: 'How is this different from cosmetology school?', answer: 'An apprenticeship lets you earn while you learn in a real salon. You complete the same 2,000 hours required by Indiana but get paid and gain real-world experience from day one.' },
     { question: 'Do I get paid during the apprenticeship?', answer: 'Yes. Apprentices are employees of the host salon and receive wages during training.' },

@@ -205,7 +205,6 @@ export default function HeroVideo({
           </video>
         ) : (
           // Reduced-motion or video-failed: show poster only
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={posterImage}
             alt=""
@@ -224,7 +223,6 @@ export default function HeroVideo({
         {/* Brand bug — top-left, only when requested */}
         {showBrandBug && (
           <div className="absolute top-4 left-4 z-10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt="Elevate for Humanity"

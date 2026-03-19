@@ -37,7 +37,7 @@ export function useHeroVideo({
         // Browser blocked unmuted autoplay — fall back to muted
         el.muted = true;
         setMuted(true);
-        try { await el.play(); } catch {}
+        try { await el.play(); } catch (_err) { /* autoplay blocked — video stays paused */ }
       }
     }
 

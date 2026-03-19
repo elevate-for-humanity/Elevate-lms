@@ -79,7 +79,7 @@ export default function ExamAuthWorkQueue({
 
     try {
       let url = '';
-      let method = 'POST';
+      const method = 'POST';
       let body: Record<string, unknown> = {};
 
       switch (action) {

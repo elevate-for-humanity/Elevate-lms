@@ -60,6 +60,8 @@ export default tseslint.config(
       'react-hooks/gating': 'off',
       'react-hooks/unsupported-syntax': 'off',
       'no-unsafe-optional-chaining': 'warn',
+      // @next/eslint-plugin-next is not registered — suppress inline-disable warnings
+      '@next/next/no-img-element': 'off',
     },
   },
   {
@@ -83,6 +85,7 @@ export default tseslint.config(
       'server/generate-*.ts',
       'server/test-*.ts',
       'eslint-rules/**',
+      'legal/**',
       'tests/**',
       'lib/dynamic-imports.ts',
       'lib/ocr/**',

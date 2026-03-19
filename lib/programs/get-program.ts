@@ -4,14 +4,22 @@
  * Used by program-specific pages (request-info, etc.) that need the full
  * canonical program data including CTA links, specs, and credentials.
  *
+ * For programs migrated to DB-only (no static file), falls back to a minimal
+ * ProgramSchema built from the DB record. Add migrated slugs to DB_MIGRATED_SLUGS.
+ *
  * Returns null if the program does not exist.
  */
 
 import type { ProgramSchema } from './program-schema';
+import { getPublishedProgramBySlug } from './getProgramBySlug';
+
+// Slugs fully migrated to DB — no static data/programs/<slug>.ts file exists.
+// For these, a minimal ProgramSchema is synthesized from the DB record.
+const DB_MIGRATED_SLUGS = new Set(['hvac-technician']);
 
 // Static registry — add new programs here when created
 const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>> = {
-  'hvac-technician':               () => import('@/data/programs/hvac-technician'),
+  // hvac-technician removed — DB-driven, handled via DB_MIGRATED_SLUGS above
   'barber-apprenticeship':         () => import('@/data/programs/barber-apprenticeship'),
   'beauty-career-educator':        () => import('@/data/programs/beauty-career-educator'),
   'bookkeeping':                   () => import('@/data/programs/bookkeeping'),
@@ -50,6 +58,36 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>
 };
 
 export async function getProgramBySlug(slug: string): Promise<ProgramSchema | null> {
+  // DB-migrated programs: synthesize a minimal ProgramSchema from the DB record.
+  if (DB_MIGRATED_SLUGS.has(slug)) {
+    try {
+      const db = await getPublishedProgramBySlug(slug);
+      const applyCta = db.program_ctas.find((c) => c.cta_type === 'apply');
+      const requestInfoCta = db.program_ctas.find((c) => c.cta_type === 'request_info');
+      // Return a minimal ProgramSchema-compatible object with the fields
+      // request-info and other shared pages actually use.
+      return {
+        slug: db.slug,
+        title: db.title,
+        subtitle: db.short_description ?? '',
+        category: 'Workforce Training',
+        durationWeeks: db.length_weeks ?? 12,
+        hoursPerWeekMin: 0,
+        hoursPerWeekMax: 0,
+        credentials: [],
+        enrollmentTracks: [],
+        outcomes: [],
+        curriculum: [],
+        cta: {
+          applyHref: applyCta?.href ?? `/apply?program=${db.slug}`,
+          requestInfoHref: requestInfoCta?.href ?? `/programs/${db.slug}/request-info`,
+        },
+      } as unknown as ProgramSchema;
+    } catch {
+      return null;
+    }
+  }
+
   const loader = PROGRAM_REGISTRY[slug];
   if (!loader) return null;
   try {

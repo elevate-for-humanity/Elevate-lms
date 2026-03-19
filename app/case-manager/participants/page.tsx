@@ -41,8 +41,8 @@ export default async function CaseManagerParticipantsPage() {
   // For each application email, look up profile + enrollment summary
   const emails = applications.map((a) => a.email).filter(Boolean);
 
-  let profilesByEmail: Record<string, any> = {};
-  let enrollmentCountByEmail: Record<string, number> = {};
+  const profilesByEmail: Record<string, any> = {};
+  const enrollmentCountByEmail: Record<string, number> = {};
 
   if (emails.length > 0) {
     const { data: profiles } = await db

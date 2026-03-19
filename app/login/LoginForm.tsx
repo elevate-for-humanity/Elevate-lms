@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function LoginForm() {
       } else if (profile?.role === 'instructor') {
         router.push('/instructor/dashboard');
       } else {
-        router.push('/lms/dashboard');
+        router.push(getRoleDestination(profile?.role));
       }
       router.refresh();
     } catch (err: any) {

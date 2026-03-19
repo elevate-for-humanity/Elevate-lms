@@ -67,7 +67,7 @@ export default async function WIOAReportPage() {
 
   // Fetch outcome records for these participants
   const wioaIds = wioaRows.map((w) => w.id);
-  let outcomesByParticipant: Record<string, any> = {};
+  const outcomesByParticipant: Record<string, any> = {};
 
   if (wioaIds.length > 0) {
     const { data: outcomes } = await db
@@ -91,7 +91,7 @@ export default async function WIOAReportPage() {
   }
 
   // Fetch verified placements for these users
-  let placementsByUser: Record<string, any> = {};
+  const placementsByUser: Record<string, any> = {};
   if (participantUserIds.length > 0) {
     const { data: placements } = await db
       .from('placement_records')

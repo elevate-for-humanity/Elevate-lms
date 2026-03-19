@@ -189,7 +189,7 @@ function LoginForm() {
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Link
-                  href="/lms/dashboard"
+                  href="/learner/dashboard"
                   prefetch={false}
                   className="text-center px-4 py-3 bg-white text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >

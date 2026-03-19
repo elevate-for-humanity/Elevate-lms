@@ -18,11 +18,11 @@ export default async function LearnerPage() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      redirect('/login?redirect=/lms/dashboard');
+      redirect('/login?redirect=/learner/dashboard');
     }
 
-    redirect('/lms/dashboard');
+    redirect('/learner/dashboard');
   } catch {
-    redirect('/login?redirect=/lms/dashboard');
+    redirect('/login?redirect=/learner/dashboard');
   }
 }

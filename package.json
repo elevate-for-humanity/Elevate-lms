@@ -277,7 +277,7 @@
     "lint-staged": "lint-staged",
     "type-check": "NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache",
     "healthcheck": "bash scripts/run-full-healthcheck.sh .",
     "lint:brand": "node scripts/reviewer.js src",
     "lint:brand:all": "node scripts/reviewer.js",

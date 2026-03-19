@@ -59,19 +59,63 @@ Never assume a migration is live just because the file exists in `supabase/migra
 
 ## LMS Architecture
 
-### Course Engine — DB-Driven, Program-Agnostic
+### Source of Truth — Canonical Course Tables
 
-The course engine routes rendering and completion rules by `step_type`, a column on `curriculum_lessons`. Do not write per-program hardcoded logic — set `step_type` in the DB and the renderer handles it automatically.
+**`courses` / `course_modules` / `course_lessons` is the source of truth for all new programs.**
 
-### Data Hierarchy
+`curriculum_lessons` and `modules` are legacy tables retained for HVAC and PRS backward compatibility. Do not write new programs to them. Do not read from them for new features.
+
+### Canonical Data Hierarchy
 
 ```
-programs → modules → curriculum_lessons (step_type) → lesson_progress
-                                                     → checkpoint_scores
-                                                     → step_submissions
+programs → courses → course_modules → course_lessons → lesson_progress
+                   → module_completion_rules
 ```
 
-### step_type Values
+### Adding a New Program — One Entry Point
+
+```ts
+import { createAndPublishProgram } from '@/lib/programs/create-and-publish-program';
+
+const result = await createAndPublishProgram({
+  program: { slug, title, description, category: 'workforce' },
+  modules: [
+    {
+      slug: 'mod-1', title: 'Module 1', orderIndex: 1,
+      lessons: [
+        { slug: 'lesson-1', title: 'Lesson 1', orderIndex: 1, lessonType: 'lesson' },
+        { slug: 'checkpoint-1', title: 'Checkpoint', orderIndex: 2, lessonType: 'checkpoint', passingScore: 80 },
+      ],
+    },
+  ],
+  publish: true,
+});
+// result: { programId, courseId, moduleCount, lessonCount, published }
+```
+
+This is the **only** path for creating new programs. No seed scripts. No hardcoded UUIDs. No manual DB inserts.
+
+- **Input type:** `lib/programs/types.ts` — `ProgramCreateInput`
+- **Pipeline:** `lib/programs/create-and-publish-program.ts`
+- **API route:** `POST /api/admin/programs/create` (admin/super_admin/staff only)
+- **Kill test:** `npx tsx scripts/test-generator-one-shot.ts --cleanup`
+- **Hardening tests:** `SUPABASE_MANAGEMENT_TOKEN=<pat> npx tsx scripts/test-generator-hardening.ts --cleanup`
+
+### Reading a Published Course
+
+```ts
+import { getPublishedCourseBySlug } from '@/lib/lms/course-repository';
+const course = await getPublishedCourseBySlug(db, slug);
+// Returns full module+lesson tree, sorted by order_index
+```
+
+`lib/lms/course-repository.ts` reads `courses → course_modules → course_lessons` only. Never falls back to `curriculum_lessons`.
+
+### lms_lessons View
+
+`lms_lessons` is a read-only projection from `course_lessons` (migration `20260504000001`). It exists for backward compatibility with renderer code that queries it by `course_id`. New code should use `course-repository.ts` directly.
+
+### lesson_type Values
 
 | Value | Rendering | Completion Rule |
 |-------|-----------|-----------------|
@@ -87,21 +131,33 @@ programs → modules → curriculum_lessons (step_type) → lesson_progress
 
 | Object | Purpose |
 |--------|---------|
-| `curriculum_lessons` | Canonical lesson store — `step_type`, `module_order`, `lesson_order`, `passing_score` |
-| `training_lessons` | Legacy HVAC lesson store (94 rows) — do not add new programs here |
-| `lms_lessons` (view) | Unified lesson source: `curriculum_lessons` (priority) UNION `training_lessons` (fallback) |
-| `modules` | Module definitions — `title`, `slug`, `program_id` |
+| `courses` | Canonical course store — `slug`, `title`, `status`, `program_id` |
+| `course_modules` | Module definitions — `title`, `order_index`, FK → `courses.id` |
+| `course_lessons` | Lesson store — `lesson_type`, `order_index`, `passing_score`, `quiz_questions` |
+| `module_completion_rules` | Per-module completion gates — one row per module |
+| `lms_lessons` (view) | Projection from `course_lessons` — backward compat only |
+| `curriculum_lessons` | Legacy content store (HVAC, PRS) — read-only, do not write new programs here |
+| `training_lessons` | Legacy HVAC lesson store (94 rows) — archive only |
 | `lesson_progress` | Per-user lesson completion |
 | `checkpoint_scores` | Per-user checkpoint pass/fail records — drives module gating |
 | `step_submissions` | Lab/assignment submissions with instructor sign-off |
-| `completion_rules` | Per-course/program completion rule definitions |
 | `program_completion_certificates` | Auto-issued on course completion when all checkpoints pass |
 
-### Checkpoint Gating
+### Schema Integrity
 
-When a learner completes a checkpoint lesson, a `checkpoint_scores` row is written. The next module is locked until the checkpoint for the previous module has a passing row. This is enforced in the lesson page — do not bypass it.
+The pipeline depends on these FKs being present in the live DB:
 
-**Requires migration `20260327000003_checkpoint_gating.sql` to be applied in Supabase Dashboard.**
+| Constraint | Table | References |
+|-----------|-------|-----------|
+| `course_modules_course_id_fkey` | `course_modules.course_id` | `courses.id` ON DELETE CASCADE |
+| `course_lessons_course_id_fkey` | `course_lessons.course_id` | `courses.id` ON DELETE CASCADE |
+| `course_lessons_module_id_fkey` | `course_lessons.module_id` | `course_modules.id` ON DELETE SET NULL |
+
+Added live on 2026-05-04 and codified in migration `20260504000002_course_modules_fk.sql`. If PostgREST returns "relationship not found" errors, run:
+
+```sql
+NOTIFY pgrst, 'reload schema';
+```
 
 ### Certification Chain
 
@@ -112,16 +168,6 @@ All lessons complete + all checkpoints passed
   → learner lands on /lms/courses/[courseId]/certification
   → public verification at /verify/[certificateId]
 ```
-
-### Adding a New Program
-
-1. Create `lib/curriculum/blueprints/[program].ts` following `prs-indiana.ts`
-2. Register it in `lib/curriculum/blueprints/index.ts`
-3. Run the curriculum generator (`lib/services/curriculum-generator.ts`)
-4. Generator seeds `modules` and `curriculum_lessons` rows idempotently
-5. Set `step_type = 'checkpoint'` on module-boundary lessons in the DB
-6. Store `quiz_questions` as JSONB in `curriculum_lessons` rows
-7. LMS renders the course automatically — no new code required
 
 ### HVAC Legacy Path — Do Not Replicate
 
@@ -167,12 +213,18 @@ These files exist in `supabase/migrations/` but have **not** been applied to the
 
 | File | Effect |
 |------|--------|
-| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data, fixes `lms_lessons` view |
-| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs`; backfills `short_description` from `excerpt` |
+| `20260401000005_curriculum_lessons_quiz_questions.sql` | Adds `quiz_questions` to `curriculum_lessons`, backfills HVAC data |
+| `20260402000003_programs_lms_columns.sql` | Adds `short_description` and `display_order` to `programs` |
+
+These files **have been applied** to the live DB (applied 2026-05-04):
+
+| File | Effect |
+|------|--------|
+| `20260504000001_lms_lessons_canonical_view.sql` | Rebuilds `lms_lessons` as projection from `course_lessons` |
+| `20260504000002_course_modules_fk.sql` | Adds `course_modules_course_id_fkey` FK; removes orphaned rows |
 
 Until `20260401000005` is applied:
 - `curriculum_lessons.quiz_questions` column does not exist
-- `lms_lessons` view returns `NULL` for `quiz_questions` on curriculum rows
 - HVAC checkpoint quiz player falls back to `HVAC_QUIZ_MAP` (still functional, but not DB-driven)
 
 Until `20260402000003` is applied:
@@ -182,16 +234,9 @@ Until `20260402000003` is applied:
 
 **Verify after applying `20260402000003`:**
 ```sql
--- Confirm columns exist
 SELECT column_name FROM information_schema.columns
 WHERE table_schema = 'public' AND table_name = 'programs'
   AND column_name IN ('short_description', 'display_order');
-
--- Confirm live programs are published
-SELECT id, slug, title, published, is_active, status
-FROM public.programs
-WHERE published = true AND is_active = true AND status != 'archived'
-ORDER BY title LIMIT 10;
 ```
 
 ### Programs vs Courses — Tracked UX Debt

@@ -197,6 +197,47 @@ export async function approveApplication(
       .eq('id', userId);
   }
 
+  // ── Partner routing ──────────────────────────────────────────────────────
+  // CNA → CMI (Choice Medical Institute, School Code #015188)
+  if (app.program_slug === 'cna' && userId) {
+    const { data: existingCmi } = await db
+      .from('cmi_students')
+      .select('id')
+      .eq('application_id', applicationId)
+      .maybeSingle();
+
+    if (!existingCmi) {
+      await db.from('partner_enrollments').insert({
+        user_id: userId,
+        program_slug: 'cna',
+        partner: 'CMI',
+        status: 'assigned',
+      });
+
+      const { error: cmiErr } = await db.from('cmi_students').insert({
+        user_id: userId,
+        application_id: applicationId,
+        status: 'enrolled',
+      });
+
+      if (cmiErr) {
+        logger.error('[approve] Failed to create cmi_students row', { applicationId, error: cmiErr });
+      } else {
+        logger.info('[approve] CNA → CMI enrolled', { applicationId, userId });
+      }
+    }
+  }
+
+  // NHA certification lane (ekg, phlebotomy)
+  if ((app.program_slug === 'ekg' || app.program_slug === 'phlebotomy') && userId) {
+    await db.from('partner_enrollments').insert({
+      user_id: userId,
+      program_slug: app.program_slug,
+      partner: 'NHA',
+      status: 'enrolled',
+    });
+  }
+
   // Generate password setup link for new users
   let passwordSetupLink: string | null = null;
   if (isNewUser && userId) {

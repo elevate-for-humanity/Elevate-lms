@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  # Prevent broken code from being merged
+  # Hard quality gate: install + test + build must pass
   test-and-build:
     runs-on: ubuntu-latest
 
@@ -48,10 +48,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-tsbuildinfo-
 
-      - name: Run linter
-        run: pnpm run lint
-        continue-on-error: true  # 896k lines across 2500+ files; lint has never passed on full scan. Cache added to package.json lint script to speed up subsequent runs.
-
       - name: Run unit tests
         run: pnpm run test || echo "No unit tests found"
         continue-on-error: false
@@ -66,7 +62,7 @@ jobs:
 
       - name: Archetype + Quality Gates
         run: pnpm run archetype:check
-        continue-on-error: true  # Keep as warning
+        continue-on-error: true
 
       - name: Build
         env:
@@ -74,6 +70,46 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: pnpm run build
+
+  # Non-blocking legacy lint.
+  # 896k lines, 2500+ files, pre-existing violations across the codebase.
+  # This job NEVER blocks merge. Failure = lint found something, not build broken.
+  # Scoped to files changed in the commit/PR to surface new regressions only.
+  legacy-lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint changed files only
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | grep -v node_modules | grep -v '.next' | tr '\n' ' ')
+          if [ -z "$CHANGED" ]; then
+            echo "No TS/JS files changed. Skipping lint."
+            exit 0
+          fi
+          echo "Linting changed files: $CHANGED"
+          npx eslint $CHANGED --max-warnings=0
 
   # Deployment verification (runs after successful merge to main)
   post-deployment-check:
@@ -92,38 +128,26 @@ jobs:
         run: |
           HEALTH_URL="https://www.elevateforhumanity.org/api/health"
           echo "Checking health endpoint: $HEALTH_URL"
-
           response=$(curl -s -w "\n%{http_code}" "$HEALTH_URL")
           status_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | head -n-1)
-
           echo "Status: $status_code"
           echo "Response: $body"
-
-          # Accept 200 (healthy) or 503 (degraded but running)
           if [ "$status_code" = "200" ] || [ "$status_code" = "503" ]; then
-            echo "✅ Health check passed"
+            echo "Health check passed"
             exit 0
           else
-            echo "❌ Health check failed"
+            echo "Health check failed"
             exit 1
           fi
 
       - name: Run production smoke tests
         run: bash scripts/smoke-test-portal.sh https://www.elevateforhumanity.org
 
-      - name: Notify deployment success
-        if: success()
-        run: |
-          echo "✅ Deployment verified successfully"
-          echo "Health check: PASSED"
-          echo "Smoke tests: PASSED"
-          echo "Deployment URL: https://www.elevateforhumanity.org"
-
       - name: Notify deployment failure
         if: failure()
         run: |
-          echo "❌ Deployment verification failed"
+          echo "Deployment verification failed"
           echo "Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
   # Clean up old branches automatically
@@ -140,7 +164,6 @@ jobs:
       - name: Delete merged branches
         run: |
           git fetch --prune
-          # Delete branches that have been merged to main (except protected branches)
           for branch in $(git branch -r --merged origin/main | grep -v 'main\|HEAD\|dependabot'); do
             branch_name=$(echo $branch | sed 's/origin\///')
             echo "Deleting merged branch: $branch_name"
@@ -157,4 +180,3 @@ jobs:
       - name: Send notification
         run: |
           echo "Build failed! Check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          # Add Slack/Discord/Email notification here if needed

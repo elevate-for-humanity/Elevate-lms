@@ -1,26 +1,43 @@
 /**
  * lib/db/programs.ts — Canonical DB-driven program data layer.
  *
- * Single source of truth for program reads. All program pages, enrollment
- * routes, and CTA logic must use these functions — not static data files.
+ * DATABASE is the source of truth. These functions throw on failure — they do
+ * not fall back to static files. Callers must handle errors with notFound()
+ * or an explicit error boundary.
  *
- * Table mapping (live DB → spec names):
- *   programs            → programs          (same)
- *   program_funding     → program_funding   (new, added in migration 20260503000005)
- *   training_courses    → courses           (live name differs from spec)
- *   partner_lms_providers → partner_providers
- *   partner_lms_courses   → partner_courses
- *   partner_course_mappings → program_partner_courses
+ * Table mapping (live DB slugs differ from canonical slugs in some cases):
+ *   Canonical slug              → Live DB slug
+ *   peer-recovery-specialist    → peer-recovery-specialist-jri
+ *   cna                         → cna-cert
+ *   cpr-first-aid               → cpr-cert
+ *   business                    → business-startup
  *
- * IMPORTANT: migration 20260503000005 must be applied in Supabase Dashboard
- * before delivery_model, enrollment_type, has_lms_course, and program_funding
- * are available. Until then, those fields return null/empty and the code
- * falls back gracefully.
+ * All other canonical slugs match the DB directly.
+ *
+ * Requires migration 20260503000005 (delivery_model, enrollment_type,
+ * has_lms_course, program_funding table).
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type { DeliveryModel, FundingType, EnrollmentType } from '@/lib/programs/program-schema';
+
+// ─── Slug normalization ───────────────────────────────────────────────────────
+
+/**
+ * Maps canonical slugs used in URLs/code to the actual slug stored in the DB.
+ * Only entries that differ are listed — all others pass through unchanged.
+ */
+const CANONICAL_TO_DB_SLUG: Record<string, string> = {
+  'peer-recovery-specialist': 'peer-recovery-specialist-jri',
+  'cna':                      'cna-cert',
+  'cpr-first-aid':            'cpr-cert',
+  'business':                 'business-startup',
+};
+
+export function toDbSlug(canonicalSlug: string): string {
+  return CANONICAL_TO_DB_SLUG[canonicalSlug] ?? canonicalSlug;
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,6 +53,45 @@ export interface ProgramCourse {
   slug: string;
   title: string;
   published: boolean;
+}
+
+export interface ProgramCurriculumModule {
+  id: string;
+  title: string;
+  topics: string[];
+  module_order: number;
+}
+
+export interface ProgramEnrollmentTrack {
+  id: string;
+  track_type: 'funded' | 'self_pay' | 'employer_paid' | 'partner';
+  label: string;
+  requirement: string | null;
+  cost: string | null;
+  description: string | null;
+  apply_href: string | null;
+  available: boolean;
+  coming_soon_msg: string | null;
+  track_order: number;
+}
+
+export interface ProgramCTAs {
+  apply_href: string | null;
+  enroll_href: string | null;
+  request_info_href: string | null;
+  career_connect_href: string | null;
+  advisor_href: string | null;
+  course_href: string | null;
+}
+
+export interface ProgramMedia {
+  hero_image: string | null;
+  hero_image_alt: string | null;
+  video_src: string | null;
+  voiceover_src: string | null;
+  thumbnail: string | null;
+  badge_text: string | null;
+  badge_color: string | null;
 }
 
 export interface DbProgram {
@@ -55,7 +111,6 @@ export interface DbProgram {
   status: string | null;
   featured: boolean | null;
   display_order: number | null;
-  // Phase 3 columns (added in migration 20260503000005)
   delivery_model: string | null;
   enrollment_type: EnrollmentType | null;
   external_enrollment_url: string | null;
@@ -63,9 +118,15 @@ export interface DbProgram {
   // Relations
   program_funding: ProgramFunding[];
   training_courses: ProgramCourse[];
+  program_curriculum_modules: ProgramCurriculumModule[];
+  program_enrollment_tracks: ProgramEnrollmentTrack[];
+  program_ctas: ProgramCTAs | null;
+  program_media: ProgramMedia | null;
+  program_outcomes: { outcome: string; outcome_order: number }[];
+  program_requirements: { requirement: string; requirement_order: number }[];
 }
 
-// ─── DB client helper ─────────────────────────────────────────────────────────
+// ─── DB client ────────────────────────────────────────────────────────────────
 
 async function getDb() {
   const admin = createAdminClient();
@@ -76,14 +137,15 @@ async function getDb() {
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
 /**
- * Fetch a single published program by slug, including funding options
- * and attached LMS courses.
+ * Fetch a single published program by slug.
  *
- * Throws if the program is not found or not published.
- * Callers should catch and handle with notFound() or a user-facing error.
+ * Accepts canonical slugs (e.g. 'cna') and resolves them to the live DB slug
+ * automatically. Throws — never returns null. Callers must catch and call
+ * notFound() or render an error boundary.
  */
 export async function getProgramBySlug(slug: string): Promise<DbProgram> {
   const db = await getDb();
+  const dbSlug = toDbSlug(slug);
 
   const { data, error } = await db
     .from('programs')
@@ -94,21 +156,27 @@ export async function getProgramBySlug(slug: string): Promise<DbProgram> {
       published, is_active, status, featured, display_order,
       delivery_model, enrollment_type, external_enrollment_url, has_lms_course,
       program_funding(id, type, label, is_active),
-      training_courses(id, slug, title, published)
+      training_courses(id, slug, title, published),
+      program_curriculum_modules(id, title, topics, module_order),
+      program_enrollment_tracks(id, track_type, label, requirement, cost, description, apply_href, available, coming_soon_msg, track_order),
+      program_ctas(apply_href, enroll_href, request_info_href, career_connect_href, advisor_href, course_href),
+      program_media(hero_image, hero_image_alt, video_src, voiceover_src, thumbnail, badge_text, badge_color),
+      program_outcomes(outcome, outcome_order),
+      program_requirements(requirement, requirement_order)
     `)
-    .eq('slug', slug)
+    .eq('slug', dbSlug)
     .eq('published', true)
     .maybeSingle();
 
-  if (error) throw new Error(`DB error fetching program '${slug}': ${error.message}`);
-  if (!data) throw new Error(`Program not found: '${slug}'`);
+  if (error) throw new Error(`DB error fetching program '${dbSlug}': ${error.message}`);
+  if (!data) throw new Error(`Program not found: '${slug}'${dbSlug !== slug ? ` (db slug: '${dbSlug}')` : ''}`);
 
   return data as DbProgram;
 }
 
 /**
  * Fetch all published, active programs for catalog display.
- * Returns lightweight rows — no funding or course relations.
+ * Throws on DB error — never returns stale static data.
  */
 export async function getPublishedPrograms(): Promise<Omit<DbProgram, 'program_funding' | 'training_courses'>[]> {
   const db = await getDb();
@@ -136,9 +204,8 @@ export async function getPublishedPrograms(): Promise<Omit<DbProgram, 'program_f
 // ─── Validation ───────────────────────────────────────────────────────────────
 
 /**
- * Validate a loaded program's DB state.
- * Throws with a specific message for each integrity violation.
- * Call this inside program loaders — not in UI components.
+ * Validate a loaded program's DB state. Throws on integrity violations.
+ * Call inside program loaders — not in UI components.
  */
 export function validateDbProgram(program: DbProgram): void {
   if (!program.slug) {
@@ -149,7 +216,7 @@ export function validateDbProgram(program: DbProgram): void {
 
   if (type === 'internal' && program.has_lms_course && program.training_courses.length === 0) {
     throw new Error(
-      `Program '${program.slug}' is marked has_lms_course=true but has no attached training_courses row`
+      `Program '${program.slug}' has has_lms_course=true but no attached training_courses row`
     );
   }
 
@@ -170,8 +237,8 @@ export interface DbPrimaryCTA {
 
 /**
  * Derive the single primary CTA from DB program state.
- * Mirrors getPrimaryCTA() in program-schema.ts but operates on DbProgram.
- * Returns null only when no valid destination can be determined.
+ * Returns null only when enrollment_type='external' with no URL set —
+ * a data integrity error that validateDbProgram catches first.
  */
 export function getDbPrimaryCTA(program: DbProgram): DbPrimaryCTA | null {
   const type = program.enrollment_type ?? 'internal';
@@ -196,7 +263,7 @@ export function getDbPrimaryCTA(program: DbProgram): DbPrimaryCTA | null {
   // internal (default)
   return {
     label: 'Apply Now',
-    href: `/programs/${program.slug}/apply`,
+    href: `/apply?program=${program.slug}`,
     external: false,
   };
 }

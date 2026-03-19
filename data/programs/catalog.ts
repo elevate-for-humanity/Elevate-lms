@@ -1,5 +1,5 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { HVAC_TECHNICIAN } from './hvac-technician';
+// HVAC_TECHNICIAN removed — hvac-technician is now DB-driven (lib/programs/getProgramBySlug.ts)
 import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { BARBER_APPRENTICESHIP } from './barber-apprenticeship';
 import { CNA } from './cna';
@@ -53,7 +53,7 @@ export const ALL_PROGRAMS: ProgramSchema[] = [
   EMERGENCY_HEALTH_SAFETY,
   HOME_HEALTH_AIDE,
   // Skilled Trades
-  HVAC_TECHNICIAN,
+  // HVAC_TECHNICIAN removed — DB-driven via lib/programs/getProgramBySlug.ts
   ELECTRICAL,
   WELDING,
   PLUMBING,

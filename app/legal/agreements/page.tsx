@@ -124,7 +124,7 @@ function LegalAgreementsContent() {
   const [drawnSignature, setDrawnSignature] = useState<string | null>(null);
   const [acknowledged, setAcknowledged] = useState(false);
 
-  const nextUrl = searchParams.get('next') || '/lms/dashboard';
+  const nextUrl = searchParams.get('next') || '/learner/dashboard';
 
   useEffect(() => {
     const supabase = createClient();

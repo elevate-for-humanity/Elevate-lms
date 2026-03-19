@@ -71,7 +71,7 @@ async function completeOrientation() {
       Log in to your learner dashboard to begin your first lesson. Work at your own pace —
       your progress is saved automatically.
     </p>
-    <a href="${siteUrl}/lms/dashboard"
+    <a href="${siteUrl}/learner/dashboard"
        style="display:inline-block;background:#dc2626;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px">
       Go to My Dashboard →
     </a>
@@ -88,7 +88,7 @@ async function completeOrientation() {
     logger.error('[orientation] Post-orientation email failed', emailErr);
   }
 
-  redirect('/lms/dashboard');
+  redirect('/learner/dashboard');
 }
 
 export default async function OrientationPage() {

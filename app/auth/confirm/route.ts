@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       let redirectTo = next;
 
       if (type === 'signup' || type === 'email') {
-        redirectTo = '/lms/dashboard?verified=true';
+        redirectTo = '/learner/dashboard?verified=true';
 
         // Link any pre-payment program_enrollments rows (user paid before
         // creating an account — email matches, user_id is null).
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
               // If the user has a pending enrollment and landed on the default
               // dashboard redirect, send them to their program's enrollment-success
               // page instead. Driven by program_slug so this works for future programs.
-              if (redirectTo === '/lms/dashboard?verified=true') {
+              if (redirectTo === '/learner/dashboard?verified=true') {
                 const firstSlug = unlinked!.find(r => r.program_slug)?.program_slug;
                 if (firstSlug) {
                   redirectTo = `/programs/${firstSlug}/enrollment-success`;
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
         // same-origin paths (must start with /, no protocol-relative or external URLs).
         redirectTo = next !== '/' ? next : '/auth/reset-password';
       } else if (type === 'invite') {
-        redirectTo = '/lms/dashboard?invited=true';
+        redirectTo = '/learner/dashboard?invited=true';
       }
 
       // Always redirect to canonical domain — request.url may be a Netlify

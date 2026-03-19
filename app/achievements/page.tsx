@@ -146,7 +146,7 @@ export default async function AchievementsPage() {
             <Link href="/" className="text-xl font-bold text-gray-900">
               Elevate for Humanity
             </Link>
-            <Link href="/lms/dashboard" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
+            <Link href="/learner/dashboard" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
               Back to Dashboard
             </Link>
           </div>

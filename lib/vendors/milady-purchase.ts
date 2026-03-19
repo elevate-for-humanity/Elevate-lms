@@ -425,7 +425,7 @@ async function sendMiladyCredentialsEmail(
     <ol style="font-size: 14px; color: #6b7280;">
       <li>Login to Milady RISE using the details above</li>
       <li>Complete your theory coursework at your own pace</li>
-      <li>Track your progress on your <a href="${siteUrl}/lms/dashboard">Elevate Dashboard</a></li>
+      <li>Track your progress on your <a href="${siteUrl}/learner/dashboard">Elevate Dashboard</a></li>
     </ol>
     
     <p style="font-size: 14px; color: #6b7280;">

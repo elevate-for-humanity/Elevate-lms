@@ -39,7 +39,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
     handsOnInfo,
   } = data;
 
-  const dashboardUrl = `${APP_URL}/lms/dashboard`;
+  const dashboardUrl = `${APP_URL}/learner/dashboard`;
   const courseUrl = `${APP_URL}/lms/courses/${courseSlug}`;
 
   const html = `

@@ -253,7 +253,7 @@ async function sendCredentialEmail(
               </div>
 
               <div style="text-align: center; margin: 24px 0;">
-                <a href="${result.loginUrl || siteUrl + '/lms/dashboard'}"
+                <a href="${result.loginUrl || siteUrl + '/learner/dashboard'}"
                    style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                   Access Your Course
                 </a>

@@ -89,7 +89,7 @@ async function _POST(req: NextRequest) {
       'Welcome to Elevate – Your Training Access',
       `Great news! Your training in ${courseTitle} is funded through ${programName}.
 
-Start your learning journey here: ${origin}/lms/dashboard
+Start your learning journey here: ${origin}/learner/dashboard
 
 Your tuition is fully covered. If you need any help getting started, simply reply to this email.
 

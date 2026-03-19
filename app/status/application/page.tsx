@@ -54,7 +54,7 @@ const STAGE_HELP: Record<string, { message: string; action?: string; actionUrl?:
   enrolled: {
     message: 'You are enrolled and ready for training.',
     action: 'Go to your learning dashboard',
-    actionUrl: '/lms/dashboard',
+    actionUrl: '/learner/dashboard',
   },
   closed: {
     message: 'This application is closed. Contact us if you have questions.',

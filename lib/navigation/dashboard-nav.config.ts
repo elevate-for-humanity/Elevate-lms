@@ -52,7 +52,7 @@ export interface NavSection {
  */
 export const studentNavigation: NavItem[] = [
   {
-    href: '/lms/dashboard',
+    href: '/learner/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
   },
@@ -364,7 +364,7 @@ export function getDashboardRoute(role: string): string {
       return '/dashboard';
     case 'student':
     default:
-      return '/lms/dashboard';
+      return '/learner/dashboard';
   }
 }
 

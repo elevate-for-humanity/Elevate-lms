@@ -87,7 +87,7 @@ async function _POST(req: Request) {
               full_name: body.full_name.trim(),
               role: 'student',
             },
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org'}/lms/dashboard`,
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org'}/learner/dashboard`,
           }
         );
 

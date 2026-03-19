@@ -53,7 +53,7 @@ export default async function LearningHubPage() {
             Everything you need to succeed in your learning journey. Access lessons, resources, and tools.
           </p>
           <Link
-            href="/lms/dashboard"
+            href="/learner/dashboard"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-white"
           >
             Go to Dashboard
@@ -136,7 +136,7 @@ export default async function LearningHubPage() {
           <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
           <p className="text-xl mb-8">Access all your courses and resources in one place</p>
           <Link
-            href="/lms/dashboard"
+            href="/learner/dashboard"
             className="inline-block px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-white"
           >
             Go to My Dashboard

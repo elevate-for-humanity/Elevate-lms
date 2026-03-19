@@ -103,7 +103,7 @@ async function _POST(
           html: `
             <h2>Congratulations, ${app.first_name || 'Student'}!</h2>
             <p>Your application has been <strong style="color:#10b981;">approved</strong>.</p>
-            <p><a href="${siteUrl}/lms/dashboard" style="display:inline-block;padding:12px 24px;background:#ea580c;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to Dashboard</a></p>
+            <p><a href="${siteUrl}/learner/dashboard" style="display:inline-block;padding:12px 24px;background:#ea580c;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to Dashboard</a></p>
             <p>Questions? Call <a href="tel:317-314-3757">317-314-3757</a></p>
           `,
         });

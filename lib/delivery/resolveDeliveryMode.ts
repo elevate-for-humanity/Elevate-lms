@@ -89,13 +89,13 @@ export function getContinueLearningUrl(
       if (enrollment.course_id) {
         return `/lms/courses/${enrollment.course_id}`;
       }
-      return '/lms/dashboard';
+      return '/learner/dashboard';
     
     case 'internal':
     default:
       if (enrollment.course_id) {
         return `/lms/courses/${enrollment.course_id}`;
       }
-      return '/lms/dashboard';
+      return '/learner/dashboard';
   }
 }

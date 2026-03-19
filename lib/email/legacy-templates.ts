@@ -459,7 +459,7 @@ export async function sendEnrollmentEmail(params: EnrollmentEmailParams) {
         <li>Review program materials</li>
         <li>Attend orientation (if required)</li>
       </ol>
-      <p><a href="https://www.elevateforhumanity.org/lms/dashboard">Access Your Dashboard</a></p>
+      <p><a href="https://www.elevateforhumanity.org/learner/dashboard">Access Your Dashboard</a></p>
       <p>If you have any questions, please contact us at info@elevateforhumanity.org</p>
     `,
   });

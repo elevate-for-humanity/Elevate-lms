@@ -150,7 +150,7 @@ export default function LegalOnboardingPage() {
       }
 
       // Redirect to LMS
-      router.push('/lms/dashboard');
+      router.push('/learner/dashboard');
 
     } catch (err: any) {
       setError(err.message || 'An error occurred');

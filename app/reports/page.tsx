@@ -99,7 +99,7 @@ export default async function ReportsPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Reports Yet</h3>
               <p className="text-gray-600 mb-6">Reports will appear here as your programs generate data.</p>
               <Link
-                href="/lms/dashboard"
+                href="/learner/dashboard"
                 className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to Dashboard

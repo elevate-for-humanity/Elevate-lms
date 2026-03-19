@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
-  const next = validateRedirect(requestUrl.searchParams.get('next'), '/lms/dashboard');
+  const next = validateRedirect(requestUrl.searchParams.get('next'), '/learner/dashboard');
 
   // Handle OAuth errors from Supabase
   if (error) {
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
       }
 
       // Route by role — always, unless an explicit ?next= was provided
-      const hasExplicitNext = requestUrl.searchParams.has('next') && next !== '/lms/dashboard';
+      const hasExplicitNext = requestUrl.searchParams.has('next') && next !== '/learner/dashboard';
       if (!hasExplicitNext) {
         if (resolvedRole === 'admin' || resolvedRole === 'super_admin') {
           return NextResponse.redirect(new URL('/admin/dashboard', requestUrl.origin));

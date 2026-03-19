@@ -291,7 +291,7 @@ export default async function LearnerOnboardingPage() {
                   <li>Attend your first in-person session on your confirmed start date</li>
                 </ol>
                 <div style="text-align:center;margin:28px 0">
-                  <a href="${siteUrlInner}/lms/dashboard"
+                  <a href="${siteUrlInner}/learner/dashboard"
                      style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">
                     Go to My Dashboard
                   </a>
@@ -386,7 +386,7 @@ export default async function LearnerOnboardingPage() {
               <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Approved</h2>
               <p className="text-slate-500 text-sm">Your enrollment has been approved. Access your courses and begin training.</p>
             </div>
-            <Link href="/lms/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
               Go to Student Portal <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -402,7 +402,7 @@ export default async function LearnerOnboardingPage() {
               <h2 className="text-xl font-black text-slate-900 mb-1">Enrollment Activated!</h2>
               <p className="text-slate-500 text-sm">All steps complete. Check your email for confirmation, then head to your dashboard to start your courses.</p>
             </div>
-            <Link href="/lms/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
+            <Link href="/learner/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0">
               Go to Dashboard <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

@@ -47,7 +47,7 @@ export default function LMSError({
           </button>
 
           <Link
-            href="/lms/dashboard"
+            href="/learner/dashboard"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold"
           >
             <BookOpen className="h-5 w-5" />

@@ -23,7 +23,7 @@ function lmsUrl(data: CourseEmailData): string {
   const id = data.courseId ?? COURSE_ID_MAP[data.courseSlug];
   return id
     ? `${SITE_URL}/lms/courses/${id}`
-    : `${SITE_URL}/lms/dashboard`;
+    : `${SITE_URL}/learner/dashboard`;
 }
 
 // ─── Brand colors ─────────────────────────────────────────────────────────────

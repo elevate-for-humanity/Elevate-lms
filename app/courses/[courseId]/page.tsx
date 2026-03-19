@@ -460,7 +460,7 @@ export default async function CourseDetailPage({
                 )}
                 {isEnrolled && (
                   <Link
-                    href="/lms/dashboard"
+                    href="/learner/dashboard"
                     className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-semibold hover:border-slate-400 transition-colors"
                   >
                     Back to Dashboard

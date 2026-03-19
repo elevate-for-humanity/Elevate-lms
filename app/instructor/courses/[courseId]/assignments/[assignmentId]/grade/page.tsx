@@ -38,7 +38,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     .single();
 
   if (!profile || !['admin', 'super_admin', 'staff', 'instructor'].includes(profile.role)) {
-    redirect('/lms/dashboard');
+    redirect('/learner/dashboard');
   }
 
   // Fetch assignment

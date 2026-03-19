@@ -52,7 +52,7 @@ async function sendEnrollmentConfirmationEmail({
             <li>Attend your first in-person session on your confirmed start date</li>
           </ol>
           <div style="text-align:center;margin:28px 0">
-            <a href="${SITE_URL}/lms/dashboard"
+            <a href="${SITE_URL}/learner/dashboard"
                style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">
               Go to My Dashboard
             </a>

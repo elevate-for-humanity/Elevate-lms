@@ -92,7 +92,7 @@ async function _GET(request: Request) {
           profile?.full_name || profile?.email?.split('@')[0] || 'Student';
         const courseName = course?.title || 'Course';
         const studentEmail = profile?.email || '';
-        const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.URL}` || 'http://localhost:3000'}/lms/dashboard`;
+        const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.URL}` || 'http://localhost:3000'}/learner/dashboard`;
 
         const html = emailTemplates.inactivityReminder(
           studentName,

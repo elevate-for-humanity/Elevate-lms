@@ -118,7 +118,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Student Login',
-        href: '/lms/dashboard',
+        href: '/learner/dashboard',
         description: 'Access your courses',
       },
     ],
@@ -343,7 +343,7 @@ export const footerNavigation = {
       { label: 'Career Services', href: '/career-services' },
       { label: 'Employment Support', href: '/employment-support' },
       { label: 'Success Stories', href: '/success' },
-      { label: 'Student Login', href: '/lms/dashboard' },
+      { label: 'Student Login', href: '/learner/dashboard' },
     ],
   },
   partners: {

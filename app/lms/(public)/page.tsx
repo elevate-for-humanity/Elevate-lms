@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
-import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
+import { StudentToolsStrip } from '@/components/learner/dashboard/StudentToolsStrip';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
@@ -33,7 +33,7 @@ export default async function LmsPublicPage() {
   // Logged-in users go straight to their dashboard
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) redirect('/lms/dashboard');
+  if (user) redirect('/learner/dashboard');
   return (
     <div className="min-h-screen bg-white">
 

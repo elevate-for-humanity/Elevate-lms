@@ -18,7 +18,7 @@ const PORTALS = [
     title: 'Student Portal',
     desc: 'Access courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
     href: '/student-portal',
-    loginHref: '/login?redirect=/lms/dashboard',
+    loginHref: '/login?redirect=/learner/dashboard',
     image: '/images/pages/career-services-page-1.jpg',
     Icon: BookOpen,
     features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule'],

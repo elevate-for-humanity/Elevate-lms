@@ -47,7 +47,7 @@ async function _POST(request: NextRequest) {
       <div class="info-box">
         <h3>📚 Your Access Links:</h3>
         <p><strong>Hub (Command Center):</strong> <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/hub">${process.env.NEXT_PUBLIC_SITE_URL?.replace('https://', '').replace('http://', '') || 'www.elevateforhumanity.org'}/hub</a></p>
-        <p><strong>LMS Dashboard:</strong> <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/lms/dashboard">${process.env.NEXT_PUBLIC_SITE_URL?.replace('https://', '').replace('http://', '') || 'www.elevateforhumanity.org'}/lms/dashboard</a></p>
+        <p><strong>LMS Dashboard:</strong> <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/learner/dashboard">${process.env.NEXT_PUBLIC_SITE_URL?.replace('https://', '').replace('http://', '') || 'www.elevateforhumanity.org'}/learner/dashboard</a></p>
         <p><strong>Email:</strong> ${to}</p>
         <p><strong>Password:</strong> The password you created during registration</p>
       </div>

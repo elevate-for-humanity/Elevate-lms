@@ -257,7 +257,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     id: 'student-dashboard',
     title: 'Student Dashboard',
     description: 'Access your courses, track progress, and download materials.',
-    href: '/lms/dashboard',
+    href: '/learner/dashboard',
     category: 'dashboard',
     audiences: ['students'],
     keywords: ['dashboard', 'student', 'courses', 'progress', 'login'],

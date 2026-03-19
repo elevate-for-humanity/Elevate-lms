@@ -75,7 +75,7 @@ async function _POST() {
         `</ul>`,
         `<h3>What Happens Next</h3>`,
         `<ol>`,
-        `<li>Access your course materials: <a href="${SITE_URL}/lms/dashboard">${SITE_URL}/lms/dashboard</a></li>`,
+        `<li>Access your course materials: <a href="${SITE_URL}/learner/dashboard">${SITE_URL}/learner/dashboard</a></li>`,
         `<li>Your instructor will contact you with your class schedule</li>`,
         `<li>If you applied for WIOA funding, we will coordinate with WorkOne on your behalf</li>`,
         `</ol>`,

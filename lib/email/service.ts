@@ -94,7 +94,7 @@ export async function sendEnrollmentApprovalNotification(
         <li>Complete your profile</li>
         <li>Start your first lesson</li>
       </ol>
-      <p><a href="https://www.elevateforhumanity.org/lms/dashboard">Go to Dashboard</a></p>
+      <p><a href="https://www.elevateforhumanity.org/learner/dashboard">Go to Dashboard</a></p>
       <p>Welcome to Elevate for Humanity!</p>
     `,
     text: `Hi ${name}, Your enrollment in ${programName} has been approved! Log in to get started.`,
@@ -210,7 +210,7 @@ export async function sendStudentAcceptanceNotification(
       <p>Hi ${studentName},</p>
       <p>${programHolderName} has accepted your application.</p>
       <p>You can now begin your training program.</p>
-      <p><a href="https://www.elevateforhumanity.org/lms/dashboard">Go to Dashboard</a></p>
+      <p><a href="https://www.elevateforhumanity.org/learner/dashboard">Go to Dashboard</a></p>
     `,
     text: `Hi ${studentName}, ${programHolderName} has accepted your application.`,
   });

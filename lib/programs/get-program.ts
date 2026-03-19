@@ -59,33 +59,30 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<{ default: ProgramSchema }>
 
 export async function getProgramBySlug(slug: string): Promise<ProgramSchema | null> {
   // DB-migrated programs: synthesize a minimal ProgramSchema from the DB record.
+  // These slugs have no static file — DB is the only source. Throw on failure.
   if (DB_MIGRATED_SLUGS.has(slug)) {
-    try {
-      const db = await getPublishedProgramBySlug(slug);
-      const applyCta = db.program_ctas.find((c) => c.cta_type === 'apply');
-      const requestInfoCta = db.program_ctas.find((c) => c.cta_type === 'request_info');
-      // Return a minimal ProgramSchema-compatible object with the fields
-      // request-info and other shared pages actually use.
-      return {
-        slug: db.slug,
-        title: db.title,
-        subtitle: db.short_description ?? '',
-        category: 'Workforce Training',
-        durationWeeks: db.length_weeks ?? 12,
-        hoursPerWeekMin: 0,
-        hoursPerWeekMax: 0,
-        credentials: [],
-        enrollmentTracks: [],
-        outcomes: [],
-        curriculum: [],
-        cta: {
-          applyHref: applyCta?.href ?? `/apply?program=${db.slug}`,
-          requestInfoHref: requestInfoCta?.href ?? `/programs/${db.slug}/request-info`,
-        },
-      } as unknown as ProgramSchema;
-    } catch {
-      return null;
-    }
+    const db = await getPublishedProgramBySlug(slug);
+    const applyCta = db.program_ctas.find((c) => c.cta_type === 'apply');
+    const requestInfoCta = db.program_ctas.find((c) => c.cta_type === 'request_info');
+    // Return a minimal ProgramSchema-compatible object with the fields
+    // request-info and other shared pages actually use.
+    return {
+      slug: db.slug,
+      title: db.title,
+      subtitle: db.short_description ?? '',
+      category: 'Workforce Training',
+      durationWeeks: db.length_weeks ?? 12,
+      hoursPerWeekMin: 0,
+      hoursPerWeekMax: 0,
+      credentials: [],
+      enrollmentTracks: [],
+      outcomes: [],
+      curriculum: [],
+      cta: {
+        applyHref: applyCta?.href ?? `/apply?program=${db.slug}`,
+        requestInfoHref: requestInfoCta?.href ?? `/programs/${db.slug}/request-info`,
+      },
+    } as unknown as ProgramSchema;
   }
 
   const loader = PROGRAM_REGISTRY[slug];
@@ -97,7 +94,8 @@ export async function getProgramBySlug(slug: string): Promise<ProgramSchema | nu
       (v) => v && typeof v === 'object' && 'slug' in v && 'title' in v && 'cta' in v
     ) as ProgramSchema | undefined;
     return named ?? null;
-  } catch {
+  } catch (err) {
+    console.error(`[getProgramBySlug] Failed to load static program file for slug '${slug}':`, err);
     return null;
   }
 }

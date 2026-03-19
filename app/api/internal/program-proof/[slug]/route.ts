@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getPublishedProgramBySlug } from '@/lib/programs/getProgramBySlug';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -40,43 +40,71 @@ export async function GET(
   const startMs = Date.now();
 
   try {
-    const program = await getPublishedProgramBySlug(slug);
+    const supabase = createAdminClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Admin client unavailable' }, { status: 503 });
+    }
 
-    const heroMedia = program.program_media.filter(
-      (m) => m.media_type === 'hero_image' || m.media_type === 'hero_video'
+    const { data, error } = await supabase
+      .from('programs')
+      .select(`
+        id, slug, title, published, delivery_model, length_weeks, certificate_title,
+        program_media ( id, media_type, url, sort_order ),
+        program_ctas ( id, cta_type, label, href, sort_order ),
+        program_tracks ( id, track_code, title, funding_type, available, sort_order ),
+        program_modules (
+          id, module_number, title, sort_order,
+          program_lessons ( id, lesson_number, title, sort_order )
+        )
+      `)
+      .eq('slug', slug)
+      .eq('published', true)
+      .single();
+
+    if (error || !data) {
+      return NextResponse.json(
+        { error: `Published program not found for slug: ${slug}`, slug, query_ms: Date.now() - startMs },
+        { status: 404 }
+      );
+    }
+
+    const heroMedia = (data.program_media ?? []).filter(
+      (m: { media_type: string }) => m.media_type === 'hero_image' || m.media_type === 'hero_video'
     );
-
-    const totalLessons = program.program_modules.reduce(
-      (sum, mod) => sum + (mod.program_lessons?.length ?? 0),
+    const totalLessons = (data.program_modules ?? []).reduce(
+      (sum: number, mod: { program_lessons?: unknown[] }) => sum + (mod.program_lessons?.length ?? 0),
       0
     );
-
-    const fundedTracks = program.program_tracks.filter(
-      (t) => t.funding_type === 'funded'
+    const fundedTracks = (data.program_tracks ?? []).filter(
+      (t: { funding_type: string }) => t.funding_type === 'funded'
     );
 
     return NextResponse.json({
       proof: {
-        slug: program.slug,
-        title: program.title,
-        published: program.published,
-        source: 'programs + program_media + program_ctas + program_tracks + program_modules + program_lessons',
+        slug: data.slug,
+        title: data.title,
+        published: data.published,
+        source: 'programs + program_media + program_ctas + program_tracks + program_modules + program_lessons (admin client)',
         counts: {
-          media: program.program_media.length,
+          media: (data.program_media ?? []).length,
           hero_media: heroMedia.length,
-          ctas: program.program_ctas.length,
-          tracks: program.program_tracks.length,
+          ctas: (data.program_ctas ?? []).length,
+          tracks: (data.program_tracks ?? []).length,
           funded_tracks: fundedTracks.length,
-          modules: program.program_modules.length,
+          modules: (data.program_modules ?? []).length,
           lessons: totalLessons,
         },
         hero_media_present: heroMedia.length > 0,
-        cta_hrefs: program.program_ctas.map((c) => ({ type: c.cta_type, href: c.href, label: c.label })),
-        track_titles: program.program_tracks.map((t) => ({ title: t.title, funding_type: t.funding_type, available: t.available })),
-        module_titles: program.program_modules.map((m) => m.title),
-        delivery_model: program.delivery_model,
-        length_weeks: program.length_weeks,
-        certificate_title: program.certificate_title,
+        cta_hrefs: (data.program_ctas ?? []).map((c: { cta_type: string; href: string; label: string }) => ({
+          type: c.cta_type, href: c.href, label: c.label,
+        })),
+        track_titles: (data.program_tracks ?? []).map((t: { title: string; funding_type: string; available: boolean }) => ({
+          title: t.title, funding_type: t.funding_type, available: t.available,
+        })),
+        module_titles: (data.program_modules ?? []).map((m: { title: string }) => m.title),
+        delivery_model: data.delivery_model,
+        length_weeks: data.length_weeks,
+        certificate_title: data.certificate_title,
         queried_at: new Date().toISOString(),
         query_ms: Date.now() - startMs,
       },
@@ -84,13 +112,8 @@ export async function GET(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
-      {
-        error: message,
-        slug,
-        queried_at: new Date().toISOString(),
-        query_ms: Date.now() - startMs,
-      },
-      { status: 404 }
+      { error: message, slug, queried_at: new Date().toISOString(), query_ms: Date.now() - startMs },
+      { status: 500 }
     );
   }
 }

@@ -692,6 +692,9 @@ const nextConfig = {
       { source: '/video', destination: '/videos', permanent: true },
       
       // LMS redirects
+      // /lms/dashboard was a standalone redirect page — removed because it conflicted
+      // with /lms/(app)/dashboard (same resolved path). Redirect lives here instead.
+      { source: '/lms/dashboard', destination: '/learner/dashboard', permanent: false },
       { source: '/lms/my-courses', destination: '/lms/courses', permanent: true },
       
       // Student portal redirects

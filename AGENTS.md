@@ -253,6 +253,18 @@ The public LMS uses "Programs" (`/lms/programs`) while the authenticated app use
 
 **Do not rename without a migration plan.** Until resolved, use "Program" in all new public-facing UI and "Course" only where it refers to the internal `training_courses` table object.
 
+### Legacy Programs Pending Canonical Migration
+
+Three programs have `has_lms_course=false` because they were seeded via `curriculum_lessons` (old path) and never migrated to the canonical pipeline. They have zero live enrollments and fail safely (program page shows "No courses yet"). They must be rebuilt through `createAndPublishProgram()` before being re-enabled.
+
+| Slug | Title | Blocker |
+|------|-------|---------|
+| `peer-recovery-specialist` | Peer Recovery Specialist | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
+| `bookkeeping` | Bookkeeping | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
+| `cna` | Certified Nursing Assistant | Content exists in `curriculum_lessons` — needs blueprint + `createAndPublishProgram()` |
+
+**Migration order:** Run `peer-recovery-specialist` first (most content-complete). Verify with `pnpm lms:test:integrity` after each. Do not set `has_lms_course=true` until `createAndPublishProgram()` succeeds and `validate-lms-integrity.ts` passes.
+
 ### Lab / Assignment Instructor Sign-Off UI
 
 `step_submissions` table exists (applied via earlier migration). The lesson page renders lab/assignment UI shells but instructor sign-off UI is not yet built.

@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -11,14 +12,29 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
+  // Preserve the requested path through login so the user lands back here after auth.
+  // next/headers exposes the raw request headers; Next.js sets x-url on internal requests.
+  const headersList = await headers();
+  const rawUrl = headersList.get('x-url') || headersList.get('x-invoke-path') || '';
+  let returnPath = '/lms/courses';
+  if (rawUrl) {
+    try {
+      const u = new URL(rawUrl, 'http://localhost');
+      returnPath = u.pathname + (u.search || '');
+    } catch {
+      // malformed — use default
+    }
+  }
+  const loginRedirect = `/login?redirect=${encodeURIComponent(returnPath)}`;
+
   if (!supabase) {
-    redirect('/login?redirect=/lms/dashboard');
+    redirect(loginRedirect);
   }
 
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/login?redirect=/lms/dashboard');
+    redirect(loginRedirect);
   }
 
   const { data: profile } = await db

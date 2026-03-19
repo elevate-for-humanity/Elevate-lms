@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
@@ -251,7 +252,9 @@ export function CourseCatalog() {
                   <div>
                     <p className="text-2xl font-bold text-brand-orange-600">${course.price}</p>
                   </div>
-                  <Button size="sm">Enroll Now</Button>
+                  <Link href={`/programs`}>
+                    <Button size="sm">Enroll Now</Button>
+                  </Link>
                 </div>
               </div>
             </Card>

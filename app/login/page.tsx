@@ -68,8 +68,8 @@ function LoginForm() {
       const role = profile.role;
       const onboardingDone = profile.onboarding_completed === true;
 
-      // Employer: gate on onboarding completion before sending to dashboard.
-      // All other roles: use canonical destination map.
+      // Employer: gate on onboarding before dashboard. All other roles:
+      // canonical destination from lib/auth/role-destinations.ts.
       if (role === 'employer' && !onboardingDone) {
         router.push('/onboarding/employer');
       } else {

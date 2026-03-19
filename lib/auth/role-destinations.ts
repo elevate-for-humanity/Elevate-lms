@@ -76,7 +76,7 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
   grant_client:   '/grants',
 
   // Students (default)
-  student:        '/lms/dashboard',
+  student:        '/learner/dashboard',
 };
 
 /**
@@ -84,6 +84,6 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
  * Falls back to /lms/dashboard for unknown roles.
  */
 export function getRoleDestination(role: string | null | undefined): string {
-  if (!role) return '/lms/dashboard';
-  return ROLE_DESTINATIONS[role] ?? '/lms/dashboard';
+  if (!role) return '/learner/dashboard';
+  return ROLE_DESTINATIONS[role] ?? '/learner/dashboard';
 }

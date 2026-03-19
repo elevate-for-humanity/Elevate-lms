@@ -24,7 +24,7 @@ const VISUAL_TEMPLATE_PROGRAMS = [
   'cdl-training',
   'tax-prep',
   'business-startup',
-  'peer-recovery-specialist-jri',
+  'peer-recovery-specialist',
   'beauty-career-educator',
   'phlebotomy-technician',
   // Aliases that may still be hit before redirect

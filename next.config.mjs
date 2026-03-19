@@ -389,6 +389,7 @@ const nextConfig = {
       // forklift now has its own detail page — redirect removed
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/jri', destination: '/programs/peer-recovery-specialist', permanent: true },
+      { source: '/programs/peer-recovery-specialist-jri', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/phlebotomy-technician', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/business-startup-marketing', destination: '/programs/entrepreneurship', permanent: true },
@@ -506,6 +507,11 @@ const nextConfig = {
       { source: '/student/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/students/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/learners/:path*', destination: '/lms/:path*', permanent: true },
+      // /learner/certifications has no page — redirect to canonical certificates route
+      { source: '/learner/certifications', destination: '/certificates', permanent: true },
+      { source: '/learner/certifications/:path*', destination: '/certificates', permanent: true },
+      // /learner/courses has no page — redirect to LMS courses
+      { source: '/learner/courses', destination: '/lms/courses', permanent: true },
       { source: '/program-holder-portal/:path*', destination: '/program-holder/:path*', permanent: true },
       // /admin-portal is now a public landing page - no redirect needed
       // /dashboard redirect removed - handled by middleware with auth check

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 export interface AuthResult {
   user: {
@@ -18,9 +19,9 @@ export interface AuthResult {
 }
 
 /**
- * Require user to have one of the specified roles
- * Redirects to login if not authenticated
- * Redirects to unauthorized if wrong role
+ * Require user to have one of the specified roles.
+ * Redirects to /login?redirect=<current-path> if not authenticated.
+ * Redirects to /unauthorized if authenticated but wrong role.
  */
 export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   const supabase = await createClient();
@@ -29,7 +30,19 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    // Preserve the requested path so login can return the user here
+    const headersList = await headers();
+    const rawUrl = headersList.get('x-url') || headersList.get('x-invoke-path') || '';
+    let returnPath = '/learner/dashboard';
+    if (rawUrl) {
+      try {
+        const u = new URL(rawUrl, 'http://localhost');
+        returnPath = u.pathname + (u.search || '');
+      } catch {
+        // malformed — use default
+      }
+    }
+    redirect(`/login?redirect=${encodeURIComponent(returnPath)}`);
   }
 
   const { data: profile } = await supabase

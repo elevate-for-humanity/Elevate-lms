@@ -6,7 +6,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   subtitle: '4-week hybrid program. Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications for healthcare and public safety careers.',
   sector: 'healthcare',
   category: 'Emergency Response',
-  heroImage: '/images/pages/cna-patient-care.jpg',
+  heroImage: '/images/pages/cpr-aed.jpg',
   heroImageAlt: 'Emergency medical responder providing care',
   videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',

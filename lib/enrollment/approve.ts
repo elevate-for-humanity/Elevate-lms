@@ -12,6 +12,7 @@
 
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { attachPartnerRouting } from '@/lib/enrollment/partner-routing';
 
 export interface ApproveApplicationInput {
   applicationId: string;
@@ -198,49 +199,9 @@ export async function approveApplication(
   }
 
   // ── Partner routing ──────────────────────────────────────────────────────
-  // CNA → CMI (Choice Medical Institute, School Code #015188)
-  // partner_enrollments schema: partner_id (FK→partners), student_id (FK→profiles), program_id
-  const CMI_PARTNER_ID = '66685a9d-1b27-4c28-a7d7-2ee6287923bc';
-
-  if (app.program_slug === 'cna' && userId) {
-    const { data: existingCmi } = await db
-      .from('cmi_students')
-      .select('id')
-      .eq('application_id', applicationId)
-      .maybeSingle();
-
-    if (!existingCmi) {
-      await db.from('partner_enrollments').insert({
-        partner_id: CMI_PARTNER_ID,
-        student_id: userId,
-        program_id: resolvedProgramId ?? null,
-        status: 'assigned',
-        enrollment_date: new Date().toISOString(),
-      });
-
-      const { error: cmiErr } = await db.from('cmi_students').insert({
-        user_id: userId,
-        application_id: applicationId,
-        status: 'enrolled',
-      });
-
-      if (cmiErr) {
-        logger.error('[approve] Failed to create cmi_students row', { applicationId, error: cmiErr });
-      } else {
-        logger.info('[approve] CNA → CMI enrolled', { applicationId, userId });
-      }
-    }
-  }
-
-  // NHA certification lane (ekg, phlebotomy)
-  if ((app.program_slug === 'ekg' || app.program_slug === 'phlebotomy') && userId) {
-    await db.from('partner_enrollments').insert({
-      student_id: userId,
-      program_id: resolvedProgramId ?? null,
-      status: 'enrolled',
-      enrollment_date: new Date().toISOString(),
-    });
-  }
+  // Dynamically resolves partner + program. Throws on missing records.
+  // Handles: CNA → CMI, EKG/Phlebotomy → NHA
+  await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
 
   // Generate password setup link for new users
   let passwordSetupLink: string | null = null;

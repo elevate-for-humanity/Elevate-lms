@@ -24,7 +24,7 @@ export async function getProgramStructure(
   const courseName = course?.title ?? courseId;
 
   // Fetch lessons with module join — canonical tables
-  let query = db
+  const query = db
     .from('course_lessons')
     .select(
       'id, slug, title, lesson_type, passing_score, order_index, ' +

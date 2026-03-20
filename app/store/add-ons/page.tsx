@@ -8,9 +8,9 @@ import {
   ArrowRight, 
   Zap, 
   Trophy, 
-  Play,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import StoreProductVideo from '@/app/store/StoreProductVideo';
 
 import { createBrowserClient } from '@supabase/ssr';
 const addOns = [
@@ -21,7 +21,8 @@ const addOns = [
     href: '/store/add-ons/community-hub',
     icon: Users,
     price: '$1,997',
-    image: '/images/pages/training-cohort.jpg',
+    video: '/videos/store/store-community-hub.mp4',
+    poster: '/images/pages/training-cohort.jpg',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',
@@ -46,7 +47,8 @@ const moreAddOns = [
     description: 'Advanced reporting and predictive analytics for student outcomes. Real-time dashboards, custom reports, and cohort analysis.',
     href: '/store/add-ons/analytics-pro',
     price: '$1,497',
-    image: '/images/pages/wioa-meeting.jpg',
+    video: '/videos/store/store-analytics-pro.mp4',
+    poster: '/images/pages/wioa-meeting.jpg',
   },
   {
     id: 'compliance-automation',
@@ -54,7 +56,8 @@ const moreAddOns = [
     description: 'Automated compliance tracking and reporting for WIOA, grants, FERPA, and accreditation requirements.',
     href: '/store/add-ons/compliance-automation',
     price: '$1,297',
-    image: '/images/pages/workforce-training.jpg',
+    video: '/videos/store/store-compliance-automation.mp4',
+    poster: '/images/pages/admin-compliance-hero.jpg',
   },
 ];
 
@@ -68,8 +71,6 @@ export default function AddOnsPage() {
     supabase.from('products').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
-
-  const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,24 +110,16 @@ export default function AddOnsPage() {
           {addOns.map((addon) => (
             <div key={addon.id} className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-12">
               <div className="grid lg:grid-cols-2">
-                {/* Image/Video Side */}
-                <div className="relative h-64 lg:h-auto min-h-[300px] overflow-hidden">
-                  <Image
-                    src={addon.image}
-                    alt={addon.title}
-                    fill
-                    className="object-cover"
+                {/* Video Side */}
+                <div className="relative p-4 lg:p-6 flex flex-col justify-center bg-slate-50">
+                  <StoreProductVideo
+                    src={addon.video}
+                    poster={addon.poster}
+                    alt={`${addon.title} demo`}
+                    label={`Watch: ${addon.title} Demo`}
                   />
-                  <button 
-                    onClick={() => setActiveVideo(addon.id)}
-                    className="absolute inset-0 flex items-center justify-center group"
-                  >
-                    <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                      <Play className="w-8 h-8 text-brand-blue-600 ml-1" />
-                    </div>
-                  </button>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                  <div className="mt-3">
+                    <span className="inline-block bg-brand-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-bold">
                       Most Popular
                     </span>
                   </div>
@@ -214,19 +207,16 @@ export default function AddOnsPage() {
                 key={item.id} 
                 className="group bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="relative h-44 overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                <div className="p-4 pb-0">
+                  <StoreProductVideo
+                    src={item.video}
+                    poster={item.poster}
+                    alt={`${item.title} demo`}
+                    label={`Watch: ${item.title}`}
                   />
-                  <div className="absolute bottom-3 left-4">
-                    <h3 className="text-xl font-bold text-white">{item.title}</h3>
-                  </div>
                 </div>
                 <div className="p-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
                   <p className="text-slate-600 mb-4">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-black text-slate-900">{item.price}</div>

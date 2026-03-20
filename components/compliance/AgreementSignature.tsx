@@ -197,7 +197,7 @@ export function AgreementSignature({
       }
 
       setSuccess(true);
-      onSuccess?.(result.id!);
+      onSuccess?.(result.acceptanceId ?? '');
 
       if (redirectOnSuccess) {
         setTimeout(() => {
@@ -205,7 +205,7 @@ export function AgreementSignature({
         }, 1500);
       }
     } catch (err) {
-      const errorMessage = 'An error occurred';
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.';
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {

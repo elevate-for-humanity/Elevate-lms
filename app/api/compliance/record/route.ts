@@ -35,12 +35,13 @@ async function _POST(request: NextRequest) {
     }
 
     if (action === 'agreement_acceptance') {
-      const { data, error } = await db.from('license_agreement_acceptances').insert({
+      const insertPayload = {
         user_id: user.id,
         agreement_type: params.agreementType || params.agreementKey,
         document_version: params.documentVersion || params.agreementVersion || '1.0',
-        signer_name: params.signerName || params.acceptedName,
+        signer_name: params.signerName || params.acceptedName || user.email,
         signer_email: params.signerEmail || params.acceptedEmail || user.email,
+        auth_email: params.authEmail || user.email,
         signature_method: params.signatureMethod || 'checkbox',
         signature_data: params.signatureData || null,
         signature_typed: params.signatureTyped || null,
@@ -49,10 +50,40 @@ async function _POST(request: NextRequest) {
         accepted_at: new Date().toISOString(),
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
         user_agent: request.headers.get('user-agent') || 'unknown',
-      }).select('id').single();
+      };
+
+      // Check if already signed — RLS blocks UPDATE so we can't upsert
+      const { data: existing } = await db
+        .from('license_agreement_acceptances')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('agreement_type', insertPayload.agreement_type)
+        .maybeSingle();
+
+      if (existing?.id) {
+        // Already signed — return success without re-inserting
+        return NextResponse.json({ success: true, acceptanceId: existing.id });
+      }
+
+      const { data, error } = await db
+        .from('license_agreement_acceptances')
+        .insert(insertPayload)
+        .select('id')
+        .single();
+
       if (error) {
-        logger.error('[Compliance] Agreement acceptance failed:', error.message);
-        return NextResponse.json({ success: false, error: 'Failed to record agreement' }, { status: 500 });
+        logger.error('[Compliance] Agreement acceptance failed:', error.message, error.code);
+        // Race condition — another request inserted between our check and insert
+        if (error.code === '23505') {
+          const { data: race } = await db
+            .from('license_agreement_acceptances')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('agreement_type', insertPayload.agreement_type)
+            .maybeSingle();
+          return NextResponse.json({ success: true, acceptanceId: race?.id });
+        }
+        return NextResponse.json({ success: false, error: 'Failed to record agreement. Please try again.' }, { status: 500 });
       }
       return NextResponse.json({ success: true, acceptanceId: data?.id });
     }

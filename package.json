@@ -301,6 +301,8 @@
     "lms:test:integrity": "tsx scripts/validate-lms-integrity.ts",
     "lms:test:concurrency": "tsx scripts/test-generator-concurrency.ts --cleanup",
     "lms:test:all": "pnpm lms:test:one-shot && pnpm lms:test:hardening && pnpm lms:test:integrity && pnpm lms:test:concurrency",
+    "audit:e2e": "tsx scripts/e2e-integrity-audit.ts",
+    "audit:e2e:cleanup": "tsx scripts/e2e-integrity-audit.ts --cleanup",
     "lms:build": "pnpm lms:check && pnpm build",
     "lms:migrations": "echo '📋 Run migrations at /admin/migrations or use Supabase CLI'",
     "lms:activate": "pnpm lms:setup && pnpm lms:migrations && echo '✅ LMS activated'",

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
+import CanonicalHero from '@/components/hero/CanonicalHero';
+import HeroMediaFrame from '@/components/hero/HeroMediaFrame';
 import {
   GraduationCap,
   Clock,
@@ -29,49 +31,29 @@ export const metadata: Metadata = {
 export default function ApprenticeshipPage() {
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero — video frame only, no text overlay */}
-      <section
-        className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(280px, 56vw, 680px)' }}
-        aria-label="Barber apprenticeship hero video"
-      >
-        <CanonicalVideo
-          src="/videos/barber-hero-final.mp4"
-          poster="/images/pages/barber-apprenticeship.jpg"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </section>
-
-      {/* Below-hero identity and CTAs */}
-      <section className="bg-white border-b border-slate-100 py-10 sm:py-14">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="px-3 py-1 bg-brand-orange-100 text-brand-orange-700 text-xs font-bold rounded-full uppercase tracking-wide">Earn While You Learn</span>
-            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full uppercase tracking-wide">DOL Registered</span>
-            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full uppercase tracking-wide">$12–15/Hour</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-            Barber Apprenticeship
-          </h1>
-          <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
-            Get paid to learn. Master your craft. Build your career.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/start"
-              className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors"
-            >
+      <CanonicalHero
+        media={
+          <HeroMediaFrame heightClass="h-[50vh] sm:h-[56vw] min-h-[280px] max-h-[680px]">
+            <CanonicalVideo
+              src="/videos/barber-hero-final.mp4"
+              poster="/images/pages/barber-apprenticeship.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </HeroMediaFrame>
+        }
+        title="Barber Apprenticeship"
+        body="Get paid to learn. Master your craft. Build your career."
+        actions={
+          <>
+            <Link href="/start" className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors">
               Start Your Journey <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link
-              href="#how-it-works"
-              className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors"
-            >
+            <Link href="#how-it-works" className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors">
               How It Works
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Value Props Strip */}
       <section className="bg-white py-8 border-t">

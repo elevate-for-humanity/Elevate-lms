@@ -3,6 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
+import CanonicalHero from '@/components/hero/CanonicalHero';
+import HeroMediaFrame from '@/components/hero/HeroMediaFrame';
 
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
@@ -19,47 +21,29 @@ export default function Page() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Getstarted" }]} />
       </div>
-      {/* Hero — video frame only, no text overlay */}
-      <section
-        className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(280px, 50vw, 600px)' }}
-        aria-label="Get started hero video"
-      >
-        <CanonicalVideo
-          src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/training-cohort.jpg"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </section>
-
-      {/* Below-hero identity and CTAs */}
-      <section className="bg-white border-b border-slate-100 py-10 sm:py-14">
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-brand-orange-600 font-bold text-xs uppercase tracking-widest mb-3">
-            Begin Your Journey
-          </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-            Start Your Career Journey Today
-          </h1>
-          <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
-            Funded training. No cost, no debt. Real careers waiting. Get started in 3 simple steps.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors"
-            >
+      <CanonicalHero
+        media={
+          <HeroMediaFrame>
+            <CanonicalVideo
+              src="/videos/getting-started-hero.mp4"
+              poster="/images/pages/training-cohort.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </HeroMediaFrame>
+        }
+        title="Start Your Career Journey Today"
+        body="Funded training. No cost, no debt. Real careers waiting. Get started in 3 simple steps."
+        actions={
+          <>
+            <Link href="/contact" className="bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors">
               Contact Us
             </Link>
-            <Link
-              href="/programs"
-              className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors"
-            >
+            <Link href="/programs" className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors">
               View Programs
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* Your Journey - 3 Simple Steps */}
       <section className="py-20 bg-white">

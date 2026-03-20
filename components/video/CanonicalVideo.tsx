@@ -21,14 +21,25 @@ import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   src: string;
-  /** Local static path. Never a signed URL or remote URL with expiry. */
-  poster: string;
+  /**
+   * Local static path only. Template literal type blocks remote URLs at compile time.
+   * Must start with `/` — no https://, no Supabase signed URLs, no expiring CDN links.
+   */
+  poster: `/${string}`;
   className?: string;
   /** Intersection threshold to trigger play (default 0.5) */
   threshold?: number;
 };
 
 export default function CanonicalVideo({ src, poster, className, threshold = 0.5 }: Props) {
+  if (process.env.NODE_ENV === 'development') {
+    if (!poster) {
+      throw new Error('CanonicalVideo requires a local poster. This is not optional.');
+    }
+    if (poster.startsWith('http')) {
+      throw new Error(`CanonicalVideo poster must be a local path, not a remote URL: ${poster}`);
+    }
+  }
   const ref = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);

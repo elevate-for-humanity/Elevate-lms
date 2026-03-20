@@ -96,6 +96,42 @@ export async function GET(request: NextRequest) {
     .slice(0, 5)
     .map(([program_slug, stuck_count]) => ({ program_slug, stuck_count }));
 
+  // Deadman check: log this run and alert if the previous run is stale.
+  // If health checks stop running, the entire detection chain silently fails.
+  const DEADMAN_INTERVAL_HOURS = 2;
+  const now = new Date();
+
+  const { data: lastRun } = await db
+    .from('health_check_log')
+    .select('ran_at')
+    .eq('route', 'enrollment-health')
+    .order('ran_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (lastRun?.ran_at) {
+    const hoursSinceLast = (now.getTime() - new Date(lastRun.ran_at).getTime()) / 3_600_000;
+    if (hoursSinceLast > DEADMAN_INTERVAL_HOURS) {
+      const alertTo = process.env.ALERT_EMAIL_TO || process.env.ADMIN_ALERT_EMAIL;
+      const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+      const msg = `Health check gap: enrollment-health last ran ${hoursSinceLast.toFixed(1)}h ago (threshold: ${DEADMAN_INTERVAL_HOURS}h). Detection chain may have been silent.`;
+      if (alertTo) {
+        await trySendEmail({
+          to: alertTo,
+          subject: `[ALERT] Enrollment health check gap — ${hoursSinceLast.toFixed(1)}h since last run`,
+          html: `<p>${msg}</p><p>If this was intentional downtime, no action needed. Otherwise investigate why the health route stopped running.</p>`,
+        });
+      }
+      if (slackWebhook) {
+        await fetch(slackWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: `⚠️ *HEALTH_CHECK_GAP* — ${msg}` }),
+        }).catch(() => {});
+      }
+    }
+  }
+
   // Enrollment integrity audit — failures here are deployment blockers
   const integrity = await validateEnrollmentIntegrity(db);
 
@@ -138,8 +174,16 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Log this run for deadman tracking — fire and forget, never block response
+  db.from('health_check_log').insert({
+    route:    'enrollment-health',
+    ran_at:   now.toISOString(),
+    clean:    integrity.clean,
+    failures: integrity.failures,
+  }).then(() => {}).catch(() => {});
+
   return NextResponse.json({
-    generated_at: new Date().toISOString(),
+    generated_at: now.toISOString(),
     total: rows?.length ?? 0,
     counts_by_status: counts,
     avg_hours_by_stage,
@@ -151,6 +195,10 @@ export async function GET(request: NextRequest) {
       clean: integrity.clean,
       failures: integrity.failures,
       counts: integrity.counts,
+    },
+    deadman: {
+      last_run_at:            lastRun?.ran_at ?? null,
+      interval_threshold_hours: DEADMAN_INTERVAL_HOURS,
     },
   });
 }

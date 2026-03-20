@@ -62,15 +62,10 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('status, enrolled_at, revoked_at')
+    .select('status, enrolled_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
-
-  // Revoked enrollment — treat as not enrolled
-  if (enrollment?.revoked_at) {
-    redirect(`/lms/programs`);
-  }
 
   const isPendingApproval = enrollment?.status === 'pending_approval';
 

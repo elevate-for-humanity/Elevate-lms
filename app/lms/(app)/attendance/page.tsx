@@ -22,8 +22,7 @@ export default async function AttendancePage() {
   const { data: enrollments } = await db
     .from('program_enrollments')
     .select('id, course_id, courses(title)')
-    .eq('user_id', user.id)
-    .is('revoked_at', null);
+    .eq('user_id', user.id);
 
   const enrollmentIds = enrollments?.map(e => e.id) || [];
 

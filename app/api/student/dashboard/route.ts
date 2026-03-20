@@ -53,7 +53,6 @@ async function _GET(request: Request) {
       `)
       .eq('student_id', studentId)
       .in('status', ['active', 'enrolled', 'in_progress'])
-      .is('revoked_at', null)
       .order('enrolled_at', { ascending: false });
 
     if (enrollError) {

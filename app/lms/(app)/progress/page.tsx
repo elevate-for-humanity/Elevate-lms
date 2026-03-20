@@ -81,7 +81,6 @@ export default async function ProgressPage() {
         )
       `)
       .eq('user_id', user.id)
-      .is('revoked_at', null)
       .order('updated_at', { ascending: false });
 
     if (enrollmentData) {

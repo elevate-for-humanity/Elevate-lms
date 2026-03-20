@@ -58,15 +58,15 @@ export default async function ProgramDashboardPage({ params }: { params: Params 
   // Verify enrollment
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('id, status, enrolled_at, progress_percent, revoked_at')
+    .select('id, status, enrolled_at, progress_percent')
     .eq('user_id', user.id)
     .eq('program_id', program.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (!enrollment || enrollment.revoked_at) {
-    // Not enrolled or enrollment revoked — redirect to program page
+  if (!enrollment) {
+    // Not enrolled — redirect to program page
     redirect(`/programs/${program.slug || program.code || programId}`);
   }
 

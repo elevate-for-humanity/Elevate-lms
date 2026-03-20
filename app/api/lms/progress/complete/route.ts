@@ -62,7 +62,6 @@ async function _POST(req: NextRequest) {
       .eq('user_id', user.id)
       .eq('course_id', courseId)
       .in('status', ['active', 'in_progress', 'enrolled', 'confirmed'])
-      .is('revoked_at', null)
       .maybeSingle();
 
     if (!enrollment) {

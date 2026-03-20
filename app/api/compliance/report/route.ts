@@ -45,8 +45,7 @@ async function _GET(request: NextRequest) {
 
     const { data: enrollments } = await db
       .from('program_enrollments')
-      .select('id, status, program_id, enrolled_at, completed_at')
-      .is('revoked_at', null);
+      .select('id, status, program_id, enrolled_at, completed_at');
 
     const { data: applications } = await db
       .from('applications')

@@ -119,20 +119,25 @@ export default async function WorkforceBoardPage() {
         </div>
       </div>
 
-      {/* Video Hero Section */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/how-it-works-hero.jpg"
-            className="absolute inset-0 w-full h-full object-cover" />
-        </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Portal</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Program oversight, performance metrics, and compliance monitoring in one place</p>
-          </div>
-        </div>
+      {/* Hero — video frame only */}
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
+        <LazyVideo
+          src="/videos/training-providers-hero.mp4"
+          poster="/images/pages/how-it-works-hero.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </section>
+
+      {/* Page identity — below hero */}
+      <div className="bg-white border-b border-slate-100 py-10">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-brand-blue-600 text-xs font-bold uppercase tracking-widest mb-2">Portal</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Workforce Board Portal</h1>
+          <p className="text-slate-600 text-base md:text-lg max-w-3xl leading-relaxed">
+            Program oversight, performance metrics, and compliance monitoring in one place
+          </p>
+        </div>
+      </div>
 
       {/* Features Grid */}
       <section className="py-16 px-6 bg-white">
@@ -157,11 +162,9 @@ export default async function WorkforceBoardPage() {
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
-                    {feature.title}
-                  </h3>
                 </div>
                 <div className="p-4">
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{feature.title}</h3>
                   <p className="text-slate-600 text-sm">{feature.description}</p>
                   <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
                     Learn More <ArrowRight className="w-4 h-4" />
@@ -187,19 +190,19 @@ export default async function WorkforceBoardPage() {
               <Link
                 key={link.title}
                 href={link.href}
-                className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition"
+                className="group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition border border-slate-100"
               >
-                <div className="relative h-48">
+                <div className="relative h-36 overflow-hidden">
                   <Image
                     src={link.image}
                     alt={link.title}
                     fill
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="text-lg font-bold mb-1">{link.title}</h3>
-                    <p className="text-white/80 text-sm">{link.description}</p>
-                  </div>
+                </div>
+                <div className="p-4 bg-white">
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{link.title}</h3>
+                  <p className="text-slate-500 text-sm leading-snug">{link.description}</p>
                 </div>
               </Link>
             ))}

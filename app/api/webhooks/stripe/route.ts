@@ -299,21 +299,36 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ received: true, duplicate: true });
     }
 
-    // Record webhook event before processing
+    // Record webhook event before processing.
+    // Attempts full insert first (payload + metadata added in migration 20260503000009).
+    // Falls back to minimal insert if those columns don't exist yet (42703 = undefined_column).
     let eventRecorded = false;
     try {
-      const { error: insertError } = await supabase
+      let insertError = (await supabase
         .from('stripe_webhook_events')
         .insert({
           stripe_event_id: event.id,
           event_type: event.type,
           status: 'processing',
           payload: event.data.object,
-          metadata: { received_at: new Date().toISOString() },
-        });
+          metadata: { received_at: new Date().toISOString(), livemode: event.livemode },
+        })).error;
+
+      // Column doesn't exist yet (migration pending) — retry without optional columns
+      if (insertError?.code === '42703') {
+        logger.warn('[webhook] payload/metadata columns missing — retrying minimal insert');
+        const fallback = await supabase
+          .from('stripe_webhook_events')
+          .insert({
+            stripe_event_id: event.id,
+            event_type: event.type,
+            status: 'processing',
+          });
+        insertError = fallback.error ?? null;
+      }
 
       if (insertError) {
-        // If insert fails due to unique constraint, another process is handling it
+        // Unique constraint = another process is already handling this event
         if (insertError.code === '23505') {
           logger.info(`[webhook] Being processed by another instance: ${event.id}`);
           try {

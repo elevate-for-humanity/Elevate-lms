@@ -149,8 +149,39 @@ async function handleSummary(adminDb: NonNullable<ReturnType<typeof createAdminC
     });
   }
 
+  // Payment integrity metrics (Audit A + B + open flags)
+  const [paidNotEnrolled, enrolledNotPaid, openFlags] = await Promise.all([
+    adminDb.from('v_paid_not_enrolled').select('session_id', { count: 'exact', head: true }),
+    adminDb.from('v_enrolled_not_paid').select('enrollment_id', { count: 'exact', head: true }),
+    adminDb.from('payment_integrity_flags')
+      .select('id', { count: 'exact', head: true })
+      .is('resolved_at', null),
+  ]);
+
+  const integrityAlerts: string[] = [];
+  if ((paidNotEnrolled.count ?? 0) > 0)
+    integrityAlerts.push(`CRITICAL: ${paidNotEnrolled.count} paid sessions with no enrollment`);
+  if ((enrolledNotPaid.count ?? 0) > 0)
+    integrityAlerts.push(`CRITICAL: ${enrolledNotPaid.count} active enrollments with no payment evidence`);
+  if ((openFlags.count ?? 0) > 0)
+    integrityAlerts.push(`WARNING: ${openFlags.count} unresolved payment integrity flags`);
+
+  const allAlerts = [...alerts, ...integrityAlerts];
+
+  // Persist health snapshot for trend tracking
+  adminDb.from('webhook_health_log').insert({
+    provider: 'stripe',
+    endpoint_status: allAlerts.some(a => a.includes('CRITICAL')) ? 'degraded' : 'enabled',
+    events_last_24h: total24h ?? 0,
+    events_failed: failed24h ?? 0,
+    events_processed: processed24h ?? 0,
+    unprocessed_paid_sessions: paidNotEnrolled.count ?? 0,
+    enrolled_not_paid: enrolledNotPaid.count ?? 0,
+    metadata: { alerts: allAlerts },
+  }).then(() => {}).catch(() => {});
+
   return NextResponse.json({
-    healthy: alerts.length === 0,
+    healthy: allAlerts.length === 0,
     checkedAt: now.toISOString(),
     threshold: VOLUME_DROP_THRESHOLD,
     summary: {
@@ -161,7 +192,12 @@ async function handleSummary(adminDb: NonNullable<ReturnType<typeof createAdminC
       skipped: skipped24h || 0,
     },
     providers: providerHealth,
-    alerts,
+    integrity: {
+      paid_not_enrolled:  paidNotEnrolled.count  ?? 0,
+      enrolled_not_paid:  enrolledNotPaid.count   ?? 0,
+      open_flags:         openFlags.count          ?? 0,
+    },
+    alerts: allAlerts,
   });
 }
 

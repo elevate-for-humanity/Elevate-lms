@@ -165,6 +165,17 @@ async function _POST(request: NextRequest) {
     const baseUrl =
       process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
+    // Look up the most recent application for this user+program so we can
+    // embed application_id in metadata — required for reconciliation.
+    const { data: application } = await db
+      .from('applications')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('program_id', programId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     // Common session configuration
     const commonConfig: Partial<Stripe.Checkout.SessionCreateParams> = {
       payment_method_types: paymentMethodTypes,
@@ -173,12 +184,16 @@ async function _POST(request: NextRequest) {
       success_url: `${baseUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}&program=${program.slug}`,
       cancel_url: `${baseUrl}/programs/${program.slug}/enroll`,
       metadata: {
+        kind: 'program_enrollment',
         program_id: programId,
         program_name: program.name,
         program_slug: program.slug,
         payment_type: paymentType,
         user_id: user.id,
+        student_id: user.id,
         user_email: profile?.email || '',
+        // application_id enables reconciliation — present when application exists
+        ...(application?.id ? { application_id: application.id } : {}),
       },
       allow_promotion_codes: true,
       billing_address_collection: 'required',

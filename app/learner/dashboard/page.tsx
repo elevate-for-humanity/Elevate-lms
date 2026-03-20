@@ -193,6 +193,42 @@ export default async function LearnerDashboardPage() {
     .limit(1)
     .maybeSingle();
 
+  // Auto-repair: if user has no active enrollment but has a paid Stripe session,
+  // trigger reconciliation server-side. Fire-and-forget — never blocks render.
+  const hasActiveEnrollment = (legacyEnrollments ?? []).some((e: any) => e.status === 'active');
+  if (!hasActiveEnrollment) {
+    const { data: paidApp } = await db
+      .from('applications')
+      .select('id')
+      .eq('user_id', user.id)
+      .in('status', ['enrolled', 'ready_to_enroll', 'approved', 'in_review'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (paidApp) {
+      const { data: stripeSession } = await db
+        .from('stripe_sessions_staging')
+        .select('session_id')
+        .eq('application_id', paidApp.id)
+        .eq('payment_status', 'paid')
+        .limit(1)
+        .maybeSingle();
+
+      if (stripeSession) {
+        // Paid session exists but no active enrollment — trigger repair silently
+        import('@/lib/logger').then(({ logger }) =>
+          logger.info('[dashboard] Auto-repair triggered', { userId: user.id, appId: paidApp.id })
+        ).catch(() => {});
+        db.rpc('enroll_application', {
+          p_application_id: paidApp.id,
+          p_actor_id: user.id,
+          p_source: 'stripe_repair',
+        }).then(() => {}).catch(() => {});
+      }
+    }
+  }
+
   // Check whether the learner has a pending_workone application — gates WorkOne checklist
   const { data: workoneApp } = await db
     .from('applications')

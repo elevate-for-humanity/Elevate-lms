@@ -211,6 +211,9 @@ export interface StudentApplicationData extends BaseApplicationData {
   employmentStatus?: string;
   educationLevel?: string;
   goals?: string;
+  /** 'inquiry' = information request only, no enrollment created.
+   *  'enrollment' = intent to enroll — requires payment or verified funding. */
+  applicationType?: 'inquiry' | 'enrollment' | string;
   // Funding eligibility fields
   requestedFundingSource?: string;
   householdSize?: number | null;

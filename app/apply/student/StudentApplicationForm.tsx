@@ -2,17 +2,22 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { submitStudentApplication } from '../actions';
 import { getActiveProgramsByCategory } from '@/lib/program-registry';
 import { trackEvent } from '@/components/analytics/google-analytics';
 
-
 const programGroups = getActiveProgramsByCategory();
+
+// Programs that have a waitlist — show waitlist link instead of enrollment form
+const WAITLIST_PROGRAMS = new Set(['cdl-training', 'barber-apprenticeship']);
 
 export default function StudentApplicationForm({ initialProgram = '' }: { initialProgram?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [applicationType, setApplicationType] = useState<'inquiry' | 'enrollment' | ''>('');
+  const [selectedProgram, setSelectedProgram] = useState(initialProgram);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,21 +61,30 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       employmentStatus: formData.get('employmentStatus') as string,
       educationLevel: formData.get('educationLevel') as string,
       goals: formData.get('goals') as string,
+      applicationType: applicationType as string,
       role: 'student' as const,
     };
 
     try {
-      trackEvent('form_submit', 'application', data.programInterest);
+      trackEvent('form_submit', applicationType === 'inquiry' ? 'inquiry' : 'application', data.programInterest);
       const result = await submitStudentApplication(data);
 
       if (result.success) {
         trackEvent('application_complete', 'conversion', data.programInterest);
-        // Account created and approved — send straight to onboarding.
-        router.push('/onboarding/learner');
+
+        // Inquiry path — thank you page, no enrollment, no payment
+        if (applicationType === 'inquiry') {
+          router.push('/apply/inquiry-received');
+          return;
+        }
+
+        // Enrollment path — must complete payment before access is granted
+        // Redirect to checkout for the selected program
+        router.push(`/enroll/checkout?program=${encodeURIComponent(data.programInterest)}&application_id=${result.applicationId}`);
         return;
       } else {
         setError(
-          result.error ||
+          ('error' in result ? result.error : undefined) ||
           'Something went wrong submitting your application. Please try again or contact us at info@elevateforhumanity.org.'
         );
         setLoading(false);
@@ -97,6 +111,75 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
         </div>
       )}
 
+      {/* Step 1 — Application type */}
+      <div className="bg-white border border-slate-200 rounded-lg p-6">
+        <h2 className="text-xl font-bold text-black mb-1">What would you like to do?</h2>
+        <p className="text-sm text-slate-500 mb-4">Select an option to get started.</p>
+        <select
+          required
+          value={applicationType}
+          onChange={e => setApplicationType(e.target.value as 'inquiry' | 'enrollment')}
+          className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent bg-white text-sm"
+        >
+          <option value="">— Select an option —</option>
+          <option value="inquiry">I want to learn more / request information (Inquiry)</option>
+          <option value="enrollment">I am ready to enroll in a program (Enrollment)</option>
+        </select>
+
+        {/* Inquiry info box */}
+        {applicationType === 'inquiry' && (
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="text-sm text-blue-800 leading-relaxed">
+              <strong>Inquiry:</strong> We'll create your account and an advisor will follow up
+              with program details, costs, and next steps. No payment is required at this stage.
+            </p>
+          </div>
+        )}
+
+        {/* Enrollment info + waitlist check */}
+        {applicationType === 'enrollment' && selectedProgram && WAITLIST_PROGRAMS.has(selectedProgram) && (
+          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="text-sm font-semibold text-amber-800 mb-2">This program currently has a waitlist.</p>
+            <p className="text-sm text-amber-700 leading-relaxed mb-3">
+              New enrollment spots are limited. Join the waitlist and we'll contact you
+              as soon as a seat opens.
+            </p>
+            <Link
+              href={`/apply/waitlist/${selectedProgram}`}
+              className="inline-block bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
+            >
+              Join the Waitlist →
+            </Link>
+          </div>
+        )}
+
+        {/* Enrollment funding disclosure */}
+        {applicationType === 'enrollment' && (
+          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="text-sm font-semibold text-amber-800 mb-2">
+              Important — Enrollment requires payment or verified funding
+            </p>
+            <p className="text-sm text-amber-700 leading-relaxed">
+              Enrollment is not finalized until payment is received or funding is verified.
+              If you plan to use <strong>WIOA, WorkOne, EmployIndy, Workforce Ready Grant,
+              or any state or federal funding</strong>, you must have written approval from
+              your funding agency before enrollment can be completed.{' '}
+              <a href="https://www.workone.in.gov" target="_blank" rel="noopener noreferrer"
+                 className="underline font-semibold">Find your WorkOne office →</a>
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Only show the rest of the form once a type is selected */}
+      {!applicationType && (
+        <div className="text-center py-8 text-slate-400 text-sm">
+          Select an option above to continue.
+        </div>
+      )}
+
+      {/* Personal Information — shown for both paths */}
+      {applicationType && (<>
       {/* Personal Information */}
       <div className="bg-white border border-slate-200 rounded-lg p-6">
         <h2 className="text-xl font-bold text-black mb-4">
@@ -312,7 +395,8 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
             <select
               id="programInterest"
               name="programInterest"
-              defaultValue={initialProgram}
+              value={selectedProgram}
+              onChange={e => setSelectedProgram(e.target.value)}
               className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select a program</option>
@@ -392,10 +476,14 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       <div className="flex flex-col sm:flex-row gap-4">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !applicationType}
           className="flex-1 min-h-[48px] px-6 py-3 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Submitting...' : 'Submit Application'}
+          {loading
+            ? 'Submitting...'
+            : applicationType === 'inquiry'
+              ? 'Submit Inquiry'
+              : 'Continue to Enrollment →'}
         </button>
         <button
           type="button"
@@ -405,6 +493,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
           Back
         </button>
       </div>
+      </>)}
     </form>
   );
 }

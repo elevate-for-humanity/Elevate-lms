@@ -65,6 +65,35 @@ export async function approveApplication(
     };
   }
 
+  // PAYMENT GATE — enrollment requires Stripe payment OR verified funding.
+  // This is the canonical enforcement point. No enrollment is created without one of:
+  //   1. A paid Stripe session in stripe_sessions_staging
+  //   2. funding_verified = true on the application (WIOA/WorkOne/EmployIndy confirmed)
+  //   3. WorkOne approval on file (has_workone_approval = true)
+  //   4. Source is 'stripe_repair' (reconciliation — Stripe session verified separately)
+  const isRepair = (input as any).source === 'stripe_repair';
+  if (!isRepair) {
+    const hasFundingVerified = app.funding_verified === true || app.has_workone_approval === true;
+
+    if (!hasFundingVerified) {
+      // Check stripe_sessions_staging for a paid session
+      const { data: stripeSession } = await db
+        .from('stripe_sessions_staging')
+        .select('session_id')
+        .eq('application_id', applicationId)
+        .eq('payment_status', 'paid')
+        .limit(1)
+        .maybeSingle();
+
+      if (!stripeSession) {
+        return {
+          success: false,
+          error: 'PAYMENT_NOT_VERIFIED: No paid Stripe session and no verified funding on file. Enrollment requires payment or approved funding before access is granted.',
+        };
+      }
+    }
+  }
+
   const email = (app.email || '').trim().toLowerCase();
   if (!email) {
     return { success: false, error: 'Application has no email' };

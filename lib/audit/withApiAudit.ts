@@ -144,7 +144,15 @@ export function withApiAudit(
       result = 'error';
       statusCode = 500;
       errorSummary = e instanceof Error ? e.message.slice(0, 200) : 'Unknown error';
-      throw e;
+      logger.error(`[withApiAudit] Unhandled exception in handler for ${endpoint}`, e instanceof Error ? e : new Error(String(e)));
+      Sentry.captureException(e, { tags: { endpoint, subsystem: 'withApiAudit' } });
+      // For webhook routes: never propagate — Stripe must receive a response, not a connection error.
+      // For all other routes: re-throw so Next.js renders its error boundary.
+      if (options?.actor_type === 'webhook') {
+        response = NextResponse.json({ error: 'Internal error' }, { status: 500 });
+      } else {
+        throw e;
+      }
     } finally {
       const auditPayload = {
         endpoint,

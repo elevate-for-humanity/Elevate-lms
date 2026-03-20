@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -233,8 +234,12 @@ export default function HandbookPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* VIDEO HERO — full bleed, no text on top */}
-      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
-        <video src="/videos/elevate-overview-with-narration.mp4" autoPlay loop playsInline className="w-full h-full object-cover" />
+      <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
+        <CanonicalVideo
+          src="/videos/elevate-overview-with-narration.mp4"
+          poster="/images/pages/training-cohort.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </div>
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

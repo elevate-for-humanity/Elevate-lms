@@ -7,10 +7,10 @@ import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { ProgramAppointmentBanner } from '@/components/programs/ProgramAppointmentBanner';
 import ProgramHowItWorks from '@/components/program/ProgramHowItWorks';
 import ProgramFAQ from '@/components/program/ProgramFAQ';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 export function ProgramDetails({ program }: { program: Program }) {
-  const { videoRef } = useHeroVideo();
+
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const programPrice = program.price || 0; // Use program price from data
 
@@ -325,17 +325,12 @@ export function ProgramDetails({ program }: { program: Program }) {
       <section className="w-full bg-white py-16 border-t">
         <div className="mx-auto max-w-5xl px-4">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-            <video
-              ref={videoRef}
-              
-              loop
-              
-              playsInline
-              preload="metadata"
+            <CanonicalVideo
+              src="/videos/hero-home.mp4"
+              poster="/images/pages/training-cohort.jpg"
               className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="/videos/hero-home.mp4" type="video/mp4" />
-            </video>          </div>
+            />
+          </div>
         </div>
       </section>
     </>

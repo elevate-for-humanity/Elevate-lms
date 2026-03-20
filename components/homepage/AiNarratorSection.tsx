@@ -1,7 +1,7 @@
 "use client";
 
 import { aiNarrator } from "@/content/homepage/aiInstructor";
-import LazyVideo from "@/components/ui/LazyVideo";
+
 
 export function AiNarratorSection() {
   return (
@@ -42,12 +42,13 @@ export function AiNarratorSection() {
         {/* Right: Video slot */}
         <div className="aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 bg-black">
           {aiNarrator.videoUrl ? (
-            <LazyVideo
+            <video
               src={aiNarrator.videoUrl}
               className="h-full w-full"
-              autoPlay={false}
               controls
-              muted={false}
+              playsInline
+              preload="metadata"
+              poster="/images/og-default.jpg"
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center text-xs text-slate-300">

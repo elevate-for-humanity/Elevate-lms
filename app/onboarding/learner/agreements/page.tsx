@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -101,15 +102,12 @@ export default function AgreementsPage() {
     <div className="min-h-screen bg-white">
 
       {/* VIDEO HERO — Elevate overview, full bleed, no overlay text */}
-      <div className="relative w-full" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>
-        <video
+      <div className="relative w-full overflow-hidden" style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}>
+        <CanonicalVideo
           src="/videos/elevate-overview-with-narration.mp4"
-          autoPlay
-          loop
-          playsInline
-          className="w-full h-full object-cover"
+          poster="/images/pages/training-cohort.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <audio src="/videos/elevate-overview-with-narration.mp3" autoPlay preload="auto" />
       </div>
 
       {/* Back link below the video */}

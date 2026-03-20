@@ -3,6 +3,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
@@ -86,9 +87,11 @@ export default function FinancePathwayPage() {
 
       {/* Hero — clean video, no text overlay */}
       <section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
-          <source src="/videos/business-finance.mp4" type="video/mp4" />
-        </video>
+        <CanonicalVideo
+          src="/videos/business-finance.mp4"
+          poster="/images/pages/business-sector.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </section>
 
       {/* Page identity — below hero */}

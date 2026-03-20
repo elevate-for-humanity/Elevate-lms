@@ -47,7 +47,7 @@ export default function OrientationAvatar() {
           className="w-full aspect-video object-cover"
           playsInline
           autoPlay
-          preload="auto"
+          preload="metadata"
         >
           <source src="/videos/orientation-full.mp4" type="video/mp4" />
         </video>

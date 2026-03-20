@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 /**
  * Hero Section Component
@@ -90,16 +91,11 @@ export function HeroSection({
     return (
       <section data-hero="true" data-hero-variant="video" className={`relative ${heightClasses[height]} flex items-end overflow-hidden`}>
         {/* Video background - NO overlay, NO gradient */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={videoPoster}
+        <CanonicalVideo
+          src={videoSrc ?? ''}
+          poster={videoPoster ?? '/images/og-default.jpg'}
           className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
+        />
         
         {/* Content panel - solid background, positioned bottom-left */}
         <div className="relative z-10 w-full">

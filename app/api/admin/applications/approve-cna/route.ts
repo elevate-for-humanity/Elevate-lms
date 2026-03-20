@@ -11,14 +11,14 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/admin/applications/approve-cna
  *
- * Approves a CNA application and routes the applicant into the CMI pipeline:
- *   applications.status → 'approved'
- *   partner_enrollments row created (partner: 'CMI')
- *   cmi_students row created (status: 'enrolled')
+ * Thin wrapper — delegates entirely to approve_application_and_grant_access_atomic.
+ * That function owns: financial gate, compliance gate, state machine transitions,
+ * training_enrollments, partner_enrollments, cmi_students, audit log, revoked_at check.
  *
- * Body: { application_id: string, cohort?: string }
+ * This route exists for backward compatibility with existing callers.
+ * New callers should use POST /api/admin/applications/[id]/approve-and-grant.
  *
- * Requires admin or super_admin role.
+ * Body: { application_id: string }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -45,72 +45,58 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => null);
-    const { application_id, cohort } = body ?? {};
+    const { application_id } = body ?? {};
 
     if (!application_id) return safeError('application_id is required', 400);
 
-    // Fetch the application — must be CNA and not already approved
+    // Verify it's a CNA application before delegating
     const { data: app, error: fetchErr } = await db
       .from('applications')
-      .select('id, user_id, program_slug, status, first_name, last_name, email')
+      .select('id, program_slug')
       .eq('id', application_id)
       .single();
 
     if (fetchErr || !app) return safeError('Application not found', 404);
     if (app.program_slug !== 'cna') return safeError('This route only handles CNA applications', 400);
-    if (app.status === 'approved') return safeError('Application already approved', 409);
 
-    // 1. Update application status
-    const { error: updateErr } = await db
-      .from('applications')
-      .update({ status: 'approved', updated_at: new Date().toISOString() })
-      .eq('id', application_id);
+    // Delegate to the atomic function — it owns all gates, writes, and revocation checks
+    const { data: result, error: rpcErr } = await db.rpc(
+      'approve_application_and_grant_access_atomic',
+      {
+        p_application_id: application_id,
+        p_actor_user_id:  user.id,
+        p_request_id:     crypto.randomUUID(),
+      },
+    );
 
-    if (updateErr) {
-      logger.error('[approve-cna] Failed to update application status:', updateErr);
-      return safeInternalError(updateErr, 'Failed to update application status');
+    if (rpcErr) {
+      logger.error('[approve-cna] RPC error:', rpcErr);
+      return safeInternalError(rpcErr, 'Approval failed');
     }
 
-    // 2. Create partner_enrollments row
-    const { error: enrollErr } = await db
-      .from('partner_enrollments')
-      .insert({
-        user_id: app.user_id,
-        program_slug: 'cna',
-        partner: 'CMI',
-        status: 'assigned',
-      });
-
-    if (enrollErr) {
-      logger.error('[approve-cna] Failed to create partner_enrollment:', enrollErr);
-      // Non-fatal — log and continue so application status is not left inconsistent
+    if (result?.status === 'blocked') {
+      return NextResponse.json(
+        { error: 'Approval blocked', blockers: result.blockers },
+        { status: 409 },
+      );
     }
 
-    // 3. Create cmi_students row
-    const { data: cmiStudent, error: cmiErr } = await db
-      .from('cmi_students')
-      .insert({
-        user_id: app.user_id,
-        application_id: app.id,
-        cohort: cohort ?? null,
-        status: 'enrolled',
-      })
-      .select('id')
-      .single();
-
-    if (cmiErr) {
-      logger.error('[approve-cna] Failed to create cmi_students row:', cmiErr);
-      return safeInternalError(cmiErr, 'Failed to enroll student in CMI');
+    if (result?.status === 'already_processed') {
+      return NextResponse.json({ success: true, status: 'already_processed', application_id });
     }
 
-    logger.info(`[approve-cna] application=${application_id} → cmi_student=${cmiStudent.id} actor=${user.id}`);
+    if (result?.status === 'error') {
+      return safeError(result.message ?? 'Approval failed', 422);
+    }
+
+    logger.info(`[approve-cna] application=${application_id} status=${result?.status} actor=${user.id}`);
 
     return NextResponse.json({
-      success: true,
+      success:        true,
       application_id,
-      cmi_student_id: cmiStudent.id,
-      status: 'approved',
-      partner: 'CMI',
+      status:         result?.status,
+      program_id:     result?.program_id,
+      course_id:      result?.course_id,
     });
   } catch (err) {
     logger.error('[approve-cna] Unexpected error:', err);

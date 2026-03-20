@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
@@ -82,66 +82,44 @@ export default function ProgramCategoryPage({
   avatarVideoSrc,
   avatarName,
 }: ProgramCategoryPageProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    el.muted = false;
-    el.volume = 0.8;
-    el.play().catch(() => {
-      el.muted = true;
-      el.play().catch(() => {});
-    });
-  }, []);
-  const [showContent, setShowContent] = useState(false);
   const colors = colorClasses[accentColor];
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section - Compact */}
-      <section className="relative w-full min-h-[45vh] sm:min-h-[50vh] flex items-center overflow-hidden">
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover brightness-75"
-          loop
-          playsInline
-          preload="metadata"
+      {/* Hero — video frame only, no text overlay */}
+      <section className="relative w-full h-[45vh] sm:h-[50vh] min-h-[280px] overflow-hidden">
+        <CanonicalVideo
+          src={heroVideoSrc}
           poster={heroPosterImage}
-        >
-          <source src={heroVideoSrc} type="video/mp4" />
-        </video>
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className={`max-w-2xl transition-all duration-700 ease-out ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <span className={`inline-block ${colors.badge} text-white text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
-              {tagline}
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
-              {categoryName}
-            </h1>
-            <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-              {description}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link 
-                href={`/apply?program=${categorySlug}`}
-                className={`inline-flex items-center justify-center ${colors.button} text-white px-8 py-4 rounded-full font-semibold transition-colors text-lg shadow-lg`}
-              >
-                Apply Now
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              <Link 
-                href="/wioa-eligibility"
-                className="inline-flex items-center text-white text-lg border-2 border-white/50 px-6 py-3 rounded-full hover:bg-white/10 transition-all"
-              >
-                Check Eligibility
-              </Link>
-            </div>
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </section>
+
+      {/* Below-hero identity and CTAs */}
+      <section className="bg-white border-b border-slate-100 py-10 sm:py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <span className={`inline-block ${colors.badge} text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wide`}>
+            {tagline}
+          </span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+            {categoryName}
+          </h1>
+          <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
+            {description}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/apply?program=${categorySlug}`}
+              className={`inline-flex items-center gap-2 ${colors.button} text-white px-8 py-3.5 rounded-lg font-bold transition-colors`}
+            >
+              Apply Now <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/wioa-eligibility"
+              className="border border-slate-300 text-slate-700 px-8 py-3.5 rounded-lg font-bold hover:bg-slate-50 transition-colors"
+            >
+              Check Eligibility
+            </Link>
           </div>
         </div>
       </section>

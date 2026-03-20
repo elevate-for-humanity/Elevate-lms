@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import Link from 'next/link';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 type HeroBannerProps = {
   title: string;
@@ -12,7 +12,6 @@ type HeroBannerProps = {
   trustIndicators?: string[];
   type?: 'image' | 'video';
   videoSrc?: string;
-  voiceoverSrc?: string;
   posterSrc?: string;
   heroImageSrc?: string;
   heroImageAlt?: string;
@@ -26,50 +25,19 @@ export default function HeroBanner({
   trustIndicators = [],
   type = 'image',
   videoSrc = '/videos/homepage-hero-montage.mp4',
-  voiceoverSrc,
   posterSrc = '/images/pages/comp-home-hero-programs.jpg',
   heroImageSrc = '/images/pages/workforce-training.jpg',
   heroImageAlt = 'Elevate for Humanity',
 }: HeroBannerProps) {
-  const { videoRef } = useHeroVideo({ pauseOffScreen: type === 'video' });
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playedRef = useRef(false);
-
-  useEffect(() => {
-    if (!voiceoverSrc || !audioRef.current || playedRef.current) return;
-    playedRef.current = true;
-    const audio = audioRef.current;
-    audio.volume = 1;
-    audio. = false;
-    audio.play().catch(() => {
-      audio. = true;
-      audio.play().catch(() => {});
-      const unmute = () => {
-        audio. = false;
-        window.removeEventListener('scroll', unmute, true);
-        window.removeEventListener('touchmove', unmute, true);
-      };
-      window.addEventListener('scroll', unmute, { capture: true, passive: true });
-      window.addEventListener('touchmove', unmute, { capture: true, passive: true });
-    });
-  }, [voiceoverSrc]);
-
   return (
     <section className="relative w-full overflow-hidden rounded-3xl">
       <div className="relative h-[50svh] sm:h-[55svh] md:h-[60svh] lg:h-[65svh] min-h-[320px] w-full">
         {type === 'video' ? (
-          <>
-            <video
-              ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover"
-              src={videoSrc}
-              loop playsInline preload="auto"
-              poster={posterSrc}
-            />
-            {voiceoverSrc && (
-              <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" />
-            )}
-          </>
+          <CanonicalVideo
+            src={videoSrc}
+            poster={posterSrc}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         ) : (
           <Image src={heroImageSrc} alt={heroImageAlt} fill priority sizes="100vw" className="object-cover" />
         )}
@@ -78,24 +46,29 @@ export default function HeroBanner({
         <div className="mx-auto w-full max-w-5xl px-4 md:px-8 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{title}</h1>
           <p className="mt-3 text-base text-slate-600 md:text-lg max-w-3xl mx-auto">{subtitle}</p>
-          <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            {primaryCta && (
-              <a href={primaryCta.href} className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm hover:bg-gray-100 transition-colors">
-                {primaryCta.label}
-              </a>
-            )}
-            {secondaryCta && (
-              <a href={secondaryCta.href} className="inline-flex items-center justify-center rounded-xl border border-slate-500 bg-slate-700 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-600 transition-colors">
-                {secondaryCta.label}
-              </a>
-            )}
-          </div>
-          {trustIndicators.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2 justify-center">
-              {trustIndicators.map((indicator, i) => (
-                <span key={i} className="rounded-full bg-slate-700 px-3 py-2 text-xs font-medium text-slate-600">{indicator}</span>
-              ))}
+          {(primaryCta || secondaryCta) && (
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              {primaryCta && (
+                <Link href={primaryCta.href} className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm">
+                  {primaryCta.label}
+                </Link>
+              )}
+              {secondaryCta && (
+                <Link href={secondaryCta.href} className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                  {secondaryCta.label}
+                </Link>
+              )}
             </div>
+          )}
+          {trustIndicators.length > 0 && (
+            <ul className="flex flex-wrap justify-center gap-x-6 gap-y-1.5 mt-4">
+              {trustIndicators.map((item) => (
+                <li key={item} className="flex items-center gap-1.5 text-slate-500 text-sm">
+                  <span className="w-1 h-1 rounded-full bg-brand-red-400 flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>

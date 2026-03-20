@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface StatCard {
   image: string;
@@ -43,24 +44,20 @@ export function PortalPageLayout({
 }: PortalPageLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Video Hero */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] flex items-center justify-center text-white overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+      {/* Hero — video frame only */}
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
+        <CanonicalVideo
+          src={videoSrc}
           poster={posterSrc}
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
-        
-        <div className="relative max-w-6xl mx-auto px-6 text-center">
-          <div className="p-8 rounded-2xl inline-block">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">{subtitle}</p>
-          </div>
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </section>
+
+      {/* Below-hero identity */}
+      <section className="bg-white border-b border-slate-100 py-10">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">{title}</h1>
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">{subtitle}</p>
         </div>
       </section>
 

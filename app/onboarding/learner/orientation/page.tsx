@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { BookOpen, CheckCircle2, ArrowLeft, Shield, Clock, Users, AlertTriangle } from 'lucide-react';
 import OrientationAvatar from './OrientationAvatar';
 
@@ -135,14 +136,11 @@ export default async function OrientationPage() {
     <div className="min-h-screen bg-white">
 
       {/* VIDEO HERO — students learning, full bleed */}
-      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
-        <video
+      <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
+        <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          autoPlay
-          loop
-          playsInline
-          muted
-          className="w-full h-full object-cover"
+          poster="/images/pages/training-cohort.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
 

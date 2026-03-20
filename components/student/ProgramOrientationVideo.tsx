@@ -136,7 +136,7 @@ export default function ProgramOrientationVideo({
                 controls
                 autoPlay
                 playsInline
-                preload="auto"
+                preload="metadata"
                 onEnded={handleVideoEnd}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}

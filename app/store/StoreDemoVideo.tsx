@@ -16,9 +16,7 @@ export default function StoreDemoVideo() {
 
   const start = () => {
     setStarted(true);
-    setTimeout(() => {
-      videoRef.current?.play().then(() => setPlaying(true)).catch(() => {});
-    }, 100);
+    // play() is called in the onCanPlay handler once the video element mounts
   };
 
   const toggle = () => {
@@ -67,7 +65,9 @@ export default function StoreDemoVideo() {
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-contain bg-black"
             playsInline
+            muted
             controls={false}
+            onCanPlay={() => { videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
             onEnded={() => setPlaying(false)}
           >
             <source src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`} type="video/mp4" />

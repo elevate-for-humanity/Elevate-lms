@@ -3,10 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import type { Program } from '@/app/data/programs';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 export function ProgramHero({ program }: { program: Program }) {
-  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
 
   const isBarberProgram = program.slug === 'barber-apprenticeship';
   const isHVACProgram = program.slug === 'hvac-technician';
@@ -36,16 +35,11 @@ export function ProgramHero({ program }: { program: Program }) {
       <section className="relative bg-transparent">
         <div className="relative w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px] overflow-hidden">
           {hasVideo ? (
-            <>
-              <video
-                ref={videoRef}
-                loop
-                playsInline
-                preload="metadata"
-                className="absolute inset-0 w-full h-full object-cover"
-              >
-                <source src="/videos/hero-home.mp4" type="video/mp4" />
-              </video>            </>
+            <CanonicalVideo
+              src="/videos/hero-home.mp4"
+              poster={program.heroImage || '/images/pages/training-cohort.jpg'}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           ) : (
             <Image
               src={program.heroImage}

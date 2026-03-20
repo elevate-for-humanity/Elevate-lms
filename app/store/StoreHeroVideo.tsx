@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { RotateCcw } from 'lucide-react';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
 
 export default function StoreHeroVideo() {
-  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [hasEnded, setHasEnded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -13,8 +12,6 @@ export default function StoreHeroVideo() {
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = 0;
-    video.muted = false;
-    video.volume = 1;
     video.play().catch(() => {});
     setHasEnded(false);
   };
@@ -25,7 +22,10 @@ export default function StoreHeroVideo() {
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
+          muted
           playsInline
+          preload="metadata"
+          poster="/images/pages/store-hero.jpg"
           onEnded={() => setHasEnded(true)}
           onLoadedData={() => setIsLoaded(true)}
         >
@@ -34,7 +34,7 @@ export default function StoreHeroVideo() {
 
         {!isLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent" />
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-blue-200 border-t-brand-blue-600" />
           </div>
         )}
 
@@ -52,7 +52,6 @@ export default function StoreHeroVideo() {
           </div>
         )}
       </div>
-
       <p className="text-slate-600 text-sm mt-3">
         Watch our guide explain what&apos;s available in the store
       </p>

@@ -221,7 +221,7 @@ export default function HvacLessonVideo({
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           onCanPlay={handleVideoLoaded}
           className="w-full h-full object-cover"
         />
@@ -229,7 +229,7 @@ export default function HvacLessonVideo({
         <audio
           ref={audioRef}
           src={mp3Url}
-          preload="auto"
+          preload="metadata"
           onLoadedMetadata={handleAudioLoaded}
           onTimeUpdate={handleAudioTimeUpdate}
           onEnded={handleAudioEnded}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { 
   
   XCircle, 
@@ -87,7 +87,7 @@ export function ProgramPageTemplate({
   applyLink,
   contactPhone = '(317) 314-3757',
 }: ProgramPageProps) {
-  const { videoRef } = useHeroVideo();
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,16 +101,10 @@ export function ProgramPageTemplate({
       {/* Hero Image — clean, no overlays */}
       <section className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
         {heroVideo ? (
-          <video
-            ref={videoRef}
+          <CanonicalVideo
             src={heroVideo}
-            poster={heroImage}
+            poster={heroImage || '/images/og-default.jpg'}
             className="w-full h-full object-cover"
-            
-            loop
-            
-            playsInline
-            preload="metadata"
           />
         ) : (
           <Image

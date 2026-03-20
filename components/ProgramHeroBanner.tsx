@@ -1,54 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import VoiceoverWithMusic from '@/components/VoiceoverWithMusic';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
-  voiceoverSrc?: string;
   posterImage?: string;
   title?: string;
-  subtitle?: string;
-  badge?: string;
 }
 
-export default function ProgramHeroBanner({ videoSrc, voiceoverSrc, posterImage, title, subtitle, badge }: ProgramHeroBannerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoFailed, setVideoFailed] = useState(false);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    // Try unmuted. Fall back to muted if browser blocks it.
-    el.muted = false;
-    el.volume = 0.8;
-    el.play().catch(() => {
-      el.muted = true;
-      el.play().catch(() => {});
-    });
-  }, []);
-
+export default function ProgramHeroBanner({ videoSrc, posterImage = '/images/og-default.jpg' }: ProgramHeroBannerProps) {
   return (
     <div className="relative w-full h-full">
-      {!videoFailed ? (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
-          src={videoSrc}
-          poster={posterImage}
-          loop playsInline preload="auto"
-          onError={() => setVideoFailed(true)}
-        />
-      ) : posterImage ? (
-        <img src={posterImage} alt={title || 'Program hero'} className="absolute inset-0 w-full h-full object-cover" />
-      ) : (
-        <div className="absolute inset-0 bg-slate-100" />
-      )}
-
-      {/* No gradient overlay. No text on video.
-          title/subtitle/badge props are deprecated — render messaging below the hero instead. */}
-
-      {voiceoverSrc && <VoiceoverWithMusic audioSrc={voiceoverSrc} />}
+      <CanonicalVideo
+        src={videoSrc}
+        poster={posterImage}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
     </div>
   );
 }

@@ -181,7 +181,7 @@ export default function SupersonicFastCashPage() {
                 poster="/images/pages/tax-prep-desk.jpg"
                 controls
                 playsInline
-                preload="auto"
+                preload="metadata"
                 className="w-full h-full object-cover"
               />
             </div>

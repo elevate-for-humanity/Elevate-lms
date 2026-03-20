@@ -3,7 +3,7 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   slug: 'graphic-design', title: 'Graphic Design',
   subtitle: 'Learn Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional credentials in 10 weeks.',
   sector: 'technology', category: 'Graphic Design',
-  heroImage: '/images/pages/tech-classroom.jpg', heroImageAlt: 'Graphic design student working in Adobe Creative Suite',
+  heroImage: '/images/pages/graphic-design.jpg', heroImageAlt: 'Graphic design student working in Adobe Creative Suite',
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM', cohortSize: '10–14 participants per cohort',

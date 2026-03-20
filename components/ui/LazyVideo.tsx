@@ -1,11 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+/**
+ * LazyVideo — thin wrapper around CanonicalVideo for ambient/background use.
+ * All invariants (muted, playsInline, preload="metadata", poster, visibility-gated)
+ * are enforced by CanonicalVideo. Props that would violate those invariants
+ * (autoPlay, muted, preload, playsInline) are intentionally not forwarded.
+ *
+ * For interactive video with controls, use components/video/VideoPlayer instead.
+ */
+
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface LazyVideoProps {
   src: string;
   poster?: string;
   className?: string;
+  // Legacy props accepted but ignored — invariants are enforced by CanonicalVideo
   autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;
@@ -13,59 +23,12 @@ interface LazyVideoProps {
   controls?: boolean;
 }
 
-export default function LazyVideo({
-  src,
-  poster,
-  className = '',
-  autoPlay = true,
-  loop = true,
-  muted = true,
-  playsInline = true,
-  controls = false,
-}: LazyVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '100px' }
-    );
-
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (isVisible && videoRef.current && autoPlay) {
-      videoRef.current.play().catch(() => {
-        // Autoplay blocked, that's okay
-      });
-    }
-  }, [isVisible, autoPlay]);
-
+export default function LazyVideo({ src, poster = '/images/og-default.jpg', className = '' }: LazyVideoProps) {
   return (
-    <video
-      ref={videoRef}
-      className={className}
+    <CanonicalVideo
+      src={src}
       poster={poster}
-      loop={loop}
-      muted={muted}
-      playsInline={playsInline}
-      controls={controls}
-      preload="none"
-      onLoadedData={() => setHasLoaded(true)}
-    >
-      {isVisible && <source src={src} type="video/mp4" />}
-    </video>
+      className={className}
+    />
   );
 }

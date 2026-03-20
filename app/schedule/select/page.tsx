@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { CheckCircle2, ArrowLeft, Clock, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -97,13 +98,11 @@ export default async function SelectSchedulePage() {
     <div className="min-h-screen bg-white">
 
       {/* VIDEO HERO — getting started, full bleed */}
-      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
-        <video
+      <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}>
+        <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          autoPlay
-          loop
-          playsInline
-          className="w-full h-full object-cover"
+          poster="/images/pages/training-cohort.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
 

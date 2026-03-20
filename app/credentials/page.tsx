@@ -76,29 +76,29 @@ export default function CredentialsPage() {
           <div className="flex items-center gap-3">
             <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
             <div>
-              <p className="text-white font-bold text-lg leading-none">20+</p>
-              <p className="text-slate-400 text-xs mt-0.5">Credentials offered</p>
+              <p className="text-slate-900 font-bold text-lg leading-none">20+</p>
+              <p className="text-slate-500 text-xs mt-0.5">Credentials offered</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <DollarSign className="w-8 h-8 text-emerald-400 flex-shrink-0" />
+            <DollarSign className="w-8 h-8 text-emerald-500 flex-shrink-0" />
             <div>
-              <p className="text-white font-bold text-lg leading-none">$0</p>
-              <p className="text-slate-400 text-xs mt-0.5">For eligible Indiana residents</p>
+              <p className="text-slate-900 font-bold text-lg leading-none">$0</p>
+              <p className="text-slate-500 text-xs mt-0.5">For eligible Indiana residents</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <MapPin className="w-8 h-8 text-amber-400 flex-shrink-0" />
+            <MapPin className="w-8 h-8 text-amber-500 flex-shrink-0" />
             <div>
-              <p className="text-white font-bold text-sm leading-none">On-site proctoring</p>
-              <p className="text-slate-400 text-xs mt-0.5">EPA 608 · Certiport · CompTIA</p>
+              <p className="text-slate-900 font-bold text-sm leading-none">On-site proctoring</p>
+              <p className="text-slate-500 text-xs mt-0.5">EPA 608 · Certiport · CompTIA</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Briefcase className="w-8 h-8 text-brand-blue-400 flex-shrink-0" />
+            <Briefcase className="w-8 h-8 text-brand-blue-500 flex-shrink-0" />
             <div>
-              <p className="text-white font-bold text-sm leading-none">DOL Registered</p>
-              <p className="text-slate-400 text-xs mt-0.5">Apprenticeship Sponsor</p>
+              <p className="text-slate-900 font-bold text-sm leading-none">DOL Registered</p>
+              <p className="text-slate-500 text-xs mt-0.5">Apprenticeship Sponsor</p>
             </div>
           </div>
         </div>

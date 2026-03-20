@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { Check, Play, ShoppingCart, Star, Search, Bell, FileText, DollarSign, Calendar, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -84,16 +85,12 @@ export default function GrantsAppPage() {
             </div>
             <div className="relative">
               <div className="bg-white rounded-2xl shadow-2xl p-4">
-                <div className="aspect-video bg-white rounded-lg overflow-hidden">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                  >
-                    <source src="/videos/training-providers-video-with-narration.mp4" type="video/mp4" />
-                  </video>
+                <div className="aspect-video bg-white rounded-lg overflow-hidden relative">
+                  <CanonicalVideo
+                    src="/videos/training-providers-video-with-narration.mp4"
+                    poster="/images/pages/store-hero.jpg"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -138,16 +135,12 @@ export default function GrantsAppPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">See How It Works</h2>
           <p className="text-gray-600 mb-8">Watch a complete walkthrough of the grants discovery and management process</p>
-          <div className="aspect-video bg-white rounded-2xl overflow-hidden">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-            >
-              <source src="/videos/training-providers-video-with-narration.mp4" type="video/mp4" />
-            </video>
+          <div className="aspect-video bg-white rounded-2xl overflow-hidden relative">
+            <CanonicalVideo
+              src="/videos/training-providers-video-with-narration.mp4"
+              poster="/images/pages/store-hero.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
         </div>
       </section>

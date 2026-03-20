@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { useAutoPlayOnVisible } from '@/hooks/useAutoPlayOnVisible';
+import React, { useRef, useEffect } from 'react';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 
 type VideoShellProps = {
@@ -29,8 +28,28 @@ export function VideoShell({
 }: VideoShellProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // TikTok-style behavior - always call hook, pass autoPlay flag
-  useAutoPlayOnVisible(videoRef, autoPlay);
+  // Visibility-gated autoplay (inlined from deleted useAutoPlayOnVisible hook)
+  useEffect(() => {
+    if (!autoPlay) return;
+    const el = videoRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = videoRef.current;
+          if (!video) return;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [autoPlay]);
 
   // Progress tracking for LMS
   useVideoProgress(videoRef, { lessonId, threshold: 0.8 });

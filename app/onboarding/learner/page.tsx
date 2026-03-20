@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle, ClipboardCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
@@ -332,13 +333,11 @@ export default async function LearnerOnboardingPage() {
       <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding' }, { label: 'Student Onboarding' }]} />
 
       {/* VIDEO HERO — full bleed, no text on top */}
-      <div className="relative w-full" style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}>
-        <video
+      <div className="relative w-full overflow-hidden" style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}>
+        <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          autoPlay
-          loop
-          playsInline
-          className="w-full h-full object-cover"
+          poster="/images/pages/training-cohort.jpg"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
 

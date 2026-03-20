@@ -1,6 +1,6 @@
 'use client';
 
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface VideoHeroBannerProps {
   videoSrc: string;
@@ -8,17 +8,12 @@ interface VideoHeroBannerProps {
   posterAlt?: string;
 }
 
-export default function VideoHeroBanner({ videoSrc, posterSrc, posterAlt }: VideoHeroBannerProps) {
-  const { videoRef } = useHeroVideo();
-
+export default function VideoHeroBanner({ videoSrc, posterSrc }: VideoHeroBannerProps) {
   return (
     <div className="absolute inset-0 w-full h-full">
-      <video
-        ref={videoRef}
+      <CanonicalVideo
         src={videoSrc}
-        loop playsInline preload="auto"
         poster={posterSrc}
-        aria-label={posterAlt}
         className="absolute inset-0 w-full h-full object-cover"
       />
     </div>

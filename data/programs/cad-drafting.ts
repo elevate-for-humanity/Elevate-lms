@@ -3,7 +3,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   slug: 'cad-drafting', title: 'CAD/Drafting Technician',
   subtitle: 'Learn AutoCAD and Revit for architectural and mechanical drafting. Prepare for Autodesk Certified User credentials in 10 weeks.',
   sector: 'technology', category: 'Design & Drafting',
-  heroImage: '/images/pages/tech-classroom.jpg', heroImageAlt: 'CAD drafting student working on technical drawings',
+  heroImage: '/images/pages/cad-drafting.jpg', heroImageAlt: 'CAD drafting student working on technical drawings',
   deliveryMode: 'hybrid', durationWeeks: 10, hoursPerWeekMin: 20, hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
   schedule: 'Mon–Fri, 9:00 AM–1:00 PM (20 hrs/week)', cohortSize: '10–14 participants per cohort',

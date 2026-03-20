@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useHeroVideo } from '@/hooks/useHeroVideo';
+import CanonicalVideo from '@/components/video/CanonicalVideo';
 
 interface HeroVideoProps {
   videoSrc: string;
@@ -13,25 +13,18 @@ interface HeroVideoProps {
 
 export function HeroVideo({
   videoSrc,
-  posterSrc,
+  posterSrc = '/images/og-default.jpg',
   overlayOpacity = 40,
   children,
   className = '',
 }: HeroVideoProps) {
-  const { videoRef } = useHeroVideo({ pauseOffScreen: false });
-
   return (
     <section className={`relative overflow-hidden ${className}`}>
-      <video
-        ref={videoRef}
-        loop
-        playsInline
-        preload="none"
+      <CanonicalVideo
+        src={videoSrc}
         poster={posterSrc}
         className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+      />
       <div className={`absolute inset-0 bg-black/${overlayOpacity}`} />
       <div className="relative">{children}</div>
     </section>

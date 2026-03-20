@@ -36,11 +36,9 @@ const productData = {
   rating: 4.9,
   reviewCount: 127,
   images: [
-    { src: '/images/pages/comp-universal-hero.jpg', alt: 'SAM.gov Assistant Dashboard', type: 'image' as const },
-    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Registration Progress', type: 'image' as const },
-    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Compliance Monitoring', type: 'image' as const },
-    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Step-by-Step Wizard', type: 'image' as const },
-    { src: '/images/pages/comp-universal-hero.jpg', alt: 'Product Demo Video', type: 'video' as const },
+    { src: '/images/pages/store-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance dashboard overview', type: 'image' as const },
+    { src: '/images/pages/store-digital-detail1.jpg', alt: 'SAM.gov Assistant — registration step-by-step wizard', type: 'image' as const },
+    { src: '/images/pages/store-addons-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance monitoring', type: 'image' as const },
   ],
   features: [
     {

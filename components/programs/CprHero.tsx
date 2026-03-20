@@ -106,7 +106,7 @@ export default function CprHero() {
       <audio
         ref={audioRef}
         src="/audio/heroes/cpr.mp3"
-        preload="auto"
+        preload="metadata"
         onEnded={handleAudioEnded}
         aria-hidden="true"
       />

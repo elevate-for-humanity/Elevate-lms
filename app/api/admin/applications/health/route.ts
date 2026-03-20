@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { validateEnrollmentIntegrity } from '@/lib/enrollment-integrity-audit';
 
 // SLA thresholds in hours
 const SLA_HOURS: Record<string, number> = {
@@ -94,6 +95,9 @@ export async function GET(request: NextRequest) {
     .slice(0, 5)
     .map(([program_slug, stuck_count]) => ({ program_slug, stuck_count }));
 
+  // Enrollment integrity audit — failures here are deployment blockers
+  const integrity = await validateEnrollmentIntegrity(db);
+
   return NextResponse.json({
     generated_at: new Date().toISOString(),
     total: rows?.length ?? 0,
@@ -103,5 +107,10 @@ export async function GET(request: NextRequest) {
     stuck_count: stuck.length,
     top_bottlenecks,
     stuck,
+    enrollment_integrity: {
+      clean: integrity.clean,
+      failures: integrity.failures,
+      counts: integrity.counts,
+    },
   });
 }

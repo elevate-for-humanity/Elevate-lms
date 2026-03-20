@@ -80,6 +80,12 @@ async function _POST(request: Request) {
         .eq('program_id', prog.id)
         .maybeSingle();
 
+      if (enroll?.status === 'pending_funding_verification') {
+        return NextResponse.json(
+          { error: 'Certificates cannot be issued while enrollment is pending funding verification.' },
+          { status: 403 }
+        );
+      }
       enrollment = enroll || { id: null, user_id: user.id, course_id: null, status: 'active' };
       course_id = enroll?.course_id || null;
     } else {

@@ -110,6 +110,13 @@ async function _POST(
       );
     }
 
+    if (enrollment.status === 'pending_funding_verification') {
+      return NextResponse.json(
+        { error: 'Enrollment pending funding verification. Complete your payment or funding approval to continue.' },
+        { status: 403 }
+      );
+    }
+
     if (enrollment.status === 'pending_approval') {
       return NextResponse.json(
         { error: 'Enrollment pending approval' },

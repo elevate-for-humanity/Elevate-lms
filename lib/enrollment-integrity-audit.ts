@@ -15,7 +15,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 export type IntegrityFailure =
   | 'NULL_PROGRAM_ID_DETECTED'
   | 'ORPHANED_PROGRAM_REFERENCE'
-  | 'LMS_INTEGRITY_BROKEN';
+  | 'LMS_INTEGRITY_BROKEN'
+  | 'PRIVILEGED_BYPASS_DETECTED';
 
 export interface IntegrityResult {
   failures: IntegrityFailure[];
@@ -30,6 +31,7 @@ export async function validateEnrollmentIntegrity(
     NULL_PROGRAM_ID_DETECTED: 0,
     ORPHANED_PROGRAM_REFERENCE: 0,
     LMS_INTEGRITY_BROKEN: 0,
+    PRIVILEGED_BYPASS_DETECTED: 0,
   };
 
   // 1. Null program_id — should be impossible after NOT NULL constraint,
@@ -96,6 +98,18 @@ export async function validateEnrollmentIntegrity(
         }
       }
     }
+  }
+
+  // 4. Privileged bypass detection — any enrollment_insert_audit row with via_rpc=false
+  //    means an insert reached program_enrollments outside the enroll_application RPC.
+  //    This is the tripwire for service_role or postgres writes that bypassed the gate.
+  const { count: bypassCount, error: e4 } = await db
+    .from('enrollment_insert_audit')
+    .select('id', { count: 'exact', head: true })
+    .eq('via_rpc', false);
+
+  if (!e4 && bypassCount != null && bypassCount > 0) {
+    counts.PRIVILEGED_BYPASS_DETECTED = bypassCount;
   }
 
   const failures = (Object.keys(counts) as IntegrityFailure[]).filter(

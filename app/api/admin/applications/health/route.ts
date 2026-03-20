@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validateEnrollmentIntegrity } from '@/lib/enrollment-integrity-audit';
+import { trySendEmail } from '@/lib/email/resend';
 
 // SLA thresholds in hours
 const SLA_HOURS: Record<string, number> = {
@@ -97,6 +98,45 @@ export async function GET(request: NextRequest) {
 
   // Enrollment integrity audit — failures here are deployment blockers
   const integrity = await validateEnrollmentIntegrity(db);
+
+  // PRIVILEGED_BYPASS_DETECTED is page-worthy: fire an alert immediately.
+  // Detection is after the fact — the alert is the consequence attached to the signal.
+  if (integrity.failures.includes('PRIVILEGED_BYPASS_DETECTED')) {
+    const bypassCount = integrity.counts.PRIVILEGED_BYPASS_DETECTED;
+    const alertTo = process.env.ALERT_EMAIL_TO || process.env.ADMIN_ALERT_EMAIL;
+    const slackWebhook = process.env.SLACK_WEBHOOK_URL;
+
+    // Email alert
+    if (alertTo) {
+      await trySendEmail({
+        to: alertTo,
+        subject: `[SECURITY] Enrollment bypass detected — ${bypassCount} unauthorized write(s)`,
+        html: `
+          <p><strong>PRIVILEGED_BYPASS_DETECTED</strong></p>
+          <p>${bypassCount} enrollment row(s) were written to <code>program_enrollments</code>
+          outside the <code>enroll_application</code> RPC.</p>
+          <p>This means a privileged caller (service_role or postgres) inserted directly,
+          bypassing all enrollment invariant gates.</p>
+          <p>Check <code>enrollment_insert_audit</code> where <code>via_rpc = false</code>
+          for full context: enrollment_id, user_id, program_slug, db_user, inserted_at.</p>
+          <p>If this was an approved maintenance operation, register it in
+          <code>enrollment_bypass_allowlist</code> with a sunset date.
+          If it was not approved, treat this as a security incident.</p>
+        `,
+      });
+    }
+
+    // Slack alert
+    if (slackWebhook) {
+      await fetch(slackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `🚨 *PRIVILEGED_BYPASS_DETECTED* — ${bypassCount} enrollment row(s) written outside the RPC. Check \`enrollment_insert_audit\` where \`via_rpc = false\`. Treat as security incident if not an approved maintenance write.`,
+        }),
+      }).catch(() => {}); // Slack failure must never block the health response
+    }
+  }
 
   return NextResponse.json({
     generated_at: new Date().toISOString(),

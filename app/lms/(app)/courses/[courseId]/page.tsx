@@ -62,7 +62,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('status, enrolled_at, revoked_at')
+    .select('status, enrollment_state, enrolled_at, revoked_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
@@ -70,6 +70,12 @@ export default async function CoursePage({ params }: { params: Params }) {
   // Revoked enrollment — treat as not enrolled
   if (enrollment?.revoked_at) {
     redirect(`/lms/programs`);
+  }
+
+  // Funding not yet verified — block course content entirely.
+  // Student must wait for admin action; showing lesson list would imply access.
+  if (enrollment?.enrollment_state === 'pending_funding_verification') {
+    redirect(`/lms/enrollment-pending?courseId=${courseId}`);
   }
 
   const isPendingApproval = enrollment?.status === 'pending_approval';

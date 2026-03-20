@@ -197,3 +197,37 @@ COMMENT ON VIEW public.v_funding_verification_queue IS
 'Admin action queue for provisionally admitted students awaiting funding
 confirmation. SLA: 14 days from enrollment. Overdue = requires immediate
 admin contact. Critical = 7+ days past due, consider suspending access.';
+
+-- ── 8. DB-level invariant: funding_verified=true cannot coexist with pending state ──
+--
+-- Prevents the UI from showing "verified" while the system still blocks access.
+-- Without this, a partial update (funding_verified set but enrollment_state not
+-- transitioned) would silently leave the student locked out.
+
+CREATE OR REPLACE FUNCTION public.enforce_funding_state_consistency()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- funding_verified=true must not remain in pending_funding_verification state
+  IF NEW.funding_verified = true
+     AND NEW.enrollment_state = 'pending_funding_verification' THEN
+    RAISE EXCEPTION 'INVALID_STATE: funding_verified=true but enrollment_state is still pending_funding_verification. Transition enrollment_state to onboarding or active.';
+  END IF;
+
+  -- revoked enrollment must not have funding_verified=true
+  IF NEW.enrollment_state = 'revoked'
+     AND NEW.funding_verified = true
+     AND (OLD.enrollment_state = 'pending_funding_verification') THEN
+    RAISE EXCEPTION 'INVALID_STATE: cannot set funding_verified=true on a revoked enrollment.';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_funding_state_consistency ON public.program_enrollments;
+CREATE TRIGGER trg_funding_state_consistency
+  BEFORE UPDATE ON public.program_enrollments
+  FOR EACH ROW
+  EXECUTE FUNCTION public.enforce_funding_state_consistency();

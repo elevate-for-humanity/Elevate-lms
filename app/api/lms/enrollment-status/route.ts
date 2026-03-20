@@ -28,18 +28,28 @@ export async function GET(req: NextRequest) {
 
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('id, status, progress_percent, enrolled_at, revoked_at')
+    .select('id, status, enrollment_state, progress_percent, enrolled_at, revoked_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
 
   const isRevoked = !!enrollment?.revoked_at;
-  const effectiveStatus = isRevoked ? 'revoked' : (enrollment?.status ?? null);
+  const isPendingFunding = enrollment?.enrollment_state === 'pending_funding_verification';
+  const effectiveStatus = isRevoked ? 'revoked'
+    : isPendingFunding ? 'pending_funding_verification'
+    : (enrollment?.status ?? null);
+
+  // approved=false blocks lesson page from loading content.
+  // pending_funding_verification is explicitly not approved — student has no
+  // confirmed funding source and must not access lesson content.
+  const approved = !!enrollment && !isRevoked && !isPendingFunding
+    && !['pending_approval', 'pending'].includes(enrollment.status ?? '');
 
   return NextResponse.json({
-    enrolled:  !!enrollment && !isRevoked,
-    status:    effectiveStatus,
-    progress:  enrollment?.progress_percent ?? 0,
-    approved:  enrollment && !isRevoked ? !['pending_approval', 'pending'].includes(enrollment.status) : false,
+    enrolled:         !!enrollment && !isRevoked,
+    status:           effectiveStatus,
+    enrollment_state: enrollment?.enrollment_state ?? null,
+    progress:         enrollment?.progress_percent ?? 0,
+    approved,
   });
 }

@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 async function requireAdmin() {
@@ -20,13 +21,22 @@ async function requireAdmin() {
     throw new Error('Forbidden');
   }
 
-  return { supabase, adminId: user.id };
+  // Admin client bypasses RLS on program_enrollments
+  const db = createAdminClient() || supabase;
+  return { supabase, db, adminId: user.id };
 }
 
 export async function verifyFunding(enrollmentId: string, note?: string) {
-  const { supabase, adminId } = await requireAdmin();
+  const { db, adminId } = await requireAdmin();
 
-  const { error } = await supabase
+  // Capture current state before mutation for structured audit trail
+  const { data: current } = await db
+    .from('program_enrollments')
+    .select('enrollment_state, status')
+    .eq('id', enrollmentId)
+    .single();
+
+  const { error } = await db
     .from('program_enrollments')
     .update({
       enrollment_state: 'onboarding',
@@ -40,63 +50,91 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
 
   if (error) throw new Error(`Failed to verify: ${error.message}`);
 
-  // Resolve the open integrity flag
-  await supabase
+  // "resolved_admin_override" distinguishes human judgment from system auto-resolution.
+  // This distinction matters when auditing fraud vs legitimate admin overrides.
+  await db
     .from('payment_integrity_flags')
     .update({
       resolved_at: new Date().toISOString(),
       resolved_by: adminId,
-      resolution_note: note || 'Funding verified by admin',
+      resolution_type: 'resolved_admin_override',
+      resolution_note: note?.trim() || 'Funding verified by admin',
     })
     .eq('enrollment_id', enrollmentId)
     .is('resolved_at', null);
 
-  await supabase.from('audit_logs').insert({
+  await db.from('audit_logs').insert({
     actor_id: adminId,
     actor_type: 'admin',
     action: 'funding.verified',
     resource_type: 'enrollment',
     resource_id: enrollmentId,
-    metadata: { note: note || null },
+    metadata: {
+      previous_state: current?.enrollment_state ?? null,
+      new_state: 'onboarding',
+      previous_status: current?.status ?? null,
+      new_status: 'active',
+      note: note?.trim() || null,
+      resolution_type: 'resolved_admin_override',
+    },
   });
 
   revalidatePath('/admin/funding-verification');
 }
 
-export async function rejectFunding(enrollmentId: string, note?: string) {
-  const { supabase, adminId } = await requireAdmin();
+export async function rejectFunding(enrollmentId: string, reason: string) {
+  // Reason is required — no silent rejections. Admins must document why.
+  if (!reason?.trim()) {
+    throw new Error('A reason is required when rejecting funding verification.');
+  }
 
-  const { error } = await supabase
+  const { db, adminId } = await requireAdmin();
+
+  const { data: current } = await db
+    .from('program_enrollments')
+    .select('enrollment_state, status')
+    .eq('id', enrollmentId)
+    .single();
+
+  const { error } = await db
     .from('program_enrollments')
     .update({
       enrollment_state: 'revoked',
       status: 'revoked',
       revoked_at: new Date().toISOString(),
       revoked_by: adminId,
-      revocation_reason: note || 'Funding not verified',
+      revocation_reason: reason.trim(),
     })
     .eq('id', enrollmentId)
     .eq('enrollment_state', 'pending_funding_verification');
 
   if (error) throw new Error(`Failed to reject: ${error.message}`);
 
-  await supabase
+  await db
     .from('payment_integrity_flags')
     .update({
       resolved_at: new Date().toISOString(),
       resolved_by: adminId,
-      resolution_note: note || 'Funding rejected — enrollment revoked',
+      resolution_type: 'resolved_admin_override',
+      resolution_note: reason.trim(),
     })
     .eq('enrollment_id', enrollmentId)
     .is('resolved_at', null);
 
-  await supabase.from('audit_logs').insert({
+  await db.from('audit_logs').insert({
     actor_id: adminId,
     actor_type: 'admin',
     action: 'funding.rejected',
     resource_type: 'enrollment',
     resource_id: enrollmentId,
-    metadata: { note: note || null },
+    metadata: {
+      previous_state: current?.enrollment_state ?? null,
+      new_state: 'revoked',
+      previous_status: current?.status ?? null,
+      new_status: 'revoked',
+      reason: reason.trim(),
+      resolution_type: 'resolved_admin_override',
+    },
   });
 
   revalidatePath('/admin/funding-verification');

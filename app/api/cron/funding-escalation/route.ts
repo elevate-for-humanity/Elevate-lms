@@ -4,15 +4,20 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { sendSlackMessage } from '@/lib/notifications/slack';
 
 /**
  * GET /api/cron/funding-escalation
  *
- * Called daily. Runs `escalate_overdue_funding_verifications()` which marks
- * enrollments past the 14-day SLA as escalated and inserts rows into
- * `funding_verification_escalations`.
+ * Called daily. Runs `escalate_overdue_funding_verifications()` which inserts
+ * rows into `funding_verification_escalations` for any enrollment past its
+ * 14-day SLA deadline.
  *
  * Auth: Authorization: Bearer <CRON_SECRET>
+ *
+ * Alerts via Slack (SLACK_WEBHOOK_URL) on:
+ *   - RPC errors (cron failure = SLA enforcement silently dead)
+ *   - Any escalations fired (ops visibility for follow-up)
  */
 export async function GET(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -28,11 +33,29 @@ export async function GET(req: Request) {
   }
 
   const db = createAdminClient();
+  const timestamp = new Date().toISOString();
 
   const { data, error } = await db.rpc('escalate_overdue_funding_verifications');
 
   if (error) {
     logger.error('[cron/funding-escalation] RPC error:', error);
+
+    // Alert ops — a cron failure means SLA enforcement is silently dead.
+    // Without this alert, overdue enrollments accumulate invisibly.
+    await sendSlackMessage({
+      text: ':rotating_light: *Funding escalation cron FAILED*',
+      color: '#CC0000',
+      fields: [
+        { title: 'Error', value: error.message, short: false },
+        { title: 'Time', value: timestamp, short: true },
+        {
+          title: 'Action required',
+          value: 'Run `SELECT escalate_overdue_funding_verifications();` in Supabase SQL Editor',
+          short: false,
+        },
+      ],
+    });
+
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
@@ -42,18 +65,34 @@ export async function GET(req: Request) {
   await db
     .from('webhook_health_log')
     .insert({
-      checked_at: new Date().toISOString(),
+      checked_at: timestamp,
       open_flags: escalated,
       notes: `funding-escalation cron: ${escalated} enrollment(s) escalated`,
     })
     .then(() => {})
-    .catch(() => {});
+    .catch((err: unknown) => {
+      logger.error('[cron/funding-escalation] health log write failed (non-fatal):', err);
+    });
 
   logger.info(`[cron/funding-escalation] Escalated ${escalated} enrollment(s)`);
 
-  return NextResponse.json({
-    ok: true,
-    escalated,
-    timestamp: new Date().toISOString(),
-  });
+  // Notify ops when escalations fire so they can follow up with students.
+  // Zero escalations = no alert (expected steady state).
+  if (escalated > 0) {
+    await sendSlackMessage({
+      text: `:warning: *${escalated} funding verification${escalated === 1 ? '' : 's'} escalated — SLA breach*`,
+      color: '#FF6600',
+      fields: [
+        { title: 'Escalated', value: String(escalated), short: true },
+        { title: 'Time', value: timestamp, short: true },
+        {
+          title: 'Action required',
+          value: 'Review at /admin/funding-verification — filter Critical or Overdue',
+          short: false,
+        },
+      ],
+    });
+  }
+
+  return NextResponse.json({ ok: true, escalated, timestamp });
 }

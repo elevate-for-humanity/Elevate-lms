@@ -55,6 +55,7 @@ export default function LessonPage() {
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
   const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
+  const [enrollmentBlockReason, setEnrollmentBlockReason] = useState<'pending_approval' | 'pending_funding_verification' | 'not_enrolled'>('not_enrolled');
   const [completionError, setCompletionError] = useState<string | null>(null);
   // checkpointBlocked: true when the previous module's checkpoint has not been passed.
   // Prevents advancing past a failed checkpoint into the next module.
@@ -78,7 +79,20 @@ export default function LessonPage() {
         const enrollRes = await fetch(`/api/lms/enrollment-status?courseId=${courseId}`);
         const enrollData = enrollRes.ok ? await enrollRes.json() : null;
 
-        if (!enrollData?.enrolled || enrollData.status === 'pending_approval') {
+        // Block if not enrolled, pending approval, or pending funding verification.
+        // pending_funding_verification = provisionally admitted with no confirmed
+        // funding source — must not access lesson content until admin verifies.
+        const isPendingFunding =
+          enrollData?.status === 'pending_funding_verification' ||
+          enrollData?.enrollment_state === 'pending_funding_verification';
+        const isPendingApproval = enrollData?.status === 'pending_approval';
+
+        if (!enrollData?.enrolled || isPendingApproval || isPendingFunding) {
+          setEnrollmentBlockReason(
+            isPendingFunding ? 'pending_funding_verification'
+            : isPendingApproval ? 'pending_approval'
+            : 'not_enrolled'
+          );
           setEnrollmentBlocked(true);
           return;
         }
@@ -326,18 +340,25 @@ export default function LessonPage() {
   }, [lesson]);
 
   if (enrollmentBlocked) {
+    const isFundingBlock = enrollmentBlockReason === 'pending_funding_verification';
     return (
       <div className="flex items-center justify-center h-[100dvh] bg-white">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ClipboardList className="w-8 h-8 text-amber-600" />
+        <div className="text-center max-w-md px-4">
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isFundingBlock ? 'bg-orange-100' : 'bg-amber-100'}`}>
+            <ClipboardList className={`w-8 h-8 ${isFundingBlock ? 'text-orange-600' : 'text-amber-600'}`} />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Enrollment Pending Approval</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            {isFundingBlock ? 'Funding Verification Required' : 'Enrollment Pending Approval'}
+          </h2>
           <p className="text-slate-600 mb-2">
-            Your enrollment is being reviewed by an administrator. You will receive an email once approved.
+            {isFundingBlock
+              ? 'Your enrollment is pending funding verification. An administrator needs to confirm your funding source before you can access course content.'
+              : 'Your enrollment is being reviewed by an administrator. You will receive an email once approved.'}
           </p>
           <p className="text-slate-500 text-sm mb-6">
-            Course access is locked until an admin approves your enrollment.
+            {isFundingBlock
+              ? 'Contact your program advisor or reply to your enrollment email with proof of funding.'
+              : 'Course access is locked until an admin approves your enrollment.'}
           </p>
           <Link
             href="/lms/courses"

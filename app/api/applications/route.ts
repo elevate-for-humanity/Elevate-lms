@@ -130,7 +130,7 @@ async function _POST(req: Request) {
         program_interest: program,
         program_slug: body.programSlug || body.program_slug || null,
         support_notes: notes,
-        status: 'pending',
+        status: 'submitted',
         source: body.source || 'website',
         contact_preference: body.preferredContact || 'phone',
       })

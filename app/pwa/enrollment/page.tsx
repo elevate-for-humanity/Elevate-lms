@@ -7,7 +7,7 @@ async function getEnrollmentData() {
   if (!supabase) return { applications: [], programs: [], enrollments: [] };
 
   const [appRes, programRes, enrollRes] = await Promise.all([
-    supabase.from('student_applications').select('id, full_name, email, phone, status, state, created_at, data').order('created_at', { ascending: false }).limit(20),
+    supabase.from('applications').select('id, first_name, last_name, email, phone, status, created_at').order('created_at', { ascending: false }).limit(20),
     supabase.from('programs').select('id, name, slug, category, total_cost, is_active, funding_eligible, is_free').eq('is_active', true).order('category, name').limit(30),
     supabase.from('enrollments').select('id, user_id, course_id, status, progress, enrolled_at').order('enrolled_at', { ascending: false }).limit(20),
   ]);

@@ -8,12 +8,12 @@ async function getAdminDashboardData() {
 
   const [profileRes, appRes, enrollRes, courseRes, programRes, productRes, recentAppsRes, recentEnrollRes] = await Promise.all([
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    supabase.from('student_applications').select('id', { count: 'exact', head: true }),
+    supabase.from('applications').select('id', { count: 'exact', head: true }),
     supabase.from('enrollments').select('id', { count: 'exact', head: true }),
     supabase.from('courses').select('id', { count: 'exact', head: true }),
     supabase.from('programs').select('id', { count: 'exact', head: true }),
     supabase.from('products').select('id', { count: 'exact', head: true }),
-    supabase.from('student_applications').select('id, full_name, email, status, created_at').order('created_at', { ascending: false }).limit(5),
+    supabase.from('applications').select('id, first_name, last_name, email, status, created_at').order('created_at', { ascending: false }).limit(5),
     supabase.from('enrollments').select('id, user_id, course_id, status, enrolled_at').order('enrolled_at', { ascending: false }).limit(5),
   ]);
 
@@ -91,7 +91,7 @@ export default async function AdminPWAPage() {
             <div key={app.id} className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-3">
               <div className={`w-2 h-2 rounded-full flex-shrink-0 ${app.status === 'approved' ? 'bg-brand-green-500' : app.status === 'pending' ? 'bg-amber-500' : 'bg-slate-400'}`} />
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-slate-900 text-sm truncate">{app.full_name || 'Unknown'}</div>
+                <div className="font-semibold text-slate-900 text-sm truncate">{[app.first_name, app.last_name].filter(Boolean).join(' ') || 'Unknown'}</div>
                 <div className="text-xs text-slate-500">{app.email}</div>
               </div>
               <span className={`text-xs font-medium px-2 py-1 rounded-full ${app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' : app.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>

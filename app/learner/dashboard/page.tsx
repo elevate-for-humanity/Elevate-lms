@@ -93,6 +93,14 @@ export default async function LearnerDashboardPage() {
     return true;
   });
 
+  // Fetch external (non-LMS) enrollments — rendered as admin-managed program cards
+  const { data: externalEnrollments } = await db
+    .from('external_program_enrollments')
+    .select('id, program_slug, enrollment_state, start_date, notes, created_at')
+    .eq('user_id', user.id)
+    .eq('enrollment_state', 'active')
+    .order('created_at', { ascending: false });
+
   // Fetch achievements
   const { data: achievements } = await db
     .from('user_achievements')
@@ -415,6 +423,37 @@ export default async function LearnerDashboardPage() {
                   </div>
                 )}
               </div>
+
+              {/* External (admin-managed) program enrollments — no LMS progress, no course links */}
+              {(externalEnrollments ?? []).length > 0 && (
+                <div className="divide-y divide-gray-200 border-t border-gray-200">
+                  {(externalEnrollments ?? []).map((ext: any) => (
+                    <div key={ext.id} className="p-6">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-20 h-20 bg-brand-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center">
+                          <GraduationCap className="w-8 h-8 text-brand-blue-400" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-1 capitalize">
+                            {ext.program_slug.replace(/-/g, ' ')}
+                          </h3>
+                          <p className="text-sm text-gray-500 mb-3">
+                            This program is managed by an administrator. Your advisor will contact you with next steps.
+                          </p>
+                          {ext.start_date && (
+                            <p className="text-xs text-gray-400">
+                              Start date: {new Date(ext.start_date).toLocaleDateString()}
+                            </p>
+                          )}
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-blue-100 text-brand-blue-800 mt-2">
+                            Enrolled — Advisor Managed
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Quick Actions */}

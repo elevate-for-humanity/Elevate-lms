@@ -80,7 +80,7 @@ export default async function ApplyPage({
           <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-2/5 h-[200px] md:h-auto md:min-h-[280px] overflow-hidden">
               <Image
-                src="/images/pages/apply-page-1.jpg"
+                src="/images/pages/apply-page-2.jpg"
                 alt="Students in hands-on career training"
                 fill
                 className="object-cover"
@@ -118,7 +118,7 @@ export default async function ApplyPage({
           <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
             <div className="relative h-[200px] overflow-hidden">
               <Image
-                src="/images/pages/apply-page-1.jpg"
+                src="/images/pages/about-employer-partners.jpg"
                 alt="Employer partnership meeting"
                 fill
                 className="object-cover"
@@ -161,7 +161,7 @@ export default async function ApplyPage({
           >
             <div className="relative h-[320px] sm:h-[360px] overflow-hidden">
               <Image
-                src="/images/pages/apply-page-1.jpg"
+                src="/images/pages/apply-page-3.jpg"
                 alt="Launch your own training program with Elevate"
                 fill
                 className="object-cover"

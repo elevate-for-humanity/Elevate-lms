@@ -385,7 +385,7 @@ export default function PathwaysPage() {
           <div className="space-y-4 text-gray-700">
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/funding.jpg" alt="Funding navigation" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We navigate funding for you</h3>
@@ -394,7 +394,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Credentials" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/certifications.jpg" alt="Credentials" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Your credential is issued by a recognized authority — not by us</h3>
@@ -403,7 +403,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/employer-handshake.jpg" alt="Employer connections" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">We connect you to employers who are actually hiring</h3>
@@ -412,7 +412,7 @@ export default function PathwaysPage() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <Image src="/images/pages/pathways-page-2.jpg" alt="Ongoing support" fill sizes="80px" className="object-cover" />
+                <Image src="/images/pages/mentorship-page-3.jpg" alt="Ongoing support" fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Support does not end when you graduate</h3>

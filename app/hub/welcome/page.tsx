@@ -101,7 +101,7 @@ export default async function HubWelcomePage() {
       {/* Hero Section */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/hub-page-1.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/adult-learner.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -258,7 +258,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/hub-page-1.jpg"
+                    src="/images/pages/apply-page-2.jpg"
                     alt="Apply for a program"
                     fill
                     className="object-cover"
@@ -274,7 +274,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/hub-page-1.jpg"
+                    src="/images/pages/lms-page-2.jpg"
                     alt="Get enrolled"
                     fill
                     className="object-cover"
@@ -290,7 +290,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/hub-page-1.jpg"
+                    src="/images/pages/graduation-ceremony.jpg"
                     alt="Complete and succeed"
                     fill
                     className="object-cover"

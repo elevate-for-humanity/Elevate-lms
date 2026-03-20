@@ -16,7 +16,7 @@ const QUALIFIES = [
 ];
 
 const STEPS = [
-  { number: '01', title: 'Schedule Your Appointment', desc: 'Book online via Calendly or call our support center. Video, phone, and in-person appointments are available.', image: '/images/pages/calendar-page-1.jpg' },
+  { number: '01', title: 'Schedule Your Appointment', desc: 'Book online via Calendly or call our support center. Video, phone, and in-person appointments are available.', image: '/images/pages/booking-page-1.jpg' },
   { number: '02', title: 'Gather Your Documents', desc: 'Bring photo ID, Social Security cards, all W-2 and 1099 forms, last year\'s return, and bank account info for direct deposit.', image: '/images/pages/admin-documents-hero.jpg' },
   { number: '03', title: 'Meet With a Volunteer', desc: 'An IRS-certified volunteer reviews your documents, prepares your return, and walks you through it before filing.', image: '/images/pages/admin-tax-training-hero.jpg' },
   { number: '04', title: 'File for Free', desc: 'Your return is e-filed at no cost. Refund arrives in 10–21 days via direct deposit. No fees. No upsells.', image: '/images/pages/admin-tax-filing-hero.jpg' },
@@ -55,7 +55,7 @@ export default function FreeTaxHelpPage() {
               className="rounded-2xl overflow-hidden border-2 border-emerald-700 hover:shadow-xl transition-all duration-300 group"
             >
               <div className="relative h-44">
-                <Image src="/images/pages/calendar-page-1.jpg" alt="Schedule appointment" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/pages/booking-page-1.jpg" alt="Schedule appointment" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-5 bg-emerald-700">
                 <p className="font-black text-white text-lg">Schedule Free Appointment</p>

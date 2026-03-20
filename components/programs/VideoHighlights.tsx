@@ -76,23 +76,16 @@ function VideoCard({
               </button>
             )}
           </>
+        ) : poster ? (
+          // No video — show poster image only, no text on frame
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={poster} alt={title} className="w-full h-full object-cover" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-            <div className="max-w-sm">
-              <div className="text-sm uppercase tracking-wide text-white/80 font-extrabold">
-                {title}
-              </div>
-              {description && (
-                <div className="mt-2 text-sm text-white/90 leading-relaxed">
-                  {description}
-                </div>
-              )}
-            </div>
+          // No video, no poster — neutral placeholder
+          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+            <span className="text-slate-400 text-sm">No preview available</span>
           </div>
         )}
-
-        {/* subtle overlay for readability */}
-        {!hasVideo && <div className="absolute inset-0 bg-black/35 pointer-events-none" />}
       </div>
 
       <div className="mt-4">

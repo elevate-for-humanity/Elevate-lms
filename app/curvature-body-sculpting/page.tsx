@@ -75,46 +75,46 @@ const wellnessProducts = [
 export default function CurvatureBodySculptingPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative py-20 min-h-[600px] flex items-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/esthetician.jpg"
-            alt="Curvature Body Sculpting"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-900/90 via-purple-900/80 to-indigo-900/70" />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
-            <Heart className="w-4 h-4 text-pink-300" />
+      {/* Hero — image only, no text on frame */}
+      <section className="relative min-h-[400px] overflow-hidden">
+        <Image
+          src="/images/beauty/esthetician.jpg"
+          alt="Curvature Body Sculpting"
+          fill
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Headline + CTAs — below the image */}
+      <section className="bg-white pt-8 pb-6">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-sm font-medium mb-6 text-pink-700">
+            <Heart className="w-4 h-4 text-pink-500" />
             VITA & Selfish Inc. Partner
           </div>
-          <h1 className="text-4xl md:text-6xl font-black mb-6">
+          <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-6">
             Curvature Body Sculpting
           </h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             Transform your body. Nurture your mind. Professional body contouring services 
             and mental health wellness products.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/curvature-body-sculpting/book-appointment"
-              className="px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+              className="px-8 py-4 bg-purple-700 text-white font-bold rounded-lg hover:bg-purple-800 transition"
             >
               Book Appointment
             </Link>
             <Link
               href="/curvature-body-sculpting/shop"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
+              className="px-8 py-4 border-2 border-purple-700 text-purple-700 font-bold rounded-lg hover:bg-purple-50 transition"
             >
               Shop Wellness Products
             </Link>
           </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-pink-200">
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
             <span className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
               (317) 314-3757

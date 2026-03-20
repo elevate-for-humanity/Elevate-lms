@@ -50,7 +50,7 @@ export default function SiteLocatorPage() {
                     </div>
                     <div className="flex gap-3 items-start">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image src="/images/pages/calendar-page-1.jpg" alt="Hours" fill className="object-cover" sizes="40px" />
+                        <Image src="/images/pages/locations-page-1.jpg" alt="Hours" fill className="object-cover" sizes="40px" />
                       </div>
                       <p className="text-slate-600 text-sm leading-relaxed">{site.hours}</p>
                     </div>
@@ -83,14 +83,12 @@ export default function SiteLocatorPage() {
 
       <section className="relative h-[45vh] min-h-[320px]">
         <Image src="/images/pages/subpage-tax-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
-        <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File for Free?</h2>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/tax/rise-up-foundation/documents" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">What to Bring</Link>
-              <Link href="/tax/rise-up-foundation/faq" className="px-10 py-4 bg-emerald-700 text-white font-black text-xl rounded-xl hover:bg-emerald-600 transition-colors">Check Eligibility</Link>
-            </div>
-          </div>
+      </section>
+      <section className="bg-emerald-900 py-12 text-center px-4">
+        <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File for Free?</h2>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/tax/rise-up-foundation/documents" className="px-10 py-4 bg-white text-emerald-900 font-black text-xl rounded-xl hover:bg-emerald-50 transition-colors">What to Bring</Link>
+          <Link href="/tax/rise-up-foundation/faq" className="px-10 py-4 bg-emerald-700 text-white font-black text-xl rounded-xl hover:bg-emerald-600 transition-colors border border-emerald-500">Check Eligibility</Link>
         </div>
       </section>
     </div>

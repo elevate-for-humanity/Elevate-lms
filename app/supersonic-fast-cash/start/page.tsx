@@ -119,7 +119,7 @@ export default function StartPage() {
 
       {/* PRICING CTA */}
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-5.jpg" alt="Supersonic Fast Cash pricing" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/supersonic-page-7.jpg" alt="Supersonic Fast Cash pricing" fill className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Questions About Pricing?</h2>

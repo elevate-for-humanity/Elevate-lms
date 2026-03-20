@@ -67,7 +67,7 @@ export function PortalPageLayout({
           <div className="max-w-7xl mx-auto">
             <div className={`grid md:grid-cols-${Math.min(stats.length, 4)} gap-6 mb-12`}>
               {stats.map((stat, index) => (
-                <div key={index} className="relative rounded-xl overflow-hidden shadow-lg">
+                <div key={index} className="rounded-xl overflow-hidden shadow-lg bg-white">
                   <Image
                     src={stat.image}
                     alt={stat.label}
@@ -75,9 +75,9 @@ export function PortalPageLayout({
                     height={200}
                     className="w-full h-40 object-cover"
                   />
-                  <div className="absolute bottom-4 left-4 text-white bg-black/60 backdrop-blur-sm p-3 rounded-lg">
-                    <p className="text-4xl font-bold">{stat.value}</p>
-                    <p className="text-sm">{stat.label}</p>
+                  <div className="p-4">
+                    <p className="text-4xl font-bold text-slate-900">{stat.value}</p>
+                    <p className="text-sm text-slate-600">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -105,11 +105,9 @@ export function PortalPageLayout({
                       fill
                       className="object-cover group-hover:scale-105 transition duration-300"
                     />
-                    <h3 className="absolute bottom-3 left-3 text-lg font-bold text-white">
-                      {action.title}
-                    </h3>
                   </div>
                   <div className="p-4">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{action.title}</h3>
                     <p className="text-slate-600 text-sm">{action.description}</p>
                     <span className="inline-flex items-center gap-1 text-indigo-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
                       Open <ArrowRight className="w-4 h-4" />

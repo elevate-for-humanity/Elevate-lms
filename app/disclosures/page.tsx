@@ -80,7 +80,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/pages/disclosures-page-1.jpg"
+                  src="/images/pages/about-hero.jpg"
                   alt="Our Institution"
                   fill
                   className="object-cover"
@@ -110,7 +110,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/pages/disclosures-page-1.jpg"
+                  src="/images/pages/compliance-page-1.jpg"
                   alt="Approvals"
                   fill
                   className="object-cover"

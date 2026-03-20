@@ -30,42 +30,42 @@ const programs = [
   {
     name: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/pages/search-page-1.jpg',
+    image: '/images/pages/programs-cna-hero.jpg',
     certs: ['CNA', 'Medical Assistant', 'Phlebotomy*'],
     funding: 'WIOA & WRG eligible · *Phlebotomy self-pay',
   },
   {
     name: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/pages/search-page-1.jpg',
+    image: '/images/pages/programs-hvac-hero.jpg',
     certs: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
     funding: 'WIOA & JRI eligible',
   },
   {
     name: 'CDL Training',
     href: '/programs/cdl-training',
-    image: '/images/pages/features-hero.jpg',
+    image: '/images/pages/programs-cdl-hero.jpg',
     certs: ['Class A CDL', 'Class B CDL'],
     funding: 'WRG eligible',
   },
   {
     name: 'Barber Apprenticeship',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/search-page-1.jpg',
+    image: '/images/pages/programs-barber-hero-new.jpg',
     certs: ['Barber License'],
     funding: 'Earn while you learn — paid apprenticeship',
   },
   {
     name: 'Technology',
     href: '/programs/technology',
-    image: '/images/pages/search-page-1.jpg',
+    image: '/images/pages/programs-it-hero.jpg',
     certs: ['IT Support', 'Cybersecurity'],
     funding: 'WIOA eligible',
   },
   {
     name: 'CPR & First Aid',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/search-page-1.jpg',
+    image: '/images/pages/programs-cpr-hero.jpg',
     certs: ['HSI CPR/AED', 'First Aid'],
     funding: 'Same-day certification',
   },
@@ -91,7 +91,7 @@ export default function SearchPage() {
       {/* Hero */}
       <section className="relative h-[320px] sm:h-[400px] overflow-hidden">
         <Image
-          src="/images/pages/search-page-1.jpg"
+          src="/images/pages/programs-hero-vibrant.jpg"
           alt="Workforce training programs"
           fill
           className="object-cover"
@@ -175,7 +175,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/search-page-1.jpg"
+                src="/images/pages/about-funding-nav.jpg"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
@@ -236,7 +236,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/pages/search-page-1.jpg"
+                src="/images/pages/about-employer-partners.jpg"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

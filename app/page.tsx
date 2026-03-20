@@ -91,7 +91,7 @@ export default function HomePage() {
             {/* Employer */}
             <Link href="/employer" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-brand-blue-500 rounded-xl overflow-hidden transition-all hover:shadow-md">
               <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                <Image src="/images/pages/hp-employer-real.jpg" alt="Employer hiring Elevate graduates" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+                <Image src="/images/pages/employer-handshake.jpg" alt="Employer hiring Elevate graduates" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <p className="font-bold text-slate-900 text-base mb-1">Employer / Hiring Partner</p>
@@ -104,7 +104,7 @@ export default function HomePage() {
             {/* Agency */}
             <Link href="/workforce-board" className="group flex flex-col bg-white border-2 border-slate-200 hover:border-slate-700 rounded-xl overflow-hidden transition-all hover:shadow-md">
               <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                <Image src="/images/pages/career-services-page-3.jpg" alt="Workforce agency and compliance reporting" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
+                <Image src="/images/pages/workforce-board.jpg" alt="Workforce agency and compliance reporting" fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <p className="font-bold text-slate-900 text-base mb-1">Agency / Workforce Board</p>

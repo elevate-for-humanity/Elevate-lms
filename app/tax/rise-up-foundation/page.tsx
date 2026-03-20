@@ -49,7 +49,7 @@ const SERVICES = [
     title: 'Volunteer With Us',
     description:
       'Become an IRS-certified VITA volunteer. No tax background required — we provide full training through the IRS Link & Learn program. Volunteers commit to 4–6 hours per week during tax season (January through April).',
-    image: '/images/pages/admin-tax-training-hero.jpg',
+    image: '/images/pages/rise-foundation-page-3.jpg',
     href: '/tax/rise-up-foundation/volunteer',
   },
   {
@@ -269,7 +269,7 @@ export default function RiseUpFoundationPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative h-[480px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/admin-tax-training-hero.jpg"
+                src="/images/pages/rise-foundation-page-4.jpg"
                 alt="Become a VITA volunteer"
                 fill
                 className="object-cover"

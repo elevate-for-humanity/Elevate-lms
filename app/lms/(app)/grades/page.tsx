@@ -70,6 +70,7 @@ export default async function GradesPage() {
       )
     `)
     .eq('user_id', user.id)
+    .is('revoked_at', null)
     .order('created_at', { ascending: false });
 
   // Fetch assignment submissions with grades

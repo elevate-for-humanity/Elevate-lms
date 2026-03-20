@@ -46,7 +46,8 @@ export default async function QuizzesPage() {
       .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .is('revoked_at', null);
 
     const courseIds = enrollments?.map(e => e.course_id) || [];
 

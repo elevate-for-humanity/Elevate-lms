@@ -54,7 +54,8 @@ export default async function SchedulePage() {
     `
     )
     .eq('user_id', user.id)
-    .eq('status', 'active');
+    .eq('status', 'active')
+    .is('revoked_at', null);
 
   return (
     <div className="min-h-screen bg-white py-8">

@@ -75,6 +75,7 @@ export default async function AchievementsPage() {
       )
     `)
     .eq('user_id', user.id)
+    .is('revoked_at', null)
     .order('created_at', { ascending: false });
 
   // Fetch completed courses
@@ -82,7 +83,8 @@ export default async function AchievementsPage() {
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'completed');
+    .eq('status', 'completed')
+    .is('revoked_at', null);
 
   // Fetch lesson progress
   const { count: completedLessons } = await db

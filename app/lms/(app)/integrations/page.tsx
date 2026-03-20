@@ -67,19 +67,22 @@ export default async function IntegrationsPage() {
     `
     )
     .eq('user_id', user.id)
+    .is('revoked_at', null)
     .order('created_at', { ascending: false });
 
   const { count: activeCourses } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'active');
+    .eq('status', 'active')
+    .is('revoked_at', null);
 
   const { count: completedCourses } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'completed');
+    .eq('status', 'completed')
+    .is('revoked_at', null);
 
   const { data: recentProgress } = await db
     .from('student_progress')

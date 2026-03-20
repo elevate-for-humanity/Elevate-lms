@@ -29,18 +29,18 @@ async function getDashboardData(supabase: any, db: any) {
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
     db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).is('revoked_at', null),
     db.from('certificates').select('id', { count: 'exact', head: true }),
     db.from('course_lessons').select('id', { count: 'exact', head: true }),
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     // Full data for charts
     db.from('profiles').select('enrollment_status').eq('role', 'student'),
-    db.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
+    db.from('program_enrollments').select('status, enrolled_at, progress, course_id').is('revoked_at', null),
     db.from('programs').select('id, name, status'),
     db.from('courses').select('id, title, is_active'),
     db.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
-    db.from('program_enrollments').select('course_id, status').limit(500),
+    db.from('program_enrollments').select('course_id, status').is('revoked_at', null).limit(500),
   ]);
 
   // Build enrollment trend by month

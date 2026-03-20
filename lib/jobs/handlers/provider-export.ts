@@ -54,6 +54,7 @@ async function fetchRows(
         .from('program_enrollments')
         .select('id, user_id, program_id, status, funding_source, enrolled_at, completed_at')
         .eq('tenant_id', tenantId)
+        .is('revoked_at', null)
         .order('enrolled_at', { ascending: false });
       return data ?? [];
     }

@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   if (!user) redirect('/login');
 
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
-  const { count: completedCourses } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed');
+  const { count: completedCourses } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed').is('revoked_at', null);
   const { count: certificates } = await db.from('certificates').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
 
   return (

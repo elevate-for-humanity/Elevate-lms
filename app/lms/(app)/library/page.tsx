@@ -67,6 +67,7 @@ export default async function LibraryPage() {
       )
     `)
     .eq('user_id', user.id)
+    .is('revoked_at', null)
     .order('created_at', { ascending: false });
 
   // Fetch library resources

@@ -39,7 +39,8 @@ export default async function MyCoursesPage() {
   const { data: enrollments } = await db
     .from('program_enrollments')
     .select('course_id, status, progress_percent')
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .is('revoked_at', null);
 
   const enrolledCourseIds = new Set(enrollments?.map(e => e.course_id) || []);
   const enrollmentMap = new Map(enrollments?.map(e => [e.course_id, e]) || []);

@@ -168,7 +168,8 @@ export default async function BadgesPage() {
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .eq('status', 'completed');
+    .eq('status', 'completed')
+    .is('revoked_at', null);
 
   const { data: quizAttempts } = await db
     .from('quiz_attempts')

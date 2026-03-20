@@ -55,6 +55,7 @@ export default async function CertificationPage() {
       .from('program_enrollments')
       .select('id, progress, course:courses(id, title, certification_name)')
       .eq('user_id', user.id)
+      .is('revoked_at', null)
       .lt('progress', 100)
       .not('course.certification_name', 'is', null),
 

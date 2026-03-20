@@ -39,7 +39,8 @@ async function _GET(request: NextRequest) {
 
     const { data: enrollments } = await db
       .from('program_enrollments')
-      .select('id, status, program_id, enrolled_at, completed_at');
+      .select('id, status, program_id, enrolled_at, completed_at')
+      .is('revoked_at', null);
 
     const { data: certificates } = await db
       .from('certificates')

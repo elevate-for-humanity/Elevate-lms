@@ -24,6 +24,7 @@ async function getStudentData(userId: string, email: string) {
       .from('program_enrollments')
       .select('id, program_id, program_slug, status, enrollment_state, next_required_action, enrolled_at, started_at, completed_at, funding_source')
       .eq('user_id', userId)
+      .is('revoked_at', null)
       .order('enrolled_at', { ascending: false }),
 
     // Course enrollments — individual courses with progress

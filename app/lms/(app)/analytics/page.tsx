@@ -65,7 +65,8 @@ export default async function AnalyticsPage() {
         duration_hours
       )
     `)
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .is('revoked_at', null);
 
   // Fetch lesson progress
   const { data: lessonProgress } = await db

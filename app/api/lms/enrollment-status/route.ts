@@ -28,15 +28,18 @@ export async function GET(req: NextRequest) {
 
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select('id, status, progress_percent, enrolled_at')
+    .select('id, status, progress_percent, enrolled_at, revoked_at')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
 
+  const isRevoked = !!enrollment?.revoked_at;
+  const effectiveStatus = isRevoked ? 'revoked' : (enrollment?.status ?? null);
+
   return NextResponse.json({
-    enrolled:  !!enrollment,
-    status:    enrollment?.status ?? null,
+    enrolled:  !!enrollment && !isRevoked,
+    status:    effectiveStatus,
     progress:  enrollment?.progress_percent ?? 0,
-    approved:  enrollment ? !['pending_approval', 'pending'].includes(enrollment.status) : false,
+    approved:  enrollment && !isRevoked ? !['pending_approval', 'pending'].includes(enrollment.status) : false,
   });
 }

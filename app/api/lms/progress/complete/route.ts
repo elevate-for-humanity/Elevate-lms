@@ -56,15 +56,18 @@ async function _POST(req: NextRequest) {
 
     // ── ENROLLMENT OWNERSHIP ─────────────────────────────────────────
     // Verify the user is enrolled in this course before allowing completion.
+    // Explicit access gate: status OR enrollment_state must grant access.
+    // pending_funding_verification retains provisional LMS access by policy.
+    // See enrollment_grants_lms_access() in DB and docs/enrollment-funding-states.md.
     const { data: enrollment } = await db
       .from('program_enrollments')
-      .select('id, status')
+      .select('id, status, enrollment_state')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
-      .in('status', ['active', 'in_progress', 'enrolled', 'confirmed'])
       .maybeSingle();
 
-    if (!enrollment) {
+    const accessStates = ['active', 'in_progress', 'enrolled', 'confirmed', 'pending_funding_verification'];
+    if (!enrollment || (!accessStates.includes(enrollment.status) && !accessStates.includes(enrollment.enrollment_state))) {
       return NextResponse.json(
         { error: 'Not enrolled in this course' },
         { status: 403 },

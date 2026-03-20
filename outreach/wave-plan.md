@@ -1,6 +1,36 @@
 # Partnership Outreach Wave Plan
 
-## Sending Rules
+---
+
+## Wave 0 — CRS Training Provider Approval (send FIRST, before all other waves)
+
+This is a direct credentialing submission, not a partnership inquiry. Send to both recipients simultaneously. Do not BCC — these are individual, named submissions.
+
+**Send to (individually, not BCC):**
+```
+info@inarr.org        — Indiana Affiliation of Recovery Residences
+DMHA@fssa.in.gov      — Indiana Division of Mental Health and Addiction (FSSA)
+```
+
+**Subject line:**
+```
+CRS Training Provider Approval + Fee Waiver Request (Elevate for Humanity / Selfish Inc.)
+```
+
+**Body:** Use the approval letter drafted for this submission. Add the line:
+> "We are prepared to launch our first cohort within 60–90 days of approval."
+
+**Attachments to include:**
+- `documents/crs/instructor-qualifications.md` (export to PDF)
+- `documents/crs/supervision-structure.md` (export to PDF)
+- `documents/crs/partner-employer-pipeline.md` (export to PDF)
+- CRS curriculum outline (8 modules, 40 lessons — export from LMS or use the blueprint summary)
+
+**Follow-up:** If no response in 5 business days, call INARR directly. Do not wait for email.
+
+---
+
+## Sending Rules (Waves 1–3)
 - Max 10-12 recipients per wave (BCC)
 - Max 2-3 waves per day
 - Send Tuesday through Thursday, 9:00-10:30 AM ET

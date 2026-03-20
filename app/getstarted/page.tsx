@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
@@ -18,47 +19,39 @@ export default function Page() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Getstarted" }]} />
       </div>
-{/* Hero Banner with Video */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="none"
-            className="w-full h-full object-cover"
-          >
-            <source src="/videos/getting-started-hero.mp4" type="video/mp4" />
-          </video>
-        </div>
+      {/* Hero — video frame only, no text overlay */}
+      <PageVideoHero
+        videoSrc="/videos/getting-started-hero.mp4"
+        posterSrc="/images/pages/getstarted-page-1.jpg"
+        posterAlt="Get started with Elevate for Humanity career training"
+        size="marketing"
+      />
 
-        <div className="relative container mx-auto px-4 py-20">
-          <div className="max-w-4xl text-white">
-            <p className="text-sm font-bold uppercase tracking-wide text-brand-orange-400 mb-4">
-              Begin Your Journey
-            </p>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Start Your Career Journey Today
-            </h1>
-            <p className="text-base md:text-lg mb-8 text-white/95">
-              Funded training. No cost, no debt. Real careers waiting. Get
-              started in 3 simple steps.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/contact"
-                className="bg-brand-orange-600 text-white px-8 py-4 rounded-full font-bold hover:bg-brand-orange-700 text-lg shadow-2xl transition-all"
-              >
-                Contact Us
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-white text-lg shadow-2xl transition-all border-2 border-white"
-              >
-                View Programs
-              </Link>
-            </div>
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-orange-600 font-bold text-xs uppercase tracking-widest mb-3">
+            Begin Your Journey
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Start Your Career Journey Today
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            Funded training. No cost, no debt. Real careers waiting. Get started in 3 simple steps.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/contact"
+              className="bg-brand-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-orange-700 transition-colors"
+            >
+              Contact Us
+            </Link>
+            <Link
+              href="/programs"
+              className="border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-xl font-bold hover:border-brand-orange-400 hover:text-brand-orange-700 transition-colors"
+            >
+              View Programs
+            </Link>
           </div>
         </div>
       </section>

@@ -18,6 +18,7 @@ import {
   Calendar,
   Building2,
 } from 'lucide-react';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship | Earn While You Learn | DOL Registered',
@@ -28,67 +29,54 @@ export const metadata: Metadata = {
 export default function ApprenticeshipPage() {
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero Video */}
-      <section className="relative w-full -mt-[72px]">
-        <div className="relative min-h-[100vh] w-full overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="none"
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/videos/barber-hero-final.mp4" type="video/mp4" />
-          </video>
+      {/* Hero — video frame only, no text overlay */}
+      <PageVideoHero
+        videoSrc="/videos/barber-hero-final.mp4"
+        posterSrc="/images/pages/barber-apprenticeship-hero.jpg"
+        posterAlt="Barber apprenticeship training at Elevate for Humanity"
+        size="primary"
+      />
 
-          {/* Overlay Content */}
-          <div className="absolute inset-0 flex items-end">
-            <div className="max-w-7xl mx-auto px-6 pb-20 w-full">
-              <div className="max-w-3xl">
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <span className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-bold rounded-full">
-                    Earn While You Learn
-                  </span>
-                  <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-bold rounded-full border border-white/30">
-                    DOL Registered
-                  </span>
-                  <span className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-bold rounded-full border border-white/30">
-                    $12-15/Hour
-                  </span>
-                </div>
-
-                <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
-                  Barber Apprenticeship
-                </h1>
-
-                <p className="text-xl md:text-2xl text-white mb-8 leading-relaxed">
-                  Get paid to learn. Master your craft. Build your career.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/start"
-                    className="inline-flex items-center justify-center gap-3 bg-brand-orange-600 text-white px-10 py-5 rounded-xl text-lg font-bold hover:bg-brand-orange-700 transition shadow-2xl"
-                  >
-                    Start Your Journey
-                    <ArrowRight className="w-6 h-6" />
-                  </Link>
-                  <Link
-                    href="#how-it-works"
-                    className="inline-flex items-center justify-center gap-3 bg-white/20 backdrop-blur-sm text-white px-10 py-5 rounded-xl text-lg font-bold hover:bg-white/30 transition border border-white/30"
-                  >
-                    How It Works
-                  </Link>
-                </div>
-              </div>
-            </div>
+      {/* Page identity — below hero */}
+      <section className="bg-white border-b border-slate-100 py-10 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="px-3 py-1 bg-brand-orange-600 text-white text-xs font-bold rounded-full">
+              Earn While You Learn
+            </span>
+            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+              DOL Registered
+            </span>
+            <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+              $12–15/Hour
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
+            Barber Apprenticeship
+          </h1>
+          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
+            Get paid to learn. Master your craft. Build your career.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/start"
+              className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-orange-700 transition-colors"
+            >
+              Start Your Journey
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="border-2 border-slate-300 text-slate-700 px-8 py-3 rounded-xl font-bold hover:border-brand-orange-400 hover:text-brand-orange-700 transition-colors"
+            >
+              How It Works
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Value Props Strip */}
-      <section className="bg-white py-8 border-t">
+      <section className="bg-white py-8 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">

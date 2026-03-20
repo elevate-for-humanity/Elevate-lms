@@ -13,6 +13,7 @@
 
 import { useEffect, useRef, useState, useId } from 'react';
 import { Volume2, VolumeX, Pause, Play } from 'lucide-react';
+import { validateHeroVideoElement } from '@/lib/hero-video-audit';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -112,6 +113,11 @@ export default function HeroVideo({
     video.play()
       .then(() => setPlaying(true))
       .catch(() => {});
+
+    const result = validateHeroVideoElement(video);
+    if (!result.ok) {
+      console.error('[HeroVideo] audit failed:', result.errors);
+    }
   }, [prefersReducedMotion]);
 
   // Pause video + audio when scrolled out of view; resume when back in view

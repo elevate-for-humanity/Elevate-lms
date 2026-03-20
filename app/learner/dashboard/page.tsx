@@ -385,13 +385,19 @@ export default async function LearnerDashboardPage() {
                                 />
                               </div>
                             </div>
-                            <Link
-                              href={`/lms/courses/${enrollment.course_id}`}
-                              className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-medium rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
-                            >
-                              <Play className="w-4 h-4" />
-                              Continue
-                            </Link>
+                            {enrollment.course_id ? (
+                              <Link
+                                href={`/lms/courses/${enrollment.course_id}`}
+                                className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-medium rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
+                              >
+                                <Play className="w-4 h-4" />
+                                Continue
+                              </Link>
+                            ) : (
+                              <span className="px-4 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed">
+                                Coming Soon
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

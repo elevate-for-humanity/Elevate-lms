@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
+import PageVideoHero from '@/components/ui/PageVideoHero';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -84,12 +85,13 @@ export default function FinancePathwayPage() {
         </div>
       </div>
 
-      {/* Hero — clean video, no text overlay */}
-      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-        <video autoPlay loop muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover">
-          <source src="/videos/business-finance.mp4" type="video/mp4" />
-        </video>
-      </section>
+      {/* Hero — video frame only, no text overlay */}
+      <PageVideoHero
+        videoSrc="/videos/business-finance.mp4"
+        posterSrc="/images/pages/bookkeeping-ledger.jpg"
+        posterAlt="Finance, bookkeeping and accounting credential pathway"
+        size="marketing"
+      />
 
       {/* Page identity — below hero */}
       <section className="bg-white border-b border-slate-100 py-10 px-4">

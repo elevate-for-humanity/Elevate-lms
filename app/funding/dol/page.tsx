@@ -40,7 +40,7 @@ const programs = (dbRows as any[]) || [];
 
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
-        <Image src="/images/pages/funding-page-1.jpg" alt="DOL Registered Apprenticeship" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/apprenticeship-hero.jpg" alt="DOL Registered Apprenticeship" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 
@@ -61,7 +61,7 @@ const programs = (dbRows as any[]) || [];
               </Link>
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/pages/funding-page-1.jpg" alt="Hands-on apprenticeship training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/pages/ojt-and-funding.jpg" alt="Hands-on apprenticeship training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>

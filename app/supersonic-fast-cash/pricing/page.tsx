@@ -47,7 +47,7 @@ const ADD_ONS = [
   { name: 'Additional State', price: '+$49', desc: 'Each additional state return beyond the first. Most returns include one state.', image: '/images/pages/supersonic-page-10.jpg' },
   { name: 'Prior Year Return', price: '+$75', desc: 'Amend or file a prior year return. Available for up to 3 years back.', image: '/images/pages/admin-tax-filing-hero.jpg' },
   { name: 'Bookkeeping', price: 'From $199/mo', desc: 'Monthly bookkeeping for small businesses. Includes reconciliation, P&L, and tax-ready books.', image: '/images/pages/finance-accounting.jpg' },
-  { name: 'Payroll', price: 'From $99/mo', desc: 'Full-service payroll for up to 5 employees. Includes direct deposit, tax filings, and W-2s.', image: '/images/pages/supersonic-page-5.jpg' },
+  { name: 'Payroll', price: 'From $99/mo', desc: 'Full-service payroll for up to 5 employees. Includes direct deposit, tax filings, and W-2s.', image: '/images/pages/supersonic-page-8.jpg' },
 ];
 
 export default function PricingPage() {
@@ -140,7 +140,7 @@ export default function PricingPage() {
 
       {/* CTA */}
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/supersonic-page-5.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/tax-prep-desk.jpg" alt="Start your tax return" fill className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-slate-900/70 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Get Started?</h2>

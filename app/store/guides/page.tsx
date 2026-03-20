@@ -94,14 +94,15 @@ export default function GuidesPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-slate-900/55" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-6 pb-8 w-full">
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Guides &amp; Resources</h1>
-            <p className="text-slate-200 text-base max-w-xl">
-              Practical documentation for workforce organizations — written from the inside, not from a consulting firm.
-            </p>
-          </div>
+      </section>
+
+      {/* Headline — below the image */}
+      <section className="bg-white pt-8 pb-4">
+        <div className="max-w-6xl mx-auto px-6">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Guides &amp; Resources</h1>
+          <p className="text-slate-600 text-base max-w-xl">
+            Practical documentation for workforce organizations — written from the inside, not from a consulting firm.
+          </p>
         </div>
       </section>
 

@@ -109,7 +109,7 @@ export default function TrainingPage() {
 
       {/* CTA */}
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/admin-tax-training-hero.jpg" alt="Start IRS training" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/rise-foundation-page-2.jpg" alt="Start IRS training" fill className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Get Certified?</h2>

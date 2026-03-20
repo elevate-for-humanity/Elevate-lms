@@ -164,8 +164,7 @@ export async function exportNewRegistrations(
       )
     `)
     .eq('rapids_submitted', false)
-    .in('status', ['active', 'enrolled'])
-    .is('revoked_at', null);
+    .in('status', ['active', 'enrolled']);
 
   if (startDate) {
     query = query.gte('enrolled_at', startDate);

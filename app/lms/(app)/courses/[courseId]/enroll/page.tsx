@@ -80,7 +80,6 @@ export default async function CourseEnrollPage({ params }: Props) {
     .select('id, status')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
-    .is('revoked_at', null)
     .maybeSingle();
 
   const existingByProgram = course.program_id
@@ -89,7 +88,6 @@ export default async function CourseEnrollPage({ params }: Props) {
         .select('id, status')
         .eq('user_id', user.id)
         .eq('program_id', course.program_id)
-        .is('revoked_at', null)
         .maybeSingle()
         .then(r => r.data)
     : null;

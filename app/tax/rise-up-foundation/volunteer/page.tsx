@@ -96,7 +96,7 @@ export default function VolunteerPage() {
       </section>
 
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/admin-tax-training-hero.jpg" alt="Apply to volunteer" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/rise-foundation-page-1.jpg" alt="Apply to volunteer" fill className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Make a Difference?</h2>

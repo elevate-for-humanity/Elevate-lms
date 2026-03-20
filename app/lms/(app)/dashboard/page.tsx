@@ -83,7 +83,6 @@ export default async function StudentDashboardOrchestrated() {
     .from('program_enrollments')
     .select('id, status, enrolled_at, progress_percent, program_id, programs(id, title, slug, code)')
     .eq('user_id', user.id)
-    .is('revoked_at', null)
     .order('enrolled_at', { ascending: false });
 
   // Get partner enrollments (external providers like HSI)
@@ -99,7 +98,6 @@ export default async function StudentDashboardOrchestrated() {
     .select('id, status, enrolled_at, progress_percent, course_id, courses(id, title, description)')
     .eq('user_id', user.id)
     .not('course_id', 'is', null)
-    .is('revoked_at', null)
     .order('enrolled_at', { ascending: false });
 
   // Combine only for active enrollment check — display stays separated

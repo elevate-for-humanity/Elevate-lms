@@ -106,40 +106,41 @@ const openPositions = [
 export default function CurvatureCareersPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative py-20 min-h-[400px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/cosmetology.jpg"
-            alt="Careers at Curvature Body Sculpting"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-900/90 via-purple-900/80 to-indigo-900/70" />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+      {/* Hero — image only, no text on frame */}
+      <section className="relative min-h-[400px] overflow-hidden">
+        <Image
+          src="/images/beauty/cosmetology.jpg"
+          alt="Careers at Curvature Body Sculpting"
+          fill
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Headline — below the image */}
+      <section className="bg-white pt-8 pb-6">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-sm font-medium mb-6 text-pink-700">
             <Briefcase className="w-4 h-4" />
             We're Hiring
           </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Join Curvature Body Sculpting
           </h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             Start your career in body sculpting and wellness. We hire graduates from 
             Elevate for Humanity's esthetician and beauty programs.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="#positions"
-              className="px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+              className="px-8 py-4 bg-purple-700 text-white font-bold rounded-lg hover:bg-purple-800 transition"
             >
               View Open Positions
             </a>
             <Link
               href="/programs/esthetician-apprenticeship"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
+              className="px-8 py-4 border-2 border-purple-700 text-purple-700 font-bold rounded-lg hover:bg-purple-50 transition"
             >
               Get Trained First
             </Link>

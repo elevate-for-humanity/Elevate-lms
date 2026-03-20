@@ -48,14 +48,15 @@ export default async function BankingPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-slate-900/50" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto px-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Banking Services</h1>
-            <p className="text-slate-200 text-lg max-w-xl">
-              Refund advances, direct deposit, and prepaid cards — powered by EPS Financial, Member FDIC.
-            </p>
-          </div>
+      </section>
+
+      {/* Headline — below the image */}
+      <section className="bg-white pt-8 pb-4">
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Banking Services</h1>
+          <p className="text-slate-600 text-lg max-w-xl">
+            Refund advances, direct deposit, and prepaid cards — powered by EPS Financial, Member FDIC.
+          </p>
         </div>
       </section>
 

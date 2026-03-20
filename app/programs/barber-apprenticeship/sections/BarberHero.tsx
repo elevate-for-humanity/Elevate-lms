@@ -6,7 +6,7 @@ import { QUICK_STATS } from '../barber-program-data';
 export function BarberHero() {
   return (
     <>
-      {/* Hero */}
+      {/* Hero — image only, no text on frame */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden bg-white">
         <Image
           src="/images/pages/programs-barber-hero-new.jpg"
@@ -15,13 +15,13 @@ export function BarberHero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 flex items-end">
-          <div className="w-full bg-black/55 px-6 py-6">
-            <div className="max-w-5xl mx-auto">
-              <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2">Barber Apprenticeship Program</h1>
-              <p className="text-white/85 text-lg max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
-            </div>
-          </div>
+      </section>
+
+      {/* Headline — below the image frame */}
+      <section className="bg-white pt-8 pb-2">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2">Barber Apprenticeship Program</h1>
+          <p className="text-slate-600 text-lg max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
         </div>
       </section>
 

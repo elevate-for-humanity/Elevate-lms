@@ -291,7 +291,7 @@ export default async function BookkeepingPage() {
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
         <Image
-          src="/images/pages/supersonic-page-5.jpg"
+          src="/images/pages/bookkeeping.jpg"
           alt="Bookkeeping"
           fill
           className="object-cover"

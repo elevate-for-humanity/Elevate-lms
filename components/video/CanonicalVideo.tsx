@@ -93,7 +93,6 @@ export default function CanonicalVideo({ src, poster, className, threshold = 0.5
       className={className}
       muted
       playsInline
-      loop
       preload="metadata"
       poster={poster}
       aria-hidden="true"

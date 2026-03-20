@@ -142,26 +142,27 @@ const colorClasses: Record<string, { bg: string; light: string; text: string }> 
 export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative py-20 min-h-[400px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/program-beauty-training.jpg"
-            alt="Body Sculpting Services"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-900/90 via-purple-900/80 to-indigo-900/70" />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-black mb-6">Our Services</h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
+      {/* Hero — image only, no text on frame */}
+      <section className="relative min-h-[400px] overflow-hidden">
+        <Image
+          src="/images/beauty/program-beauty-training.jpg"
+          alt="Body Sculpting Services"
+          fill
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Headline — below the image */}
+      <section className="bg-white pt-8 pb-6">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">Our Services</h1>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
             Non-invasive body sculpting and wellness treatments to help you look and feel your best
           </p>
           <Link
             href="/curvature-body-sculpting/book-appointment"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-purple-700 text-white font-bold rounded-lg hover:bg-purple-800 transition"
           >
             <Calendar className="w-5 h-5" />
             Book Free Consultation

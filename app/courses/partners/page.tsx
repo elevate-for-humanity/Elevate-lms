@@ -72,7 +72,7 @@ export default async function PartnerCoursesPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/courses-page-7.jpg"
+          src="/images/pages/about-partner-cta.jpg"
           alt="Partners"
           fill
           className="object-cover"
@@ -278,7 +278,7 @@ export default async function PartnerCoursesPage() {
                 </div>
                 <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] rounded-2xl overflow-hidden border-4 border-gray-200">
                   <Image
-                    src="/images/pages/courses-page-7.jpg"
+                    src="/images/pages/adult-learner.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

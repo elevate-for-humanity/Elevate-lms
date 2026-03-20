@@ -37,21 +37,18 @@ const getCachedUserData = unstable_cache(
           courses (id, title, description, thumbnail_url)
         `)
         .eq('user_id', userId)
-        .is('revoked_at', null)
         .order('created_at', { ascending: false })
         .limit(10),
       db
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('status', 'active')
-        .is('revoked_at', null),
+        .eq('status', 'active'),
       db
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('status', 'completed')
-        .is('revoked_at', null),
+        .eq('status', 'completed'),
       db
         .from('student_progress')
         .select(`id, updated_at, courses (title)`)

@@ -21,19 +21,20 @@ export default function ForStudentsPage() {
   return (
     <div className="bg-white">
 
-      {/* HERO */}
+      {/* HERO — image only, no text on frame */}
       <section className="relative h-[340px] sm:h-[460px] overflow-hidden">
         <Image src="/images/pages/for-students-hero.jpg" alt="Job seekers in workforce training" fill sizes="100vw" className="object-cover object-center" priority />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 to-slate-900/20" />
-        <div className="relative h-full flex items-center">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-            <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">For Job Seekers</p>
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 leading-tight max-w-2xl">A real career in weeks — not years.</h1>
-            <p className="text-slate-200 text-base sm:text-lg max-w-xl leading-relaxed mb-6">Short-term training in healthcare, trades, CDL, barbering, and technology. Most programs are fully funded for eligible Indiana residents.</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg text-sm transition-colors">Apply Now</Link>
-              <Link href="/programs" className="border border-white/40 text-white font-semibold px-7 py-3 rounded-lg text-sm hover:bg-white/10 transition-colors">View All Programs</Link>
-            </div>
+      </section>
+
+      {/* Headline — below the image */}
+      <section className="bg-white pt-8 pb-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Job Seekers</p>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 leading-tight max-w-2xl">A real career in weeks — not years.</h1>
+          <p className="text-slate-500 text-base sm:text-lg max-w-xl leading-relaxed mb-6">Short-term training in healthcare, trades, CDL, barbering, and technology. Most programs are fully funded for eligible Indiana residents.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg text-sm transition-colors">Apply Now</Link>
+            <Link href="/programs" className="border border-slate-300 text-slate-700 font-semibold px-7 py-3 rounded-lg text-sm hover:bg-slate-50 transition-colors">View All Programs</Link>
           </div>
         </div>
       </section>

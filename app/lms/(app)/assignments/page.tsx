@@ -46,8 +46,7 @@ export default async function AssignmentsPage() {
       .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
-      .eq('status', 'active')
-      .is('revoked_at', null);
+      .eq('status', 'active');
 
     const courseIds = enrollments?.map(e => e.course_id) || [];
 

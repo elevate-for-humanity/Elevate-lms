@@ -278,30 +278,27 @@ export default function CoursesCatalogPage() {
         </div>
       </div>
 
-      {/* ── VIDEO HERO ──────────────────────────────────────────────── */}
+      {/* ── VIDEO HERO — video only, no text on frame ───────────────── */}
       <section className="relative overflow-hidden" style={{ minHeight: 420 }}>
-        <div className="absolute inset-0">
-          <ScrollVideo
-            src="/videos/elevate-overview-with-narration.mp4"
-            className="w-full h-full object-cover"
-            style={{ minHeight: '420px' }}
-          />
-          {/* Solid scrim for text contrast */}
-          
-        </div>
+        <ScrollVideo
+          src="/videos/elevate-overview-with-narration.mp4"
+          className="w-full h-full object-cover"
+          style={{ minHeight: '420px' }}
+        />
+      </section>
 
-        <div className="relative max-w-6xl mx-auto px-4 py-16">
+      {/* Headline + search — below the video frame */}
+      <section className="bg-white pt-8 pb-6">
+        <div className="max-w-6xl mx-auto px-4">
           <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-5">
             Free to Apply · Grant Funding Available
           </span>
-          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 leading-tight mb-5 drop-shadow-lg max-w-3xl">
+          <h1 className="text-4xl sm:text-6xl font-black text-slate-900 leading-tight mb-5 max-w-3xl">
             Find Your Career.<br />Start Training Today.
           </h1>
-          <p className="text-white/90 text-lg max-w-2xl mb-8 leading-relaxed">
-            Every course below leads to a real job with real pay. No college degree required. Many are fully covered by workforce grants — meaning <strong className="text-white">you pay nothing</strong>.
+          <p className="text-slate-600 text-lg max-w-2xl mb-8 leading-relaxed">
+            Every course below leads to a real job with real pay. No college degree required. Many are fully covered by workforce grants — meaning <strong className="text-slate-900">you pay nothing</strong>.
           </p>
-
-          {/* Search bar */}
           <div className="relative max-w-lg">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input
@@ -309,7 +306,7 @@ export default function CoursesCatalogPage() {
               placeholder="Search courses — try 'healthcare', 'tech', 'safety'..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-sm font-medium shadow-xl focus:outline-none focus:ring-2 focus:ring-brand-blue-400"
+              className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-sm font-medium shadow-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-blue-400"
             />
           </div>
         </div>

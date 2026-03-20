@@ -86,8 +86,7 @@ export async function getUserCourses(userId: string): Promise<CourseProgress[]> 
     .from('program_enrollments')
     .select('id, status, progress_percent, program_id, programs(id, title, slug)')
     .eq('user_id', userId)
-    .in('status', ['active', 'enrolled', 'in_progress'])
-    .is('revoked_at', null);
+    .in('status', ['active', 'enrolled', 'in_progress']);
 
   if (error) {
     console.error('getUserCourses error:', error.message);

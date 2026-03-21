@@ -10,7 +10,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import PageVideoHero from '@/components/ui/PageVideoHero';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 import {
   BookOpen, Clock, DollarSign,
   MapPin, Shield, TrendingUp, ChevronRight,
@@ -48,25 +49,33 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
     <div className="min-h-screen bg-white">
       {/* ═══ A. HERO ════════════════════════════════════════════════ */}
       <section>
-        {heroOverride ?? (p.videoSrc ? (
-          <PageVideoHero
-            videoSrc={p.videoSrc}
-            posterSrc={p.heroImage}
-            posterAlt={p.heroImageAlt}
-            size="program"
-          />
-        ) : (
-          <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-            <Image
-              src={p.heroImage}
-              alt={p.heroImageAlt}
-              fill
-              className="object-cover object-center"
-              priority
-              sizes="100vw"
-            />
-          </div>
-        ))}
+        {heroOverride ?? (() => {
+          const banner = heroBanners[p.slug];
+          if (banner) {
+            return (
+              <HeroVideo
+                videoSrcDesktop={banner.videoSrcDesktop}
+                posterImage={banner.posterImage}
+                voiceoverSrc={banner.voiceoverSrc}
+                microLabel={banner.microLabel}
+                analyticsName={banner.analyticsName}
+              />
+            );
+          }
+          // Fallback: plain image hero for programs without a banner entry
+          return (
+            <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+              <Image
+                src={p.heroImage}
+                alt={p.heroImageAlt}
+                fill
+                className="object-cover object-center"
+                priority
+                sizes="100vw"
+              />
+            </div>
+          );
+        })()}
 
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-white">

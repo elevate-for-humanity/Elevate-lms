@@ -8,7 +8,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 /* ------------------------------------------------------------------ */
 /*  Config types — every section is data-driven                        */
@@ -36,7 +37,9 @@ interface Step {
 }
 
 export interface ProgramPageConfig {
-  // Hero — video or static image
+  // Hero — resolved via heroBanners.ts using pageKey
+  pageKey?: string;
+  // Legacy direct props — used as fallback if no heroBanners entry
   videoSrc?: string;
   voiceoverSrc?: string;
   heroImage?: string;
@@ -166,25 +169,48 @@ export default function ProgramPageLayout({
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ===== HERO — clean media, no text overlay ===== */}
-      {c.videoSrc ? (
-        <ProgramHeroBanner
-          videoSrc={c.videoSrc}
-          voiceoverSrc={c.voiceoverSrc}
-          posterImage={c.heroImage || c.overviewImage}
-        />
-      ) : c.heroImage ? (
-        <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-          <Image
-            src={c.heroImage}
-            alt={c.heroImageAlt || c.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        </div>
-      ) : null}
+      {/* ===== HERO — canonical HeroVideo, no text overlay ===== */}
+      {(() => {
+        const key = c.pageKey;
+        const banner = key ? heroBanners[key] : undefined;
+        if (banner) {
+          return (
+            <HeroVideo
+              videoSrcDesktop={banner.videoSrcDesktop}
+              posterImage={banner.posterImage}
+              voiceoverSrc={banner.voiceoverSrc}
+              microLabel={banner.microLabel}
+              analyticsName={banner.analyticsName}
+            />
+          );
+        }
+        // Fallback for configs without a pageKey
+        if (c.videoSrc) {
+          return (
+            <HeroVideo
+              videoSrcDesktop={c.videoSrc}
+              posterImage={c.heroImage || c.overviewImage || ''}
+              voiceoverSrc={c.voiceoverSrc}
+              analyticsName={c.title}
+            />
+          );
+        }
+        if (c.heroImage) {
+          return (
+            <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+              <Image
+                src={c.heroImage}
+                alt={c.heroImageAlt || c.title}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       {/* ===== BREADCRUMBS ===== */}
       <div className="bg-white border-b border-slate-100">

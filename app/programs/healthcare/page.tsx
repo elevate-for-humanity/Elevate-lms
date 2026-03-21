@@ -27,8 +27,7 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/healthcare-cna.mp4',
-  voiceoverSrc: '/audio/heroes/healthcare.mp3',
+  pageKey: 'healthcare',
 
   title: 'Healthcare Programs',
   subtitle: 'Launch a career in healthcare. CNA and Medical Assistant are free with WIOA funding. Phlebotomy is self-pay with BNPL options available.',

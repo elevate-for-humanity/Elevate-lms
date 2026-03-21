@@ -36,7 +36,7 @@ const programs = [
 ];
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/it-technology.mp4', voiceoverSrc: '/audio/heroes/technology.mp3',
+  pageKey: 'technology',
   title: 'Technology Programs', subtitle: 'IT Support, Cybersecurity, Web Development, and more. Industry certifications for high-demand tech careers.',
   badge: 'Funding Available', badgeColor: 'blue',
   duration: '6–12 weeks', cost: 'WorkOne funding available', format: 'In-person, Indianapolis', credential: 'CompTIA + Certiport + Meta',

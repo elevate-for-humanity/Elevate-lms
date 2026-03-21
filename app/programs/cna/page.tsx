@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'CNA Program | Elevate for Humanity',
@@ -35,8 +37,18 @@ const FAQ = [
 ];
 
 export default function CNAPage() {
+  const b = heroBanners['cna'];
   return (
     <main className="min-h-screen bg-white">
+
+      {/* Hero video */}
+      <HeroVideo
+        videoSrcDesktop={b.videoSrcDesktop}
+        posterImage={b.posterImage}
+        voiceoverSrc={b.voiceoverSrc}
+        microLabel={b.microLabel}
+        analyticsName={b.analyticsName}
+      />
 
       {/* Header */}
       <div className="bg-white border-b border-slate-100 py-10 px-4">

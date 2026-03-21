@@ -32,7 +32,7 @@ const programs = [
 ];
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/training-providers-hero.mp4',
+  pageKey: 'apprenticeships',
   title: 'Apprenticeship Programs', subtitle: 'Earn while you learn. On-the-job training in licensed shops and professional kitchens.',
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '6–18 months', cost: 'Varies by program', format: 'OJT + classroom, Indianapolis', credential: 'State Licensure Pathway',

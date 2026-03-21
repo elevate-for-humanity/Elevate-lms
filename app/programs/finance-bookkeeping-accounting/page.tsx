@@ -3,7 +3,8 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { InView } from '@/components/ui/InView';
@@ -85,14 +86,19 @@ export default function FinancePathwayPage() {
         </div>
       </div>
 
-      {/* Hero — clean video, no text overlay */}
-      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
-        <CanonicalVideo
-          src="/videos/business-finance.mp4"
-          poster="/images/pages/business-sector.jpg"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </section>
+      {/* Hero video */}
+      {(() => {
+        const b = heroBanners['finance-bookkeeping-accounting'];
+        return (
+          <HeroVideo
+            videoSrcDesktop={b.videoSrcDesktop}
+            posterImage={b.posterImage}
+            voiceoverSrc={b.voiceoverSrc}
+            microLabel={b.microLabel}
+            analyticsName={b.analyticsName}
+          />
+        );
+      })()}
 
       {/* Page identity — below hero */}
       <section className="border-b border-slate-100 py-10 px-4">

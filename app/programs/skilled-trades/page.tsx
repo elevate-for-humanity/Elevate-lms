@@ -33,7 +33,7 @@ const programs = [
 ];
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/electrician-trades.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
+  pageKey: 'skilled-trades',
   title: 'Skilled Trades', subtitle: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel. Hands-on training with real job placement.',
   badge: 'Funding Available', badgeColor: 'orange',
   duration: '3–12 weeks', cost: '$0 with WIOA funding', format: 'Hybrid — Online + In-person, Indianapolis', credential: 'OSHA + Industry Certifications',

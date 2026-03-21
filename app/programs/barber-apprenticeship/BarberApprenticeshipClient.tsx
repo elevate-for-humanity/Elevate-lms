@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 import {
   Award, Clock, ChevronRight, MapPin, BookOpen,
   Briefcase, TrendingUp, DollarSign, AlertTriangle,
@@ -22,34 +24,43 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* ═══ HERO ═══ */}
-      <section className="relative">
-        <div className="relative h-[320px] sm:h-[400px] lg:h-[480px]">
-          <Image src="/images/pages/barber-hero-main.jpg" alt="Barber cutting hair in a professional barbershop" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="max-w-6xl mx-auto px-4 -mt-28 relative z-10 pb-8">
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 sm:p-8">
-            <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-4">
-              <Link href="/programs" className="hover:text-brand-blue-600">Programs</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-slate-900 font-medium">Barber Apprenticeship</span>
-            </nav>
-            <div className="flex items-start gap-3 mb-4">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Barber Apprenticeship</h1>
-              <span className="flex-shrink-0 text-xs font-bold text-white px-3 py-1 rounded-full bg-brand-blue-600">DOL Registered</span>
-            </div>
-            <p className="text-slate-600 text-lg mb-6">{p.subtitle}</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white rounded-lg p-4">
-              <SpecItem icon={Clock} label="Duration" value="52 weeks" />
-              <SpecItem icon={BookOpen} label="Hours/Week" value="15–20 hrs" />
-              <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
-              <SpecItem icon={Award} label="Credentials" value={`${p.credentials.length} earned`} />
-            </div>
-            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
-              <span><strong>Schedule:</strong> {p.schedule}</span>
-              <span><strong>Cohort:</strong> {p.cohortSize}</span>
-              <span><strong>Funding:</strong> {p.fundingStatement}</span>
-              <span><strong>Self-pay:</strong> {p.selfPayCost}</span>
-            </div>
+      {(() => {
+        const b = heroBanners['barber-apprenticeship'];
+        return (
+          <HeroVideo
+            videoSrcDesktop={b.videoSrcDesktop}
+            posterImage={b.posterImage}
+            voiceoverSrc={b.voiceoverSrc}
+            microLabel={b.microLabel}
+            analyticsName={b.analyticsName}
+          />
+        );
+      })()}
+
+      {/* ═══ PROGRAM IDENTITY CARD (below video) ═══ */}
+      <section className="border-b border-slate-200 bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-4">
+            <Link href="/programs" className="hover:text-brand-blue-600">Programs</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-900 font-medium">Barber Apprenticeship</span>
+          </nav>
+          <div className="flex items-start gap-3 mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Barber Apprenticeship</h1>
+            <span className="flex-shrink-0 text-xs font-bold text-white px-3 py-1 rounded-full bg-brand-blue-600">DOL Registered</span>
+          </div>
+          <p className="text-slate-600 text-lg mb-6">{p.subtitle}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 rounded-lg p-4">
+            <SpecItem icon={Clock} label="Duration" value="52 weeks" />
+            <SpecItem icon={BookOpen} label="Hours/Week" value="15–20 hrs" />
+            <SpecItem icon={MapPin} label="Delivery" value="Hybrid" />
+            <SpecItem icon={Award} label="Credentials" value={`${p.credentials.length} earned`} />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
+            <span><strong>Schedule:</strong> {p.schedule}</span>
+            <span><strong>Cohort:</strong> {p.cohortSize}</span>
+            <span><strong>Funding:</strong> {p.fundingStatement}</span>
+            <span><strong>Self-pay:</strong> {p.selfPayCost}</span>
           </div>
         </div>
       </section>

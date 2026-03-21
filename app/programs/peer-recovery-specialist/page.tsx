@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPublishedProgramBySlug, formatTrackCost } from '@/lib/programs/getProgramBySlug';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const revalidate = 600;
 
@@ -41,10 +43,23 @@ export default async function PeerRecoverySpecialistPage() {
     program.program_media.find((m) => m.media_type === 'hero_image') ??
     program.program_media[0];
 
+  const banner = heroBanners['peer-recovery-specialist'];
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <section className="relative overflow-hidden border-b border-slate-200">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-2 md:items-center">
+
+      {/* ── Hero video ───────────────────────────────────────────────────── */}
+      <HeroVideo
+        videoSrcDesktop={banner.videoSrcDesktop}
+        posterImage={banner.posterImage}
+        voiceoverSrc={banner.voiceoverSrc}
+        microLabel={banner.microLabel}
+        analyticsName={banner.analyticsName}
+      />
+
+      {/* ── Program identity + CTAs (below video) ────────────────────────── */}
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-2 md:items-center">
           <div>
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
               Workforce Training Program

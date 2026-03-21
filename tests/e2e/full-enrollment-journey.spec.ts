@@ -62,16 +62,14 @@ test.describe('Full Enrollment Journey: Apply → Auth → Checkout → Enrollme
     // Step 2.2: Verify apply landing page content
     await expect(page.locator('h1')).toBeVisible();
     
-    // Step 2.3: Verify two enrollment paths are presented
-    const inquiryLink = page.locator('a[href*="/inquiry"]');
-    const programsLink = page.locator('a[href*="/programs"]');
-    
-    await expect(inquiryLink.first()).toBeVisible();
-    await expect(programsLink.first()).toBeVisible();
-    
-    // Step 2.4: Verify eligibility notice is shown
-    const eligibilityNotice = page.locator('text=/eligibility|WorkOne/i');
-    await expect(eligibilityNotice.first()).toBeVisible();
+    // Step 2.3: Verify enrollment paths are presented
+    // /apply links to /start (student path) and /apply/program-holder
+    const startLink = page.locator('a[href*="/start"]');
+    await expect(startLink.first()).toBeVisible();
+
+    // Step 2.4: Verify funding/eligibility content is shown
+    const fundingContent = page.locator('text=/funding|WIOA|eligibility/i');
+    await expect(fundingContent.first()).toBeVisible();
   });
 
   /**

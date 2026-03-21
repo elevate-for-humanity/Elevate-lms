@@ -239,6 +239,7 @@
     "validate:docs": "tsx scripts/validate-docs.ts",
     "validate:routes": "tsx scripts/validate-routes.ts",
     "validate:enrollment": "tsx scripts/validate-enrollment.ts",
+    "validate:lms": "tsx scripts/validate-lms-integrity.ts",
     "readiness": "tsx scripts/final-readiness.ts",
     "audit-rls": "tsx scripts/audit-rls.ts",
     "make:images": "python3 tools/make_brand_images.py",

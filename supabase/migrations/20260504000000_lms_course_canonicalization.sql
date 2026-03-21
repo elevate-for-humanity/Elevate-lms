@@ -300,31 +300,138 @@ BEGIN
 END $$;
 
 -- ------------------------------------------------------------
--- STEP 5c — HARD FAIL if any program has zero course_lessons
+-- STEP 5c — Correctness assertions (not just existence)
+--
+-- Checks, per program:
+--   1. course row exists and program_id is correctly linked
+--   2. course_modules exist and their course_id matches the course
+--   3. course_lessons exist and their course_id matches the course
+--   4. every course_lesson has a non-null module_id pointing to a
+--      course_modules row in the same course (no orphaned lessons)
+--   5. every course_module has at least one lesson (no empty modules)
+--   6. course_lessons.slug matches the source curriculum_lessons.lesson_slug
+--      (detects slug drift / wrong-program promotion)
+--   7. lesson count matches the published curriculum_lessons count
+--      (detects partial promotion)
 -- ------------------------------------------------------------
 DO $$
 DECLARE
-  r RECORD;
+  r              RECORD;
+  v_course_id    UUID;
+  v_prog_id      UUID;
+  v_mod_count    INTEGER;
+  v_lesson_count INTEGER;
+  v_orphans      INTEGER;
+  v_empty_mods   INTEGER;
+  v_slug_drift   INTEGER;
+  v_expected     INTEGER;
 BEGIN
   FOR r IN
-    SELECT p.slug, COUNT(cl2.id) AS lesson_count
+    SELECT p.id AS program_id, p.slug AS program_slug, c.id AS course_id
     FROM public.programs p
     JOIN public.courses c ON c.program_id = p.id
-    LEFT JOIN public.course_lessons cl2 ON cl2.course_id = c.id
     WHERE p.slug IN (
       'peer-recovery-specialist-jri',
       'certified-recovery-specialist',
       'bookkeeping'
     )
-    GROUP BY p.slug
   LOOP
-    IF r.lesson_count = 0 THEN
-      RAISE EXCEPTION
-        'PROMOTION_FAILED: % has 0 course_lessons after promotion. '
-        'Ensure curriculum_lessons are seeded and status=published before running this migration.',
-        r.slug;
+    v_prog_id   := r.program_id;
+    v_course_id := r.course_id;
+
+    -- 1. course.program_id must equal programs.id
+    IF v_course_id IS NULL THEN
+      RAISE EXCEPTION 'INTEGRITY_FAIL [%]: no courses row linked to program', r.program_slug;
     END IF;
-    RAISE NOTICE 'STEP 5c PASSED: % has % course_lessons', r.slug, r.lesson_count;
+
+    -- 2. course_modules count
+    SELECT COUNT(*) INTO v_mod_count
+    FROM public.course_modules
+    WHERE course_id = v_course_id;
+
+    IF v_mod_count = 0 THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: 0 course_modules — modules were not promoted',
+        r.program_slug;
+    END IF;
+
+    -- 3. course_lessons count
+    SELECT COUNT(*) INTO v_lesson_count
+    FROM public.course_lessons
+    WHERE course_id = v_course_id;
+
+    IF v_lesson_count = 0 THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: 0 course_lessons — curriculum_lessons were not promoted. '
+        'Run the seed script for this program before applying this migration.',
+        r.program_slug;
+    END IF;
+
+    -- 4. Orphaned lessons: course_lesson.module_id is NULL or points outside this course
+    SELECT COUNT(*) INTO v_orphans
+    FROM public.course_lessons cl
+    WHERE cl.course_id = v_course_id
+      AND (
+        cl.module_id IS NULL
+        OR NOT EXISTS (
+          SELECT 1 FROM public.course_modules cm
+          WHERE cm.id = cl.module_id AND cm.course_id = v_course_id
+        )
+      );
+
+    IF v_orphans > 0 THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: % course_lessons have NULL or cross-course module_id',
+        r.program_slug, v_orphans;
+    END IF;
+
+    -- 5. Empty modules: every course_module must have at least one lesson
+    SELECT COUNT(*) INTO v_empty_mods
+    FROM public.course_modules cm
+    WHERE cm.course_id = v_course_id
+      AND NOT EXISTS (
+        SELECT 1 FROM public.course_lessons cl
+        WHERE cl.module_id = cm.id
+      );
+
+    IF v_empty_mods > 0 THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: % course_modules have 0 lessons',
+        r.program_slug, v_empty_mods;
+    END IF;
+
+    -- 6. Slug drift: every course_lesson.slug must exist in curriculum_lessons.lesson_slug
+    --    for this program — detects wrong-program promotion
+    SELECT COUNT(*) INTO v_slug_drift
+    FROM public.course_lessons cl
+    WHERE cl.course_id = v_course_id
+      AND NOT EXISTS (
+        SELECT 1 FROM public.curriculum_lessons src
+        WHERE src.program_id = v_prog_id
+          AND src.lesson_slug = cl.slug
+      );
+
+    IF v_slug_drift > 0 THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: % course_lessons have slugs not found in curriculum_lessons '
+        'for this program — possible wrong-program promotion',
+        r.program_slug, v_slug_drift;
+    END IF;
+
+    -- 7. Count parity: course_lessons must equal published curriculum_lessons
+    SELECT COUNT(*) INTO v_expected
+    FROM public.curriculum_lessons
+    WHERE program_id = v_prog_id
+      AND status = 'published';
+
+    IF v_lesson_count <> v_expected THEN
+      RAISE EXCEPTION
+        'INTEGRITY_FAIL [%]: course_lessons=% but published curriculum_lessons=% — partial promotion',
+        r.program_slug, v_lesson_count, v_expected;
+    END IF;
+
+    RAISE NOTICE 'STEP 5c PASSED [%]: course_id=% | modules=% | lessons=% | orphans=0 | slug_drift=0',
+      r.program_slug, v_course_id, v_mod_count, v_lesson_count;
   END LOOP;
 END $$;
 

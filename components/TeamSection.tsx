@@ -27,12 +27,6 @@ const teamMembers = [
     bio: "Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her 'reach one, teach one' philosophy.",
   },
   {
-    name: "Alina Smith, PMHNP",
-    title: "Psychiatric Mental Health Nurse Practitioner",
-    image: "/images/alina-smith.jpg",
-    bio: "Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.",
-  },
-  {
     name: "Delores Reynolds",
     title: "Social Media & Digital Engagement Coordinator",
     image: "/images/delores-reynolds.jpg",

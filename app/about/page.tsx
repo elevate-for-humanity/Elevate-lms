@@ -187,8 +187,7 @@ export default function AboutPage() {
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
                 <p className="text-sm text-slate-700">
                   Training alone is not enough if someone cannot get to class or keep the lights on.
-                  We provide career counseling, mental health support (through our board-certified
-                  Psychiatric Mental Health Nurse Practitioner), housing assistance, transportation
+                  We provide career counseling, mental health support, housing assistance, transportation
                   help, and connections to community resources. Our goal is to remove every barrier
                   between a participant and a stable career.
                 </p>

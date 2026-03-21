@@ -48,14 +48,6 @@ const fallbackTeam = [
     email: 'leslie@elevateforhumanity.org',
   },
   {
-    id: '6', slug: 'alina-smith',
-    name: 'Alina Smith, PMHNP',
-    title: 'Psychiatric Mental Health Nurse Practitioner',
-    image_url: '/images/alina-smith.jpg',
-    bio: 'Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.',
-    email: 'alina@elevateforhumanity.org',
-  },
-  {
     id: '7', slug: 'delores-reynolds',
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',

@@ -86,7 +86,7 @@ const PRIMARY_NAV: NavSection[] = [
       { name: 'Partners', href: '/admin/partners' },
       { name: 'Applications', href: '/admin/applications' },
       { name: 'Partner Inquiries', href: '/admin/partner-inquiries' },
-      { name: 'CMI — CNA Program', href: '/admin/cmi' },
+
     ],
   },
   {

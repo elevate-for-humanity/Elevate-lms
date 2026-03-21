@@ -23,7 +23,7 @@ export default function UrbanBuildCrewPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/pages/urban-build-crew-page-1.jpg" alt="Urban Build Crew" fill className="object-cover" priority sizes="100vw" />
       </section>
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Programs</h2>
           <div className="grid md:grid-cols-3 gap-8">

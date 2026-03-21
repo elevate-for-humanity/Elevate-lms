@@ -10,7 +10,7 @@ export default function ProgramHowItWorks({
   isApprenticeship,
 }: Props) {
   return (
-    <section className="mt-8 rounded-2xl border bg-white p-6 shadow-sm">
+    <section className="mt-8 rounded-2xl border p-6 shadow-sm">
       <h2 className="text-2xl font-semibold">
         How {programName ? programName : 'This Program'} Works
       </h2>

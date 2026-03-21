@@ -307,7 +307,7 @@ export default function VerifyCredentialsPage() {
       </section>
 
       {/* Verification Contact */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -390,7 +390,7 @@ export default function VerifyCredentialsPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5" />

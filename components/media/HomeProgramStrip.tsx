@@ -10,7 +10,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
   if (!items.length) return null;
 
   return (
-    <section className="border-b border-slate-800 bg-white">
+    <section className="border-b border-slate-800">
       <div className="mx-auto max-w-6xl px-3 py-5 text-white md:px-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>

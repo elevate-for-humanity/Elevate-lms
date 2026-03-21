@@ -51,7 +51,7 @@ export default function StartPage() {
       />
 
       {/* FILING OPTIONS */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-12 text-center">Choose Your Filing Method</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -98,7 +98,7 @@ export default function StartPage() {
       </section>
 
       {/* CALL OPTION */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative h-64 rounded-2xl overflow-hidden">

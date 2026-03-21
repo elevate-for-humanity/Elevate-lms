@@ -87,7 +87,7 @@ export default async function GetInvolvedPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/rise-foundation-page-1.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/admin-applicants-hero.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -98,7 +98,7 @@ export default async function GetInvolvedPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-10 bg-white border-b">
+      <section className="py-10 border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>

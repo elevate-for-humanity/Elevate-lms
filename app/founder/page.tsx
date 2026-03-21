@@ -18,8 +18,8 @@ export default function FounderPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[280px] sm:h-[360px] overflow-hidden bg-white">
-        <Image src="/images/pages/about-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover" priority />
+      <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
+        <Image src="/images/pages/admin-audit-logs-hero.jpg" alt="Elevate for Humanity founder" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
             <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">Founder &amp; CEO</p>
@@ -107,7 +107,7 @@ export default function FounderPage() {
       </section>
 
       {/* Credentials — categorized dark section */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-slate-900 mb-10 text-center">Credentials & Approvals</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -208,7 +208,7 @@ export default function FounderPage() {
       </section>
 
       {/* Quote */}
-      <section className="py-14 bg-white border-y border-slate-100">
+      <section className="py-14 border-y border-slate-100">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <blockquote className="text-xl sm:text-2xl text-slate-800 italic leading-relaxed">
             &ldquo;Every person — regardless of their past — deserves access to quality education,
@@ -265,7 +265,7 @@ export default function FounderPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Start Your Career</h2>
           <p className="text-slate-600 text-lg mb-8">Explore funded training programs or apply today.</p>

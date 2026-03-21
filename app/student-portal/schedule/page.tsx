@@ -66,7 +66,7 @@ export default async function StudentPortalSchedulePage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[260px] sm:h-[340px] overflow-hidden bg-white">
+      <section className="relative h-[260px] sm:h-[340px] overflow-hidden">
         <Image
           src="/images/pages/student-portal-page-10.jpg"
           alt="Class schedule"
@@ -78,7 +78,7 @@ export default async function StudentPortalSchedulePage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-6 pb-2">
+      <section className="pt-6 pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-brand-blue-600 text-xs font-bold uppercase tracking-widest mb-2">Student Portal</p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2">My Schedule</h1>
@@ -235,7 +235,7 @@ export default async function StudentPortalSchedulePage() {
                 <div key={apt.id} className="flex items-center gap-4 p-5 hover:bg-white transition-colors">
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/booking-page-1.jpg"
+                      src="/images/pages/admin-affiliates-hero.jpg"
                       alt="Appointment"
                       fill
                       sizes="64px"

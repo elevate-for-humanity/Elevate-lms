@@ -45,7 +45,7 @@ export default function AboutPage() {
       </section>
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-4xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
             Indianapolis, Indiana
@@ -60,7 +60,7 @@ export default function AboutPage() {
       </section>
 
       {/* Who We Are */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-6">
             <Image src="/logo.png" alt="Elevate for Humanity logo" width={64} height={64} />
@@ -99,7 +99,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Mission */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Our Mission</h2>
           <p className="text-lg text-slate-700 leading-relaxed max-w-3xl mx-auto">
@@ -117,7 +117,7 @@ export default function AboutPage() {
       </section>
 
       {/* What We Actually Do — with images */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">What We Do</h2>
 
@@ -199,7 +199,7 @@ export default function AboutPage() {
       </section>
 
       {/* Training Delivery Model */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
           <p className="text-sm text-slate-600 mb-4">
@@ -253,7 +253,7 @@ export default function AboutPage() {
       </section>
 
       {/* Institutional Governance */}
-      <section className="py-12 bg-white border-t border-slate-200">
+      <section className="py-12 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Centralized Workforce Development &amp; Apprenticeship Sponsor</h2>
           <p className="text-sm text-slate-700 mb-4">
@@ -285,7 +285,7 @@ export default function AboutPage() {
       </section>
 
       {/* Who We Serve — with images */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Who We Serve</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -341,7 +341,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Credentials */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">Our Credentials</h2>
           <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
@@ -389,7 +389,7 @@ export default function AboutPage() {
           <div className="mt-8 bg-white rounded-lg border border-slate-200 p-6">
             <h3 className="font-bold text-slate-900 text-sm mb-3 uppercase tracking-wider">Verify Our Credentials</h3>
             <div className="grid sm:grid-cols-2 gap-3 text-sm">
-              <a href="https://intraining.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
+              <a href="https://intraining.dwd.in.gov" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
                 <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                 INTraining — ETPL Provider Lookup (search &quot;2Exclusive&quot;)
               </a>
@@ -411,7 +411,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -454,7 +454,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Our Team</h2>
@@ -491,7 +491,7 @@ export default function AboutPage() {
       </section>
 
       {/* Programs at a glance */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -523,7 +523,7 @@ export default function AboutPage() {
       </section>
 
       {/* For Partners */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
           <div className="grid sm:grid-cols-3 gap-6">
@@ -541,7 +541,7 @@ export default function AboutPage() {
             </Link>
             <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-employer-partners.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
+                <Image src="/images/pages/employer-hero.jpg" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>

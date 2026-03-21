@@ -148,7 +148,7 @@ export default function CapitalReadinessGuidePage() {
       />
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-white text-slate-900 py-20 lg:py-28">
+      <section className="relative text-slate-900 py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -204,7 +204,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">What You Get</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -268,7 +268,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Table of Contents */}
-      <section id="preview" className="py-16 lg:py-24 bg-white">
+      <section id="preview"className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-4">What's Inside</h2>
           <p className="text-center text-slate-600 mb-12">10 chapters of practical, actionable guidance</p>
@@ -313,7 +313,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Readiness Levels */}
-      <section className="py-16 lg:py-24 bg-white text-slate-900">
+      <section className="py-16 lg:py-24 text-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-4">Capital Readiness Levels</h2>
           <p className="text-center text-slate-600 mb-12">Where does your organization stand?</p>
@@ -361,7 +361,7 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Enterprise */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Award className="w-12 h-12 text-brand-blue-600 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Enterprise & Licensing</h2>

@@ -75,7 +75,7 @@ export default async function RiseFoundationEventsPage() {
         </section>
       )}
 
-      <section className="bg-white py-10">
+      <section className="py-10">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-xl font-bold text-white">Support the Rise Foundation</h2>
           <p className="text-slate-400 mt-2 text-sm max-w-lg mx-auto">

@@ -108,7 +108,7 @@ export default async function EmployerBenefitsPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-lg p-8">
+          <section className="rounded-lg p-8">
             <h2 className="text-2xl font-bold mb-4">Success Metrics</h2>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>

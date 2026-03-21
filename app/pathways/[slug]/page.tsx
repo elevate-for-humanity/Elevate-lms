@@ -78,7 +78,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
         />
       </header>
 
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-12 grid gap-10 md:grid-cols-2">
           <div className="relative h-[320px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
             <Image

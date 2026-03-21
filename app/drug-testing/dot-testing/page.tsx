@@ -188,7 +188,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* Tests Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">DOT Testing Services</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -270,7 +270,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* Random Consortium */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -304,7 +304,7 @@ export default function DotTestingPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/drug-testing-page-1.jpg"
+                src="/images/pages/drug-testing-page-10.jpg"
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"
@@ -315,7 +315,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need DOT-Compliant Testing?</h2>
           <p className="text-xl text-brand-orange-100 mb-8">

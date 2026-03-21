@@ -66,7 +66,7 @@ export default function SupportContactPage() {
       </section>
 
       {/* Help Topics */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-8">
             <HelpCircle className="w-7 h-7 text-brand-blue-600" />

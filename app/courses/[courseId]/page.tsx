@@ -175,7 +175,7 @@ export default async function CourseDetailPage({
       />
 
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src={heroImage}

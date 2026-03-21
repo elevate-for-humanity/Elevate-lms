@@ -48,7 +48,7 @@ export default async function CompliancePage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Compliance" }]} />
       </div>
-<section className="bg-white text-slate-900 py-20">
+<section className="text-slate-900 py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Shield className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-5xl font-black mb-6">
@@ -60,7 +60,7 @@ export default async function CompliancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Compliance Standards</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -213,7 +213,7 @@ export default async function CompliancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Additional Compliance</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -243,7 +243,7 @@ export default async function CompliancePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-12 text-center">
             <Download className="w-16 h-16 text-brand-blue-600 mx-auto mb-6" />

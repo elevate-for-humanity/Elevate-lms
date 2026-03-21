@@ -27,7 +27,7 @@ export default function SiteLocatorPage() {
       />
 
       {/* SITES */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">VITA Sites Near You</h2>
@@ -44,13 +44,13 @@ export default function SiteLocatorPage() {
                   <div className="space-y-3">
                     <div className="flex gap-3 items-start">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image src="/images/pages/locations-page-1.jpg" alt="Address" fill className="object-cover" sizes="40px" />
+                        <Image src="/images/pages/admin-analytics.jpg" alt="Address" fill className="object-cover" sizes="40px" />
                       </div>
                       <p className="text-slate-600 text-sm leading-relaxed">{site.address}</p>
                     </div>
                     <div className="flex gap-3 items-start">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image src="/images/pages/locations-page-1.jpg" alt="Hours" fill className="object-cover" sizes="40px" />
+                        <Image src="/images/pages/locations.jpg" alt="Hours" fill className="object-cover" sizes="40px" />
                       </div>
                       <p className="text-slate-600 text-sm leading-relaxed">{site.hours}</p>
                     </div>
@@ -82,7 +82,7 @@ export default function SiteLocatorPage() {
       </section>
 
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/subpage-tax-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/admin-ai-tutor-logs-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
       </section>
       <section className="bg-emerald-900 py-12 text-center px-4">
         <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to File for Free?</h2>

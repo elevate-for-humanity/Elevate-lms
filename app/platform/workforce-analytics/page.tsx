@@ -112,7 +112,7 @@ export default function WorkforceAnalyticsPage() {
       </section>
 
       {/* Report Types */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Built-In Report Types</h2>

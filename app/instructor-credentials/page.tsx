@@ -183,7 +183,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* Intro */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="border-l-4 border-brand-blue-600 pl-6 mb-8">
             <p className="text-gray-700 leading-relaxed">
@@ -247,7 +247,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* Per-Program Credential Details */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program-Specific Instructor Requirements</h2>
           <p className="text-gray-600 mb-8">
@@ -320,7 +320,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* MOU Framework */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">MOU & Agreement Framework</h2>
           <p className="text-gray-600 mb-6">
@@ -372,7 +372,7 @@ export default function InstructorCredentialsPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link

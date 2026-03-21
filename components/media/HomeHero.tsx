@@ -25,7 +25,7 @@ export function HomeHero({ images }: HomeHeroProps) {
   const current = images[index];
 
   return (
-    <section className="relative overflow-hidden border-b border-slate-800 bg-white">
+    <section className="relative overflow-hidden border-b border-slate-800">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-4 md:px-4 md:py-6">
         {/* IMAGE ON TOP FOR MOBILE */}
         <div className="md:hidden">

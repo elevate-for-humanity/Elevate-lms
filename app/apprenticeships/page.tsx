@@ -77,7 +77,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* Benefits Strip */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {benefits.map((b, i) => (
@@ -97,7 +97,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* What is an Apprenticeship */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -174,7 +174,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">How It Works</h2>
           <p className="text-center text-slate-600 mb-12">4 steps to your new career</p>
@@ -227,7 +227,7 @@ const apprenticeships = (dbRows as any[]) || [];
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         {/* Registered Apprenticeship Authority */}
         <div className="max-w-5xl mx-auto px-4 mb-16">
           <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8">

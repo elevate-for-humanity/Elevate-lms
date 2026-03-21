@@ -56,7 +56,7 @@ export default async function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden bg-white">
+      <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden">
         <Image
           src="/images/pages/onboarding-page-2.jpg"
           alt="Welcome to Elevate for Humanity"
@@ -67,7 +67,7 @@ export default async function OnboardingPage() {
           sizes="100vw"
         />
       </section>
-      <section className="py-12 sm:py-16 bg-white border-b">
+      <section className="py-12 sm:py-16 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black mb-4">
             Welcome to Elevate for Humanity
@@ -78,7 +78,7 @@ export default async function OnboardingPage() {
           </p>
         </div>
       </section>
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             Choose Your Path
@@ -89,7 +89,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/adult-learner.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/about-career-training.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -160,7 +160,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-employer-partners.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/pages/partner.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">

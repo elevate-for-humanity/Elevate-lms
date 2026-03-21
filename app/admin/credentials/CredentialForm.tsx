@@ -188,7 +188,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       )}
 
       {/* Authority lane — most important decision */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900 flex items-center gap-2">
           <Shield className="w-4 h-4 text-brand-blue-600" />
           Authority Lane
@@ -226,7 +226,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       </section>
 
       {/* Identity */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900">Credential Identity</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           {field('Credential Name', 'name', { required: true, placeholder: 'e.g. EPA Section 608 Certification' })}
@@ -240,7 +240,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       </section>
 
       {/* Classification */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900">Classification</h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {select('Credential Stack', 'credential_stack', [
@@ -274,7 +274,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       </section>
 
       {/* Exam */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900">Exam / Assessment</h2>
         <div className="flex flex-wrap gap-6">
           {checkbox('Requires Exam', 'requires_exam')}
@@ -301,7 +301,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       </section>
 
       {/* Verification */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900">Verification</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           {select('Verification Source', 'verification_source', [
@@ -316,7 +316,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       </section>
 
       {/* Status */}
-      <section className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <section className="rounded-xl border border-slate-200 p-6 space-y-4">
         <h2 className="font-semibold text-slate-900">Status</h2>
         <div className="flex flex-wrap gap-6">
           {checkbox('Active', 'is_active', 'Credential is available for use in programs')}

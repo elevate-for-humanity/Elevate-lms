@@ -76,7 +76,7 @@ export default function StateTaxPreparationPage({ state }: Props) {
       </section>
 
       {/* FEATURES — photo cards, no icons */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-4xl font-black text-slate-900 mb-4">
@@ -160,7 +160,7 @@ export default function StateTaxPreparationPage({ state }: Props) {
       </section>
 
       {/* CITIES */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-4xl font-black text-slate-900 mb-4">
@@ -272,7 +272,7 @@ export default function StateTaxPreparationPage({ state }: Props) {
       </section>
 
       {/* DISCLOSURE */}
-      <section className="py-6 bg-white border-t border-slate-200">
+      <section className="py-6 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-slate-500 leading-relaxed">
             VITA services are provided by IRS-certified volunteers at no cost to qualifying taxpayers.

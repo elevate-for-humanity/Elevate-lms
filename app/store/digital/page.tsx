@@ -64,7 +64,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Demo Videos Section */}
-      <section id="demos" className="py-16 bg-white">
+      <section id="demos"className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">See Our Tools in Action</h2>
@@ -169,7 +169,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Downloadable Resources */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
             <Download className="w-8 h-8 text-amber-600" />
@@ -205,7 +205,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Platform Tools */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
             <Building2 className="w-8 h-8 text-brand-blue-600" />

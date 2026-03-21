@@ -69,7 +69,7 @@ export default async function JoinCommunityPage() {
 
       {/* Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">What Our Community Says</h2>
             <div className="grid md:grid-cols-2 gap-8">

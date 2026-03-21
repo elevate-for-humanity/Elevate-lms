@@ -54,7 +54,7 @@ export default function JobReadyIndyPage() {
       </section>
 
       {/* What's Covered + Eligibility */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10">
             <div>

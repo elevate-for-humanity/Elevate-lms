@@ -5,7 +5,7 @@ export function BarberDeliveryModel() {
   return (
     <>
       {/* Section 2 — Training Delivery Model */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Training Delivery Model</h2>
           <p className="text-slate-600 mb-10 max-w-3xl">
@@ -53,7 +53,7 @@ export function BarberDeliveryModel() {
       </section>
 
       {/* Section 3 — Program Structure (Mapped Hours) */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Program Structure</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
@@ -97,7 +97,7 @@ export function BarberDeliveryModel() {
       </section>
 
       {/* Section 4 — Core Competencies */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Core Competencies</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">

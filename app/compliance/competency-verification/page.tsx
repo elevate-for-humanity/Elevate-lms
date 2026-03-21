@@ -143,7 +143,7 @@ export default function CompetencyVerificationPage() {
       </div>
 
       {/* Purpose & Verification Authority */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="border-l-4 border-brand-blue-600 pl-6 mb-8 print:border-gray-900">
             <h2 className="text-lg font-bold text-gray-900 mb-2">Document Purpose</h2>
@@ -215,7 +215,7 @@ export default function CompetencyVerificationPage() {
       </section>
 
       {/* Program Rubrics */}
-      <section className="py-10 bg-white print:bg-white">
+      <section className="py-10 print:">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program Competency Rubrics</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -238,7 +238,7 @@ export default function CompetencyVerificationPage() {
       </section>
 
       {/* Rubric Format Standard */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Rubric Format Standard</h2>
           <p className="text-gray-600 text-sm mb-4">
@@ -270,7 +270,7 @@ export default function CompetencyVerificationPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-10 bg-white print:hidden">
+      <section className="py-10 print:hidden">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">

@@ -188,7 +188,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       </section>
 
       {/* ═══ CREDIBILITY STRIP ══════════════════════════════════════ */}
-      <section className="bg-white py-8 border-y border-slate-100">
+      <section className="py-8 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div>
@@ -223,7 +223,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
       </section>
 
       {/* ═══ CURRICULUM ══════════════════════════════════════════════ */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
           <p className="text-slate-500 text-sm mb-8">Full curriculum broken down by module. Every topic is covered in class and assessed before you advance.</p>
@@ -348,7 +348,7 @@ export default function ProgramDetailPage({ program: p, heroOverride, children }
 
       {/* ═══ ENROLLMENT TRACKS ══════════════════════════════════════ */}
       {p.enrollmentTracks && (
-        <section className="py-14 bg-white border-y border-slate-100">
+        <section className="py-14 border-y border-slate-100">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-10">
               <h2 className="text-2xl font-extrabold text-slate-900 mb-2">How to Enroll</h2>

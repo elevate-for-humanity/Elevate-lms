@@ -46,7 +46,7 @@ export default async function MentorshipPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/pages/mentorship-page-1.jpg" alt="Mentorship Program" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/mentorship-page-5.jpg" alt="Mentorship Program" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -70,7 +70,7 @@ export default async function MentorshipPage() {
           </div>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/pages/networking-hero.jpg" alt="Networking" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/admin-automation-hero.jpg" alt="Networking" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Networking</h3>
@@ -127,7 +127,7 @@ export default async function MentorshipPage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48">
-              <Image src="/images/pages/mentorship-page-2.jpg" alt="Mentorship" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/mentorship-page-11.jpg" alt="Mentorship" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Mentors Available</h2>

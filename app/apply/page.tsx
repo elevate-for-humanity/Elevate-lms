@@ -56,7 +56,7 @@ export default async function ApplyPage({
 
 
       {/* Heading */}
-      <section className="pt-4 pb-8 px-4 bg-white">
+      <section className="pt-4 pb-8 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             Start Your New Career
@@ -118,7 +118,7 @@ export default async function ApplyPage({
           <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
             <div className="relative h-[200px] overflow-hidden">
               <Image
-                src="/images/pages/about-employer-partners.jpg"
+                src="/images/pages/employer-page-2.jpg"
                 alt="Employer partnership meeting"
                 fill
                 className="object-cover"

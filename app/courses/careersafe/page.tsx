@@ -148,7 +148,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Why CareerSafe Training?
@@ -188,7 +188,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* Courses Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Available Courses
@@ -243,7 +243,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* Programs Using CareerSafe */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
             Programs Including CareerSafe Training
@@ -294,7 +294,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?

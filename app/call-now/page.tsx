@@ -76,7 +76,7 @@ export default function GetStartedPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-8">Everything Is Self-Service</h2>
           <div className="grid md:grid-cols-3 gap-6">

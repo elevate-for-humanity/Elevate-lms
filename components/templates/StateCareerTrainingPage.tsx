@@ -50,7 +50,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">
             Workforce Training in {state.name}
@@ -89,7 +89,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </section>
 
       {/* Other States */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Programs in Other States
@@ -109,7 +109,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your Career Journey?

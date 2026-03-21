@@ -76,7 +76,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
 
       {/* Program Description */}
       {data.longDescription && (
-        <section className="bg-white py-16">
+        <section className="py-16">
           <div className="mx-auto max-w-4xl px-6">
             <h2 className="text-3xl font-bold text-black mb-6">
               About This Program
@@ -111,7 +111,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
 
       {/* What You'll Learn */}
       {data.whatYouLearn && data.whatYouLearn.length > 0 && (
-        <section className="bg-white py-16">
+        <section className="py-16">
           <div className="mx-auto max-w-4xl px-6">
             <div className="flex items-center gap-3 mb-6">
               <Award className="w-8 h-8 text-brand-blue-600" />
@@ -162,7 +162,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
 
       {/* Funding Options */}
       {data.fundingOptions && data.fundingOptions.length > 0 && (
-        <section className="bg-white py-16">
+        <section className="py-16">
           <div className="mx-auto max-w-4xl px-6">
             <h2 className="text-3xl font-bold text-black mb-6">
               Funding Options

@@ -68,7 +68,7 @@ export default async function MobileAppPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-black">
             Everything You Need, Anywhere
@@ -154,7 +154,7 @@ export default async function MobileAppPage() {
       </section>
 
       {/* Installation Instructions */}
-      <section id="install" className="py-16 bg-white">
+      <section id="install"className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-black">
             How to Install
@@ -247,7 +247,7 @@ export default async function MobileAppPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?

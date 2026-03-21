@@ -62,7 +62,7 @@ export default function ImpactPage() {
       />
 
       {/* Why Funders Choose Elevate */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             Why Funders Choose Elevate
@@ -113,7 +113,7 @@ export default function ImpactPage() {
       </section>
 
       {/* Partnership Opportunities */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-3">
             Partnership Opportunities
@@ -154,7 +154,7 @@ export default function ImpactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-16 sm:py-20 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
             Ready to Make an Impact?

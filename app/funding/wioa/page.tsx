@@ -55,7 +55,7 @@ export default async function WioaPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-base md:text-lg text-black mb-6 leading-relaxed">
             James worked at a factory for 8 years. Then the plant closed. No
@@ -80,7 +80,7 @@ export default async function WioaPage() {
       </section>
 
       {/* What is WIOA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">What is WIOA?</h2>
 
@@ -137,7 +137,7 @@ export default async function WioaPage() {
       </section>
 
       {/* What WIOA Covers */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             What Does WIOA Cover?
@@ -207,7 +207,7 @@ export default async function WioaPage() {
       </section>
 
       {/* How to Qualify */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             How Do I Qualify?
@@ -269,7 +269,7 @@ export default async function WioaPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             How to Apply for WIOA
@@ -360,7 +360,7 @@ export default async function WioaPage() {
       </section>
 
       {/* Real Stories */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
             Real WIOA Success Stories

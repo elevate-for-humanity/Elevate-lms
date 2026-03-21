@@ -3,7 +3,7 @@ import { Shield, Award, Lock } from 'lucide-react';
 
 export function TrustBadges() {
   return (
-    <section className="py-12 bg-white border-y border-slate-200">
+    <section className="py-12 border-y border-slate-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-black mb-2">

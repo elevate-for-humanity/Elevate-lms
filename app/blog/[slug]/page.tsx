@@ -193,7 +193,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       </article>
 
       {relatedPosts.length > 0 && (
-        <section className="bg-white py-16">
+        <section className="py-16">
           <div className="max-w-7xl mx-auto px-6">
             <h2 className="text-2xl font-bold text-black mb-8">Related Articles</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -226,7 +226,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </section>
       )}
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Career Journey?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

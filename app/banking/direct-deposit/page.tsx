@@ -83,7 +83,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             How Direct Deposit Works
@@ -173,7 +173,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* Timeline */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Expected Timeline
@@ -220,7 +220,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* Split Refund Option */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -249,7 +249,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions
@@ -294,7 +294,7 @@ export default function DirectDepositPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to File Your Taxes?

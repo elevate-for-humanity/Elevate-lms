@@ -41,7 +41,7 @@ export default async function OpportunitiesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>

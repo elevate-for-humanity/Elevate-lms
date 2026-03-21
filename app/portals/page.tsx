@@ -132,7 +132,7 @@ export default function PortalsPage() {
       </section>
 
       {/* Portals Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {portals.map((portal) => {
@@ -173,7 +173,7 @@ export default function PortalsPage() {
       </section>
 
       {/* Help Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Need Help Accessing Your Portal?</h2>
           <p className="text-lg text-slate-600 mb-8">

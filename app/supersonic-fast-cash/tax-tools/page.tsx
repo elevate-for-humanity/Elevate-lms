@@ -47,7 +47,7 @@ export default async function TaxToolsPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Tax Tools" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-white py-16">
+      <section className="relative py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">
             Tax Tools & Calculators
@@ -59,7 +59,7 @@ export default async function TaxToolsPage() {
       </section>
 
       {/* IRS Forms */}
-      <section id="tax-form" className="py-20 bg-white">
+      <section id="tax-form"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
             <FileText className="w-12 h-12 text-brand-blue-600" />
@@ -183,7 +183,7 @@ export default async function TaxToolsPage() {
       </section>
 
       {/* Due Dates */}
-      <section id="due-dates" className="py-20 bg-white">
+      <section id="due-dates"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
             <Calendar className="w-12 h-12 text-brand-green-600" />
@@ -341,7 +341,7 @@ export default async function TaxToolsPage() {
       </section>
 
       {/* Calculators */}
-      <section id="calculators" className="py-20 bg-white">
+      <section id="calculators"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
             <Calculator className="w-12 h-12 text-brand-orange-600" />

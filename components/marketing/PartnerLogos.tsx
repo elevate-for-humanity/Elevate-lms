@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function PartnerLogos() {
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h3 className="text-center text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">
           Aligned With & Serving In Collaboration With

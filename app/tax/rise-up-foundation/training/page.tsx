@@ -36,7 +36,7 @@ export default function TrainingPage() {
       />
 
       {/* OVERVIEW */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -85,7 +85,7 @@ export default function TrainingPage() {
       </section>
 
       {/* TRAINING MODULES */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">What You Will Learn</h2>

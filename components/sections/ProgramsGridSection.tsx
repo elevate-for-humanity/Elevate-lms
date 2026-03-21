@@ -20,7 +20,7 @@ export function ProgramsGridSection({ title, programs }: ProgramsGridSectionProp
   if (!programs || programs.length === 0) return null;
 
   return (
-    <section className="bg-white py-16">
+    <section className="py-16">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-3xl font-bold text-black mb-8">{title}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

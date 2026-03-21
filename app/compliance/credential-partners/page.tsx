@@ -135,7 +135,7 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Purpose */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="border-l-4 border-brand-blue-600 pl-6 mb-8">
             <h2 className="text-lg font-bold text-gray-900 mb-2">Registry Purpose</h2>
@@ -171,7 +171,7 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Registry Cards */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Per-Program Credential Partners</h2>
 
@@ -234,7 +234,7 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Disclosure */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
             <div className="flex items-start gap-3">
@@ -258,7 +258,7 @@ export default function CredentialPartnersPage() {
       </section>
 
       {/* Navigation */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">

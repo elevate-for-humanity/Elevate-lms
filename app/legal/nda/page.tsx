@@ -52,7 +52,7 @@ export default function NDAPage() {
 
         <div className="space-y-8">
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Parties</h2>
             <p className="text-slate-700 mb-3">
               This Non-Disclosure Agreement (&quot;Agreement&quot;) is between:
@@ -68,7 +68,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">2. What Is Confidential Information</h2>
             <p className="text-slate-700 mb-3">
               &quot;Confidential Information&quot; means any information disclosed by Elevate to the Receiving Party
@@ -91,7 +91,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">3. Your Obligations</h2>
             <p className="text-slate-700 mb-3">The Receiving Party agrees to:</p>
             <ul className="list-disc pl-6 text-slate-700 space-y-2 mb-4">
@@ -107,7 +107,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">4. What Is Not Covered</h2>
             <p className="text-slate-700 mb-3">
               This Agreement does not apply to information that the Receiving Party can demonstrate:
@@ -125,7 +125,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">5. Student Data — Additional Obligations</h2>
             <p className="text-slate-700 mb-3">
               Student personally identifiable information (PII) is subject to additional protections under
@@ -140,7 +140,7 @@ export default function NDAPage() {
             </ul>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">6. Duration</h2>
             <p className="text-slate-700 mb-3">
               Confidentiality obligations under this Agreement begin on the date you first receive
@@ -157,7 +157,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">7. Remedies for Breach</h2>
             <p className="text-slate-700 mb-3">
               The Receiving Party acknowledges that a breach of this Agreement would cause irreparable
@@ -177,7 +177,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">8. Governing Law</h2>
             <p className="text-slate-700">
               This Agreement is governed by the laws of the State of Indiana. Disputes shall first be
@@ -187,7 +187,7 @@ export default function NDAPage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">9. Contact</h2>
             <div className="text-slate-700 space-y-1">
               <p><strong>Elevate for Humanity</strong></p>

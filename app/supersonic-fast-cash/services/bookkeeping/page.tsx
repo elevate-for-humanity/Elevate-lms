@@ -338,7 +338,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Benefits */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Why Professional Bookkeeping Matters
@@ -416,7 +416,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Process */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">How It Works</h2>
           <p className="text-xl text-gray-600 mb-12">
@@ -466,7 +466,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Frequently Asked Questions
@@ -516,7 +516,7 @@ export default async function BookkeepingPage() {
       </section>
 
       {/* Contact Info */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>

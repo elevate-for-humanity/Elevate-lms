@@ -53,7 +53,7 @@ export default function ProgramFAQ() {
   ];
 
   return (
-    <section className="mt-8 rounded-2xl border bg-white p-6 shadow-sm">
+    <section className="mt-8 rounded-2xl border p-6 shadow-sm">
       <h2 className="text-2xl font-semibold">FAQ</h2>
       <div className="mt-4 space-y-3">
         {items.map((it) => (

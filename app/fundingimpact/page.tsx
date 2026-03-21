@@ -55,7 +55,7 @@ export default function FundingImpactPage() {
       </section>
 
       {/* Impact Stats with Images */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -71,7 +71,7 @@ export default function FundingImpactPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/training-cohort.jpg"
+                  src="/images/pages/admin-business-hero.jpg"
                   alt="Participants in training"
                   fill
                   className="object-cover"
@@ -254,7 +254,7 @@ export default function FundingImpactPage() {
       </section>
 
       {/* Success Stories with Photos */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -330,7 +330,7 @@ export default function FundingImpactPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src="/images/pages/hvac-technician.jpg"
+                  src="/images/pages/admin-advanced-tools-hero.jpg"
                   alt="David W. success story"
                   fill
                   className="object-cover"
@@ -422,7 +422,7 @@ export default function FundingImpactPage() {
             <div className="bg-brand-blue-50 rounded-xl overflow-hidden border border-brand-blue-200">
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src="/images/pages/about-employer-partners.jpg"
+                  src="/images/pages/admin-applications-id-hero.jpg"
                   alt="Employer benefits"
                   fill
                   className="object-cover"
@@ -493,7 +493,7 @@ export default function FundingImpactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Be Part of the Impact

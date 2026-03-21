@@ -87,7 +87,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* How Instant Tests Work */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">How Instant Tests Work</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -126,7 +126,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* Tests Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8">
             {instantTests.map((test) => (
@@ -187,7 +187,7 @@ export default function InstantTestsPage() {
       </section>
 
       {/* When to Use */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">When to Use Instant Tests</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

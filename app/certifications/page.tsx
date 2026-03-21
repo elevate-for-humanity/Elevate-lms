@@ -32,7 +32,7 @@ export default function CertificationsPage() {
         
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Available Certifications</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,7 +65,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Certifications Matter</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -84,7 +84,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Certification FAQ</h2>
           <div className="space-y-4">
@@ -110,7 +110,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>

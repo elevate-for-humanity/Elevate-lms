@@ -185,7 +185,7 @@ export default function HeroVideo({
       {/* ── BELOW-HERO CONTENT ── */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="bg-white border-b border-slate-100 py-10 sm:py-14">
+        <section className="border-b border-slate-100 py-10 sm:py-14">
           <div className="max-w-4xl mx-auto px-6">
             {children ? (
               children

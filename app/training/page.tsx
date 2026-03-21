@@ -107,7 +107,7 @@ export default function TrainingPage() {
       </section>
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
             Indianapolis, Indiana
@@ -137,7 +137,7 @@ export default function TrainingPage() {
       </section>
 
       {/* Program areas — real images, no icons as content */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4">
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
@@ -209,7 +209,7 @@ export default function TrainingPage() {
       </section>
 
       {/* Funding clarity */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 gap-8 items-start">
             <div>

@@ -162,7 +162,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Credentials */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Credential Issuance</h2>
           <p className="text-sm text-slate-600 mb-3">
@@ -187,7 +187,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Funding Eligibility Disclaimer */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Funding &amp; Tuition Disclosure</h2>
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -209,7 +209,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Employer Partner Documentation */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Employer Partner Documentation</h2>
           <p className="text-sm text-slate-600 mb-3">

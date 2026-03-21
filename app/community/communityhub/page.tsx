@@ -159,7 +159,7 @@ export default async function CommunityHubPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Upcoming Events */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-blue-600" />
                 Upcoming Events
@@ -191,7 +191,7 @@ export default async function CommunityHubPage() {
             </section>
 
             {/* Resources */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-brand-blue-600" />
                 Resources

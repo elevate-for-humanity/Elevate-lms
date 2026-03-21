@@ -40,7 +40,7 @@ export default async function UploadDocumentsPage() {
       />
 
       {/* STEPS */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">How It Works</h2>
@@ -85,7 +85,7 @@ export default async function UploadDocumentsPage() {
       </section>
 
       {/* ACCEPTED DOCUMENTS */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">Accepted Documents</h2>

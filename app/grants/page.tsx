@@ -32,7 +32,7 @@ export default function GrantsPage() {
       </section>
 
       {/* What This Means For You */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
             What This Means For You
@@ -197,7 +197,7 @@ export default function GrantsPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-white mb-4 text-center">
             How to Get Started
@@ -233,7 +233,7 @@ export default function GrantsPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="text-xl font-bold text-slate-900 mb-2">Have Questions?</h3>
           <p className="text-slate-600 mb-4">

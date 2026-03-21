@@ -156,7 +156,7 @@ export default function HealthcareFundamentalsCoursePage() {
 
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
               <Image
-                src="/images/pages/lms-page-2.jpg"
+                src="/images/pages/lms-page-5.jpg"
                 alt="Healthcare Fundamentals Course"
                 fill
                 className="object-cover"
@@ -167,7 +167,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* Course Overview */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <h2 className="text-4xl font-black text-black mb-6">
@@ -197,7 +197,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* Course Features */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             What's Included
@@ -226,7 +226,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* Curriculum */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Course Curriculum
@@ -260,7 +260,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             What You'll Learn
@@ -333,7 +333,7 @@ export default function HealthcareFundamentalsCoursePage() {
       </section>
 
       {/* Instructor */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Your Instructor

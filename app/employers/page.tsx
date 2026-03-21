@@ -81,7 +81,7 @@ export default function EmployersPage() {
       </div>
 
       {/* Value Props — Top Line */}
-      <section className="py-6 bg-white border-b">
+      <section className="py-6 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -105,7 +105,7 @@ export default function EmployersPage() {
       </section>
 
       {/* The Problem We Solve */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="max-w-3xl">
             <h2 className="text-3xl font-bold text-slate-900 mb-6">
@@ -149,7 +149,7 @@ export default function EmployersPage() {
       <GrantsSection />
 
       {/* Why Partner — Talent Pipeline */}
-      <section className="py-16 bg-white border-y border-slate-200">
+      <section className="py-16 border-y border-slate-200">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
             What You Get When You Partner With Elevate

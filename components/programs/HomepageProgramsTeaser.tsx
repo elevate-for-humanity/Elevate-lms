@@ -24,7 +24,7 @@ export function HomepageProgramsTeaser() {
   ];
 
   return (
-    <section className="border-t border-slate-200 bg-white">
+    <section className="border-t border-slate-200">
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>

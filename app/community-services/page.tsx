@@ -48,7 +48,7 @@ const services = (dbRows as any[]) || [];
         ]}
       />
       {/* Hero */}
-      <section className="relative py-20 bg-white">
+      <section className="relative py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
             <Heart className="w-4 h-4 text-brand-red-400" />
@@ -85,7 +85,7 @@ const services = (dbRows as any[]) || [];
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How Our Community Ecosystem Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
@@ -188,7 +188,7 @@ const services = (dbRows as any[]) || [];
       </section>
 
       {/* Contact */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Apply Now</h2>
           <p className="text-gray-600 mb-8">

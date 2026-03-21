@@ -88,7 +88,7 @@ export default async function SupportiveServicesPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/workforce-board-page-6.jpg"
+                  src="/images/pages/workforce-board-page-10.jpg"
                   alt="Supportive Services"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -121,7 +121,7 @@ export default async function SupportiveServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

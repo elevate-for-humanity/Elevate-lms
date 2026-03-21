@@ -109,7 +109,7 @@ export default function EqualOpportunityPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* EEO Statement */}
-        <section className="bg-white rounded-xl shadow-sm border p-8 mb-12">
+        <section className="rounded-xl shadow-sm border p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Commitment</h2>
           <div className="prose prose-lg max-w-none text-gray-700">
             <p>
@@ -176,7 +176,7 @@ export default function EqualOpportunityPage() {
         </section>
 
         {/* Protected Classes */}
-        <section className="bg-white rounded-xl shadow-sm border p-8 mb-12">
+        <section className="rounded-xl shadow-sm border p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Protected Classes</h2>
           <p className="text-gray-600 mb-6">
             We do not discriminate against any individual based on the following protected characteristics:
@@ -264,7 +264,7 @@ export default function EqualOpportunityPage() {
       </div>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Need Assistance or Have Questions?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

@@ -34,7 +34,7 @@ export default function PhlebotomyPage() {
       <ProgramDetailPage program={p} />
 
       {/* State licensing section */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Can You Work as a Phlebotomist in Your State?</h2>

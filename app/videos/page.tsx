@@ -118,7 +118,7 @@ export default async function VideosPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-black mb-6">
             Ready to Get Started?

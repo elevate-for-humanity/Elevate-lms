@@ -63,7 +63,7 @@ export default function AgenciesPage() {
         </p>
       </HeroVideo>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Built for Government Compliance</h2>
           <div className="grid md:grid-cols-4 gap-8">
@@ -130,7 +130,7 @@ export default function AgenciesPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">Platform Governance &amp; Operational Readiness</h2>
           <p className="text-center text-slate-600 mb-12 max-w-3xl mx-auto">

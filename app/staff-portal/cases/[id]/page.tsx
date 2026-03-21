@@ -41,7 +41,7 @@ function StatusBadge({ status }: { status: string }) {
 // Section component
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof User; children: React.ReactNode }) {
   return (
-    <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <section className="rounded-xl border border-slate-200 overflow-hidden">
       <div className="bg-white px-6 py-4 border-b border-slate-200 flex items-center gap-3">
         <Icon className="w-5 h-5 text-slate-600" />
         <h2 className="font-semibold text-slate-900">{title}</h2>

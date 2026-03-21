@@ -56,7 +56,7 @@ export function QualityHero({
   }
 
   return (
-    <section className="relative bg-white">
+    <section className="relative">
       {/* Breadcrumbs */}
       {breadcrumbs.length > 0 && (
         <nav

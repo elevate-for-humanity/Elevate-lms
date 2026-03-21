@@ -73,7 +73,7 @@ export default async function SponsorLicensingPage() {
       />
 
       {/* Pricing Tiers */}
-      <section id="pricing" className="py-20 bg-white">
+      <section id="pricing"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -344,7 +344,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* Add-Ons */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-black mb-4">
@@ -392,7 +392,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* Employer Fees */}
-      <section className="py-20 bg-white  ">
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-block px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-bold mb-4">
@@ -451,7 +451,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* What's Included */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -516,7 +516,7 @@ export default async function SponsorLicensingPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-white border-t border-slate-200">
+      <section className="py-8 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-sm text-slate-600">
             Credentials and instructional partners may be provided by the licensee. 

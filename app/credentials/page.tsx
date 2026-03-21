@@ -120,7 +120,7 @@ export default function CredentialsPage() {
       </div>
 
       {/* Layer 1 — Completion Certificates */}
-      <section id="layer-1" className="py-14 bg-white border-b border-slate-100">
+      <section id="layer-1"className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
             <FileCheck className="w-5 h-5 text-brand-blue-600" />
@@ -148,7 +148,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* Layer 2 — Industry Certifications */}
-      <section id="layer-2" className="py-14 bg-white border-b border-slate-100">
+      <section id="layer-2"className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
             <Award className="w-5 h-5 text-emerald-600" />
@@ -178,7 +178,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* Layer 3 — Registered Apprenticeship */}
-      <section id="layer-3" className="py-14 bg-white border-b border-slate-200">
+      <section id="layer-3"className="py-14 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-1">
             <Briefcase className="w-5 h-5 text-amber-600" />
@@ -209,7 +209,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* HVAC resources */}
-      <section className="py-8 bg-white border-b border-slate-200">
+      <section className="py-8 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">HVAC Credential Resources</h2>
           <div className="flex flex-wrap gap-3">
@@ -233,7 +233,7 @@ export default function CredentialsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Start Earning Credentials</h2>
           <p className="text-white/80 text-base mb-8">Training may be funded for eligible Indiana residents.</p>

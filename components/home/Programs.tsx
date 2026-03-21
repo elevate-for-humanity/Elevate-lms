@@ -42,7 +42,7 @@ export default function Programs() {
   ];
 
   return (
-    <section className="bg-white py-16">
+    <section className="py-16">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="text-3xl font-bold text-black mb-4 text-center">
           Training Programs

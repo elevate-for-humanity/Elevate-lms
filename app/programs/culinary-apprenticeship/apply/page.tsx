@@ -14,7 +14,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Banner */}
-      <section className="bg-white py-16 border-t">
+      <section className="py-16 border-t">
         <div className="max-w-4xl mx-auto px-6">
           <Breadcrumbs
             items={[

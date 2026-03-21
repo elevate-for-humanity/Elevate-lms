@@ -376,7 +376,7 @@ export default async function PayrollPage() {
       </section>
 
       {/* Benefits */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Why Outsource Payroll?
@@ -456,7 +456,7 @@ export default async function PayrollPage() {
       </section>
 
       {/* Process */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">How It Works</h2>
           <p className="text-xl text-gray-600 mb-12">
@@ -520,7 +520,7 @@ export default async function PayrollPage() {
       </section>
 
       {/* Common Mistakes */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Avoid Costly Payroll Mistakes
@@ -605,7 +605,7 @@ export default async function PayrollPage() {
       </section>
 
       {/* Contact Info */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>

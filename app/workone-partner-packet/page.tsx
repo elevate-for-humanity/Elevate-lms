@@ -66,7 +66,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Organization Overview */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Organization Overview</h3>
@@ -105,7 +105,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Who We Are with Image */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -203,7 +203,7 @@ export default function WorkOnePartnerPacketPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32 overflow-hidden">
-                <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/pages/partner-page-1.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
@@ -216,7 +216,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32 overflow-hidden">
-                <Image src="/images/pages/workone-partner-packet-page-1.jpg" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/pages/partner-page-14.jpg" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
@@ -257,7 +257,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* Programs Available with Images */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -372,7 +372,7 @@ export default function WorkOnePartnerPacketPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Ready to Refer Participants?</h2>
           <p className="text-xl text-white/90 mb-8">

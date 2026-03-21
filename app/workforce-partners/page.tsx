@@ -50,7 +50,7 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* How We Work Together */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-black text-center mb-4">How We Work Together</h2>
           <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
@@ -107,7 +107,7 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* For WorkOne Staff */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -136,7 +136,7 @@ export default function WorkforcePartnersPage() {
               </Link>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/pages/workforce-partners-page-1.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/pages/partner-page-15.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Partner With Us</h2>
           <p className="text-xl text-slate-600 mb-8">

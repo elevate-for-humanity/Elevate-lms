@@ -59,7 +59,7 @@ export default async function WrgPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-base md:text-lg text-black mb-6 leading-relaxed">
             Maria didn't know WRG existed. She was working at Target for
@@ -91,7 +91,7 @@ export default async function WrgPage() {
       </section>
 
       {/* What is WRG */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">What is WRG?</h2>
 
@@ -154,7 +154,7 @@ export default async function WrgPage() {
       </section>
 
       {/* What WRG Covers */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             What Does WRG Cover?
@@ -202,7 +202,7 @@ export default async function WrgPage() {
       </section>
 
       {/* Programs Covered */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             Which Programs Are WRG-Approved?
@@ -290,7 +290,7 @@ export default async function WrgPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             How to Apply for WRG
@@ -377,7 +377,7 @@ export default async function WrgPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             Common Questions
@@ -430,7 +430,7 @@ export default async function WrgPage() {
       </section>
 
       {/* Real Stories */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
             Real WRG Success Stories

@@ -53,7 +53,7 @@ export default function NonCompetePage() {
 
         <div className="space-y-8">
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Parties</h2>
             <p className="text-slate-700 mb-3">This Non-Compete Agreement (&quot;Agreement&quot;) is between:</p>
             <ul className="list-disc pl-6 text-slate-700 space-y-1 mb-3">
@@ -66,7 +66,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">2. Why This Agreement Exists</h2>
             <p className="text-slate-700 mb-3">
               As a Program Holder, partner, or collaborating organization, you receive access to Elevate&apos;s
@@ -81,7 +81,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">3. Restricted Activities — During the Agreement</h2>
             <p className="text-slate-700 mb-3">
               While your Elevate agreement is active, the Restricted Party may not:
@@ -95,7 +95,7 @@ export default function NonCompetePage() {
             </ul>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">4. Restricted Activities — 3 Years After Termination</h2>
             <p className="text-slate-700 mb-3">
               For <strong>three (3) years</strong> following the termination or expiration of your Elevate
@@ -114,7 +114,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">5. What Is NOT Restricted</h2>
             <p className="text-slate-700 mb-3">
               This Agreement does not prevent the Restricted Party from:
@@ -133,7 +133,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">6. Geographic Scope</h2>
             <p className="text-slate-700">
               These restrictions apply in any geographic area where Elevate actively operates or has
@@ -143,7 +143,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">7. Consideration</h2>
             <p className="text-slate-700 mb-3">
               In exchange for these restrictions, the Restricted Party receives:
@@ -163,7 +163,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">8. Remedies for Breach</h2>
             <p className="text-slate-700 mb-3">
               The Restricted Party acknowledges that a breach of this Agreement would cause irreparable
@@ -179,7 +179,7 @@ export default function NonCompetePage() {
             </ul>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">9. Severability</h2>
             <p className="text-slate-700">
               If any provision of this Agreement is found to be unenforceable by a court, the remaining
@@ -189,7 +189,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">10. Governing Law</h2>
             <p className="text-slate-700">
               This Agreement is governed by the laws of the State of Indiana. Disputes shall first be
@@ -199,7 +199,7 @@ export default function NonCompetePage() {
             </p>
           </section>
 
-          <section className="bg-white border border-slate-200 rounded-xl p-6">
+          <section className="border border-slate-200 rounded-xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-3">11. Contact</h2>
             <div className="text-slate-700 space-y-1">
               <p><strong>Elevate for Humanity</strong></p>

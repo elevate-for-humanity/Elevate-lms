@@ -45,7 +45,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Contact Options */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             {/* Phone */}
@@ -100,7 +100,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Office Location */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Visit Our Office
@@ -164,7 +164,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Services Quick Links */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Career Services Available
@@ -231,7 +231,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions

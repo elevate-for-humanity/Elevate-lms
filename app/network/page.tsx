@@ -55,7 +55,7 @@ export default async function NetworkPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white py-14">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Provider Network</h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">
@@ -182,7 +182,7 @@ export default async function NetworkPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white border-t border-slate-100 py-14">
+      <section className="border-t border-slate-100 py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Join the Network</h2>
           <p className="text-slate-600 mb-6">

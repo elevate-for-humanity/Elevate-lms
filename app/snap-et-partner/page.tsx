@@ -82,7 +82,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* Why EFH is Positioned */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
@@ -188,7 +188,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* SNAP E&T Program Mapping */}
-      <section id="capabilities" className="py-20 bg-white">
+      <section id="capabilities"className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
@@ -348,7 +348,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* Our Infrastructure */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Our Infrastructure</h2>
@@ -396,7 +396,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* Partnership Process */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Partnership Process</h2>
@@ -454,7 +454,7 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* FSSA / TANF / Third Party Partnership */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">FSSA Partnership & Third Party Reimbursement</h2>

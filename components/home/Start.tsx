@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Start() {
   return (
-    <section className="bg-white py-16">
+    <section className="py-16">
       <div className="max-w-3xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-brand-red-600 mb-8">
           Start with clarity

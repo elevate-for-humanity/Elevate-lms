@@ -120,7 +120,7 @@ export default function AccreditationPage() {
       </div>
 
       {/* Credentials Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">
             Our Credentials
@@ -165,7 +165,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Certification Testing Partners */}
-      <section className="py-12 bg-white border-t border-slate-100">
+      <section className="py-12 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Certification Testing Partners</h2>
           <p className="text-slate-500 text-sm mb-8 max-w-2xl">
@@ -236,7 +236,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* What This Means */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">
             What This Means for Students
@@ -283,7 +283,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Legal Entity Attribution */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">
             Legal Entity Attribution
@@ -329,7 +329,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Compliance & Data Handling */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">
             Compliance &amp; Data Handling
@@ -368,7 +368,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Important Disclosure */}
-      <section className="py-12 bg-white border-y">
+      <section className="py-12 border-y">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold mb-4">Important Information</h2>
           <div className="space-y-3 text-gray-600 text-sm">
@@ -398,7 +398,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Verification Links */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">
             Verify Our Credentials
@@ -485,7 +485,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Compliance Documentation */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-4">
             Compliance Documentation
@@ -560,7 +560,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* Outcomes Methodology */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-4">
             Outcomes Reporting Methodology
@@ -604,7 +604,7 @@ export default function AccreditationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your Training?

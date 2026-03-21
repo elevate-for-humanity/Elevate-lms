@@ -42,7 +42,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* 3 Steps — visual cards */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             3 Steps to Get Funded
@@ -97,7 +97,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* What's Covered — 4 visual cards */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             What WIOA Covers
@@ -123,7 +123,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* Who Qualifies — compact grid */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">
             Who Qualifies
@@ -161,7 +161,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* Other Funding — 3 cards */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             Other Funding Options
@@ -188,7 +188,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* FAQ — collapsible */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">FAQ</h2>
           <div className="space-y-2">
@@ -214,7 +214,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Ready to Get Started?</h2>
           <p className="text-slate-900 mb-6 text-sm sm:text-base">

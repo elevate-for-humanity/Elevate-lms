@@ -73,7 +73,7 @@ export default function EmployerPage() {
       </div>
 
       {/* Incentives grid */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">What You Get</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Employer Benefits</h2>
@@ -94,7 +94,7 @@ export default function EmployerPage() {
       </section>
 
       {/* Available sectors */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Available Talent</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Sectors We Train</h2>
@@ -115,7 +115,7 @@ export default function EmployerPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Process</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">How It Works</h2>
@@ -135,7 +135,7 @@ export default function EmployerPage() {
       </section>
 
       {/* Dark CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>

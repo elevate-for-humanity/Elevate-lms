@@ -190,7 +190,7 @@ export default function BarbershopPartnerApplyPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white py-6 border-b">
+      <section className="py-6 border-b">
         <div className="max-w-5xl mx-auto px-4">
           <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Information

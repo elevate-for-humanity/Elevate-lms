@@ -216,7 +216,7 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Search Bar */}
-        <section className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <section className="border-b border-slate-200 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="flex-1 relative w-full">
@@ -244,7 +244,7 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Featured Categories */}
-        <section className="py-12 bg-white">
+        <section className="py-12">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Shop by Industry</h2>
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -373,7 +373,7 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Shop Products */}
-        <section id="products" className="py-16 bg-white">
+        <section id="products"className="py-16">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -490,7 +490,7 @@ export default async function CommunityMarketplacePage() {
         </section>
 
         {/* Trust Badges */}
-        <section className="py-12 bg-white border-t border-slate-200">
+        <section className="py-12 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-8 text-center">
               <div>

@@ -40,7 +40,7 @@ export default function StorePage() {
       />
 
       {/* ============ TRUST METRICS ============ */}
-      <section className="py-8 bg-white border-y border-slate-200">
+      <section className="py-8 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
@@ -140,7 +140,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ COMPLIANCE & TRUST ============ */}
-      <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
+      <section className="py-14 sm:py-20 border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 justify-center mb-3">
             <Shield className="w-6 h-6 text-brand-red-600" />
@@ -288,7 +288,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ ALSO IN THE STORE ============ */}
-      <section className="py-10 bg-white border-t border-slate-100">
+      <section className="py-10 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
           <div className="flex flex-wrap gap-3">

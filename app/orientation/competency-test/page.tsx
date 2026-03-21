@@ -64,7 +64,7 @@ export default function CompetencyTestPage() {
       </section>
 
       {/* What's Covered */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">What the Assessment Covers</h2>
           <ul className="space-y-4">

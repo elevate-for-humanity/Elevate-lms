@@ -229,7 +229,7 @@ export default async function ProductDetailPage({ params }: Props) {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-black">
             Frequently Asked Questions

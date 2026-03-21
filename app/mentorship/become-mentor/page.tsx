@@ -19,7 +19,7 @@ export default function BecomeMentorPage() {
       </div>
 
       {/* Hero */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <Heart className="w-12 h-12 text-brand-red-400 mx-auto mb-4" />
           <h1 className="text-4xl font-black text-slate-900 mb-4">Become a Mentor</h1>
@@ -49,7 +49,7 @@ export default function BecomeMentorPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Mentor Requirements</h2>
           <div className="bg-white rounded-xl p-6 border border-slate-200">
@@ -72,7 +72,7 @@ export default function BecomeMentorPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Make a Difference?</h2>
           <p className="text-slate-600 mb-8">Fill out the mentor interest form and our team will reach out within a week.</p>

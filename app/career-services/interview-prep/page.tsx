@@ -84,7 +84,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Services */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Our Interview Prep Services
@@ -106,7 +106,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Mock Interview Process */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Mock Interview Process
@@ -149,7 +149,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* STAR Method */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Master the STAR Method
@@ -198,7 +198,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Tips */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Top Interview Tips
@@ -217,7 +217,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Common Questions */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Common Interview Questions
@@ -256,7 +256,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Success Stats */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
@@ -280,7 +280,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Ready to Ace Your Interview?

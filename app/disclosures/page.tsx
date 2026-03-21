@@ -50,7 +50,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -74,13 +74,13 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Institution Info Card */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/pages/about-hero.jpg"
+                  src="/images/pages/admin-at-risk-hero.jpg"
                   alt="Our Institution"
                   fill
                   className="object-cover"
@@ -310,7 +310,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Important Notices */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Important Notices</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -349,7 +349,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Complaint Process CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -404,7 +404,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Footer Notice */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="font-semibold text-gray-900">
             This institution is an equal opportunity provider and employer.

@@ -95,7 +95,7 @@ export default async function ApplicationsPage() {
     <div className="min-h-screen bg-white">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Applications" }]} />
 {/* Header */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
             <FileText className="w-8 h-8 text-brand-blue-600" />
@@ -106,7 +106,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex gap-8 overflow-x-auto">
             {stats.map((stat, index) => (
@@ -120,7 +120,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {/* Filters */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">

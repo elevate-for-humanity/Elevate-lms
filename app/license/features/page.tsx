@@ -149,7 +149,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Automated Self-Service Operations */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4 text-white">Automated, Self-Service Operations</h2>
           <p className="text-lg text-slate-300 text-center mb-8 max-w-3xl mx-auto">
@@ -183,7 +183,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Highlights */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How Our Programs Work</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -224,7 +224,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             See It In Action

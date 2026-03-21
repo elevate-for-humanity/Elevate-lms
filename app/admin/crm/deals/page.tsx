@@ -53,7 +53,7 @@ export default async function DealsPage() {
 
       {/* Hero Image */}
       {/* Header */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -75,7 +75,7 @@ export default async function DealsPage() {
       </section>
 
       {/* Pipeline Overview */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Pipeline Overview</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -94,7 +94,7 @@ export default async function DealsPage() {
       </section>
 
       {/* Filters */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">

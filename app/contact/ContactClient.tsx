@@ -65,7 +65,7 @@ export default function ContactClient() {
   return (
     <main className="bg-white overflow-hidden">
       {/* Hero Section with Curved Bottom */}
-      <section className="relative bg-white py-24 md:py-32 overflow-hidden">
+      <section className="relative py-24 md:py-32 overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute top-10 right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -78,7 +78,7 @@ export default function ContactClient() {
       </section>
 
       {/* Contact Options Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {contactOptions.map((option, idx) => (
@@ -126,7 +126,7 @@ export default function ContactClient() {
       </section>
 
       {/* Quick Contact Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-20 relative overflow-hidden">
         {/* Decorative shapes */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-orange-200 rounded-full opacity-20 blur-3xl" />
 
@@ -185,7 +185,7 @@ export default function ContactClient() {
       </section>
 
       {/* Already Enrolled Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="bg-white rounded-3xl p-12 shadow-2xl relative overflow-hidden">
             {/* Decorative elements */}
@@ -211,7 +211,7 @@ export default function ContactClient() {
       </section>
 
       {/* Ready to Join Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
             Ready to start your journey?

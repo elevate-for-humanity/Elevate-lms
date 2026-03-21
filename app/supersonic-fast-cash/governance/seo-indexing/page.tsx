@@ -172,7 +172,7 @@ export default function SupersonicSeoIndexingPage() {
         </section>
 
         {/* Technical Details */}
-        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Technical Implementation</h2>
           <div className="space-y-4 text-slate-700">
             <p>

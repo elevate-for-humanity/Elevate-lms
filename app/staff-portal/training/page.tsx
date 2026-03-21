@@ -88,7 +88,7 @@ export default async function StaffTrainingPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white border-b border-slate-200 py-6">
+      <section className="border-b border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>

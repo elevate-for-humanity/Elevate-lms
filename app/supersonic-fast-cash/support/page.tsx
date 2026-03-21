@@ -57,7 +57,7 @@ export default function SupportPage() {
       />
 
       {/* CONTACT OPTIONS — image cards, no icons */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-10 text-center">Contact Us</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -109,7 +109,7 @@ export default function SupportPage() {
       </section>
 
       {/* QUICK LINKS — image cards */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-10 text-center">Quick Links</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">

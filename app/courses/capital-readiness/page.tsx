@@ -169,7 +169,7 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* Outcomes */}
-        <section className="py-16 lg:py-24 bg-white">
+        <section className="py-16 lg:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-4">What You'll Learn</h2>
             <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
@@ -252,7 +252,7 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 lg:py-24 bg-white">
+        <section className="py-16 lg:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Build Institutional Trust?</h2>
             <p className="text-emerald-100 mb-8 max-w-xl mx-auto">
@@ -270,7 +270,7 @@ export default function CapitalReadinessCoursePage() {
         </section>
 
         {/* Related Content */}
-        <section className="py-16 lg:py-24 bg-white">
+        <section className="py-16 lg:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold mb-8">Related Resources</h2>
             <div className="grid md:grid-cols-2 gap-6">

@@ -75,7 +75,7 @@ export default function CommunityHubPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Community Hub" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-white">
+      <section className="relative py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-slate-900">
@@ -176,7 +176,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Perfect For</h2>
@@ -193,7 +193,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Pricing Options */}
-      <section id="pricing" className="py-20 bg-white">
+      <section id="pricing"className="py-20">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Pricing Options</h2>
@@ -297,7 +297,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Stats + Write a Review */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Community Hub by the Numbers</h2>

@@ -124,7 +124,7 @@ export default function HairTestsPage() {
       </section>
 
       {/* Tests */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid gap-8">
             {hairTests.map((test) => (
@@ -200,7 +200,7 @@ export default function HairTestsPage() {
       </section>
 
       {/* Comparison */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Hair vs. Urine Testing</h2>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">

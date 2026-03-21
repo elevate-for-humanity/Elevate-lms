@@ -142,7 +142,7 @@ export default function StartPage() {
       </section>
 
       {/* Pathway cards — secondary navigation */}
-      <section className="border-t bg-white py-12 md:py-16">
+      <section className="border-t py-12 md:py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="mb-8 text-center text-2xl font-bold text-gray-900">
             Not ready to apply? Explore your options.
@@ -168,7 +168,7 @@ export default function StartPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">
             Ready to change your career?

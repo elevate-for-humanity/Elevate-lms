@@ -156,7 +156,7 @@ export default function RequiredFormsPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-white py-6 border-b">
+      <section className="py-6 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <InstitutionalHeader
             documentType="Required Forms"
@@ -210,7 +210,7 @@ export default function RequiredFormsPage() {
             className="bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all group"
           >
             <div className="relative h-32">
-              <Image src="/images/pages/barber-training.jpg" alt="Partner Handbook" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+              <Image src="/images/pages/admin-campaigns-new-hero.jpg" alt="Partner Handbook" fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
             </div>
             <div className="p-4">
               <p className="font-semibold text-gray-900">Partner Handbook</p>

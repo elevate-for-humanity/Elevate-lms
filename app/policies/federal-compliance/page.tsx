@@ -214,7 +214,7 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* Reporting and Contact */}
-        <section className="bg-white rounded-2xl p-8">
+        <section className="rounded-2xl p-8">
           <h2 className="text-2xl font-bold mb-6">Reporting Compliance Concerns</h2>
           <p className="text-slate-600 mb-6">
             If you believe the Institution has violated any federal compliance requirement, you may report your concern through the following channels:

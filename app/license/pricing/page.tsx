@@ -66,7 +66,7 @@ export default async function PricingPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Platform Licensing</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -141,7 +141,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Features Comparison */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Plans Include</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -177,7 +177,7 @@ export default async function PricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?
@@ -204,7 +204,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-gray-500">
           <p>{DISCLAIMERS.pricing}</p>
         </div>

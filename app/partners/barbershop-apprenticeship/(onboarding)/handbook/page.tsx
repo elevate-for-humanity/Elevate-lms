@@ -167,7 +167,7 @@ export default function PartnerHandbookPage() {
       </div>
 
       {/* Institutional Header */}
-      <section className="bg-white py-8 border-b">
+      <section className="py-8 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <InstitutionalHeader
             documentType="Partner Handbook"

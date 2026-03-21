@@ -8,7 +8,7 @@ export function BarberEnrollment() {
   return (
     <>
       {/* Section 10 — Tuition, Funding & Payment */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition, Funding &amp; Payment Options</h2>
           <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
@@ -116,7 +116,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* Section 11 — Eligibility & Enrollment */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 text-center mb-4">Eligibility &amp; Enrollment</h2>
 
@@ -170,7 +170,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* Section 12 — Compliance & Workforce Alignment */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
             <div className="flex items-start gap-3">
@@ -184,7 +184,7 @@ export function BarberEnrollment() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white border-t">
+      <section className="py-20 border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white text-amber-950 text-sm font-bold px-4 py-2 rounded-full mb-6">
             <span className="w-2 h-2 bg-amber-900 rounded-full animate-pulse" />

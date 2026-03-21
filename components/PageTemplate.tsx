@@ -211,7 +211,7 @@ export function PageTemplate({
 
       {/* CTA Section */}
       {finalCTA && (
-        <section className="py-16 bg-white border-t">
+        <section className="py-16 border-t">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold mb-4">{finalCTA.title}</h2>

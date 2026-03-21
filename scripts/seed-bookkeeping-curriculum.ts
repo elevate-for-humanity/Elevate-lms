@@ -13,7 +13,9 @@
  *   npx tsx scripts/seed-bookkeeping-curriculum.ts --force   # overwrite existing
  */
 
-import 'dotenv/config';
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 import { createClient } from '@supabase/supabase-js';
 import { CurriculumGenerator } from '../lib/services/curriculum-generator';
 import { bookkeepingQuickbooksBlueprint } from '../lib/curriculum/blueprints/bookkeeping-quickbooks';

@@ -27,7 +27,9 @@ BEGIN;
 -- This replacement keeps lesson_number for backward compatibility
 -- and adds order_index as a direct alias so sort and interface work.
 -- ------------------------------------------------------------
-CREATE OR REPLACE VIEW public.lms_lessons AS
+DROP VIEW IF EXISTS public.lms_lessons CASCADE;
+
+CREATE VIEW public.lms_lessons AS
 SELECT
   cl.id,
   cl.course_id,
@@ -206,13 +208,13 @@ END $$;
 -- ------------------------------------------------------------
 
 -- 5a. Promote modules table rows → course_modules
+-- course_modules has no slug column; use (course_id, order_index) as identity.
 INSERT INTO public.course_modules (
-  id, course_id, slug, title, description, order_index, created_at, updated_at
+  id, course_id, title, description, order_index, created_at, updated_at
 )
 SELECT
   gen_random_uuid(),
   c.id,
-  m.slug,
   m.title,
   COALESCE(m.description, m.summary),
   m.order_index,
@@ -226,7 +228,11 @@ WHERE p.slug IN (
   'certified-recovery-specialist',
   'bookkeeping'
 )
-ON CONFLICT (course_id, slug) DO NOTHING;
+-- Skip if a module with this order_index already exists for this course
+AND NOT EXISTS (
+  SELECT 1 FROM public.course_modules cm
+  WHERE cm.course_id = c.id AND cm.order_index = m.order_index
+);
 
 -- 5b. Promote curriculum_lessons → course_lessons
 -- order_index encodes position as (module_order * 1000 + lesson_order)
@@ -263,11 +269,12 @@ SELECT
   now(),
   now()
 FROM public.curriculum_lessons cl
-JOIN public.programs p ON p.id = cl.program_id
-JOIN public.courses  c ON c.program_id = p.id
--- match to course_modules via the modules table slug
-JOIN public.modules  m ON m.program_id = p.id AND m.order_index = cl.module_order
-JOIN public.course_modules cm ON cm.course_id = c.id AND cm.slug = m.slug
+JOIN public.programs p  ON p.id  = cl.program_id
+JOIN public.courses  c  ON c.program_id = p.id
+-- Join through modules.id (curriculum_lessons.module_id is always set for these programs)
+-- then match to course_modules by order_index — avoids 0-based vs 1-based offset ambiguity
+JOIN public.modules  m  ON m.id  = cl.module_id
+JOIN public.course_modules cm ON cm.course_id = c.id AND cm.order_index = m.order_index
 WHERE p.slug IN (
   'peer-recovery-specialist-jri',
   'certified-recovery-specialist',

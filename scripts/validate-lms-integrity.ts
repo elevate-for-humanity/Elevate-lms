@@ -16,7 +16,9 @@
  * Designed to run in CI against the live DB (requires SUPABASE env vars).
  */
 
-import 'dotenv/config';
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 import { createClient } from '@supabase/supabase-js';
 
 const SLUG_FILTER = (() => {
@@ -25,11 +27,7 @@ const SLUG_FILTER = (() => {
 })();
 const FAIL_FAST = process.argv.includes('--fail-fast');
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
+let supabase: ReturnType<typeof createClient>;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -88,7 +86,7 @@ async function validateProgram(program: { id: string; slug: string; title: strin
   // 2. course_modules exist and all belong to this course
   const { data: modules, error: modErr } = await supabase
     .from('course_modules')
-    .select('id, slug, course_id, order_index')
+    .select('id, title, course_id, order_index')
     .eq('course_id', courseId);
 
   if (modErr || !modules || modules.length === 0) {
@@ -133,7 +131,7 @@ async function validateProgram(program: { id: string; slug: string; title: strin
   const emptyMods = modules.filter(m => !lessonsByModule.has(m.id));
   if (emptyMods.length > 0) {
     fail(slug, 'no_empty_modules',
-      `${emptyMods.length} modules have 0 lessons: ${emptyMods.map(m => m.slug).join(', ')}`
+      `${emptyMods.length} modules have 0 lessons: ${emptyMods.map(m => m.title).join(', ')}`
     );
   } else {
     pass(slug, 'no_empty_modules', 'all modules have lessons');
@@ -192,6 +190,12 @@ async function validateProgram(program: { id: string; slug: string; title: strin
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  );
+
   console.log('\nLMS Integrity Validation');
   console.log('========================');
   if (SLUG_FILTER) console.log(`Filter: --slug ${SLUG_FILTER}\n`);

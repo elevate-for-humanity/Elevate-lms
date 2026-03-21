@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Users, Clock, FileText, ClipboardList, Settings,
   ArrowRight, AlertCircle, CheckCircle, BarChart3,
-  Scissors, Calendar, Upload, DollarSign,
+  Calendar, Upload, DollarSign, GraduationCap,
 } from 'lucide-react';
 import { MOUStatusBadge, MOUStatusAlert } from '@/components/MOUStatusBadge';
 import { requirePartnerIdentity } from '@/lib/auth-guard';
@@ -34,6 +34,7 @@ export default async function PartnerPortalPage() {
     attendanceThisWeek: 0,
   };
   let recentActivity: any[] = [];
+  let partnerPrograms: { slug: string; name: string }[] = [];
 
   try {
     if (db) {
@@ -108,6 +109,17 @@ export default async function PartnerPortalPage() {
         if (mou && mou.length > 0) {
           mouStatus = mou[0].status === 'signed' ? 'fully_executed' : mou[0].status;
         }
+
+        // Programs this partner is enrolled in
+        const { data: programLinks } = await db
+          .from('partner_programs')
+          .select('program_slug, programs(title, name)')
+          .eq('partner_id', orgId)
+          .eq('status', 'active');
+        partnerPrograms = (programLinks || []).map((p: any) => ({
+          slug: p.program_slug,
+          name: p.programs?.title || p.programs?.name || p.program_slug,
+        }));
       }
     }
   } catch {
@@ -126,7 +138,7 @@ export default async function PartnerPortalPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-1">
-            {org.name} &middot; {org.city || 'Indianapolis'}, {org.state || 'IN'}
+            {org.name}{org.city ? ` · ${org.city}${org.state ? `, ${org.state}` : ''}` : ''}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -172,12 +184,22 @@ export default async function PartnerPortalPage() {
           { title: 'Log Hours', href: '/partner/hours', icon: Clock, description: 'Submit apprentice training hours', color: 'border-l-brand-blue-500' },
           { title: 'Record Attendance', href: '/partner/attendance/record', icon: ClipboardList, description: 'Mark daily attendance', color: 'border-l-brand-green-500' },
           { title: 'Upload Documents', href: '/partner/documents', icon: Upload, description: 'Submit required documents', color: 'border-l-amber-500' },
-          { title: 'View Apprentices', href: '/partner/programs/barber', icon: Scissors, description: 'Manage current apprentices', color: 'border-l-pink-500' },
-          { title: 'MOU Agreement', href: '/docs/Indiana-Barbershop-Apprenticeship-MOU', icon: FileText, description: 'View or download your Memorandum of Understanding', color: 'border-l-gray-500' },
+          // Program-aware: show one card per enrolled program, fall back to generic
+          ...(partnerPrograms.length > 0
+            ? partnerPrograms.map((p) => ({
+                title: p.name,
+                href: `/partner/programs/${p.slug}`,
+                icon: GraduationCap,
+                description: 'Manage apprentices and progress',
+                color: 'border-l-pink-500',
+              }))
+            : [{ title: 'Programs', href: '/partner/programs', icon: GraduationCap, description: 'Manage apprentices and progress', color: 'border-l-pink-500' }]
+          ),
+          { title: 'MOU Agreement', href: '/partner/documents', icon: FileText, description: 'View or upload your Memorandum of Understanding', color: 'border-l-gray-500' },
           { title: 'Payroll & Payouts', href: '/onboarding/payroll-setup', icon: DollarSign, description: 'Set up pay method, W-9, and view earnings', color: 'border-l-brand-green-500' },
           { title: 'Settings', href: '/partner/settings', icon: Settings, description: 'Manage shop profile and contacts', color: 'border-l-slate-400' },
         ].map((action) => (
-          <Link key={action.title} href={action.href}
+          <Link key={action.href} href={action.href}
             className={`bg-white rounded-xl border border-l-4 ${action.color} p-5 hover:shadow-md transition`}>
             <action.icon className="w-6 h-6 text-gray-700 mb-3" />
             <h3 className="font-bold mb-1">{action.title}</h3>

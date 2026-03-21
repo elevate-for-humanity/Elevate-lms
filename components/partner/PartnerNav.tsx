@@ -13,7 +13,7 @@ const items = [
   { href: '/partner/attendance', label: 'Attendance', icon: ClipboardCheck },
   { href: '/partner/documents', label: 'Documents', icon: FileText },
   { href: '/partner/reports', label: 'Reports', icon: BarChart3 },
-  { href: '/partner/programs/barber', label: 'Programs', icon: GraduationCap },
+  { href: '/partner/programs', label: 'Programs', icon: GraduationCap },
   { href: '/partner/settings', label: 'Settings', icon: Settings },
 ];
 

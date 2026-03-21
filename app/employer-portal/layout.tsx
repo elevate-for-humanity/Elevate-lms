@@ -34,7 +34,7 @@ export default async function EmployerPortalLayout({
     <div className="min-h-screen bg-white">
       <div className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-          <Link href="/employer-portal" className="font-semibold text-gray-900">Employer Portal</Link>
+          <Link href="/employer/dashboard" className="font-semibold text-gray-900">Employer Portal</Link>
           <div className="text-sm text-gray-500">{user.email}</div>
         </div>
       </div>

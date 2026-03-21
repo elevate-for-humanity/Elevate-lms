@@ -120,7 +120,7 @@ export default function Testimonials() {
   );
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">

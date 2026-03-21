@@ -99,7 +99,7 @@ export default function RiseUpFoundationPage() {
       {/* HERO — full bleed, no text overlay */}
       <section className="relative w-full h-[75vh] min-h-[500px]">
         <Image
-          src="/images/pages/subpage-tax-hero.jpg"
+          src="/images/pages/admin-ai-console-hero.jpg"
           alt="Rise Up Foundation free VITA tax preparation"
           fill
           className="object-cover object-center"
@@ -109,7 +109,7 @@ export default function RiseUpFoundationPage() {
       </section>
 
       {/* INTRO BAND */}
-      <section className="bg-white border-b border-slate-100 py-16">
+      <section className="border-b border-slate-100 py-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
             Rise Up Foundation
@@ -186,7 +186,7 @@ export default function RiseUpFoundationPage() {
       </section>
 
       {/* SERVICES */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-4xl font-black text-slate-900 mb-4">What We Offer</h2>
@@ -264,7 +264,7 @@ export default function RiseUpFoundationPage() {
       </section>
 
       {/* VOLUNTEER CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative h-[480px] rounded-2xl overflow-hidden">
@@ -381,7 +381,7 @@ export default function RiseUpFoundationPage() {
       </section>
 
       {/* DISCLOSURE */}
-      <section className="py-6 bg-white border-t border-slate-200">
+      <section className="py-6 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-slate-500 leading-relaxed">
             Rise Up Foundation VITA services are provided by IRS-certified volunteers.

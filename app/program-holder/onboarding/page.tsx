@@ -57,7 +57,7 @@ export default async function ProgramHolderOnboarding() {
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden bg-white">
+      <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden">
         <Image
           src="/images/pages/programs-hero-new-2.jpg"
           alt="Program holder training"
@@ -70,7 +70,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* Title Section */}
-      <section className="py-12 sm:py-16 bg-white border-b">
+      <section className="py-12 sm:py-16 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black mb-4">
             Program Holder Onboarding
@@ -97,7 +97,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* What is a Program Holder */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-6">
             What is a Program Holder?
@@ -225,7 +225,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* Platform Navigation */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
             Navigating Your Dashboard
@@ -398,7 +398,7 @@ export default async function ProgramHolderOnboarding() {
       </section>
 
       {/* Resources */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
             Resources & Support

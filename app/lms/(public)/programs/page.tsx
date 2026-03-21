@@ -66,7 +66,7 @@ export default async function LmsProgramsPage() {
       </nav>
 
       {/* HEADER */}
-      <section className="bg-white py-12 border-b border-slate-100">
+      <section className="py-12 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-bold text-brand-red-600 uppercase tracking-widest mb-3">
             Career Training Programs
@@ -184,7 +184,7 @@ export default async function LmsProgramsPage() {
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="py-12 bg-white border-t border-slate-100">
+      <section className="py-12 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Already enrolled?</h2>
           <p className="text-slate-700 text-sm mb-6">

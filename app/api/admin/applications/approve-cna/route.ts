@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  *
  * Thin wrapper — delegates entirely to approve_application_and_grant_access_atomic.
  * That function owns: financial gate, compliance gate, state machine transitions,
- * training_enrollments, partner_enrollments, cmi_students, audit log, revoked_at check.
+ * training_enrollments, partner_enrollments, audit log, revoked_at check.
  *
  * This route exists for backward compatibility with existing callers.
  * New callers should use POST /api/admin/applications/[id]/approve-and-grant.

@@ -47,6 +47,45 @@ export async function createDraftCourse(
   db: SupabaseClient,
   input: CreateCourseInput,
 ) {
+  // Validation gate — fail loudly before writing anything to the DB.
+  const assessmentTypes = new Set(['checkpoint', 'quiz', 'exam']);
+  const emptyLessons: string[] = [];
+  const missingAssessments: string[] = [];
+
+  for (const mod of input.modules) {
+    for (const lesson of mod.lessons) {
+      const body = typeof lesson.content === 'string'
+        ? lesson.content.trim()
+        : JSON.stringify(lesson.content ?? '').trim();
+
+      if (!body || body === '{}' || body === '""' || body.length < 50) {
+        emptyLessons.push(lesson.slug ?? lesson.title ?? '(unknown)');
+      }
+
+      const type = lesson.lessonType ?? 'lesson';
+      if (assessmentTypes.has(type)) {
+        const hasQuiz = Array.isArray(lesson.quizQuestions) && lesson.quizQuestions.length > 0;
+        if (!hasQuiz) {
+          missingAssessments.push(`${lesson.slug ?? lesson.title} (${type})`);
+        }
+      }
+    }
+  }
+
+  if (emptyLessons.length > 0) {
+    throw new Error(
+      `createDraftCourse: ${emptyLessons.length} lesson(s) have empty or missing content — build aborted.\n` +
+      `Empty lessons: ${emptyLessons.join(', ')}`
+    );
+  }
+
+  if (missingAssessments.length > 0) {
+    throw new Error(
+      `createDraftCourse: ${missingAssessments.length} assessment lesson(s) have no quiz_questions — build aborted.\n` +
+      `Missing assessments: ${missingAssessments.join(', ')}`
+    );
+  }
+
   const { data: course, error: courseErr } = await db
     .from('courses')
     .insert({
@@ -85,7 +124,7 @@ export async function createDraftCourse(
       module_id:      moduleRow.id,
       slug:           l.slug,
       title:          l.title,
-      content:        l.content ?? {},
+      content:        l.content,
       lesson_type:    l.lessonType ?? 'lesson',
       order_index:    (mi + 1) * 1000 + (li + 1),
       passing_score:  l.passingScore ?? null,

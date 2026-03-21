@@ -56,7 +56,7 @@ export default async function UploadDocumentPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Documents" }]} />
         </div>
-      <section className="bg-white border-b py-8">
+      <section className="border-b py-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">
             Upload Document

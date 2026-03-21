@@ -118,7 +118,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* Title + CTAs below hero in white */}
-      <section className="bg-white py-10 border-b">
+      <section className="py-10 border-b">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {badges.map((badge, i) => (
@@ -163,7 +163,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* At a Glance */}
-      <section className="bg-white py-12 border-b">
+      <section className="py-12 border-b">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center p-4">
@@ -192,7 +192,7 @@ export function ProgramPageTemplate({
 
       {/* Funding Banner */}
       {fundingAvailable && (
-        <section className="bg-white py-6">
+        <section className="py-6">
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
@@ -254,7 +254,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* Requirements */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Requirements</h2>
           
@@ -276,7 +276,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* Outcomes */}
-      <section className="py-16 bg-white border-b">
+      <section className="py-16 border-b">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-3xl font-bold mb-8 text-center text-slate-900">Career Outcomes</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -315,7 +315,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Investment</h2>
           <p className="text-gray-600 mb-8">Transparent pricing with flexible options</p>
@@ -345,7 +345,7 @@ export function ProgramPageTemplate({
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white border-t">
+      <section className="py-16 border-t">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
           <p className="text-slate-600 mb-8">Take the first step toward your new career</p>

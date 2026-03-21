@@ -117,7 +117,7 @@ export default async function ProgramHolderLanding() {
       )}
 
       {/* Features */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Portal Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,7 +133,7 @@ export default async function ProgramHolderLanding() {
       </section>
 
       {/* Barber on File */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <ShieldCheck className="w-7 h-7 text-teal-700 flex-shrink-0" />
@@ -177,7 +177,7 @@ export default async function ProgramHolderLanding() {
       </section>
 
       {/* Shop Owner */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <Store className="w-7 h-7 text-teal-700 flex-shrink-0" />
@@ -225,7 +225,7 @@ export default async function ProgramHolderLanding() {
       </section>
 
       {/* Compensation */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <DollarSign className="w-7 h-7 text-teal-700 flex-shrink-0" />

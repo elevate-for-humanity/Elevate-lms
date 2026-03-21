@@ -94,7 +94,7 @@ export default async function NetworkingEventsPage() {
       )}
 
       {/* Employer CTA */}
-      <section className="bg-white border-t py-12">
+      <section className="border-t py-12">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center gap-6">
           <div className="flex-shrink-0 w-14 h-14 bg-brand-blue-100 rounded-2xl flex items-center justify-center">
             <Building2 className="w-7 h-7 text-brand-blue-600" />

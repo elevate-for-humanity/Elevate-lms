@@ -68,7 +68,7 @@ const programs = (dbRows as any[]) || [];
       </section>
 
       {/* Benefits */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-6">Apprenticeship Benefits</h2>
           <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 border border-slate-200">

@@ -87,7 +87,7 @@ export default function CoursesCatalog({
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
@@ -119,7 +119,7 @@ export default function CoursesCatalog({
       </section>
 
       {/* Search & Filters */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

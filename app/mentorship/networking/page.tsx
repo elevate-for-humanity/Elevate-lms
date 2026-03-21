@@ -31,10 +31,10 @@ export default function NetworkingPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/pages/networking-hero.jpg" alt="Professional Networking" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/it-networking.jpg" alt="Professional Networking" fill className="object-cover" priority sizes="100vw" />
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Networking Support</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -57,7 +57,7 @@ export default function NetworkingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">What You Will Learn</h2>
           <div className="grid md:grid-cols-2 gap-4">

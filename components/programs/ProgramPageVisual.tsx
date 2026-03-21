@@ -155,7 +155,7 @@ export function ProgramPageVisual({ program }: Props) {
       ))}
 
       {/* CAREER OUTCOMES - Visual cards */}
-      <section className="py-16 lg:py-24 bg-white border-t">
+      <section className="py-16 lg:py-24 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
@@ -184,7 +184,7 @@ export function ProgramPageVisual({ program }: Props) {
       </section>
 
       {/* REQUIREMENTS - Simple visual */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
@@ -244,7 +244,7 @@ export function ProgramPageVisual({ program }: Props) {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to Start?

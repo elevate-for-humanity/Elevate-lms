@@ -58,7 +58,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Training Provider Partnership</h1>
           <p className="text-lg text-slate-600 max-w-3xl">
@@ -68,7 +68,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-10 text-center">What You Get</h2>
           <div className="grid sm:grid-cols-2 gap-8">
@@ -88,7 +88,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -110,7 +110,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-10 text-center">How the Partnership Works</h2>
           <div className="grid sm:grid-cols-3 gap-6">
@@ -137,7 +137,7 @@ export default function TrainingProviderPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white border-t border-slate-100">
+      <section className="py-16 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Become an Approved Provider</h2>
           <p className="text-slate-600 mb-3">Apply to join our training provider network and start receiving funded student referrals.</p>

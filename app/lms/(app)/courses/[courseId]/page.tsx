@@ -15,10 +15,75 @@ import AIInstructor from '@/components/AIInstructor';
 
 type Params = Promise<{ courseId: string }>;
 
+async function resolveCourse(courseId: string) {
+  const db = createAdminClient();
+
+  // 1. Try canonical courses table
+  const { data: course } = await db
+    .from('courses')
+    .select('id, title, description, short_description, status, is_active, program_id')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (course) return { ...course, _lessonCourseId: course.id };
+
+  // 2. Fall back to training_courses (HVAC legacy: f0593164)
+  const { data: tc } = await db
+    .from('training_courses')
+    .select('id, title, description, is_active')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (!tc) return null;
+
+  // 3. Find the canonical lesson course_id for this training_course.
+  //    After the 2025-Q2 migration, curriculum_lessons use a new course_id (0ba9a61c)
+  //    while the URL still uses the old training_courses id (f0593164).
+  //    Look up curriculum_lessons rows that reference the old id OR find the new id
+  //    by checking which course_id has the most curriculum_lessons rows.
+  const { data: clByOldId } = await db
+    .from('curriculum_lessons')
+    .select('course_id')
+    .eq('course_id', tc.id)
+    .limit(1);
+
+  let lessonCourseId = tc.id;
+
+  if (!clByOldId || clByOldId.length === 0) {
+    // No curriculum_lessons under the old id — find the new canonical id
+    // by looking up the program that matches this training_course title
+    const { data: prog } = await db
+      .from('programs')
+      .select('id')
+      .ilike('title', `%${tc.title?.split(' ')[0]}%`)
+      .limit(1)
+      .maybeSingle();
+
+    if (prog?.id) {
+      const { data: clByProg } = await db
+        .from('curriculum_lessons')
+        .select('course_id')
+        .eq('program_id', prog.id)
+        .not('course_id', 'is', null)
+        .limit(1)
+        .maybeSingle();
+      if (clByProg?.course_id) lessonCourseId = clByProg.course_id;
+    }
+  }
+
+  return {
+    id: tc.id,
+    title: tc.title,
+    description: tc.description,
+    short_description: null,
+    status: 'published',
+    is_active: tc.is_active,
+    program_id: null,
+    _lessonCourseId: lessonCourseId,
+  };
+}
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { courseId } = await params;
-  const db = createAdminClient();
-  const { data: course } = await db.from('courses').select('title, description').eq('id', courseId).single();
+  const course = await resolveCourse(courseId);
   return {
     title: course ? `${course.title} | Elevate LMS` : 'Course | Elevate LMS',
     description: course?.description || 'View course details and lessons.',
@@ -49,8 +114,8 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/courses/' + courseId);
 
-  const { data: course, error } = await db.from('courses').select('id, title, description, short_description, status, is_active, program_id').eq('id', courseId).single();
-  if (error || !course) notFound();
+  const course = await resolveCourse(courseId);
+  if (!course) notFound();
 
   // Pull richer metadata from programs table when available
   const { data: program } = course.program_id
@@ -80,10 +145,13 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   const isPendingApproval = enrollment?.status === 'pending_approval';
 
+  // Use the canonical lesson course_id — may differ from URL courseId for legacy courses
+  const lessonCourseId = (course as any)._lessonCourseId || courseId;
+
   const { data: lessons } = await db
     .from('lms_lessons')
     .select('*')
-    .eq('course_id', courseId)
+    .eq('course_id', lessonCourseId)
     .order('order_index', { ascending: true });
 
   const typedLessons = (lessons || []) as Lesson[];

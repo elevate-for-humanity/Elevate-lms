@@ -16,7 +16,7 @@ export function BarberCredentials() {
   return (
     <>
       {/* Section 5 — Credential Pathway */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Credential Pathway</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
@@ -38,7 +38,7 @@ export function BarberCredentials() {
       </section>
 
       {/* Section 6 — What You'll Learn (Curriculum) */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">What You&apos;ll Learn</h2>
           <p className="text-slate-600 mb-10 max-w-3xl">
@@ -61,7 +61,7 @@ export function BarberCredentials() {
       </section>
 
       {/* Section 6.5 — Apprenticeship Workplace Training */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Workplace Training Component</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
@@ -97,7 +97,7 @@ export function BarberCredentials() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-40">
-                <Image src="/images/pages/barber-training.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                <Image src="/images/pages/admin-career-courses-create-hero.jpg" alt="OJT hour logging" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-slate-900 mb-2">OJT Hour Logging</h3>

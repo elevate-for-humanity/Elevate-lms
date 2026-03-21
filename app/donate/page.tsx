@@ -117,7 +117,7 @@ export default async function DonatePage() {
       </section>
 
       {/* Impact Stats */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {impactStats.map((stat) => (
@@ -214,7 +214,7 @@ export default async function DonatePage() {
       </div>
 
       {/* Other Ways to Give */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Other Ways to Give</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -252,7 +252,7 @@ export default async function DonatePage() {
         </div>
       </section>
       {/* FAQ */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Donation FAQ</h2>
           <div className="space-y-4">

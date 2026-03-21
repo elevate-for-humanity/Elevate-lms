@@ -207,7 +207,7 @@ export default function ProgramPageLayout({
 
       {/* ===== PROGRAM IDENTITY — two-column compressed block ===== */}
       <InView animation="fade-up">
-        <section className="bg-white py-8 sm:py-10 border-b border-slate-100">
+        <section className="py-8 sm:py-10 border-b border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             {/* Row 1: Title + CTA */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
@@ -324,7 +324,7 @@ export default function ProgramPageLayout({
       {/* ===== CURRICULUM ===== */}
       {c.curriculum && c.curriculum.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Curriculum</p>
@@ -355,7 +355,7 @@ export default function ProgramPageLayout({
       {/* ===== INSTRUCTIONAL DELIVERY ===== */}
       {c.instructionalDelivery && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Instructional Delivery</p>
@@ -429,7 +429,7 @@ export default function ProgramPageLayout({
       {/* ===== ASSESSMENT STRUCTURE ===== */}
       {c.assessmentStructure && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Assessment</p>
@@ -535,7 +535,7 @@ export default function ProgramPageLayout({
       {/* ===== PROGRAM DETAILS (workforce partner info) ===== */}
       {(c.totalHours || c.schedule || c.cohortSize || c.modality || c.bilingualSupport || c.employerPartners || c.selfPayCost) && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Program Details</p>
@@ -671,7 +671,7 @@ export default function ProgramPageLayout({
       {/* ===== CAREER PATHS ===== */}
       {c.careers && c.careers.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-6">
               <div className="text-center mb-10">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">After Graduation</p>
@@ -738,7 +738,7 @@ export default function ProgramPageLayout({
       {/* ===== FAQ ===== */}
       {c.faqs && c.faqs.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <section className="py-14 lg:py-20 border-t border-slate-100">
             <div className="max-w-3xl mx-auto px-6">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
               <div className="space-y-3">

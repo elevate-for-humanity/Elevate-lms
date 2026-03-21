@@ -48,14 +48,6 @@ const fallbackTeam = [
     email: 'leslie@elevateforhumanity.org',
   },
   {
-    id: '6', slug: 'alina-smith',
-    name: 'Alina Smith, PMHNP',
-    title: 'Psychiatric Mental Health Nurse Practitioner',
-    image_url: '/images/alina-smith.jpg',
-    bio: 'Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.',
-    email: 'alina@elevateforhumanity.org',
-  },
-  {
     id: '7', slug: 'delores-reynolds',
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',
@@ -179,7 +171,7 @@ export default async function TeamPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Join Our Mission

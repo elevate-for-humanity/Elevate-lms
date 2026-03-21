@@ -180,7 +180,7 @@ export default function PolicyAcknowledgmentPage() {
       </div>
 
       {/* Institutional Header */}
-      <section className="bg-white py-6 border-b">
+      <section className="py-6 border-b">
         <div className="max-w-4xl mx-auto px-4">
           <Link href="/partners/barbershop-apprenticeship/forms" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Forms

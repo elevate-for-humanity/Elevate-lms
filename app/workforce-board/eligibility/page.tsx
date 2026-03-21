@@ -83,7 +83,7 @@ export default function EligibilityPage() {
       </section>
 
       {/* Priority Populations */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Priority Populations</h2>
           <p className="text-gray-600 mb-8">WIOA gives priority of service to individuals in the following categories:</p>

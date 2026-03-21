@@ -140,7 +140,7 @@ export default async function StudentPortalGradesPage() {
 
         {/* Course Progress */}
         {(enrollmentsList.length > 0 || courseEnrollmentsList.length > 0) && (
-          <section className="bg-white rounded-xl border p-6 mb-6">
+          <section className="rounded-xl border p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Course Progress</h2>
             <div className="space-y-4">
               {enrollmentsList.map((enrollment: any) => (
@@ -208,7 +208,7 @@ export default async function StudentPortalGradesPage() {
         )}
 
         {/* Assignment Grades */}
-        <section className="bg-white rounded-xl border p-6">
+        <section className="rounded-xl border p-6">
           <h2 className="text-xl font-semibold mb-4">Assignment Grades</h2>
           
           {gradesList.length > 0 ? (

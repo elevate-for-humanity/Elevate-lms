@@ -11,7 +11,7 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 7 — Career Pathways */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="text-white">
@@ -44,7 +44,7 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 7.5 — Progress Tracking */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Progress Tracking &amp; Reporting</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
@@ -69,7 +69,7 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 8 — Transfer Hours */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Transfer Hours &amp; Prior Training</h2>
           <p className="text-slate-600 mb-6 max-w-3xl">
@@ -95,7 +95,7 @@ export function BarberPartnership() {
       </section>
 
       {/* Section 9 — Partnership Barbershops */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Partnership Barbershops &amp; Training Sites</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">

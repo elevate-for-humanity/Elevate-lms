@@ -138,7 +138,7 @@ export default function UrineTestsPage() {
       </section>
 
       {/* Tests Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid gap-8">
             {urineTests.map((test) => (

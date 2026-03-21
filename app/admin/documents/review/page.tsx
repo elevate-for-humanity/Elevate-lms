@@ -104,7 +104,7 @@ export default async function AdminDocumentReviewPage() {
 
       {/* Hero Image */}
       {/* Header */}
-      <section className="bg-white border-b py-8">
+      <section className="border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
             <div>

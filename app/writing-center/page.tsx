@@ -90,7 +90,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* Intro */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Writing Center</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -100,7 +100,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* Two Options */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Two Ways to Get Help</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -110,7 +110,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56 overflow-hidden">
-                <Image src="/images/pages/writing-center-page-1.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
+                <Image src="/images/pages/writing-center.jpg" alt="Student submitting a draft for written review" fill className="object-cover" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Submit for Written Review</h3>
@@ -128,7 +128,7 @@ export default function WritingCenterPage() {
               className="bg-white rounded-2xl overflow-hidden shadow-sm"
             >
               <div className="relative h-56 overflow-hidden">
-                <Image src="/images/pages/writing-center-page-1.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
+                <Image src="/images/pages/career-services-page-10.jpg" alt="Live tutoring session via Zoom" fill className="object-cover" />
               </div>
               <div className="p-8">
                 <h3 className="text-xl font-bold mb-3">Book a Live Session</h3>
@@ -145,7 +145,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* Services */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">What We Help With</h2>
@@ -173,7 +173,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-4">
@@ -202,7 +202,7 @@ export default function WritingCenterPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Writing Help?</h2>
           <p className="text-lg text-brand-blue-100 mb-8">Log in to the LMS to submit a draft or book a live session with a writing tutor.</p>

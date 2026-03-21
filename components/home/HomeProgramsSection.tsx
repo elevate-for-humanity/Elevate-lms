@@ -8,7 +8,7 @@ export default function HomeProgramsSection() {
   const featured = programs;
 
   return (
-    <section className="bg-white py-12 sm:py-16 md:py-20 lg:py-12 md:py-24">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-12 md:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="mb-6 sm:mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>

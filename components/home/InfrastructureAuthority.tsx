@@ -40,7 +40,7 @@ const CAPABILITIES = [
 
 export default function InfrastructureAuthority() {
   return (
-    <section className="py-20 sm:py-28 bg-white border-t border-slate-100">
+    <section className="py-20 sm:py-28 border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left: positioning */}

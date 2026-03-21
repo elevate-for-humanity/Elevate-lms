@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import LazyVideo from '@/components/ui/LazyVideo';
+import StoreProductVideo from '@/app/store/StoreProductVideo';
 import { 
   Download, FileText, Video, BookOpen, Check, ArrowRight, Zap, 
   Shield, MessageCircle, Play, Sparkles, Users, Building2, DollarSign 
@@ -63,53 +64,47 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Demo Videos Section */}
-      <section id="demos" className="py-16 bg-white">
+      <section id="demos"className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">See Our Tools in Action</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">Watch quick demos of our most popular digital resources</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-white">
-                <Image src="/images/pages/store-digital-hero.jpg" alt="AI Studio Demo" fill sizes="100vw" quality={85} className="object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-slate-900 ml-1" />
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white rounded-2xl overflow-hidden">
+              <StoreProductVideo
+                src="/videos/store/store-ai-studio.mp4"
+                poster="/images/pages/store-digital-hero.jpg"
+                alt="AI Studio demo"
+                label="AI Studio Demo"
+              />
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">AI Studio Demo</h3>
                 <p className="text-sm text-slate-600">Generate videos, images & voiceovers</p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-white">
-                <Image src="/images/pages/store-digital-detail1.jpg" alt="SAM.gov Assistant Demo" fill sizes="100vw" quality={85} className="object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-slate-900 ml-1" />
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white rounded-2xl overflow-hidden">
+              <StoreProductVideo
+                src="/videos/store/store-sam-gov.mp4"
+                poster="/images/pages/store-digital-detail1.jpg"
+                alt="SAM.gov Assistant demo"
+                label="SAM.gov Walkthrough"
+              />
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">SAM.gov Walkthrough</h3>
                 <p className="text-sm text-slate-600">Step-by-step registration guide</p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-white">
-                <Image src="/images/pages/store-digital-detail2.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-slate-900 ml-1" />
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white rounded-2xl overflow-hidden">
+              <StoreProductVideo
+                src="/videos/store/store-digital-resources.mp4"
+                poster="/images/pages/store-digital-detail2.jpg"
+                alt="Digital resources demo"
+                label="Digital Resources Overview"
+              />
               <div className="p-4">
-                <h3 className="font-bold text-slate-900">AI Tutor Demo</h3>
-                <p className="text-sm text-slate-600">24/7 student assistance</p>
+                <h3 className="font-bold text-slate-900">Digital Resources</h3>
+                <p className="text-sm text-slate-600">Toolkits, guides & templates</p>
               </div>
             </div>
           </div>
@@ -174,7 +169,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Downloadable Resources */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
             <Download className="w-8 h-8 text-amber-600" />
@@ -210,7 +205,7 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Platform Tools */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
             <Building2 className="w-8 h-8 text-brand-blue-600" />

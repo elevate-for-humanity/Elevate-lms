@@ -40,7 +40,7 @@ export function ProgramBanner() {
   };
 
   return (
-    <section className="rounded-2xl border bg-white p-4 md:p-5 shadow-sm">
+    <section className="rounded-2xl border p-4 md:p-5 shadow-sm">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-semibold text-black">

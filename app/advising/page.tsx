@@ -104,7 +104,7 @@ export default function AdvisingPage() {
             </p>
           </section>
         ) : (
-          <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <section className="rounded-2xl p-5 shadow-sm ring-1 ring-slate-200">
             <h2 className="text-sm font-semibold text-black">
               Schedule a meeting or visit
             </h2>

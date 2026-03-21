@@ -41,11 +41,12 @@ export default function AdminLoginPage() {
       }
 
       router.push('/admin/dashboard');
-    } catch (err: any) {
-      if (err.message?.includes('Invalid login')) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (err as any)?.message;
+      if (typeof msg === 'string' && msg.toLowerCase().includes('invalid')) {
         setError('Invalid email or password.');
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(typeof msg === 'string' && msg ? msg : 'Something went wrong. Please try again.');
       }
       setLoading(false);
     }

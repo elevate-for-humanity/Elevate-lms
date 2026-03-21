@@ -35,7 +35,7 @@ export default function MentorshipPage() {
         <Image src="/images/pages/mentorship-page-1.jpg" alt="Mentorship program — career guidance from experienced professionals" fill className="object-cover" priority sizes="100vw" />
       </section>
 
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Mentorship Program</h1>
           <p className="text-lg text-slate-600 mb-6 max-w-2xl">Get personalized guidance from experienced professionals in your field.</p>
@@ -59,7 +59,7 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-10 bg-white border-t border-slate-100">
+      <section className="py-10 border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-lg font-bold text-slate-900 mb-5">Mentorship Focus Areas</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -81,7 +81,7 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-12">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -102,7 +102,7 @@ export default function MentorshipPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white border-t">
+      <section className="py-16 border-t">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
@@ -119,7 +119,7 @@ export default function MentorshipPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-white border-t py-12">
+      <section className="border-t py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Ready to Start Your Career?</h2>
           <p className="text-slate-600 mb-6">Check your eligibility for funded career training programs.</p>

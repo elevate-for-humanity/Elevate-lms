@@ -162,7 +162,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Quick Stats Bar */}
-      <section className="py-6 bg-white border-t">
+      <section className="py-6 border-t">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -192,7 +192,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Section 1 — Program Overview */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
@@ -261,7 +261,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Section 3 — Program Structure (Mapped Hours) */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-8">Program Structure</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -315,7 +315,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Section 5 — Credential Pathway */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Credential Pathway</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">{program.credentialStatement}</p>
@@ -360,7 +360,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
 
       {/* Section 6.5 — Apprenticeship / Employer Training (conditional) */}
       {program.apprenticeship && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Workplace Training Component</h2>
             <p className="text-slate-600 mb-8 max-w-3xl">{program.apprenticeship.description}</p>
@@ -418,7 +418,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* Section 7.5 — Progress Tracking & Reporting */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Progress Tracking &amp; Reporting</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
@@ -484,7 +484,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white border-t">
+      <section className="py-20 border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Start Your {program.title} Career

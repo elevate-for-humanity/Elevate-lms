@@ -103,7 +103,7 @@ export default function ProgramPageTemplate({
       </section>
 
       {/* Program Quick Facts */}
-      <section className="py-16 bg-white border-b border-slate-200">
+      <section className="py-16 border-b border-slate-200">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Duration */}
@@ -178,7 +178,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </section>
 
       {/* Program Highlights */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-black mb-16 text-2xl md:text-3xl lg:text-4xl">
             Program Highlights
@@ -262,7 +262,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 
       {/* CTA Section with Image */}
       {ctaImage && ctaTitle && (
-        <section className="py-20 bg-white">
+        <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">

@@ -58,7 +58,7 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* What's Included */}
-      <section className="py-14 bg-white border-b">
+      <section className="py-14 border-b">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">
             What&apos;s Included
@@ -85,7 +85,7 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* 15-Week Schedule */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">
             15-Week Course Schedule
@@ -120,7 +120,7 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* Exam Details */}
-      <section className="py-14 bg-white border-t">
+      <section className="py-14 border-t">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">
             About the EPA 608 Exam
@@ -152,7 +152,7 @@ export default function EPA608CoursePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-3">
             Ready to Get Certified?

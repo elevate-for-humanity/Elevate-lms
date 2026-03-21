@@ -59,7 +59,7 @@ export default function MissionPage() {
       </div>
 
       {/* Hero — image with title overlaid */}
-      <section className="relative h-[300px] sm:h-[400px] overflow-hidden bg-white">
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
         <Image src="/images/pages/mission-page-1.jpg" alt="Our mission to elevate communities" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 flex items-center justify-center text-center px-4">
           <div className="max-w-3xl">

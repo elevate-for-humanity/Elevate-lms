@@ -24,10 +24,10 @@ const SUBJECTS = [
 
 export default function WorkKeysPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <>
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[420px] overflow-hidden bg-white">
-        <Image src="/images/pages/adult-learner.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover" priority />
+      <section className="relative h-[300px] sm:h-[420px] overflow-hidden">
+        <Image src="/images/pages/about-team-hero.jpg" alt="ACT WorkKeys career readiness assessment" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Header */}
@@ -50,7 +50,7 @@ export default function WorkKeysPage() {
       </div>
 
       {/* What is WorkKeys */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="relative h-64 rounded-2xl overflow-hidden">
@@ -71,7 +71,7 @@ export default function WorkKeysPage() {
       </section>
 
       {/* Three subjects */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">The Assessment</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Three Subject Areas</h2>
@@ -94,7 +94,7 @@ export default function WorkKeysPage() {
       </section>
 
       {/* Four levels */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Credential Levels</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">NCRC Levels</h2>
@@ -117,14 +117,15 @@ export default function WorkKeysPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-2">Schedule Your Test</p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Take WorkKeys at Elevate</h2>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. Contact us to schedule.
+                We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. By appointment only — contact us to schedule.
+              {/* TODO: Add ACT Testing Center Site Code once confirmed — display alongside ESCO ID: 358010 pattern */}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link href="/testing/book?provider=workkeys" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">
@@ -141,6 +142,6 @@ export default function WorkKeysPage() {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

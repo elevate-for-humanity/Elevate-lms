@@ -6,6 +6,8 @@ import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3,
 import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
 import StoreDemoVideo from './StoreDemoVideo';
 import StoreFAQ from './StoreFAQ';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'License the Elevate Platform | White-Label Workforce LMS',
@@ -14,44 +16,31 @@ export const metadata: Metadata = {
 };
 
 export default function StorePage() {
+  const hero = heroBanners.store;
 
   return (
     <div className="bg-white min-h-screen">
 
-      {/* ============ HERO — Video on the right, pitch on the left ============ */}
-      <section className="py-12 sm:py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <p className="text-brand-red-600 font-semibold text-sm tracking-wider mb-4">WHITE-LABEL WORKFORCE PLATFORM</p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-[1.1] mb-5">
-                License the LMS that runs workforce programs end to end.
-              </h1>
-              <p className="text-lg text-slate-600 leading-relaxed mb-4">
-                Elevate replaces the spreadsheets, paper forms, and disconnected systems your organization uses today. One platform handles enrollment, eligibility, attendance, credentials, employer matching, compliance reporting, and grant tracking — all automated.
-              </p>
-              <p className="text-base text-slate-500 mb-6">
-                You get your own branded instance. We handle the infrastructure. Your staff focuses on people, not data entry.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/store/trial" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition">
-                  Start 14-Day Free Trial <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link href="/demo/admin" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-white transition">
-                  Try Full Demo — No Signup
-                </Link>
-              </div>
-              <p className="text-xs text-slate-400 mt-3">No credit card required. Full platform access.</p>
-            </div>
-            <div>
-              <StoreDemoVideo />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ============ HERO ============ */}
+      <HeroVideo
+        videoSrcDesktop={hero.videoSrcDesktop}
+        videoSrcMobile={hero.videoSrcMobile}
+        posterImage={hero.posterImage}
+        voiceoverSrc={hero.voiceoverSrc}
+        microLabel={hero.microLabel}
+        transcript={hero.transcript}
+        analyticsName={hero.analyticsName}
+        belowHeroHeadline={hero.belowHeroHeadline}
+        belowHeroSubheadline={hero.belowHeroSubheadline}
+        ctas={[
+          { label: 'Start 14-Day Free Trial', href: '/store/trial' },
+          { label: 'Try Full Demo — No Signup', href: '/demo/admin', variant: 'secondary' },
+        ]}
+        trustIndicators={hero.trustIndicators}
+      />
 
       {/* ============ TRUST METRICS ============ */}
-      <section className="py-8 bg-white border-y border-slate-200">
+      <section className="py-8 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
@@ -95,29 +84,6 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* ============ PLATFORM SCREENSHOTS ============ */}
-      <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 text-center mb-3">See what you&apos;re getting</h2>
-          <p className="text-slate-600 text-center mb-10">Real screenshots from the platform. This is what your staff and students will use every day.</p>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {[
-              { img: '/images/pages/admin-compliance-hero.jpg', label: 'Admin Dashboard — enrollment pipeline, compliance alerts, program metrics' },
-              { img: '/images/pages/admin-employers-hero.jpg', label: 'Employer Portal — candidate search, apprenticeship tracking, incentives' },
-              { img: '/images/pages/admin-funding-hero.jpg', label: 'Course Builder — modules, lessons, quizzes, progress tracking' },
-              { img: '/images/pages/admin-grants-hero.jpg', label: 'Student View — courses, certificates, career services' },
-            ].map(s => (
-              <div key={s.img} className="group">
-                <div className="relative aspect-video rounded-xl overflow-hidden shadow-lg border border-slate-200">
-                  <Image src={s.img} alt={s.label} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
-                </div>
-                <p className="text-sm text-slate-600 mt-2">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ============ FULL-ACCESS DEMO ============ */}
       <section className="py-14 sm:py-20 bg-slate-900">
         <div className="max-w-6xl mx-auto px-6">
@@ -129,21 +95,16 @@ export default function StorePage() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5 mb-8">
             {[
-              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting', img: '/images/pages/admin-compliance-detail.jpg' },
-              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives', img: '/images/pages/admin-employers-playbook-detail.jpg' },
-              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials', img: '/images/pages/admin-partners-lms-detail.jpg' },
+              { label: 'Admin Dashboard', href: '/demo/admin', desc: 'Enrollment, compliance, reporting' },
+              { label: 'Employer Portal', href: '/demo/employer', desc: 'Candidates, apprenticeships, incentives' },
+              { label: 'Student Portal', href: '/demo/learner', desc: 'Courses, progress, credentials' },
             ].map(d => (
-              <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition">
-                <div className="relative aspect-video">
-                  <Image src={d.img} alt={d.label} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-white font-bold mb-1">{d.label}</h3>
-                  <p className="text-slate-400 text-sm mb-2">{d.desc}</p>
-                  <span className="text-brand-red-400 text-sm font-semibold inline-flex items-center gap-1">
-                    Open Live Demo <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
+              <Link key={d.href} href={d.href} className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-6 transition">
+                <h3 className="text-white font-bold mb-1">{d.label}</h3>
+                <p className="text-slate-400 text-sm mb-4">{d.desc}</p>
+                <span className="text-brand-red-400 text-sm font-semibold inline-flex items-center gap-1">
+                  Open Live Demo <ArrowRight className="w-3 h-3" />
+                </span>
               </Link>
             ))}
           </div>
@@ -179,7 +140,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ COMPLIANCE & TRUST ============ */}
-      <section className="py-14 sm:py-20 bg-white border-y border-slate-200">
+      <section className="py-14 sm:py-20 border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 justify-center mb-3">
             <Shield className="w-6 h-6 text-brand-red-600" />
@@ -327,7 +288,7 @@ export default function StorePage() {
       </section>
 
       {/* ============ ALSO IN THE STORE ============ */}
-      <section className="py-10 bg-white border-t border-slate-100">
+      <section className="py-10 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
           <div className="flex flex-wrap gap-3">

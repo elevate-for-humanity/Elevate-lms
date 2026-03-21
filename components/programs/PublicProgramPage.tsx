@@ -228,7 +228,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {config.stats.map((stat, index) => (
@@ -340,7 +340,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       </section>
 
       {/* Curriculum from DB */}
-      <section id="curriculum" className="py-16 bg-white">
+      <section id="curriculum"className="py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className={`inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4`}>
@@ -512,7 +512,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
             {config.cta.title}

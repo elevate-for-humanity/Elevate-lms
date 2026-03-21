@@ -1,5 +1,3 @@
-import 'server-only';
-
 export type ProgramFacts = {
   slug: string;
   name: string;

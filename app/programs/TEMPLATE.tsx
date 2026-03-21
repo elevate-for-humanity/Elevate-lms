@@ -15,7 +15,7 @@ export default function ProgramTemplate() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section - Clean, White Background */}
-      <section className="bg-white py-16 border-b">
+      <section className="py-16 border-b">
         <div className="max-w-7xl mx-auto px-6">
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-3 mb-6">

@@ -70,6 +70,21 @@ export default function HomePage() {
       {/* ── TRUST STRIP ── */}
       <TrustStrip variant="compact" showAnimation />
 
+      {/* ── CNA COHORT WAITLIST BANNER ── */}
+      <section className="bg-brand-blue-700 border-b border-brand-blue-800 py-6 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <p className="text-white text-sm sm:text-base leading-snug">
+            CNA cohorts are anticipated to begin in October. Join the waiting list to receive official updates on enrollment, scheduling, and program details.
+          </p>
+          <a
+            href="/cna-waitlist"
+            className="flex-shrink-0 bg-white text-brand-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-brand-blue-50 transition-colors text-sm whitespace-nowrap"
+          >
+            Join the CNA Waiting List
+          </a>
+        </div>
+      </section>
+
       {/* ── AUDIENCE ROUTING ── */}
       <section className="bg-slate-50 border-b border-slate-200 py-8 sm:py-10">
         <div className="max-w-5xl mx-auto px-6">
@@ -119,7 +134,7 @@ export default function HomePage() {
       </section>
 
       {/* ── WHAT WE DO ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">What We Do</p>
@@ -178,7 +193,7 @@ export default function HomePage() {
 
 
       {/* ── HOW IT WORKS ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">The Process</p>
@@ -273,7 +288,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Student Outcomes</p>
@@ -328,8 +343,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── CNA COHORT SECTION ── */}
+      <section className="py-16 sm:py-20 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-brand-blue-600 text-xs font-bold uppercase tracking-widest mb-3">Healthcare Training</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Upcoming CNA Cohorts</h2>
+          <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+            Elevate for Humanity is planning upcoming CNA cohorts with an anticipated start in October. If you are interested in joining a future cohort, join the waiting list to receive official updates on enrollment, scheduling, and program details.
+          </p>
+          <Link
+            href="/cna-waitlist"
+            className="inline-block bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-8 py-4 rounded-xl transition-colors"
+          >
+            Join the Waiting List
+          </Link>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
-      <section className="py-20 sm:py-24 bg-white">
+      <section className="py-20 sm:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <BlurIn>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Ready to start?</h2>

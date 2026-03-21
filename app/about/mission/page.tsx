@@ -38,7 +38,7 @@ export default function MissionPage() {
       </section>
 
       {/* Mission Statement */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <Target className="w-16 h-16 text-brand-orange-600 mx-auto mb-6" />
@@ -56,7 +56,7 @@ export default function MissionPage() {
       </section>
 
       {/* Core Values */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
             Our Core Values
@@ -115,7 +115,7 @@ export default function MissionPage() {
       </section>
 
       {/* Vision Section */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-[400px] rounded-xl overflow-hidden">

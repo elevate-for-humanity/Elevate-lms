@@ -34,7 +34,7 @@ export default function OngoingSupportPage() {
         <Image src="/images/pages/mentorship-page-3.jpg" alt="Ongoing Support" fill className="object-cover" priority sizes="100vw" />
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Support When You Need It</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -57,7 +57,7 @@ export default function OngoingSupportPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Types of Support</h2>
           <div className="space-y-4">

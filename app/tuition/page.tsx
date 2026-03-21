@@ -50,7 +50,7 @@ export default async function TuitionPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-white py-12 sm:py-16">
+      <section className="relative py-12 sm:py-16">
         <Image
           src="/images/pages/tuition-hero.jpg"
           alt="Tuition and Payment Options"
@@ -211,7 +211,7 @@ export default async function TuitionPage() {
       </section>
 
       {/* Important Notes */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
             Important Notes
@@ -241,7 +241,7 @@ export default async function TuitionPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Tuition FAQ</h2>
           <div className="space-y-4">

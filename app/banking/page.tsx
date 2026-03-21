@@ -51,7 +51,7 @@ export default async function BankingPage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-8 pb-4">
+      <section className="pt-8 pb-4">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Banking Services</h1>
           <p className="text-slate-600 text-lg max-w-xl">
@@ -61,7 +61,7 @@ export default async function BankingPage() {
       </section>
 
       {/* Trust strip */}
-      <section className="py-5 bg-white border-b">
+      <section className="py-5 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap justify-center items-center gap-8 text-sm font-semibold text-slate-700">
             <span>FDIC Insured</span>
@@ -141,7 +141,7 @@ export default async function BankingPage() {
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative w-full" style={{ aspectRatio: '16/10' }}>
                 <Image
-                  src="/images/pages/banking-page-2.jpg"
+                  src="/images/pages/pathways-page-6.jpg"
                   alt="Prepaid debit card for tax refund disbursement"
                   fill
                   className="object-cover"
@@ -169,7 +169,7 @@ export default async function BankingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-16 sm:py-20 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-12">How It Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -197,7 +197,7 @@ export default async function BankingPage() {
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
               <Image
-                src="/images/pages/tax-prep-desk.jpg"
+                src="/images/pages/pathways-page-7.jpg"
                 alt="Professional tax preparation services powered by EPS Financial"
                 fill
                 className="object-cover"
@@ -236,7 +236,7 @@ export default async function BankingPage() {
       </section>
 
       {/* Fees & Disclosures */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Fees &amp; Disclosures</h2>
           <div className="bg-white rounded-xl border border-slate-200 p-8 space-y-6">
@@ -277,7 +277,7 @@ export default async function BankingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-16 sm:py-20 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
           <p className="text-slate-600 mb-8">

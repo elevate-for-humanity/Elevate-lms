@@ -131,7 +131,7 @@ export default function AnalyticsProPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Built for Workforce Development</h2>

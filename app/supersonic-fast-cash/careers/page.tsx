@@ -528,7 +528,7 @@ export default async function TaxCareersPage() {
       </section>
 
       {/* Why Work With Us */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Work With Us?</h2>
@@ -559,7 +559,7 @@ export default async function TaxCareersPage() {
       </section>
 
       {/* Open Positions */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Open Positions</h2>
@@ -622,7 +622,7 @@ export default async function TaxCareersPage() {
       </section>
 
       {/* Comparison vs Competitors */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">How We Compare</h2>
@@ -739,7 +739,7 @@ export default async function TaxCareersPage() {
       </section>
 
       {/* Application Form */}
-      <section id="apply" className="py-20 bg-white">
+      <section id="apply"className="py-20">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Apply Now</h2>

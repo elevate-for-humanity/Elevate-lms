@@ -330,6 +330,26 @@ section {
   }
 }
 
+/*
+ * Section rhythm — alternating backgrounds.
+ *
+ * Any <section> that immediately follows another <section> gets slate-50.
+ * This creates white → slate-50 → white → slate-50 alternation regardless
+ * of DOM nesting depth or page structure.
+ *
+ * Tailwind bg-* utilities (bg-slate-900, bg-brand-red-700, etc.) are in
+ * @layer utilities which has higher priority than @layer base, so explicit
+ * colored sections always override this rule automatically.
+ *
+ * Prerequisite: bg-white stripped from <section> tags (it's the browser
+ * default and would otherwise override this @layer base rule).
+ */
+@layer base {
+  section + section {
+    background-color: #f8fafc; /* slate-50 */
+  }
+}
+
 /* ============================================================================
    COMPONENTS
    ============================================================================ */
@@ -1418,11 +1438,8 @@ html {
 /* Body styles consolidated - single source of truth */
 /* background and color set in @layer base */
 
-/* Ensure main content is readable */
-main,
-section {
-  background-color: transparent;
-}
+/* background-color: transparent on main/section removed — it was overriding
+   the section + section alternation rule. Transparent is the browser default. */
 
 /* 2) Kill accidental transparency/blur that makes text look faint */
 [data-polish-solid],

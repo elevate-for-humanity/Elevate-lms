@@ -82,7 +82,7 @@ export default function ProgramPageLayout({
       </section>
 
       {/* Title + CTA below hero */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-slate-900 leading-tight">
@@ -134,7 +134,7 @@ export default function ProgramPageLayout({
       </section>
 
       {/* Program Overview with Image */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-5xl font-black mb-12 text-center text-3xl md:text-4xl lg:text-5xl">{overviewTitle}</h2>
@@ -204,7 +204,7 @@ export default function ProgramPageLayout({
       </section>
 
       {/* Career Outcomes with Visual */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-5xl font-black mb-12 text-center text-3xl md:text-4xl lg:text-5xl">{careerTitle}</h2>

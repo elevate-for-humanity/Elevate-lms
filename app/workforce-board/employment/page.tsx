@@ -65,7 +65,7 @@ export default function EmploymentPage() {
       </section>
 
       {/* Process */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Your Path to Employment</h2>
           <div className="grid md:grid-cols-4 gap-6">

@@ -41,7 +41,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* How You Get Paid - CRITICAL */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <DollarSign className="w-16 h-16 mx-auto mb-4" />
@@ -141,7 +141,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* Onboarding Steps */}
-      <section id="start" className="py-16 bg-white">
+      <section id="start"className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-12 text-center">
             Onboarding Process
@@ -258,7 +258,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* Required Acknowledgments */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-8 text-center">
             Required Acknowledgments
@@ -336,7 +336,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?
@@ -354,7 +354,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-black mb-8 text-center">
             Frequently Asked Questions

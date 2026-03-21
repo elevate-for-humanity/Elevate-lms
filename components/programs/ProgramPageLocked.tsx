@@ -81,7 +81,7 @@ export function ProgramPageLocked({
       </section>
 
       {/* 1. WHO THIS IS FOR */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-black mb-8 text-center">
             Is This For You?
@@ -125,7 +125,7 @@ export function ProgramPageLocked({
       </section>
 
       {/* 3. HOW LONG IT TAKES */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-black mb-8 text-center">
             Time Commitment
@@ -171,7 +171,7 @@ export function ProgramPageLocked({
 
       {/* Proof (if available) */}
       {(rapidsId || avgSalary) && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-3xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-6">
               {rapidsId && (

@@ -59,7 +59,7 @@ export default function JobPlacementPage() {
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
             <div className="relative h-40 overflow-hidden">
-              <Image src="/images/pages/about-employer-partners.jpg" alt="Employer connections" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+              <Image src="/images/pages/admin-applications-review-hero.jpg" alt="Employer connections" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
             <div className="p-8">
               <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
@@ -183,7 +183,7 @@ export default function JobPlacementPage() {
         </div>
       </section>
 
-      <section id="employers" className="bg-white py-16">
+      <section id="employers"className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4 text-center">
             Our Employer Partners

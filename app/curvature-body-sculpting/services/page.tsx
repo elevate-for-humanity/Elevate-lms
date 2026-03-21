@@ -154,7 +154,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-8 pb-6">
+      <section className="pt-8 pb-6">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">Our Services</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
@@ -240,7 +240,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Packages */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Body Sculpting Packages</h2>

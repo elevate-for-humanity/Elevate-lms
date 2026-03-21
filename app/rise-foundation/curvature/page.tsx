@@ -65,7 +65,7 @@ export default function CurvaturePage() {
       {/* Hero */}
       <section className="relative h-[340px] sm:h-[440px] overflow-hidden bg-slate-900">
         <Image
-          src="/images/pages/rise-foundation-page-1.jpg"
+          src="/images/pages/admin-api-keys-hero.jpg"
           alt="CurvatureBody Sculpting non-invasive body contouring Indianapolis"
           fill sizes="100vw"
           className="object-cover"

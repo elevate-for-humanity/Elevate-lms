@@ -61,7 +61,7 @@ export function RealOutcomes() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="text-black">Loading verified outcomes...</div>
         </div>
@@ -115,7 +115,7 @@ export function RealOutcomes() {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full mb-4">

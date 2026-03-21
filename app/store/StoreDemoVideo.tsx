@@ -40,7 +40,7 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <Image
-            src="/images/pages/hvac-technician.jpg"
+            src="/images/pages/admin-activity-hero.jpg"
             alt="HVAC Technician course — Module 1 preview"
             fill
             className="object-cover"

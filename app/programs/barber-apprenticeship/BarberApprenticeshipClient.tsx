@@ -94,7 +94,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ MEASURABLE OUTCOMES (condensed paragraph) ═══ */}
-      <section className="bg-white py-10">
+      <section className="py-10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-72 rounded-xl overflow-hidden shadow-lg order-2 md:order-1">
@@ -150,7 +150,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ CTA: INQUIRY & ENROLLMENT ═══ */}
-      <section className="bg-white py-12 border-t">
+      <section className="py-12 border-t">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-3">Ready to Start?</h2>
           <p className="text-slate-500 text-center max-w-2xl mx-auto mb-8">
@@ -265,7 +265,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ CAREER OUTCOMES / LABOR MARKET ═══ */}
-      <section className="bg-white py-10">
+      <section className="py-10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
@@ -391,7 +391,7 @@ export default function BarberApprenticeshipClient({ program: p }: Props) {
       </section>
 
       {/* ═══ INSTITUTIONAL FOOTER ═══ */}
-      <section className="bg-white border-t py-8">
+      <section className="border-t py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-slate-600">
             <div>

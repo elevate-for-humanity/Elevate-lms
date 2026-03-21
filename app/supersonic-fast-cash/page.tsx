@@ -123,7 +123,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* INTRO BAND — white background, dark text */}
-      <section className="bg-white py-16 border-b border-slate-100">
+      <section className="py-16 border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
             Supersonic Fast Cash
@@ -190,7 +190,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* SERVICES — white background, plain cards with single button */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-4xl font-black text-slate-900 mb-4">Our Services</h2>
@@ -267,7 +267,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* REFUND ADVANCE — white background */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative h-[480px] rounded-2xl overflow-hidden">
@@ -339,7 +339,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* LOCATION — white background */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -432,7 +432,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* BECOME A TAX PRO — white */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -507,7 +507,7 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* DISCLOSURE */}
-      <section className="py-6 bg-white border-t border-slate-200">
+      <section className="py-6 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-slate-500 leading-relaxed">
             Electronic filing is subject to IRS validation. Acceptance is not guaranteed.

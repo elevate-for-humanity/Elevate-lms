@@ -108,7 +108,7 @@ export default function CourseLeaderboardPage() {
           <p className="text-black">Loading leaderboard...</p>
 
           {/* Storytelling Section */}
-          <section className="py-16 bg-white">
+          <section className="py-16">
             <div className="container mx-auto px-4">
               <div className="max-w-7xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -153,7 +153,7 @@ export default function CourseLeaderboardPage() {
                   </div>
                   <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/pages/graduation-ceremony.jpg"
+                      src="/images/pages/admin-barriers-hero.jpg"
                       alt="Students achieving goals"
                       fill
                       className="object-cover"

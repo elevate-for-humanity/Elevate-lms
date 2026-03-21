@@ -98,7 +98,7 @@ export default function StudentPortalResourcesPage() {
       </div>
 
       {/* Quick Links */}
-      <section className="mt-8 bg-white rounded-lg shadow p-6">
+      <section className="mt-8 rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
         <div className="grid md:grid-cols-4 gap-4">
           <a href="/learner/calendar" className="p-3 border rounded-lg hover:bg-white text-center">

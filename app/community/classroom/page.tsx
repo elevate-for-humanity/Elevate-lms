@@ -65,7 +65,7 @@ export default async function ClassroomPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
@@ -184,7 +184,7 @@ export default async function ClassroomPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Start Learning?</h2>
           <p className="text-brand-green-100 mb-8 max-w-2xl mx-auto">

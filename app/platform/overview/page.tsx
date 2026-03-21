@@ -109,7 +109,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* Government Credentials Included */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
@@ -241,7 +241,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* License Types */}
-      <section id="license-types" className="py-20 bg-white">
+      <section id="license-types"className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
@@ -555,7 +555,7 @@ export default async function PlatformLicensingPage() {
       </section>
 
       {/* Original Pricing Tiers Section (Keep for reference) */}
-      <section id="tiers" className="py-20 bg-white">
+      <section id="tiers"className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">

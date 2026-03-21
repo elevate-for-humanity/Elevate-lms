@@ -75,7 +75,7 @@ export default function StoreLicensesPage() {
       <RedirectNotice />
 
       {/* Hero with platform screenshot */}
-      <section className="py-14 sm:py-18 bg-white">
+      <section className="py-14 sm:py-18">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -176,7 +176,7 @@ export default function StoreLicensesPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
@@ -201,7 +201,7 @@ export default function StoreLicensesPage() {
       </section>
 
       {/* Not sure? */}
-      <section className="py-12 bg-white border-t border-slate-200">
+      <section className="py-12 border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Not sure which license fits?</h2>
           <p className="text-slate-800 mb-6">

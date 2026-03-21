@@ -101,7 +101,7 @@ export default async function HubWelcomePage() {
       {/* Hero Section */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/adult-learner.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/admin-accreditation-hero.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -173,7 +173,7 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Hub Sub-Pages Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Explore the Hub</h2>
@@ -212,7 +212,7 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Success Stories</h2>
@@ -258,7 +258,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/apply-page-2.jpg"
+                    src="/images/pages/admin-applications-hero.jpg"
                     alt="Apply for a program"
                     fill
                     className="object-cover"
@@ -274,7 +274,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/lms-page-2.jpg"
+                    src="/images/pages/lms-page-11.jpg"
                     alt="Get enrolled"
                     fill
                     className="object-cover"
@@ -290,7 +290,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/graduation-ceremony.jpg"
+                    src="/images/pages/admin-blog-hero.jpg"
                     alt="Complete and succeed"
                     fill
                     className="object-cover"
@@ -305,7 +305,7 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">Questions? Contact Us</h2>
           <p className="text-xl text-brand-green-100 mb-8 max-w-2xl mx-auto">

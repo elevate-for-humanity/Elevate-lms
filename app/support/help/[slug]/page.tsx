@@ -80,7 +80,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "[Slug]" }]} />
       </div>
 {/* Header */}
-      <section className="bg-white border-b py-6">
+      <section className="border-b py-6">
         <div className="max-w-4xl mx-auto px-6">
           <Link
             href="/support/help"

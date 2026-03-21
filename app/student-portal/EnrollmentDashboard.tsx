@@ -105,7 +105,7 @@ export default function EnrollmentDashboard() {
   };
 
   return (
-    <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <section className="rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
       <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
         <GraduationCap className="w-6 h-6 text-brand-blue-600" />
         My Enrollments

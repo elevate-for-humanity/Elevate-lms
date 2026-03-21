@@ -40,7 +40,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Institutional Governance */}
-      <section className="py-12 bg-white border-b border-slate-200">
+      <section className="py-12 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h2 className="text-xl font-bold text-slate-900 mb-3">Institutional Governance</h2>
@@ -71,7 +71,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* State & Workforce Approvals */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Shield className="w-12 h-12 text-brand-blue-600" />
@@ -171,7 +171,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Federal Approvals */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Building2 className="w-12 h-12 text-brand-orange-600" />
@@ -226,7 +226,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Certification & Testing Partnerships */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Award className="w-12 h-12 text-brand-orange-600" />
@@ -323,7 +323,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Nonprofit & Diversity Certifications */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <Users className="w-12 h-12 text-brand-blue-600" />
@@ -383,7 +383,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* Why This Matters */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <FileCheck className="w-12 h-12 text-white" />
@@ -430,7 +430,7 @@ export default function ApprovalsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
             Ready to Get Started?

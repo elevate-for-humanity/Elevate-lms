@@ -129,9 +129,9 @@ export default function JRIPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-48 md:h-64 flex items-center bg-white overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/pages/jri-page-1.jpg"
+          src="/images/pages/jri-hero.jpg"
           alt="JRI Program participants"
           fill
           className="object-cover"
@@ -141,7 +141,7 @@ export default function JRIPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => {
@@ -159,7 +159,7 @@ export default function JRIPage() {
       </section>
 
       {/* What is JRI */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -189,7 +189,7 @@ export default function JRIPage() {
       </section>
 
       {/* Eligibility */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -242,7 +242,7 @@ export default function JRIPage() {
       </section>
 
       {/* Available Programs */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -288,7 +288,7 @@ export default function JRIPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">JRI Program FAQ</h2>
           <div className="space-y-4">
@@ -317,7 +317,7 @@ export default function JRIPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Start Your New Chapter?

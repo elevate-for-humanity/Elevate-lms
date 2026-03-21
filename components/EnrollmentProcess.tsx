@@ -49,7 +49,7 @@ const steps = [
 
 export default function EnrollmentProcess() {
   return (
-    <section className="py-16 sm:py-20 bg-white">
+    <section className="py-16 sm:py-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
           <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Enrollment Guide</p>

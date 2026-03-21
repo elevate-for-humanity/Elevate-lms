@@ -249,7 +249,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* My Enrollments - Shows for logged-in users */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-6">
           <EnrollmentDashboard />
           <StudentProgressWidget />
@@ -328,7 +328,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* Student Resources */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-4">
             Student Resources
@@ -382,7 +382,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black text-black mb-12 text-center">
             Frequently Asked Questions

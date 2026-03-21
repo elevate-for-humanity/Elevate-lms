@@ -91,7 +91,7 @@ export default async function PartnersPage() {
 
       {/* Certification Partners */}
       {certificationPartners.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
               <Award className="w-8 h-8 text-brand-green-600" />
@@ -151,7 +151,7 @@ export default async function PartnersPage() {
 
       {/* Employer Partners */}
       {employerPartners.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
               <Briefcase className="w-8 h-8 text-brand-orange-600" />

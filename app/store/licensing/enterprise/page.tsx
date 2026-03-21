@@ -22,7 +22,7 @@ export default function SourceUseLicensePage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Source Use" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 overflow-hidden bg-white">
+      <section className="relative py-20 overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-brand-blue-50 border border-brand-blue-200 rounded-full px-4 py-2 mb-6">
@@ -59,7 +59,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Info Banner */}
-      <section className="py-8 bg-white border-y border-slate-200">
+      <section className="py-8 border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start gap-4">
             <Info className="w-6 h-6 text-brand-blue-500 flex-shrink-0 mt-1" />
@@ -149,7 +149,7 @@ export default function SourceUseLicensePage() {
       />
 
       {/* Restrictions */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">License Restrictions</h2>
           
@@ -261,7 +261,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Comparison */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Compare License Types</h2>
           
@@ -310,7 +310,7 @@ export default function SourceUseLicensePage() {
       </section>
 
       {/* Implementation Timeline */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Implementation Timeline</h2>
           <div className="grid md:grid-cols-4 gap-6">

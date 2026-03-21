@@ -105,7 +105,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* Why Partner */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Partner With Us</h2>
@@ -167,7 +167,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="space-y-8">
@@ -192,7 +192,7 @@ export default async function ForEmployersPage() {
       </section>
 
       {/* Quick Links */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-10">Employer Resources</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

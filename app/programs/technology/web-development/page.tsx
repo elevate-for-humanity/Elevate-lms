@@ -76,7 +76,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
             Technology · Indianapolis
@@ -125,7 +125,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* What this program is */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
@@ -197,7 +197,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Portfolio projects */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg">
@@ -260,7 +260,7 @@ export default function WebDevelopmentPage() {
       </section>
 
       {/* Who should apply */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">

@@ -101,7 +101,7 @@ export default async function HsiPage() {
       {/* Avatar Guide */}
 
       {/* Stats Section */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
@@ -171,7 +171,7 @@ export default async function HsiPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">

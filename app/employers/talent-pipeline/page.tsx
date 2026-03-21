@@ -165,7 +165,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -193,7 +193,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -216,7 +216,7 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Industries */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -280,7 +280,7 @@ export default async function TalentPipelinePage() {
             </div>
             <div className="relative h-[400px] rounded-xl overflow-hidden">
               <Image
-                src="/images/pages/employers-page-3.jpg"
+                src="/images/pages/admin-employers-hero.jpg"
                 alt="Training in progress"
                 fill
                 className="object-cover"

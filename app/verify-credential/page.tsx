@@ -48,7 +48,7 @@ export default function VerifyCredentialPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Simple Header - No Hero */}
-      <section className="bg-white border-b border-gray-200">
+      <section className="border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center gap-3 mb-2">
             <Shield className="w-8 h-8 text-brand-blue-600" />

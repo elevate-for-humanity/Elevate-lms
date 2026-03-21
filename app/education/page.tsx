@@ -135,7 +135,7 @@ export default function EducationLandingPage() {
       </section>
 
       {/* STATS */}
-      <section className="bg-white py-8 border-b">
+      <section className="py-8 border-b">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map((s) => (
             <div key={s.label} className="flex items-center gap-3 justify-center">
@@ -179,7 +179,7 @@ export default function EducationLandingPage() {
       </section>
 
       {/* LOCATIONS */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Pick Your Location</h2>

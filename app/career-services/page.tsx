@@ -38,7 +38,7 @@ export default function CareerServicesPage() {
       />
 
       {/* What We Offer — stacked on mobile */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What You Get</h2>
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
@@ -63,7 +63,7 @@ export default function CareerServicesPage() {
       </section>
 
       {/* Your Journey — step by step */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">Your Path to Employment</h2>
           <div className="space-y-3">
@@ -87,35 +87,35 @@ export default function CareerServicesPage() {
       </section>
 
       {/* Skills Gap Analysis */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <SkillsGapAnalysis />
         </div>
       </section>
 
       {/* Virtual Career Fair */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <VirtualCareerFair />
         </div>
       </section>
 
       {/* Student Success Coaching */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <StudentSuccessCoaching />
         </div>
       </section>
 
       {/* WorkOne Locator */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <WorkOneLocator />
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Start Your Career?</h2>
           <p className="text-white mb-6 text-sm">Apply for training and career services are included at no extra cost.</p>

@@ -92,7 +92,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* What We Offer */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             How We Can Help
@@ -114,7 +114,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Process */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Our Counseling Process
@@ -157,7 +157,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Assessments */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Career Assessments
@@ -255,7 +255,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Session Types */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Session Options
@@ -314,7 +314,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;
@@ -324,7 +324,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Ready to Explore Your Options?

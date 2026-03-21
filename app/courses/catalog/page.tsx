@@ -288,7 +288,7 @@ export default function CoursesCatalogPage() {
       </section>
 
       {/* Headline + search — below the video frame */}
-      <section className="bg-white pt-8 pb-6">
+      <section className="pt-8 pb-6">
         <div className="max-w-6xl mx-auto px-4">
           <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-5">
             Free to Apply · Grant Funding Available
@@ -313,7 +313,7 @@ export default function CoursesCatalogPage() {
       </section>
 
       {/* ── ELEVATE FLAGSHIP PROGRAMS ───────────────────────────────── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -382,7 +382,7 @@ export default function CoursesCatalogPage() {
       </section>
 
       {/* ── PARTNER COURSES ─────────────────────────────────────────── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1">All Courses</h2>

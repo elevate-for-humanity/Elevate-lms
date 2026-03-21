@@ -77,7 +77,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
       </section>
 
       {/* Program title + quick facts */}
-      <section className="bg-white">
+      <section className="">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
@@ -265,7 +265,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
       </section>
 
       {/* CTA */}
-      <section className="bg-white py-10 border-t">
+      <section className="py-10 border-t">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">{data.name}</h2>

@@ -166,7 +166,7 @@ export default function RoleSelectionCards({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {roles.map((roleData) => (
           <div
             key={roleData.role}
@@ -265,7 +265,7 @@ export default function RoleSelectionCards({
             </div>
 
             {/* Requirements */}
-            <div className="p-6 border-b border-slate-200">
+            <div className="p-6">
               <h4 className="font-semibold text-black mb-3">
                 Requirements
               </h4>

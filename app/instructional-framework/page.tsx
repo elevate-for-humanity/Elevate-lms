@@ -151,7 +151,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Governance Statement */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="border-l-4 border-brand-blue-600 pl-6 mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-3">RTI Governance Statement</h2>
@@ -249,7 +249,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Provider Tier System */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Provider Tier System</h2>
           <p className="text-gray-600 mb-8">
@@ -301,7 +301,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* RTI Hours Table */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">RTI Hour Structure by Program</h2>
           <p className="text-gray-600 mb-6">
@@ -341,7 +341,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Authorized RTI Provider Registry */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Authorized RTI Provider Registry</h2>
           <p className="text-gray-600 mb-6">
@@ -389,7 +389,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Competency & Assessment */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Competency Tracking & Assessment</h2>
           <p className="text-gray-600 mb-8">
@@ -443,7 +443,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* OJT Structure */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Employer OJT Structure</h2>
           <p className="text-gray-600 mb-6">
@@ -483,7 +483,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Credential Issuance */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Credential Issuance (Dual-Issuer Model)</h2>
           <p className="text-gray-600 mb-6">
@@ -530,7 +530,7 @@ export default function InstructionalFrameworkPage() {
       </section>
 
       {/* Registration & Links */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Registration & Compliance References</h2>
           <div className="grid sm:grid-cols-2 gap-4">

@@ -68,7 +68,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Funding Badge */}
       {program.fundingType && (
-        <section className="bg-white border-b border-slate-100">
+        <section className="border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <FundingBadge type={program.fundingType} />
           </div>
@@ -76,7 +76,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       )}
 
       {/* Badges + CTA */}
-      <section className="bg-white border-b border-slate-100">
+      <section className="border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex flex-wrap items-center gap-3">
@@ -104,7 +104,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* Title + Highlights */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-16">
             <Link 
@@ -154,7 +154,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* How It Works - Detailed Steps */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
@@ -355,7 +355,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Requirements */}
       {program.requirements && program.requirements.length > 0 && (
-        <section className="py-16 lg:py-24 bg-white">
+        <section className="py-16 lg:py-24">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-12">
               Requirements
@@ -398,7 +398,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       )}
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to get started?

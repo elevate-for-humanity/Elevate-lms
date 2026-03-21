@@ -132,7 +132,7 @@ export default function ComplianceAutomationPage() {
       </section>
 
       {/* Compliance Areas */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Comprehensive Coverage</h2>
@@ -198,7 +198,7 @@ export default function ComplianceAutomationPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Pricing</h2>

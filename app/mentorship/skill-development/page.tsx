@@ -41,7 +41,7 @@ export default function SkillDevelopmentPage() {
         
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Skills We Help Develop</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -62,7 +62,7 @@ export default function SkillDevelopmentPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Personalized Learning Plans</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -88,7 +88,7 @@ export default function SkillDevelopmentPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Start Building Your Skills</h2>
           <p className="text-xl text-brand-green-100 mb-8">Get matched with a mentor who can help you grow.</p>

@@ -45,7 +45,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Contact Options */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             {/* Phone */}
@@ -100,7 +100,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Office Location */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Visit Our Office
@@ -135,9 +135,9 @@ export default function CareerServicesContactPage() {
                 <div className="flex items-start">
                   <MessageSquare className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Walk-ins Welcome</h3>
+                    <h3 className="font-bold text-gray-900 mb-1">By Appointment Only</h3>
                     <p className="text-gray-600">
-                      No appointment needed for quick questions. For in-depth sessions, please schedule ahead.
+                      By appointment only — for meetings, support, testing, and hands-on training. This is not a walk-in location.
                     </p>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* Services Quick Links */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Career Services Available
@@ -231,7 +231,7 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions
@@ -248,7 +248,7 @@ export default function CareerServicesContactPage() {
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-2">Do I need an appointment?</h3>
               <p className="text-gray-600">
-                Walk-ins are welcome for quick questions. For resume reviews, mock interviews, or counseling sessions, we recommend scheduling an appointment.
+                Yes — all visits are by appointment only. Elevate is a hybrid training institute, not a walk-in location. Schedule through the booking link on this page.
               </p>
             </div>
 

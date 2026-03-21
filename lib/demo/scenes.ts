@@ -1,0 +1,200 @@
+import type { DemoScene } from '@/components/demo/InteractiveDemoPlayer';
+
+// ---------------------------------------------------------------------------
+// Admin Tour
+// ---------------------------------------------------------------------------
+export const ADMIN_SCENES: DemoScene[] = [
+  {
+    id: 'admin-overview',
+    title: 'Admin Dashboard Overview',
+    description: 'See enrollment, compliance, and outcomes across all programs at a glance.',
+    videoSrc: '/videos/store/store-admin-demo.mp4',
+    poster: '/images/pages/admin-dashboard-hero.jpg',
+    choices: [
+      { label: 'Review Applications',    description: 'See how students apply and get approved',    nextScene: 'admin-applications', variant: 'primary'   },
+      { label: 'WIOA Compliance',        description: 'Automated eligibility and PIRL reporting',   nextScene: 'admin-compliance',   variant: 'primary'   },
+      { label: 'Funding & Outcomes',     description: 'Track funding utilization and placements',   nextScene: 'admin-funding',      variant: 'secondary' },
+      { label: 'Analytics',              description: 'Enrollment trends and at-risk alerts',        nextScene: 'admin-analytics',    variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-applications',
+    title: 'Application Pipeline',
+    description: 'Students apply online. Your staff reviews, approves, and routes funding — no paper.',
+    videoSrc: '/videos/store/store-platform-overview.mp4',
+    poster: '/images/pages/admin-applications-hero.jpg',
+    choices: [
+      { label: 'WIOA Compliance',    description: 'See automated eligibility screening',  nextScene: 'admin-compliance',   variant: 'primary'   },
+      { label: 'Student Enrollment', description: 'What students see after approval',     nextScene: 'admin-enrollment',   variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-compliance',
+    title: 'WIOA Compliance & Reporting',
+    description: 'Eligibility verified at enrollment. PIRL reports generated on demand. Audit logs automatic.',
+    videoSrc: '/videos/store/store-compliance-automation.mp4',
+    poster: '/images/pages/admin-wioa-hero.jpg',
+    choices: [
+      { label: 'Funding Dashboard',  description: 'ITA tracking and funding allocation',  nextScene: 'admin-funding',    variant: 'primary'   },
+      { label: 'Analytics',          description: 'Outcomes and placement metrics',        nextScene: 'admin-analytics',  variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-funding',
+    title: 'Funding & ITA Management',
+    description: 'Track WIOA ITAs, Workforce Ready Grant, and JRI funding across all enrolled students.',
+    videoSrc: '/videos/store/store-managed-platform.mp4',
+    poster: '/images/pages/admin-funding-hero.jpg',
+    choices: [
+      { label: 'Analytics & Outcomes', description: 'Completion rates and placement data', nextScene: 'admin-analytics',  variant: 'primary'   },
+      { label: 'Employer Portal',      description: 'See what your hiring partners see',   nextScene: 'admin-employers',  variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-analytics',
+    title: 'Analytics & Outcomes',
+    description: 'Real-time dashboards, cohort analysis, at-risk alerts, and automated compliance reports.',
+    videoSrc: '/videos/store/store-analytics-pro.mp4',
+    poster: '/images/pages/admin-analytics-hero.jpg',
+    choices: [
+      { label: 'Employer Portal',   description: 'See the employer-facing view',       nextScene: 'admin-employers',  variant: 'primary'   },
+      { label: 'Student Portal',    description: 'See what your students experience',  nextScene: 'admin-enrollment', variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-enrollment',
+    title: 'Student Enrollment View',
+    description: 'Students track their own progress, log hours, and download credentials — all from their phone.',
+    videoSrc: '/videos/store/store-student-demo.mp4',
+    poster: '/images/pages/student-portal-page-1.jpg',
+    choices: [
+      { label: 'Employer Portal',   description: 'See the employer-facing view',    nextScene: 'admin-employers',  variant: 'primary'   },
+      { label: 'Start Over',        description: 'Back to the admin overview',       nextScene: 'admin-overview',   variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+  {
+    id: 'admin-employers',
+    title: 'Employer Portal',
+    description: 'Hiring partners browse verified candidates, track apprenticeship hours, and manage OJT contracts.',
+    videoSrc: '/videos/store/store-employer-demo.mp4',
+    poster: '/images/pages/admin-employers-hero.jpg',
+    choices: [
+      { label: 'Start Over',        description: 'Back to the admin overview',       nextScene: 'admin-overview',   variant: 'secondary' },
+    ],
+    exitCta: { label: 'Start your free trial', href: '/store/trial' },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Employer Tour
+// ---------------------------------------------------------------------------
+export const EMPLOYER_SCENES: DemoScene[] = [
+  {
+    id: 'employer-overview',
+    title: 'Employer Dashboard',
+    description: 'Browse pre-screened candidates, track apprentices, and manage hiring incentives.',
+    videoSrc: '/videos/store/store-employer-demo.mp4',
+    poster: '/images/pages/employer-hero.jpg',
+    choices: [
+      { label: 'Browse Candidates',     description: 'Search verified graduates by credential',    nextScene: 'employer-candidates',     variant: 'primary'   },
+      { label: 'Apprenticeship Hours',  description: 'Approve hours and track wage progression',   nextScene: 'employer-apprenticeships', variant: 'primary'   },
+      { label: 'Hiring Incentives',     description: 'WOTC credits and OJT reimbursement',         nextScene: 'employer-incentives',     variant: 'secondary' },
+    ],
+    exitCta: { label: 'Become an employer partner', href: '/apply/employer' },
+  },
+  {
+    id: 'employer-candidates',
+    title: 'Candidate Search',
+    description: 'Every candidate has a verified credential. Filter by program, availability, and match score.',
+    videoSrc: '/videos/store/store-workforce-demo.mp4',
+    poster: '/images/pages/employer-page-1.jpg',
+    choices: [
+      { label: 'Apprenticeship Hours', description: 'Track and approve OJT hours',          nextScene: 'employer-apprenticeships', variant: 'primary'   },
+      { label: 'Hiring Incentives',    description: 'WOTC and OJT reimbursement details',   nextScene: 'employer-incentives',     variant: 'secondary' },
+    ],
+    exitCta: { label: 'Become an employer partner', href: '/apply/employer' },
+  },
+  {
+    id: 'employer-apprenticeships',
+    title: 'Apprenticeship Tracking',
+    description: 'Log and approve OJT hours, track wage progression, and manage DOL compliance — all in one place.',
+    videoSrc: '/videos/store/store-managed-platform.mp4',
+    poster: '/images/pages/admin-apprenticeships-hero.jpg',
+    choices: [
+      { label: 'Hiring Incentives',  description: 'WOTC credits and reimbursement',    nextScene: 'employer-incentives', variant: 'primary'   },
+      { label: 'Start Over',         description: 'Back to employer overview',          nextScene: 'employer-overview',   variant: 'secondary' },
+    ],
+    exitCta: { label: 'Become an employer partner', href: '/apply/employer' },
+  },
+  {
+    id: 'employer-incentives',
+    title: 'Hiring Incentives',
+    description: 'WOTC tax credit documentation generated automatically. OJT reimbursement tracked per employee.',
+    videoSrc: '/videos/store/store-analytics-pro.mp4',
+    poster: '/images/pages/admin-incentives-hero.jpg',
+    choices: [
+      { label: 'Start Over', description: 'Back to employer overview', nextScene: 'employer-overview', variant: 'secondary' },
+    ],
+    exitCta: { label: 'Become an employer partner', href: '/apply/employer' },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Student Tour
+// ---------------------------------------------------------------------------
+export const STUDENT_SCENES: DemoScene[] = [
+  {
+    id: 'student-overview',
+    title: 'Student Dashboard',
+    description: 'Track your courses, log apprenticeship hours, and download your credentials — all from your phone.',
+    videoSrc: '/videos/store/store-student-demo.mp4',
+    poster: '/images/pages/student-portal-page-1.jpg',
+    choices: [
+      { label: 'My Courses',          description: 'Video lessons, quizzes, and progress',     nextScene: 'student-courses',      variant: 'primary'   },
+      { label: 'Log Hours',           description: 'Submit apprenticeship hours for approval',  nextScene: 'student-hours',        variant: 'primary'   },
+      { label: 'My Credentials',      description: 'Download and share your certificates',      nextScene: 'student-credentials',  variant: 'secondary' },
+    ],
+    exitCta: { label: 'Apply for training', href: '/apply/student' },
+  },
+  {
+    id: 'student-courses',
+    title: 'Course Player',
+    description: 'Video lessons, interactive quizzes, and checkpoint exams — all in your browser or on your phone.',
+    videoSrc: '/videos/store/store-hvac-course.mp4',
+    poster: '/images/pages/student-portal-page-3.jpg',
+    choices: [
+      { label: 'Log Hours',       description: 'Submit OJT hours from your phone',    nextScene: 'student-hours',       variant: 'primary'   },
+      { label: 'My Credentials',  description: 'Certificates earned so far',          nextScene: 'student-credentials', variant: 'secondary' },
+    ],
+    exitCta: { label: 'Apply for training', href: '/apply/student' },
+  },
+  {
+    id: 'student-hours',
+    title: 'Apprenticeship Hours',
+    description: 'Log your OJT hours from your phone. Your supervisor approves them. Your total updates instantly.',
+    videoSrc: '/videos/store/store-platform-overview.mp4',
+    poster: '/images/pages/student-portal-page-5.jpg',
+    choices: [
+      { label: 'My Credentials',  description: 'Download and share certificates',  nextScene: 'student-credentials', variant: 'primary'   },
+      { label: 'Start Over',      description: 'Back to student overview',          nextScene: 'student-overview',    variant: 'secondary' },
+    ],
+    exitCta: { label: 'Apply for training', href: '/apply/student' },
+  },
+  {
+    id: 'student-credentials',
+    title: 'Credential Wallet',
+    description: 'Every credential you earn is stored here. Download the PDF or share a public verification link with employers.',
+    videoSrc: '/videos/store/store-community-hub.mp4',
+    poster: '/images/pages/student-portal-page-7.jpg',
+    choices: [
+      { label: 'Start Over', description: 'Back to student overview', nextScene: 'student-overview', variant: 'secondary' },
+    ],
+    exitCta: { label: 'Apply for training', href: '/apply/student' },
+  },
+];

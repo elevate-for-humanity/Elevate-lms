@@ -126,7 +126,7 @@ export default function DocumentUploadPage() {
       </p>
 
       {/* Contact Information */}
-      <section className="rounded-2xl border bg-white p-6 mb-6">
+      <section className="rounded-2xl border p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">Your Information</h2>
         <div className="grid md:grid-cols-3 gap-4">
           <div>
@@ -178,7 +178,7 @@ export default function DocumentUploadPage() {
       </section>
 
       {/* Upload Area */}
-      <section className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-8 text-center mb-6">
+      <section className="rounded-2xl border-2 border-dashed border-gray-300 p-8 text-center mb-6">
         <Upload className="w-12 h-12 text-black mx-auto mb-4" />
         <h2 className="text-xl font-bold mb-2">Upload Your Documents</h2>
         <p className="text-black mb-6">
@@ -209,7 +209,7 @@ export default function DocumentUploadPage() {
 
       {/* Uploaded Files List */}
       {files.length > 0 && (
-        <section className="rounded-2xl border bg-white p-6 mb-6">
+        <section className="rounded-2xl border p-6 mb-6">
           <h2 className="text-xl font-bold mb-4">
             Uploaded Files ({files.length})
           </h2>
@@ -255,7 +255,7 @@ export default function DocumentUploadPage() {
       )}
 
       {/* Document Checklist */}
-      <section className="rounded-2xl border bg-white p-6">
+      <section className="rounded-2xl border p-6">
         <h2 className="text-xl font-bold mb-4">Document Checklist</h2>
         <p className="text-black mb-4">
           Please upload the following documents for your tax preparation:
@@ -327,7 +327,7 @@ export default function DocumentUploadPage() {
       </section>
 
       {/* Next Steps */}
-      <section className="mt-6 rounded-2xl border bg-white p-6">
+      <section className="mt-6 rounded-2xl border p-6">
         <h2 className="text-xl font-bold mb-4">What Happens Next?</h2>
         <div className="space-y-4">
           <div className="flex items-start gap-3">

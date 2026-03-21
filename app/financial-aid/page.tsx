@@ -80,7 +80,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* Quick Links to Related Pages */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
@@ -166,7 +166,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* Financial Aid Calculator */}
-      <section className="py-16 lg:py-24 bg-white border-t">
+      <section className="py-16 lg:py-24 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -183,7 +183,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">How to Get Started</h2>
           <div className="grid md:grid-cols-4 gap-8">
@@ -201,7 +201,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
           <p className="text-xl text-white/90 mb-8">

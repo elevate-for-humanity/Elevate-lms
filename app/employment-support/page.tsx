@@ -33,7 +33,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Page heading below hero */}
-      <section className="bg-white py-6 sm:py-10">
+      <section className="py-6 sm:py-10">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-sm font-semibold tracking-wide text-brand-blue-600 mb-1">Support Services</p>
           <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-2">
@@ -47,7 +47,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* What We Provide — image cards */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">
             What We Provide
@@ -103,7 +103,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Path to Employment — steps */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">
             Your Path to Employment
@@ -132,12 +132,12 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Who We Serve */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto min-h-[300px]">
               <Image
-                src="/images/pages/training-cohort.jpg"
+                src="/images/pages/admin-campaigns-hero.jpg"
                 alt="Participants in a training session"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -177,7 +177,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Training + Support Connection */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -232,7 +232,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* Compliance Disclaimer */}
-      <section className="py-6 bg-white">
+      <section className="py-6">
         <div className="max-w-4xl mx-auto px-4">
           <div className="rounded-xl bg-white border border-slate-200 p-4">
             <p className="text-sm text-slate-600">
@@ -245,7 +245,7 @@ export default function EmploymentSupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Ready to Start Your Career?

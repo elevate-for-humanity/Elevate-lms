@@ -535,7 +535,7 @@ export default function CurvatureShopPage() {
       </section>
 
       {/* Filters */}
-      <section className="bg-white border-b sticky top-0 z-10">
+      <section className="border-b sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search */}
@@ -681,7 +681,7 @@ export default function CurvatureShopPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Questions?</h2>
           <p className="text-gray-600 mb-6">

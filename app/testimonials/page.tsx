@@ -66,7 +66,7 @@ export default function TestimonialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-white">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 text-center px-4">
             Success Stories
@@ -76,7 +76,7 @@ export default function TestimonialsPage() {
 
       {/* Stats - only show if we have testimonials */}
       {testimonials.length > 0 && (
-        <section className="py-8 bg-white border-b">
+        <section className="py-8 border-b">
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
               <div>
@@ -199,7 +199,7 @@ export default function TestimonialsPage() {
         )}
 
         {/* CTA */}
-        <section className="bg-white rounded-2xl p-8 text-center">
+        <section className="rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Your Success Story Starts Here</h2>
           <p className="text-brand-orange-100 mb-6 max-w-xl mx-auto">
             Join the graduates who have transformed their lives through 

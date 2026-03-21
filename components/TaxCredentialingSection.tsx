@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function TaxCredentialingSection() {
   return (
-    <section className="mt-8 rounded-xl bg-white p-4 text-xs shadow-sm border border-slate-200">
+    <section className="mt-8 rounded-xl p-4 text-xs shadow-sm border border-slate-200">
       <h2 className="text-sm font-semibold text-black">
         Credentialing & Volunteer Requirements (IRS VITA / TCE)
       </h2>

@@ -77,7 +77,7 @@ export default function GrievancePage() {
       </section>
 
       {/* Grounds for Grievance */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Grounds for Filing</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -120,7 +120,7 @@ export default function GrievancePage() {
       </section>
 
       {/* External Agencies */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">External Agencies</h2>
           <p className="text-gray-600 mb-4 text-sm">

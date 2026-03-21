@@ -28,7 +28,7 @@ export default function OjtAndFundingPage() {
     <div className="min-h-screen bg-white">
 
       {/* Video hero */}
-      <section className="relative h-[320px] sm:h-[460px] overflow-hidden bg-white">
+      <section className="relative h-[320px] sm:h-[460px] overflow-hidden">
         <LazyVideo src="/videos/training-providers-hero.mp4" poster="/images/pages/ojt-and-funding-page-1.jpg"
           className="absolute inset-0 w-full h-full object-cover" />
       </section>
@@ -53,7 +53,7 @@ export default function OjtAndFundingPage() {
       </div>
 
       {/* OJT benefits */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">On-the-Job Training</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">OJT Benefits for Employers</h2>
@@ -76,7 +76,7 @@ export default function OjtAndFundingPage() {
       </section>
 
       {/* Apprenticeship */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">Registered Apprenticeship</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Sponsor an Apprentice</h2>
@@ -99,7 +99,7 @@ export default function OjtAndFundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>

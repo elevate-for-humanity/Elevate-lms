@@ -106,7 +106,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Title + Info Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           {/* Badge */}
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full mb-6">
@@ -143,7 +143,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6">
             {[
@@ -161,7 +161,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* What is the Community Hub */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">What is the Community Hub?</h2>
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
@@ -188,7 +188,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Discussion Categories */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Popular Discussions</h2>
@@ -219,7 +219,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Upcoming Events */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Upcoming Events</h2>
@@ -260,7 +260,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Why Join */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Join the Community?</h2>
           
@@ -282,7 +282,7 @@ export default async function CommunityPage() {
             </div>
             <div className="relative h-64 md:h-auto rounded-xl overflow-hidden">
               <Image
-                src="/images/pages/community-page-5.jpg"
+                src="/images/pages/community-page-10.jpg"
                 alt="Community members"
                 fill
                 className="object-cover"
@@ -293,7 +293,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Join Form */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">Get Started</h2>
           <p className="text-center text-gray-600 mb-12">Join the community or ask us a question</p>
@@ -345,7 +345,7 @@ export default async function CommunityPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Connect?</h2>
           <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">

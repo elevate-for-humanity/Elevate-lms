@@ -82,7 +82,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Services */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Our Resume Services
@@ -120,7 +120,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Resume Sections */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Essential Resume Sections
@@ -149,7 +149,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Action Verbs */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
             Power Words for Your Resume
@@ -172,7 +172,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* Common Mistakes */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Common Resume Mistakes to Avoid
@@ -243,7 +243,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* ATS Tips */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 rounded-xl p-8 border-2 border-brand-blue-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
@@ -263,7 +263,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Build Your Resume?

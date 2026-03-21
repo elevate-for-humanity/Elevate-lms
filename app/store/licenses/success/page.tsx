@@ -103,7 +103,7 @@ function SuccessContent() {
   return (
     <div className="min-h-screen bg-white">
       {/* Success Header */}
-      <section className="bg-white text-slate-900 py-16">
+      <section className="text-slate-900 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>

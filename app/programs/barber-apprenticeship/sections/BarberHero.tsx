@@ -7,7 +7,7 @@ export function BarberHero() {
   return (
     <>
       {/* Hero — image only, no text on frame */}
-      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden bg-white">
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
           src="/images/pages/programs-barber-hero-new.jpg"
           alt="Barber apprentice cutting hair in a licensed barbershop"
@@ -18,7 +18,7 @@ export function BarberHero() {
       </section>
 
       {/* Headline — below the image frame */}
-      <section className="bg-white pt-8 pb-2">
+      <section className="pt-8 pb-2">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-2">Barber Apprenticeship Program</h1>
           <p className="text-slate-600 text-lg max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
@@ -39,7 +39,7 @@ export function BarberHero() {
       </section>
 
       {/* CTAs below hero */}
-      <section className="py-6 bg-white border-b">
+      <section className="py-6 border-b">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <a href="#program-overview" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
@@ -53,7 +53,7 @@ export function BarberHero() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-6 bg-white border-t">
+      <section className="py-6 border-t">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {QUICK_STATS.map((s) => (
@@ -67,7 +67,7 @@ export function BarberHero() {
       </section>
 
       {/* Section 1 — Program Overview */}
-      <section id="program-overview" className="py-16 bg-white">
+      <section id="program-overview"className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>

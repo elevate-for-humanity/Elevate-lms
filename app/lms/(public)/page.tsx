@@ -52,7 +52,7 @@ export default async function LmsPublicPage() {
       </nav>
 
       {/* HERO */}
-      <section className="bg-white py-16 sm:py-24 border-b border-slate-100">
+      <section className="py-16 sm:py-24 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-xs font-bold text-brand-red-600 uppercase tracking-widest mb-4">Elevate for Humanity · Career Training</p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-5">
@@ -113,7 +113,7 @@ export default async function LmsPublicPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-16 bg-white border-y border-slate-100">
+      <section className="py-16 border-y border-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-12">How It Works</h2>
           <div className="grid sm:grid-cols-3 gap-8">
@@ -143,7 +143,7 @@ export default async function LmsPublicPage() {
       </section>
 
       {/* STUDENT TOOLS */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-slate-600 text-base mb-2 text-center">Everything you need to study, practice, and succeed.</p>
           <StudentToolsStrip />

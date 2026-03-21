@@ -132,7 +132,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
       </section>
 
       {/* CONTENT */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
           <section className="grid gap-6 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)] items-start mb-10">
         <div className="space-y-4">

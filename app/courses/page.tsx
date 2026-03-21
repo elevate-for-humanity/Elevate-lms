@@ -90,7 +90,7 @@ export default async function CoursesPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             {[
@@ -156,7 +156,7 @@ export default async function CoursesPage() {
 
       {/* Featured Courses */}
       {featuredCourses.length > 0 && (
-        <section className="py-20 bg-white">
+        <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
@@ -211,7 +211,7 @@ export default async function CoursesPage() {
       )}
 
       {/* Micro Classes Section */}
-      <section id="micro-classes" className="py-20 bg-white">
+      <section id="micro-classes"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-bold mb-4">
@@ -268,14 +268,14 @@ export default async function CoursesPage() {
       </section>
 
       {/* COURSE CATALOG */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CourseCatalog />
         </div>
       </section>
 
       {/* Partner course catalogs */}
-      <section className="py-8 bg-white border-t border-slate-100">
+      <section className="py-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Course Catalogs by Provider</h2>
           <div className="flex flex-wrap gap-3">
@@ -302,21 +302,21 @@ export default async function CoursesPage() {
       </section>
 
       {/* COURSE COMPLETION TRACKING */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CourseCompletionTracking />
         </div>
       </section>
 
       {/* PREREQUISITES */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CoursePrerequisiteManagement />
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
             Ready to Start Your New Career?

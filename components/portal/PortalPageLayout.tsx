@@ -54,7 +54,7 @@ export function PortalPageLayout({
       </section>
 
       {/* Below-hero identity */}
-      <section className="bg-white border-b border-slate-100 py-10">
+      <section className="border-b border-slate-100 py-10">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">{title}</h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">{subtitle}</p>
@@ -63,7 +63,7 @@ export function PortalPageLayout({
 
       {/* Stats Cards with Images */}
       {stats && stats.length > 0 && (
-        <section className="py-12 px-6 bg-white">
+        <section className="py-12 px-6">
           <div className="max-w-7xl mx-auto">
             <div className={`grid md:grid-cols-${Math.min(stats.length, 4)} gap-6 mb-12`}>
               {stats.map((stat, index) => (

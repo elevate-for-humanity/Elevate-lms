@@ -39,7 +39,7 @@ export default function ApplyAvatarGuide() {
   };
 
   return (
-    <section className="w-full bg-white py-4 px-4">
+    <section className="w-full py-4 px-4">
       <div className="max-w-2xl mx-auto">
         <div
           className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 cursor-pointer"

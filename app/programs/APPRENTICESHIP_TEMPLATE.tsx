@@ -56,7 +56,7 @@ export default function ApprenticeshipPage() {
       />
 
       {/* Value Props Strip */}
-      <section className="bg-white py-8 border-t">
+      <section className="py-8 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
@@ -79,7 +79,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-white">
+      <section id="how-it-works"className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-black mb-6">
@@ -155,7 +155,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Why Apprenticeship */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -279,7 +279,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* What You'll Master */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-black mb-6">
@@ -376,7 +376,7 @@ export default function ApprenticeshipPage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-24 bg-white border-t">
+      <section className="py-24 border-t">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black mb-6">

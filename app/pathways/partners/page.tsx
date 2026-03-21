@@ -25,7 +25,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Intro */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Partners &amp; Cohort Training</h1>
           <div className="text-gray-700 space-y-4">
@@ -44,7 +44,7 @@ export default function PartnersPage() {
       </section>
 
       {/* How a custom cohort works — step by step */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How a Custom Cohort Works</h2>
           <p className="text-gray-600 mb-8">
@@ -120,7 +120,7 @@ export default function PartnersPage() {
       </section>
 
       {/* What reports look like */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">What Reports You Receive</h2>
           <p className="text-gray-600 mb-8">
@@ -168,7 +168,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Who partners with us */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Who Partners With Us</h2>
 
@@ -248,7 +248,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Available programs quick reference */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Programs Available for Custom Cohorts</h2>
           <p className="text-gray-600 mb-6 text-sm">

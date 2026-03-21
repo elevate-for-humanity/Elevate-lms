@@ -151,7 +151,7 @@ export default function SupersonicGovernanceContactPage() {
         </section>
 
         {/* For Tax Filers */}
-        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">For Tax Filers</h2>
           <p className="text-slate-700 mb-4">
             If you have questions about your tax preparation or refund advance:

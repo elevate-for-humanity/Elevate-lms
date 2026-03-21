@@ -45,7 +45,7 @@ export default function PhilanthropyPage() {
       </section>
 
       {/* Impact Areas */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">Where Your Support Goes</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -88,7 +88,7 @@ export default function PhilanthropyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-24 bg-white border-t">
+      <section className="py-16 sm:py-24 border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Make a Difference Today</h2>
           <p className="text-lg text-slate-600 mb-10">Contact us to discuss how you can support workforce training in Indianapolis.</p>

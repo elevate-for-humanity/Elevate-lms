@@ -55,15 +55,6 @@ export const TEAM: TeamMember[] = [
     email: 'leslie@elevateforhumanity.org',
   },
   {
-    id: '6',
-    name: 'Alina Smith, PMHNP',
-    title: 'Psychiatric Mental Health Nurse Practitioner',
-    orgRole: 'Behavioral Health',
-    bio: 'Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.',
-    headshotSrc: '/images/alina-smith.jpg',
-    email: 'alina@elevateforhumanity.org',
-  },
-  {
     id: '7',
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',

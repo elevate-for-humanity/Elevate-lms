@@ -83,7 +83,7 @@ export default async function PartnerCoursesPage() {
 
       </section>
 
-      <section className="bg-white py-20">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
@@ -234,7 +234,7 @@ export default async function PartnerCoursesPage() {
         </div>
 
         {/* Storytelling Section */}
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-7xl mx-auto">
               <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -278,7 +278,7 @@ export default async function PartnerCoursesPage() {
                 </div>
                 <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] rounded-2xl overflow-hidden border-4 border-gray-200">
                   <Image
-                    src="/images/pages/adult-learner.jpg"
+                    src="/images/pages/accreditation.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

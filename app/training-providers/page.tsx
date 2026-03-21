@@ -108,7 +108,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -136,7 +136,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Program Types */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -168,7 +168,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -193,7 +193,7 @@ export default function TrainingProvidersPage() {
             
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/training-providers-page-1.jpg"
+                src="/images/pages/pathways-page-5.jpg"
                 alt="Training classroom"
                 fill
                 className="object-cover"
@@ -204,7 +204,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -235,7 +235,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
@@ -259,7 +259,7 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Ready to Grow Your Training Program?

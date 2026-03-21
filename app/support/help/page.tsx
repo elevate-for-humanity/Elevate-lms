@@ -86,7 +86,7 @@ export default async function HelpCenterPage({
       </section>
 
       {/* Categories */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap gap-3 justify-center">
             <Link
@@ -175,7 +175,7 @@ export default async function HelpCenterPage({
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-white border-t">
+      <section className="py-12 border-t">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold text-black mb-4">Can't find what you're looking for?</h2>
           <p className="text-gray-600 mb-6">

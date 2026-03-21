@@ -64,7 +64,7 @@ const PROGRAMS = [
 
 export default function ProgramOutcomes() {
   return (
-    <section className="py-20 sm:py-28 bg-white">
+    <section className="py-20 sm:py-28">
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <div className="flex items-end justify-between mb-12">

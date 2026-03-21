@@ -63,11 +63,10 @@ export default function LessonPage() {
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
   const lessonStartTime = React.useRef(Date.now());
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     lessonStartTime.current = Date.now();
     fetchLessonData();
-  }, [lessonId]);
+  }, [lessonId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchLessonData = async () => {
     const { createClient } = await import('@/lib/supabase/client');

@@ -63,6 +63,7 @@ export default function LessonPage() {
   const [passedCheckpointIds, setPassedCheckpointIds] = useState<Set<string>>(new Set());
   const lessonStartTime = React.useRef(Date.now());
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     lessonStartTime.current = Date.now();
     fetchLessonData();

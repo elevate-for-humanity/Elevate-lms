@@ -23,16 +23,21 @@ export async function POST(req: NextRequest) {
     return safeError('Missing required fields', 400);
   }
 
+  const notes = [
+    `Preferred start: ${preferred_start_date}`,
+    `Location: ${city_state}`,
+    employed_in_healthcare ? `Currently in healthcare: ${employed_in_healthcare}` : null,
+  ].filter(Boolean).join(' | ');
+
   const db = createAdminClient();
-  const { error } = await db.from('cna_waitlist').insert({
-    full_name,
+  const { error } = await db.from('waitlist').insert({
+    name: full_name,
     email,
     phone,
-    program_of_interest: 'CNA Certification',
-    preferred_start_date,
-    city_state,
-    employed_in_healthcare: employed_in_healthcare || null,
-    submitted_at: new Date().toISOString(),
+    program: 'cna-certification',
+    program_slug: 'cna-certification',
+    status: 'waiting',
+    notes,
   });
 
   if (error) return safeInternalError(error, 'Failed to save waitlist entry');

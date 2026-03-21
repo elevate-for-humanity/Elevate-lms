@@ -12,6 +12,7 @@
     ]
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@aws-sdk/client-s3": "^3.975.0",
     "@aws-sdk/s3-request-presigner": "^3.975.0",
     "@dnd-kit/core": "6.3.1",
@@ -242,6 +243,8 @@
     "validate:lms": "tsx scripts/validate-lms-integrity.ts",
     "course:report": "tsx scripts/course-build-report.ts",
     "course:report:fail": "tsx scripts/course-build-report.ts --fail-fast",
+    "content:generate": "tsx scripts/generate-course-content.ts",
+    "content:dry-run": "tsx scripts/generate-course-content.ts --dry-run",
     "readiness": "tsx scripts/final-readiness.ts",
     "audit-rls": "tsx scripts/audit-rls.ts",
     "make:images": "python3 tools/make_brand_images.py",

@@ -500,21 +500,41 @@ async function publishCompiledDraft(
       }
     }
 
+    // Validate: every content lesson must have narration_script before writing.
+    // A curriculum row with null script_text is an empty shell — hard fail.
+    const emptyContentRows = curriculumRows.filter(r =>
+      r.step_type === 'lesson' && (!r.script_text || r.script_text.trim().length < 300)
+    );
+    if (emptyContentRows.length > 0) {
+      return NextResponse.json(
+        {
+          error: 'CONTENT_INCOMPLETE',
+          message: `${emptyContentRows.length} lesson(s) have missing or insufficient narration_script. A course cannot be published with empty lesson content.`,
+          lessons: emptyContentRows.map(r => r.lesson_slug),
+        },
+        { status: 422 }
+      );
+    }
+
     const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
     if (clErr) {
-      // Non-fatal: training_lessons already written. Log and continue.
-      logger.warn('curriculum_lessons parallel write failed (non-fatal)', {
+      // Fatal: curriculum_lessons is the canonical content store.
+      // A failed write here means the course is not complete.
+      logger.error('curriculum_lessons write failed — course not published', {
         courseId,
         programId: draft.program_id,
         error: clErr.message,
       });
-    } else {
-      logger.info('curriculum_lessons parallel write succeeded', {
-        courseId,
-        programId: draft.program_id,
-        count: curriculumRows.length,
-      });
+      return NextResponse.json(
+        { error: 'CURRICULUM_WRITE_FAILED', message: clErr.message },
+        { status: 500 }
+      );
     }
+    logger.info('curriculum_lessons write succeeded', {
+      courseId,
+      programId: draft.program_id,
+      count: curriculumRows.length,
+    });
   }
 
   // 3. completion_rules — entity_type/entity_id pattern (no direct course_id column)
@@ -732,16 +752,34 @@ async function _POST(req: NextRequest) {
         });
       });
 
+      // Validate content completeness before writing — same gate as path 1
+      const emptyRows = curriculumRows.filter(r =>
+        r.step_type === 'lesson' && (!r.script_text || (r.script_text as string).trim().length < 300)
+      );
+      if (emptyRows.length > 0) {
+        return NextResponse.json(
+          {
+            error: 'CONTENT_INCOMPLETE',
+            message: `${emptyRows.length} lesson(s) have missing or insufficient content. A course cannot be published with empty lesson content.`,
+            lessons: emptyRows.map((r: { lesson_slug: string }) => r.lesson_slug),
+          },
+          { status: 422 }
+        );
+      }
+
       const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
       if (clErr) {
-        logger.warn('curriculum_lessons parallel write failed (non-fatal)', {
+        logger.error('curriculum_lessons write failed — course not published', {
           courseId, programId: program_id, error: clErr.message,
         });
-      } else {
-        logger.info('curriculum_lessons parallel write succeeded', {
-          courseId, programId: program_id, count: curriculumRows.length,
-        });
+        return NextResponse.json(
+          { error: 'CURRICULUM_WRITE_FAILED', message: clErr.message },
+          { status: 500 }
+        );
       }
+      logger.info('curriculum_lessons write succeeded', {
+        courseId, programId: program_id, count: curriculumRows.length,
+      });
     }
 
     // ── 3. Completion rule ──────────────────────────────────────────────────

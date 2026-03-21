@@ -146,6 +146,12 @@ BEGIN
       cl.lesson_slug,
       cl.lesson_title,
       cl.script_text,
+      cl.summary_text,
+      cl.reflection_prompt,
+      cl.key_terms,
+      cl.watch_for,
+      cl.job_application,
+      cl.competency_keys,
       cl.quiz_questions,
       cl.passing_score,
       cl.step_type,
@@ -187,14 +193,17 @@ BEGIN
     -- Transform plain text to HTML
     v_html := public.format_script_to_html(rec.script_text, rec.lesson_title);
 
-    -- Upsert into course_lessons
+    -- Upsert into course_lessons — carries ALL learner-facing fields from curriculum_lessons.
     -- order_index formula: always 1-based module × 1000 + lesson_order
     -- v_module_offset normalizes 0-based source data to 1-based before multiplication,
     -- so PRS (1-based) and CRS/Bookkeeping (0-based) produce the same numeric range.
     INSERT INTO public.course_lessons (
       id, course_id, module_id, legacy_lesson_id, slug, title,
       content, lesson_type, order_index, passing_score,
-      quiz_questions, is_required, created_at, updated_at
+      quiz_questions, is_required,
+      -- Learner-facing instructional fields (must be carried, not dropped)
+      scenario_prompt, key_terms,
+      created_at, updated_at
     )
     VALUES (
       gen_random_uuid(),
@@ -203,7 +212,26 @@ BEGIN
       rec.curriculum_id,
       rec.lesson_slug,
       rec.lesson_title,
-      to_jsonb(v_html),
+      -- HTML content: embed summary, reflection, watch_for, job_application as
+      -- structured sections appended after the main body so the renderer can
+      -- display them without a separate query.
+      to_jsonb(
+        v_html
+        || CASE WHEN rec.summary_text IS NOT NULL AND LENGTH(TRIM(rec.summary_text)) > 0
+             THEN '<section class="lesson-summary"><h3>Summary</h3><p>' || public.html_escape(rec.summary_text) || '</p></section>'
+             ELSE '' END
+        || CASE WHEN rec.reflection_prompt IS NOT NULL AND LENGTH(TRIM(rec.reflection_prompt)) > 0
+             THEN '<section class="lesson-reflection"><h3>Reflect</h3><p>' || public.html_escape(rec.reflection_prompt) || '</p></section>'
+             ELSE '' END
+        || CASE WHEN rec.watch_for IS NOT NULL AND array_length(rec.watch_for, 1) > 0
+             THEN '<section class="lesson-watchfor"><h3>Watch For</h3><ul>'
+               || (SELECT string_agg('<li>' || public.html_escape(w) || '</li>', '') FROM unnest(rec.watch_for) AS w)
+               || '</ul></section>'
+             ELSE '' END
+        || CASE WHEN rec.job_application IS NOT NULL AND LENGTH(TRIM(rec.job_application)) > 0
+             THEN '<section class="lesson-job-application"><h3>On the Job</h3><p>' || public.html_escape(rec.job_application) || '</p></section>'
+             ELSE '' END
+      ),
       CASE rec.step_type
         WHEN 'checkpoint'    THEN 'checkpoint'::public.lesson_type
         WHEN 'exam'          THEN 'exam'::public.lesson_type
@@ -222,18 +250,25 @@ BEGIN
       END,
       rec.quiz_questions,
       true,
+      -- scenario_prompt: use reflection_prompt as the applied scenario
+      -- (same field, different rendering context in TrainingLessonFlow)
+      rec.reflection_prompt,
+      -- key_terms: carry directly from curriculum_lessons
+      rec.key_terms,
       now(),
       now()
     )
     ON CONFLICT (course_id, slug) DO UPDATE
     SET
-      content        = EXCLUDED.content,
-      lesson_type    = EXCLUDED.lesson_type,
-      order_index    = EXCLUDED.order_index,
-      passing_score  = EXCLUDED.passing_score,
-      quiz_questions = EXCLUDED.quiz_questions,
-      module_id      = EXCLUDED.module_id,
-      updated_at     = now();
+      content         = EXCLUDED.content,
+      lesson_type     = EXCLUDED.lesson_type,
+      order_index     = EXCLUDED.order_index,
+      passing_score   = EXCLUDED.passing_score,
+      quiz_questions  = EXCLUDED.quiz_questions,
+      module_id       = EXCLUDED.module_id,
+      scenario_prompt = EXCLUDED.scenario_prompt,
+      key_terms       = EXCLUDED.key_terms,
+      updated_at      = now();
 
     v_upserted := v_upserted + 1;
     RETURN QUERY SELECT rec.lesson_slug::TEXT, 'upserted'::TEXT;

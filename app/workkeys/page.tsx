@@ -125,6 +125,7 @@ export default function WorkKeysPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Take WorkKeys at Elevate</h2>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
                 We proctor ACT WorkKeys on-site at our Indianapolis testing center. Individual and group sessions available. By appointment only — contact us to schedule.
+              {/* TODO: Add ACT Testing Center Site Code once confirmed — display alongside ESCO ID: 358010 pattern */}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link href="/testing/book?provider=workkeys" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm">

@@ -488,7 +488,7 @@ async function publishCompiledDraft(
           module_title:      mod.module_title,
           step_type,
           passing_score:     isCheckpoint ? 80 : 0,
-          script_text:       lesson.narration_script,
+          script_text:       lesson.narration_script || renderCompiledLessonContent(lesson),
           summary_text:      lesson.summary_text || '',
           reflection_prompt: lesson.reflection_prompt || '',
           competency_keys:   lesson.competency_keys ?? [],
@@ -500,21 +500,27 @@ async function publishCompiledDraft(
       }
     }
 
+    // Validate content before writing — every lesson must have script_text.
+    const emptyScripts = curriculumRows.filter(
+      (r) => !r.script_text || String(r.script_text).trim().length < 50
+    );
+    if (emptyScripts.length > 0) {
+      throw new Error(
+        `curriculum_lessons write blocked: ${emptyScripts.length} lesson(s) have empty script_text. ` +
+        `Slugs: ${emptyScripts.map((r) => r.lesson_slug).join(', ')}`
+      );
+    }
+
     const { error: clErr } = await db.from('curriculum_lessons').insert(curriculumRows);
     if (clErr) {
-      // Non-fatal: training_lessons already written. Log and continue.
-      logger.warn('curriculum_lessons parallel write failed (non-fatal)', {
-        courseId,
-        programId: draft.program_id,
-        error: clErr.message,
-      });
-    } else {
-      logger.info('curriculum_lessons parallel write succeeded', {
-        courseId,
-        programId: draft.program_id,
-        count: curriculumRows.length,
-      });
+      // Fatal — curriculum_lessons is the canonical delivery path for lms_lessons view.
+      throw new Error(`curriculum_lessons write failed: ${clErr.message}`);
     }
+    logger.info('curriculum_lessons write succeeded', {
+      courseId,
+      programId: draft.program_id,
+      count: curriculumRows.length,
+    });
   }
 
   // 3. completion_rules — entity_type/entity_id pattern (no direct course_id column)

@@ -18,6 +18,213 @@
 - `pnpm next dev --turbopack` — Start dev server
 - `pnpm lint` — Run linter
 
+---
+
+## No-Drift PR Validation SOP
+
+This repository must be operated as a production system, not a patch-and-chase workspace. No pull request is considered reviewable, mergeable, or diagnosable until the working branch is synchronized with `origin/main` and validated from the latest branch head.
+
+### 1. Branch sync is mandatory before any diagnosis
+
+Before reviewing CI, Netlify, lint, test, integrity, accessibility, E2E, or runtime issues, run:
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+```
+
+If any commits are listed, the branch is behind main. Stop all debugging and synchronize first:
+
+```bash
+git merge origin/main
+```
+
+Resolve conflicts immediately. Do not continue evaluation on a stale branch.
+
+After merge resolution:
+
+```bash
+git push origin <feature-branch>
+```
+
+Only the CI and deploy results from this updated branch head are valid for review.
+
+### 2. Cherry-pick is not routine branch maintenance
+
+Do not use cherry-pick as the default method to keep a feature branch current. Cherry-pick is allowed only when all three conditions are true:
+
+- the fix already exists and is proven on another branch
+- the change is isolated and low-risk
+- the transfer is intentional and explicitly justified
+
+Otherwise, merge `origin/main` into the feature branch. Repeated cherry-picking is a process failure and creates hidden branch drift.
+
+### 3. Branch health and feature correctness are separate
+
+Do not confuse them.
+
+**Branch health** means: branch is current with `origin/main`, dependencies install, lint passes, build passes, deploy starts successfully, no unresolved conflicts.
+
+**Feature correctness** means: the changed route/page/component behaves correctly, the business logic works, the database state is correct, the UX is complete and coherent.
+
+A green build does not prove feature correctness. A failed build does not always mean the feature is wrong. Stale-branch failures must be eliminated before feature diagnosis begins.
+
+### 4. Every fix claim must include evidence
+
+No one may say "fixed," "resolved," "good," "non-blocking," or "ready to merge" without attaching the evidence category.
+
+Allowed evidence categories:
+- code diff
+- green build on the latest branch commit
+- runtime verification on the affected surface
+- live database validation for DB-affecting work
+- proof that a failing check is pre-existing on `origin/main`
+
+Unsupported claims are not accepted.
+
+### 5. Required validation sequence for every PR
+
+**Step A — Synchronize branch with main**
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+git merge origin/main
+git push origin <feature-branch>
+```
+
+If the branch was already current, `git log --oneline HEAD..origin/main` returns no output.
+
+**Step B — Inspect changed surface**
+
+```bash
+git diff --name-only origin/main...HEAD
+```
+
+This defines the actual review surface. Use it to determine whether later failures are likely regressions or unrelated baseline issues.
+
+**Step C — Run branch health checks**
+
+```bash
+pnpm install
+pnpm lint
+pnpm build
+```
+
+If project-specific checks exist, run them too (e.g. `pnpm test`, `pnpm validate:lms`).
+
+**Step D — Review CI and deploys only from latest head**
+
+GitHub checks must be evaluated on the newest commit after sync. Netlify preview must correspond to the newest commit after sync. Old CI results on pre-sync commits are invalid.
+
+**Step E — Runtime verification**
+
+Manually hit the exact changed page, API route, or workflow in preview or dev. Do not infer runtime correctness from compile success.
+
+**Step F — Database validation for DB-affecting changes**
+
+If the PR touches migrations, Supabase queries, data promotion pipelines, view logic, publication flows, course/module/lesson generation, enrollment state, or application/status logic — live database validation is mandatory before merge.
+
+Validate: expected row counts, expected null/non-null state, foreign key integrity, no cross-program contamination, no orphaned records, correct view resolution, no unintended updates to unaffected programs.
+
+### 6. Handling failing checks
+
+**If the build fails:** verify the branch is current with `origin/main` first. If stale, sync first. If current, diagnose the actual code failure.
+
+**If accessibility, integrity, or E2E fails:** compare the failing surface against `git diff --name-only origin/main...HEAD`. If the failing paths are inside the diff, treat as regression until disproven. If outside the diff, test whether failure reproduces on `origin/main`. Only then may it be called pre-existing.
+
+**If runtime fails:** treat as a real blocker on the changed surface unless proven unrelated.
+
+**If database validation fails:** treat as merge-blocking.
+
+### 7. Standard for calling something "pre-existing"
+
+A failure may be called pre-existing only if there is evidence of **both**:
+
+1. the failing surface is outside the PR's changed scope, **and**
+2. the same failure reproduces on `origin/main` or is already documented with current evidence
+
+Without both, do not call it pre-existing. Do not downgrade uncertainty into confidence.
+
+### 8. Netlify and preview rules
+
+A successful deploy means only that the branch built and deployed. It does not prove the application works.
+
+Minimum preview validation: preview corresponds to latest commit, affected route loads, no runtime exception, expected response shape or UI behavior is present, no obvious broken data path.
+
+For API routes, test the exact route. For LMS work, test the actual learner-facing route, not just the landing page.
+
+### 9. Rules specific to this LMS repo
+
+**For curriculum, publication, blueprint, promotion, or course-generation work**, validation must include: correct program-to-course linkage, correct module count, correct lesson count, no wrong-program lesson promotion, no slug-only cross-program contamination, no empty modules, lesson ordering resolves correctly in views, expected lesson content exists in the final learner-facing structure, unaffected programs remain unchanged.
+
+**For application/admin health work**, validation must include: route compiles, route returns valid JSON, date math is correct, deadman/status logic works with real timestamps, no duplicate declarations or shadowing remains.
+
+### 10. Required response format from any coding agent
+
+When reporting status, use this structure exactly:
+
+```
+Branch status:
+- current with origin/main: yes/no
+
+Changed surface:
+- <files or subsystem summary>
+
+Checks:
+- lint: pass/fail
+- build: pass/fail
+- deploy: pass/fail
+- runtime verification: pass/fail
+- DB validation: pass/fail/not applicable
+
+Failures:
+- <each failure with classification: regression / pre-existing / unknown>
+
+Evidence:
+- <diff, command output, runtime path tested, DB query result>
+
+Merge recommendation:
+- merge / do not merge / merge after specific blocker
+```
+
+No vague summaries. No "should be fine." No "looks good." No implied confidence without evidence.
+
+### 11. Hard stop conditions
+
+A PR is not mergeable if any of these are true:
+
+- branch is behind `origin/main`
+- build fails on latest synced head
+- runtime fails on changed surface
+- DB validation fails for DB-affecting work
+- an allegedly pre-existing failure is unproven
+- deploy reviewed is not from latest branch head
+
+### 12. Default commands
+
+```bash
+git fetch origin
+git checkout <feature-branch>
+git log --oneline HEAD..origin/main
+git merge origin/main
+git diff --name-only origin/main...HEAD
+pnpm install
+pnpm lint
+pnpm build
+git push origin <feature-branch>
+```
+
+For LMS validation where applicable: `pnpm validate:lms`
+
+### Paste-this instruction for coding agents
+
+> Before making or evaluating any change, fetch origin and compare the working branch to `origin/main`. If the branch is behind, merge `origin/main` into the feature branch first and resolve conflicts before any further debugging. Do not cherry-pick routine fixes unless explicitly instructed. Do not interpret CI or Netlify failures from a stale branch as feature regressions. For every claimed fix, report evidence from the latest branch head only: changed surface, build result, runtime verification, and live DB validation where applicable. Separate branch health from feature correctness at all times. No PR may be called ready, fixed, or mergeable without evidence.
+
+---
+
 ## Key Directories
 
 - `app/` — Next.js App Router pages

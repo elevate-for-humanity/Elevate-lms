@@ -141,7 +141,7 @@ export default function InteractiveDemoPlayer({
           className="absolute inset-0 w-full h-full object-cover"
           playsInline
           muted
-          preload="auto"
+          preload="metadata"
           poster={scene.poster}
           onLoadedData={() => setLoaded(true)}
           onPlay={() => setPlaying(true)}

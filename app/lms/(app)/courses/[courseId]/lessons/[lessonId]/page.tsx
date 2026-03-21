@@ -136,18 +136,28 @@ export default function LessonPage() {
           quizPassingScore = quizPassingScore || HVAC_QUIZ_MAP[defId].passingScore;
         }
       }
-      // Enrich placeholder content with generated rich HTML
-      let enrichedContent = lessonData.content;
-      if (isPlaceholderContent(lessonData.content)) {
+      // Normalize content: treat {}, non-string, and placeholder values as null.
+      // For HVAC lessons only, fall back to the static content builder when the
+      // DB row has placeholder content. This fallback is temporary — it will be
+      // removed once all HVAC course_lessons rows have verified HTML content.
+      let enrichedContent: string | null = null;
+      const rawContent = lessonData.content;
+
+      if (typeof rawContent === 'string' && !isPlaceholderContent(rawContent)) {
+        // Valid HTML string from DB — use directly
+        enrichedContent = rawContent;
+      } else {
+        // Placeholder or missing — attempt HVAC static fallback if applicable
         const defId = Object.entries(HVAC_LESSON_UUID).find(([, uuid]) => uuid === lessonData.id)?.[0];
         if (defId) {
           enrichedContent = buildLessonContent(defId);
         }
+        // For non-HVAC programs: enrichedContent stays null → renderer shows unavailable state
       }
 
       setLesson({
         ...lessonData,
-        content: enrichedContent || lessonData.content,
+        content: enrichedContent,
         quiz_questions: quizQuestions || lessonData.quiz_questions,
         passing_score: quizPassingScore || lessonData.passing_score,
         quiz_id: lessonData.quiz_id || (quizQuestions?.length ? lessonData.id : null),
@@ -801,12 +811,15 @@ export default function LessonPage() {
                     </div>
                   </>
                 ) : (
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                      <BookOpen className="w-4 h-4" />
-                      <span>Lesson {currentIndex + 1} of {lessons.length}</span>
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+                    <div className="flex items-center gap-2 text-amber-700 mb-2">
+                      <BookOpen className="w-5 h-5 flex-shrink-0" />
+                      <span className="font-medium">Lesson content not yet published</span>
                     </div>
-                    <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>
+                    <p className="text-amber-600 text-sm">
+                      This lesson is part of the course structure but its content has not been
+                      published yet. Check back soon or contact your instructor.
+                    </p>
                   </div>
                 )}
               </div>

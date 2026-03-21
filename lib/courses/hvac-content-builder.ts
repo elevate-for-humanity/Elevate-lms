@@ -283,9 +283,13 @@ export function getAllLessonContent(): Record<string, string> {
 /**
  * Check if a lesson's DB content is just a placeholder (one-line HTML)
  */
-export function isPlaceholderContent(html: string | null | undefined): boolean {
+export function isPlaceholderContent(html: string | null | undefined | object): boolean {
   if (!html) return true;
-  // Placeholder content is typically < 200 chars and has generic patterns
-  const stripped = html.replace(/<[^>]*>/g, '').trim();
+  // Catch empty JSONB object promoted as-is from DB default
+  if (typeof html === 'object') return true;
+  if (typeof html !== 'string') return true;
+  const trimmed = html.trim();
+  if (trimmed === '{}' || trimmed === '' || trimmed === 'null') return true;
+  const stripped = trimmed.replace(/<[^>]*>/g, '').trim();
   return stripped.length < 150;
 }

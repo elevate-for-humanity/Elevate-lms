@@ -9,7 +9,9 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-type AgreementType = 'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda' | 'mou';
+type AgreementType = 'enrollment' | 'handbook' | 'data_sharing' | 'program_holder_mou' |
+  'employer_agreement' | 'staff_agreement' | 'mou' | 'ferpa' | 'participation' |
+  'eula' | 'tos' | 'aup' | 'disclosures' | 'license' | 'nda';
 type SignatureMethod = 'checkbox' | 'typed' | 'drawn';
 
 interface SignRequest {

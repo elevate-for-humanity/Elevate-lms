@@ -4,10 +4,15 @@
 -- Provides two DB functions that replace the fragile one-time
 -- migration promotion pattern:
 --
+-- html_escape(input TEXT)
+--   Escapes &, <, > so raw script_text cannot produce malformed markup.
+--
 -- format_script_to_html(input TEXT, p_title TEXT)
 --   Converts plain-text script_text to valid HTML.
+--   Escapes all text via html_escape() before wrapping.
 --   First line (or p_title if supplied) → <h2>
---   Remaining lines → <p> blocks
+--   Remaining blank-line-separated blocks → <p> blocks
+--   Internal newlines within a block are collapsed to spaces.
 --   Idempotent — safe to call on already-HTML content.
 --
 -- promote_to_course_lessons(p_program_slug TEXT)
@@ -32,6 +37,17 @@
 -- ------------------------------------------------------------
 -- format_script_to_html
 -- ------------------------------------------------------------
+-- html_escape: escapes &, <, > so raw script_text cannot produce malformed markup.
+-- PostgreSQL has no built-in htmlentities; this covers the three characters that
+-- break HTML structure. Quotes are left unescaped (safe inside text nodes).
+CREATE OR REPLACE FUNCTION public.html_escape(input TEXT)
+RETURNS TEXT
+LANGUAGE sql
+IMMUTABLE STRICT
+AS $$
+  SELECT replace(replace(replace(input, '&', '&amp;'), '<', '&lt;'), '>', '&gt;')
+$$;
+
 CREATE OR REPLACE FUNCTION public.format_script_to_html(
   input   TEXT,
   p_title TEXT DEFAULT NULL
@@ -42,24 +58,33 @@ IMMUTABLE
 AS $$
 DECLARE
   lines      TEXT[];
+  safe_title TEXT;
   rest       TEXT;
+  i          INTEGER;
+  parts      TEXT[] := ARRAY[]::TEXT[];
 BEGIN
   IF input IS NULL OR LENGTH(TRIM(input)) = 0 THEN
     RETURN NULL;
   END IF;
 
-  lines := regexp_split_to_array(TRIM(input), E'\\n+');
+  -- Split on one or more blank lines to produce paragraph boundaries.
+  -- Each element may still contain internal newlines (treated as spaces).
+  lines := regexp_split_to_array(TRIM(input), E'\\n{2,}');
 
   IF p_title IS NOT NULL AND TRIM(p_title) <> '' THEN
-    -- Title supplied: all lines become paragraph body
-    rest := array_to_string(lines, E'\\n');
-    rest := regexp_replace(rest, E'\\n+', '</p><p>', 'g');
-    RETURN '<h2>' || TRIM(p_title) || '</h2><p>' || rest || '</p>';
+    safe_title := public.html_escape(TRIM(p_title));
+    -- All lines become paragraphs under the supplied title
+    FOR i IN 1..array_length(lines, 1) LOOP
+      parts := parts || ('<p>' || public.html_escape(regexp_replace(TRIM(lines[i]), E'\\n', ' ', 'g')) || '</p>');
+    END LOOP;
+    RETURN '<h2>' || safe_title || '</h2>' || array_to_string(parts, '');
   ELSE
-    -- No title: first line becomes h2, rest becomes paragraphs
-    rest := array_to_string(lines[2:array_length(lines,1)], E'\\n');
-    rest := regexp_replace(rest, E'\\n+', '</p><p>', 'g');
-    RETURN '<h2>' || TRIM(lines[1]) || '</h2><p>' || rest || '</p>';
+    -- First non-empty line becomes h2; remaining lines become paragraphs
+    safe_title := public.html_escape(TRIM(lines[1]));
+    FOR i IN 2..array_length(lines, 1) LOOP
+      parts := parts || ('<p>' || public.html_escape(regexp_replace(TRIM(lines[i]), E'\\n', ' ', 'g')) || '</p>');
+    END LOOP;
+    RETURN '<h2>' || safe_title || '</h2>' || array_to_string(parts, '');
   END IF;
 END $$;
 
@@ -153,6 +178,9 @@ BEGIN
     v_html := public.format_script_to_html(rec.script_text, rec.lesson_title);
 
     -- Upsert into course_lessons
+    -- order_index formula: always 1-based module × 1000 + lesson_order
+    -- v_module_offset normalizes 0-based source data to 1-based before multiplication,
+    -- so PRS (1-based) and CRS/Bookkeeping (0-based) produce the same numeric range.
     INSERT INTO public.course_lessons (
       id, course_id, module_id, legacy_lesson_id, slug, title,
       content, lesson_type, order_index, passing_score,
@@ -175,7 +203,8 @@ BEGIN
         WHEN 'certification' THEN 'certification'::public.lesson_type
         ELSE 'lesson'::public.lesson_type
       END,
-      (rec.module_order * 1000 + rec.lesson_order),
+      -- Normalize: (module_order + offset) is always 1-based here
+      ((rec.module_order + v_module_offset) * 1000 + rec.lesson_order),
       CASE
         WHEN rec.step_type IN ('checkpoint', 'exam', 'quiz')
           THEN COALESCE(rec.passing_score, 70)
@@ -203,5 +232,6 @@ BEGIN
   RAISE NOTICE 'promote_to_course_lessons(%): upserted=%', p_program_slug, v_upserted;
 END $$;
 
+GRANT EXECUTE ON FUNCTION public.html_escape(TEXT) TO service_role;
 GRANT EXECUTE ON FUNCTION public.format_script_to_html(TEXT, TEXT) TO service_role;
 GRANT EXECUTE ON FUNCTION public.promote_to_course_lessons(TEXT) TO service_role;

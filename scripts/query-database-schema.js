@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 
-const supabaseUrl = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 // Need service role key - check env or ask user
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

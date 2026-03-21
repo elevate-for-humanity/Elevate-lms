@@ -21,7 +21,7 @@ import { generateLessonScript } from '../lib/autopilot/lesson-script-generator';
 import { generateTextToSpeech } from '../server/tts-service';
 import { renderLessonVideo } from '../server/lesson-video-renderer';
 
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const COURSE_ID = '2cffc43f-b90f-4c6d-a5d1-1fd2a5e14285';
 const COURSE_NAME = 'Bookkeeping & QuickBooks Certified User';

@@ -33,7 +33,7 @@ async function getFFmpeg() {
   return ff;
 }
 
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const LESSON_ID = 'b500b9d3-cf78-42d3-ba91-cb2b33c9eecf';
 const INSTRUCTOR_PHOTO = path.join(process.cwd(), 'public/images/team/elizabeth-greene-headshot.jpg');
 const INSTRUCTOR_NAME = 'Elizabeth Greene';

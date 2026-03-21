@@ -15,7 +15,8 @@ async function _GET(request: NextRequest) {
   }
 
   // Only allow proxying from our Supabase storage
-  const ALLOWED_HOST = 'cuxzzpsyufcewtmicszk.supabase.co';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const ALLOWED_HOST = supabaseUrl.replace('https://', '').replace('http://', '').split('/')[0];
   try {
     const parsed = new URL(url);
     if (parsed.hostname !== ALLOWED_HOST) {

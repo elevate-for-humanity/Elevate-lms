@@ -25,7 +25,7 @@ export interface ModuleDef {
 }
 
 const SUPABASE_VIDEO_BASE =
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac'
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac`
 
 export const MODULES: ModuleDef[] = [
   {

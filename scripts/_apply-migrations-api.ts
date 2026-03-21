@@ -6,7 +6,7 @@ import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 
-const PROJECT_REF = 'cuxzzpsyufcewtmicszk';
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
 const ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN!;
 
 if (!ACCESS_TOKEN) { console.error('SUPABASE_ACCESS_TOKEN not set'); process.exit(1); }

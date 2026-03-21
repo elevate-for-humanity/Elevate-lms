@@ -17,7 +17,7 @@ interface ProgramOrientationVideoProps {
 
 export default function ProgramOrientationVideo({
   onComplete,
-  videoUrl = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/media/orientation/orientation-final.mp4',
+  videoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/orientation/orientation-final.mp4`,
   title = 'Program Orientation',
   description = 'Watch this orientation video to learn about our programs, what to expect, and how to succeed.',
   programId,

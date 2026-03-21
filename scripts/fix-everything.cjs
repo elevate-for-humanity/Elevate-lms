@@ -108,7 +108,7 @@ function fixEnvironment() {
   if (!fs.existsSync(envPath)) {
     log('.env missing - creating with defaults', 'warning');
     const defaultEnv = `# Elevate for Humanity - Environment Variables
-VITE_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
+VITE_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
 VITE_SUPABASE_ANON_KEY=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51RvqjzIRNf5vPH3ABuHQofarfuWw0PW5ww9eTwkj21A6VLJaLopuYbPdpAFCTU10O5uLgGHeCTBEcu9xeM8ErbFy004j2KPoSx
 VITE_ENVIRONMENT=production

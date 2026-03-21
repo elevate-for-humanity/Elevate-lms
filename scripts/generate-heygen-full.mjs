@@ -10,7 +10,7 @@ import fs from 'fs';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Avatar + voice config

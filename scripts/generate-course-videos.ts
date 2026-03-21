@@ -18,7 +18,7 @@ import { lessonToScenes, cleanupSceneImages } from '../lib/autopilot/lesson-to-s
 import { generateVideo } from '../server/video-generator-v2';
 import { getInstructorForCourse } from '../lib/ai-instructors';
 
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 const COURSES: Record<string, { id: string; name: string; category: string }> = {

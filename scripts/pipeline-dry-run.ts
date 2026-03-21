@@ -9,7 +9,7 @@
  *   5. Report what would happen on a real publish
  *
  * Requires live DB credentials. Set in .env.local:
- *   NEXT_PUBLIC_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
+ *   NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
  *   SUPABASE_SERVICE_ROLE_KEY=...
  *
  * Run:

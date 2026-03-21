@@ -28,7 +28,7 @@ function getConnectionString() {
   if (process.env.SUPABASE_DB_URL) return process.env.SUPABASE_DB_URL;
 
   const password = process.env.SUPABASE_DB_PASSWORD;
-  const ref = process.env.SUPABASE_PROJECT_REF || 'cuxzzpsyufcewtmicszk';
+  const ref = process.env.SUPABASE_PROJECT_REF || process.env.SUPABASE_PROJECT_REF;
 
   if (password) {
     return `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;

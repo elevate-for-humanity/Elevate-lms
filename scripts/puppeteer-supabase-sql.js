@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 // Configuration
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'elevateforhumanity';
 const GITHUB_PASSWORD = process.env.GITHUB_PASSWORD || '';
-const PROJECT_ID = 'cuxzzpsyufcewtmicszk';
+const PROJECT_ID = process.env.SUPABASE_PROJECT_REF;
 const SQL_FILE = path.join(process.cwd(), 'simple-credentials.sql');
 const HEADLESS = process.env.HEADLESS !== 'false';
 const USE_GITHUB_AUTH = true;

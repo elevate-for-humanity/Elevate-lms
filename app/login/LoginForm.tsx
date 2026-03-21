@@ -1,5 +1,4 @@
 "use client";
-import { createAdminClient } from '@/lib/supabase/admin';
 
 import React from 'react';
 
@@ -59,9 +58,17 @@ export default function LoginForm() {
       } else {
         router.push(getRoleDestination(profile?.role));
       }
-      router.refresh();
-    } catch (err: any) {
-      setError((err as Error).message || 'Failed to sign in');
+    } catch (err: unknown) {
+      let msg = 'Failed to sign in. Please check your email and password.';
+      if (err instanceof Error && err.message) {
+        msg = err.message;
+      } else if (err && typeof err === 'object') {
+        const e = err as any;
+        if (typeof e.message === 'string' && e.message) msg = e.message;
+        else if (typeof e.error_description === 'string') msg = e.error_description;
+        else if (typeof e.code === 'string') msg = `Sign in failed (${e.code})`;
+      }
+      setError(msg);
       setLoading(false);
     }
   };

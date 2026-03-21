@@ -109,7 +109,7 @@ jobs:
             exit 0
           fi
           echo "Linting changed files: $CHANGED"
-          npx eslint $CHANGED --max-warnings=0
+          npx eslint $CHANGED --max-warnings=0 --no-warn-ignored
 
   # Deployment verification (runs after successful merge to main)
   post-deployment-check:

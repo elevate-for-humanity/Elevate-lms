@@ -143,13 +143,15 @@ export default function TrainingDeliveryDisclosure() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  Testing Center
+                  Administrative Office, Testing, and Hands-On Training
                 </h3>
                 <p className="text-sm text-slate-600 mb-2">
-                  Elevate for Humanity maintains an on-site location for enrollment processing,
-                  compliance documentation, select hands-on training components, and proctored
-                  credential exams (Certiport, EPA 608, ACT WorkKeys/NCRC, and others). All visits
-                  are <strong>by appointment only</strong> — this is not a walk-in location.
+                  Elevate for Humanity maintains this location for administrative operations,
+                  enrollment support, scheduled meetings, authorized proctored testing, and approved
+                  hands-on training activities. Services at this site are available{' '}
+                  <strong>by appointment only</strong>. This is not a walk-in location. Instruction,
+                  testing, and practical training are provided only when scheduled in advance and
+                  when required staff, faculty, or proctors are present.
                 </p>
                 <div className="flex items-start gap-2 text-sm text-slate-600">
                   <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />

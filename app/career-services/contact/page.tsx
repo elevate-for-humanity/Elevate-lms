@@ -137,7 +137,7 @@ export default function CareerServicesContactPage() {
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">By Appointment Only</h3>
                     <p className="text-gray-600">
-                      All visits are by appointment — this is a hybrid institute, not a walk-in location. Use the booking link above to schedule.
+                      By appointment only — for meetings, support, testing, and hands-on training. This is not a walk-in location.
                     </p>
                   </div>
                 </div>

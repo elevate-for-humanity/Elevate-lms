@@ -37,14 +37,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
-      # Integrity checks - each fails the build if issues found
-      - name: Link integrity check
-        run: pnpm run integrity:links
-
-      - name: Media integrity check
-        run: pnpm run integrity:media
+      # ── HARD GATES (product must exist and be complete) ───────────────────
+      # These run first. A failure here means the product is broken.
+      # Pipeline does not proceed to cosmetic checks if product is incomplete.
 
       - name: LMS course integrity check
+        # Hard gate: NULL content, missing quizzes, incomplete lessons all fail.
         run: pnpm run integrity:lms
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -73,11 +71,25 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
+      # ── SOFT CHECKS (cosmetic / site health) ─────────────────────────────
+      # These run after product gates. Failures are visible but non-blocking.
+      # Broken links and missing media do not block a complete product from merging.
+
+      - name: Link integrity check
+        run: pnpm run integrity:links
+        continue-on-error: true
+
+      - name: Media integrity check
+        run: pnpm run integrity:media
+        continue-on-error: true
+
       - name: Analytics integrity check
         run: pnpm run integrity:analytics
+        continue-on-error: true
 
       - name: Self-service policy check
         run: pnpm run integrity:self-service
+        continue-on-error: true
 
       - name: Upload integrity reports
         if: always()

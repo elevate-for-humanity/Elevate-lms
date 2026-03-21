@@ -13,13 +13,23 @@ No student will participate in clinical training until they have successfully co
 
 ## CLINICAL HOURS
 
-| Component | Hours |
-|-----------|-------|
-| Supervised clinical experience | 25 hours |
-| Minimum required by Indiana (410 IAC 17) | 16 hours |
-| Elevate for Humanity program requirement | 25 hours |
+Indiana NATCEP Administrative Standards require a minimum of 45 total clinical training hours. Of those 45 hours:
+- Up to 21 hours may be conducted in a skills laboratory setting.
+- A minimum of 24 hours must be completed in a licensed long-term care (LTC) facility under direct RN supervision.
 
-Clinical hours are completed at an approved clinical site. Students must complete all 25 clinical hours to be eligible for the Indiana Nurse Aide Competency Evaluation.
+Elevate for Humanity LLC meets these requirements exactly:
+
+| Component | Indiana Requirement | This Program |
+|-----------|-------------------|--------------|
+| Skills Laboratory hours | Up to 21 hours (max) | 21 hours |
+| Licensed LTC Facility hours | 24 hours (minimum) | 24 hours |
+| **Total Clinical Hours** | **45 hours (minimum)** | **45 hours** |
+
+Skills laboratory hours are conducted at Elevate for Humanity LLC's on-site skills lab, 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240.
+
+LTC facility hours are conducted at a licensed long-term care facility under a signed clinical affiliation agreement. Students must complete all 45 clinical hours (21 lab + 24 LTC) to be eligible for the Indiana Nurse Aide Competency Evaluation.
+
+**No clinical training of any kind will begin until written program approval is received from IDOH.**
 
 ---
 

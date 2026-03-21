@@ -5,22 +5,29 @@
 
 ## MODULE STRUCTURE OVERVIEW
 
-| Module | Title | Theory Hours | Lab Hours | Total |
-|--------|-------|-------------|-----------|-------|
-| 1 | Introduction to the CNA Role | 6 | 0 | 6 |
-| 2 | Infection Control & Standard Precautions | 6 | 2 | 8 |
-| 3 | Safety, Body Mechanics & Emergency Procedures | 5 | 2 | 7 |
-| 4 | Patient Rights, Ethics & Communication | 6 | 0 | 6 |
-| 5 | Vital Signs | 5 | 3 | 8 |
-| 6 | Personal Care Skills | 8 | 4 | 12 |
-| 7 | Mobility, Transfers & Positioning | 6 | 4 | 10 |
-| 8 | Nutrition, Hydration & Elimination | 5 | 2 | 7 |
-| 9 | Dementia, Mental Health & Restorative Care | 6 | 1 | 7 |
-| 10 | Chronic Conditions & End-of-Life Care | 5 | 1 | 6 |
-| 11 | Documentation & Reporting | 4 | 1 | 5 |
-| 12 | Clinical Preparation & Competency Review | 4 | 0 | 4 |
-| **Clinical Rotation** | Supervised Clinical Experience | — | — | **25** |
-| **TOTAL** | | **66** | **20** | **105** |
+**Hour Model (Indiana NATCEP compliant):**
+- Classroom / Theory: 30 hours minimum (Indiana requirement: 30)
+- Skills Laboratory: 21 hours (counts within the 45-hour clinical bucket; Indiana maximum: 21)
+- Licensed LTC Facility Clinical: 24 hours (Indiana minimum: 24)
+- **Total: 75 hours (Indiana minimum: 75)**
+
+| Module | Title | Classroom Hrs | Lab Hrs | Total |
+|--------|-------|--------------|---------|-------|
+| 1 | Introduction to the CNA Role | 3 | 0 | 3 |
+| 2 | Infection Control & Standard Precautions | 3 | 2 | 5 |
+| 3 | Safety, Body Mechanics & Emergency Procedures | 3 | 2 | 5 |
+| 4 | Patient Rights, Ethics & Communication | 3 | 0 | 3 |
+| 5 | Vital Signs | 3 | 3 | 6 |
+| 6 | Personal Care Skills | 4 | 5 | 9 |
+| 7 | Mobility, Transfers & Positioning | 4 | 5 | 9 |
+| 8 | Nutrition, Hydration & Elimination | 3 | 2 | 5 |
+| 9 | Dementia, Mental Health & Restorative Care | 2 | 1 | 3 |
+| 10 | Chronic Conditions & End-of-Life Care | 2 | 1 | 3 |
+| 11 | Documentation & Reporting | 2 | 0 | 2 |
+| 12 | Clinical Preparation & Competency Review | 2 | 0 | 2 |
+| **Subtotal — Classroom + Lab** | | **30** | **21** | **51** |
+| **LTC Facility Clinical Rotation** | Supervised clinical at licensed LTC facility | — | — | **24** |
+| **TOTAL** | | **30** | **21** | **75** |
 
 ---
 

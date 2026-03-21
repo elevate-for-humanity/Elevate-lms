@@ -26,14 +26,23 @@ The program is designed to serve adult learners, career changers, justice-involv
 
 ## TOTAL PROGRAM HOURS
 
-| Component | Hours |
-|-----------|-------|
-| Classroom / Theory Instruction | 60 hours |
-| Skills Laboratory Practice | 20 hours |
-| Supervised Clinical Experience | 25 hours |
-| **Total Program Hours** | **105 hours** |
+Indiana NATCEP Administrative Standards require a minimum of 75 total training hours: at least 30 hours of classroom instruction and at least 45 hours of clinical training. Of the 45 clinical hours, up to 21 hours may be conducted in a skills laboratory; a minimum of 24 hours must be completed in a licensed long-term care facility under direct RN supervision at a ratio not to exceed 8:1.
 
-All hours meet or exceed Indiana's minimum requirement of 105 total training hours, including a minimum of 16 clinical hours, as required under 410 IAC 17.
+Elevate for Humanity LLC meets these requirements as follows:
+
+| Component | Indiana Minimum | This Program |
+|-----------|----------------|--------------|
+| Classroom / Theory Instruction | 30 hours | 30 hours |
+| Skills Laboratory (part of clinical bucket) | up to 21 hours | 21 hours |
+| Licensed LTC Facility Clinical | 24 hours minimum | 24 hours |
+| **Total Clinical (Lab + LTC combined)** | **45 hours** | **45 hours** |
+| **Total Program Hours** | **75 hours** | **75 hours** |
+
+**Important distinctions:**
+- Skills laboratory hours are counted within the 45-hour clinical requirement, not as a separate third category.
+- The 21 lab hours are conducted at Elevate for Humanity LLC's on-site skills lab, 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240.
+- The 24 LTC facility hours are conducted at a licensed long-term care facility under a signed clinical affiliation agreement, under direct supervision of a qualified RN instructor.
+- No training of any kind will begin until written program approval is received from the Indiana State Department of Health (IDOH).
 
 ---
 

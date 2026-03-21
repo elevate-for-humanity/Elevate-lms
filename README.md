@@ -271,4 +271,14 @@ Elevate-lms/
 
 ---
 
+## Support This Mission
+
+Elevate for Humanity provides **free workforce training** to underserved communities in Indiana through WIOA, Workforce Ready Grant, and DOL-registered apprenticeships. Every dollar goes directly toward training costs, credentialing fees, and learner support services.
+
+**[Donate via PayPal →](https://www.paypal.com/donate/?business=Marcusgreene0103%40gmail.com&currency_code=USD)**
+
+See [SPONSORS.md](SPONSORS.md) for sponsorship tiers and partnership opportunities.
+
+---
+
 **License:** Proprietary — All rights reserved by 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute.

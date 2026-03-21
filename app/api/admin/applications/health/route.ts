@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const now = Date.now();
+  const now = new Date();
 
   // Counts by status
   const counts: Record<string, number> = {};
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     counts[status] = (counts[status] ?? 0) + 1;
 
     const since = new Date(row.updated_at ?? row.created_at).getTime();
-    const hoursInStatus = (now - since) / (1000 * 60 * 60);
+    const hoursInStatus = (now.getTime() - since) / (1000 * 60 * 60);
 
     if (SLA_HOURS[status] !== undefined) {
       totalHours[status] = (totalHours[status] ?? 0) + hoursInStatus;
@@ -99,7 +99,6 @@ export async function GET(request: NextRequest) {
   // Deadman check: log this run and alert if the previous run is stale.
   // If health checks stop running, the entire detection chain silently fails.
   const DEADMAN_INTERVAL_HOURS = 2;
-  const now = new Date();
 
   const { data: lastRun } = await db
     .from('health_check_log')

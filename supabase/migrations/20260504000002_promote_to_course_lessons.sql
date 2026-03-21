@@ -136,10 +136,13 @@ BEGIN
   RAISE NOTICE 'promote_to_course_lessons(%): course_id=% module_offset=%',
     p_program_slug, v_course_id, v_module_offset;
 
-  -- 4. Promote each published curriculum_lesson
+  -- 4. Promote each published curriculum_lesson.
+  --    PROGRAM ISOLATION: every join and filter uses v_program_id explicitly.
+  --    Slug alone is never used as a join key — slugs are not globally unique.
   FOR rec IN
     SELECT
       cl.id              AS curriculum_id,
+      cl.program_id      AS curriculum_program_id,  -- carried for assertion below
       cl.lesson_slug,
       cl.lesson_title,
       cl.script_text,
@@ -154,10 +157,17 @@ BEGIN
          AND cm.order_index = cl.module_order + v_module_offset
        LIMIT 1) AS course_module_id
     FROM public.curriculum_lessons cl
-    WHERE cl.program_id = v_program_id
+    WHERE cl.program_id = v_program_id   -- HARD FILTER: program_id, not slug
       AND cl.status = 'published'
     ORDER BY cl.module_order, cl.lesson_order
   LOOP
+    -- Assertion: curriculum row must belong to this program.
+    -- Guards against future schema changes that could loosen the filter.
+    IF rec.curriculum_program_id != v_program_id THEN
+      RAISE EXCEPTION
+        'PROMOTE_FAILED: program isolation breach — lesson % belongs to program % not %',
+        rec.lesson_slug, rec.curriculum_program_id, v_program_id;
+    END IF;
     -- Hard fail on empty script_text for content lessons
     IF rec.step_type NOT IN ('checkpoint', 'exam', 'quiz') THEN
       IF rec.script_text IS NULL OR LENGTH(TRIM(rec.script_text)) = 0 THEN

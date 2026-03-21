@@ -1,7 +1,5 @@
 # GitHub Sponsor / Donate button
 # Displayed on the repo sidebar as "Sponsor this project"
-# Replace the custom URL with your Stripe donation link once created.
-# Create one at: https://dashboard.stripe.com/payment-links
 
 custom:
-  - https://donate.stripe.com/REPLACE_WITH_YOUR_LINK
+  - https://www.paypal.com/donate/?business=Marcusgreene0103%40gmail.com&currency_code=USD

@@ -76,7 +76,7 @@ export default async function HSISuccessPage({
 
       {/* HSI Course Access */}
       {enrollment?.course?.hsi_enrollment_link && (
-        <section className="py-12 bg-white border-b">
+        <section className="py-12 border-b">
           <div className="max-w-3xl mx-auto px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Your Course Now</h2>
             <p className="text-gray-600 mb-6">
@@ -137,7 +137,7 @@ export default async function HSISuccessPage({
       </section>
 
       {/* Important Information */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 rounded-2xl p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -175,7 +175,7 @@ export default async function HSISuccessPage({
       </section>
 
       {/* Need Help */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Need Help?</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -213,7 +213,7 @@ export default async function HSISuccessPage({
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
             Explore More Training Opportunities

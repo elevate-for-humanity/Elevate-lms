@@ -32,7 +32,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* Title + Intro */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 text-center">
             Virtual Orientation
@@ -53,7 +53,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* Schedule Your Orientation */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 text-center">
             Schedule Your Orientation
@@ -70,7 +70,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* Join via Zoom */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Join via Zoom</h2>
           <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
@@ -85,7 +85,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">What You&apos;ll Learn in Orientation</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -117,7 +117,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-slate-900">
             What Students Say
@@ -156,7 +156,7 @@ export default async function OrientationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Get Started?

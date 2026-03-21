@@ -150,7 +150,7 @@ export default function SearchPage() {
       </section>
 
       {/* Quick Links */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Quick Links</h2>
           <p className="text-slate-600 mb-10">Common pages and resources.</p>
@@ -215,7 +215,7 @@ export default function SearchPage() {
       </section>
 
       {/* Employer Section */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="order-2 md:order-1">
@@ -236,7 +236,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/pages/about-employer-partners.jpg"
+                src="/images/pages/admin-apprenticeships-hero.jpg"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

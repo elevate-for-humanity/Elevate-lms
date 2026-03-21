@@ -119,7 +119,7 @@ export default function HomePage() {
       </section>
 
       {/* ── WHAT WE DO ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">What We Do</p>
@@ -178,7 +178,7 @@ export default function HomePage() {
 
 
       {/* ── HOW IT WORKS ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">The Process</p>
@@ -273,7 +273,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <FadeInUp>
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Student Outcomes</p>
@@ -329,7 +329,7 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-20 sm:py-24 bg-white">
+      <section className="py-20 sm:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <BlurIn>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Ready to start?</h2>

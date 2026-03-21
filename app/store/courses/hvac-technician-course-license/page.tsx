@@ -102,7 +102,7 @@ export default function HvacCourseLicensePage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-12 bg-white border-b border-slate-200">
+      <section className="py-12 border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -167,7 +167,7 @@ export default function HvacCourseLicensePage() {
       </section>
 
       {/* Module list */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Course curriculum</h2>
           <p className="text-slate-600 mb-8">16 modules · 94 lessons · 640 hours</p>

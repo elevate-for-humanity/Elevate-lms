@@ -169,7 +169,7 @@ export default async function CourseDetailPage({
       <CourseDetailClient course={course} />
 
       {/* What You'll Learn */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">What You'll Get</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -230,7 +230,7 @@ export default async function CourseDetailPage({
       </section>
 
       {/* Guarantees */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">

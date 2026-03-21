@@ -145,7 +145,7 @@ export default async function StudentHandbookPage() {
         {/* Content Sections */}
         <div className="space-y-8">
 
-          <section id="section-1" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-1"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">1. Welcome & Mission</h2>
             <p className="text-gray-700 mb-4">
               Elevate for Humanity provides career training, credentialing, and job placement support
@@ -160,7 +160,7 @@ export default async function StudentHandbookPage() {
             </p>
           </section>
 
-          <section id="section-2" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-2"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">2. Program Expectations</h2>
             <p className="text-gray-700 mb-4">
               These are not suggestions. They are the minimum standards required to remain enrolled.
@@ -182,7 +182,7 @@ export default async function StudentHandbookPage() {
             </ul>
           </section>
 
-          <section id="section-3" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-3"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">3. Attendance Policy</h2>
             <p className="text-gray-700 mb-4">
               <strong>Minimum 80% attendance is required to remain in good standing.</strong> This is
@@ -203,7 +203,7 @@ export default async function StudentHandbookPage() {
             </div>
           </section>
 
-          <section id="section-4" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-4"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">4. Code of Conduct</h2>
             <p className="text-gray-700 mb-4">
               You are training to enter a professional field. The conduct standards here mirror what
@@ -228,7 +228,7 @@ export default async function StudentHandbookPage() {
             </div>
           </section>
 
-          <section id="section-5" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-5"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">5. Academic Integrity</h2>
             <p className="text-gray-700 mb-3">
               Your credentials mean something because they are earned. Cheating undermines that — for
@@ -242,7 +242,7 @@ export default async function StudentHandbookPage() {
             </ul>
           </section>
 
-          <section id="section-6" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-6"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">6. Your Rights as a Student</h2>
             <p className="text-gray-700 mb-4">
               These rights are guaranteed. Elevate is obligated to honor them. If you believe any
@@ -258,7 +258,7 @@ export default async function StudentHandbookPage() {
             </ul>
           </section>
 
-          <section id="section-7" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-7"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">7. Support Services</h2>
             <p className="text-gray-700 mb-4">
               These services exist to help you succeed. Use them. Asking for help is not a sign of
@@ -279,7 +279,7 @@ export default async function StudentHandbookPage() {
             </div>
           </section>
 
-          <section id="section-8" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-8"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">8. Grievance Procedure</h2>
             <p className="text-gray-700 mb-3">
               If you have a complaint about a student, instructor, staff member, or program condition:
@@ -295,7 +295,7 @@ export default async function StudentHandbookPage() {
             </p>
           </section>
 
-          <section id="section-9" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-9"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">9. Disciplinary Process</h2>
             <p className="text-gray-700 mb-3">
               For most violations, the process is: verbal warning → written warning → probation → dismissal.
@@ -308,7 +308,7 @@ export default async function StudentHandbookPage() {
             </p>
           </section>
 
-          <section id="section-10" className="bg-white rounded-xl shadow-sm border p-6">
+          <section id="section-10"className="rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold mb-4">10. Contact</h2>
             <div className="space-y-1 text-gray-700">
               <p><strong>Program Coordinator:</strong> Assigned at enrollment</p>

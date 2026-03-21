@@ -204,7 +204,7 @@ export default async function PaymentPage() {
       </section>
 
       {/* Help Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4">Need Help?</h2>

@@ -68,7 +68,7 @@ export default function FundingHowItWorksPage() {
       </section>
 
       {/* Funding Sources */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 text-center">Available Funding Sources</h2>
           <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">

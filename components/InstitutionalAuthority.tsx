@@ -64,7 +64,7 @@ const AUTHORITIES = [
  */
 export function AuthorityBanner() {
   return (
-    <section className="py-12 md:py-16 bg-white border-t border-b border-gray-100">
+    <section className="py-12 md:py-16 border-t border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="text-center mb-8">
           <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-widest mb-2">Institutional Authority</p>

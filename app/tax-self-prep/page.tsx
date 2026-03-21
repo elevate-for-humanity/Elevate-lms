@@ -92,7 +92,7 @@ export default async function TaxSelfPrepPage() {
 
       {/* Product Tiers - TurboTax Style */}
       <ScrollReveal>
-        <section className="py-20 px-4 bg-white">
+        <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-center mb-4 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
               Choose the right product for you
@@ -390,7 +390,7 @@ export default async function TaxSelfPrepPage() {
 
       {/* How It Works */}
       <ScrollReveal>
-        <section className="py-20 px-4 bg-white">
+        <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-center mb-16 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
               How it works
@@ -454,7 +454,7 @@ export default async function TaxSelfPrepPage() {
 
       {/* Features */}
       <ScrollReveal>
-        <section className="py-20 px-4 bg-white">
+        <section className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-center mb-16 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
               Why choose our self-prep software?
@@ -535,7 +535,7 @@ export default async function TaxSelfPrepPage() {
       </ScrollReveal>
 
       {/* CTA */}
-      <section className="py-20 bg-white px-4">
+      <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
             Ready to do your taxes?
@@ -555,7 +555,7 @@ export default async function TaxSelfPrepPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Check your eligibility for funded career training programs.</p>

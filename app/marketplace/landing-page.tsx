@@ -40,7 +40,7 @@ export default function MarketplaceLanding() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Marketplace Features</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -102,7 +102,7 @@ export default function MarketplaceLanding() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose Our Marketplace?</h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -143,7 +143,7 @@ export default function MarketplaceLanding() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-black mb-8">

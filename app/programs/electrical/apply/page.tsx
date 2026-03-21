@@ -41,7 +41,7 @@ export default function ApplyPage() {
 
         <div className="grid md:grid-cols-2 gap-6 mb-10">
           <Link href="/inquiry?program=electrical" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/pages/programs-electrical-apply-d2.jpg" alt="Request information about Electrical" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/electrical.jpg" alt="Request information about Electrical" width={600} height={300} className="w-full h-52 object-cover" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Request Information</h3>
               <p className="text-black mb-4">Get program details, schedules, and eligibility info sent to you.</p>
@@ -49,7 +49,7 @@ export default function ApplyPage() {
             </div>
           </Link>
           <Link href="/apply/student?program=electrical" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
-            <Image src="/images/pages/programs-electrical-apply-d3.jpg" alt="Apply for Electrical" width={600} height={300} className="w-full h-52 object-cover" />
+            <Image src="/images/pages/programs-page-hero.jpg" alt="Apply for Electrical" width={600} height={300} className="w-full h-52 object-cover" />
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
               <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>

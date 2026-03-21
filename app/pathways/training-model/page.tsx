@@ -25,7 +25,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* Intro */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">How Training Works</h1>
           <div className="text-gray-700 space-y-4">
@@ -54,7 +54,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* Three training formats */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Three Ways We Deliver Training</h2>
 
@@ -63,7 +63,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
-                  <Image src="/images/pages/pathways-page-4.jpg" alt="Hands-on trades training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-10.jpg" alt="Hands-on trades training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Classroom + Hands-On Lab</h3>
@@ -89,7 +89,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
-                  <Image src="/images/pages/pathways-page-4.jpg" alt="CDL behind-the-wheel training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-11.jpg" alt="CDL behind-the-wheel training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Full-Time In-Person</h3>
@@ -115,7 +115,7 @@ export default function TrainingModelPage() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
-                  <Image src="/images/pages/pathways-page-4.jpg" alt="Online cybersecurity training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
+                  <Image src="/images/pages/pathways-page-12.jpg" alt="Online cybersecurity training" fill sizes="(max-width: 640px) 100vw, 256px" className="object-cover" />
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Online with Live Instructors</h3>
@@ -139,7 +139,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* What a typical week looks like */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">What a Typical Week Looks Like</h2>
           <p className="text-gray-600 mb-8">
@@ -168,7 +168,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* How we track your progress */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">How We Track Your Progress</h2>
           <p className="text-gray-600 mb-8">
@@ -213,7 +213,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* What happens if you fall behind */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">What Happens If You Fall Behind</h2>
           <p className="text-gray-700 mb-4">
@@ -237,7 +237,7 @@ export default function TrainingModelPage() {
       </section>
 
       {/* Cohort timeline example */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Example: 12-Week Skilled Trades Program Timeline</h2>
           <p className="text-gray-600 mb-6 text-sm">

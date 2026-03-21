@@ -86,7 +86,7 @@ export default function StatusPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Current Status */}
-        <section className="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <section className="rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold text-black mb-6 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Current Status
@@ -122,7 +122,7 @@ export default function StatusPage() {
         </section>
 
         {/* Incident History */}
-        <section className="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <section className="rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold text-black mb-6 flex items-center gap-2">
             <Clock className="w-5 h-5" />
             Incident History

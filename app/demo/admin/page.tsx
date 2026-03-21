@@ -1,30 +1,26 @@
-import Image from 'next/image';
-import AdminDemoClient from './AdminDemoClient';
+import { Metadata } from 'next';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
-import {
-  DEMO_STUDENTS,
-  DEMO_PROGRAMS,
-  DEMO_METRICS,
-  DEMO_RECENT_ACTIVITY,
-} from '@/lib/demo/sandbox-data';
+import InteractiveDemoPlayer from '@/components/demo/InteractiveDemoPlayer';
+import { ADMIN_SCENES } from '@/lib/demo/scenes';
+
+export const metadata: Metadata = {
+  title: 'Admin Portal Demo | Elevate for Humanity',
+  description: 'Interactive walkthrough of the Elevate admin portal — enrollment, WIOA compliance, funding, and outcomes.',
+  robots: { index: false, follow: false },
+};
 
 export default function DemoAdminPage() {
   return (
     <DemoPageShell
-      title="Dashboard"
-      description="Overview of enrollment, outcomes, and compliance across all programs."
+      title="Admin Portal"
+      description="Click through the platform — every scene is a real walkthrough. Choose what you want to see next."
       portal="admin"
     >
-
-      {/* Hero Image */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[720px]">
-        <Image src="/images/pages/demo-page-7.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
-      </section>
-      <AdminDemoClient
-        students={DEMO_STUDENTS}
-        programs={DEMO_PROGRAMS}
-        metrics={DEMO_METRICS}
-        recentActivity={DEMO_RECENT_ACTIVITY}
+      <InteractiveDemoPlayer
+        scenes={ADMIN_SCENES}
+        startSceneId="admin-overview"
+        portalLabel="Admin Portal"
+        trialHref="/store/trial"
       />
     </DemoPageShell>
   );

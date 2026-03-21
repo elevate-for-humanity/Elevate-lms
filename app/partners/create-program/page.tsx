@@ -66,7 +66,7 @@ export default function CreateProgramPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Partner Benefits</h2>
           <div className="grid sm:grid-cols-2 gap-6">

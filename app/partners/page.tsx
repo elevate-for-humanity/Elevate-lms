@@ -123,7 +123,7 @@ export default function PartnersIndexPage() {
 
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[260px] overflow-hidden">
-        <Image src="/images/pages/workforce-partnership-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/admin-autopilot-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/50" />
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-8 max-w-5xl mx-auto">
           <p className="text-brand-blue-300 font-bold text-xs uppercase tracking-widest mb-2">Indianapolis, Indiana</p>
@@ -135,7 +135,7 @@ export default function PartnersIndexPage() {
       </section>
 
       {/* 3-step directions */}
-      <section className="bg-white border-b border-slate-100 py-10">
+      <section className="border-b border-slate-100 py-10">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-lg font-bold text-slate-900 mb-6 text-center">How to get started</h2>
           <div className="grid sm:grid-cols-3 gap-6 text-center">
@@ -155,7 +155,7 @@ export default function PartnersIndexPage() {
       </section>
 
       {/* Partner type cards */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4 flex flex-col gap-8">
           {PARTNER_TYPES.map((type) => {
             const c = C[type.color as keyof typeof C];
@@ -215,7 +215,7 @@ export default function PartnersIndexPage() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="py-12 bg-white border-t border-slate-100">
+      <section className="py-12 border-t border-slate-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Not sure which type fits?</h2>
           <p className="text-slate-600 mb-6">Call us and we will figure it out together. Most partnerships are set up within a week.</p>

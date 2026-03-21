@@ -83,7 +83,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Loan Amounts */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             Advance Amounts Available
@@ -125,7 +125,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
             How Refund Advance Works
@@ -218,7 +218,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Eligibility Requirements
@@ -279,7 +279,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* Important Disclosures */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Important Information
@@ -333,7 +333,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions
@@ -376,7 +376,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Need Cash Now?

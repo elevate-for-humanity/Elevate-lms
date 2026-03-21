@@ -191,7 +191,7 @@ export default function SupersonicGovernancePage() {
         </section>
 
         {/* Related Resources */}
-        <section className="mb-12 bg-white rounded-xl p-6 border border-slate-200">
+        <section className="mb-12 rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link

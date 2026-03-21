@@ -27,7 +27,7 @@ export default function ForStudentsPage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-8 pb-4">
+      <section className="pt-8 pb-4">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">For Job Seekers</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mb-4 leading-tight max-w-2xl">A real career in weeks — not years.</h1>
@@ -64,7 +64,7 @@ export default function ForStudentsPage() {
       </section>
 
       {/* PROGRAMS */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Programs</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Popular programs for job seekers</h2>
@@ -120,7 +120,7 @@ export default function ForStudentsPage() {
       </section>
 
       {/* FUNDING */}
-      <section className="py-14 bg-white border-b border-slate-100">
+      <section className="py-14 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>

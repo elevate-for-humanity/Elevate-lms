@@ -140,7 +140,7 @@ export default function HVACCurriculumPage() {
       </div>
 
       {/* CTA */}
-      <section className="bg-white py-10 border-t">
+      <section className="py-10 border-t">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900">HVAC Technician Training</h2>

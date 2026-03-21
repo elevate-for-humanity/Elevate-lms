@@ -36,7 +36,7 @@ export default function HSIPage() {
       {/* Avatar Guide */}
 
       {/* Features */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             What You Get
@@ -161,7 +161,7 @@ export default function HSIPage() {
       </section>
 
       {/* Contact Information */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 text-center">
             Need Help?

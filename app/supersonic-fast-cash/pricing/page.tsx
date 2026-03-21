@@ -61,7 +61,7 @@ export default function PricingPage() {
       />
 
       {/* TIERS */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-14">
             <h2 className="text-3xl font-black text-slate-900 mb-4">Tax Preparation Fees</h2>
@@ -123,7 +123,7 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative h-52 rounded-2xl overflow-hidden">
-              <Image src="/images/pages/subpage-tax-hero.jpg" alt="Free VITA tax preparation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/pages/admin-analytics-hero.jpg" alt="Free VITA tax preparation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
               <h3 className="text-2xl font-black text-slate-900 mb-4">Qualify for Free Filing?</h3>

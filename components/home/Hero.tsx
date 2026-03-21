@@ -17,7 +17,7 @@ export function Hero() {
       </div>
 
       {/* HERO SECTION WITH TEXT AND IMAGE */}
-      <section className="bg-white">
+      <section className="">
       <div className="max-w-6xl mx-auto px-4 py-10 lg:py-16 grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-center">
         {/* LEFT – TEXT */}
         <div className="space-y-4">

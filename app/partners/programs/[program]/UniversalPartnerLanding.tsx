@@ -45,7 +45,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">How the Program Works</h2>
           {config.registeredApprenticeship && (
@@ -93,7 +93,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
       </section>
 
       {/* Requirements */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">What Partner {Cap(config.siteLabelPlural)} Need to Know</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -108,7 +108,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
       </section>
 
       {/* Timeline */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Approval Timeline</h2>
           <div className="space-y-6">
@@ -137,7 +137,7 @@ export default function UniversalPartnerLanding({ config }: { config: ProgramCon
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Frequently Asked Questions</h2>
           <div className="space-y-4">

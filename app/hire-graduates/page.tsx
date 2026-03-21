@@ -119,7 +119,7 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* FAQ for Employers */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Employer FAQ</h2>
           <div className="space-y-4">
@@ -146,7 +146,7 @@ export default async function HireGraduatesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-16 sm:py-20 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
             Ready to Hire Trained Talent?

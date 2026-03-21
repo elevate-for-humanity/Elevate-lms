@@ -47,7 +47,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* 5 Steps — visual journey */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-4xl mx-auto px-4">
           <div className="space-y-5">
             {[
@@ -84,7 +84,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Inclusive Services Note */}
-      <section className="py-10 sm:py-14 bg-white">
+      <section className="py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
@@ -111,7 +111,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-white">
+      <section className="py-8 sm:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Ready to Begin?</h2>
           <p className="text-slate-900 mb-6 text-sm">Register at Indiana Career Connect to get started.</p>

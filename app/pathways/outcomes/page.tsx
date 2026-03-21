@@ -183,7 +183,7 @@ export default function OutcomesPage() {
       </section>
 
       {/* Intro */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Outcomes &amp; What You Can Expect</h1>
           <div className="text-gray-700 space-y-4">

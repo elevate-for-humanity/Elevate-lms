@@ -52,7 +52,7 @@ export default function ServicesPage() {
         </Link>
       </div>
 
-      <section className="rounded-2xl border bg-white p-8 shadow-sm">
+      <section className="rounded-2xl border p-8 shadow-sm">
         <div className="inline-block px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold mb-4">
           PAID SERVICES
         </div>
@@ -281,7 +281,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="mt-12 rounded-2xl border bg-white p-8">
+      <section className="mt-12 rounded-2xl border p-8">
         <h2 className="text-2xl font-bold mb-6">
           Why Choose SupersonicFastCash?
         </h2>

@@ -112,7 +112,7 @@ export default function PartnersPage() {
 
       {/* Avatar Guide */}
 
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 md:grid-cols-2">
           <div className="relative h-[340px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
             <Image
@@ -167,7 +167,7 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <h2 className="text-2xl md:text-3xl font-bold text-center">What partners get</h2>
 
@@ -186,7 +186,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Government & Workforce Partners */}
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
@@ -210,7 +210,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Credential & Certification Partners */}
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
@@ -234,7 +234,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Industry & Employer Partners */}
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
@@ -307,7 +307,7 @@ export default function PartnersPage() {
       </section>
 
       {/* Partner Outcomes */}
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Partner Outcomes</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -336,7 +336,7 @@ export default function PartnersPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white">
+      <section className="">
         <div className="mx-auto max-w-4xl px-6 py-16">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Partner FAQ</h2>
           <p className="text-lg text-gray-600 text-center mb-12">

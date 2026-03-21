@@ -71,7 +71,7 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* Partner Badge */}
-      <section className="bg-white border-b py-6">
+      <section className="border-b py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-center gap-4 text-gray-600">
             <span className="text-sm">Training provided in partnership with</span>
@@ -148,7 +148,7 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Why Train With Us?</h2>
           <div className="grid md:grid-cols-4 gap-6">

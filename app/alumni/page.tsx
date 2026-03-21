@@ -84,7 +84,7 @@ export default function AlumniPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -114,7 +114,7 @@ export default function AlumniPage() {
       </section>
 
       {/* Featured Alumni */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Alumni Network</h2>
           {featuredAlumni.length > 0 ? (

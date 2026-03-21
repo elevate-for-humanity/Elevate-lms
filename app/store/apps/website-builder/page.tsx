@@ -54,7 +54,7 @@ export default function WebsiteBuilderAppPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Website Builder" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-white text-slate-900 py-16 px-4">
+      <section className="text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -101,7 +101,7 @@ export default function WebsiteBuilderAppPage() {
       </section>
 
       {/* Templates */}
-      <section className="py-12 px-4 bg-white">
+      <section className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-gray-600 mb-6">Industry-specific templates included</p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -187,7 +187,7 @@ export default function WebsiteBuilderAppPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-white text-slate-900">
+      <section className="py-16 px-4 text-slate-900">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Launch Your Training Website Today</h2>
           <p className="text-gray-300 mb-8">14-day free trial. Card required, not charged until trial ends.</p>

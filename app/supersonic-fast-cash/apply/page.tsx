@@ -92,7 +92,7 @@ export default function RefundApplyPage() {
       </section>
 
       {/* Benefits Bar */}
-      <section className="bg-white border-b py-4">
+      <section className="border-b py-4">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="flex items-center justify-center gap-2">

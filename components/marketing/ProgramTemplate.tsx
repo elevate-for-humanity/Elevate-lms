@@ -137,7 +137,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       </section>
 
       {/* GOVERNMENT PARTNERS BAR */}
-      <section className="bg-white border-y border-slate-200 py-6">
+      <section className="border-y border-slate-200 py-6">
         <div className="mx-auto max-w-7xl px-6">
           <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
             Approved Workforce Development Partner
@@ -160,7 +160,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       </section>
 
       {/* What You'll Learn Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
@@ -299,7 +299,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       </section>
 
       {/* Program Details Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">

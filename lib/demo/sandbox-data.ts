@@ -221,6 +221,50 @@ export const DEMO_COURSES = [
   },
 ];
 
+export const DEMO_APPRENTICES = [
+  { id: 1, name: 'Marcus Johnson',   program: 'Barber Apprenticeship',    hours: 847,  total: 2000, wage: '$14/hr', status: 'On Track',  pendingHours: 16 },
+  { id: 2, name: 'Aaliyah Thompson', program: 'Cosmetology Apprenticeship', hours: 1203, total: 1500, wage: '$13/hr', status: 'Ahead',     pendingHours: 0  },
+  { id: 3, name: 'DeShawn Williams', program: 'HVAC Technician',           hours: 2450, total: 8000, wage: '$22/hr', status: 'On Track',  pendingHours: 40 },
+  { id: 4, name: 'James Carter',     program: 'Electrical Apprenticeship', hours: 3200, total: 8000, wage: '$24/hr', status: 'On Track',  pendingHours: 0  },
+  { id: 5, name: 'Tyler Robinson',   program: 'CDL Class A',               hours: 80,   total: 160,  wage: '$18/hr', status: 'New',       pendingHours: 8  },
+];
+
+export const DEMO_CANDIDATES = [
+  { id: 1, name: 'Jasmine Davis',    program: 'CNA Training',    credential: 'Indiana CNA License', available: 'Immediately',  match: 98 },
+  { id: 2, name: 'Maria Gonzalez',   program: 'Phlebotomy',      credential: 'CPT(ASCP)',            available: 'Immediately',  match: 95 },
+  { id: 3, name: 'Keisha Brown',     program: 'Medical Assistant', credential: 'CMA (in progress)',  available: 'Mar 2026',     match: 88 },
+  { id: 4, name: 'Robert Lee',       program: 'CDL Class B',     credential: 'CDL-B (in progress)', available: 'Apr 2026',     match: 84 },
+  { id: 5, name: 'Tanya Washington', program: 'IT Support',      credential: 'CompTIA A+ (pending)', available: 'Jun 2026',    match: 79 },
+];
+
+export const DEMO_INCENTIVES = [
+  { type: 'OJT Wage Reimbursement', employee: 'Marcus Johnson',   amount: '$4,200', status: 'Approved'   },
+  { type: 'WOTC Tax Credit',        employee: 'Tyler Robinson',   amount: '$2,400', status: 'Processing' },
+  { type: 'OJT Wage Reimbursement', employee: 'DeShawn Williams', amount: '$6,800', status: 'Approved'   },
+  { type: 'Hiring Incentive',       employee: 'James Carter',     amount: '$3,000', status: 'Pending'    },
+  { type: 'WOTC Tax Credit',        employee: 'Aaliyah Thompson', amount: '$2,400', status: 'Approved'   },
+];
+
+export const DEMO_LEARNER_COURSES = [
+  { id: 1, name: 'Barbering Fundamentals',   progress: 72, status: 'In Progress',  nextLesson: 'Fade Techniques',    grade: null  },
+  { id: 2, name: 'Sanitation & Safety',      progress: 100, status: 'Completed',   nextLesson: null,                  grade: 'A'   },
+  { id: 3, name: 'Business of Barbering',    progress: 30, status: 'In Progress',  nextLesson: 'Client Retention',   grade: null  },
+  { id: 4, name: 'State Board Prep',         progress: 0,  status: 'Not Started',  nextLesson: null,                  grade: null  },
+];
+
+export const DEMO_HOURS_LOG = [
+  { date: 'Jan 14, 2026', hours: 8,  activity: 'Floor work — haircuts & fades',    supervisor: 'James Williams', approved: true  },
+  { date: 'Jan 13, 2026', hours: 8,  activity: 'Floor work — shaves & trims',      supervisor: 'James Williams', approved: true  },
+  { date: 'Jan 10, 2026', hours: 8,  activity: 'Observation & assisted cuts',      supervisor: 'James Williams', approved: true  },
+  { date: 'Jan 9, 2026',  hours: 8,  activity: 'Floor work — haircuts',            supervisor: 'James Williams', approved: true  },
+  { date: 'Jan 8, 2026',  hours: 8,  activity: 'Sanitation training',              supervisor: 'James Williams', approved: false },
+];
+
+export const DEMO_LEARNER_CERTS = [
+  { name: 'OSHA 10-Hour Safety',    issued: 'Dec 2025', status: 'Active', expires: 'Dec 2030' },
+  { name: 'CPR / AED Certification', issued: 'Nov 2025', status: 'Active', expires: 'Nov 2027' },
+];
+
 /**
  * Check if current session is in demo mode
  */

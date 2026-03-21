@@ -155,7 +155,7 @@ export default function PlatformPage() {
       })()}
 
       {/* CAPABILITIES */}
-      <section className="py-16 sm:py-20 bg-white border-b">
+      <section className="py-16 sm:py-20 border-b">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Platform Capabilities</p>
@@ -184,7 +184,7 @@ export default function PlatformPage() {
       </section>
 
       {/* PIPELINE */}
-      <section className="py-16 sm:py-20 bg-white border-b">
+      <section className="py-16 sm:py-20 border-b">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">End-to-End Pipeline</p>
@@ -213,7 +213,7 @@ export default function PlatformPage() {
       </section>
 
       {/* WHO IT SERVES */}
-      <section className="py-16 sm:py-20 bg-white border-b">
+      <section className="py-16 sm:py-20 border-b">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-12">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Who It Serves</p>
@@ -245,7 +245,7 @@ export default function PlatformPage() {
       </section>
 
       {/* COMPLIANCE & SECURITY */}
-      <section className="py-16 sm:py-20 bg-white border-b">
+      <section className="py-16 sm:py-20 border-b">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -284,7 +284,7 @@ export default function PlatformPage() {
       </section>
 
       {/* PRIMARY CTA */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-4">Get Started</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">

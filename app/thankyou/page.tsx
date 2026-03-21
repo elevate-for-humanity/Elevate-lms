@@ -80,7 +80,7 @@ export default async function ThankyouPage() {
       </div>
 
       {/* Success Message */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-500 flex-shrink-0">•</span>
@@ -102,7 +102,7 @@ export default async function ThankyouPage() {
       </section>
 
       {/* Next Steps */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Next Steps</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -120,7 +120,7 @@ export default async function ThankyouPage() {
       </section>
 
       {/* Contact Info */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-8">Questions? Contact Us</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -160,7 +160,7 @@ export default async function ThankyouPage() {
 
       {/* Suggested Programs */}
       {programs && programs.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto px-4">
             <h2 className="text-2xl font-bold text-center mb-8">Explore Our Programs</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -187,7 +187,7 @@ export default async function ThankyouPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">
             Ready to Learn More?

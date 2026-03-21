@@ -89,7 +89,7 @@ export default function ManagedPlatformPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Managed Platform" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 overflow-hidden bg-white">
+      <section className="relative py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-brand-red-600/10 border border-brand-red-600/20 rounded-full px-4 py-2 mb-6">
@@ -141,7 +141,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* What You Get */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">What You Get</h2>
           
@@ -185,7 +185,7 @@ export default function ManagedPlatformPage() {
       />
 
       {/* License Terms - Clear */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white border border-slate-200 rounded-xl p-8">
             <h3 className="text-xl font-bold text-slate-900 mb-6">This is a Managed Platform License</h3>
@@ -305,7 +305,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* Onboarding Timeline */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">From signup to live in 2 weeks</h2>
           <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
@@ -332,7 +332,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* Credential Add-ons */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">Credential Add-ons</h2>
           <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
@@ -397,7 +397,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* Legal */}
-      <section className="py-8 border-t border-slate-200 bg-white">
+      <section className="py-8 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-600 text-xs">
             All products are licensed access to platforms operated by Elevate for Humanity. 

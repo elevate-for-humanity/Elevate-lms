@@ -39,7 +39,7 @@ export default function TestimonialsSection() {
   // Strict rendering: no testimonials = no section
   if (loading) {
     return (
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8"></div>
@@ -67,7 +67,7 @@ export default function TestimonialsSection() {
   const current = testimonials[currentIndex];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">What Our Graduates Say</h2>

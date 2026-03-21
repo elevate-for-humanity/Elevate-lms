@@ -144,7 +144,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* Our Programs — Three Pillars */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Selfish Inc. Programs</h2>
@@ -211,7 +211,7 @@ export default async function RiseFoundationPage() {
             <div id="curvature" className="bg-white rounded-2xl border shadow-sm overflow-hidden">
               <div className="h-52 relative">
                 <Image
-                  src="/images/pages/rise-foundation-page-2.jpg"
+                  src="/images/pages/pathways-page-8.jpg"
                   alt="CurvatureBody Sculpting non-invasive body contouring services"
                   fill
                   className="object-cover"
@@ -372,7 +372,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* Entity Structure */}
-      <section id="organization" className="py-16 bg-white">
+      <section id="organization"className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-2">Our Organization</h2>
           <p className="text-center text-gray-500 mb-10 text-sm">Legal entity and operating names explained</p>
@@ -444,7 +444,7 @@ export default async function RiseFoundationPage() {
 
       {/* Events from DB */}
       {events && events.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8">Upcoming Events</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -481,7 +481,7 @@ export default async function RiseFoundationPage() {
       )}
 
       {/* Founder */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Founded by Elizabeth Greene</h2>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto text-lg">

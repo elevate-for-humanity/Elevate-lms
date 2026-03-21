@@ -34,7 +34,7 @@ export default function GoalSettingPage() {
         <Image src="/images/pages/goal-setting-hero.jpg" alt="Goal Setting" fill className="object-cover" priority sizes="100vw" />
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">SMART Goal Framework</h2>
           <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -60,7 +60,7 @@ export default function GoalSettingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What We Help With</h2>
           <div className="grid md:grid-cols-3 gap-8">

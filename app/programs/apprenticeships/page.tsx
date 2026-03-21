@@ -62,7 +62,7 @@ export default function Page() {
         <SponsorDisclosure />
       </div>
       <InView animation="fade-up">
-        <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+        <section className="py-14 lg:py-20 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-10">
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Choose Your Path</p>

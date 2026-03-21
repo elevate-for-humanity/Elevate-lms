@@ -67,7 +67,7 @@ export default async function StaffPortalAttendancePage() {
         </div>
 
         {/* Active Cohorts */}
-        <section className="bg-white rounded-lg shadow p-6 mb-6">
+        <section className="rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Active Cohorts</h2>
           {activeCohorts.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-4">
@@ -86,7 +86,7 @@ export default async function StaffPortalAttendancePage() {
         </section>
 
         {/* Attendance Records */}
-        <section className="bg-white rounded-lg shadow p-6">
+        <section className="rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Recent Attendance Records</h2>
           {records.length > 0 ? (
             <div className="overflow-x-auto">

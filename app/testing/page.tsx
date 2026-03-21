@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams | Elevate for Humanity',
   description:
-    'Workforce credential exams and proctor-supervised certification testing. Certiport, EPA 608, OSHA, Rise Up, and CareerSafe exams available through authorized testing partnerships.',
+    'Workforce credential exams and proctor-supervised certification testing. Certiport, EPA 608, ACT WorkKeys/NCRC, OSHA, Rise Up, and CareerSafe exams available through authorized testing partnerships.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/testing',
   },
@@ -79,7 +79,7 @@ const examCategories = [
     id: 'careersafe',
     name: 'CareerSafe Safety Training',
     provider: 'CareerSafe',
-    image: '/images/pages/hvac-technician.jpg',
+    image: '/images/pages/career-services-page-3.jpg',
     description: 'Online safety training courses with certification upon completion. Accepted by employers in construction, manufacturing, and general industry.',
     exams: [
       'Bloodborne Pathogens',
@@ -89,6 +89,21 @@ const examCategories = [
     ],
     access: 'Online self-paced with assessment',
     bookable: false,
+  },
+  {
+    id: 'workkeys',
+    name: 'ACT WorkKeys / NCRC',
+    provider: 'ACT — Authorized Testing Site (Site Code: TBD)',
+    image: '/images/pages/career-services-page-4.jpg',
+    description: 'Elevate for Humanity is an authorized ACT WorkKeys testing site. The National Career Readiness Certificate (NCRC) is a portable, employer-recognized credential that proves workplace skills. Required by many Indiana workforce programs and accepted by WorkOne as evidence of career readiness.',
+    exams: [
+      'Applied Math',
+      'Workplace Documents',
+      'Business Writing',
+      'NCRC — Bronze, Silver, Gold, Platinum',
+    ],
+    access: 'Proctored on-site — by appointment',
+    bookable: true,
   },
 ];
 
@@ -104,7 +119,7 @@ export default function TestingPage() {
       {/* Hero */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/pages/testing-page-1.jpg"
+          src="/images/pages/career-services-page-1.jpg"
           alt="Workforce credential testing"
           fill sizes="100vw"
           className="object-cover"
@@ -113,7 +128,7 @@ export default function TestingPage() {
       </section>
 
       {/* Disclosure */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-5xl mx-auto px-4">
           <div className="bg-white border border-slate-200 rounded-xl p-5">
             <p className="text-sm text-slate-700 leading-relaxed">
@@ -172,7 +187,7 @@ export default function TestingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">How Testing Works</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -193,7 +208,7 @@ export default function TestingPage() {
       </section>
 
       {/* For Workforce Partners */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-4">For Workforce Partners</h2>
           <p className="text-slate-600 mb-6">
@@ -223,7 +238,7 @@ export default function TestingPage() {
       </section>
 
       {/* EPA 608 Proctor Information */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 sm:p-10">
             <div className="flex items-start gap-4 mb-6">
@@ -311,7 +326,7 @@ export default function TestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">Ready to Earn Your Credential?</h2>
           <p className="text-slate-600 mb-8">Enroll in a training program to access exam preparation and proctored testing.</p>

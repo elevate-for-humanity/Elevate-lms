@@ -140,7 +140,7 @@ export default function WCAGCompliancePage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16 bg-white">
+      <section id="pricing"className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-black mb-8 text-center">Accessibility Pricing</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">

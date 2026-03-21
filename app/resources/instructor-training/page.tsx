@@ -145,7 +145,7 @@ export default function InstructorTrainingPage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-xl p-8">
+        <section className="rounded-xl p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Interested in Teaching?</h2>
           <p className="text-slate-600 mb-6">
             We&apos;re looking for licensed professionals to teach in our career training programs.

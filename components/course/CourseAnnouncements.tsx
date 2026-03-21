@@ -33,7 +33,7 @@ export function CourseAnnouncements({ courseId }: { courseId: string }) {
 
   if (loading) {
     return (
-      <section className="mt-6 rounded-xl border bg-white p-4 text-xs text-slate-500">
+      <section className="mt-6 rounded-xl border p-4 text-xs text-slate-500">
         Loading announcements…
       </section>
     );
@@ -41,7 +41,7 @@ export function CourseAnnouncements({ courseId }: { courseId: string }) {
 
   if (!items.length) {
     return (
-      <section className="mt-6 rounded-xl border bg-white p-4 text-xs text-slate-500">
+      <section className="mt-6 rounded-xl border p-4 text-xs text-slate-500">
         <h2 className="text-sm font-semibold text-black mb-2">
           Course announcements
         </h2>
@@ -51,7 +51,7 @@ export function CourseAnnouncements({ courseId }: { courseId: string }) {
   }
 
   return (
-    <section className="mt-6 rounded-xl border bg-white p-4 text-xs">
+    <section className="mt-6 rounded-xl border p-4 text-xs">
       <h2 className="text-sm font-semibold text-black mb-3">
         Course announcements
       </h2>

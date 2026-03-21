@@ -58,7 +58,7 @@ export default function WorkforcePartnershipPacketPage() {
       {/* Hero — hidden on print */}
       <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
         <Image
-          src="/images/pages/workforce-partnership-hero.jpg"
+          src="/images/pages/admin-automation-qa-hero.jpg"
           alt="Workforce partnership meeting"
           fill
           sizes="100vw"
@@ -85,7 +85,7 @@ export default function WorkforcePartnershipPacketPage() {
       </div>
 
       {/* Organization Overview */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Organization Overview</h2>
 
@@ -173,7 +173,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Program Catalog */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Program Catalog</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -215,7 +215,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Progress Reporting */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Progress Reporting for Partners</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -253,7 +253,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Cohort Timeline */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Cohort Setup Timeline</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -283,7 +283,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Assessment & Verification */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Assessment & Competency Verification</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -315,7 +315,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Partnership Inquiries</h2>
           <div className="bg-white rounded-lg border p-6 print:border-gray-300">
@@ -354,7 +354,7 @@ export default function WorkforcePartnershipPacketPage() {
       </section>
 
       {/* Navigation — hidden on print */}
-      <section className="py-10 bg-white print:hidden">
+      <section className="py-10 print:hidden">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import DemoTabs from './DemoTabs';
 
 export const metadata: Metadata = {
   title: 'Platform Demos | Elevate for Humanity',
@@ -127,7 +128,7 @@ export default function StoreDemosPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-white border-t border-slate-200">
+      <section className="py-14 border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">Ready to set up your own?</h2>
           <p className="text-slate-700 mb-6">

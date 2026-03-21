@@ -107,7 +107,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* Stats Strip */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -262,7 +262,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12">How to Get Funded</h2>
           
@@ -314,7 +314,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
             Don&apos;t Let Cost Stop You

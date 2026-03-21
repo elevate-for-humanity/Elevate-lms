@@ -91,7 +91,7 @@ export default async function LicensePage() {
       </div>
 
       {/* HERO BANNER */}
-      <section className="bg-white py-12 sm:py-16">
+      <section className="py-12 sm:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4 sm:mb-6">
             License the Elevate LMS + Workforce Hub
@@ -124,7 +124,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Quick nav */}
-      <section className="py-3 bg-white border-b border-slate-700">
+      <section className="py-3 border-b border-slate-700">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/license/features" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
@@ -144,7 +144,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Features */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Platform Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -163,7 +163,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Automated Self-Service Operations Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4 text-slate-900">Automated, Self-Service Operations</h2>
           <p className="text-lg text-slate-600 text-center mb-8 max-w-3xl mx-auto">
@@ -197,7 +197,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Pricing Tiers */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">Licensing Options</h2>
           <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -246,7 +246,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Platform Governance & Operational Readiness */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-4">Platform Governance & Operational Readiness</h2>
           <p className="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
@@ -273,7 +273,7 @@ export default async function LicensePage() {
 
       {/* Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">What Licensees Say</h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -293,7 +293,7 @@ export default async function LicensePage() {
 
       {/* Partners */}
       {partners && partners.length > 0 && (
-        <section className="py-12 bg-white">
+        <section className="py-12">
           <div className="max-w-7xl mx-auto px-4">
             <h3 className="text-center text-gray-500 mb-8">Trusted by organizations across Indiana</h3>
             <div className="flex flex-wrap justify-center items-center gap-8">
@@ -308,7 +308,7 @@ export default async function LicensePage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Ready to Improve Your Workforce Programs?
@@ -334,7 +334,7 @@ export default async function LicensePage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="py-8 bg-white">
+      <section className="py-8">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-gray-500">
           <p>{DISCLAIMERS.pricing}</p>
         </div>

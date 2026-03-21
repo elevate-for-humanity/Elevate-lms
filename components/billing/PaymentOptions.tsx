@@ -7,7 +7,7 @@ type Props = {
 
 export default function PaymentOptions({ price, programName }: Props) {
   return (
-    <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+    <section className="mt-6 rounded-2xl border p-5 shadow-sm">
       <h3 className="text-xl font-semibold">Payment Options</h3>
       <p className="mt-1 text-sm text-black">
         Choose the option that fits your situation. If you're using workforce

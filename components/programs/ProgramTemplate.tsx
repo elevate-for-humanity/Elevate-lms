@@ -40,7 +40,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
       ) : null}
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
             {program.heroTitle || program.title}

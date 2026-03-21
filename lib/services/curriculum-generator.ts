@@ -370,6 +370,25 @@ export class CurriculumGenerator {
       return null;
     }
 
+    // Content enforcement — lesson body is required for all lesson types.
+    // Assessment lessons (checkpoint/quiz/exam) additionally require quizzes.
+    const assessmentTypes = ['checkpoint', 'quiz', 'exam'];
+    const isAssessment = assessmentTypes.includes(def.stepType ?? 'lesson');
+
+    if (!def.scriptText || def.scriptText.trim().length < 50) {
+      const msg = `upsertLesson(${def.lessonSlug}): script_text is required and must be at least 50 characters — lesson not written`;
+      this.summary.errors.push(msg);
+      logger.error('curriculum-generator: ' + msg);
+      return null;
+    }
+
+    if (isAssessment && (!def.quizzes || def.quizzes.length === 0)) {
+      const msg = `upsertLesson(${def.lessonSlug}): step_type '${def.stepType}' requires at least one quiz question — lesson not written`;
+      this.summary.errors.push(msg);
+      logger.error('curriculum-generator: ' + msg);
+      return null;
+    }
+
     const { data: lessonRow, error: lessonErr } = await this.db
 
       .from('curriculum_lessons')
@@ -383,7 +402,7 @@ export class CurriculumGenerator {
           lesson_order:         def.lessonOrder,
           module_order:         def.moduleOrder,
           module_title:         def.moduleTitle,
-          script_text:          def.scriptText ?? null,
+          script_text:          def.scriptText,
           key_terms:            def.keyTerms ?? [],
           job_application:      def.jobApplication ?? null,
           watch_for:            def.watchFor ?? [],

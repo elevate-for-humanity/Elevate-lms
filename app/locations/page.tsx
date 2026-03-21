@@ -86,7 +86,7 @@ export default async function LocationsPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Our Locations</h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
@@ -225,7 +225,7 @@ export default async function LocationsPage() {
         )}
 
         {/* FAQ */}
-        <section className="bg-white rounded-2xl p-8 mb-8">
+        <section className="rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Locations FAQ</h2>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[

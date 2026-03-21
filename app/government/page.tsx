@@ -68,7 +68,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Credentials */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Our Credentials</h3>
@@ -84,7 +84,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Who We Serve with Images */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -234,7 +234,7 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/training-cohort.jpg"
+                      src="/images/pages/admin-cafeteria-hero.jpg"
                       alt="ETPL Training"
                       fill
                       className="object-cover"
@@ -291,7 +291,7 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/compliance-page-1.jpg"
+                      src="/images/pages/admin-compliance-audit-hero.jpg"
                       alt="Compliance"
                       fill
                       className="object-cover"
@@ -368,7 +368,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Why Partner With Us */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -385,7 +385,7 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/government-2.jpg"
+                  src="/images/pages/government-page-1.jpg"
                   alt="Proven Results"
                   fill
                   className="object-cover"
@@ -509,7 +509,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Ready to Partner?

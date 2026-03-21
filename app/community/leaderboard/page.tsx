@@ -67,7 +67,7 @@ export default async function LeaderboardPage() {
 
       {/* Top 3 Podium */}
       {hasEnoughForPodium && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-center gap-4">
               {/* 2nd Place */}
@@ -164,7 +164,7 @@ export default async function LeaderboardPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Climb the Ranks?</h2>
           <p className="text-yellow-100 mb-8 max-w-2xl mx-auto">

@@ -488,7 +488,7 @@ async function publishCompiledDraft(
           module_title:      mod.module_title,
           step_type,
           passing_score:     isCheckpoint ? 80 : 0,
-          script_text:       lesson.narration_script,
+          script_text:       lesson.narration_script || renderCompiledLessonContent(lesson),
           summary_text:      lesson.summary_text || '',
           reflection_prompt: lesson.reflection_prompt || '',
           competency_keys:   lesson.competency_keys ?? [],

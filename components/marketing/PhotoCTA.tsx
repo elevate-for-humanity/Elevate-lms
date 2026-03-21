@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function PhotoCTA() {
   return (
-    <section className="bg-white">
+    <section className="">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
           {/* Photo collage */}

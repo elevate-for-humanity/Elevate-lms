@@ -116,7 +116,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* Features Bar */}
-      <section className="py-8 bg-white text-slate-900">
+      <section className="py-8 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-6">
             {features.map((feature) => (
@@ -144,7 +144,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* Testing Categories */}
-      <section id="services" className="py-20 bg-white">
+      <section id="services"className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -200,7 +200,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* Employer Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
@@ -250,7 +250,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* DOT Section */}
-      <section className="py-20 bg-white text-slate-900">
+      <section className="py-20 text-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -301,7 +301,7 @@ export default async function DrugTestingLandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
             How It Works
@@ -331,7 +331,7 @@ export default async function DrugTestingLandingPage() {
 
       {/* Certification Program from DB */}
       {program && (
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 rounded-full text-brand-green-700 text-sm font-medium mb-4">
@@ -397,7 +397,7 @@ export default async function DrugTestingLandingPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Schedule a Drug Test?

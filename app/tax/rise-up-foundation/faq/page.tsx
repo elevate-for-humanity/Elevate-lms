@@ -30,7 +30,7 @@ export default function FAQPage() {
         subtitle="Everything you need to know about free VITA tax preparation through Rise Up Foundation."
       />
 
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid gap-6">
             {FAQS.map((faq) => (
@@ -49,7 +49,7 @@ export default function FAQPage() {
       </section>
 
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/subpage-tax-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/admin-ai-studio-hero.jpg" alt="Get free tax help" fill className="object-cover object-center" sizes="100vw" />
       </section>
       <section className="bg-emerald-900 py-12 text-center px-4">
         <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Still Have Questions?</h2>

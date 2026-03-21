@@ -47,7 +47,7 @@ export default async function VerifyIdentityPage() {
   if (verification && (verification.status === 'approved' || verification.status === 'verified')) {
     return (
       <div className="min-h-screen bg-white">
-        <section className="bg-white border-b py-8">
+        <section className="border-b py-8">
           <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-4xl font-bold text-black mb-2">
               Identity Verification
@@ -86,7 +86,7 @@ export default async function VerifyIdentityPage() {
   if (verification && (verification.status === 'pending' || verification.status === 'pending_review')) {
     return (
       <div className="min-h-screen bg-white">
-        <section className="bg-white border-b py-8">
+        <section className="border-b py-8">
           <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-4xl font-bold text-black mb-2">
               Identity Verification
@@ -130,7 +130,7 @@ export default async function VerifyIdentityPage() {
   if (verification && verification.status === 'rejected') {
     return (
       <div className="min-h-screen bg-white">
-        <section className="bg-white border-b py-8">
+        <section className="border-b py-8">
           <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-4xl font-bold text-black mb-2">
               Identity Verification

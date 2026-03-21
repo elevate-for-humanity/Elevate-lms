@@ -27,7 +27,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Title */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-3">
             Workforce Partnerships
@@ -40,7 +40,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Who This Is For */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Who We Work With</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -61,7 +61,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* How It Works for Partners */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">How Referrals Work</h2>
           <div className="grid md:grid-cols-4 gap-6">
@@ -84,7 +84,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Our Credentials */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Our Credentials</h2>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
@@ -106,7 +106,7 @@ export default function PartnershipsPage() {
             ))}
           </div>
           <div className="mt-6 text-center">
-            <a href="https://intraining.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-brand-blue-600 hover:underline">
+            <a href="https://intraining.dwd.in.gov" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-brand-blue-600 hover:underline">
               <ExternalLink className="w-3.5 h-3.5" />
               Verify on INTraining (search &quot;2Exclusive&quot;)
             </a>
@@ -115,7 +115,7 @@ export default function PartnershipsPage() {
       </section>
 
       {/* Programs Available */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs Available for Referral</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

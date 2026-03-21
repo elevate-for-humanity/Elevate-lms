@@ -354,7 +354,7 @@ export default function LicensingPartnershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
             Ready to Partner With Us?

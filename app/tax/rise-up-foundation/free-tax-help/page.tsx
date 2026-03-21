@@ -47,7 +47,7 @@ export default function FreeTaxHelpPage() {
       />
 
       {/* BOOK CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="grid md:grid-cols-2 gap-6">
             <button
@@ -55,7 +55,7 @@ export default function FreeTaxHelpPage() {
               className="rounded-2xl overflow-hidden border-2 border-emerald-700 hover:shadow-xl transition-all duration-300 group"
             >
               <div className="relative h-44">
-                <Image src="/images/pages/booking-page-1.jpg" alt="Schedule appointment" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/pages/admin-affiliates-new-hero.jpg" alt="Schedule appointment" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-5 bg-emerald-700">
                 <p className="font-black text-white text-lg">Schedule Free Appointment</p>
@@ -64,7 +64,7 @@ export default function FreeTaxHelpPage() {
             </button>
             <Link href="/tax/rise-up-foundation/site-locator" className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition-all duration-300 group">
               <div className="relative h-44">
-                <Image src="/images/pages/locations-page-1.jpg" alt="Find a VITA site" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/pages/admin-analytics-learning-hero.jpg" alt="Find a VITA site" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-5 bg-white">
                 <p className="font-black text-slate-900 text-lg">Find a Walk-In Site</p>
@@ -101,7 +101,7 @@ export default function FreeTaxHelpPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">How It Works</h2>
@@ -151,7 +151,7 @@ export default function FreeTaxHelpPage() {
       </section>
 
       {/* IRS REFERENCE */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-sm text-slate-500 leading-relaxed">
             For more information about the VITA program, visit the{' '}

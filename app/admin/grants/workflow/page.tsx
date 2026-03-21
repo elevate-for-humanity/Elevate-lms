@@ -157,7 +157,7 @@ export default async function GrantWorkflowPage() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Stage 1: Intake - New Opportunities */}
-            <section className="bg-white rounded-xl shadow-sm p-6">
+            <section className="rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-black">
                   🟡 Intake: New Opportunities

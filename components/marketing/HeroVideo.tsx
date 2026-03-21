@@ -82,6 +82,10 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
 
+  // Track whether we're mounted on the client (avoids SSR/client hydration mismatch)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Preload voiceover audio metadata on mount
   useEffect(() => {
     const audio = audioRef.current;
@@ -104,17 +108,20 @@ export default function HeroVideo({
     }
   }
 
-  // Determine video source based on viewport
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const videoSrc = (isMobile && videoSrcMobile) ? videoSrcMobile : videoSrcDesktop;
+  // Always use desktop src on server. Switch to mobile src after mount if viewport is narrow.
+  // This prevents the SSR/client src mismatch hydration error.
+  const videoSrc =
+    mounted && videoSrcMobile && window.innerWidth < 768
+      ? videoSrcMobile
+      : videoSrcDesktop;
 
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
       {/* ── VIDEO FRAME ── */}
-      {/* Height: 56vw clamped between 280px and 680px — no layout shift */}
+      {/* Height: 56vw clamped between 400px and 780px */}
       <section
         className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(280px, 56vw, 680px)' }}
+        style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
         {/* CanonicalVideo handles reduced-motion, error fallback, and visibility gating */}
@@ -126,7 +133,7 @@ export default function HeroVideo({
 
         {/* Voiceover audio — preload metadata so it's ready when scroll fires */}
         {voiceoverSrc && (
-          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" loop />
+          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" />
         )}
 
         {/* ── ON-VIDEO ELEMENTS (only these three are allowed) ── */}
@@ -178,7 +185,7 @@ export default function HeroVideo({
       {/* ── BELOW-HERO CONTENT ── */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="bg-white border-b border-slate-100 py-10 sm:py-14">
+        <section className="border-b border-slate-100 py-10 sm:py-14">
           <div className="max-w-4xl mx-auto px-6">
             {children ? (
               children

@@ -546,7 +546,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
       </section>
 
       {/* CONTENT */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid lg:grid-cols-2 gap-12">
             <div>

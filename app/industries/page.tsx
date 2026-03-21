@@ -156,7 +156,7 @@ export default async function IndustriesPage() {
       />
 
       {/* Industries Grid */}
-      <section id="industries" className="py-20 bg-white">
+      <section id="industries"className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {industries.map((industry) => {
@@ -209,7 +209,7 @@ export default async function IndustriesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white py-20">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-black mb-6">
             Ready to Start Your Career?

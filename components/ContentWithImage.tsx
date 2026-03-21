@@ -10,7 +10,7 @@ export function ContentWithImage({ section, reverse }: ContentWithImageProps) {
   const hasImage = Boolean(section.imageSrc);
 
   return (
-    <section className="bg-white">
+    <section className="">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center">
         <div className={reverse ? "md:order-2 md:w-1/2" : "md:w-1/2"}>
           <h2 className="text-lg font-semibold text-black">

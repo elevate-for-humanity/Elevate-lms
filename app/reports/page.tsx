@@ -45,7 +45,7 @@ export default async function ReportsPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white border-b">
+      <section className="border-b">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4 mb-2">
             <BarChart3 className="w-8 h-8 text-brand-blue-600" />

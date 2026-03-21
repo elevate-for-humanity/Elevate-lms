@@ -1,4 +1,4 @@
-export type ExamProvider = 'esco_epa608' | 'mainstream_epa608' | 'certiport' | 'careersafe_osha' | 'other';
+export type ExamProvider = 'esco_epa608' | 'mainstream_epa608' | 'certiport' | 'act_workkeys' | 'careersafe_osha' | 'other';
 export type ExamSessionStatus = 'checked_in' | 'in_progress' | 'completed' | 'voided' | 'no_show';
 export type ExamResult = 'pass' | 'fail' | 'incomplete' | 'pending';
 export type IdType = 'drivers_license' | 'state_id' | 'passport' | 'military_id' | 'other';
@@ -47,6 +47,7 @@ export const PROVIDER_LABELS: Record<ExamProvider, string> = {
   esco_epa608: 'ESCO Institute (EPA 608)',
   mainstream_epa608: 'Mainstream Engineering (EPA 608)',
   certiport: 'Certiport',
+  act_workkeys: 'ACT WorkKeys / NCRC (Site Code: TBD)',
   careersafe_osha: 'CareerSafe (OSHA)',
   other: 'Other',
 };

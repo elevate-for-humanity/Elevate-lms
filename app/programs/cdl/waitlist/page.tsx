@@ -96,7 +96,7 @@ export default function CDLWaitlistPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-white py-16 overflow-hidden border-t">
+      <section className="relative py-16 overflow-hidden border-t">
         <div className="absolute inset-0">
           <Image src="/images/pages/programs-cdl-waitlist-hero.jpg" alt="CDL truck training" fill className="object-cover" priority />
         </div>
@@ -107,7 +107,7 @@ export default function CDLWaitlistPage() {
       </section>
 
       {/* Program Highlights */}
-      <section className="py-10 bg-white border-b">
+      <section className="py-10 border-b">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid sm:grid-cols-4 gap-6 text-center">
             <div>

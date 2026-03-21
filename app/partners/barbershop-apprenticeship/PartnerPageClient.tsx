@@ -22,7 +22,7 @@ export default function PartnerPageClient() {
       />
 
       {/* CTA Section below hero */}
-      <section className="bg-white py-16 border-b border-slate-100">
+      <section className="py-16 border-b border-slate-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-4">Barbershop Partner Program</h1>
           <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
@@ -49,7 +49,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* Program Overview */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">How the Program Works</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -83,7 +83,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* What You Need to Know */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">What Partner Shops Need to Know</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -107,7 +107,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* Timeline */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Approval Timeline</h2>
           <div className="space-y-6">
@@ -136,7 +136,7 @@ export default function PartnerPageClient() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">

@@ -198,7 +198,7 @@ export default function IndianaOutcomesPage() {
         </section>
 
         {/* Methodology */}
-        <section className="mb-16 bg-white rounded-xl p-6 border border-slate-200">
+        <section className="mb-16 rounded-xl p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Outcome Tracking Methodology</h2>
           <ul className="space-y-2 text-slate-700 text-sm">
             <li className="flex items-start gap-2">

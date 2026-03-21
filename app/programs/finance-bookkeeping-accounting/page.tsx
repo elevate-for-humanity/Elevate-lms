@@ -95,7 +95,7 @@ export default function FinancePathwayPage() {
       </section>
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
             Credential Pathway · Business
@@ -126,7 +126,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== HEADER ===== */}
       <InView animation="fade-up">
-        <section className="bg-white py-10 sm:py-14">
+        <section className="py-10 sm:py-14">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-wider mb-2">Credential Pathway</p>
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
@@ -149,7 +149,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== PATHWAY MODEL ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Pathway Structure</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Training → Credential → Internship → Employment</h2>
@@ -171,7 +171,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== TIERED STRUCTURE ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Tiered Positioning</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Three Tiers. One Pathway.</h2>
@@ -235,7 +235,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== CREDENTIAL STACK ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">National Credentials</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Credential &amp; Validation Stack</h2>
@@ -255,7 +255,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== INTERNSHIP MODEL ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Work-Based Learning</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Structured Internship &amp; Employment Transition</h2>
@@ -301,7 +301,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== OUTCOME LADDER ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Outcome Metrics</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">Defined Outcome Ladder</h2>
@@ -325,7 +325,7 @@ export default function FinancePathwayPage() {
 
       {/* ===== SUB-PROGRAMS ===== */}
       <InView animation="fade-up">
-        <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+        <section className="py-10 sm:py-14 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
             <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Programs in This Pathway</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">Individual Program Details</h2>
@@ -380,7 +380,7 @@ export default function FinancePathwayPage() {
       </InView>
 
       {/* ===== TRUST BAR ===== */}
-      <section className="py-8 bg-white border-t border-slate-100">
+      <section className="py-8 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-4">

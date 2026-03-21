@@ -76,7 +76,7 @@ export default function FranchisePage() {
       </section>
 
       {/* Why Franchise With Us */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
@@ -158,7 +158,7 @@ export default function FranchisePage() {
       </section>
 
       {/* Franchise Packages */}
-      <section id="packages" className="py-20 bg-white">
+      <section id="packages"className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Franchise Packages</h2>
@@ -460,7 +460,7 @@ export default function FranchisePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">
             Ready to Start Your Own Training Center?

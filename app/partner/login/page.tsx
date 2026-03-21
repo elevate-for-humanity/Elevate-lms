@@ -89,11 +89,10 @@ function PartnerLoginPageInner() {
 
       // Success - redirect to partner dashboard
       router.push('/partner-portal');
-      router.refresh();
 
-    } catch (err: any) {
-      console.error('Partner login error:', err);
-      setError('Login failed. Please check your credentials.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (err as any)?.message;
+      setError(typeof msg === 'string' && msg ? msg : 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -122,8 +121,9 @@ function PartnerLoginPageInner() {
 
       setError('');
       setMagicLinkSent(true);
-    } catch (err: any) {
-      setError('An error occurred sending the magic link. Please try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      setError(msg || 'An error occurred sending the magic link. Please try again.');
     } finally {
       setIsLoading(false);
     }

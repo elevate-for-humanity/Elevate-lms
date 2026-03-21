@@ -33,11 +33,11 @@ export default function IndustryInsightsPage() {
       </div>
 
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/pages/mentorship-page-2.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/pages/mentorship-page-10.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What You Will Learn</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -60,7 +60,7 @@ export default function IndustryInsightsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Industries We Cover</h2>
           <div className="flex flex-wrap justify-center gap-4">
@@ -76,7 +76,7 @@ export default function IndustryInsightsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Industry Knowledge</h2>
           <p className="text-xl text-indigo-100 mb-8">Connect with mentors who have been where you want to go.</p>

@@ -55,7 +55,7 @@ export default function YoungAdultWellnessPage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[320px] sm:h-[420px] overflow-hidden bg-white">
+      <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
         <Image
           src="/images/pages/rise-foundation.jpg"
           alt="Young adult wellness support"

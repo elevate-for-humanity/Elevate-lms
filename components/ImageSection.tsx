@@ -21,7 +21,7 @@ export function ImageSection({
   const media = getMediaBySlot(mediaSlot);
 
   return (
-    <section className="bg-white">
+    <section className="">
       <div
         className={`mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 ${
           reverse ? "md:flex-row-reverse" : "md:flex-row"

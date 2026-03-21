@@ -51,7 +51,7 @@ export default async function StudentApplicationPage({
       </div>
 
       {/* Page identity */}
-      <section className="border-b border-slate-100 bg-white py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-4xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
             Student Application
@@ -71,7 +71,7 @@ export default async function StudentApplicationPage({
       </section>
 
       {/* Other application types */}
-      <section className="bg-white border-t border-slate-200">
+      <section className="border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
           <p className="text-slate-600 text-sm mb-3">Not a student?</p>
           <div className="flex flex-wrap justify-center gap-4">

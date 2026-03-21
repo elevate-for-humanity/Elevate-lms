@@ -68,7 +68,7 @@ export default function AppsPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Apps" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-white text-slate-900 py-16 px-4">
+      <section className="text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Apps & Tools</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -134,7 +134,7 @@ export default function AppsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Need a Custom Solution?</h2>
           <p className="text-gray-600 mb-8">Contact us for enterprise pricing and custom integrations.</p>

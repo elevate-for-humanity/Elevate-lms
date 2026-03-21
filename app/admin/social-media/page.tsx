@@ -375,7 +375,7 @@ export default function SocialMediaPage() {
         </div>
 
         {/* Storytelling Section */}
-        <section className="py-16 bg-white">
+        <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-7xl mx-auto">
               <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -419,7 +419,7 @@ export default function SocialMediaPage() {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/pages/admin-social-hero.jpg"
+                    src="/images/pages/social.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

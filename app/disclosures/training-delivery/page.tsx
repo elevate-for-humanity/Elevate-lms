@@ -143,13 +143,13 @@ export default function TrainingDeliveryDisclosure() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  Administrative Office — Non-Instructional
+                  Testing Center
                 </h3>
                 <p className="text-sm text-slate-600 mb-2">
-                  Elevate for Humanity maintains an administrative office for enrollment processing,
-                  compliance documentation, and organizational operations. This location is used for
-                  administrative purposes and scheduled meetings — it is <strong>not an instructional
-                  facility</strong> and does not serve as a classroom or training site.
+                  Elevate for Humanity maintains an on-site location for enrollment processing,
+                  compliance documentation, select hands-on training components, and proctored
+                  credential exams (Certiport, EPA 608, ACT WorkKeys/NCRC, and others). All visits
+                  are <strong>by appointment only</strong> — this is not a walk-in location.
                 </p>
                 <div className="flex items-start gap-2 text-sm text-slate-600">
                   <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
@@ -162,7 +162,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Credentials */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Credential Issuance</h2>
           <p className="text-sm text-slate-600 mb-3">
@@ -187,7 +187,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Funding Eligibility Disclaimer */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Funding &amp; Tuition Disclosure</h2>
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -209,7 +209,7 @@ export default function TrainingDeliveryDisclosure() {
       </section>
 
       {/* Employer Partner Documentation */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Employer Partner Documentation</h2>
           <p className="text-sm text-slate-600 mb-3">

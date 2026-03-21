@@ -290,7 +290,7 @@ function LegalAgreementsContent() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] overflow-hidden bg-white">
+      <section className="relative h-[240px] sm:h-[320px] overflow-hidden">
         <Image
           src="/images/pages/enrollment-agreement.jpg"
           alt="Legal agreements"

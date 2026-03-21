@@ -91,7 +91,7 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
       : 0;
 
   return (
-    <section className="mt-8 space-y-4 rounded-xl border bg-white p-5 shadow-sm">
+    <section className="mt-8 space-y-4 rounded-xl border p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold">Student reviews</h2>
         <div className="text-xs text-black">

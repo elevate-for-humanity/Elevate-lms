@@ -143,7 +143,7 @@ export default async function HelpPage() {
       </section>
 
       {/* Quick Contact */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6">
             <a href="/support" className="flex items-center gap-4 p-4 rounded-xl hover:bg-white transition-colors">
@@ -213,7 +213,7 @@ export default async function HelpPage() {
       </section>
 
       {/* FAQs */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions

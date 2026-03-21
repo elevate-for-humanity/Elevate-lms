@@ -164,7 +164,7 @@ const client = new ElevateClient({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Links */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4">Resources</h3>
               <ul className="space-y-3">
                 <li>
@@ -195,7 +195,7 @@ const client = new ElevateClient({
             </section>
 
             {/* API Status */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4">API Status</h3>
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
@@ -212,7 +212,7 @@ const client = new ElevateClient({
             </section>
 
             {/* Support */}
-            <section className="bg-white rounded-xl p-6">
+            <section className="rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Need Help?</h3>
               <p className="text-gray-600 text-sm mb-4">
                 Our developer support team is here to help with integration questions.

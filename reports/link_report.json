@@ -1,12 +1,133 @@
 {
-  "timestamp": "2026-01-28T20:58:18.504Z",
+  "timestamp": "2026-03-21T10:44:07.889Z",
   "summary": {
-    "totalLinks": 831,
-    "validLinks": 831,
-    "brokenLinks": 0,
+    "totalLinks": 828,
+    "validLinks": 798,
+    "brokenLinks": 30,
     "dynamicSkipped": 0
   },
-  "brokenLinks": [],
+  "brokenLinks": [
+    {
+      "link": "/learner/progress",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/courses",
+      "status": "broken"
+    },
+    {
+      "link": "/programs/esthetician-apprenticeship",
+      "status": "broken"
+    },
+    {
+      "link": "/nonprofit/mental-wellness",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/forums",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/certifications",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/assignments",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/grades",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/calendar",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/messages",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/resources",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/alumni",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/certificates",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/enroll",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/groups",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/leaderboard",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/orientation",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/placement",
+      "status": "broken"
+    },
+    {
+      "link": "/lms/forums/new",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/quizzes",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/community",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/badges",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/settings",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/ai-tutor",
+      "status": "broken"
+    },
+    {
+      "link": "/lms/courses/0ba9a61c-1f1b-4019-be6f-90e92eba2bc0",
+      "status": "broken"
+    },
+    {
+      "link": "/onboarding/partner",
+      "status": "broken"
+    },
+    {
+      "link": "/legal/privacy",
+      "status": "broken"
+    },
+    {
+      "link": "/student-portal/onboarding",
+      "status": "broken"
+    },
+    {
+      "link": "/learner/library",
+      "status": "broken"
+    },
+    {
+      "link": "/tax/rise-up-foundation/volunteer/apply",
+      "status": "broken"
+    }
+  ],
   "validLinks": [
     {
       "link": "/",
@@ -17,31 +138,27 @@
       "status": "valid"
     },
     {
+      "link": "/contact",
+      "status": "valid"
+    },
+    {
+      "link": "/org/cohorts",
+      "status": "valid"
+    },
+    {
+      "link": "/org/invites",
+      "status": "valid"
+    },
+    {
+      "link": "/login",
+      "status": "valid"
+    },
+    {
       "link": "/programs",
       "status": "valid"
     },
     {
-      "link": "/how-it-works",
-      "status": "valid"
-    },
-    {
-      "link": "/career-services",
-      "status": "valid"
-    },
-    {
-      "link": "/apply",
-      "status": "valid"
-    },
-    {
-      "link": "/partner/attendance/record",
-      "status": "valid"
-    },
-    {
-      "link": "/partner/students",
-      "status": "valid"
-    },
-    {
-      "link": "/partner/reports",
+      "link": "/start",
       "status": "valid"
     },
     {
@@ -49,11 +166,51 @@
       "status": "valid"
     },
     {
-      "link": "/drug-testing",
+      "link": "/pathways",
       "status": "valid"
     },
     {
-      "link": "/contact",
+      "link": "/about/mission",
+      "status": "valid"
+    },
+    {
+      "link": "/funding",
+      "status": "valid"
+    },
+    {
+      "link": "/career-services/job-placement",
+      "status": "valid"
+    },
+    {
+      "link": "/partners/training-sites",
+      "status": "valid"
+    },
+    {
+      "link": "/disclosures/training-delivery",
+      "status": "valid"
+    },
+    {
+      "link": "/accreditation",
+      "status": "valid"
+    },
+    {
+      "link": "/governance",
+      "status": "valid"
+    },
+    {
+      "link": "/cert/verify",
+      "status": "valid"
+    },
+    {
+      "link": "/about/team",
+      "status": "valid"
+    },
+    {
+      "link": "/pathways/partners",
+      "status": "valid"
+    },
+    {
+      "link": "/about/partners",
       "status": "valid"
     },
     {
@@ -61,7 +218,7 @@
       "status": "valid"
     },
     {
-      "link": "/student/support",
+      "link": "/support",
       "status": "valid"
     },
     {
@@ -69,15 +226,15 @@
       "status": "valid"
     },
     {
+      "link": "/privacy-policy",
+      "status": "valid"
+    },
+    {
       "link": "/support/contact",
       "status": "valid"
     },
     {
-      "link": "/auth/login",
-      "status": "valid"
-    },
-    {
-      "link": "/pricing",
+      "link": "/license/pricing",
       "status": "valid"
     },
     {
@@ -85,11 +242,19 @@
       "status": "valid"
     },
     {
-      "link": "/store/licenses",
+      "link": "/store/licensing",
       "status": "valid"
     },
     {
       "link": "/account/settings",
+      "status": "valid"
+    },
+    {
+      "link": "/account/settings/security",
+      "status": "valid"
+    },
+    {
+      "link": "/signup",
       "status": "valid"
     },
     {
@@ -121,19 +286,15 @@
       "status": "valid"
     },
     {
-      "link": "/admin/dashboard",
+      "link": "/admin",
       "status": "valid"
     },
     {
-      "link": "/admin/students",
+      "link": "/admin/analytics",
       "status": "valid"
     },
     {
-      "link": "/admin/enrollments",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/programs",
+      "link": "/admin/applicants",
       "status": "valid"
     },
     {
@@ -141,15 +302,19 @@
       "status": "valid"
     },
     {
+      "link": "/admin/dashboard",
+      "status": "valid"
+    },
+    {
       "link": "/admin/applications",
       "status": "valid"
     },
     {
-      "link": "/admin",
+      "link": "/admin/apprenticeships",
       "status": "valid"
     },
     {
-      "link": "/admin/autopilots",
+      "link": "/admin/autopilot",
       "status": "valid"
     },
     {
@@ -161,51 +326,7 @@
       "status": "valid"
     },
     {
-      "link": "/admin/campaigns",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/campaigns/new",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/cash-advances/pending",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/cash-advances/reports",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/cash-advances/settings",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/cash-advances",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/certifications/bulk",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/compliance",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/course-builder",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/course-builder/new",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/crm/appointments",
-      "status": "valid"
-    },
-    {
-      "link": "/admin/crm/appointments/new",
+      "link": "/programs/barber-apprenticeship/apply",
       "status": "valid"
     }
   ]

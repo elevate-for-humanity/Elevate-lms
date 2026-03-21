@@ -69,7 +69,7 @@ export default async function TrainingPage() {
       </section>
 
       {/* Orientation Video */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-6">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-8">

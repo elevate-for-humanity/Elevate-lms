@@ -60,7 +60,7 @@ export default async function IntegrationsPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-white py-16">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl font-bold text-slate-900 mb-4">Integrations</h1>
@@ -110,7 +110,7 @@ export default async function IntegrationsPage() {
       </section>
 
       {/* Salesforce Deep Dive */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Salesforce Integration</h2>
@@ -173,7 +173,7 @@ export default async function IntegrationsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Questions about integrations?</h2>
           <p className="text-slate-300 mb-8">

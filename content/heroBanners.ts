@@ -141,6 +141,92 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     analyticsName: 'healthcare',
   },
 
+  store: {
+    pageKey: 'store',
+    posterImage: '/images/pages/store-licensing-hero.jpg',
+    videoSrcDesktop: '/videos/store-whitelabel-narrated.mp4',
+    videoSrcMobile: '/videos/store-demo-narrated.mp4',
+    voiceoverSrc: '/audio/heroes/store.mp3',
+    microLabel: 'White-Label Platform',
+    belowHeroHeadline: 'License the LMS that runs workforce programs end to end.',
+    belowHeroSubheadline:
+      'One platform handles enrollment, eligibility, attendance, credentials, employer matching, compliance reporting, and grant tracking — all automated. Your brand, your domain, your instance.',
+    primaryCta: { label: 'Start 14-Day Free Trial', href: '/store/trial' },
+    secondaryCta: { label: 'Try Full Demo — No Signup', href: '/demo/admin', variant: 'secondary' },
+    trustIndicators: [
+      'No credit card required',
+      'WIOA & DOL compliant',
+      'White-label branding included',
+      'Launch in two weeks',
+    ],
+    transcript:
+      `If your organization manages workforce training, you already know the problem. Enrollment is tracked in spreadsheets. Eligibility paperwork gets emailed back and forth. WIOA reports are assembled by hand every quarter. Credentials are issued late — if at all. Employers call asking for candidate lists you don't have ready.
+
+The Elevate Workforce Operating System was built to replace all of that.
+
+When a student applies, the platform checks eligibility automatically, collects documents, and routes the application through your approval workflow — no paper, no re-keying. When they enroll, attendance is tracked in real time. When they complete a program, their credential is issued automatically and posted to a public verification page employers can check with a single link.
+
+Your WIOA compliance reports generate themselves from enrollment data. PIRL reporting, ITA tracking, quarterly performance metrics — all automated. Your workforce board gets the data they need without your staff spending a week assembling it.
+
+The employer portal gives your hiring partners a live view of pre-screened candidates with verified credentials. They can track apprenticeship hours, manage OJT reimbursement requests, and sign MOUs electronically. WOTC documentation is generated automatically.
+
+You get your own branded instance — your logo, your domain, your colors. Students and employers see your organization. The platform is invisible.
+
+We handle the hosting, security, backups, and updates. Your staff focuses on people, not data entry.
+
+Two licensing options: Managed Platform starting at fifteen hundred dollars per month, or Enterprise Source-Use for organizations that need to deploy on their own infrastructure.
+
+Both start with a 14-day free trial. No credit card required. Full platform access from day one.
+
+Try the live demo — no signup, no time limit. Every screen is clickable. Search students, run reports, review applications, browse candidates. See exactly what your staff and students will use every day.`,
+    analyticsName: 'store',
+  },
+
+  programs: {
+    pageKey: 'programs',
+    posterImage: '/images/pages/programs-hero.jpg',
+    videoSrcDesktop: '/videos/programs-overview-video-with-narration.mp4',
+    videoSrcMobile: '/videos/program-hero.mp4',
+    voiceoverSrc: '/audio/heroes/programs.mp3',
+    microLabel: 'Career Training',
+    belowHeroHeadline: 'Start a Career — Not Just a Class',
+    belowHeroSubheadline:
+      'Get trained, certified, and connected to real job opportunities in weeks — not years. Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.',
+    primaryCta: { label: 'Apply Now', href: '/apply/student' },
+    secondaryCta: { label: 'Find My Program', href: '#programs', variant: 'secondary' },
+    trustIndicators: [
+      'WIOA & state funding available',
+      'DOL Registered Apprenticeship Sponsor',
+      'ETPL approved training provider',
+      'Job placement assistance included',
+    ],
+    transcript:
+      `At Elevate for Humanity, we train adults for real jobs — in weeks, not years.
+
+Every program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.
+
+Here is what we offer.
+
+In healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.
+
+In skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.
+
+In technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.
+
+In business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.
+
+We also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts — earn-while-you-learn programs where you work in a licensed shop and get paid from day one.
+
+Most programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.
+
+The process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility — usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.
+
+After you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.
+
+Apply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.`,
+    analyticsName: 'programs',
+  },
+
   'skilled-trades': {
     pageKey: 'skilled-trades',
     posterImage: '/images/pages/skilled-trades-sector.jpg',

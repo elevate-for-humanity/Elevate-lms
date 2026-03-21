@@ -102,7 +102,7 @@ export default function ProvidersPage() {
       </div>
 
       {/* ─── HEADER ─── */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-3">Workforce Development Hub</p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
@@ -123,7 +123,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── FOUR CONTROLS ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Operational Controls</p>
@@ -172,7 +172,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── ELIGIBILITY ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Eligibility</p>
@@ -195,7 +195,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── PROGRAM REQUIREMENTS ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Program Standards</p>
@@ -242,7 +242,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── ONBOARDING STEPS ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Onboarding Process</p>
@@ -268,7 +268,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── PERFORMANCE THRESHOLDS ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">Ongoing Performance</p>
@@ -302,7 +302,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── WHAT PROVIDERS GET ─── */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">What Providers Receive</p>
@@ -330,7 +330,7 @@ export default function ProvidersPage() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-4">Ready to apply?</h2>
           <p className="text-slate-500 text-sm max-w-xl mx-auto mb-8 leading-relaxed">

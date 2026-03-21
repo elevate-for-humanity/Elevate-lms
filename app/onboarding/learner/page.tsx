@@ -342,7 +342,7 @@ export default async function LearnerOnboardingPage() {
       </div>
 
       {/* Page header below video */}
-      <section className="bg-white border-b border-slate-100">
+      <section className="border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-2xl">
             <p className="text-brand-blue-600 text-sm font-semibold uppercase tracking-wider mb-1">
@@ -494,7 +494,7 @@ export default async function LearnerOnboardingPage() {
           <div className="relative overflow-hidden rounded-2xl bg-white">
             <div className="absolute inset-0">
               <Image
-                src="/images/pages/onboarding-page-1.jpg"
+                src="/images/pages/onboarding.jpg"
                 alt="Contact Elevate for Humanity support"
                 fill
                 className="object-cover opacity-20"

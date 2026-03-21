@@ -34,7 +34,7 @@ export default function VolunteerPage() {
       />
 
       {/* ROLES */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">Volunteer Roles</h2>
@@ -79,7 +79,7 @@ export default function VolunteerPage() {
       </section>
 
       {/* COMMITMENT */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -96,7 +96,7 @@ export default function VolunteerPage() {
       </section>
 
       <section className="relative h-[45vh] min-h-[320px]">
-        <Image src="/images/pages/rise-foundation-page-1.jpg" alt="Apply to volunteer" fill className="object-cover object-center" sizes="100vw" />
+        <Image src="/images/pages/admin-analytics-programs-hero.jpg" alt="Apply to volunteer" fill className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-emerald-900/75 flex items-center justify-center">
           <div className="text-center px-4">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Ready to Make a Difference?</h2>

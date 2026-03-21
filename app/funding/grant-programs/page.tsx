@@ -50,7 +50,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* What is ETPL/WRG */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             What Does ETPL Approved Mean?
@@ -141,7 +141,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* Available Programs */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8">
             ETPL Approved Programs
@@ -216,7 +216,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
             How to Apply for Free Training
@@ -279,7 +279,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Start Your Free Training?

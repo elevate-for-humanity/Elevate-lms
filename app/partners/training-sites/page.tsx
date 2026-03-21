@@ -212,7 +212,7 @@ export default function TrainingSitesPage() {
       </section>
 
       {/* Documentation Standards */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-900 mb-4">
             <FileCheck className="w-5 h-5 inline-block mr-2 text-brand-blue-600" />
@@ -245,7 +245,7 @@ export default function TrainingSitesPage() {
       </section>
 
       {/* Become a Partner CTA */}
-      <section className="py-10 bg-white border-t border-slate-200">
+      <section className="py-10 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
           <div className="bg-brand-blue-700 rounded-xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-3">Become a Training Partner</h2>
@@ -272,7 +272,7 @@ export default function TrainingSitesPage() {
       </section>
 
       {/* Related Links */}
-      <section className="py-8 bg-white border-t border-slate-200">
+      <section className="py-8 border-t border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center text-sm">
             <Link href="/disclosures/training-delivery" className="text-brand-red-600 hover:underline font-medium">

@@ -142,7 +142,7 @@ export default function ConnectsLandingPage() {
       </section>
 
       {/* FEATURES */}
-      <section className="bg-white py-8 border-b">
+      <section className="py-8 border-b">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {FEATURES.map((f) => (
             <div key={f.title} className="flex items-start gap-3">
@@ -194,7 +194,7 @@ export default function ConnectsLandingPage() {
       </section>
 
       {/* QUICK SIGN IN */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-16 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <Users className="w-12 h-12 mx-auto mb-4 text-cyan-600" />
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Already have an account?</h2>

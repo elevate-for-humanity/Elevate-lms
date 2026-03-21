@@ -59,7 +59,7 @@ export default function LearningCenterPage() {
       </section>
 
       {/* Access Note */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Enrolled Students</h2>
           <p className="text-slate-600 mb-6">

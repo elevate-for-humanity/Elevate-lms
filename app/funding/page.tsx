@@ -159,7 +159,7 @@ export default function FundingPage() {
       </section>
 
       {/* Page identity — below hero */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
+      <section className="border-b border-slate-100 py-10 px-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
             Indiana Residents · All Students
@@ -195,7 +195,7 @@ export default function FundingPage() {
       </section>
 
       {/* Funding options */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-5xl mx-auto px-4">
           <div className="mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
@@ -302,7 +302,7 @@ export default function FundingPage() {
       </section>
 
       {/* How to get funded */}
-      <section className="py-14 bg-white border-t border-slate-100">
+      <section className="py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">

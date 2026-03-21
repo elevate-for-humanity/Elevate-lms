@@ -194,7 +194,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Who We Are / What This Is ── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
             Career Pathways &amp; Workforce Infrastructure
@@ -230,7 +230,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── The 5 Stages (photo + deep description each) ── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">How the Pathway Works</h2>
           <p className="text-gray-600 mb-10 max-w-3xl">
@@ -280,7 +280,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Every Program (individual cards with full detail) ── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Training Programs</h2>
           <p className="text-gray-600 mb-10 max-w-3xl">
@@ -327,7 +327,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── How Programs Are Delivered ── */}
-      <section className="py-10 bg-white border-t border-gray-200">
+      <section className="py-10 border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">How Programs Are Delivered</h2>
           <div className="text-sm text-gray-700 space-y-3">
@@ -357,7 +357,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Who Is This For ── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Who Is This For?</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -379,7 +379,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── What Makes This Different ── */}
-      <section className="py-14 bg-white">
+      <section className="py-14">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">What Makes This Different</h2>
           <div className="space-y-4 text-gray-700">
@@ -424,7 +424,7 @@ export default function PathwaysPage() {
       </section>
 
       {/* ── Explore More ── */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Explore the Pathway System</h2>
           <div className="grid sm:grid-cols-3 gap-4">

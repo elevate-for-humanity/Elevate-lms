@@ -166,7 +166,7 @@ export default async function AdminsPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Links */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4">Quick Links</h3>
               <ul className="space-y-3">
                 <li>
@@ -193,7 +193,7 @@ export default async function AdminsPage() {
             </section>
 
             {/* Discussions */}
-            <section className="bg-white rounded-xl border p-6">
+            <section className="rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5 text-brand-blue-600" />
                 Admin Discussions

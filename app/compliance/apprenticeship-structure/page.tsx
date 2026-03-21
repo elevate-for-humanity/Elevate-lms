@@ -81,7 +81,7 @@ export default function ApprenticeshipStructurePage() {
       </div>
 
       {/* Document Purpose */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="border-l-4 border-brand-blue-600 pl-6 mb-8 print:border-gray-900">
             <h2 className="text-lg font-bold text-gray-900 mb-2">Document Purpose</h2>
@@ -111,7 +111,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Institutional Hierarchy */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Institutional Hierarchy</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -149,7 +149,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* RTI/OJT Hour Map */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">RTI & OJT Hour Structure by Program</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -204,7 +204,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Credential Issuance Chain */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Credential Issuance Chain</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -264,7 +264,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* RTI Delivery Model */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">RTI Delivery Model</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -306,7 +306,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* OJT Structure */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">OJT Structure</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -330,7 +330,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Competency Verification */}
-      <section className="py-10 bg-white">
+      <section className="py-10">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Competency-Based Assessment</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -362,7 +362,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* LMS as Compliance System */}
-      <section className="py-10 bg-white print:bg-white print:border-t">
+      <section className="py-10 print: print:border-t">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">LMS as Compliance Record System</h2>
           <p className="text-gray-600 text-sm mb-6">
@@ -388,7 +388,7 @@ export default function ApprenticeshipStructurePage() {
       </section>
 
       {/* Navigation — hidden on print */}
-      <section className="py-10 bg-white print:hidden">
+      <section className="py-10 print:hidden">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap gap-3">
             <Link href="/compliance/credential-partners" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">

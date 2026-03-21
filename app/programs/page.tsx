@@ -4,7 +4,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign } from 'lucide-react';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Career Training Programs | Elevate for Humanity',
@@ -104,39 +105,28 @@ function SectionHeader({ label, title }: { label: string; title: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ProgramsPage() {
+  const hero = heroBanners.programs;
+
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero — clean media, no text overlay */}
-      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
-        <ProgramHeroBanner
-          videoSrc="/videos/program-hero.mp4"
-          posterImage="/images/pages/programs-hero.jpg"
-          voiceoverSrc="/audio/heroes/programs.mp3"
-        />
-      </section>
-
-      {/* Page identity — below hero, white background */}
-      <section className="bg-white border-b border-slate-100 py-10 px-4">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">Indianapolis, Indiana</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-            Start a Career — Not Just a Class
-          </h1>
-          <p className="text-slate-600 text-base sm:text-lg mb-6 max-w-2xl leading-relaxed">
-            Get trained, certified, and connected to real job opportunities in weeks — not years.
-            Most programs are available at no cost to eligible Indiana residents.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm">
-              Apply Now
-            </Link>
-            <Link href="#programs" className="border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm">
-              Find My Program
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero */}
+      <HeroVideo
+        videoSrcDesktop={hero.videoSrcDesktop}
+        videoSrcMobile={hero.videoSrcMobile}
+        posterImage={hero.posterImage}
+        voiceoverSrc={hero.voiceoverSrc}
+        microLabel={hero.microLabel}
+        transcript={hero.transcript}
+        analyticsName={hero.analyticsName}
+        belowHeroHeadline={hero.belowHeroHeadline}
+        belowHeroSubheadline={hero.belowHeroSubheadline}
+        ctas={[
+          { label: 'Apply Now', href: '/apply/student' },
+          { label: 'Find My Program', href: '#programs', variant: 'secondary' },
+        ]}
+        trustIndicators={hero.trustIndicators}
+      />
 
       {/* Decision engine */}
       <section className="bg-slate-900 py-10 px-4">

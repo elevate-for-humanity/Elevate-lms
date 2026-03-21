@@ -75,7 +75,7 @@ export default function EcosystemPage() {
       </section>
 
       {/* How It Connects */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">How the Ecosystem Works</h2>
@@ -97,7 +97,7 @@ export default function EcosystemPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Join Our Network</h2>
           <p className="text-gray-600 mb-8">Whether you are a training provider, employer, or community organization, there is a place for you in our ecosystem.</p>

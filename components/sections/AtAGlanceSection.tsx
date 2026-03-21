@@ -23,7 +23,7 @@ export function AtAGlanceSection({
   if (items.length === 0) return null;
 
   return (
-    <section className="bg-white py-16">
+    <section className="py-16">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-3xl font-bold text-black mb-8">At-a-Glance</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

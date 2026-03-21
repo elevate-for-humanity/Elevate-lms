@@ -16,7 +16,7 @@ const items: Item[] = [
 
 export default function HighlightStrip() {
   return (
-    <section className="border-y border-slate-200 bg-white/70 backdrop-blur">
+    <section className="border-y border-slate-200 /70 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-wrap items-stretch gap-3 px-4 py-3 md:gap-4 md:py-4">
         {items.map((it, idx) => (
           <div

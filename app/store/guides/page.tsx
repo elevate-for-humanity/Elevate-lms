@@ -97,7 +97,7 @@ export default function GuidesPage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-8 pb-4">
+      <section className="pt-8 pb-4">
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Guides &amp; Resources</h1>
           <p className="text-slate-600 text-base max-w-xl">
@@ -107,7 +107,7 @@ export default function GuidesPage() {
       </section>
 
       {/* Category filter */}
-      <section className="py-6 border-b bg-white">
+      <section className="py-6 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
             <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-semibold">

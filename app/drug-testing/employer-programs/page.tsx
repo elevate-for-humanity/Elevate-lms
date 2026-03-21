@@ -116,7 +116,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Program Types */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Testing Programs We Offer</h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -139,7 +139,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How We Help</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -157,7 +157,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Volume Pricing */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">Volume Discounts</h2>
           <p className="text-brand-blue-200 text-center mb-8">
@@ -188,7 +188,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* How to Get Started */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How to Get Started</h2>
           <div className="space-y-6">
@@ -213,7 +213,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Industries */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Industries We Serve</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -284,7 +284,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white text-slate-900">
+      <section className="py-16 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up Your Program?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

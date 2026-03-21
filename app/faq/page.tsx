@@ -82,7 +82,7 @@ export default function FAQPage() {
       </div>
 
       {/* Quick Links */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">

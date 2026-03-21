@@ -118,7 +118,7 @@ export default function CurvatureCareersPage() {
       </section>
 
       {/* Headline — below the image */}
-      <section className="bg-white pt-8 pb-6">
+      <section className="pt-8 pb-6">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-sm font-medium mb-6 text-pink-700">
             <Briefcase className="w-4 h-4" />

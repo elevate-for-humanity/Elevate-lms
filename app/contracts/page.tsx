@@ -44,7 +44,7 @@ export default function ContractsPage() {
       </section>
 
       {/* Contract Templates */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Master Platform License Agreement */}
@@ -290,7 +290,7 @@ export default function ContractsPage() {
       </section>
 
       {/* Grant-Safe Language */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-block px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-bold mb-4">
@@ -325,7 +325,7 @@ export default function ContractsPage() {
       </section>
 
       {/* How to Use */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-black mb-4">

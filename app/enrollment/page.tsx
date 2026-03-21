@@ -67,7 +67,7 @@ export default async function EnrollmentPage() {
       </section>
 
       {/* Featured Programs */}
-      <section className="bg-white py-12 border-t border-gray-100">
+      <section className="py-12 border-t border-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Available Programs</h2>
           <p className="text-sm text-gray-500 text-center mb-8">Select a program to begin your application</p>
@@ -120,7 +120,7 @@ export default async function EnrollmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
           <p className="text-brand-blue-100 text-sm mb-6">Applications are reviewed within 1-2 business days. No application fee.</p>

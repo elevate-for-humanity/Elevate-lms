@@ -64,18 +64,22 @@ async function main() {
   }
   console.log(`Program: ${program.title} (${program.id})\n`);
 
-  // 2. Resolve training_courses row for course_id linkage
+  // 2. Resolve canonical courses row for course_id linkage.
+  // The courses row is created by the canonicalization migration; it may not
+  // exist yet if the migration hasn't been applied. Seed proceeds without it —
+  // the migration backfills course_id after the fact.
   const { data: course } = await supabase
-    .from('training_courses')
+    .from('courses')
     .select('id, slug, title')
-    .eq('slug', 'bookkeeping-quickbooks')
+    .eq('program_id', program.id)
     .maybeSingle();
 
   const courseId = course?.id ?? null;
   if (courseId) {
     console.log(`Linked course: ${course!.title} (${courseId})`);
   } else {
-    console.log(`No training_courses row found for slug 'bookkeeping-quickbooks' — lessons will seed without course_id`);
+    console.log(`No courses row found for program_id ${program.id} — lessons will seed without course_id.`);
+    console.log(`Apply 20260504000000_lms_course_canonicalization.sql to backfill course_id after seeding.`);
   }
 
   // 3. Run generator

@@ -21,13 +21,22 @@ import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
+import { createClient } from '@supabase/supabase-js';
 import { CurriculumGenerator } from '../lib/services/curriculum-generator';
 import type { QuizDef } from '../lib/services/curriculum-generator';
 import { peerRecoveryCourse } from '../lms-data/courses/program-peer-recovery';
 
+// PRS_PROGRAM_ID is the canonical UUID for the peer-recovery-specialist-jri program.
+// PRS_CREDENTIAL_ID is the credential row UUID for the IN-PRS credential.
+// course_id is resolved at runtime from the courses table — not hardcoded.
 const PRS_PROGRAM_ID    = 'a7b8c9d0-e1f2-4a5b-4c5d-6e7f8a9b0c1d';
 const PRS_CREDENTIAL_ID = '00000000-0000-0000-0000-000000000109';
-const PRS_COURSE_ID     = '15cc1096-13d7-47ea-a79c-b833cf46776e';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false } }
+);
 
 const MODULE_DOMAIN_MAP: Record<string, string> = {
   'peer-mod-1': 'recovery_support',
@@ -205,6 +214,24 @@ async function main() {
   const mode = process.argv.includes('--force') ? 'force' : 'seed_missing';
   console.log(`Seeding PRS curriculum (mode: ${mode})`);
 
+  // Resolve canonical course_id from the courses table.
+  // The courses row is created by 20260504000000_lms_course_canonicalization.sql.
+  // If it doesn't exist yet, lessons seed without course_id and the migration
+  // backfills it afterward.
+  const { data: courseRow } = await supabase
+    .from('courses')
+    .select('id, title')
+    .eq('program_id', PRS_PROGRAM_ID)
+    .maybeSingle();
+
+  const courseId = courseRow?.id ?? null;
+  if (courseId) {
+    console.log(`Linked course: ${courseRow!.title} (${courseId})`);
+  } else {
+    console.log(`No courses row found for program_id ${PRS_PROGRAM_ID} — lessons will seed without course_id.`);
+    console.log(`Apply 20260504000000_lms_course_canonicalization.sql to backfill course_id after seeding.`);
+  }
+
   const gen = new CurriculumGenerator(PRS_PROGRAM_ID, PRS_CREDENTIAL_ID, mode as 'seed_missing' | 'force');
   await gen.loadExistingSlugs();
 
@@ -234,7 +261,7 @@ async function main() {
         lessonTitle:         lesson.title,
         moduleSlug:          mod.id,
         moduleTitle:         mod.title,
-        courseId:            PRS_COURSE_ID,
+        courseId:            courseId ?? undefined,
         durationMinutes:     lesson.durationMinutes ?? 30,
         lessonOrder:         lessonIndex + 1,
         moduleOrder:         modIndex + 1,

@@ -29,10 +29,10 @@ const SLUG_TO_CREDENTIAL: Record<string, string> = {
   'crs':                              'crs',
   'certified-recovery-specialist':    'crs',
 
-  // Bookkeeping
-  'bookkeeping':                      'bookkeeping-quickbooks',
-  'bookkeeping-quickbooks':           'bookkeeping-quickbooks',
-  'bookkeeping-and-quickbooks':       'bookkeeping-quickbooks',
+  // Bookkeeping — credentialSlug on the blueprint is 'quickbooks-certified-user'
+  'bookkeeping':                      'quickbooks-certified-user',
+  'bookkeeping-quickbooks':           'quickbooks-certified-user',
+  'bookkeeping-and-quickbooks':       'quickbooks-certified-user',
 };
 
 export function getBlueprintForProgram(program: ProgramLike): CredentialBlueprint | null {

@@ -71,7 +71,7 @@ jobs:
             "https://api.netlify.com/api/v1/accounts/-/env/NEXT_PUBLIC_SUPABASE_ANON_KEY?site_id=12f120ab-3f63-419b-bc49-430f043415c1" \
             -H "Authorization: Bearer $TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"context":"all","value":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA3MzI0NzUsImV4cCI6MjA0NjMwODQ3NX0.9y3VZ_pqLbHqEqGJYqxQxqxQxqxQxqxQxqxQxqxQxqxQ"}'
+            -d '{"context":"all","value":"process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY"}'
           echo "✅ Set NEXT_PUBLIC_SUPABASE_ANON_KEY"
 
       - name: Set SUPABASE_SERVICE_ROLE_KEY

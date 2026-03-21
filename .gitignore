@@ -174,3 +174,11 @@ broken-links-report.json
 r2-url-mapping.json
 output/
 .eslintcache
+
+# Private / unpublished content — never commit
+private-content/
+private/
+
+# Secrets and credentials
+*.secret
+*.secrets

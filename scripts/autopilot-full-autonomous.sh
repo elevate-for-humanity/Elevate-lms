@@ -33,7 +33,7 @@ load_secrets() {
   
   # Supabase
   export SUPABASE_URL="${SUPABASE_URL:-https://cuxzzpsyufcewtmicszk.supabase.co}"
-  export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA3MzI0NzUsImV4cCI6MjA0NjMwODQ3NX0.9y3VZ_pqLbHqEqGJYqxQxqxQxqxQxqxQxqxQxqxQxqxQ}"
+  export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}"
   
   # API
   export API_URL="${API_URL:-https://api.elevateforhumanity.org}"
@@ -72,7 +72,7 @@ Add these variables:
 
 1. VITE_API_URL=https://api.elevateforhumanity.org
 2. VITE_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
-3. VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA3MzI0NzUsImV4cCI6MjA0NjMwODQ3NX0.9y3VZ_pqLbHqEqGJYqxQxqxQxqxQxqxQxqxQxqxQxqxQ
+3. VITE_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 Then trigger a new deployment.
 

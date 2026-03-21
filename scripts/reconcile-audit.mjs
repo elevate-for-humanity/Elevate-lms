@@ -8,7 +8,8 @@ import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
 const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODE2MTA0NywiZXhwIjoyMDczNzM3MDQ3fQ.5JRYvJPzFzsVaZQkbZDLcohP7dq8LWQEFeFdVByyihE';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!SUPABASE_KEY) { console.error('SUPABASE_SERVICE_ROLE_KEY is required'); process.exit(1); }
 
 // Pull Stripe key from app_secrets via service role
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {

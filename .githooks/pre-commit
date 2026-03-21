@@ -1,0 +1,46 @@
+#!/bin/sh
+# Pre-commit hook: block commits containing hardcoded secrets.
+# Install: git config core.hooksPath .githooks
+
+# Only scan source files — skip hook definitions and env templates
+STAGED=$(git diff --cached --name-only | grep -v "^\.githooks/" | grep -v "\.env\.example" | grep -v "\.env\.template" | grep -v "\.env\.structure")
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+DIFF=$(git diff --cached -U0 -- $STAGED 2>/dev/null | grep "^+" | grep -v "^+++")
+
+if [ -z "$DIFF" ]; then
+  exit 0
+fi
+
+FOUND=0
+
+check() {
+  LABEL="$1"
+  PATTERN="$2"
+  MATCHES=$(echo "$DIFF" | grep -E "$PATTERN" 2>/dev/null)
+  if [ -n "$MATCHES" ]; then
+    echo "BLOCKED: Possible secret — $LABEL"
+    echo "$MATCHES" | head -2
+    FOUND=1
+  fi
+}
+
+# Match actual key values, not variable name references
+check "Supabase JWT"       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[a-zA-Z0-9_-]{50,}'
+check "OpenAI key"         'sk-[a-zA-Z0-9_-]{40,}'
+check "Anthropic key"      'sk-ant-[a-zA-Z0-9_-]{20,}'
+check "Stripe live key"    'sk_live_[a-zA-Z0-9]{20,}'
+check "Stripe test key"    'sk_test_[a-zA-Z0-9]{20,}'
+check "Private key block"  'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
+
+if [ "$FOUND" -eq 1 ]; then
+  echo ""
+  echo "Commit blocked. Use environment variables instead of hardcoded secrets."
+  echo "False positive? Use: git commit --no-verify"
+  exit 1
+fi
+
+exit 0

@@ -143,13 +143,13 @@ export default function TrainingDeliveryDisclosure() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  Administrative Office — Non-Instructional
+                  Testing Center
                 </h3>
                 <p className="text-sm text-slate-600 mb-2">
-                  Elevate for Humanity maintains an administrative office for enrollment processing,
-                  compliance documentation, and organizational operations. This location is used for
-                  administrative purposes and scheduled meetings — it is <strong>not an instructional
-                  facility</strong> and does not serve as a classroom or training site.
+                  Elevate for Humanity maintains an on-site location for enrollment processing,
+                  compliance documentation, select hands-on training components, and proctored
+                  credential exams (Certiport, EPA 608, ACT WorkKeys/NCRC, and others). All visits
+                  are <strong>by appointment only</strong> — this is not a walk-in location.
                 </p>
                 <div className="flex items-start gap-2 text-sm text-slate-600">
                   <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />

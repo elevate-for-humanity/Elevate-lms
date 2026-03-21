@@ -131,7 +131,7 @@ export default function JRIPage() {
       {/* Hero Section */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
-          src="/images/pages/jri-page-1.jpg"
+          src="/images/pages/jri-hero.jpg"
           alt="JRI Program participants"
           fill
           className="object-cover"

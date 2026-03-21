@@ -182,3 +182,11 @@ private/
 # Secrets and credentials
 *.secret
 *.secrets
+
+# Removed bloat — do not re-add
+reports/
+audit-packet/
+audit_artifacts/
+playwright-report/
+.github/workflows-disabled-all/
+scripts/archive/

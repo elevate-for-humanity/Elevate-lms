@@ -152,13 +152,27 @@ export default function AutomaticCourseBuilder() {
       setProgress(95);
       setCurrentStep('Finalizing course...');
 
-      const saveResponse = await fetch('/api/courses/create', {
+      // Generate slug from title
+      const slug = courseOutline.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+
+      const saveResponse = await fetch('/api/admin/lms/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseOutline }),
+        body: JSON.stringify({
+          slug,
+          title: courseOutline.title,
+          description: courseOutline.description || '',
+          modules: courseOutline.modules || [],
+        }),
       });
 
-      if (!saveResponse.ok) throw new Error('Failed to save course');
+      if (!saveResponse.ok) {
+        const err = await saveResponse.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save course');
+      }
       const savedCourse = await saveResponse.json();
 
       setProgress(100);

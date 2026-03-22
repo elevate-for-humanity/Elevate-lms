@@ -178,7 +178,7 @@ html, body {
   html,
   body {
     font-family:
-      'Inter',
+      var(--font-inter),
       -apple-system,
       BlinkMacSystemFont,
       'Segoe UI',
@@ -534,7 +534,7 @@ section {
   --brand-space-2xl: 3rem;
 
   --brand-font-sans:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto',
+    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
     'Helvetica Neue', sans-serif;
 }
 

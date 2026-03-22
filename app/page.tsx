@@ -39,9 +39,6 @@ export default function HomePage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4">
               We train adults for real jobs —<br className="hidden sm:block" /> in weeks, not years.
             </h1>
-            <p className="text-slate-400 text-sm italic mb-6 max-w-md leading-relaxed">
-              Short-term programs. Industry credentials. Funding that can cover the cost. And a direct path to work.
-            </p>
             <p className="text-slate-300 text-base leading-relaxed mb-8 max-w-xl">
               Short-term career training in healthcare, skilled trades, CDL, barbering, and technology.
               Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.
@@ -52,6 +49,44 @@ export default function HomePage() {
               </Link>
               <Link href="/programs" className="border border-white/20 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-base">
                 See All Programs
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CPR — first program, attention block ── */}
+      <section className="grid lg:grid-cols-2 border-t border-slate-800">
+        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[480px] overflow-hidden bg-slate-900">
+          <Image src="/images/pages/cpr-training-real.jpg" alt="CPR training" fill className="object-cover object-center" sizes="(max-width: 1024px) 100vw, 50vw" />
+        </div>
+        <div className="bg-white flex items-center">
+          <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-3">CPR &amp; First Aid</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-4">
+              Get CPR Certified — In the Comfort of Your Own Home
+            </h2>
+            <p className="text-slate-600 text-base leading-relaxed mb-6">
+              Live instruction from a certified instructor. Mannequin shipped directly to your door. Complete your CPR certification without ever leaving home.
+            </p>
+            <ul className="space-y-2 mb-8">
+              {[
+                'Live instructor — real-time guidance, not a recording',
+                'Mannequin shipped directly to your home',
+                'CPR certified on completion — same day',
+                'Free with any Elevate program enrollment',
+              ].map((b, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />{b}
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/apply?program=cpr-first-aid" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-base">
+                Get Enrolled Now
+              </Link>
+              <Link href="/programs/cpr-first-aid" className="border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6 py-3.5 rounded-lg transition-colors text-sm">
+                Learn More
               </Link>
             </div>
           </div>
@@ -173,31 +208,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CPR — copy left, video right, dark ── */}
-      <section className="grid lg:grid-cols-2 border-t border-slate-800">
-        <div className="bg-slate-900 flex items-center order-2 lg:order-1">
-          <div className="px-8 py-12 lg:px-14 lg:py-16 max-w-xl w-full">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">CPR &amp; First Aid</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-4">Get AHA Certified from Home — Mannequin Shipped to Your Door</h2>
-            <p className="text-slate-300 text-base leading-relaxed mb-6">A training mannequin ships directly to your address. A live instructor guides you through every skill in real time. One session. Same-day AHA certification card. $130 — or free with any Elevate program.</p>
-            <ul className="space-y-2 mb-8">
-              {['No classroom required — 100% remote', 'Live instructor, not a pre-recorded video', 'AHA BLS + Heartsaver First Aid certification', 'Included free with any Elevate program enrollment'].map((b, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0" />{b}
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/apply?program=cpr-first-aid" className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-6 py-3 rounded-lg transition-colors text-sm">Enroll — $130</Link>
-              <Link href="/programs/cpr-first-aid" className="border border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-lg transition-colors text-sm">Learn More</Link>
-            </div>
-          </div>
-        </div>
-        <div className="relative h-72 sm:h-96 lg:h-auto min-h-[460px] overflow-hidden bg-slate-900 order-1 lg:order-2">
-          <video src="/videos/getting-started-hero.mp4"
-            autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
-        </div>
-      </section>
+
 
       {/* ── FUNDING ── */}
       <div className="bg-brand-red-700 border-t border-brand-red-800 py-14 sm:py-20 px-6">

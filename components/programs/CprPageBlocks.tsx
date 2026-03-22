@@ -6,7 +6,7 @@
  * Rendered below the hero in the CPR page.
  * Uses the shared block system. All content sourced from CPR_FIRST_AID data.
  *
- * HSI: partnerProvider = 'hsi', partnerName = 'Health & Safety Institute'
+ * HSI: partnerProvider = 'hsi', 
  * Images: cpr-mannequin.jpg (real), cpr-training-real.jpg (real)
  * Video: /videos/cpr-training.mp4 — placeholder path, falls back to image
  */
@@ -121,7 +121,7 @@ function SplitBlock() {
 function StatsBand() {
   const stats = [
     { value: '1 Day', label: 'Complete the course', note: 'Morning + afternoon session' },
-    { value: '2 Years', label: 'Certification valid', note: 'AHA standard' },
+    { value: '2 Years', label: 'Certification valid', note: 'industry standard' },
     { value: '$130', label: 'Stand-alone cost', note: 'Free with any Elevate program' },
     { value: '100%', label: 'Remote — no classroom', note: 'Train from anywhere in the U.S.' },
   ];
@@ -164,7 +164,7 @@ function WhatComesWithIt() {
     },
     {
       title: 'Same-Day Certification Card',
-      body: 'Pass the written and practical evaluation and receive your AHA digital certification card the same day. Valid for 2 years.',
+      body: 'Pass the written and practical evaluation and receive your digital certification card the same day. Valid for 2 years.',
       accent: 'border-t-4 border-t-brand-red-600',
     },
   ];
@@ -199,10 +199,10 @@ function HSIBand() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
         <div className="flex-shrink-0 bg-slate-100 border border-slate-200 rounded-lg px-6 py-3">
           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Training Partner</p>
-          <p className="text-base font-extrabold text-slate-900 mt-0.5">Health &amp; Safety Institute</p>
+          <p className="text-base font-extrabold text-slate-900 mt-0.5">our training partner</p>
         </div>
         <p className="text-slate-600 text-sm leading-relaxed text-center sm:text-left">
-          This program is delivered in partnership with <strong>Health &amp; Safety Institute (HSI)</strong>, a nationally recognized provider of CPR, AED, and first aid training. Certifications are issued through the American Heart Association and accepted by healthcare, construction, childcare, and fitness employers nationwide.
+          This program is delivered through a nationally recognized CPR, AED, and first aid training provider. Certifications are accepted by healthcare, construction, childcare, and fitness employers nationwide.
         </p>
       </div>
     </div>
@@ -220,7 +220,7 @@ function FAQAccordion() {
     },
     {
       q: 'What is included with the program?',
-      a: 'Training mannequin, AED trainer device, AHA course materials, live instructor session, written and practical evaluation, and your AHA certification card (digital, same day). A prepaid return label for the mannequin is also included.',
+      a: 'Training mannequin, AED trainer device, course materials, live instructor session, written and practical evaluation, and your digital certification card (same day). A prepaid return label for the mannequin is also included.',
     },
     {
       q: 'Who is this for?',
@@ -232,7 +232,7 @@ function FAQAccordion() {
     },
     {
       q: 'What certification do I receive?',
-      a: 'You receive an AHA BLS for Healthcare Providers card and AHA Heartsaver First Aid card — both valid for 2 years. These are the certifications required by hospitals, clinics, nursing facilities, and most healthcare and safety employers.',
+      a: 'You receive an CPR and First Aid certification card — both valid for 2 years. These are the certifications required by hospitals, clinics, nursing facilities, and most healthcare and safety employers.',
     },
     {
       q: 'Do I have to return the mannequin?',
@@ -278,8 +278,8 @@ function RotatingBanner() {
     'Train from home with real-time instruction',
     'A mannequin is shipped to you for hands-on practice',
     'Complete CPR training without going into a classroom',
-    'Same-day AHA certification card on completion',
-    'Delivered in partnership with Health & Safety Institute',
+    'Same-day certification card on completion',
+    'Delivered through a nationally recognized training provider',
   ];
 
   return (
@@ -313,7 +313,7 @@ function FinalCTA() {
           Start Your CPR Training from Home
         </h2>
         <p className="text-slate-300 text-base mb-8 max-w-xl mx-auto">
-          Get the materials, join live instruction, and complete hands-on CPR training with a clear path to your AHA certification card.
+          Get the materials, join live instruction, and complete hands-on CPR training with a clear path to your certification card.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <Link

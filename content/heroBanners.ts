@@ -96,6 +96,27 @@ export function programBanner(key: string, config: HeroBannerConfig): HeroBanner
 
   if (!/[.?!]$/.test(transcript!.trim())) fail(key, 'transcript must end with sentence punctuation');
 
+  // HSI partner enforcement — CPR/first-aid must name the certifying body
+  const HSI_SLUGS = ['cpr-first-aid', 'emergency-health-safety', 'sanitation-infection-control'];
+  if (HSI_SLUGS.includes(config.pageKey)) {
+    if (!/\bHSI\b/i.test(transcript!)) {
+      fail(key, 'HSI-partner program transcript must reference "HSI" as the certifying body');
+    }
+  }
+
+  // Non-salary programs must signal certification value or compliance requirement
+  const EMPTY_SALARY = ['', 'n/a', 'varies'];
+  if (EMPTY_SALARY.includes(salaryRangeLabel!.toLowerCase())) {
+    if (!/\b(certif|compliance|required|license|credential)\b/i.test(transcript!)) {
+      fail(key, 'non-salary program transcript must include certification, compliance, or licensing language');
+    }
+  }
+
+  // Video/poster pairing — if video is set, poster must be set (no blank frames)
+  if (config.videoSrcDesktop && !config.posterImage) {
+    fail(key, 'videoSrcDesktop requires posterImage to prevent blank frames on load');
+  }
+
   return config;
 }
 
@@ -175,8 +196,6 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'Audit-ready reporting',
       'Role-based data isolation',
     ],
-    transcript:
-      'Elevate operates a multi-tenant workforce hub. Training providers deliver programs. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.',
     analyticsName: 'platform',
   },
 
@@ -198,8 +217,6 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'DOL Registered Apprenticeship',
       'Job Ready Indy (JRI)',
     ],
-    transcript:
-      'Funding should not be confusing. We help eligible participants navigate workforce programs, complete the steps, and move into training without unnecessary friction.',
     analyticsName: 'funding-how-it-works',
   },
 
@@ -220,8 +237,6 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'Clinical rotations included',
       'Job placement assistance',
     ],
-    transcript:
-      'Healthcare training should feel professional from day one. Learn the skills, prepare for certification, and step into patient-facing work with confidence.',
     analyticsName: 'healthcare',
   },
 
@@ -243,27 +258,6 @@ const heroBanners: Record<string, HeroBannerConfig> = {
       'White-label branding included',
       'Launch in two weeks',
     ],
-    transcript:
-      `If your organization manages workforce training, you already know the problem. Enrollment is tracked in spreadsheets. Eligibility paperwork gets emailed back and forth. WIOA reports are assembled by hand every quarter. Credentials are issued late — if at all. Employers call asking for candidate lists you don't have ready.
-
-The Elevate Workforce Operating System was built to replace all of that.
-
-When a student applies, the platform checks eligibility automatically, collects documents, and routes the application through your approval workflow — no paper, no re-keying. When they enroll, attendance is tracked in real time. When they complete a program, their credential is issued automatically and posted to a public verification page employers can check with a single link.
-
-Your WIOA compliance reports generate themselves from enrollment data. PIRL reporting, ITA tracking, quarterly performance metrics — all automated. Your workforce board gets the data they need without your staff spending a week assembling it.
-
-The employer portal gives your hiring partners a live view of pre-screened candidates with verified credentials. They can track apprenticeship hours, manage OJT reimbursement requests, and sign MOUs electronically. WOTC documentation is generated automatically.
-
-You get your own branded instance — your logo, your domain, your colors. Students and employers see your organization. The platform is invisible.
-
-We handle the hosting, security, backups, and updates. Your staff focuses on people, not data entry.
-
-Two licensing options: Managed Platform starting at fifteen hundred dollars per month, or Enterprise Source-Use for organizations that need to deploy on their own infrastructure.
-
-Both start with a 14-day free trial. No credit card required. Full platform access from day one.
-
-Try the live demo — no signup, no time limit. Every screen is clickable. Search students, run reports, review applications, browse candidates. See exactly what your staff and students will use every day.`,
-    analyticsName: 'store',
   },
 
   programs: {
@@ -284,31 +278,6 @@ Try the live demo — no signup, no time limit. Every screen is clickable. Searc
       'ETPL approved training provider',
       'Job placement assistance included',
     ],
-    transcript:
-      `At Elevate for Humanity, we train adults for real jobs — in weeks, not years.
-
-Every program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.
-
-Here is what we offer.
-
-In healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.
-
-In skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.
-
-In technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.
-
-In business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.
-
-We also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts — earn-while-you-learn programs where you work in a licensed shop and get paid from day one.
-
-Most programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.
-
-The process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility — usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.
-
-After you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.
-
-Apply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.`,
-    analyticsName: 'programs',
   },
 
   'skilled-trades': {
@@ -327,8 +296,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
       'Hands-on training',
       'Apprenticeship pathways available',
     ],
-    transcript:
-      'In the trades, confidence comes from repetition, safety, and real equipment. Elevate trains for the field — with hands-on practice, credentials, and a clear route to employment.',
     analyticsName: 'skilled-trades',
   },
 
@@ -363,7 +330,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=cdl-training' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'Starting pay $22–$35/hr', 'Job placement included', 'DOT physical covered'],
-    transcript: 'Get your Class A Commercial Driver\'s License in 3 to 6 weeks. High demand across the country with starting salaries over $50,000. Funding available through WIOA and the Workforce Ready Grant. Start driving at Elevate for Humanity.',
     credentialLabel: 'CDL Class A',
     durationLabel: '3 to 6 weeks',
     salaryRangeLabel: '$22 to $35 per hour',
@@ -383,7 +349,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=electrical' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'OSHA 30 included', 'NCCER credential', '3-Star Indiana Top Job'],
-    transcript: 'Build your foundation in the electrical trades. This 12-week program covers residential and commercial wiring, NEC code, safety, and troubleshooting. WIOA funding available. Begin your electrical career at Elevate for Humanity.',
     credentialLabel: 'NCCER Electrical Technician',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$20 to $32 per hour',
@@ -403,7 +368,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=welding' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'AWS certifications', 'OSHA 30 included', 'Starting pay $54K avg'],
-    transcript: 'Learn MIG, TIG, and stick welding from industry professionals. This 10-week program earns you AWS certifications and OSHA 30. Starting salaries average $54,000. WIOA funding can cover your full tuition. Start your welding career at Elevate for Humanity.',
     credentialLabel: 'AWS Welding Certification',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$18 to $30 per hour',
@@ -423,7 +387,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=plumbing' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'OSHA 10 included', 'NCCER credential', 'Hands-on training'],
-    transcript: 'Install and repair residential and commercial plumbing systems. This 10-week program earns you OSHA 10 and NCCER credentials. WIOA funding available. Start your plumbing career at Elevate for Humanity.',
     credentialLabel: 'NCCER Plumbing Technician',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$18 to $28 per hour',
@@ -443,7 +406,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Express Interest', href: '/apply?program=diesel-mechanic' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'OSHA 10 included', 'ASE exam prep', 'High-demand career'],
-    transcript: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. This 12-week program includes OSHA 10 and ASE exam preparation. WIOA funding available. Start your diesel mechanic career at Elevate for Humanity.',
     credentialLabel: 'ASE Diesel Technician',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$20 to $32 per hour',
@@ -463,7 +425,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=construction-trades-certification' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'OSHA 30 included', 'EPA 608 included', 'Forklift cert included'],
-    transcript: 'Earn OSHA 30, EPA 608, and forklift certifications in 8 weeks. A multi-trade foundation for construction careers. WIOA funding available. Build your construction career at Elevate for Humanity.',
     credentialLabel: 'NCCER Core Curriculum',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$17 to $28 per hour',
@@ -483,7 +444,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=forklift' },
     secondaryCta: { label: 'View Schedule', href: '/contact?program=forklift', variant: 'secondary' },
     trustIndicators: ['OSHA-compliant cert', 'Hands-on equipment', 'WIOA funding available', 'Starting pay $15–$20/hr'],
-    transcript: 'Earn OSHA-compliant forklift operator certification in 1 week. Hands-on training on sit-down, stand-up, and reach truck forklifts. Get certified and job-ready for warehouse and logistics roles at Elevate for Humanity.',
     credentialLabel: 'OSHA Forklift Operator',
     durationLabel: '1 week',
     salaryRangeLabel: '$16 to $22 per hour',
@@ -503,7 +463,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Join Waiting List', href: '/programs/cna#waitlist' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['State certification included', 'WIOA funding available', 'Clinical rotations', 'Job placement assistance'],
-    transcript: 'Become a Certified Nursing Assistant. State certification exam is included. Start a career in healthcare at hospitals, nursing facilities, and clinics. Funding available through WIOA. Apply at Elevate for Humanity.',
     credentialLabel: 'Indiana CNA Certification',
     durationLabel: '6 weeks',
     salaryRangeLabel: '$15 to $22 per hour',
@@ -523,7 +482,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=medical-assistant' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'CCMA exam prep', '14% job growth', 'Clinical rotations included'],
-    transcript: 'Launch your healthcare career as a Medical Assistant. Learn clinical procedures, patient care, and administrative skills. Prepare for the CCMA certification exam in 12 weeks. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'Certified Medical Assistant',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$16 to $24 per hour',
@@ -543,7 +501,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=pharmacy-technician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'PTCB exam prep', 'Next Level Jobs accepted', 'Payment plans available'],
-    transcript: 'Prepare for the PTCB Certified Pharmacy Technician exam in 10 weeks. Learn medication dispensing, pharmacy law, sterile compounding, and inventory management. Free with WIOA funding. Apply at Elevate for Humanity.',
     credentialLabel: 'PTCB Pharmacy Technician',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$15 to $22 per hour',
@@ -563,7 +520,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=phlebotomy' },
     secondaryCta: { label: 'Payment Plans', href: '/contact?program=phlebotomy', variant: 'secondary' },
     trustIndicators: ['NHA CPT exam prep', 'Clinical training included', 'Flexible payment plans', 'Starting pay $16–$22/hr'],
-    transcript: 'Complete 120 hours of classroom and clinical training in 4 weeks. Prepare for the NHA Certified Phlebotomy Technician exam and enter healthcare within a month. Flexible payment plans available. Apply at Elevate for Humanity.',
     credentialLabel: 'NPA Phlebotomy Technician',
     durationLabel: '6 weeks',
     salaryRangeLabel: '$15 to $20 per hour',
@@ -583,7 +539,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=home-health-aide' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'CCHW & HHA certifications', 'ETPL approved', 'Job placement assistance'],
-    transcript: 'Become a certified Home Health Aide in 4 weeks. Earn CCHW and HHA certifications for in-home care careers. Free with WIOA or Workforce Ready Grant. Apply at Elevate for Humanity.',
     credentialLabel: 'Indiana HHA Certification',
     durationLabel: '4 weeks',
     salaryRangeLabel: '$14 to $19 per hour',
@@ -602,13 +557,12 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     belowHeroSubheadline: 'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications for healthcare and public safety careers. Free with WIOA or Workforce Ready Grant.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=emergency-health-safety' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
-    trustIndicators: ['Free with WIOA funding', 'EMR certification', 'OSHA 10 included', 'ETPL approved'],
-    transcript: 'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications in 4 weeks. Prepare for healthcare and public safety careers. Free with WIOA or Workforce Ready Grant. Apply at Elevate for Humanity.',
+    trustIndicators: ['HSI certified', 'OSHA 10 included', 'WIOA eligible', 'ETPL approved'],
     credentialLabel: 'Emergency Health Safety Certificate',
     durationLabel: '2 weeks',
     salaryRangeLabel: '$15 to $22 per hour',
     transcript:
-      'Train for Emergency Health Safety Certificate in 2 weeks, building practical skills in first aid response, AED operation, and emergency protocols. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+      'Train for Emergency Health Safety Certificate in 2 weeks through HSI-certified instruction, building practical skills in first aid response, AED operation, and emergency protocols. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
     analyticsName: 'emergency-health-safety',
   }),
 
@@ -623,12 +577,11 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Enroll Now', href: '/apply?program=cpr-first-aid' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=cpr-first-aid', variant: 'secondary' },
     trustIndicators: ['HSI certified', 'Mannequin included', 'Live instructor', 'Included free with Elevate programs'],
-    transcript: 'Get CPR and First Aid certified in one day. HSI-certified training that teaches life-saving skills for the workplace and everyday emergencies. Required for healthcare, education, and many licensed professions. Schedule your class at Elevate for Humanity.',
     credentialLabel: 'CPR/AED Certification',
     durationLabel: '1 day',
     salaryRangeLabel: '$15 to $22 per hour',
     transcript:
-      'Earn CPR/AED Certification in 1 day, building practical skills in chest compressions, rescue breathing, and AED operation. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+      'Earn CPR/AED Certification in 1 day through HSI-certified instruction, building practical skills in chest compressions, rescue breathing, and AED operation. Required for healthcare, education, and many licensed professions. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
     analyticsName: 'cpr-first-aid',
   }),
 
@@ -642,13 +595,12 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     belowHeroSubheadline: 'ServSafe and infection control certifications for healthcare, food service, and personal services. Included free with Elevate training programs.',
     primaryCta: { label: 'Apply Now', href: '/apply?program=sanitation-infection-control' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=sanitation-infection-control', variant: 'secondary' },
-    trustIndicators: ['ServSafe certification', 'Infection control cert', 'Included with programs', '$400 self-pay'],
-    transcript: 'Prepare for infection control and ServSafe certifications in 2 weeks. Required for healthcare, food service, and personal services careers. Included free with Elevate training programs. Apply at Elevate for Humanity.',
+    trustIndicators: ['HSI certified', 'ServSafe included', 'Required for healthcare', 'Included with programs'],
     credentialLabel: 'Infection Control Certificate',
     durationLabel: '2 weeks',
     salaryRangeLabel: '$15 to $22 per hour',
     transcript:
-      'Earn Infection Control Certificate in 2 weeks, building practical skills in PPE protocols, surface disinfection, and outbreak prevention. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
+      'Earn Infection Control Certificate in 2 weeks through HSI-certified instruction, building practical skills in PPE protocols, surface disinfection, and outbreak prevention. Required for healthcare, food service, and personal services compliance. Related entry-level opportunities commonly fall in the $15 to $22 per hour range depending on employer, experience, and local market.',
     analyticsName: 'sanitation-infection-control',
   }),
 
@@ -663,7 +615,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
     secondaryCta: { label: 'Find a Host Shop', href: '/programs/barber-apprenticeship/host-shops', variant: 'secondary' },
     trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Barber License', 'Rise Up certification'],
-    transcript: 'Earn while you learn. The Barber Apprenticeship is a 15-month, 2,000-hour program where you train in a licensed barbershop under a master barber. Earn your Indiana Barber License, Rise Up certification, and CPR credential. Apply today at Elevate for Humanity.',
     credentialLabel: 'Indiana Barber License',
     durationLabel: '2 years',
     salaryRangeLabel: '$18 to $40 per hour',
@@ -683,7 +634,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=cosmetology-apprenticeship', variant: 'secondary' },
     trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Cosmetology License', 'Salon-based training'],
-    transcript: 'Get paid while you train to become a licensed cosmetologist. This 18-month apprenticeship includes hands-on salon training with a licensed professional. Earn your Indiana Cosmetology License. Apply at Elevate for Humanity.',
     credentialLabel: 'Indiana Cosmetology License',
     durationLabel: '2 years',
     salaryRangeLabel: '$16 to $38 per hour',
@@ -703,7 +653,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=nail-technician-apprenticeship' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=nail-technician-apprenticeship', variant: 'secondary' },
     trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'Indiana Nail Tech License', '600 hours training'],
-    transcript: 'Learn manicure, pedicure, acrylics, and gel nails through a hands-on apprenticeship. Earn your Indiana Nail Technician License while getting paid to train. Apply at Elevate for Humanity.',
     credentialLabel: 'Indiana Nail Technician License',
     durationLabel: '1 year',
     salaryRangeLabel: '$14 to $30 per hour',
@@ -723,7 +672,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=culinary-apprenticeship' },
     secondaryCta: { label: 'Learn More', href: '/contact?program=culinary-apprenticeship', variant: 'secondary' },
     trustIndicators: ['DOL Registered Apprenticeship', 'Earn while you train', 'ServSafe certification', 'Professional kitchen training'],
-    transcript: 'Earn ServSafe certification and culinary skills through a registered apprenticeship. Hands-on training in a professional kitchen. Earn wages from day one. Apply at Elevate for Humanity.',
     credentialLabel: 'Culinary Arts Certificate',
     durationLabel: '2 years',
     salaryRangeLabel: '$15 to $28 per hour',
@@ -743,7 +691,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=esthetician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'ETPL approved', 'Workforce Ready Grant eligible', 'Business startup included'],
-    transcript: 'Complete a 5-week accelerated esthetician certificate. Learn skin analysis, facial treatments, hair removal, and business startup skills. Free with WIOA or Workforce Ready Grant. Apply at Elevate for Humanity.',
     credentialLabel: 'Indiana Esthetician License',
     durationLabel: '1 year',
     salaryRangeLabel: '$14 to $32 per hour',
@@ -763,7 +710,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=beauty-career-educator' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'ETPL approved', 'Entrepreneurship included', 'Workforce readiness'],
-    transcript: 'A 12-week hybrid program combining salon services, peer teaching, entrepreneurship, and workforce readiness. Free with WIOA or Workforce Ready Grant. Apply at Elevate for Humanity.',
     credentialLabel: 'Cosmetology Instructor License',
     durationLabel: '1 year',
     salaryRangeLabel: '$18 to $35 per hour',
@@ -800,7 +746,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=it-help-desk' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'CompTIA A+ prep', '4-Star Indiana Top Job', 'Starting pay $18–$26/hr'],
-    transcript: 'Troubleshoot hardware, software, and networks. Prepare for CompTIA A+ in 8 weeks and launch your IT career. A 4-Star Indiana Top Job. WIOA funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'CompTIA A+',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$18 to $28 per hour',
@@ -820,7 +765,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=cybersecurity-analyst' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'CompTIA Security+ prep', '5-Star Indiana Top Job', 'Starting pay $25–$40/hr'],
-    transcript: 'Protect networks and data from cyber threats. Prepare for CompTIA Security+ in 12 weeks. A 5-Star Indiana Top Job with starting salaries up to $40 per hour. WIOA funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'CompTIA Security+',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$45,000 to $75,000',
@@ -840,7 +784,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=network-administration' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'CompTIA Network+ prep', 'Next Level Jobs accepted', 'Hands-on lab training'],
-    transcript: 'Prepare for CompTIA Network+ certification in 10 weeks. Learn network design, configuration, and troubleshooting. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'CompTIA Network+',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$20 to $35 per hour',
@@ -860,7 +803,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=network-support-technician' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'IT Specialist certification', 'Next Level Jobs accepted', 'Entry-level friendly'],
-    transcript: 'Prepare for IT Specialist certification in networking in 6 weeks. Entry-level network support and help desk skills. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'CompTIA Network+',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$18 to $30 per hour',
@@ -880,7 +822,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=software-development' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'IT Specialist certifications', 'Python & databases', 'Next Level Jobs accepted'],
-    transcript: 'Learn Python, databases, and software engineering fundamentals in 12 weeks. Prepare for IT Specialist certifications. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'Software Development Certificate',
     durationLabel: '16 weeks',
     salaryRangeLabel: '$45,000 to $80,000',
@@ -900,7 +841,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=web-development' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'Meta Front-End cert', 'WordPress certification', 'Next Level Jobs accepted'],
-    transcript: 'Learn HTML, CSS, JavaScript, and WordPress in 12 weeks. Prepare for Meta Front-End Developer and WordPress certifications. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'Web Development Certificate',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$40,000 to $70,000',
@@ -920,7 +860,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=graphic-design' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'Adobe Certified Professional', 'Photoshop, Illustrator, InDesign', 'Next Level Jobs accepted'],
-    transcript: 'Learn Adobe Photoshop, Illustrator, and InDesign in 10 weeks. Prepare for Adobe Certified Professional credentials. WIOA funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'Graphic Design Certificate',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$35,000 to $60,000',
@@ -940,7 +879,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=cad-drafting' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'Autodesk Certified User', 'AutoCAD & Revit', 'Next Level Jobs accepted'],
-    transcript: 'Learn AutoCAD and Revit for architectural and mechanical drafting in 10 weeks. Prepare for Autodesk Certified User credentials. WIOA funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'AutoCAD Certification',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$18 to $30 per hour',
@@ -962,7 +900,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=tax-preparation' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'IRS PTIN credential', 'Real tax software', 'Next Level Jobs accepted'],
-    transcript: 'Earn your IRS PTIN and learn individual and small business tax preparation in 8 weeks. Real tax software training. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'IRS AFSP Certificate',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$15 to $30 per hour',
@@ -982,7 +919,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=bookkeeping' },
     secondaryCta: { label: 'Payment Plans', href: '/contact?program=bookkeeping', variant: 'secondary' },
     trustIndicators: ['QuickBooks Certified User', 'Small business accounting', 'Flexible payment plans', '5-week program'],
-    transcript: 'Master small business accounting and prepare for the QuickBooks Certified User exam in 5 weeks. Flexible payment plans available. Apply at Elevate for Humanity.',
     credentialLabel: 'QuickBooks ProAdvisor',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$18 to $28 per hour',
@@ -1002,7 +938,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=office-administration' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'Microsoft Office Specialist', 'Business communication', 'Next Level Jobs accepted'],
-    transcript: 'Master Microsoft Office and business communication in 6 weeks. Prepare for Microsoft Office Specialist certifications. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'Microsoft Office Specialist',
     durationLabel: '6 weeks',
     salaryRangeLabel: '$16 to $24 per hour',
@@ -1022,7 +957,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=entrepreneurship' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'Certiport ESB certification', 'Evening schedule', 'Mentorship included'],
-    transcript: 'Launch or grow your business in 6 weeks. Business planning, marketing, financial management, and Certiport ESB certification. Evening program. Free with WIOA or grant funding. Apply at Elevate for Humanity.',
     credentialLabel: 'Business Launch Certificate',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$0 to $100,000+',
@@ -1042,7 +976,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=business-administration' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'Certiport certifications', 'Microsoft Office included', 'Next Level Jobs accepted'],
-    transcript: 'Prepare for Certiport business certifications in 8 weeks. Microsoft Office, QuickBooks, and business fundamentals. WIOA and Next Level Jobs funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'Business Administration Certificate',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$18 to $28 per hour',
@@ -1062,7 +995,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=project-management' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['Free with WIOA funding', 'Certiport PM certification', 'Agile & Scrum', 'Next Level Jobs accepted'],
-    transcript: 'Prepare for Certiport Project Management certification in 6 weeks. Agile, Scrum, and traditional PM methodologies. Free with WIOA or Next Level Jobs funding. Apply at Elevate for Humanity.',
     credentialLabel: 'CAPM Certification',
     durationLabel: '10 weeks',
     salaryRangeLabel: '$45,000 to $75,000',
@@ -1082,7 +1014,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=finance-bookkeeping-accounting' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'IRS PTIN credential', 'QuickBooks Certified User', 'Enrolled Agent prep'],
-    transcript: 'A tiered credential pathway in tax preparation, bookkeeping, payroll, and accounting. Earn your IRS PTIN, QuickBooks Certified User, and prepare for the Enrolled Agent exam. Funded for eligible participants. Apply at Elevate for Humanity.',
     credentialLabel: 'Accounting Technician Certificate',
     durationLabel: '12 weeks',
     salaryRangeLabel: '$18 to $30 per hour',
@@ -1104,7 +1035,6 @@ Apply online in minutes. No cost to apply. No obligation. Just the first step to
     primaryCta: { label: 'Apply Now', href: '/apply?program=peer-recovery-specialist' },
     secondaryCta: { label: 'Check Funding', href: '/start', variant: 'secondary' },
     trustIndicators: ['WIOA funding available', 'Indiana CPRS credential', 'JRI funding eligible', 'Job placement assistance'],
-    transcript: 'Become a Certified Peer Recovery Specialist. Support individuals in recovery and behavioral health programs. Indiana CPRS training with WIOA funding available. Apply at Elevate for Humanity.',
     credentialLabel: 'CPRS Certification',
     durationLabel: '8 weeks',
     salaryRangeLabel: '$16 to $24 per hour',

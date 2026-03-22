@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { AdminInstallPrompt } from '@/components/pwa/AdminInstallPrompt';
 
 async function getAdminDashboardData() {
   const supabase = createAdminClient();
@@ -79,6 +80,9 @@ export default async function AdminPWAPage() {
           <Link href="/admin/users" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
             Manage Users →
           </Link>
+          <Link href="/admin/courses" className="bg-purple-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-purple-700 col-span-2">
+            Course Management →
+          </Link>
         </div>
       </div>
 
@@ -122,5 +126,6 @@ export default async function AdminPWAPage() {
         </div>
       </div>
     </div>
+    <AdminInstallPrompt />
   );
 }

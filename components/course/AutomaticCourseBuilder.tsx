@@ -171,17 +171,19 @@ export default function AutomaticCourseBuilder() {
 
       if (!saveResponse.ok) {
         const err = await saveResponse.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to save course');
+        throw new Error(err.error || `Course creation failed: ${saveResponse.status}`);
       }
-      const savedCourse = await saveResponse.json();
+      const data = await saveResponse.json();
+      const courseId = data?.id ?? data?.course?.id ?? data?.courseId;
+      if (!courseId) throw new Error('Course created but no course id returned');
 
       setProgress(100);
       setCurrentStep('Course created successfully!');
       setShowPreview(true);
 
-      // Redirect to course editor after 2 seconds
+      // Redirect to course editor — never the store
       setTimeout(() => {
-        router.push(`/admin/courses/${savedCourse.id}/edit`);
+        router.push(`/admin/lms/courses/${courseId}`);
       }, 2000);
 
     } catch (error) { /* Error handled silently */ 

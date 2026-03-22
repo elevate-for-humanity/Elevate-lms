@@ -215,7 +215,7 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body
-        className={`${inter.className} min-h-dvh bg-white antialiased`}
+        className={`min-h-dvh bg-white antialiased`}
         style={{
           fontSize: '17px',
           backgroundColor: '#ffffff',

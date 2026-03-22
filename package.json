@@ -214,6 +214,8 @@
     "seo:check": "node scripts/ci/seo-check.mjs",
     "seo:validate": "node scripts/ci/seo-validation.ts",
     "audit:programs": "tsx scripts/audit-program-pages.ts",
+    "audit:hero-banners": "tsx scripts/audit-hero-banners.ts",
+    "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",
     "smoke": "next build && node -e \"require('fs').access('.next', err => { if (err) process.exit(1); else console.log('✅ Build OK'); })\"",
     "clean:full": "rimraf node_modules dist .vite .turbo .next out && pnpm store prune",

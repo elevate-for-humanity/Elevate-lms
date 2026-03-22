@@ -307,6 +307,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
               <div className="space-y-1.5">
                 {[
                   {l:'HVAC Activation',h:'/admin/hvac-activation',i:Zap,badge:'NEW'},
+                  {l:'Course Management',h:'/admin/courses',i:BookOpen,badge:''},
                   {l:'Course Builder',h:'/admin/course-builder',i:BookOpen},
                   {l:'Reports',h:'/admin/reporting',i:BarChart3},
                   {l:'Compliance',h:'/admin/compliance',i:Shield},

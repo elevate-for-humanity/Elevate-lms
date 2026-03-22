@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardClient from './DashboardClient';
+import { BuiltCoursesPanel } from './BuiltCoursesPanel';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -146,8 +147,10 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      {/* Hero Image */}
       <DashboardClient data={data} />
+      <div className="max-w-7xl mx-auto px-4 pb-8">
+        <BuiltCoursesPanel />
+      </div>
     </>
   );
 }

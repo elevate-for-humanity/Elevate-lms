@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { requireAdmin } from '@/lib/auth';
 import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 import { OfflineIndicator } from '@/components/pwa/OfflineIndicator';
@@ -22,7 +23,9 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function AdminPWALayout({ children }: { children: React.ReactNode }) {
+export default async function AdminPWALayout({ children }: { children: React.ReactNode }) {
+  await requireAdmin();
+
   return (
     <>
       <ServiceWorkerRegistration />

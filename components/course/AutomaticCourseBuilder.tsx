@@ -1,11 +1,33 @@
 "use client";
 
 import { createClient } from '@/lib/supabase/client';
-
+import { z } from 'zod';
 import React from 'react';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+const CourseIdSchema = z.string().uuid();
+
+function resolveCourseId(data: unknown): string {
+  const candidates = [
+    { path: 'data.id',        value: (data as Record<string, unknown>)?.id },
+    { path: 'data.course.id', value: (data as Record<string, Record<string, unknown>>)?.course?.id },
+    { path: 'data.courseId',  value: (data as Record<string, unknown>)?.courseId },
+  ];
+
+  for (const c of candidates) {
+    if (c.value) {
+      const result = CourseIdSchema.safeParse(c.value);
+      if (result.success) {
+        console.info('[course:create] resolved id', { id: result.data, source: c.path });
+        return result.data;
+      }
+    }
+  }
+
+  console.error('[course:create] FAILED — no valid UUID in response', data);
+  throw new Error('Course creation failed: no valid UUID returned');
+}
 
 interface CourseOutline {
   title: string;
@@ -174,8 +196,7 @@ export default function AutomaticCourseBuilder() {
         throw new Error(err.error || `Course creation failed: ${saveResponse.status}`);
       }
       const data = await saveResponse.json();
-      const courseId = data?.id ?? data?.course?.id ?? data?.courseId;
-      if (!courseId) throw new Error('Course created but no course id returned');
+      const courseId = resolveCourseId(data);
 
       setProgress(100);
       setCurrentStep('Course created successfully!');

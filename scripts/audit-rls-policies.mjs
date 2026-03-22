@@ -38,7 +38,7 @@ async function auditRLS() {
       const rowCount = count || 0;
 
       // Try to query without auth (should fail if RLS is working)
-      const publicClient = createClient(supabaseUrl, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNjEwNDcsImV4cCI6MjA3MzczNzA0N30.placeholder');
+      const publicClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
       const { data: publicData, error: publicError } = await publicClient
         .from(table)

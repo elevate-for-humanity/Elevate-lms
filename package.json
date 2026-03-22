@@ -215,6 +215,7 @@
     "seo:validate": "node scripts/ci/seo-validation.ts",
     "audit:programs": "tsx scripts/audit-program-pages.ts",
     "audit:hero-banners": "tsx scripts/audit-hero-banners.ts",
+    "verify:system": "tsx scripts/verify-system.ts",
     "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",
     "smoke": "next build && node -e \"require('fs').access('.next', err => { if (err) process.exit(1); else console.log('✅ Build OK'); })\"",

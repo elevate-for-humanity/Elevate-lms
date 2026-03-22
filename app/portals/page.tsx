@@ -38,7 +38,7 @@ const portals = [
     title: 'Student Portal',
     description:
       'Access your courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
-    href: '/student-portal',
+    href: '/learner/dashboard',
     color: 'blue',
     features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule Management'],
   },
@@ -47,7 +47,7 @@ const portals = [
     title: 'Employer Portal',
     description:
       'Manage your apprentices, track their training progress, access compliance documents, and connect with program coordinators.',
-    href: '/employer-portal',
+    href: '/employer/dashboard',
     color: 'green',
     features: ['Apprentice Management', 'Training Progress', 'Compliance Documents', 'Hiring Tools'],
   },
@@ -206,14 +206,14 @@ export default function PortalsPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <Link
-              href="/login?redirect=/student-portal/dashboard"
+              href="/login?redirect=/learner/dashboard"
               className="flex items-center justify-center gap-3 px-6 py-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors"
             >
               <GraduationCap className="w-6 h-6 text-brand-blue-400" />
               <span className="font-semibold">Student Sign In</span>
             </Link>
             <Link
-              href="/login?redirect=/employer-portal/dashboard"
+              href="/login?redirect=/employer/dashboard"
               className="flex items-center justify-center gap-3 px-6 py-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors"
             >
               <Building2 className="w-6 h-6 text-brand-green-400" />

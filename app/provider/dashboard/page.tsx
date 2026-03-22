@@ -15,11 +15,15 @@ export default async function ProviderDashboardPage() {
 
   const { data: profile } = await db
     .from('profiles')
-    .select('tenant_id, full_name')
+    .select('tenant_id, full_name, role')
     .eq('id', user.id)
     .single();
 
-  if (!profile?.tenant_id) redirect('/unauthorized');
+  if (!profile) redirect('/unauthorized');
+  if (!['provider_admin', 'admin', 'super_admin', 'staff'].includes(profile.role ?? '')) {
+    redirect('/unauthorized');
+  }
+  if (!profile.tenant_id) redirect('/unauthorized');
 
   const tenantId = profile.tenant_id;
 

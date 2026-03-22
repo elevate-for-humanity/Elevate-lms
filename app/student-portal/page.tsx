@@ -1,4 +1,5 @@
-
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -32,7 +33,7 @@ import AnnouncementsFeed from './AnnouncementsFeed';
 import EnrollmentDashboard from './EnrollmentDashboard';
 import StudentProgressWidget from './StudentProgressWidget';
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
@@ -44,7 +45,11 @@ export const metadata: Metadata = {
   keywords: ['student portal', 'student dashboard', 'course access', 'grades', 'schedule', 'career services', 'student resources'],
 };
 
-export default function StudentPortalPage() {
+export default async function StudentPortalPage() {
+  // Authenticated users go directly to the canonical learner dashboard
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect('/learner/dashboard');
 
   const quickLinks = [
     {

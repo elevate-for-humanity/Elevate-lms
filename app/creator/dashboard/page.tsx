@@ -22,9 +22,17 @@ export default async function CreatorDashboardPage() {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/creator/dashboard');
 
-  if (!user) {
-    redirect('/login?redirect=/creator/dashboard');
+  // Role guard — creator, admin, super_admin only
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || !['creator', 'admin', 'super_admin'].includes(profile.role)) {
+    redirect('/unauthorized');
   }
 
   // Fetch courses created by this user

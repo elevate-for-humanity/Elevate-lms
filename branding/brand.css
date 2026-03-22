@@ -26,8 +26,8 @@
 
   /* Typography */
   --efh-font-sans:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --efh-font-display: 'Inter', sans-serif;
+    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --efh-font-display: var(--font-inter), sans-serif;
 
   /* Spacing Scale */
   --efh-space-xs: 0.25rem;

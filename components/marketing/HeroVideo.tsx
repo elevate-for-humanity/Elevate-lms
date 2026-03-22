@@ -93,6 +93,38 @@ export default function HeroVideo({
     audio.load();
   }, []);
 
+  // Auto-play voiceover when hero scrolls into view (≥50% visible)
+  // Respects prefers-reduced-motion — stays muted if user has motion preference off
+  useEffect(() => {
+    const audio = audioRef.current;
+    const wrapper = wrapperRef.current;
+    if (!audio || !wrapper) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    let played = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !played) {
+          played = true;
+          setMuted(false);
+          audio.currentTime = 0;
+          audio.play().catch(() => setMuted(true));
+        } else if (!entry.isIntersecting && played) {
+          audio.pause();
+          setMuted(true);
+          played = false;
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, [mounted]);
+
   // Voiceover audio toggle — only controls the separate audio track, not the video
   function toggleMute() {
     const audio = audioRef.current;

@@ -80,19 +80,20 @@ const heroBanners: Record<string, HeroBannerConfig> = {
     posterImage: '/images/pages/platform-page-1.jpg',
     videoSrcDesktop: '/videos/elevate-overview-with-narration.mp4',
     voiceoverSrc: '/audio/heroes/programs.mp3',
-    microLabel: 'Workforce Infrastructure',
-    belowHeroHeadline: 'Workforce infrastructure, not just a website.',
+    microLabel: 'Multi-Tenant Hub',
+    belowHeroHeadline: 'Workforce infrastructure for providers, agencies, and employers.',
     belowHeroSubheadline:
-      'A coordinated hub for training delivery, credential pathways, and employer connection.',
+      'One coordinated system for training delivery, credential pathways, compliance reporting, and employer placement.',
     primaryCta: { label: 'Schedule a Demo', href: '/contact' },
     secondaryCta: { label: 'Licensing Options', href: '/store/licensing', variant: 'secondary' },
     trustIndicators: [
       'Multi-tenant architecture',
       'WIOA & DOL compliant',
       'Audit-ready reporting',
+      'Role-based data isolation',
     ],
     transcript:
-      'This platform connects providers, credential pathways, employers, and workforce agencies through one coordinated infrastructure. The goal is simple: verified training, cleaner operations, and better outcomes.',
+      'Elevate operates a multi-tenant workforce hub. Training providers deliver programs. Credential authorities issue certifications. Employers access a verified graduate pipeline. Workforce agencies run compliance reports. All roles operate from one coordinated system with isolated data and role-based access.',
     analyticsName: 'platform',
   },
 

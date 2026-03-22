@@ -24,7 +24,7 @@ const storageKey = (lessonId: string | number, userId?: string) =>
   userId ? `video_resume_${userId}_${lessonId}` : `video_resume_${lessonId}`;
 
 /**
- * Attaches progress tracking to a <video> element.
+ * Attaches progress tracking to a video element via ref.
  *
  * - Restores playback position from localStorage on mount.
  * - Saves position every `saveIntervalSeconds` and on unmount.
